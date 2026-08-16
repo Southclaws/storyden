@@ -525,6 +525,18 @@ func (f RobotSessionMessageFunc) Mutate(ctx context.Context, m ent.Mutation) (en
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RobotSessionMessageMutation", m)
 }
 
+// The RobotSessionTurnFunc type is an adapter to allow the use of ordinary
+// function as RobotSessionTurn mutator.
+type RobotSessionTurnFunc func(context.Context, *ent.RobotSessionTurnMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RobotSessionTurnFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RobotSessionTurnMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RobotSessionTurnMutation", m)
+}
+
 // The RobotSessionViewFunc type is an adapter to allow the use of ordinary
 // function as RobotSessionView mutator.
 type RobotSessionViewFunc func(context.Context, *ent.RobotSessionViewMutation) (ent.Value, error)

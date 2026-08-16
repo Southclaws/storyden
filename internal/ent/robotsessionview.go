@@ -30,6 +30,10 @@ type RobotSessionView struct {
 	AccountID xid.ID `json:"account_id,omitempty"`
 	// LastAccessedAt holds the value of the "last_accessed_at" field.
 	LastAccessedAt time.Time `json:"last_accessed_at,omitempty"`
+	// Turn this account should resume after loading session history.
+	ResumeTurnID *xid.ID `json:"resume_turn_id,omitempty"`
+	// Last session event the member has acknowledged.
+	LastSeenEventSequence uint64 `json:"last_seen_event_sequence,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RobotSessionViewQuery when eager-loading is set.
 	Edges        RobotSessionViewEdges `json:"edges"`
@@ -74,6 +78,10 @@ func (*RobotSessionView) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case robotsessionview.FieldResumeTurnID:
+			values[i] = &sql.NullScanner{S: new(xid.ID)}
+		case robotsessionview.FieldLastSeenEventSequence:
+			values[i] = new(sql.NullInt64)
 		case robotsessionview.FieldCreatedAt, robotsessionview.FieldUpdatedAt, robotsessionview.FieldLastAccessedAt:
 			values[i] = new(sql.NullTime)
 		case robotsessionview.FieldID, robotsessionview.FieldSessionID, robotsessionview.FieldAccountID:
@@ -128,6 +136,19 @@ func (_m *RobotSessionView) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field last_accessed_at", values[i])
 			} else if value.Valid {
 				_m.LastAccessedAt = value.Time
+			}
+		case robotsessionview.FieldResumeTurnID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field resume_turn_id", values[i])
+			} else if value.Valid {
+				_m.ResumeTurnID = new(xid.ID)
+				*_m.ResumeTurnID = *value.S.(*xid.ID)
+			}
+		case robotsessionview.FieldLastSeenEventSequence:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field last_seen_event_sequence", values[i])
+			} else if value.Valid {
+				_m.LastSeenEventSequence = uint64(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -189,6 +210,14 @@ func (_m *RobotSessionView) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("last_accessed_at=")
 	builder.WriteString(_m.LastAccessedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	if v := _m.ResumeTurnID; v != nil {
+		builder.WriteString("resume_turn_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	builder.WriteString("last_seen_event_sequence=")
+	builder.WriteString(fmt.Sprintf("%v", _m.LastSeenEventSequence))
 	builder.WriteByte(')')
 	return builder.String()
 }

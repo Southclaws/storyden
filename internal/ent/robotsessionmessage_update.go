@@ -47,6 +47,61 @@ func (_u *RobotSessionMessageUpdate) SetNillableSessionID(v *xid.ID) *RobotSessi
 	return _u
 }
 
+// SetTurnID sets the "turn_id" field.
+func (_u *RobotSessionMessageUpdate) SetTurnID(v xid.ID) *RobotSessionMessageUpdate {
+	_u.mutation.SetTurnID(v)
+	return _u
+}
+
+// SetNillableTurnID sets the "turn_id" field if the given value is not nil.
+func (_u *RobotSessionMessageUpdate) SetNillableTurnID(v *xid.ID) *RobotSessionMessageUpdate {
+	if v != nil {
+		_u.SetTurnID(*v)
+	}
+	return _u
+}
+
+// ClearTurnID clears the value of the "turn_id" field.
+func (_u *RobotSessionMessageUpdate) ClearTurnID() *RobotSessionMessageUpdate {
+	_u.mutation.ClearTurnID()
+	return _u
+}
+
+// SetSequence sets the "sequence" field.
+func (_u *RobotSessionMessageUpdate) SetSequence(v uint64) *RobotSessionMessageUpdate {
+	_u.mutation.ResetSequence()
+	_u.mutation.SetSequence(v)
+	return _u
+}
+
+// SetNillableSequence sets the "sequence" field if the given value is not nil.
+func (_u *RobotSessionMessageUpdate) SetNillableSequence(v *uint64) *RobotSessionMessageUpdate {
+	if v != nil {
+		_u.SetSequence(*v)
+	}
+	return _u
+}
+
+// AddSequence adds value to the "sequence" field.
+func (_u *RobotSessionMessageUpdate) AddSequence(v int64) *RobotSessionMessageUpdate {
+	_u.mutation.AddSequence(v)
+	return _u
+}
+
+// SetEventKind sets the "event_kind" field.
+func (_u *RobotSessionMessageUpdate) SetEventKind(v robotsessionmessage.EventKind) *RobotSessionMessageUpdate {
+	_u.mutation.SetEventKind(v)
+	return _u
+}
+
+// SetNillableEventKind sets the "event_kind" field if the given value is not nil.
+func (_u *RobotSessionMessageUpdate) SetNillableEventKind(v *robotsessionmessage.EventKind) *RobotSessionMessageUpdate {
+	if v != nil {
+		_u.SetEventKind(*v)
+	}
+	return _u
+}
+
 // SetInvocationID sets the "invocation_id" field.
 func (_u *RobotSessionMessageUpdate) SetInvocationID(v string) *RobotSessionMessageUpdate {
 	_u.mutation.SetInvocationID(v)
@@ -58,6 +113,12 @@ func (_u *RobotSessionMessageUpdate) SetNillableInvocationID(v *string) *RobotSe
 	if v != nil {
 		_u.SetInvocationID(*v)
 	}
+	return _u
+}
+
+// ClearInvocationID clears the value of the "invocation_id" field.
+func (_u *RobotSessionMessageUpdate) ClearInvocationID() *RobotSessionMessageUpdate {
+	_u.mutation.ClearInvocationID()
 	return _u
 }
 
@@ -175,6 +236,32 @@ func (_u *RobotSessionMessageUpdate) SetNillableEventData(v *schema.RobotSession
 	return _u
 }
 
+// ClearEventData clears the value of the "event_data" field.
+func (_u *RobotSessionMessageUpdate) ClearEventData() *RobotSessionMessageUpdate {
+	_u.mutation.ClearEventData()
+	return _u
+}
+
+// SetErrorText sets the "error_text" field.
+func (_u *RobotSessionMessageUpdate) SetErrorText(v string) *RobotSessionMessageUpdate {
+	_u.mutation.SetErrorText(v)
+	return _u
+}
+
+// SetNillableErrorText sets the "error_text" field if the given value is not nil.
+func (_u *RobotSessionMessageUpdate) SetNillableErrorText(v *string) *RobotSessionMessageUpdate {
+	if v != nil {
+		_u.SetErrorText(*v)
+	}
+	return _u
+}
+
+// ClearErrorText clears the value of the "error_text" field.
+func (_u *RobotSessionMessageUpdate) ClearErrorText() *RobotSessionMessageUpdate {
+	_u.mutation.ClearErrorText()
+	return _u
+}
+
 // SetSession sets the "session" edge to the RobotSession entity.
 func (_u *RobotSessionMessageUpdate) SetSession(v *RobotSession) *RobotSessionMessageUpdate {
 	return _u.SetSessionID(v.ID)
@@ -256,6 +343,11 @@ func (_u *RobotSessionMessageUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *RobotSessionMessageUpdate) check() error {
+	if v, ok := _u.mutation.EventKind(); ok {
+		if err := robotsessionmessage.EventKindValidator(v); err != nil {
+			return &ValidationError{Name: "event_kind", err: fmt.Errorf(`ent: validator failed for field "RobotSessionMessage.event_kind": %w`, err)}
+		}
+	}
 	if _u.mutation.SessionCleared() && len(_u.mutation.SessionIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "RobotSessionMessage.session"`)
 	}
@@ -280,8 +372,26 @@ func (_u *RobotSessionMessageUpdate) sqlSave(ctx context.Context) (_node int, er
 			}
 		}
 	}
+	if value, ok := _u.mutation.TurnID(); ok {
+		_spec.SetField(robotsessionmessage.FieldTurnID, field.TypeString, value)
+	}
+	if _u.mutation.TurnIDCleared() {
+		_spec.ClearField(robotsessionmessage.FieldTurnID, field.TypeString)
+	}
+	if value, ok := _u.mutation.Sequence(); ok {
+		_spec.SetField(robotsessionmessage.FieldSequence, field.TypeUint64, value)
+	}
+	if value, ok := _u.mutation.AddedSequence(); ok {
+		_spec.AddField(robotsessionmessage.FieldSequence, field.TypeUint64, value)
+	}
+	if value, ok := _u.mutation.EventKind(); ok {
+		_spec.SetField(robotsessionmessage.FieldEventKind, field.TypeEnum, value)
+	}
 	if value, ok := _u.mutation.InvocationID(); ok {
 		_spec.SetField(robotsessionmessage.FieldInvocationID, field.TypeString, value)
+	}
+	if _u.mutation.InvocationIDCleared() {
+		_spec.ClearField(robotsessionmessage.FieldInvocationID, field.TypeString)
 	}
 	if value, ok := _u.mutation.Branch(); ok {
 		_spec.SetField(robotsessionmessage.FieldBranch, field.TypeString, value)
@@ -303,6 +413,15 @@ func (_u *RobotSessionMessageUpdate) sqlSave(ctx context.Context) (_node int, er
 	}
 	if value, ok := _u.mutation.EventData(); ok {
 		_spec.SetField(robotsessionmessage.FieldEventData, field.TypeJSON, value)
+	}
+	if _u.mutation.EventDataCleared() {
+		_spec.ClearField(robotsessionmessage.FieldEventData, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.ErrorText(); ok {
+		_spec.SetField(robotsessionmessage.FieldErrorText, field.TypeString, value)
+	}
+	if _u.mutation.ErrorTextCleared() {
+		_spec.ClearField(robotsessionmessage.FieldErrorText, field.TypeString)
 	}
 	if _u.mutation.SessionCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -427,6 +546,61 @@ func (_u *RobotSessionMessageUpdateOne) SetNillableSessionID(v *xid.ID) *RobotSe
 	return _u
 }
 
+// SetTurnID sets the "turn_id" field.
+func (_u *RobotSessionMessageUpdateOne) SetTurnID(v xid.ID) *RobotSessionMessageUpdateOne {
+	_u.mutation.SetTurnID(v)
+	return _u
+}
+
+// SetNillableTurnID sets the "turn_id" field if the given value is not nil.
+func (_u *RobotSessionMessageUpdateOne) SetNillableTurnID(v *xid.ID) *RobotSessionMessageUpdateOne {
+	if v != nil {
+		_u.SetTurnID(*v)
+	}
+	return _u
+}
+
+// ClearTurnID clears the value of the "turn_id" field.
+func (_u *RobotSessionMessageUpdateOne) ClearTurnID() *RobotSessionMessageUpdateOne {
+	_u.mutation.ClearTurnID()
+	return _u
+}
+
+// SetSequence sets the "sequence" field.
+func (_u *RobotSessionMessageUpdateOne) SetSequence(v uint64) *RobotSessionMessageUpdateOne {
+	_u.mutation.ResetSequence()
+	_u.mutation.SetSequence(v)
+	return _u
+}
+
+// SetNillableSequence sets the "sequence" field if the given value is not nil.
+func (_u *RobotSessionMessageUpdateOne) SetNillableSequence(v *uint64) *RobotSessionMessageUpdateOne {
+	if v != nil {
+		_u.SetSequence(*v)
+	}
+	return _u
+}
+
+// AddSequence adds value to the "sequence" field.
+func (_u *RobotSessionMessageUpdateOne) AddSequence(v int64) *RobotSessionMessageUpdateOne {
+	_u.mutation.AddSequence(v)
+	return _u
+}
+
+// SetEventKind sets the "event_kind" field.
+func (_u *RobotSessionMessageUpdateOne) SetEventKind(v robotsessionmessage.EventKind) *RobotSessionMessageUpdateOne {
+	_u.mutation.SetEventKind(v)
+	return _u
+}
+
+// SetNillableEventKind sets the "event_kind" field if the given value is not nil.
+func (_u *RobotSessionMessageUpdateOne) SetNillableEventKind(v *robotsessionmessage.EventKind) *RobotSessionMessageUpdateOne {
+	if v != nil {
+		_u.SetEventKind(*v)
+	}
+	return _u
+}
+
 // SetInvocationID sets the "invocation_id" field.
 func (_u *RobotSessionMessageUpdateOne) SetInvocationID(v string) *RobotSessionMessageUpdateOne {
 	_u.mutation.SetInvocationID(v)
@@ -438,6 +612,12 @@ func (_u *RobotSessionMessageUpdateOne) SetNillableInvocationID(v *string) *Robo
 	if v != nil {
 		_u.SetInvocationID(*v)
 	}
+	return _u
+}
+
+// ClearInvocationID clears the value of the "invocation_id" field.
+func (_u *RobotSessionMessageUpdateOne) ClearInvocationID() *RobotSessionMessageUpdateOne {
+	_u.mutation.ClearInvocationID()
 	return _u
 }
 
@@ -555,6 +735,32 @@ func (_u *RobotSessionMessageUpdateOne) SetNillableEventData(v *schema.RobotSess
 	return _u
 }
 
+// ClearEventData clears the value of the "event_data" field.
+func (_u *RobotSessionMessageUpdateOne) ClearEventData() *RobotSessionMessageUpdateOne {
+	_u.mutation.ClearEventData()
+	return _u
+}
+
+// SetErrorText sets the "error_text" field.
+func (_u *RobotSessionMessageUpdateOne) SetErrorText(v string) *RobotSessionMessageUpdateOne {
+	_u.mutation.SetErrorText(v)
+	return _u
+}
+
+// SetNillableErrorText sets the "error_text" field if the given value is not nil.
+func (_u *RobotSessionMessageUpdateOne) SetNillableErrorText(v *string) *RobotSessionMessageUpdateOne {
+	if v != nil {
+		_u.SetErrorText(*v)
+	}
+	return _u
+}
+
+// ClearErrorText clears the value of the "error_text" field.
+func (_u *RobotSessionMessageUpdateOne) ClearErrorText() *RobotSessionMessageUpdateOne {
+	_u.mutation.ClearErrorText()
+	return _u
+}
+
 // SetSession sets the "session" edge to the RobotSession entity.
 func (_u *RobotSessionMessageUpdateOne) SetSession(v *RobotSession) *RobotSessionMessageUpdateOne {
 	return _u.SetSessionID(v.ID)
@@ -649,6 +855,11 @@ func (_u *RobotSessionMessageUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *RobotSessionMessageUpdateOne) check() error {
+	if v, ok := _u.mutation.EventKind(); ok {
+		if err := robotsessionmessage.EventKindValidator(v); err != nil {
+			return &ValidationError{Name: "event_kind", err: fmt.Errorf(`ent: validator failed for field "RobotSessionMessage.event_kind": %w`, err)}
+		}
+	}
 	if _u.mutation.SessionCleared() && len(_u.mutation.SessionIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "RobotSessionMessage.session"`)
 	}
@@ -690,8 +901,26 @@ func (_u *RobotSessionMessageUpdateOne) sqlSave(ctx context.Context) (_node *Rob
 			}
 		}
 	}
+	if value, ok := _u.mutation.TurnID(); ok {
+		_spec.SetField(robotsessionmessage.FieldTurnID, field.TypeString, value)
+	}
+	if _u.mutation.TurnIDCleared() {
+		_spec.ClearField(robotsessionmessage.FieldTurnID, field.TypeString)
+	}
+	if value, ok := _u.mutation.Sequence(); ok {
+		_spec.SetField(robotsessionmessage.FieldSequence, field.TypeUint64, value)
+	}
+	if value, ok := _u.mutation.AddedSequence(); ok {
+		_spec.AddField(robotsessionmessage.FieldSequence, field.TypeUint64, value)
+	}
+	if value, ok := _u.mutation.EventKind(); ok {
+		_spec.SetField(robotsessionmessage.FieldEventKind, field.TypeEnum, value)
+	}
 	if value, ok := _u.mutation.InvocationID(); ok {
 		_spec.SetField(robotsessionmessage.FieldInvocationID, field.TypeString, value)
+	}
+	if _u.mutation.InvocationIDCleared() {
+		_spec.ClearField(robotsessionmessage.FieldInvocationID, field.TypeString)
 	}
 	if value, ok := _u.mutation.Branch(); ok {
 		_spec.SetField(robotsessionmessage.FieldBranch, field.TypeString, value)
@@ -713,6 +942,15 @@ func (_u *RobotSessionMessageUpdateOne) sqlSave(ctx context.Context) (_node *Rob
 	}
 	if value, ok := _u.mutation.EventData(); ok {
 		_spec.SetField(robotsessionmessage.FieldEventData, field.TypeJSON, value)
+	}
+	if _u.mutation.EventDataCleared() {
+		_spec.ClearField(robotsessionmessage.FieldEventData, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.ErrorText(); ok {
+		_spec.SetField(robotsessionmessage.FieldErrorText, field.TypeString, value)
+	}
+	if _u.mutation.ErrorTextCleared() {
+		_spec.ClearField(robotsessionmessage.FieldErrorText, field.TypeString)
 	}
 	if _u.mutation.SessionCleared() {
 		edge := &sqlgraph.EdgeSpec{

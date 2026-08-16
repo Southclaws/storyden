@@ -2,6 +2,7 @@ package bindings
 
 import (
 	"context"
+	"errors"
 	"slices"
 	"strconv"
 	"strings"
@@ -661,11 +662,29 @@ func (r *Robots) RobotSessionGet(ctx context.Context, request openapi.RobotSessi
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	activeTurn, activeErr := r.sessionRepo.ActiveTurn(ctx, sessionID)
+	if activeErr != nil && !errors.Is(activeErr, robot_session.ErrTurnNotFound) {
+		return nil, fault.Wrap(activeErr, fctx.With(ctx))
+	}
+
 	sess, cursor, err := r.sessionRepo.Get(ctx, robot.SessionID(sessionID), messageParams)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 	if err := r.sessionRepo.EnsureView(ctx, robot.SessionID(sessionID), accountID); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if activeErr == nil {
+		if err := r.sessionRepo.SetResumeTurn(ctx, sessionID, accountID, &activeTurn); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+		cursor.Items = slices.DeleteFunc(cursor.Items, func(message *robot.Message) bool {
+			turnID, ok := message.TurnID.Get()
+			return ok && turnID == activeTurn && message.Event.Author != "user"
+		})
+		cursor.Results = len(cursor.Items)
+	} else if err := r.sessionRepo.SetResumeTurn(ctx, sessionID, accountID, nil); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

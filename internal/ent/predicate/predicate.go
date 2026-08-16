@@ -135,6 +135,9 @@ type RobotSession func(*sql.Selector)
 // RobotSessionMessage is the predicate function for robotsessionmessage builders.
 type RobotSessionMessage func(*sql.Selector)
 
+// RobotSessionTurn is the predicate function for robotsessionturn builders.
+type RobotSessionTurn func(*sql.Selector)
+
 // RobotSessionView is the predicate function for robotsessionview builders.
 type RobotSessionView func(*sql.Selector)
 

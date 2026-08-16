@@ -54,6 +54,10 @@ func (RobotSession) Fields() []ent.Field {
 			Default(0).
 			Comment("Monotonic fencing generation for session executions."),
 
+		field.Uint64("next_event_sequence").
+			Default(0).
+			Comment("Allocates ordered events within this session."),
+
 		field.Time("lease_expires_at").
 			Optional().
 			Nillable().
@@ -73,6 +77,9 @@ func (RobotSession) Edges() []ent.Edge {
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
 		edge.To("messages", RobotSessionMessage.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("turns", RobotSessionTurn.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 	}
 }

@@ -66,6 +66,16 @@ func SessionID(v xid.ID) predicate.RobotSessionMessage {
 	return predicate.RobotSessionMessage(sql.FieldEQ(FieldSessionID, v))
 }
 
+// TurnID applies equality check predicate on the "turn_id" field. It's identical to TurnIDEQ.
+func TurnID(v xid.ID) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldEQ(FieldTurnID, v))
+}
+
+// Sequence applies equality check predicate on the "sequence" field. It's identical to SequenceEQ.
+func Sequence(v uint64) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldEQ(FieldSequence, v))
+}
+
 // InvocationID applies equality check predicate on the "invocation_id" field. It's identical to InvocationIDEQ.
 func InvocationID(v string) predicate.RobotSessionMessage {
 	return predicate.RobotSessionMessage(sql.FieldEQ(FieldInvocationID, v))
@@ -94,6 +104,11 @@ func BuiltinRobot(v string) predicate.RobotSessionMessage {
 // AccountID applies equality check predicate on the "account_id" field. It's identical to AccountIDEQ.
 func AccountID(v xid.ID) predicate.RobotSessionMessage {
 	return predicate.RobotSessionMessage(sql.FieldEQ(FieldAccountID, v))
+}
+
+// ErrorText applies equality check predicate on the "error_text" field. It's identical to ErrorTextEQ.
+func ErrorText(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldEQ(FieldErrorText, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -206,6 +221,146 @@ func SessionIDContainsFold(v xid.ID) predicate.RobotSessionMessage {
 	return predicate.RobotSessionMessage(sql.FieldContainsFold(FieldSessionID, vc))
 }
 
+// TurnIDEQ applies the EQ predicate on the "turn_id" field.
+func TurnIDEQ(v xid.ID) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldEQ(FieldTurnID, v))
+}
+
+// TurnIDNEQ applies the NEQ predicate on the "turn_id" field.
+func TurnIDNEQ(v xid.ID) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNEQ(FieldTurnID, v))
+}
+
+// TurnIDIn applies the In predicate on the "turn_id" field.
+func TurnIDIn(vs ...xid.ID) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldIn(FieldTurnID, vs...))
+}
+
+// TurnIDNotIn applies the NotIn predicate on the "turn_id" field.
+func TurnIDNotIn(vs ...xid.ID) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNotIn(FieldTurnID, vs...))
+}
+
+// TurnIDGT applies the GT predicate on the "turn_id" field.
+func TurnIDGT(v xid.ID) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldGT(FieldTurnID, v))
+}
+
+// TurnIDGTE applies the GTE predicate on the "turn_id" field.
+func TurnIDGTE(v xid.ID) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldGTE(FieldTurnID, v))
+}
+
+// TurnIDLT applies the LT predicate on the "turn_id" field.
+func TurnIDLT(v xid.ID) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldLT(FieldTurnID, v))
+}
+
+// TurnIDLTE applies the LTE predicate on the "turn_id" field.
+func TurnIDLTE(v xid.ID) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldLTE(FieldTurnID, v))
+}
+
+// TurnIDContains applies the Contains predicate on the "turn_id" field.
+func TurnIDContains(v xid.ID) predicate.RobotSessionMessage {
+	vc := v.String()
+	return predicate.RobotSessionMessage(sql.FieldContains(FieldTurnID, vc))
+}
+
+// TurnIDHasPrefix applies the HasPrefix predicate on the "turn_id" field.
+func TurnIDHasPrefix(v xid.ID) predicate.RobotSessionMessage {
+	vc := v.String()
+	return predicate.RobotSessionMessage(sql.FieldHasPrefix(FieldTurnID, vc))
+}
+
+// TurnIDHasSuffix applies the HasSuffix predicate on the "turn_id" field.
+func TurnIDHasSuffix(v xid.ID) predicate.RobotSessionMessage {
+	vc := v.String()
+	return predicate.RobotSessionMessage(sql.FieldHasSuffix(FieldTurnID, vc))
+}
+
+// TurnIDIsNil applies the IsNil predicate on the "turn_id" field.
+func TurnIDIsNil() predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldIsNull(FieldTurnID))
+}
+
+// TurnIDNotNil applies the NotNil predicate on the "turn_id" field.
+func TurnIDNotNil() predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNotNull(FieldTurnID))
+}
+
+// TurnIDEqualFold applies the EqualFold predicate on the "turn_id" field.
+func TurnIDEqualFold(v xid.ID) predicate.RobotSessionMessage {
+	vc := v.String()
+	return predicate.RobotSessionMessage(sql.FieldEqualFold(FieldTurnID, vc))
+}
+
+// TurnIDContainsFold applies the ContainsFold predicate on the "turn_id" field.
+func TurnIDContainsFold(v xid.ID) predicate.RobotSessionMessage {
+	vc := v.String()
+	return predicate.RobotSessionMessage(sql.FieldContainsFold(FieldTurnID, vc))
+}
+
+// SequenceEQ applies the EQ predicate on the "sequence" field.
+func SequenceEQ(v uint64) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldEQ(FieldSequence, v))
+}
+
+// SequenceNEQ applies the NEQ predicate on the "sequence" field.
+func SequenceNEQ(v uint64) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNEQ(FieldSequence, v))
+}
+
+// SequenceIn applies the In predicate on the "sequence" field.
+func SequenceIn(vs ...uint64) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldIn(FieldSequence, vs...))
+}
+
+// SequenceNotIn applies the NotIn predicate on the "sequence" field.
+func SequenceNotIn(vs ...uint64) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNotIn(FieldSequence, vs...))
+}
+
+// SequenceGT applies the GT predicate on the "sequence" field.
+func SequenceGT(v uint64) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldGT(FieldSequence, v))
+}
+
+// SequenceGTE applies the GTE predicate on the "sequence" field.
+func SequenceGTE(v uint64) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldGTE(FieldSequence, v))
+}
+
+// SequenceLT applies the LT predicate on the "sequence" field.
+func SequenceLT(v uint64) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldLT(FieldSequence, v))
+}
+
+// SequenceLTE applies the LTE predicate on the "sequence" field.
+func SequenceLTE(v uint64) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldLTE(FieldSequence, v))
+}
+
+// EventKindEQ applies the EQ predicate on the "event_kind" field.
+func EventKindEQ(v EventKind) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldEQ(FieldEventKind, v))
+}
+
+// EventKindNEQ applies the NEQ predicate on the "event_kind" field.
+func EventKindNEQ(v EventKind) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNEQ(FieldEventKind, v))
+}
+
+// EventKindIn applies the In predicate on the "event_kind" field.
+func EventKindIn(vs ...EventKind) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldIn(FieldEventKind, vs...))
+}
+
+// EventKindNotIn applies the NotIn predicate on the "event_kind" field.
+func EventKindNotIn(vs ...EventKind) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNotIn(FieldEventKind, vs...))
+}
+
 // InvocationIDEQ applies the EQ predicate on the "invocation_id" field.
 func InvocationIDEQ(v string) predicate.RobotSessionMessage {
 	return predicate.RobotSessionMessage(sql.FieldEQ(FieldInvocationID, v))
@@ -259,6 +414,16 @@ func InvocationIDHasPrefix(v string) predicate.RobotSessionMessage {
 // InvocationIDHasSuffix applies the HasSuffix predicate on the "invocation_id" field.
 func InvocationIDHasSuffix(v string) predicate.RobotSessionMessage {
 	return predicate.RobotSessionMessage(sql.FieldHasSuffix(FieldInvocationID, v))
+}
+
+// InvocationIDIsNil applies the IsNil predicate on the "invocation_id" field.
+func InvocationIDIsNil() predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldIsNull(FieldInvocationID))
+}
+
+// InvocationIDNotNil applies the NotNil predicate on the "invocation_id" field.
+func InvocationIDNotNil() predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNotNull(FieldInvocationID))
 }
 
 // InvocationIDEqualFold applies the EqualFold predicate on the "invocation_id" field.
@@ -654,6 +819,91 @@ func AccountIDEqualFold(v xid.ID) predicate.RobotSessionMessage {
 func AccountIDContainsFold(v xid.ID) predicate.RobotSessionMessage {
 	vc := v.String()
 	return predicate.RobotSessionMessage(sql.FieldContainsFold(FieldAccountID, vc))
+}
+
+// EventDataIsNil applies the IsNil predicate on the "event_data" field.
+func EventDataIsNil() predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldIsNull(FieldEventData))
+}
+
+// EventDataNotNil applies the NotNil predicate on the "event_data" field.
+func EventDataNotNil() predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNotNull(FieldEventData))
+}
+
+// ErrorTextEQ applies the EQ predicate on the "error_text" field.
+func ErrorTextEQ(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldEQ(FieldErrorText, v))
+}
+
+// ErrorTextNEQ applies the NEQ predicate on the "error_text" field.
+func ErrorTextNEQ(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNEQ(FieldErrorText, v))
+}
+
+// ErrorTextIn applies the In predicate on the "error_text" field.
+func ErrorTextIn(vs ...string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldIn(FieldErrorText, vs...))
+}
+
+// ErrorTextNotIn applies the NotIn predicate on the "error_text" field.
+func ErrorTextNotIn(vs ...string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNotIn(FieldErrorText, vs...))
+}
+
+// ErrorTextGT applies the GT predicate on the "error_text" field.
+func ErrorTextGT(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldGT(FieldErrorText, v))
+}
+
+// ErrorTextGTE applies the GTE predicate on the "error_text" field.
+func ErrorTextGTE(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldGTE(FieldErrorText, v))
+}
+
+// ErrorTextLT applies the LT predicate on the "error_text" field.
+func ErrorTextLT(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldLT(FieldErrorText, v))
+}
+
+// ErrorTextLTE applies the LTE predicate on the "error_text" field.
+func ErrorTextLTE(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldLTE(FieldErrorText, v))
+}
+
+// ErrorTextContains applies the Contains predicate on the "error_text" field.
+func ErrorTextContains(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldContains(FieldErrorText, v))
+}
+
+// ErrorTextHasPrefix applies the HasPrefix predicate on the "error_text" field.
+func ErrorTextHasPrefix(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldHasPrefix(FieldErrorText, v))
+}
+
+// ErrorTextHasSuffix applies the HasSuffix predicate on the "error_text" field.
+func ErrorTextHasSuffix(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldHasSuffix(FieldErrorText, v))
+}
+
+// ErrorTextIsNil applies the IsNil predicate on the "error_text" field.
+func ErrorTextIsNil() predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldIsNull(FieldErrorText))
+}
+
+// ErrorTextNotNil applies the NotNil predicate on the "error_text" field.
+func ErrorTextNotNil() predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNotNull(FieldErrorText))
+}
+
+// ErrorTextEqualFold applies the EqualFold predicate on the "error_text" field.
+func ErrorTextEqualFold(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldEqualFold(FieldErrorText, v))
+}
+
+// ErrorTextContainsFold applies the ContainsFold predicate on the "error_text" field.
+func ErrorTextContainsFold(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldContainsFold(FieldErrorText, v))
 }
 
 // HasSession applies the HasEdge predicate on the "session" edge.

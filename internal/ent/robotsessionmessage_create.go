@@ -48,9 +48,51 @@ func (_c *RobotSessionMessageCreate) SetSessionID(v xid.ID) *RobotSessionMessage
 	return _c
 }
 
+// SetTurnID sets the "turn_id" field.
+func (_c *RobotSessionMessageCreate) SetTurnID(v xid.ID) *RobotSessionMessageCreate {
+	_c.mutation.SetTurnID(v)
+	return _c
+}
+
+// SetNillableTurnID sets the "turn_id" field if the given value is not nil.
+func (_c *RobotSessionMessageCreate) SetNillableTurnID(v *xid.ID) *RobotSessionMessageCreate {
+	if v != nil {
+		_c.SetTurnID(*v)
+	}
+	return _c
+}
+
+// SetSequence sets the "sequence" field.
+func (_c *RobotSessionMessageCreate) SetSequence(v uint64) *RobotSessionMessageCreate {
+	_c.mutation.SetSequence(v)
+	return _c
+}
+
+// SetEventKind sets the "event_kind" field.
+func (_c *RobotSessionMessageCreate) SetEventKind(v robotsessionmessage.EventKind) *RobotSessionMessageCreate {
+	_c.mutation.SetEventKind(v)
+	return _c
+}
+
+// SetNillableEventKind sets the "event_kind" field if the given value is not nil.
+func (_c *RobotSessionMessageCreate) SetNillableEventKind(v *robotsessionmessage.EventKind) *RobotSessionMessageCreate {
+	if v != nil {
+		_c.SetEventKind(*v)
+	}
+	return _c
+}
+
 // SetInvocationID sets the "invocation_id" field.
 func (_c *RobotSessionMessageCreate) SetInvocationID(v string) *RobotSessionMessageCreate {
 	_c.mutation.SetInvocationID(v)
+	return _c
+}
+
+// SetNillableInvocationID sets the "invocation_id" field if the given value is not nil.
+func (_c *RobotSessionMessageCreate) SetNillableInvocationID(v *string) *RobotSessionMessageCreate {
+	if v != nil {
+		_c.SetInvocationID(*v)
+	}
 	return _c
 }
 
@@ -127,6 +169,28 @@ func (_c *RobotSessionMessageCreate) SetNillableAccountID(v *xid.ID) *RobotSessi
 // SetEventData sets the "event_data" field.
 func (_c *RobotSessionMessageCreate) SetEventData(v schema.RobotSessionEvent) *RobotSessionMessageCreate {
 	_c.mutation.SetEventData(v)
+	return _c
+}
+
+// SetNillableEventData sets the "event_data" field if the given value is not nil.
+func (_c *RobotSessionMessageCreate) SetNillableEventData(v *schema.RobotSessionEvent) *RobotSessionMessageCreate {
+	if v != nil {
+		_c.SetEventData(*v)
+	}
+	return _c
+}
+
+// SetErrorText sets the "error_text" field.
+func (_c *RobotSessionMessageCreate) SetErrorText(v string) *RobotSessionMessageCreate {
+	_c.mutation.SetErrorText(v)
+	return _c
+}
+
+// SetNillableErrorText sets the "error_text" field if the given value is not nil.
+func (_c *RobotSessionMessageCreate) SetNillableErrorText(v *string) *RobotSessionMessageCreate {
+	if v != nil {
+		_c.SetErrorText(*v)
+	}
 	return _c
 }
 
@@ -212,6 +276,10 @@ func (_c *RobotSessionMessageCreate) defaults() {
 		v := robotsessionmessage.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
 	}
+	if _, ok := _c.mutation.EventKind(); !ok {
+		v := robotsessionmessage.DefaultEventKind
+		_c.mutation.SetEventKind(v)
+	}
 	if _, ok := _c.mutation.ID(); !ok {
 		v := robotsessionmessage.DefaultID()
 		_c.mutation.SetID(v)
@@ -226,11 +294,16 @@ func (_c *RobotSessionMessageCreate) check() error {
 	if _, ok := _c.mutation.SessionID(); !ok {
 		return &ValidationError{Name: "session_id", err: errors.New(`ent: missing required field "RobotSessionMessage.session_id"`)}
 	}
-	if _, ok := _c.mutation.InvocationID(); !ok {
-		return &ValidationError{Name: "invocation_id", err: errors.New(`ent: missing required field "RobotSessionMessage.invocation_id"`)}
+	if _, ok := _c.mutation.Sequence(); !ok {
+		return &ValidationError{Name: "sequence", err: errors.New(`ent: missing required field "RobotSessionMessage.sequence"`)}
 	}
-	if _, ok := _c.mutation.EventData(); !ok {
-		return &ValidationError{Name: "event_data", err: errors.New(`ent: missing required field "RobotSessionMessage.event_data"`)}
+	if _, ok := _c.mutation.EventKind(); !ok {
+		return &ValidationError{Name: "event_kind", err: errors.New(`ent: missing required field "RobotSessionMessage.event_kind"`)}
+	}
+	if v, ok := _c.mutation.EventKind(); ok {
+		if err := robotsessionmessage.EventKindValidator(v); err != nil {
+			return &ValidationError{Name: "event_kind", err: fmt.Errorf(`ent: validator failed for field "RobotSessionMessage.event_kind": %w`, err)}
+		}
 	}
 	if v, ok := _c.mutation.ID(); ok {
 		if err := robotsessionmessage.IDValidator(v.String()); err != nil {
@@ -280,6 +353,18 @@ func (_c *RobotSessionMessageCreate) createSpec() (*RobotSessionMessage, *sqlgra
 		_spec.SetField(robotsessionmessage.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
+	if value, ok := _c.mutation.TurnID(); ok {
+		_spec.SetField(robotsessionmessage.FieldTurnID, field.TypeString, value)
+		_node.TurnID = &value
+	}
+	if value, ok := _c.mutation.Sequence(); ok {
+		_spec.SetField(robotsessionmessage.FieldSequence, field.TypeUint64, value)
+		_node.Sequence = value
+	}
+	if value, ok := _c.mutation.EventKind(); ok {
+		_spec.SetField(robotsessionmessage.FieldEventKind, field.TypeEnum, value)
+		_node.EventKind = value
+	}
 	if value, ok := _c.mutation.InvocationID(); ok {
 		_spec.SetField(robotsessionmessage.FieldInvocationID, field.TypeString, value)
 		_node.InvocationID = value
@@ -299,6 +384,10 @@ func (_c *RobotSessionMessageCreate) createSpec() (*RobotSessionMessage, *sqlgra
 	if value, ok := _c.mutation.EventData(); ok {
 		_spec.SetField(robotsessionmessage.FieldEventData, field.TypeJSON, value)
 		_node.EventData = value
+	}
+	if value, ok := _c.mutation.ErrorText(); ok {
+		_spec.SetField(robotsessionmessage.FieldErrorText, field.TypeString, value)
+		_node.ErrorText = &value
 	}
 	if nodes := _c.mutation.SessionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -415,6 +504,54 @@ func (u *RobotSessionMessageUpsert) UpdateSessionID() *RobotSessionMessageUpsert
 	return u
 }
 
+// SetTurnID sets the "turn_id" field.
+func (u *RobotSessionMessageUpsert) SetTurnID(v xid.ID) *RobotSessionMessageUpsert {
+	u.Set(robotsessionmessage.FieldTurnID, v)
+	return u
+}
+
+// UpdateTurnID sets the "turn_id" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsert) UpdateTurnID() *RobotSessionMessageUpsert {
+	u.SetExcluded(robotsessionmessage.FieldTurnID)
+	return u
+}
+
+// ClearTurnID clears the value of the "turn_id" field.
+func (u *RobotSessionMessageUpsert) ClearTurnID() *RobotSessionMessageUpsert {
+	u.SetNull(robotsessionmessage.FieldTurnID)
+	return u
+}
+
+// SetSequence sets the "sequence" field.
+func (u *RobotSessionMessageUpsert) SetSequence(v uint64) *RobotSessionMessageUpsert {
+	u.Set(robotsessionmessage.FieldSequence, v)
+	return u
+}
+
+// UpdateSequence sets the "sequence" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsert) UpdateSequence() *RobotSessionMessageUpsert {
+	u.SetExcluded(robotsessionmessage.FieldSequence)
+	return u
+}
+
+// AddSequence adds v to the "sequence" field.
+func (u *RobotSessionMessageUpsert) AddSequence(v uint64) *RobotSessionMessageUpsert {
+	u.Add(robotsessionmessage.FieldSequence, v)
+	return u
+}
+
+// SetEventKind sets the "event_kind" field.
+func (u *RobotSessionMessageUpsert) SetEventKind(v robotsessionmessage.EventKind) *RobotSessionMessageUpsert {
+	u.Set(robotsessionmessage.FieldEventKind, v)
+	return u
+}
+
+// UpdateEventKind sets the "event_kind" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsert) UpdateEventKind() *RobotSessionMessageUpsert {
+	u.SetExcluded(robotsessionmessage.FieldEventKind)
+	return u
+}
+
 // SetInvocationID sets the "invocation_id" field.
 func (u *RobotSessionMessageUpsert) SetInvocationID(v string) *RobotSessionMessageUpsert {
 	u.Set(robotsessionmessage.FieldInvocationID, v)
@@ -424,6 +561,12 @@ func (u *RobotSessionMessageUpsert) SetInvocationID(v string) *RobotSessionMessa
 // UpdateInvocationID sets the "invocation_id" field to the value that was provided on create.
 func (u *RobotSessionMessageUpsert) UpdateInvocationID() *RobotSessionMessageUpsert {
 	u.SetExcluded(robotsessionmessage.FieldInvocationID)
+	return u
+}
+
+// ClearInvocationID clears the value of the "invocation_id" field.
+func (u *RobotSessionMessageUpsert) ClearInvocationID() *RobotSessionMessageUpsert {
+	u.SetNull(robotsessionmessage.FieldInvocationID)
 	return u
 }
 
@@ -529,6 +672,30 @@ func (u *RobotSessionMessageUpsert) UpdateEventData() *RobotSessionMessageUpsert
 	return u
 }
 
+// ClearEventData clears the value of the "event_data" field.
+func (u *RobotSessionMessageUpsert) ClearEventData() *RobotSessionMessageUpsert {
+	u.SetNull(robotsessionmessage.FieldEventData)
+	return u
+}
+
+// SetErrorText sets the "error_text" field.
+func (u *RobotSessionMessageUpsert) SetErrorText(v string) *RobotSessionMessageUpsert {
+	u.Set(robotsessionmessage.FieldErrorText, v)
+	return u
+}
+
+// UpdateErrorText sets the "error_text" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsert) UpdateErrorText() *RobotSessionMessageUpsert {
+	u.SetExcluded(robotsessionmessage.FieldErrorText)
+	return u
+}
+
+// ClearErrorText clears the value of the "error_text" field.
+func (u *RobotSessionMessageUpsert) ClearErrorText() *RobotSessionMessageUpsert {
+	u.SetNull(robotsessionmessage.FieldErrorText)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -594,6 +761,62 @@ func (u *RobotSessionMessageUpsertOne) UpdateSessionID() *RobotSessionMessageUps
 	})
 }
 
+// SetTurnID sets the "turn_id" field.
+func (u *RobotSessionMessageUpsertOne) SetTurnID(v xid.ID) *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.SetTurnID(v)
+	})
+}
+
+// UpdateTurnID sets the "turn_id" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsertOne) UpdateTurnID() *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.UpdateTurnID()
+	})
+}
+
+// ClearTurnID clears the value of the "turn_id" field.
+func (u *RobotSessionMessageUpsertOne) ClearTurnID() *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.ClearTurnID()
+	})
+}
+
+// SetSequence sets the "sequence" field.
+func (u *RobotSessionMessageUpsertOne) SetSequence(v uint64) *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.SetSequence(v)
+	})
+}
+
+// AddSequence adds v to the "sequence" field.
+func (u *RobotSessionMessageUpsertOne) AddSequence(v uint64) *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.AddSequence(v)
+	})
+}
+
+// UpdateSequence sets the "sequence" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsertOne) UpdateSequence() *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.UpdateSequence()
+	})
+}
+
+// SetEventKind sets the "event_kind" field.
+func (u *RobotSessionMessageUpsertOne) SetEventKind(v robotsessionmessage.EventKind) *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.SetEventKind(v)
+	})
+}
+
+// UpdateEventKind sets the "event_kind" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsertOne) UpdateEventKind() *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.UpdateEventKind()
+	})
+}
+
 // SetInvocationID sets the "invocation_id" field.
 func (u *RobotSessionMessageUpsertOne) SetInvocationID(v string) *RobotSessionMessageUpsertOne {
 	return u.Update(func(s *RobotSessionMessageUpsert) {
@@ -605,6 +828,13 @@ func (u *RobotSessionMessageUpsertOne) SetInvocationID(v string) *RobotSessionMe
 func (u *RobotSessionMessageUpsertOne) UpdateInvocationID() *RobotSessionMessageUpsertOne {
 	return u.Update(func(s *RobotSessionMessageUpsert) {
 		s.UpdateInvocationID()
+	})
+}
+
+// ClearInvocationID clears the value of the "invocation_id" field.
+func (u *RobotSessionMessageUpsertOne) ClearInvocationID() *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.ClearInvocationID()
 	})
 }
 
@@ -724,6 +954,34 @@ func (u *RobotSessionMessageUpsertOne) SetEventData(v schema.RobotSessionEvent) 
 func (u *RobotSessionMessageUpsertOne) UpdateEventData() *RobotSessionMessageUpsertOne {
 	return u.Update(func(s *RobotSessionMessageUpsert) {
 		s.UpdateEventData()
+	})
+}
+
+// ClearEventData clears the value of the "event_data" field.
+func (u *RobotSessionMessageUpsertOne) ClearEventData() *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.ClearEventData()
+	})
+}
+
+// SetErrorText sets the "error_text" field.
+func (u *RobotSessionMessageUpsertOne) SetErrorText(v string) *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.SetErrorText(v)
+	})
+}
+
+// UpdateErrorText sets the "error_text" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsertOne) UpdateErrorText() *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.UpdateErrorText()
+	})
+}
+
+// ClearErrorText clears the value of the "error_text" field.
+func (u *RobotSessionMessageUpsertOne) ClearErrorText() *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.ClearErrorText()
 	})
 }
 
@@ -959,6 +1217,62 @@ func (u *RobotSessionMessageUpsertBulk) UpdateSessionID() *RobotSessionMessageUp
 	})
 }
 
+// SetTurnID sets the "turn_id" field.
+func (u *RobotSessionMessageUpsertBulk) SetTurnID(v xid.ID) *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.SetTurnID(v)
+	})
+}
+
+// UpdateTurnID sets the "turn_id" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsertBulk) UpdateTurnID() *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.UpdateTurnID()
+	})
+}
+
+// ClearTurnID clears the value of the "turn_id" field.
+func (u *RobotSessionMessageUpsertBulk) ClearTurnID() *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.ClearTurnID()
+	})
+}
+
+// SetSequence sets the "sequence" field.
+func (u *RobotSessionMessageUpsertBulk) SetSequence(v uint64) *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.SetSequence(v)
+	})
+}
+
+// AddSequence adds v to the "sequence" field.
+func (u *RobotSessionMessageUpsertBulk) AddSequence(v uint64) *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.AddSequence(v)
+	})
+}
+
+// UpdateSequence sets the "sequence" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsertBulk) UpdateSequence() *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.UpdateSequence()
+	})
+}
+
+// SetEventKind sets the "event_kind" field.
+func (u *RobotSessionMessageUpsertBulk) SetEventKind(v robotsessionmessage.EventKind) *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.SetEventKind(v)
+	})
+}
+
+// UpdateEventKind sets the "event_kind" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsertBulk) UpdateEventKind() *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.UpdateEventKind()
+	})
+}
+
 // SetInvocationID sets the "invocation_id" field.
 func (u *RobotSessionMessageUpsertBulk) SetInvocationID(v string) *RobotSessionMessageUpsertBulk {
 	return u.Update(func(s *RobotSessionMessageUpsert) {
@@ -970,6 +1284,13 @@ func (u *RobotSessionMessageUpsertBulk) SetInvocationID(v string) *RobotSessionM
 func (u *RobotSessionMessageUpsertBulk) UpdateInvocationID() *RobotSessionMessageUpsertBulk {
 	return u.Update(func(s *RobotSessionMessageUpsert) {
 		s.UpdateInvocationID()
+	})
+}
+
+// ClearInvocationID clears the value of the "invocation_id" field.
+func (u *RobotSessionMessageUpsertBulk) ClearInvocationID() *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.ClearInvocationID()
 	})
 }
 
@@ -1089,6 +1410,34 @@ func (u *RobotSessionMessageUpsertBulk) SetEventData(v schema.RobotSessionEvent)
 func (u *RobotSessionMessageUpsertBulk) UpdateEventData() *RobotSessionMessageUpsertBulk {
 	return u.Update(func(s *RobotSessionMessageUpsert) {
 		s.UpdateEventData()
+	})
+}
+
+// ClearEventData clears the value of the "event_data" field.
+func (u *RobotSessionMessageUpsertBulk) ClearEventData() *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.ClearEventData()
+	})
+}
+
+// SetErrorText sets the "error_text" field.
+func (u *RobotSessionMessageUpsertBulk) SetErrorText(v string) *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.SetErrorText(v)
+	})
+}
+
+// UpdateErrorText sets the "error_text" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsertBulk) UpdateErrorText() *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.UpdateErrorText()
+	})
+}
+
+// ClearErrorText clears the value of the "error_text" field.
+func (u *RobotSessionMessageUpsertBulk) ClearErrorText() *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.ClearErrorText()
 	})
 }
 

@@ -3,6 +3,7 @@
 package robotsessionmessage
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -19,6 +20,12 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldSessionID holds the string denoting the session_id field in the database.
 	FieldSessionID = "session_id"
+	// FieldTurnID holds the string denoting the turn_id field in the database.
+	FieldTurnID = "turn_id"
+	// FieldSequence holds the string denoting the sequence field in the database.
+	FieldSequence = "sequence"
+	// FieldEventKind holds the string denoting the event_kind field in the database.
+	FieldEventKind = "event_kind"
 	// FieldInvocationID holds the string denoting the invocation_id field in the database.
 	FieldInvocationID = "invocation_id"
 	// FieldBranch holds the string denoting the branch field in the database.
@@ -33,6 +40,8 @@ const (
 	FieldAccountID = "account_id"
 	// FieldEventData holds the string denoting the event_data field in the database.
 	FieldEventData = "event_data"
+	// FieldErrorText holds the string denoting the error_text field in the database.
+	FieldErrorText = "error_text"
 	// EdgeSession holds the string denoting the session edge name in mutations.
 	EdgeSession = "session"
 	// EdgeRobot holds the string denoting the robot edge name in mutations.
@@ -69,6 +78,9 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldSessionID,
+	FieldTurnID,
+	FieldSequence,
+	FieldEventKind,
 	FieldInvocationID,
 	FieldBranch,
 	FieldIsolationScope,
@@ -76,6 +88,7 @@ var Columns = []string{
 	FieldBuiltinRobot,
 	FieldAccountID,
 	FieldEventData,
+	FieldErrorText,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -97,6 +110,36 @@ var (
 	IDValidator func(string) error
 )
 
+// EventKind defines the type for the "event_kind" enum field.
+type EventKind string
+
+// EventKindMessage is the default value of the EventKind enum.
+const DefaultEventKind = EventKindMessage
+
+// EventKind values.
+const (
+	EventKindMessage       EventKind = "message"
+	EventKindTurnQueued    EventKind = "turn_queued"
+	EventKindTurnCompleted EventKind = "turn_completed"
+	EventKindTurnBlocked   EventKind = "turn_blocked"
+	EventKindTurnFailed    EventKind = "turn_failed"
+	EventKindTurnCancelled EventKind = "turn_cancelled"
+)
+
+func (ek EventKind) String() string {
+	return string(ek)
+}
+
+// EventKindValidator is a validator for the "event_kind" field enum values. It is called by the builders before save.
+func EventKindValidator(ek EventKind) error {
+	switch ek {
+	case EventKindMessage, EventKindTurnQueued, EventKindTurnCompleted, EventKindTurnBlocked, EventKindTurnFailed, EventKindTurnCancelled:
+		return nil
+	default:
+		return fmt.Errorf("robotsessionmessage: invalid enum value for event_kind field: %q", ek)
+	}
+}
+
 // OrderOption defines the ordering options for the RobotSessionMessage queries.
 type OrderOption func(*sql.Selector)
 
@@ -113,6 +156,21 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // BySessionID orders the results by the session_id field.
 func BySessionID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSessionID, opts...).ToFunc()
+}
+
+// ByTurnID orders the results by the turn_id field.
+func ByTurnID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTurnID, opts...).ToFunc()
+}
+
+// BySequence orders the results by the sequence field.
+func BySequence(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSequence, opts...).ToFunc()
+}
+
+// ByEventKind orders the results by the event_kind field.
+func ByEventKind(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEventKind, opts...).ToFunc()
 }
 
 // ByInvocationID orders the results by the invocation_id field.
@@ -143,6 +201,11 @@ func ByBuiltinRobot(opts ...sql.OrderTermOption) OrderOption {
 // ByAccountID orders the results by the account_id field.
 func ByAccountID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAccountID, opts...).ToFunc()
+}
+
+// ByErrorText orders the results by the error_text field.
+func ByErrorText(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldErrorText, opts...).ToFunc()
 }
 
 // BySessionField orders the results by session field.

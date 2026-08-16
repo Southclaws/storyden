@@ -379,6 +379,32 @@ func PresentationPartStreamParts(event *adksession.Event, part *genai.Part, fall
 	return streamParts, consumedFallback
 }
 
+// PresentationPartStreamPartsDeterministic projects a complete, persisted ADK
+// part using IDs derived from its stored session-event identity. Re-reading
+// the same session offset therefore produces byte-stable UI chunks.
+func PresentationPartStreamPartsDeterministic(event *adksession.Event, part *genai.Part, idPrefix string) []openapi.StreamPart {
+	if event == nil || part == nil || strings.TrimSpace(part.Text) == "" {
+		return nil
+	}
+	if part.Thought {
+		return ReasoningStreamParts(idPrefix+"-reasoning", part.Text)
+	}
+
+	var streamParts []openapi.StreamPart
+	for index, presentationPart := range presentation.Parse(part.Text) {
+		switch presentationPart.Kind {
+		case presentation.PartText:
+			if presentationPart.Text != "" {
+				streamParts = append(streamParts, TextStreamParts(fmt.Sprintf("%s-%d", idPrefix, index), presentationPart.Text)...)
+			}
+		case presentation.PartRenderCard:
+			data := presentation.NewRenderCardData(presentationPart.Ref)
+			streamParts = append(streamParts, DataStreamPart(presentation.DataRenderCard, data))
+		}
+	}
+	return streamParts
+}
+
 func TextStreamParts(textID string, text string) []openapi.StreamPart {
 	textStartPart := openapi.StreamPart{}
 	_ = textStartPart.FromTextStartPart(openapi.TextStartPart{

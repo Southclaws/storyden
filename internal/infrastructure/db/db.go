@@ -34,6 +34,8 @@ import (
 	ent_email "github.com/Southclaws/storyden/internal/ent/email"
 	ent_oauth_device_authorisation "github.com/Southclaws/storyden/internal/ent/oauthdeviceauthorisation"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
+	ent_robot_session "github.com/Southclaws/storyden/internal/ent/robotsession"
+	ent_robot_session_message "github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	ent_session "github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/tracing"
 )
@@ -147,6 +149,7 @@ func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sq
 				ctx,
 				schema.WithDropIndex(true),
 				schema.WithDropColumn(true),
+				schema.WithHooks(migrateRobotSessionMessageSequences(db, driver)),
 				schema.WithApplyHook(populateLastReplyAt()),
 				schema.WithApplyHook(migrateReplyVisibility()),
 				schema.WithApplyHook(migrateAccountVerifiedStatus()),
@@ -171,6 +174,165 @@ func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sq
 	})
 
 	return client, nil
+}
+
+func migrateRobotSessionMessageSequences(db *sql.DB, driver string) schema.Hook {
+	return func(next schema.Creator) schema.Creator {
+		return schema.CreateFunc(func(ctx context.Context, tables ...*schema.Table) error {
+			if err := prepareRobotSessionMessageSequences(ctx, db, driver); err != nil {
+				return fault.Wrap(err, fmsg.With("failed to backfill robot session message sequences"))
+			}
+			if err := next.Create(ctx, tables...); err != nil {
+				return err
+			}
+			if err := reconcileRobotSessionMessageSequences(ctx, db); err != nil {
+				return fault.Wrap(err, fmsg.With("failed to reconcile robot session message sequences"))
+			}
+			return nil
+		})
+	}
+}
+
+func prepareRobotSessionMessageSequences(ctx context.Context, db *sql.DB, driver string) error {
+	migrationRequired, err := robotSessionMessageSequenceMigrationRequired(ctx, db, driver)
+	if err != nil {
+		return err
+	}
+	if !migrationRequired {
+		return nil
+	}
+
+	columnType := "INTEGER"
+	if driver == "pgx" {
+		columnType = "BIGINT"
+	}
+
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	if _, err := tx.ExecContext(ctx, fmt.Sprintf(
+		"ALTER TABLE %s ADD COLUMN %s %s NOT NULL DEFAULT 0",
+		ent_robot_session_message.Table,
+		ent_robot_session_message.FieldSequence,
+		columnType,
+	)); err != nil {
+		return err
+	}
+
+	_, err = tx.ExecContext(ctx, fmt.Sprintf(
+		`
+		WITH ranked AS (
+			SELECT %s, ROW_NUMBER() OVER (
+				PARTITION BY %s
+				ORDER BY %s, %s
+			) AS sequence
+			FROM %s
+		)
+		UPDATE %s
+		SET %s = (
+			SELECT ranked.sequence
+			FROM ranked
+			WHERE ranked.%s = %s.%s
+		)
+	`,
+		ent_robot_session_message.FieldID,
+		ent_robot_session_message.FieldSessionID,
+		ent_robot_session_message.FieldCreatedAt,
+		ent_robot_session_message.FieldID,
+		ent_robot_session_message.Table,
+		ent_robot_session_message.Table,
+		ent_robot_session_message.FieldSequence,
+		ent_robot_session_message.FieldID,
+		ent_robot_session_message.Table,
+		ent_robot_session_message.FieldID,
+	))
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
+}
+
+func robotSessionMessageSequenceMigrationRequired(ctx context.Context, db *sql.DB, driver string) (bool, error) {
+	if driver == "pgx" {
+		var required bool
+		err := db.QueryRowContext(ctx, `
+			SELECT EXISTS (
+					SELECT 1 FROM information_schema.tables
+					WHERE table_schema = current_schema() AND table_name = $1
+				)
+				AND NOT EXISTS (
+					SELECT 1 FROM information_schema.columns
+					WHERE table_schema = current_schema() AND table_name = $1 AND column_name = $2
+				)
+		`, ent_robot_session_message.Table, ent_robot_session_message.FieldSequence).Scan(&required)
+		return required, err
+	}
+
+	rows, err := db.QueryContext(ctx, fmt.Sprintf("PRAGMA table_info(%s)", ent_robot_session_message.Table))
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+
+	tableExists := false
+	columnExists := false
+	for rows.Next() {
+		var cid, notNull, primaryKey int
+		var name, columnType string
+		var defaultValue sql.NullString
+		if err := rows.Scan(&cid, &name, &columnType, &notNull, &defaultValue, &primaryKey); err != nil {
+			return false, err
+		}
+		tableExists = true
+		if name == ent_robot_session_message.FieldSequence {
+			columnExists = true
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return false, err
+	}
+
+	return tableExists && !columnExists, nil
+}
+
+func reconcileRobotSessionMessageSequences(ctx context.Context, db *sql.DB) error {
+	_, err := db.ExecContext(ctx, fmt.Sprintf(
+		`
+		UPDATE %s
+		SET %s = (
+			SELECT COALESCE(MAX(%s.%s), 0)
+			FROM %s
+			WHERE %s.%s = %s.%s
+		)
+		WHERE %s < (
+			SELECT COALESCE(MAX(%s.%s), 0)
+			FROM %s
+			WHERE %s.%s = %s.%s
+		)
+	`,
+		ent_robot_session.Table,
+		ent_robot_session.FieldNextEventSequence,
+		ent_robot_session_message.Table,
+		ent_robot_session_message.FieldSequence,
+		ent_robot_session_message.Table,
+		ent_robot_session_message.Table,
+		ent_robot_session_message.FieldSessionID,
+		ent_robot_session.Table,
+		ent_robot_session.FieldID,
+		ent_robot_session.FieldNextEventSequence,
+		ent_robot_session_message.Table,
+		ent_robot_session_message.FieldSequence,
+		ent_robot_session_message.Table,
+		ent_robot_session_message.Table,
+		ent_robot_session_message.FieldSessionID,
+		ent_robot_session.Table,
+		ent_robot_session.FieldID,
+	))
+	return err
 }
 
 // migrateSessionTokenHash invalidates sessions created before bearer secrets
@@ -275,12 +437,14 @@ func connect(cfg config.Config, driver *sql.DB) (*ent.Client, string, error) {
 		opts = append(opts, ent.Driver(entsql.OpenDB(dialect.Postgres, driver)))
 
 	case "sqlite":
-		opts = append(opts,
+		opts = append(
+			opts,
 			ent.Driver(entsql.OpenDB(dialect.SQLite, driver)),
 		)
 
 	case "libsql":
-		opts = append(opts,
+		opts = append(
+			opts,
 			ent.Driver(entsql.OpenDB(dialect.SQLite, driver)),
 		)
 
@@ -488,7 +652,8 @@ func migrateAccountVerifiedStatus() schema.ApplyHook {
 				return nil
 			}
 
-			err := conn.Exec(ctx, fmt.Sprintf(`
+			err := conn.Exec(ctx, fmt.Sprintf(
+				`
 				UPDATE %s
 				SET %s = 'email'
 				WHERE EXISTS (

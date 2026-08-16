@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Southclaws/opt"
 	"github.com/google/uuid"
 	"github.com/rs/xid"
 	"go.uber.org/fx"
@@ -91,6 +92,15 @@ func (c *Coordinator) Run(
 ) iter.Seq2[*adksession.Event, error] {
 	return func(yield func(*adksession.Event, error) bool) {
 		turnID := xid.New()
+		var runOptions robotservice.RunOptions
+		if len(options) > 0 {
+			runOptions = options[0]
+		}
+		command, err := c.prepareTurn(ctx, turnID, robotRef, userID, sessionID, content, chatContext, runOptions)
+		if err != nil {
+			yield(nil, err)
+			return
+		}
 		topic := sessionTopic(sessionID)
 		handlerName := "robot_turn_waiter_" + turnID.String() + "_" + strings.ReplaceAll(uuid.NewString(), "-", "")
 		events := make(chan EventRobotTurn, 32)
@@ -118,20 +128,10 @@ func (c *Coordinator) Run(
 		}
 		defer subscription.Close()
 
-		var runOptions robotservice.RunOptions
-		if len(options) > 0 {
-			runOptions = options[0]
-		}
-		command := &CommandRobotTurnStart{
-			TurnID:      turnID,
-			SessionID:   sessionID,
-			RobotRef:    robotRef,
-			AccountID:   userID,
-			Content:     content,
-			ChatContext: chatContext,
-			Options:     runOptions,
-		}
 		if err := c.bus.SendCommand(ctx, command); err != nil {
+			if sessionXID, parseErr := xid.FromString(sessionID); parseErr == nil {
+				_ = c.sessions.FinishTurn(context.WithoutCancel(ctx), robotresource.SessionID(sessionXID), robotresource.TurnID(turnID), robotresource.TurnStatusFailed, err.Error())
+			}
 			yield(nil, err)
 			return
 		}
@@ -179,6 +179,100 @@ func (c *Coordinator) Run(
 	}
 }
 
+func (c *Coordinator) Start(
+	ctx context.Context,
+	robotRef string,
+	userID,
+	sessionID string,
+	content *genai.Content,
+	chatContext *mcp.RobotChatContext,
+	options ...robotservice.RunOptions,
+) (robotresource.TurnID, error) {
+	turnID := xid.New()
+	var runOptions robotservice.RunOptions
+	if len(options) > 0 {
+		runOptions = options[0]
+	}
+	command, err := c.prepareTurn(ctx, turnID, robotRef, userID, sessionID, content, chatContext, runOptions)
+	if err != nil {
+		return robotresource.TurnID{}, err
+	}
+	if err := c.bus.SendCommand(ctx, command); err != nil {
+		sessionXID, parseErr := xid.FromString(sessionID)
+		if parseErr == nil {
+			_ = c.sessions.FinishTurn(context.WithoutCancel(ctx), robotresource.SessionID(sessionXID), robotresource.TurnID(turnID), robotresource.TurnStatusFailed, err.Error())
+		}
+		return robotresource.TurnID{}, err
+	}
+	return robotresource.TurnID(turnID), nil
+}
+
+func (c *Coordinator) prepareTurn(
+	ctx context.Context,
+	turnID xid.ID,
+	robotRef,
+	userID,
+	sessionID string,
+	content *genai.Content,
+	chatContext *mcp.RobotChatContext,
+	options robotservice.RunOptions,
+) (*CommandRobotTurnStart, error) {
+	if err := c.agent.PrepareSession(ctx, robotRef, userID, sessionID); err != nil {
+		return nil, err
+	}
+	sessionXID, err := xid.FromString(sessionID)
+	if err != nil {
+		return nil, err
+	}
+	accountXID, err := xid.FromString(userID)
+	if err != nil {
+		return nil, err
+	}
+	robotSessionID := robotresource.SessionID(sessionXID)
+	accountID := account.AccountID(accountXID)
+	if err := c.sessions.EnsureView(ctx, robotSessionID, accountID); err != nil {
+		return nil, err
+	}
+	command := &CommandRobotTurnStart{
+		TurnID:      turnID,
+		SessionID:   sessionID,
+		RobotRef:    robotRef,
+		AccountID:   userID,
+		Content:     content,
+		ChatContext: chatContext,
+		Options:     options,
+	}
+	input, err := json.Marshal(command)
+	if err != nil {
+		return nil, err
+	}
+	sourceKind := string(options.Source)
+	if isContinuation(content) {
+		sourceKind = "tool_result"
+	}
+	if sourceKind == "" {
+		sourceKind = string(robotservice.SourceInteractiveChat)
+	}
+	continuationOf := opt.NewEmpty[robotresource.TurnID]()
+	if isContinuation(content) {
+		if blockedTurn, err := c.sessions.BlockedTurn(ctx, robotSessionID); err == nil {
+			continuationOf = opt.New(blockedTurn)
+		}
+	}
+	if err := c.sessions.EnqueueTurn(ctx, robot_session.EnqueueTurnParams{
+		ID:             robotresource.TurnID(turnID),
+		SessionID:      robotSessionID,
+		InitiatorID:    opt.New(accountID),
+		SourceKind:     sourceKind,
+		RobotRef:       robotRef,
+		InputData:      input,
+		ContinuationOf: continuationOf,
+	}); err != nil {
+		return nil, err
+	}
+	return command, nil
+}
+
 func (c *Coordinator) handleStart(ctx context.Context, command *CommandRobotTurnStart) error {
 	topic := sessionTopic(command.SessionID)
 	publish := func(event EventRobotTurn) bool {
@@ -192,7 +286,12 @@ func (c *Coordinator) handleStart(ctx context.Context, command *CommandRobotTurn
 		}
 		return true
 	}
+	sessionXID, sessionParseErr := xid.FromString(command.SessionID)
+	sessionID := robotresource.SessionID(sessionXID)
 	fail := func(err error, sequence uint64, leaseGeneration uint64) {
+		if sessionParseErr == nil {
+			_ = c.sessions.FinishTurn(context.WithoutCancel(ctx), sessionID, robotresource.TurnID(command.TurnID), robotresource.TurnStatusFailed, err.Error())
+		}
 		publish(EventRobotTurn{
 			TurnID:          command.TurnID,
 			SessionID:       command.SessionID,
@@ -203,33 +302,21 @@ func (c *Coordinator) handleStart(ctx context.Context, command *CommandRobotTurn
 		})
 	}
 
-	if err := c.agent.PrepareSession(ctx, command.RobotRef, command.AccountID, command.SessionID); err != nil {
-		fail(err, 1, 0)
+	if sessionParseErr != nil {
+		fail(sessionParseErr, 1, 0)
 		return nil
 	}
 
-	sessionID, err := robotresource.NewSessionID(command.SessionID)
+	lease, err := c.sessions.AcquireQueuedTurnExecution(ctx, sessionID, command.TurnID, isContinuation(command.Content), leaseDuration)
 	if err != nil {
-		fail(err, 1, 0)
-		return nil
-	}
-	accountXID, err := xid.FromString(command.AccountID)
-	if err != nil {
-		fail(err, 1, 0)
-		return nil
-	}
-	accountID := account.AccountID(accountXID)
-	if err := c.sessions.EnsureView(ctx, sessionID, accountID); err != nil {
-		fail(err, 1, 0)
-		return nil
-	}
-
-	lease, err := c.sessions.AcquireExecution(ctx, sessionID, command.TurnID, isContinuation(command.Content), leaseDuration)
-	if err != nil {
+		if errors.Is(err, robot_session.ErrTurnHandled) {
+			return nil
+		}
 		kind := EventKindFailed
 		if errors.Is(err, robot_session.ErrSessionBusy) {
 			kind = EventKindBusy
 		}
+		_ = c.sessions.FinishTurn(context.WithoutCancel(ctx), sessionID, robotresource.TurnID(command.TurnID), robotresource.TurnStatusFailed, err.Error())
 		publish(EventRobotTurn{
 			TurnID:    command.TurnID,
 			SessionID: command.SessionID,
@@ -292,6 +379,7 @@ func (c *Coordinator) handleStart(ctx context.Context, command *CommandRobotTurn
 			if !blocked {
 				_ = c.sessions.ReleaseExecution(context.WithoutCancel(ctx), *lease)
 			}
+			_ = c.sessions.FinishTurn(context.WithoutCancel(ctx), sessionID, robotresource.TurnID(command.TurnID), robotresource.TurnStatusFailed, "failed to publish Robot turn output")
 			return nil
 		}
 		if blocked {
@@ -300,9 +388,15 @@ func (c *Coordinator) handleStart(ctx context.Context, command *CommandRobotTurn
 	}
 
 	terminal := EventKindCompleted
+	turnStatus := robotresource.TurnStatusCompleted
 	if blocked {
 		terminal = EventKindBlocked
+		turnStatus = robotresource.TurnStatusBlocked
 	} else if err := c.sessions.ReleaseExecution(context.WithoutCancel(ctx), *lease); err != nil {
+		fail(err, sequence+1, lease.Generation)
+		return nil
+	}
+	if err := c.sessions.FinishTurn(context.WithoutCancel(ctx), sessionID, robotresource.TurnID(command.TurnID), turnStatus, ""); err != nil {
 		fail(err, sequence+1, lease.Generation)
 		return nil
 	}
@@ -342,6 +436,23 @@ func (c *Coordinator) heartbeat(ctx context.Context, cancel context.CancelFunc, 
 
 func sessionTopic(sessionID string) string {
 	return "robot.session." + sessionID + ".turns"
+}
+
+func (c *Coordinator) SubscribeTurn(ctx context.Context, sessionID string, turnID robotresource.TurnID, handlerName string, wake chan<- struct{}) (*pubsub.Subscription, error) {
+	return pubsub.SubscribeEphemeralNamed(ctx, c.bus, sessionTopic(sessionID), handlerName, func(_ context.Context, payload json.RawMessage) error {
+		var event EventRobotTurn
+		if err := json.Unmarshal(payload, &event); err != nil {
+			return err
+		}
+		if event.TurnID != xid.ID(turnID) {
+			return nil
+		}
+		select {
+		case wake <- struct{}{}:
+		default:
+		}
+		return nil
+	})
 }
 
 func isContinuation(content *genai.Content) bool {

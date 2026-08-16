@@ -64,6 +64,7 @@ require (
 	github.com/dboslee/lru v0.0.1
 	github.com/dgraph-io/ristretto/v2 v2.3.0
 	github.com/disintegration/imaging v1.6.2
+	github.com/durable-streams/durable-streams/packages/client-go v0.2.0
 	github.com/dustinkirkland/golang-petname v0.0.0-20260215035315-f0c533e9ce9b
 	github.com/gabriel-vasile/mimetype v1.4.10
 	github.com/getsentry/sentry-go v0.35.3

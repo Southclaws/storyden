@@ -1,7 +1,6 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
 import type { JSONSchema7 } from "json-schema";
 import {
   PropsWithChildren,
@@ -15,6 +14,7 @@ import {
 } from "react";
 import { useSWRConfig } from "swr";
 
+import { createDurableChatTransport } from "@/api/durable-chat-transport";
 import {
   getRobotToolsetsListKey,
   getRobotsListKey,
@@ -198,31 +198,40 @@ export function RobotChatContext({
   }, [handleSetSelectedWorkspaceID, selectedWorkspaceID, workspacesData]);
 
   const transport = useMemo(() => {
-    return new DefaultChatTransport({
-      api: `${API_ADDRESS}/sse/chat`,
-      credentials: "include",
-      prepareSendMessagesRequest: async (request) => {
-        const pageContext = await getPageContext();
-        const currentWorkspaceID = selectedWorkspaceIDRef.current;
+    const fetchClient: typeof fetch = async (input, init) => {
+      let request: RequestInit = {
+        ...init,
+        credentials: "include",
+      };
 
-        return {
+      if (init?.method?.toUpperCase() === "POST") {
+        const body =
+          typeof init.body === "string"
+            ? (JSON.parse(init.body) as Record<string, unknown>)
+            : {};
+        const pageContext = await getPageContext();
+
+        request = {
           ...request,
-          body: {
-            ...request.body,
-            id: request.id,
-            messages: request.messages,
-            trigger: request.trigger,
-            messageId: request.messageId,
+          body: JSON.stringify({
+            ...body,
             robotId: rootRobotID === DENBOT_ID ? undefined : rootRobotID,
-            context: pageContext ?? request.body?.["context"],
-            workspace: currentWorkspaceID
-              ? { workspace_id: currentWorkspaceID }
-              : undefined,
-          },
+            context: pageContext ?? body["context"],
+            workspace: selectedWorkspaceID
+              ? { workspace_id: selectedWorkspaceID }
+              : body["workspace"],
+          }),
         };
-      },
+      }
+
+      return fetch(input, request);
+    };
+
+    return createDurableChatTransport<StorydenUIMessage>({
+      api: `${API_ADDRESS}/sse/chat`,
+      fetchClient,
     });
-  }, [getPageContext, rootRobotID]);
+  }, [getPageContext, rootRobotID, selectedWorkspaceID]);
 
   const handleToolCall = useCallback(
     async ({ toolCall }: HandleToolCallOptions) => {
@@ -266,6 +275,7 @@ export function RobotChatContext({
     id: sessionId,
     messages: initialMessages,
     transport,
+    resume: true,
     onError: async (e) => {
       console.error("[RobotChat] Chat error:", e);
       setErrorState(deriveError(e));

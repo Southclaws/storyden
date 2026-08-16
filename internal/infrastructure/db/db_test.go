@@ -20,6 +20,8 @@ import (
 
 	entmigrate "github.com/Southclaws/storyden/internal/ent/migrate"
 	ent_oauth_device_authorisation "github.com/Southclaws/storyden/internal/ent/oauthdeviceauthorisation"
+	ent_robot_session "github.com/Southclaws/storyden/internal/ent/robotsession"
+	ent_robot_session_message "github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	ent_session "github.com/Southclaws/storyden/internal/ent/session"
 )
 
@@ -340,4 +342,115 @@ func TestMigrateSessionTokenHash(t *testing.T) {
 	))
 	require.NoError(t, db.QueryRowContext(ctx, `SELECT COUNT(*) FROM sessions`).Scan(&count))
 	assert.Equal(t, 1, count)
+}
+
+func TestMigrateRobotSessionMessageSequences(t *testing.T) {
+	ctx := context.Background()
+	db, err := sql.Open("sqlite", "file:"+t.Name()+"?mode=memory&cache=shared&_pragma=foreign_keys(1)")
+	require.NoError(t, err)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
+
+	driver := entsql.OpenDB(dialect.SQLite, db)
+	legacyTables, err := entschema.CopyTables(entmigrate.Tables)
+	require.NoError(t, err)
+
+	foundSequence := false
+	foundAllocator := false
+	for _, table := range legacyTables {
+		switch table.Name {
+		case ent_robot_session_message.Table:
+			columns := table.Columns[:0]
+			for _, column := range table.Columns {
+				if column.Name == ent_robot_session_message.FieldSequence {
+					foundSequence = true
+					continue
+				}
+				columns = append(columns, column)
+			}
+			table.Columns = columns
+			table.Indexes = nil
+
+		case ent_robot_session.Table:
+			columns := table.Columns[:0]
+			for _, column := range table.Columns {
+				if column.Name == ent_robot_session.FieldNextEventSequence {
+					foundAllocator = true
+					continue
+				}
+				columns = append(columns, column)
+			}
+			table.Columns = columns
+		}
+	}
+	require.True(t, foundSequence)
+	require.True(t, foundAllocator)
+	require.NoError(t, entmigrate.Create(ctx, entmigrate.NewSchema(driver), legacyTables))
+
+	accountID := xid.New().String()
+	_, err = db.ExecContext(ctx, `
+		INSERT INTO accounts (id, updated_at, handle, name)
+		VALUES (?, ?, ?, ?)
+	`, accountID, time.Now(), "robot-migration-account", "Robot migration account")
+	require.NoError(t, err)
+
+	sessionA := xid.New().String()
+	sessionB := xid.New().String()
+	for _, sessionID := range []string{sessionA, sessionB} {
+		_, err = db.ExecContext(ctx, `
+			INSERT INTO robot_sessions (id, updated_at, name, account_id, state)
+			VALUES (?, ?, ?, ?, '{}')
+		`, sessionID, time.Now(), "Migration session", accountID)
+		require.NoError(t, err)
+	}
+
+	firstID := xid.New().String()
+	secondID := xid.New().String()
+	thirdID := xid.New().String()
+	createdAt := time.Now().Add(-time.Hour)
+	insertMessage := func(id, sessionID string, created time.Time) {
+		_, err := db.ExecContext(ctx, `
+			INSERT INTO robot_session_messages (id, created_at, session_id)
+			VALUES (?, ?, ?)
+		`, id, created, sessionID)
+		require.NoError(t, err)
+	}
+	insertMessage(secondID, sessionA, createdAt.Add(time.Minute))
+	insertMessage(firstID, sessionA, createdAt)
+	insertMessage(thirdID, sessionB, createdAt)
+
+	require.NoError(t, entmigrate.Create(
+		ctx,
+		entmigrate.NewSchema(driver),
+		entmigrate.Tables,
+		entschema.WithDropIndex(true),
+		entschema.WithDropColumn(true),
+		entschema.WithHooks(migrateRobotSessionMessageSequences(db, "sqlite")),
+	))
+
+	var firstSequence, secondSequence, thirdSequence uint64
+	require.NoError(t, db.QueryRowContext(ctx, `SELECT sequence FROM robot_session_messages WHERE id = ?`, firstID).Scan(&firstSequence))
+	require.NoError(t, db.QueryRowContext(ctx, `SELECT sequence FROM robot_session_messages WHERE id = ?`, secondID).Scan(&secondSequence))
+	require.NoError(t, db.QueryRowContext(ctx, `SELECT sequence FROM robot_session_messages WHERE id = ?`, thirdID).Scan(&thirdSequence))
+	assert.Equal(t, uint64(1), firstSequence)
+	assert.Equal(t, uint64(2), secondSequence)
+	assert.Equal(t, uint64(1), thirdSequence)
+
+	var sessionASequence, sessionBSequence uint64
+	require.NoError(t, db.QueryRowContext(ctx, `SELECT next_event_sequence FROM robot_sessions WHERE id = ?`, sessionA).Scan(&sessionASequence))
+	require.NoError(t, db.QueryRowContext(ctx, `SELECT next_event_sequence FROM robot_sessions WHERE id = ?`, sessionB).Scan(&sessionBSequence))
+	assert.Equal(t, uint64(2), sessionASequence)
+	assert.Equal(t, uint64(1), sessionBSequence)
+
+	_, err = db.ExecContext(ctx, `UPDATE robot_sessions SET next_event_sequence = 10 WHERE id = ?`, sessionA)
+	require.NoError(t, err)
+	require.NoError(t, entmigrate.Create(
+		ctx,
+		entmigrate.NewSchema(driver),
+		entmigrate.Tables,
+		entschema.WithDropIndex(true),
+		entschema.WithDropColumn(true),
+		entschema.WithHooks(migrateRobotSessionMessageSequences(db, "sqlite")),
+	))
+	require.NoError(t, db.QueryRowContext(ctx, `SELECT next_event_sequence FROM robot_sessions WHERE id = ?`, sessionA).Scan(&sessionASequence))
+	assert.Equal(t, uint64(10), sessionASequence)
 }

@@ -145,11 +145,13 @@ type AccountEdges struct {
 	RobotSessionViews []*RobotSessionView `json:"robot_session_views,omitempty"`
 	// RobotMessages holds the value of the robot_messages edge.
 	RobotMessages []*RobotSessionMessage `json:"robot_messages,omitempty"`
+	// InitiatedRobotTurns holds the value of the initiated_robot_turns edge.
+	InitiatedRobotTurns []*RobotSessionTurn `json:"initiated_robot_turns,omitempty"`
 	// AccountRoles holds the value of the account_roles edge.
 	AccountRoles []*AccountRoles `json:"account_roles,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [45]bool
+	loadedTypes [46]bool
 }
 
 // SessionsOrErr returns the Sessions value or an error if the edge
@@ -550,10 +552,19 @@ func (e AccountEdges) RobotMessagesOrErr() ([]*RobotSessionMessage, error) {
 	return nil, &NotLoadedError{edge: "robot_messages"}
 }
 
+// InitiatedRobotTurnsOrErr returns the InitiatedRobotTurns value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) InitiatedRobotTurnsOrErr() ([]*RobotSessionTurn, error) {
+	if e.loadedTypes[44] {
+		return e.InitiatedRobotTurns, nil
+	}
+	return nil, &NotLoadedError{edge: "initiated_robot_turns"}
+}
+
 // AccountRolesOrErr returns the AccountRoles value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AccountRolesOrErr() ([]*AccountRoles, error) {
-	if e.loadedTypes[44] {
+	if e.loadedTypes[45] {
 		return e.AccountRoles, nil
 	}
 	return nil, &NotLoadedError{edge: "account_roles"}
@@ -920,6 +931,11 @@ func (_m *Account) QueryRobotSessionViews() *RobotSessionViewQuery {
 // QueryRobotMessages queries the "robot_messages" edge of the Account entity.
 func (_m *Account) QueryRobotMessages() *RobotSessionMessageQuery {
 	return NewAccountClient(_m.config).QueryRobotMessages(_m)
+}
+
+// QueryInitiatedRobotTurns queries the "initiated_robot_turns" edge of the Account entity.
+func (_m *Account) QueryInitiatedRobotTurns() *RobotSessionTurnQuery {
+	return NewAccountClient(_m.config).QueryInitiatedRobotTurns(_m)
 }
 
 // QueryAccountRoles queries the "account_roles" edge of the Account entity.

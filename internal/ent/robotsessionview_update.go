@@ -80,6 +80,47 @@ func (_u *RobotSessionViewUpdate) SetNillableLastAccessedAt(v *time.Time) *Robot
 	return _u
 }
 
+// SetResumeTurnID sets the "resume_turn_id" field.
+func (_u *RobotSessionViewUpdate) SetResumeTurnID(v xid.ID) *RobotSessionViewUpdate {
+	_u.mutation.SetResumeTurnID(v)
+	return _u
+}
+
+// SetNillableResumeTurnID sets the "resume_turn_id" field if the given value is not nil.
+func (_u *RobotSessionViewUpdate) SetNillableResumeTurnID(v *xid.ID) *RobotSessionViewUpdate {
+	if v != nil {
+		_u.SetResumeTurnID(*v)
+	}
+	return _u
+}
+
+// ClearResumeTurnID clears the value of the "resume_turn_id" field.
+func (_u *RobotSessionViewUpdate) ClearResumeTurnID() *RobotSessionViewUpdate {
+	_u.mutation.ClearResumeTurnID()
+	return _u
+}
+
+// SetLastSeenEventSequence sets the "last_seen_event_sequence" field.
+func (_u *RobotSessionViewUpdate) SetLastSeenEventSequence(v uint64) *RobotSessionViewUpdate {
+	_u.mutation.ResetLastSeenEventSequence()
+	_u.mutation.SetLastSeenEventSequence(v)
+	return _u
+}
+
+// SetNillableLastSeenEventSequence sets the "last_seen_event_sequence" field if the given value is not nil.
+func (_u *RobotSessionViewUpdate) SetNillableLastSeenEventSequence(v *uint64) *RobotSessionViewUpdate {
+	if v != nil {
+		_u.SetLastSeenEventSequence(*v)
+	}
+	return _u
+}
+
+// AddLastSeenEventSequence adds value to the "last_seen_event_sequence" field.
+func (_u *RobotSessionViewUpdate) AddLastSeenEventSequence(v int64) *RobotSessionViewUpdate {
+	_u.mutation.AddLastSeenEventSequence(v)
+	return _u
+}
+
 // SetSession sets the "session" edge to the RobotSession entity.
 func (_u *RobotSessionViewUpdate) SetSession(v *RobotSession) *RobotSessionViewUpdate {
 	return _u.SetSessionID(v.ID)
@@ -177,6 +218,18 @@ func (_u *RobotSessionViewUpdate) sqlSave(ctx context.Context) (_node int, err e
 	}
 	if value, ok := _u.mutation.LastAccessedAt(); ok {
 		_spec.SetField(robotsessionview.FieldLastAccessedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.ResumeTurnID(); ok {
+		_spec.SetField(robotsessionview.FieldResumeTurnID, field.TypeString, value)
+	}
+	if _u.mutation.ResumeTurnIDCleared() {
+		_spec.ClearField(robotsessionview.FieldResumeTurnID, field.TypeString)
+	}
+	if value, ok := _u.mutation.LastSeenEventSequence(); ok {
+		_spec.SetField(robotsessionview.FieldLastSeenEventSequence, field.TypeUint64, value)
+	}
+	if value, ok := _u.mutation.AddedLastSeenEventSequence(); ok {
+		_spec.AddField(robotsessionview.FieldLastSeenEventSequence, field.TypeUint64, value)
 	}
 	if _u.mutation.SessionCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -303,6 +356,47 @@ func (_u *RobotSessionViewUpdateOne) SetNillableLastAccessedAt(v *time.Time) *Ro
 	if v != nil {
 		_u.SetLastAccessedAt(*v)
 	}
+	return _u
+}
+
+// SetResumeTurnID sets the "resume_turn_id" field.
+func (_u *RobotSessionViewUpdateOne) SetResumeTurnID(v xid.ID) *RobotSessionViewUpdateOne {
+	_u.mutation.SetResumeTurnID(v)
+	return _u
+}
+
+// SetNillableResumeTurnID sets the "resume_turn_id" field if the given value is not nil.
+func (_u *RobotSessionViewUpdateOne) SetNillableResumeTurnID(v *xid.ID) *RobotSessionViewUpdateOne {
+	if v != nil {
+		_u.SetResumeTurnID(*v)
+	}
+	return _u
+}
+
+// ClearResumeTurnID clears the value of the "resume_turn_id" field.
+func (_u *RobotSessionViewUpdateOne) ClearResumeTurnID() *RobotSessionViewUpdateOne {
+	_u.mutation.ClearResumeTurnID()
+	return _u
+}
+
+// SetLastSeenEventSequence sets the "last_seen_event_sequence" field.
+func (_u *RobotSessionViewUpdateOne) SetLastSeenEventSequence(v uint64) *RobotSessionViewUpdateOne {
+	_u.mutation.ResetLastSeenEventSequence()
+	_u.mutation.SetLastSeenEventSequence(v)
+	return _u
+}
+
+// SetNillableLastSeenEventSequence sets the "last_seen_event_sequence" field if the given value is not nil.
+func (_u *RobotSessionViewUpdateOne) SetNillableLastSeenEventSequence(v *uint64) *RobotSessionViewUpdateOne {
+	if v != nil {
+		_u.SetLastSeenEventSequence(*v)
+	}
+	return _u
+}
+
+// AddLastSeenEventSequence adds value to the "last_seen_event_sequence" field.
+func (_u *RobotSessionViewUpdateOne) AddLastSeenEventSequence(v int64) *RobotSessionViewUpdateOne {
+	_u.mutation.AddLastSeenEventSequence(v)
 	return _u
 }
 
@@ -433,6 +527,18 @@ func (_u *RobotSessionViewUpdateOne) sqlSave(ctx context.Context) (_node *RobotS
 	}
 	if value, ok := _u.mutation.LastAccessedAt(); ok {
 		_spec.SetField(robotsessionview.FieldLastAccessedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.ResumeTurnID(); ok {
+		_spec.SetField(robotsessionview.FieldResumeTurnID, field.TypeString, value)
+	}
+	if _u.mutation.ResumeTurnIDCleared() {
+		_spec.ClearField(robotsessionview.FieldResumeTurnID, field.TypeString)
+	}
+	if value, ok := _u.mutation.LastSeenEventSequence(); ok {
+		_spec.SetField(robotsessionview.FieldLastSeenEventSequence, field.TypeUint64, value)
+	}
+	if value, ok := _u.mutation.AddedLastSeenEventSequence(); ok {
+		_spec.AddField(robotsessionview.FieldLastSeenEventSequence, field.TypeUint64, value)
 	}
 	if _u.mutation.SessionCleared() {
 		edge := &sqlgraph.EdgeSpec{

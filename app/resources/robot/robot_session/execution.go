@@ -13,11 +13,13 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	ent_robot_session "github.com/Southclaws/storyden/internal/ent/robotsession"
+	"github.com/Southclaws/storyden/internal/ent/robotsessionturn"
 )
 
 var (
 	ErrSessionBusy = errors.New("robot session is already running")
 	ErrLeaseLost   = errors.New("robot session execution lease was lost")
+	ErrTurnHandled = errors.New("robot session turn is already running or terminal")
 )
 
 type ExecutionLease struct {
@@ -111,6 +113,113 @@ func (q *Repository) AcquireExecution(
 		if cleared != 1 {
 			return nil, ErrLeaseLost
 		}
+	}
+	return lease, nil
+}
+
+// AcquireQueuedTurnExecution atomically claims a queued turn and the session
+// execution lease. Duplicate command deliveries observe ErrTurnHandled and do
+// not mutate the already-running or terminal turn.
+func (q *Repository) AcquireQueuedTurnExecution(
+	ctx context.Context,
+	sessionID robot.SessionID,
+	turnID xid.ID,
+	allowBlocked bool,
+	duration time.Duration,
+) (*ExecutionLease, error) {
+	var lease *ExecutionLease
+	err := ent.WithTx(ctx, q.db, func(tx *ent.Tx) error {
+		now := time.Now()
+		reclaiming := false
+		claimed, err := tx.RobotSessionTurn.Update().
+			Where(
+				robotsessionturn.IDEQ(turnID),
+				robotsessionturn.SessionIDEQ(xid.ID(sessionID)),
+				robotsessionturn.StatusEQ(robotsessionturn.StatusQueued),
+			).
+			SetStatus(robotsessionturn.StatusRunning).
+			SetStartedAt(now).
+			Save(ctx)
+		if err != nil {
+			return err
+		}
+		if claimed != 1 {
+			turn, err := tx.RobotSessionTurn.Get(ctx, turnID)
+			if err != nil || turn.Status != robotsessionturn.StatusRunning {
+				return ErrTurnHandled
+			}
+			reclaiming = true
+		}
+
+		lease = &ExecutionLease{
+			SessionID: sessionID,
+			TurnID:    turnID,
+			Token:     uuid.NewString(),
+			ExpiresAt: now.Add(duration),
+		}
+		eligible := []predicate.RobotSession{
+			ent_robot_session.ExecutionStatusEQ(ent_robot_session.ExecutionStatusIdle),
+			ent_robot_session.And(
+				ent_robot_session.ExecutionStatusEQ(ent_robot_session.ExecutionStatusRunning),
+				ent_robot_session.LeaseExpiresAtLT(now),
+			),
+		}
+		if allowBlocked {
+			eligible = append(eligible, ent_robot_session.ExecutionStatusEQ(ent_robot_session.ExecutionStatusBlocked))
+		}
+		updated, err := tx.RobotSession.Update().
+			Where(
+				ent_robot_session.IDEQ(xid.ID(sessionID)),
+				ent_robot_session.Or(eligible...),
+			).
+			SetExecutionStatus(ent_robot_session.ExecutionStatusRunning).
+			SetActiveTurnID(turnID).
+			SetLeaseToken(lease.Token).
+			AddLeaseGeneration(1).
+			SetLeaseExpiresAt(lease.ExpiresAt).
+			Save(ctx)
+		if err != nil {
+			return err
+		}
+		if updated != 1 {
+			if reclaiming {
+				return ErrTurnHandled
+			}
+			return ErrSessionBusy
+		}
+		session, err := tx.RobotSession.Query().
+			Where(
+				ent_robot_session.IDEQ(xid.ID(sessionID)),
+				ent_robot_session.ActiveTurnIDEQ(turnID),
+				ent_robot_session.LeaseTokenEQ(lease.Token),
+			).
+			Only(ctx)
+		if err != nil {
+			return err
+		}
+		lease.Generation = session.LeaseGeneration
+
+		if allowBlocked {
+			state := maps.Clone(session.State)
+			if state == nil {
+				state = map[string]any{}
+			}
+			state = robot.ClearPendingClientTools(state)
+			cleared, err := tx.RobotSession.Update().
+				Where(executionLeasePredicates(*lease)...).
+				SetState(state).
+				Save(ctx)
+			if err != nil {
+				return err
+			}
+			if cleared != 1 {
+				return ErrLeaseLost
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 	return lease, nil
 }

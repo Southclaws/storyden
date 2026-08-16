@@ -161,6 +161,103 @@ describe("projectRobotMessages", () => {
     );
   });
 
+  it("keeps a top-level user message carrying a stale delegation scope", () => {
+    const messages = [
+      {
+        id: "coordinator-call",
+        role: "assistant",
+        parts: [
+          {
+            type: "tool-robot_d9n7eodo2dtgv230rpng",
+            toolCallId: "call_delegate_1",
+            toolName: "robot_d9n7eodo2dtgv230rpng",
+            state: "input-available",
+            input: { request: "Inspect the submitted library page." },
+          },
+        ],
+      },
+      {
+        id: "specialist-result",
+        role: "assistant",
+        robot: {
+          id: "d9n7eodo2dtgv230rpng",
+          name: "Library Curator",
+        },
+        branch: "robot_d9n7eodo2dtgv230rpng@call_delegate_1",
+        isolation_scope: "call_delegate_1",
+        parts: [
+          {
+            type: "text",
+            text: "The page has substantive library coverage.",
+            state: "done",
+          },
+        ],
+      },
+      {
+        id: "coordinator-result",
+        role: "user",
+        parts: [
+          {
+            type: "tool-robot_d9n7eodo2dtgv230rpng",
+            toolCallId: "call_delegate_1",
+            toolName: "robot_d9n7eodo2dtgv230rpng",
+            state: "output-available",
+            input: {},
+            output: { result: "The page has substantive library coverage." },
+          },
+        ],
+      },
+      {
+        id: "follow-up",
+        role: "user",
+        isolation_scope: "call_delegate_1",
+        parts: [
+          {
+            type: "text",
+            text: "Nice!",
+            state: "done",
+          },
+        ],
+      },
+    ] as unknown as StorydenUIMessage[];
+
+    const projected = projectRobotMessages(messages);
+
+    expect(projected.map((message) => message.id)).toEqual([
+      "coordinator-call",
+      "follow-up",
+    ]);
+    expect(projected[0]?.parts[0]).toMatchObject({
+      type: "data-delegation",
+      data: {
+        messages: [{ id: "specialist-result" }],
+      },
+    });
+    expect(projected[1]).toMatchObject({
+      role: "user",
+      parts: [{ type: "text", text: "Nice!" }],
+    });
+  });
+
+  it("does not infer a delegation from an isolation scope alone", () => {
+    const messages = [
+      {
+        id: "follow-up",
+        role: "user",
+        isolation_scope: "call_completed_delegation",
+        parts: [
+          {
+            type: "text",
+            text: "Okay",
+            state: "done",
+          },
+        ],
+      },
+    ] as unknown as StorydenUIMessage[];
+
+    expect(projectRobotMessages(messages)).toEqual(messages);
+  });
+
   it("merges a delegation resumed across chat requests", () => {
     const messages = [
       {

@@ -1,0 +1,7 @@
+steps:
+  - match:
+      contains: "exercise durable live tail"
+    respond:
+      delay_ms: 750
+      text: "Durable live tail completed."
+      finish: "stop"

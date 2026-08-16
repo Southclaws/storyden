@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
+	"github.com/Southclaws/storyden/internal/ent/robotsessionturn"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionview"
 	"github.com/rs/xid"
 )
@@ -137,6 +138,20 @@ func (_c *RobotSessionCreate) SetNillableLeaseGeneration(v *uint64) *RobotSessio
 	return _c
 }
 
+// SetNextEventSequence sets the "next_event_sequence" field.
+func (_c *RobotSessionCreate) SetNextEventSequence(v uint64) *RobotSessionCreate {
+	_c.mutation.SetNextEventSequence(v)
+	return _c
+}
+
+// SetNillableNextEventSequence sets the "next_event_sequence" field if the given value is not nil.
+func (_c *RobotSessionCreate) SetNillableNextEventSequence(v *uint64) *RobotSessionCreate {
+	if v != nil {
+		_c.SetNextEventSequence(*v)
+	}
+	return _c
+}
+
 // SetLeaseExpiresAt sets the "lease_expires_at" field.
 func (_c *RobotSessionCreate) SetLeaseExpiresAt(v time.Time) *RobotSessionCreate {
 	_c.mutation.SetLeaseExpiresAt(v)
@@ -206,6 +221,21 @@ func (_c *RobotSessionCreate) AddMessages(v ...*RobotSessionMessage) *RobotSessi
 	return _c.AddMessageIDs(ids...)
 }
 
+// AddTurnIDs adds the "turns" edge to the RobotSessionTurn entity by IDs.
+func (_c *RobotSessionCreate) AddTurnIDs(ids ...xid.ID) *RobotSessionCreate {
+	_c.mutation.AddTurnIDs(ids...)
+	return _c
+}
+
+// AddTurns adds the "turns" edges to the RobotSessionTurn entity.
+func (_c *RobotSessionCreate) AddTurns(v ...*RobotSessionTurn) *RobotSessionCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddTurnIDs(ids...)
+}
+
 // Mutation returns the RobotSessionMutation object of the builder.
 func (_c *RobotSessionCreate) Mutation() *RobotSessionMutation {
 	return _c.mutation
@@ -261,6 +291,10 @@ func (_c *RobotSessionCreate) defaults() {
 		v := robotsession.DefaultLeaseGeneration
 		_c.mutation.SetLeaseGeneration(v)
 	}
+	if _, ok := _c.mutation.NextEventSequence(); !ok {
+		v := robotsession.DefaultNextEventSequence
+		_c.mutation.SetNextEventSequence(v)
+	}
 	if _, ok := _c.mutation.ID(); !ok {
 		v := robotsession.DefaultID()
 		_c.mutation.SetID(v)
@@ -291,6 +325,9 @@ func (_c *RobotSessionCreate) check() error {
 	}
 	if _, ok := _c.mutation.LeaseGeneration(); !ok {
 		return &ValidationError{Name: "lease_generation", err: errors.New(`ent: missing required field "RobotSession.lease_generation"`)}
+	}
+	if _, ok := _c.mutation.NextEventSequence(); !ok {
+		return &ValidationError{Name: "next_event_sequence", err: errors.New(`ent: missing required field "RobotSession.next_event_sequence"`)}
 	}
 	if v, ok := _c.mutation.ID(); ok {
 		if err := robotsession.IDValidator(v.String()); err != nil {
@@ -368,6 +405,10 @@ func (_c *RobotSessionCreate) createSpec() (*RobotSession, *sqlgraph.CreateSpec)
 		_spec.SetField(robotsession.FieldLeaseGeneration, field.TypeUint64, value)
 		_node.LeaseGeneration = value
 	}
+	if value, ok := _c.mutation.NextEventSequence(); ok {
+		_spec.SetField(robotsession.FieldNextEventSequence, field.TypeUint64, value)
+		_node.NextEventSequence = value
+	}
 	if value, ok := _c.mutation.LeaseExpiresAt(); ok {
 		_spec.SetField(robotsession.FieldLeaseExpiresAt, field.TypeTime, value)
 		_node.LeaseExpiresAt = &value
@@ -414,6 +455,22 @@ func (_c *RobotSessionCreate) createSpec() (*RobotSession, *sqlgraph.CreateSpec)
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(robotsessionmessage.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.TurnsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   robotsession.TurnsTable,
+			Columns: []string{robotsession.TurnsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsessionturn.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -590,6 +647,24 @@ func (u *RobotSessionUpsert) UpdateLeaseGeneration() *RobotSessionUpsert {
 // AddLeaseGeneration adds v to the "lease_generation" field.
 func (u *RobotSessionUpsert) AddLeaseGeneration(v uint64) *RobotSessionUpsert {
 	u.Add(robotsession.FieldLeaseGeneration, v)
+	return u
+}
+
+// SetNextEventSequence sets the "next_event_sequence" field.
+func (u *RobotSessionUpsert) SetNextEventSequence(v uint64) *RobotSessionUpsert {
+	u.Set(robotsession.FieldNextEventSequence, v)
+	return u
+}
+
+// UpdateNextEventSequence sets the "next_event_sequence" field to the value that was provided on create.
+func (u *RobotSessionUpsert) UpdateNextEventSequence() *RobotSessionUpsert {
+	u.SetExcluded(robotsession.FieldNextEventSequence)
+	return u
+}
+
+// AddNextEventSequence adds v to the "next_event_sequence" field.
+func (u *RobotSessionUpsert) AddNextEventSequence(v uint64) *RobotSessionUpsert {
+	u.Add(robotsession.FieldNextEventSequence, v)
 	return u
 }
 
@@ -799,6 +874,27 @@ func (u *RobotSessionUpsertOne) AddLeaseGeneration(v uint64) *RobotSessionUpsert
 func (u *RobotSessionUpsertOne) UpdateLeaseGeneration() *RobotSessionUpsertOne {
 	return u.Update(func(s *RobotSessionUpsert) {
 		s.UpdateLeaseGeneration()
+	})
+}
+
+// SetNextEventSequence sets the "next_event_sequence" field.
+func (u *RobotSessionUpsertOne) SetNextEventSequence(v uint64) *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.SetNextEventSequence(v)
+	})
+}
+
+// AddNextEventSequence adds v to the "next_event_sequence" field.
+func (u *RobotSessionUpsertOne) AddNextEventSequence(v uint64) *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.AddNextEventSequence(v)
+	})
+}
+
+// UpdateNextEventSequence sets the "next_event_sequence" field to the value that was provided on create.
+func (u *RobotSessionUpsertOne) UpdateNextEventSequence() *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.UpdateNextEventSequence()
 	})
 }
 
@@ -1178,6 +1274,27 @@ func (u *RobotSessionUpsertBulk) AddLeaseGeneration(v uint64) *RobotSessionUpser
 func (u *RobotSessionUpsertBulk) UpdateLeaseGeneration() *RobotSessionUpsertBulk {
 	return u.Update(func(s *RobotSessionUpsert) {
 		s.UpdateLeaseGeneration()
+	})
+}
+
+// SetNextEventSequence sets the "next_event_sequence" field.
+func (u *RobotSessionUpsertBulk) SetNextEventSequence(v uint64) *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.SetNextEventSequence(v)
+	})
+}
+
+// AddNextEventSequence adds v to the "next_event_sequence" field.
+func (u *RobotSessionUpsertBulk) AddNextEventSequence(v uint64) *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.AddNextEventSequence(v)
+	})
+}
+
+// UpdateNextEventSequence sets the "next_event_sequence" field to the value that was provided on create.
+func (u *RobotSessionUpsertBulk) UpdateNextEventSequence() *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.UpdateNextEventSequence()
 	})
 }
 

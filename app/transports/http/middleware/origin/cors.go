@@ -41,8 +41,13 @@ func (m *Middleware) WithCORS() func(next http.Handler) http.Handler {
 
 	exposedHeaders := []string{
 		"Link",
+		"Location",
 		"Content-Type",
 		"Content-Length",
+		"Stream-Next-Offset",
+		"Stream-Up-To-Date",
+		"Stream-Closed",
+		"Stream-Cursor",
 		"X-Ratelimit-Limit",
 		"X-Ratelimit-Remaining",
 		"X-Ratelimit-Reset",

@@ -27,6 +27,12 @@ type RobotSessionMessage struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// SessionID holds the value of the "session_id" field.
 	SessionID xid.ID `json:"session_id,omitempty"`
+	// Robot turn that produced this ordered session event.
+	TurnID *xid.ID `json:"turn_id,omitempty"`
+	// Monotonic event offset within the session.
+	Sequence uint64 `json:"sequence,omitempty"`
+	// EventKind holds the value of the "event_kind" field.
+	EventKind robotsessionmessage.EventKind `json:"event_kind,omitempty"`
 	// Invocation ID from ADK Event
 	InvocationID string `json:"invocation_id,omitempty"`
 	// ADK agent branch path used to attribute delegated work
@@ -41,6 +47,8 @@ type RobotSessionMessage struct {
 	AccountID *xid.ID `json:"account_id,omitempty"`
 	// Full ADK Event object stored as JSON
 	EventData schema.RobotSessionEvent `json:"event_data,omitempty"`
+	// Terminal failure presented to clients.
+	ErrorText *string `json:"error_text,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RobotSessionMessageQuery when eager-loading is set.
 	Edges        RobotSessionMessageEdges `json:"edges"`
@@ -98,11 +106,13 @@ func (*RobotSessionMessage) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case robotsessionmessage.FieldRobotID, robotsessionmessage.FieldAccountID:
+		case robotsessionmessage.FieldTurnID, robotsessionmessage.FieldRobotID, robotsessionmessage.FieldAccountID:
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case robotsessionmessage.FieldEventData:
 			values[i] = new([]byte)
-		case robotsessionmessage.FieldInvocationID, robotsessionmessage.FieldBranch, robotsessionmessage.FieldIsolationScope, robotsessionmessage.FieldBuiltinRobot:
+		case robotsessionmessage.FieldSequence:
+			values[i] = new(sql.NullInt64)
+		case robotsessionmessage.FieldEventKind, robotsessionmessage.FieldInvocationID, robotsessionmessage.FieldBranch, robotsessionmessage.FieldIsolationScope, robotsessionmessage.FieldBuiltinRobot, robotsessionmessage.FieldErrorText:
 			values[i] = new(sql.NullString)
 		case robotsessionmessage.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -140,6 +150,25 @@ func (_m *RobotSessionMessage) assignValues(columns []string, values []any) erro
 				return fmt.Errorf("unexpected type %T for field session_id", values[i])
 			} else if value != nil {
 				_m.SessionID = *value
+			}
+		case robotsessionmessage.FieldTurnID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field turn_id", values[i])
+			} else if value.Valid {
+				_m.TurnID = new(xid.ID)
+				*_m.TurnID = *value.S.(*xid.ID)
+			}
+		case robotsessionmessage.FieldSequence:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field sequence", values[i])
+			} else if value.Valid {
+				_m.Sequence = uint64(value.Int64)
+			}
+		case robotsessionmessage.FieldEventKind:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field event_kind", values[i])
+			} else if value.Valid {
+				_m.EventKind = robotsessionmessage.EventKind(value.String)
 			}
 		case robotsessionmessage.FieldInvocationID:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -187,6 +216,13 @@ func (_m *RobotSessionMessage) assignValues(columns []string, values []any) erro
 				if err := json.Unmarshal(*value, &_m.EventData); err != nil {
 					return fmt.Errorf("unmarshal field event_data: %w", err)
 				}
+			}
+		case robotsessionmessage.FieldErrorText:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field error_text", values[i])
+			} else if value.Valid {
+				_m.ErrorText = new(string)
+				*_m.ErrorText = value.String
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -245,6 +281,17 @@ func (_m *RobotSessionMessage) String() string {
 	builder.WriteString("session_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.SessionID))
 	builder.WriteString(", ")
+	if v := _m.TurnID; v != nil {
+		builder.WriteString("turn_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	builder.WriteString("sequence=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Sequence))
+	builder.WriteString(", ")
+	builder.WriteString("event_kind=")
+	builder.WriteString(fmt.Sprintf("%v", _m.EventKind))
+	builder.WriteString(", ")
 	builder.WriteString("invocation_id=")
 	builder.WriteString(_m.InvocationID)
 	builder.WriteString(", ")
@@ -271,6 +318,11 @@ func (_m *RobotSessionMessage) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("event_data=")
 	builder.WriteString(fmt.Sprintf("%v", _m.EventData))
+	builder.WriteString(", ")
+	if v := _m.ErrorText; v != nil {
+		builder.WriteString("error_text=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -1728,6 +1728,29 @@ func HasRobotMessagesWith(preds ...predicate.RobotSessionMessage) predicate.Acco
 	})
 }
 
+// HasInitiatedRobotTurns applies the HasEdge predicate on the "initiated_robot_turns" edge.
+func HasInitiatedRobotTurns() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, InitiatedRobotTurnsTable, InitiatedRobotTurnsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasInitiatedRobotTurnsWith applies the HasEdge predicate on the "initiated_robot_turns" edge with a given conditions (other predicates).
+func HasInitiatedRobotTurnsWith(preds ...predicate.RobotSessionTurn) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newInitiatedRobotTurnsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasAccountRoles applies the HasEdge predicate on the "account_roles" edge.
 func HasAccountRoles() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {

@@ -91,6 +91,11 @@ func LeaseGeneration(v uint64) predicate.RobotSession {
 	return predicate.RobotSession(sql.FieldEQ(FieldLeaseGeneration, v))
 }
 
+// NextEventSequence applies equality check predicate on the "next_event_sequence" field. It's identical to NextEventSequenceEQ.
+func NextEventSequence(v uint64) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldEQ(FieldNextEventSequence, v))
+}
+
 // LeaseExpiresAt applies equality check predicate on the "lease_expires_at" field. It's identical to LeaseExpiresAtEQ.
 func LeaseExpiresAt(v time.Time) predicate.RobotSession {
 	return predicate.RobotSession(sql.FieldEQ(FieldLeaseExpiresAt, v))
@@ -536,6 +541,46 @@ func LeaseGenerationLTE(v uint64) predicate.RobotSession {
 	return predicate.RobotSession(sql.FieldLTE(FieldLeaseGeneration, v))
 }
 
+// NextEventSequenceEQ applies the EQ predicate on the "next_event_sequence" field.
+func NextEventSequenceEQ(v uint64) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldEQ(FieldNextEventSequence, v))
+}
+
+// NextEventSequenceNEQ applies the NEQ predicate on the "next_event_sequence" field.
+func NextEventSequenceNEQ(v uint64) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNEQ(FieldNextEventSequence, v))
+}
+
+// NextEventSequenceIn applies the In predicate on the "next_event_sequence" field.
+func NextEventSequenceIn(vs ...uint64) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldIn(FieldNextEventSequence, vs...))
+}
+
+// NextEventSequenceNotIn applies the NotIn predicate on the "next_event_sequence" field.
+func NextEventSequenceNotIn(vs ...uint64) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNotIn(FieldNextEventSequence, vs...))
+}
+
+// NextEventSequenceGT applies the GT predicate on the "next_event_sequence" field.
+func NextEventSequenceGT(v uint64) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldGT(FieldNextEventSequence, v))
+}
+
+// NextEventSequenceGTE applies the GTE predicate on the "next_event_sequence" field.
+func NextEventSequenceGTE(v uint64) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldGTE(FieldNextEventSequence, v))
+}
+
+// NextEventSequenceLT applies the LT predicate on the "next_event_sequence" field.
+func NextEventSequenceLT(v uint64) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldLT(FieldNextEventSequence, v))
+}
+
+// NextEventSequenceLTE applies the LTE predicate on the "next_event_sequence" field.
+func NextEventSequenceLTE(v uint64) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldLTE(FieldNextEventSequence, v))
+}
+
 // LeaseExpiresAtEQ applies the EQ predicate on the "lease_expires_at" field.
 func LeaseExpiresAtEQ(v time.Time) predicate.RobotSession {
 	return predicate.RobotSession(sql.FieldEQ(FieldLeaseExpiresAt, v))
@@ -647,6 +692,29 @@ func HasMessages() predicate.RobotSession {
 func HasMessagesWith(preds ...predicate.RobotSessionMessage) predicate.RobotSession {
 	return predicate.RobotSession(func(s *sql.Selector) {
 		step := newMessagesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasTurns applies the HasEdge predicate on the "turns" edge.
+func HasTurns() predicate.RobotSession {
+	return predicate.RobotSession(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, TurnsTable, TurnsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasTurnsWith applies the HasEdge predicate on the "turns" edge with a given conditions (other predicates).
+func HasTurnsWith(preds ...predicate.RobotSessionTurn) predicate.RobotSession {
+	return predicate.RobotSession(func(s *sql.Selector) {
+		step := newTurnsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_robot_session "github.com/Southclaws/storyden/internal/ent/robotsession"
+	ent_robot_session_message "github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	ent_robot_session_view "github.com/Southclaws/storyden/internal/ent/robotsessionview"
 	entschema "github.com/Southclaws/storyden/internal/ent/schema"
 )
@@ -133,30 +134,36 @@ func (q *Repository) AppendMessage(
 	}
 
 	storedEvent, stateDelta := eventForPersistence(event)
-	if lease, ok := ExecutionLeaseFromContext(ctx); ok && lease.SessionID != sessionID {
+	lease, hasLease := ExecutionLeaseFromContext(ctx)
+	if hasLease && lease.SessionID != sessionID {
 		return fault.Wrap(ErrLeaseLost, fctx.With(ctx))
 	}
 	if len(stateDelta) == 0 {
-		if lease, ok := ExecutionLeaseFromContext(ctx); ok {
-			err := ent.WithTx(ctx, q.db, func(tx *ent.Tx) error {
-				if err := validateExecutionLease(ctx, tx, lease); err != nil {
-					return err
-				}
-				return saveMessage(ctx, tx.RobotSessionMessage.Create(), sessionID, accountID, actor, storedEvent)
-			})
-			if err != nil {
-				return fault.Wrap(err, fctx.With(ctx))
+		err := ent.WithTx(ctx, q.db, func(tx *ent.Tx) error {
+			var leasePtr *ExecutionLease
+			if hasLease {
+				leasePtr = &lease
 			}
-			return nil
+			sequence, err := allocateSessionEventSequence(ctx, tx, sessionID, leasePtr)
+			if err != nil {
+				return err
+			}
+			return saveMessage(ctx, tx.RobotSessionMessage.Create(), sessionID, accountID, actor, storedEvent, sequence, leasePtr)
+		})
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
 		}
-		return saveMessage(ctx, q.db.RobotSessionMessage.Create(), sessionID, accountID, actor, storedEvent)
+		return nil
 	}
 
 	err := ent.WithTx(ctx, q.db, func(tx *ent.Tx) error {
-		if lease, ok := ExecutionLeaseFromContext(ctx); ok {
-			if err := validateExecutionLease(ctx, tx, lease); err != nil {
-				return err
-			}
+		var leasePtr *ExecutionLease
+		if hasLease {
+			leasePtr = &lease
+		}
+		sequence, err := allocateSessionEventSequence(ctx, tx, sessionID, leasePtr)
+		if err != nil {
+			return err
 		}
 		session, err := tx.RobotSession.Query().
 			Where(ent_robot_session.IDEQ(xid.ID(sessionID))).
@@ -174,7 +181,7 @@ func (q *Repository) AppendMessage(
 			return err
 		}
 
-		return saveMessage(ctx, tx.RobotSessionMessage.Create(), sessionID, accountID, actor, storedEvent)
+		return saveMessage(ctx, tx.RobotSessionMessage.Create(), sessionID, accountID, actor, storedEvent, sequence, leasePtr)
 	})
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
@@ -189,11 +196,18 @@ func saveMessage(
 	accountID opt.Optional[account.AccountID],
 	actor opt.Optional[robot.Actor],
 	event *adksession.Event,
+	sequence uint64,
+	lease *ExecutionLease,
 ) error {
 	create = create.
 		SetSessionID(xid.ID(sessionID)).
+		SetSequence(sequence).
+		SetEventKind(ent_robot_session_message.EventKindMessage).
 		SetInvocationID(event.InvocationID).
 		SetEventData(entschema.NewRobotSessionEvent(*event))
+	if lease != nil {
+		create.SetTurnID(lease.TurnID)
+	}
 	if event.Branch != "" {
 		create.SetBranch(event.Branch)
 	}

@@ -143,8 +143,9 @@ When adding a tool:
 
 ## Sessions and presentation
 
-`session_storage.go` adapts Storyden persistence to ADK's session service. Each
-non-partial event stores the complete ADK event plus indexed attribution fields:
+`session_storage.go` adapts Storyden persistence to ADK's session service. ADK
+runs with streaming disabled, so each event is stored whole in the ordered
+session event log, together with indexed attribution fields:
 
 - invocation ID
 - branch

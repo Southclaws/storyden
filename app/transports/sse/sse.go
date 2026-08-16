@@ -8,9 +8,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
-	"sync"
 
-	"github.com/google/uuid"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/fault/fmsg"
@@ -34,7 +32,6 @@ import (
 	"github.com/Southclaws/storyden/app/transports/http/middleware/origin"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/reqlog"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
-	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/app/transports/http/robotprojection"
 	"github.com/Southclaws/storyden/internal/infrastructure/httpserver"
 	"github.com/Southclaws/storyden/lib/mcp"
@@ -45,7 +42,6 @@ const (
 	headerNoCache          = "no-cache"
 	headerKeepAlive        = "keep-alive"
 	defaultFinishReason    = "stop"
-	uiMessageStreamVersion = "v1"
 )
 
 // Build wires the SSE transport into the application.
@@ -64,7 +60,6 @@ func MountSSE(
 	sessionRepo *robot_session.Repository,
 	robotQuerier *robot_querier.Querier,
 	toolRegistry *tools.Registry,
-
 	mux *http.ServeMux,
 
 	ri *headers.Middleware,
@@ -73,19 +68,25 @@ func MountSSE(
 	cj *session_cookie.Jar,
 	rl *limiter.Middleware,
 ) {
-	handler := newChatHandler(logger, chatAgent, sessionRepo, robotQuerier, toolRegistry)
+	chatHandler := newChatHandler(logger, chatAgent, sessionRepo, robotQuerier, toolRegistry)
+	readHandler := newDurableReadHandler(logger, chatAgent, sessionRepo, robotQuerier, toolRegistry)
 
-	applied := httpserver.Apply(handler,
-		ri.WithHeaderContext(),
-		co.WithCORS(),
-		lo.WithLogger(),
-		cj.WithAuth(),
-		rl.WithRequestSizeLimiter(),
-		rl.WithRateLimit(),
-	)
+	apply := func(handler http.Handler) http.Handler {
+		return httpserver.Apply(handler,
+			ri.WithHeaderContext(),
+			co.WithCORS(),
+			lo.WithLogger(),
+			cj.WithAuth(),
+			rl.WithRequestSizeLimiter(),
+			rl.WithRateLimit(),
+		)
+	}
 
 	lc.Append(fx.StartHook(func() error {
-		mux.Handle("POST /sse/chat", applied)
+		mux.Handle("POST /sse/chat", apply(chatHandler))
+		mux.Handle("GET /sse/chat/{sessionID}/stream", apply(newReconnectHandler(logger, sessionRepo)))
+		mux.Handle("GET /sse/sessions/{sessionID}/turns/{turnID}", apply(readHandler))
+		mux.Handle("HEAD /sse/sessions/{sessionID}/turns/{turnID}", apply(readHandler))
 		return nil
 	}))
 }
@@ -225,229 +226,71 @@ func newChatHandler(
 			slog.Any("context", req.Context),
 		)
 
-		stream := chatAgent.Run(ctx, robotRef, accountID.String(), sessionID, initMessage, req.Context, storydenagent.RunOptions{
+		turnID, err := chatAgent.Start(ctx, robotRef, accountID.String(), sessionID, initMessage, req.Context, storydenagent.RunOptions{
 			Mode:      storydenagent.ModeInteractive,
 			Source:    storydenagent.SourceInteractiveChat,
 			Workspace: workspaceSpec,
 		})
-
-		emitter, err := newStreamEmitter(w)
 		if err != nil {
-			logger.Error("sse chat flusher", slog.String("error", err.Error()))
+			logger.Error("Robot turn start", slog.String("error", err.Error()))
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		defer emitter.Done()
 
-		responseID := uuid.NewString()
-		textID := uuid.NewString()
+		streamPath := "/sse/sessions/" + robotSessionID.String() + "/turns/" + turnID.String()
 
-		if err := emitter.Headers(); err != nil {
-			logger.Error("sse chat headers", slog.String("error", err.Error()))
-			return
-		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Cache-Control", "no-store")
+		w.Header().Set("Location", streamPath)
+		w.WriteHeader(http.StatusCreated)
+		_ = json.NewEncoder(w).Encode(map[string]string{"streamUrl": streamPath})
+	})
+}
 
-		startPart := openapi.StreamPart{}
-		err = startPart.FromStartPart(openapi.StartPart{MessageId: responseID})
+func newReconnectHandler(logger *slog.Logger, sessions *robot_session.Repository) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		accountID, err := session.GetAccountID(ctx)
 		if err != nil {
-			logger.Error("failed to create start part", slog.String("error", err.Error()))
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+		if err := session.Authorise(ctx, nil, rbac.PermissionUseRobots); err != nil {
+			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
 			return
 		}
 
-		if err := emitter.Send(startPart); err != nil {
-			logger.Debug("sse chat start", slog.String("error", err.Error()))
+		sessionID, err := robot.NewSessionID(r.PathValue("sessionID"))
+		if err != nil {
+			http.Error(w, "invalid session ID: must be a valid xid", http.StatusBadRequest)
 			return
 		}
-
-		finishReason := defaultFinishReason
-		finalSeen := false
-		eventCount := 0
-		sessionIDSent := false
-		projectionFinished := false
-		fallbackTextID := textID
-		delegations := newDelegationStream(
-			ctx,
-			robotQuerier,
-			robotprojection.ToolMetadataFromRegistry(ctx, toolRegistry),
-			emitter,
-			logger,
-		)
-
-		for event, streamErr := range stream {
-			eventCount++
-
-			if streamErr != nil {
-				if errors.Is(streamErr, context.Canceled) || errors.Is(ctx.Err(), context.Canceled) {
-					logger.Debug("sse stream cancelled", slog.Int("event_num", eventCount))
-					return
-				}
-
-				humanReadable := streamErrorText(streamErr)
-				delegations.Fail(humanReadable)
-
-				logger.Error("sse stream error",
-					slog.Int("event_num", eventCount),
-					slog.String("error", streamErr.Error()),
-					slog.String("error_message", humanReadable),
-				)
-
-				errorPart := openapi.StreamPart{}
-				err = errorPart.FromErrorPart(openapi.ErrorPart{
-					ErrorText: humanReadable,
-				})
-				_ = emitter.Send(errorPart)
+		turnID, err := sessions.ResumeTurn(ctx, sessionID, accountID)
+		if err != nil {
+			if errors.Is(err, robot_session.ErrTurnNotFound) {
+				w.WriteHeader(http.StatusNoContent)
 				return
 			}
-
-			if ctx.Err() != nil {
-				return
-			}
-			if projectionFinished {
-				continue
-			}
-
-			if event != nil {
-				if !sessionIDSent {
-					_ = emitter.Send(robotprojection.DataStreamPart("data-session_id", sessionID))
-					sessionIDSent = true
-				}
-
-				logger.Info("sse event received",
-					slog.Int("event_num", eventCount),
-					slog.String("author", event.Author),
-					slog.String("branch", event.Branch),
-					slog.String("isolation_scope", event.IsolationScope),
-					slog.Bool("is_final", event.IsFinalResponse()),
-					slog.Bool("has_content", event.LLMResponse.Content != nil),
-					slog.Bool("is_partial", event.LLMResponse.Partial),
-					slog.Bool("turn_complete", event.LLMResponse.TurnComplete),
-					slog.String("finish_reason", string(event.LLMResponse.FinishReason)),
-				)
-			}
-
-			if event != nil && event.LLMResponse.Content != nil {
-				delegatedEvent := delegations.AppendEvent(event)
-				for _, part := range event.LLMResponse.Content.Parts {
-					if part == nil {
-						continue
-					}
-
-					if !delegatedEvent {
-						presentationParts, consumedFallback := robotprojection.PresentationPartStreamParts(event, part, fallbackTextID)
-						for _, presentationPart := range presentationParts {
-							_ = emitter.Send(presentationPart)
-						}
-						if consumedFallback {
-							fallbackTextID = ""
-						}
-					}
-
-					if part.FunctionCall != nil {
-						if !delegatedEvent && delegations.Start(part.FunctionCall) {
-							continue
-						}
-						if part.FunctionCall.Name == toolconfirmation.FunctionCallName {
-							sendToolConfirmationCall(ctx, event, part, emitter, toolRegistry, logger)
-						} else if toolRequiresConfirmation(ctx, toolRegistry, part.FunctionCall.Name) {
-							continue
-						} else {
-							sendToolCall(ctx, event, part, emitter, toolRegistry, logger)
-						}
-					}
-
-					if part.FunctionResponse != nil {
-						if !delegatedEvent && delegations.Complete(part.FunctionResponse) {
-							continue
-						}
-						if event.Author == "user" {
-							continue
-						}
-						if isClientSidePending(part.FunctionResponse.Response) || toolRequiresConfirmation(ctx, toolRegistry, part.FunctionResponse.Name) {
-							continue
-						}
-						sendToolResult(part, emitter, logger)
-					}
-				}
-
-				// WORKAROUND: Check for client-side tool markers from BeforeToolCallback
-				//
-				// When a client-side tool is called, the
-				// interceptClientSideTools callback in agent.go returns a marker
-				// {"_client_side_pending": true} instead of executing the tool.
-				//
-				// We detect this marker here and finish the client projection. The
-				// coordinator stream is still drained through its terminal blocked event
-				// so the pubsub delivery is acknowledged before its ephemeral subscriber
-				// is closed.
-				//
-				// The frontend will then:
-				// 1. Execute the tool on the client side
-				// 2. POST back the real result
-				// 3. Backend continues the agent with the real result
-				//
-				// See: agent.go:interceptClientSideTools
-				for _, part := range event.LLMResponse.Content.Parts {
-					if part != nil && part.FunctionResponse != nil {
-						if isClientSidePending(part.FunctionResponse.Response) {
-							logger.Info("client-side tool pending, ending stream to wait for client result",
-								slog.String("tool_call_id", part.FunctionResponse.ID))
-
-							finishPart := openapi.StreamPart{}
-							_ = finishPart.FromFinishMessagePart(openapi.FinishMessagePart{})
-							_ = emitter.Send(finishPart)
-
-							projectionFinished = true
-							break
-						}
-					}
-				}
-				if projectionFinished {
-					continue
-				}
-
-				if hasPendingConfirmation(event) {
-					finishPart := openapi.StreamPart{}
-					_ = finishPart.FromFinishMessagePart(openapi.FinishMessagePart{})
-					_ = emitter.Send(finishPart)
-
-					projectionFinished = true
-					continue
-				}
-			}
-
-			if event != nil && event.IsFinalResponse() {
-				finalSeen = true
-				if fr := strings.TrimSpace(string(event.LLMResponse.FinishReason)); fr != "" {
-					finishReason = strings.ToLower(fr)
-				}
-			}
+			logger.Error("durable stream reconnect", slog.String("error", err.Error()))
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
 		}
-		if projectionFinished {
+		allowed, err := sessions.CanReadTurn(ctx, sessionID, turnID, accountID)
+		if err != nil {
+			logger.Error("durable stream reconnect authorisation", slog.String("error", err.Error()))
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		if !allowed {
+			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
 			return
 		}
 
-		logger.Info("sse stream complete",
-			slog.Int("total_events", eventCount),
-			slog.Bool("final_seen", finalSeen),
-			slog.String("finish_reason", finishReason))
-
-		if !finalSeen {
-			finishReason = defaultFinishReason
-		}
-
-		sess, _, err := sessionRepo.Get(ctx, robotSessionID, robot.NewMessageCursorParams(opt.NewEmpty[robot.MessageID](), 1))
-		if err == nil {
-			dataPart := openapi.StreamPart{}
-			dataPart.FromDataPart(openapi.DataPart{
-				Data: sess.Name,
-			})
-			dataPart.Type = "data-session_name"
-			_ = emitter.Send(dataPart)
-		}
-
-		finishPart := openapi.StreamPart{}
-		err = finishPart.FromFinishMessagePart(openapi.FinishMessagePart{})
-		_ = emitter.Send(finishPart)
+		streamPath := "/sse/sessions/" + sessionID.String() + "/turns/" + turnID.String()
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Cache-Control", "no-store")
+		w.Header().Set("Location", streamPath)
+		_ = json.NewEncoder(w).Encode(map[string]string{"streamUrl": streamPath})
 	})
 }
 
@@ -726,7 +569,7 @@ func streamErrorText(err error) string {
 	return fmt.Sprintf("%s (%s)", issue, raw)
 }
 
-func sendToolCall(ctx context.Context, event *adksession.Event, part *genai.Part, emitter *streamEmitter, toolRegistry *tools.Registry, logger *slog.Logger) {
+func sendToolCall(ctx context.Context, event *adksession.Event, part *genai.Part, emitter partEmitter, toolRegistry *tools.Registry, logger *slog.Logger) {
 	fc := part.FunctionCall
 	if fc == nil {
 		return
@@ -752,7 +595,7 @@ func sendToolConfirmationCall(
 	ctx context.Context,
 	event *adksession.Event,
 	part *genai.Part,
-	emitter *streamEmitter,
+	emitter partEmitter,
 	toolRegistry *tools.Registry,
 	logger *slog.Logger,
 ) {
@@ -788,7 +631,7 @@ func sendToolConfirmationCall(
 	_ = emitter.Send(robotprojection.ToolApprovalRequestStreamPart(fc.ID, fc.ID))
 }
 
-func sendToolResult(part *genai.Part, emitter *streamEmitter, logger *slog.Logger) {
+func sendToolResult(part *genai.Part, emitter partEmitter, logger *slog.Logger) {
 	fr := part.FunctionResponse
 	if fr == nil {
 		return
@@ -808,22 +651,6 @@ func sendToolResult(part *genai.Part, emitter *streamEmitter, logger *slog.Logge
 	}
 }
 
-type streamEmitter struct {
-	w              http.ResponseWriter
-	flusher        http.Flusher
-	once           sync.Once
-	mu             sync.Mutex
-	headersWritten bool
-}
-
-func newStreamEmitter(w http.ResponseWriter) (*streamEmitter, error) {
-	flusher, ok := GetFlusher(w)
-	if !ok {
-		return nil, errors.New("streaming unsupported")
-	}
-	return &streamEmitter{w: w, flusher: flusher}, nil
-}
-
 func GetFlusher(w http.ResponseWriter) (http.Flusher, bool) {
 	for {
 		if f, ok := w.(http.Flusher); ok {
@@ -836,55 +663,4 @@ func GetFlusher(w http.ResponseWriter) (http.Flusher, bool) {
 			return nil, false
 		}
 	}
-}
-
-func (s *streamEmitter) Headers() error {
-	s.once.Do(func() {
-		header := s.w.Header()
-		header.Set("Content-Type", contentTypeEventStream)
-		header.Set("Cache-Control", headerNoCache)
-		header.Set("Connection", headerKeepAlive)
-		header.Set("X-Accel-Buffering", "no")
-		header.Set("X-Vercel-AI-UI-Message-Stream", uiMessageStreamVersion)
-		s.headersWritten = true
-	})
-	return nil
-}
-
-func (s *streamEmitter) Send(payload openapi.StreamPart) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	if !s.headersWritten {
-		if err := s.Headers(); err != nil {
-			return err
-		}
-	}
-
-	data, err := json.Marshal(payload)
-	if err != nil {
-		return err
-	}
-
-	if _, err := s.w.Write([]byte("data: ")); err != nil {
-		return err
-	}
-	if _, err := s.w.Write(data); err != nil {
-		return err
-	}
-	if _, err := s.w.Write([]byte("\n\n")); err != nil {
-		return err
-	}
-	s.flusher.Flush()
-	return nil
-}
-
-func (s *streamEmitter) Done() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	if !s.headersWritten {
-		s.Headers()
-	}
-	_, _ = s.w.Write([]byte("data: [DONE]\n\n"))
-	s.flusher.Flush()
 }

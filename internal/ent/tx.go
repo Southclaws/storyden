@@ -100,6 +100,8 @@ type Tx struct {
 	RobotSession *RobotSessionClient
 	// RobotSessionMessage is the client for interacting with the RobotSessionMessage builders.
 	RobotSessionMessage *RobotSessionMessageClient
+	// RobotSessionTurn is the client for interacting with the RobotSessionTurn builders.
+	RobotSessionTurn *RobotSessionTurnClient
 	// RobotSessionView is the client for interacting with the RobotSessionView builders.
 	RobotSessionView *RobotSessionViewClient
 	// RobotToolset is the client for interacting with the RobotToolset builders.
@@ -292,6 +294,7 @@ func (tx *Tx) init() {
 	tx.RobotProviderModel = NewRobotProviderModelClient(tx.config)
 	tx.RobotSession = NewRobotSessionClient(tx.config)
 	tx.RobotSessionMessage = NewRobotSessionMessageClient(tx.config)
+	tx.RobotSessionTurn = NewRobotSessionTurnClient(tx.config)
 	tx.RobotSessionView = NewRobotSessionViewClient(tx.config)
 	tx.RobotToolset = NewRobotToolsetClient(tx.config)
 	tx.RobotWorkspace = NewRobotWorkspaceClient(tx.config)

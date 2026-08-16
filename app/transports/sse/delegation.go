@@ -37,7 +37,7 @@ type delegationStream struct {
 	ctx          context.Context
 	robotQuerier *robot_querier.Querier
 	toolMetadata robotprojection.ToolMetadataResolver
-	emitter      *streamEmitter
+	emitter      partEmitter
 	logger       *slog.Logger
 	active       map[string]*delegationData
 }
@@ -46,7 +46,7 @@ func newDelegationStream(
 	ctx context.Context,
 	robotQuerier *robot_querier.Querier,
 	toolMetadata robotprojection.ToolMetadataResolver,
-	emitter *streamEmitter,
+	emitter partEmitter,
 	logger *slog.Logger,
 ) *delegationStream {
 	return &delegationStream{

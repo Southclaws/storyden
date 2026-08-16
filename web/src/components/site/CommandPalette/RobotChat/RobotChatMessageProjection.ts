@@ -186,7 +186,7 @@ function projectDelegations(
   const inferredScopes = inferDelegationScopes(messages);
 
   messages.forEach((message, index) => {
-    const isolationScope = message.isolation_scope ?? inferredScopes.get(index);
+    const isolationScope = delegationScope(message, index, inferredScopes);
     if (!isolationScope) {
       return;
     }
@@ -228,7 +228,7 @@ function projectDelegations(
   }
 
   return messages.flatMap<StorydenUIMessage>((message, index) => {
-    const isolationScope = message.isolation_scope ?? inferredScopes.get(index);
+    const isolationScope = delegationScope(message, index, inferredScopes);
     if (isolationScope) {
       const group = groups.get(isolationScope);
       if (group && !group.inserted && index === group.firstMessageIndex) {
@@ -258,6 +258,18 @@ function projectDelegations(
 
     return [{ ...message, parts }];
   });
+}
+
+function delegationScope(
+  message: StorydenUIMessage,
+  index: number,
+  inferredScopes: ReadonlyMap<number, string>,
+): string | undefined {
+  if (!message.branch) {
+    return undefined;
+  }
+
+  return message.isolation_scope ?? inferredScopes.get(index);
 }
 
 function inferDelegationScopes(

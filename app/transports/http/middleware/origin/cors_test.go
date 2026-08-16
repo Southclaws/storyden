@@ -1,7 +1,10 @@
 package origin
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -72,4 +75,26 @@ func TestNormaliseOrigin(t *testing.T) {
 	assert.Equal(t, "", normaliseOrigin(""))
 	assert.Equal(t, "", normaliseOrigin("notaurl"))
 	assert.Equal(t, "", normaliseOrigin("https://"))
+}
+
+func TestCORSExposesDurableStreamHeaders(t *testing.T) {
+	cfg := config.Config{
+		PublicWebAddress: mustURL(t, "https://app.example.com"),
+		PublicAPIAddress: mustURL(t, "https://api.example.com"),
+	}
+	handler := New(cfg).WithCORS()(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	request := httptest.NewRequest(http.MethodGet, "https://api.example.com/sse/sessions/example/turns/example", nil)
+	request.Header.Set("Origin", "https://app.example.com")
+	recorder := httptest.NewRecorder()
+
+	handler.ServeHTTP(recorder, request)
+
+	exposed := strings.Split(recorder.Header().Get("Access-Control-Expose-Headers"), ", ")
+	assert.Contains(t, exposed, "Location")
+	assert.Contains(t, exposed, "Stream-Next-Offset")
+	assert.Contains(t, exposed, "Stream-Up-To-Date")
+	assert.Contains(t, exposed, "Stream-Closed")
+	assert.Contains(t, exposed, "Stream-Cursor")
 }

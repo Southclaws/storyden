@@ -22,8 +22,10 @@ func (id MessageID) String() string {
 type Message struct {
 	ID        MessageID
 	CreatedAt time.Time
+	Sequence  uint64
 
 	SessionID      SessionID
+	TurnID         opt.Optional[TurnID]
 	InvocationID   string
 	Branch         opt.Optional[string]
 	IsolationScope opt.Optional[string]
@@ -90,7 +92,9 @@ func MapMessage(m *ent.RobotSessionMessage) (*Message, error) {
 	return &Message{
 		ID:             MessageID(m.ID),
 		CreatedAt:      m.CreatedAt,
+		Sequence:       m.Sequence,
 		SessionID:      SessionID(m.SessionID),
+		TurnID:         opt.Map(opt.NewPtr(m.TurnID), func(id xid.ID) TurnID { return TurnID(id) }),
 		InvocationID:   m.InvocationID,
 		Branch:         opt.NewIf(m.Branch, func(value string) bool { return value != "" }),
 		IsolationScope: opt.NewIf(m.IsolationScope, func(value string) bool { return value != "" }),

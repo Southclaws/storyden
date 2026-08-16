@@ -49,6 +49,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/robotprovidermodel"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
+	"github.com/Southclaws/storyden/internal/ent/robotsessionturn"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionview"
 	"github.com/Southclaws/storyden/internal/ent/robottoolset"
 	"github.com/Southclaws/storyden/internal/ent/robotworkspace"
@@ -1784,6 +1785,10 @@ func init() {
 	robotsessionDescLeaseGeneration := robotsessionFields[6].Descriptor()
 	// robotsession.DefaultLeaseGeneration holds the default value on creation for the lease_generation field.
 	robotsession.DefaultLeaseGeneration = robotsessionDescLeaseGeneration.Default.(uint64)
+	// robotsessionDescNextEventSequence is the schema descriptor for next_event_sequence field.
+	robotsessionDescNextEventSequence := robotsessionFields[7].Descriptor()
+	// robotsession.DefaultNextEventSequence holds the default value on creation for the next_event_sequence field.
+	robotsession.DefaultNextEventSequence = robotsessionDescNextEventSequence.Default.(uint64)
 	// robotsessionDescID is the schema descriptor for id field.
 	robotsessionDescID := robotsessionMixinFields0[0].Descriptor()
 	// robotsession.DefaultID holds the default value on creation for the id field.
@@ -1835,6 +1840,45 @@ func init() {
 			return nil
 		}
 	}()
+	robotsessionturnMixin := schema.RobotSessionTurn{}.Mixin()
+	robotsessionturnMixinFields0 := robotsessionturnMixin[0].Fields()
+	_ = robotsessionturnMixinFields0
+	robotsessionturnMixinFields1 := robotsessionturnMixin[1].Fields()
+	_ = robotsessionturnMixinFields1
+	robotsessionturnMixinFields2 := robotsessionturnMixin[2].Fields()
+	_ = robotsessionturnMixinFields2
+	robotsessionturnFields := schema.RobotSessionTurn{}.Fields()
+	_ = robotsessionturnFields
+	// robotsessionturnDescCreatedAt is the schema descriptor for created_at field.
+	robotsessionturnDescCreatedAt := robotsessionturnMixinFields1[0].Descriptor()
+	// robotsessionturn.DefaultCreatedAt holds the default value on creation for the created_at field.
+	robotsessionturn.DefaultCreatedAt = robotsessionturnDescCreatedAt.Default.(func() time.Time)
+	// robotsessionturnDescUpdatedAt is the schema descriptor for updated_at field.
+	robotsessionturnDescUpdatedAt := robotsessionturnMixinFields2[0].Descriptor()
+	// robotsessionturn.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	robotsessionturn.DefaultUpdatedAt = robotsessionturnDescUpdatedAt.Default.(func() time.Time)
+	// robotsessionturn.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	robotsessionturn.UpdateDefaultUpdatedAt = robotsessionturnDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// robotsessionturnDescID is the schema descriptor for id field.
+	robotsessionturnDescID := robotsessionturnMixinFields0[0].Descriptor()
+	// robotsessionturn.DefaultID holds the default value on creation for the id field.
+	robotsessionturn.DefaultID = robotsessionturnDescID.Default.(func() xid.ID)
+	// robotsessionturn.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	robotsessionturn.IDValidator = func() func(string) error {
+		validators := robotsessionturnDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	robotsessionviewMixin := schema.RobotSessionView{}.Mixin()
 	robotsessionviewMixinFields0 := robotsessionviewMixin[0].Fields()
 	_ = robotsessionviewMixinFields0
@@ -1858,6 +1902,10 @@ func init() {
 	robotsessionviewDescLastAccessedAt := robotsessionviewFields[2].Descriptor()
 	// robotsessionview.DefaultLastAccessedAt holds the default value on creation for the last_accessed_at field.
 	robotsessionview.DefaultLastAccessedAt = robotsessionviewDescLastAccessedAt.Default.(func() time.Time)
+	// robotsessionviewDescLastSeenEventSequence is the schema descriptor for last_seen_event_sequence field.
+	robotsessionviewDescLastSeenEventSequence := robotsessionviewFields[4].Descriptor()
+	// robotsessionview.DefaultLastSeenEventSequence holds the default value on creation for the last_seen_event_sequence field.
+	robotsessionview.DefaultLastSeenEventSequence = robotsessionviewDescLastSeenEventSequence.Default.(uint64)
 	// robotsessionviewDescID is the schema descriptor for id field.
 	robotsessionviewDescID := robotsessionviewMixinFields0[0].Descriptor()
 	// robotsessionview.DefaultID holds the default value on creation for the id field.

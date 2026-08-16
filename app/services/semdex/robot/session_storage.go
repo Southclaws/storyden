@@ -229,7 +229,7 @@ func (s *sessionStorage) AppendEvent(ctx context.Context, sess adksession.Sessio
 			//
 			// The delegated agent's next model step expects its own tool history
 			// to remain unscoped, so keep the live history intact while decorating
-			// the durable event and streamed event with the Robot call ID used for
+			// the stored event and streamed event with the Robot call ID used for
 			// attribution and hydration.
 			storedCopy := *event
 			storedCopy.IsolationScope = inferredScope

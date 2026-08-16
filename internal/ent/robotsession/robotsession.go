@@ -34,6 +34,8 @@ const (
 	FieldLeaseToken = "lease_token"
 	// FieldLeaseGeneration holds the string denoting the lease_generation field in the database.
 	FieldLeaseGeneration = "lease_generation"
+	// FieldNextEventSequence holds the string denoting the next_event_sequence field in the database.
+	FieldNextEventSequence = "next_event_sequence"
 	// FieldLeaseExpiresAt holds the string denoting the lease_expires_at field in the database.
 	FieldLeaseExpiresAt = "lease_expires_at"
 	// EdgeCreator holds the string denoting the creator edge name in mutations.
@@ -42,6 +44,8 @@ const (
 	EdgeViews = "views"
 	// EdgeMessages holds the string denoting the messages edge name in mutations.
 	EdgeMessages = "messages"
+	// EdgeTurns holds the string denoting the turns edge name in mutations.
+	EdgeTurns = "turns"
 	// Table holds the table name of the robotsession in the database.
 	Table = "robot_sessions"
 	// CreatorTable is the table that holds the creator relation/edge.
@@ -65,6 +69,13 @@ const (
 	MessagesInverseTable = "robot_session_messages"
 	// MessagesColumn is the table column denoting the messages relation/edge.
 	MessagesColumn = "session_id"
+	// TurnsTable is the table that holds the turns relation/edge.
+	TurnsTable = "robot_session_turns"
+	// TurnsInverseTable is the table name for the RobotSessionTurn entity.
+	// It exists in this package in order to avoid circular dependency with the "robotsessionturn" package.
+	TurnsInverseTable = "robot_session_turns"
+	// TurnsColumn is the table column denoting the turns relation/edge.
+	TurnsColumn = "session_id"
 )
 
 // Columns holds all SQL columns for robotsession fields.
@@ -79,6 +90,7 @@ var Columns = []string{
 	FieldActiveTurnID,
 	FieldLeaseToken,
 	FieldLeaseGeneration,
+	FieldNextEventSequence,
 	FieldLeaseExpiresAt,
 }
 
@@ -103,6 +115,8 @@ var (
 	DefaultName func() string
 	// DefaultLeaseGeneration holds the default value on creation for the "lease_generation" field.
 	DefaultLeaseGeneration uint64
+	// DefaultNextEventSequence holds the default value on creation for the "next_event_sequence" field.
+	DefaultNextEventSequence uint64
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -184,6 +198,11 @@ func ByLeaseGeneration(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLeaseGeneration, opts...).ToFunc()
 }
 
+// ByNextEventSequence orders the results by the next_event_sequence field.
+func ByNextEventSequence(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNextEventSequence, opts...).ToFunc()
+}
+
 // ByLeaseExpiresAt orders the results by the lease_expires_at field.
 func ByLeaseExpiresAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLeaseExpiresAt, opts...).ToFunc()
@@ -223,6 +242,20 @@ func ByMessages(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newMessagesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByTurnsCount orders the results by turns count.
+func ByTurnsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newTurnsStep(), opts...)
+	}
+}
+
+// ByTurns orders the results by turns terms.
+func ByTurns(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newTurnsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newCreatorStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -242,5 +275,12 @@ func newMessagesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(MessagesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, MessagesTable, MessagesColumn),
+	)
+}
+func newTurnsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(TurnsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, TurnsTable, TurnsColumn),
 	)
 }

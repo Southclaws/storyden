@@ -25,6 +25,10 @@ const (
 	FieldAccountID = "account_id"
 	// FieldLastAccessedAt holds the string denoting the last_accessed_at field in the database.
 	FieldLastAccessedAt = "last_accessed_at"
+	// FieldResumeTurnID holds the string denoting the resume_turn_id field in the database.
+	FieldResumeTurnID = "resume_turn_id"
+	// FieldLastSeenEventSequence holds the string denoting the last_seen_event_sequence field in the database.
+	FieldLastSeenEventSequence = "last_seen_event_sequence"
 	// EdgeSession holds the string denoting the session edge name in mutations.
 	EdgeSession = "session"
 	// EdgeAccount holds the string denoting the account edge name in mutations.
@@ -55,6 +59,8 @@ var Columns = []string{
 	FieldSessionID,
 	FieldAccountID,
 	FieldLastAccessedAt,
+	FieldResumeTurnID,
+	FieldLastSeenEventSequence,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -76,6 +82,8 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 	// DefaultLastAccessedAt holds the default value on creation for the "last_accessed_at" field.
 	DefaultLastAccessedAt func() time.Time
+	// DefaultLastSeenEventSequence holds the default value on creation for the "last_seen_event_sequence" field.
+	DefaultLastSeenEventSequence uint64
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -113,6 +121,16 @@ func ByAccountID(opts ...sql.OrderTermOption) OrderOption {
 // ByLastAccessedAt orders the results by the last_accessed_at field.
 func ByLastAccessedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLastAccessedAt, opts...).ToFunc()
+}
+
+// ByResumeTurnID orders the results by the resume_turn_id field.
+func ByResumeTurnID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldResumeTurnID, opts...).ToFunc()
+}
+
+// ByLastSeenEventSequence orders the results by the last_seen_event_sequence field.
+func ByLastSeenEventSequence(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLastSeenEventSequence, opts...).ToFunc()
 }
 
 // BySessionField orders the results by session field.

@@ -1,7 +1,6 @@
 package chat_test
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -14,6 +13,8 @@ import (
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/require"
+
+	robottest "github.com/Southclaws/storyden/tests/robot"
 )
 
 const (
@@ -23,6 +24,7 @@ const (
 	mockModelToolError       = "mock/../scripts/robot-chat-tool-error.yaml"
 	mockModelLLMError        = "mock/../scripts/robot-chat-llm-error.yaml"
 	mockModelAck             = "mock/../scripts/robot-chat-ack.yaml"
+	mockModelDelayed         = "mock/../scripts/robot-chat-delayed.yaml"
 
 	mockModelLibrarySearchPages = "mock/../scripts/robot-chat-library-search-pages.yaml"
 	mockModelContentSearch      = "mock/../scripts/robot-chat-content-search.yaml"
@@ -51,7 +53,8 @@ func robotIDPtr(robotID string) *string {
 }
 
 type fullResponse struct {
-	parts []openapi.StreamPart
+	parts       []openapi.StreamPart
+	usedLiveSSE bool
 }
 
 type delegationStreamData struct {
@@ -97,28 +100,8 @@ func doChat(
 	require.NoError(t, err)
 	defer resp.Body.Close()
 
-	require.Equal(t, http.StatusOK, resp.StatusCode)
-
-	ev := &fullResponse{}
-	scanner := bufio.NewScanner(resp.Body)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if !strings.HasPrefix(line, "data: ") {
-			continue
-		}
-		data := strings.TrimPrefix(line, "data: ")
-		if data == "[DONE]" {
-			break
-		}
-		var part openapi.StreamPart
-		if err := json.Unmarshal([]byte(data), &part); err != nil {
-			continue
-		}
-		ev.parts = append(ev.parts, part)
-	}
-	require.NoError(t, scanner.Err())
-
-	return ev
+	require.Equal(t, http.StatusCreated, resp.StatusCode)
+	return readDurableChatParts(t, ctx, ts, session, resp)
 }
 
 func doChatToolOutput(
@@ -175,28 +158,24 @@ func doChatToolOutputs(
 	require.NoError(t, err)
 	defer resp.Body.Close()
 
-	require.Equal(t, http.StatusOK, resp.StatusCode)
+	require.Equal(t, http.StatusCreated, resp.StatusCode)
+	return readDurableChatParts(t, ctx, ts, session, resp)
+}
 
-	ev := &fullResponse{}
-	scanner := bufio.NewScanner(resp.Body)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if !strings.HasPrefix(line, "data: ") {
-			continue
-		}
-		data := strings.TrimPrefix(line, "data: ")
-		if data == "[DONE]" {
-			break
-		}
-		var part openapi.StreamPart
-		if err := json.Unmarshal([]byte(data), &part); err != nil {
-			continue
-		}
-		ev.parts = append(ev.parts, part)
-	}
-	require.NoError(t, scanner.Err())
+func readDurableChatParts(
+	t *testing.T,
+	ctx context.Context,
+	ts *httptest.Server,
+	session openapi.RequestEditorFn,
+	created *http.Response,
+) *fullResponse {
+	t.Helper()
 
-	return ev
+	location := created.Header.Get("Location")
+	require.NotEmpty(t, location)
+	read, err := robottest.ReadDurableJSON[openapi.StreamPart](ctx, ts.URL+location, session)
+	require.NoError(t, err)
+	return &fullResponse{parts: read.Items, usedLiveSSE: read.UsedLiveSSE}
 }
 
 func collectToolInputs(ev *fullResponse) []openapi.ToolInputAvailablePart {

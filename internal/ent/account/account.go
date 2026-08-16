@@ -132,6 +132,8 @@ const (
 	EdgeRobotSessionViews = "robot_session_views"
 	// EdgeRobotMessages holds the string denoting the robot_messages edge name in mutations.
 	EdgeRobotMessages = "robot_messages"
+	// EdgeInitiatedRobotTurns holds the string denoting the initiated_robot_turns edge name in mutations.
+	EdgeInitiatedRobotTurns = "initiated_robot_turns"
 	// EdgeAccountRoles holds the string denoting the account_roles edge name in mutations.
 	EdgeAccountRoles = "account_roles"
 	// Table holds the table name of the account in the database.
@@ -440,6 +442,13 @@ const (
 	RobotMessagesInverseTable = "robot_session_messages"
 	// RobotMessagesColumn is the table column denoting the robot_messages relation/edge.
 	RobotMessagesColumn = "account_id"
+	// InitiatedRobotTurnsTable is the table that holds the initiated_robot_turns relation/edge.
+	InitiatedRobotTurnsTable = "robot_session_turns"
+	// InitiatedRobotTurnsInverseTable is the table name for the RobotSessionTurn entity.
+	// It exists in this package in order to avoid circular dependency with the "robotsessionturn" package.
+	InitiatedRobotTurnsInverseTable = "robot_session_turns"
+	// InitiatedRobotTurnsColumn is the table column denoting the initiated_robot_turns relation/edge.
+	InitiatedRobotTurnsColumn = "initiated_by_account_id"
 	// AccountRolesTable is the table that holds the account_roles relation/edge.
 	AccountRolesTable = "account_roles"
 	// AccountRolesInverseTable is the table name for the AccountRoles entity.
@@ -1236,6 +1245,20 @@ func ByRobotMessages(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByInitiatedRobotTurnsCount orders the results by initiated_robot_turns count.
+func ByInitiatedRobotTurnsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newInitiatedRobotTurnsStep(), opts...)
+	}
+}
+
+// ByInitiatedRobotTurns orders the results by initiated_robot_turns terms.
+func ByInitiatedRobotTurns(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newInitiatedRobotTurnsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByAccountRolesCount orders the results by account_roles count.
 func ByAccountRolesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -1555,6 +1578,13 @@ func newRobotMessagesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RobotMessagesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, RobotMessagesTable, RobotMessagesColumn),
+	)
+}
+func newInitiatedRobotTurnsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(InitiatedRobotTurnsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, InitiatedRobotTurnsTable, InitiatedRobotTurnsColumn),
 	)
 }
 func newAccountRolesStep() *sqlgraph.Step {

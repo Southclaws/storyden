@@ -186,5 +186,8 @@ func (Account) Edges() []ent.Edge {
 
 		edge.To("robot_messages", RobotSessionMessage.Type).
 			Annotations(entsql.OnDelete(entsql.SetNull)),
+
+		edge.To("initiated_robot_turns", RobotSessionTurn.Type).
+			Annotations(entsql.OnDelete(entsql.SetNull)),
 	}
 }
