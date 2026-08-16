@@ -1,0 +1,15 @@
+# Linguist overrides: keep GitHub's language stats representative of the
+# actual product source (Go backend + TypeScript frontend) rather than
+# generated output, vendored tooling and the separate docs site.
+
+# Panda CSS codegen output - regenerated from web/panda.config.ts on every build.
+web/styled-system/** linguist-generated=true
+home/src/styled-system/** linguist-generated=true
+
+# Vendored agent skills/plugins - third-party scripts, not product code.
+.claude/** linguist-vendored=true
+.agents/** linguist-vendored=true
+.codex/** linguist-vendored=true
+
+# Marketing site + documentation, not part of the platform itself.
+home/** linguist-documentation=true
