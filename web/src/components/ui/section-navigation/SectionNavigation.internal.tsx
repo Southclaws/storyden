@@ -19,6 +19,10 @@ export type SectionNavigationGroup = {
   items: readonly SectionNavigationItem[];
 };
 
+export function isSectionActive(href: string, activeHref: string) {
+  return activeHref === href || activeHref.startsWith(`${href}/`);
+}
+
 export type SectionNavigationInternalProps = {
   activeHref: string;
   className?: string;
@@ -41,7 +45,7 @@ export function SectionNavigationInternal({
   const styles = sectionNavigation();
   const items = groups.flatMap((group) => group.items);
   const activeItem =
-    items.find((item) => item.href === activeHref) ?? items.at(0);
+    items.find((item) => isSectionActive(item.href, activeHref)) ?? items.at(0);
 
   if (!activeItem) {
     return null;
@@ -78,7 +82,7 @@ export function SectionNavigationInternal({
                     )}
                     <ul className={styles.items}>
                       {group.items.map((item) => {
-                        const active = item.href === activeHref;
+                        const active = isSectionActive(item.href, activeHref);
 
                         return (
                           <li className={styles.item} key={item.href}>

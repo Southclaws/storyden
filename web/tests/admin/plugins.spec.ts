@@ -49,14 +49,11 @@ test.describe("admin plugins", () => {
 
     const card = page.getByRole("link", { name: plugin.name, exact: true });
     await expect(card).toBeVisible();
-    await expect(card).toHaveAttribute(
-      "href",
-      new RegExp(`plugin=${plugin.id}`),
-    );
+    await expect(card).toHaveAttribute("href", `/admin/plugins/${plugin.id}`);
 
     await card.click();
 
-    await expect(page).toHaveURL(new RegExp(`\\?plugin=${plugin.id}`));
+    await expect(page).toHaveURL(`/admin/plugins/${plugin.id}`);
     await expect(
       page.getByRole("heading", { name: plugin.name }),
     ).toBeVisible();
@@ -79,12 +76,22 @@ test.describe("admin plugins", () => {
 
     await loginAsAdmin(page, seed);
 
-    await page.goto(`/admin/plugins?plugin=${plugin.id}`);
+    await page.goto(`/admin/plugins/${plugin.id}`);
 
     await expect(
       page.getByRole("heading", { name: plugin.name }),
     ).toBeVisible();
     await expect(page.getByRole("tab", { name: "Overview" })).toBeVisible();
+
+    await expect(
+      page.locator(".section-navigation-layout__mobile-navigation"),
+    ).toBeAttached();
+    await page.waitForLoadState("networkidle");
+
+    await expect(page).toHaveURL(`/admin/plugins/${plugin.id}`);
+    await expect(
+      page.getByRole("heading", { name: plugin.name }),
+    ).toBeVisible();
 
     await withAdminAccessKey(({ pluginDelete }) => pluginDelete(plugin.id));
   });

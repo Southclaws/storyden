@@ -7,7 +7,10 @@ import { useAccountGet } from "@/api/openapi-client/accounts";
 import { Permission } from "@/api/openapi-schema";
 import { BackAction } from "@/components/site/Action/Back";
 import { UnreadyBanner } from "@/components/site/Unready";
-import { SectionNavigation } from "@/components/ui/section-navigation";
+import {
+  SectionNavigation,
+  isSectionActive,
+} from "@/components/ui/section-navigation";
 import { useSettings } from "@/lib/settings/settings-client";
 import {
   DEFAULT_ADMIN_SECTION,
@@ -32,7 +35,9 @@ export default function Layout({ children }: PropsWithChildren) {
       : [];
   const sectionAvailable =
     pathname === "/admin" ||
-    groups.some((group) => group.items.some(({ href }) => href === pathname));
+    groups.some((group) =>
+      group.items.some(({ href }) => isSectionActive(href, pathname)),
+    );
 
   useEffect(() => {
     if (ready && authorised && !sectionAvailable) {

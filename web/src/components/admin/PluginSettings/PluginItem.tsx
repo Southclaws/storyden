@@ -1,6 +1,5 @@
 import { formatDate } from "date-fns";
 import Link from "next/link";
-import { MouseEvent } from "react";
 import { useSWRConfig } from "swr";
 
 import { mutateTransaction } from "@/api/mutate";
@@ -18,7 +17,6 @@ import { HStack, LStack, WStack } from "@/styled-system/jsx";
 import { linkOverlay } from "@/styled-system/patterns";
 
 import { PluginStatusBadge } from "./PluginStatusBadge";
-import { useSelectedPlugin } from "./useSelectedPlugin";
 import { isPluginStatusError } from "./utils";
 
 type Props = {
@@ -26,7 +24,6 @@ type Props = {
 };
 
 export function PluginItem({ plugin }: Props) {
-  const [_, setSelectedPlugin] = useSelectedPlugin();
   const { mutate } = useSWRConfig();
 
   const { trigger: deletePlugin } = usePluginDelete(plugin.id);
@@ -54,15 +51,6 @@ export function PluginItem({ plugin }: Props) {
 
   const isError = plugin.status.active_state === "error";
 
-  const handleSelectPlugin = (e: MouseEvent<HTMLAnchorElement>) => {
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) {
-      return;
-    }
-
-    e.preventDefault();
-    setSelectedPlugin(plugin.id);
-  };
-
   return (
     <CardBox as="li" position="relative">
       <LStack>
@@ -70,8 +58,7 @@ export function PluginItem({ plugin }: Props) {
           <HStack alignItems="center">
             <Link
               className={linkOverlay()}
-              href={`?plugin=${plugin.id}`}
-              onClick={handleSelectPlugin}
+              href={`/admin/plugins/${plugin.id}`}
             >
               <Text
                 variant="supporting"
