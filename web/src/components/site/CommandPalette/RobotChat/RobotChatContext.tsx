@@ -228,7 +228,7 @@ export function RobotChatContext({
     };
 
     return createDurableChatTransport<StorydenUIMessage>({
-      api: `${API_ADDRESS}/sse/chat`,
+      api: `${API_ADDRESS}/api/robots/sessions`,
       fetchClient,
     });
   }, [getPageContext, rootRobotID, selectedWorkspaceID]);

@@ -9,18 +9,18 @@ describe("createDurableChatTransport", () => {
       const url = input.toString();
       if (init?.method === "POST") {
         return new Response(
-          JSON.stringify({ streamUrl: "http://api.test/sse/sessions/session-1/turns/turn-1" }),
+          JSON.stringify({ streamUrl: "http://api.test/api/robots/sessions/session-1/turns/turn-1" }),
           {
             status: 201,
             headers: {
               "Content-Type": "application/json",
-              Location: "http://api.test/sse/sessions/session-1/turns/turn-1",
+              Location: "http://api.test/api/robots/sessions/session-1/turns/turn-1",
             },
           },
         );
       }
 
-      expect(url).toContain("/sse/sessions/session-1/turns/turn-1?offset=-1");
+      expect(url).toContain("/api/robots/sessions/session-1/turns/turn-1?offset=-1");
       return new Response(
         JSON.stringify([
           { type: "start", messageId: "response-1" },
@@ -38,7 +38,7 @@ describe("createDurableChatTransport", () => {
     });
 
     const transport = createDurableChatTransport({
-      api: "http://api.test/sse/chat",
+      api: "http://api.test/api/robots/sessions",
       fetchClient,
     });
     const response = await transport.sendMessages({

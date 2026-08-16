@@ -13,7 +13,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
-	"github.com/Southclaws/storyden/app/transports/sse"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -26,7 +25,6 @@ func TestRobotDurableStreamOfficialClient(t *testing.T) {
 		&config.Config{LanguageModelProvider: "mock"},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelDelayed),
-		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,

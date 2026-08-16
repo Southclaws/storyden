@@ -118,7 +118,7 @@ func register(pl Plugin) {
 	require.Contains(t, result.Issues[0].Message, "pl.OnActivityCreated")
 }
 
-func TestPluginLintFlagsRobotChatSSEForPluginRobotRuns(t *testing.T) {
+func TestPluginLintFlagsRobotSessionCreateForPluginRobotRuns(t *testing.T) {
 	ctx := context.Background()
 	workspace, err := localworkspace.NewWorkspace(t.TempDir())
 	require.NoError(t, err)
@@ -129,10 +129,10 @@ import "context"
 
 type Client struct{}
 
-func (c Client) RobotChatSSEWithResponse(context.Context, string) error { return nil }
+func (c Client) RobotSessionCreateWithResponse(context.Context, string) error { return nil }
 
 func run(ctx context.Context, client Client) error {
-	return client.RobotChatSSEWithResponse(ctx, "robot")
+	return client.RobotSessionCreateWithResponse(ctx, "robot")
 }
 `)
 
@@ -142,7 +142,7 @@ func run(ctx context.Context, client Client) error {
 	require.NoError(t, err)
 	require.False(t, result.Success)
 	require.Len(t, result.Issues, 1)
-	require.Contains(t, result.Issues[0].Message, "UI streaming endpoint")
+	require.Contains(t, result.Issues[0].Message, "UI endpoints")
 	require.Contains(t, result.Issues[0].Message, "pl.RunRobot")
 }
 

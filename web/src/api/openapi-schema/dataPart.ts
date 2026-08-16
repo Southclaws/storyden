@@ -8,14 +8,13 @@
  * OpenAPI spec version: v1.26.15-post
  */
 import type { ArbitraryData } from "./arbitraryData";
-import type { DataPartType } from "./dataPartType";
 
 export interface DataPart {
   /**
    * Custom data part types, e.g. "data-weather".
    * @pattern ^data-[A-Za-z0-9][A-Za-z0-9._-]*$
    */
-  type: DataPartType;
+  type: string;
   /** Optional identifier for this data part. */
   id?: string;
   data: ArbitraryData;

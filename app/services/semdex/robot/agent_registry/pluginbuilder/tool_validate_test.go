@@ -502,7 +502,7 @@ func TestValidationNextActionForGoErrorsPointsToDiscovery(t *testing.T) {
 func TestValidationNextActionPrioritisesMissingGoSymbolsOverConfiguration(t *testing.T) {
 	result := ValidateResult{Checks: []ValidationCheck{
 		{Name: "configuration_implementation", Success: false, Message: "configuration_schema fields are not read from runtime configuration in Go source: discord_token"},
-		{Name: "go_test", Success: false, Output: "./main.go:64:24: client.RobotChatSSEWithResponse undefined (type *openapi.ClientWithResponses has no field or method RobotChatSSEWithResponse)"},
+		{Name: "go_test", Success: false, Output: "./main.go:64:24: client.RobotSessionCreateWithResponse undefined (type *openapi.ClientWithResponses has no field or method RobotSessionCreateWithResponse)"},
 	}}
 
 	next := validationNextAction(result)

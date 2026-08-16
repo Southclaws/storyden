@@ -136,7 +136,7 @@ func TestStorydenSDKSearchFindsRobotRunFromNaturalQueries(t *testing.T) {
 		require.NoError(t, err)
 		requireSymbol(t, result.Symbols, "RunRobot", "method")
 		requireSDKHint(t, result.Hints, "USE_ROBOTS")
-		requireSDKHint(t, result.Hints, "Do not use generated HTTP RobotChatSSE")
+		requireSDKHint(t, result.Hints, "Do not use generated HTTP RobotSessionCreate")
 	}
 }
 

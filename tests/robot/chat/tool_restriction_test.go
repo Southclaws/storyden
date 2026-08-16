@@ -18,7 +18,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
-	"github.com/Southclaws/storyden/app/transports/sse"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -76,7 +75,6 @@ func TestRobotCreateToolPersistsToolsets(t *testing.T) {
 		},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelAck),
-		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,
@@ -159,7 +157,6 @@ func TestCustomRobotCanRunAnIndividualTool(t *testing.T) {
 		},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelAck),
-		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,
@@ -218,7 +215,6 @@ func TestRobotChatStartsAndContinuesWithRequestedCustomRobot(t *testing.T) {
 		},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelSimple),
-		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,
@@ -281,7 +277,6 @@ func TestDenbotIncludesToolsetDiscovery(t *testing.T) {
 		},
 		e2e.Setup(),
 		robot.WithRobotSettings("mock/../scripts/robot-chat-toolset-search.yaml"),
-		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,

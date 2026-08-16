@@ -1,4 +1,4 @@
-package sse
+package bindings
 
 import (
 	"context"
@@ -9,8 +9,6 @@ import (
 	"net/http"
 	"strings"
 
-	"go.uber.org/fx"
-
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
@@ -18,22 +16,14 @@ import (
 	"google.golang.org/adk/v2/tool/toolconfirmation"
 	"google.golang.org/genai"
 
-	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/robot"
-	"github.com/Southclaws/storyden/app/resources/robot/robot_querier"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	storydenagent "github.com/Southclaws/storyden/app/services/semdex/robot"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry/denbot"
-	"github.com/Southclaws/storyden/app/services/semdex/robot/session_coordinator"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/tools"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/headers"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/limiter"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/origin"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/reqlog"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
+	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/app/transports/http/robotprojection"
-	"github.com/Southclaws/storyden/internal/infrastructure/httpserver"
 	"github.com/Southclaws/storyden/lib/mcp"
 )
 
@@ -44,51 +34,18 @@ const (
 	defaultFinishReason    = "stop"
 )
 
-// Build wires the SSE transport into the application.
-func Build() fx.Option {
-	return fx.Options(
-		fx.Invoke(MountSSE),
-	)
+type robotSessionCreateResponseFunc func(http.ResponseWriter)
+
+func (f robotSessionCreateResponseFunc) VisitRobotSessionCreateResponse(w http.ResponseWriter) error {
+	f(w)
+	return nil
 }
 
-func MountSSE(
-	lc fx.Lifecycle,
-	ctx context.Context,
-	logger *slog.Logger,
+type robotSessionStreamResponseFunc func(http.ResponseWriter)
 
-	chatAgent *session_coordinator.Coordinator,
-	sessionRepo *robot_session.Repository,
-	robotQuerier *robot_querier.Querier,
-	toolRegistry *tools.Registry,
-	mux *http.ServeMux,
-
-	ri *headers.Middleware,
-	co *origin.Middleware,
-	lo *reqlog.Middleware,
-	cj *session_cookie.Jar,
-	rl *limiter.Middleware,
-) {
-	chatHandler := newChatHandler(logger, chatAgent, sessionRepo, robotQuerier, toolRegistry)
-	readHandler := newDurableReadHandler(logger, chatAgent, sessionRepo, robotQuerier, toolRegistry)
-
-	apply := func(handler http.Handler) http.Handler {
-		return httpserver.Apply(handler,
-			ri.WithHeaderContext(),
-			co.WithCORS(),
-			lo.WithLogger(),
-			cj.WithAuth(),
-			rl.WithRequestSizeLimiter(),
-			rl.WithRateLimit(),
-		)
-	}
-
-	lc.Append(fx.StartHook(func() error {
-		mux.Handle("POST /sse/chat", apply(chatHandler))
-		mux.Handle("GET /sse/chat/{sessionID}/stream", apply(newReconnectHandler(logger, sessionRepo)))
-		mux.Handle("GET /sse/sessions/{sessionID}/turns/{turnID}", apply(readHandler))
-		mux.Handle("HEAD /sse/sessions/{sessionID}/turns/{turnID}", apply(readHandler))
-		return nil
-	}))
+func (f robotSessionStreamResponseFunc) VisitRobotSessionStreamResponse(w http.ResponseWriter) error {
+	f(w)
+	return nil
 }
 
 type chatRequest struct {
@@ -134,150 +91,147 @@ type chatApproval struct {
 	Reason   string `json:"reason,omitempty"`
 }
 
-func newChatHandler(
-	logger *slog.Logger,
-	chatAgent *session_coordinator.Coordinator,
-	sessionRepo *robot_session.Repository,
-	robotQuerier *robot_querier.Querier,
-	toolRegistry *tools.Registry,
-) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-
-		accountID, err := session.GetAccountID(ctx)
-		if err != nil {
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-			return
-		}
-
-		if err := session.Authorise(ctx, nil, rbac.PermissionUseRobots); err != nil {
-			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
-			return
-		}
-
-		var req chatRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			logger.Error("sse chat decode", slog.String("error", err.Error()))
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-			return
-		}
-
-		requestedRobotRef := strings.TrimSpace(req.RobotID)
-		robotRef := requestedRobotRef
-		if robotRef == "" {
-			robotRef = denbot.ID
-		}
-
-		sessionID := firstNonEmpty(req.SessionID, req.ThreadID, req.ID)
-		if sessionID == "" {
-			sessionID = fmt.Sprintf("chat-%s", accountID.String())
-		}
-		robotSessionID, err := robot.NewSessionID(sessionID)
-		if err != nil {
-			http.Error(w, "invalid session ID: must be a valid xid", http.StatusBadRequest)
-			return
-		}
-
-		existingSess, _, sessionErr := sessionRepo.Get(ctx, robotSessionID, robot.NewMessageCursorParams(opt.NewEmpty[robot.MessageID](), 1))
-		if sessionErr != nil {
-			if ftag.Get(sessionErr) == ftag.NotFound {
-				sessionErr = nil
-			}
-		}
-		if sessionErr != nil {
-			http.Error(w, "failed to retrieve session: "+sessionErr.Error(), http.StatusInternalServerError)
-			return
-		}
-		if existingSess != nil {
-			rootRobotRef := storydenagent.SessionRootRobotRef(existingSess.State).Or(denbot.ID)
-			if requestedRobotRef != "" && requestedRobotRef != rootRobotRef {
-				http.Error(w, "robotId can only select the root Robot when starting a session", http.StatusConflict)
-				return
-			}
-			robotRef = rootRobotRef
-		}
-
-		reconciliation := reconcilePendingClientTools(req.Messages, readPendingClientTools(existingSessState(existingSess)))
-		pendingToolIDs := reconciliation.Pending.IDs
-		if interaction, ok := reconciliation.BlockingInteraction.Get(); ok {
-			writeChatError(w, interaction)
-			return
-		}
-		workspaceSpec, err := workspaceMountSpecFromRequest(req.Workspace)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		initMessage, err := getLastMessage(req.Messages, pendingToolIDs, logger)
-		if err != nil {
-			logger.Error("sse chat convert message", slog.String("error", err.Error()))
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-			return
-		}
-
-		logger.Debug("sse chat request",
-			slog.String("account_id", accountID.String()),
-			slog.String("robot_id", robotRef),
-			slog.String("session_id", sessionID),
-			slog.String("user_message", lastUserMessage(req.Messages)),
-			slog.Int("messages", len(req.Messages)),
-			slog.Any("init_message", initMessage),
-			slog.Any("context", req.Context),
-		)
-
-		turnID, err := chatAgent.Start(ctx, robotRef, accountID.String(), sessionID, initMessage, req.Context, storydenagent.RunOptions{
-			Mode:      storydenagent.ModeInteractive,
-			Source:    storydenagent.SourceInteractiveChat,
-			Workspace: workspaceSpec,
-		})
-		if err != nil {
-			logger.Error("Robot turn start", slog.String("error", err.Error()))
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
-		}
-
-		streamPath := "/sse/sessions/" + robotSessionID.String() + "/turns/" + turnID.String()
-
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Cache-Control", "no-store")
-		w.Header().Set("Location", streamPath)
-		w.WriteHeader(http.StatusCreated)
-		_ = json.NewEncoder(w).Encode(map[string]string{"streamUrl": streamPath})
-	})
+func (r *Robots) RobotSessionCreate(ctx context.Context, request openapi.RobotSessionCreateRequestObject) (openapi.RobotSessionCreateResponseObject, error) {
+	return robotSessionCreateResponseFunc(func(w http.ResponseWriter) {
+		r.createSessionTurn(ctx, w, request.Body)
+	}), nil
 }
 
-func newReconnectHandler(logger *slog.Logger, sessions *robot_session.Repository) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
+func (r *Robots) createSessionTurn(ctx context.Context, w http.ResponseWriter, body *openapi.RobotSessionCreateJSONRequestBody) {
+	if body == nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	encoded, err := json.Marshal(body)
+	if err != nil {
+		r.logger.Error("Robot session request encode", slog.String("error", err.Error()))
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	var req chatRequest
+	if err := json.Unmarshal(encoded, &req); err != nil {
+		r.logger.Error("Robot session request decode", slog.String("error", err.Error()))
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	normalizeChatPartTypes(req.Messages)
+
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+
+	requestedRobotRef := strings.TrimSpace(req.RobotID)
+	robotRef := requestedRobotRef
+	if robotRef == "" {
+		robotRef = denbot.ID
+	}
+
+	sessionID := firstNonEmpty(req.SessionID, req.ThreadID, req.ID)
+	if sessionID == "" {
+		sessionID = fmt.Sprintf("chat-%s", accountID.String())
+	}
+	robotSessionID, err := robot.NewSessionID(sessionID)
+	if err != nil {
+		http.Error(w, "invalid session ID: must be a valid xid", http.StatusBadRequest)
+		return
+	}
+
+	existingSess, _, sessionErr := r.sessionRepo.Get(ctx, robotSessionID, robot.NewMessageCursorParams(opt.NewEmpty[robot.MessageID](), 1))
+	if sessionErr != nil {
+		if ftag.Get(sessionErr) == ftag.NotFound {
+			sessionErr = nil
+		}
+	}
+	if sessionErr != nil {
+		http.Error(w, "failed to retrieve session: "+sessionErr.Error(), http.StatusInternalServerError)
+		return
+	}
+	if existingSess != nil {
+		rootRobotRef := storydenagent.SessionRootRobotRef(existingSess.State).Or(denbot.ID)
+		if requestedRobotRef != "" && requestedRobotRef != rootRobotRef {
+			http.Error(w, "robotId can only select the root Robot when starting a session", http.StatusConflict)
+			return
+		}
+		robotRef = rootRobotRef
+	}
+
+	reconciliation := reconcilePendingClientTools(req.Messages, readPendingClientTools(existingSessState(existingSess)))
+	pendingToolIDs := reconciliation.Pending.IDs
+	if interaction, ok := reconciliation.BlockingInteraction.Get(); ok {
+		writeChatError(w, interaction)
+		return
+	}
+	workspaceSpec, err := workspaceMountSpecFromRequest(req.Workspace)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	initMessage, err := getLastMessage(req.Messages, pendingToolIDs, r.logger)
+	if err != nil {
+		r.logger.Error("Robot session convert message", slog.String("error", err.Error()))
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	r.logger.Debug("Robot session turn request",
+		slog.String("account_id", accountID.String()),
+		slog.String("robot_id", robotRef),
+		slog.String("session_id", sessionID),
+		slog.String("user_message", lastUserMessage(req.Messages)),
+		slog.Int("messages", len(req.Messages)),
+		slog.Any("init_message", initMessage),
+		slog.Any("context", req.Context),
+	)
+
+	turnID, err := r.coordinator.Start(ctx, robotRef, accountID.String(), sessionID, initMessage, req.Context, storydenagent.RunOptions{
+		Mode:      storydenagent.ModeInteractive,
+		Source:    storydenagent.SourceInteractiveChat,
+		Workspace: workspaceSpec,
+	})
+	if err != nil {
+		r.logger.Error("Robot turn start", slog.String("error", err.Error()))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	streamPath := "/api/robots/sessions/" + robotSessionID.String() + "/turns/" + turnID.String()
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "no-store")
+	w.Header().Set("Location", streamPath)
+	w.WriteHeader(http.StatusCreated)
+	_ = json.NewEncoder(w).Encode(map[string]string{"streamUrl": streamPath})
+}
+
+func (r *Robots) RobotSessionStream(ctx context.Context, request openapi.RobotSessionStreamRequestObject) (openapi.RobotSessionStreamResponseObject, error) {
+	return robotSessionStreamResponseFunc(func(w http.ResponseWriter) {
 		accountID, err := session.GetAccountID(ctx)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
-		if err := session.Authorise(ctx, nil, rbac.PermissionUseRobots); err != nil {
-			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
-			return
-		}
-
-		sessionID, err := robot.NewSessionID(r.PathValue("sessionID"))
+		sessionID, err := robot.NewSessionID(string(request.SessionId))
 		if err != nil {
 			http.Error(w, "invalid session ID: must be a valid xid", http.StatusBadRequest)
 			return
 		}
-		turnID, err := sessions.ResumeTurn(ctx, sessionID, accountID)
+		turnID, err := r.sessionRepo.ResumeTurn(ctx, sessionID, accountID)
 		if err != nil {
 			if errors.Is(err, robot_session.ErrTurnNotFound) {
 				w.WriteHeader(http.StatusNoContent)
 				return
 			}
-			logger.Error("durable stream reconnect", slog.String("error", err.Error()))
+			r.logger.Error("Robot session stream reconnect", slog.String("error", err.Error()))
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		allowed, err := sessions.CanReadTurn(ctx, sessionID, turnID, accountID)
+		allowed, err := r.sessionRepo.CanReadTurn(ctx, sessionID, turnID, accountID)
 		if err != nil {
-			logger.Error("durable stream reconnect authorisation", slog.String("error", err.Error()))
+			r.logger.Error("Robot session stream reconnect authorisation", slog.String("error", err.Error()))
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
@@ -286,12 +240,30 @@ func newReconnectHandler(logger *slog.Logger, sessions *robot_session.Repository
 			return
 		}
 
-		streamPath := "/sse/sessions/" + sessionID.String() + "/turns/" + turnID.String()
+		streamPath := "/api/robots/sessions/" + sessionID.String() + "/turns/" + turnID.String()
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Cache-Control", "no-store")
 		w.Header().Set("Location", streamPath)
 		_ = json.NewEncoder(w).Encode(map[string]string{"streamUrl": streamPath})
-	})
+	}), nil
+}
+
+func normalizeChatPartTypes(messages []chatMessage) {
+	for messageIndex := range messages {
+		for partIndex := range messages[messageIndex].Parts {
+			part := &messages[messageIndex].Parts[partIndex]
+			if part.Type != "" {
+				continue
+			}
+			if part.ToolName != "" {
+				part.Type = "tool-" + part.ToolName
+				continue
+			}
+			if part.Text != "" {
+				part.Type = "text"
+			}
+		}
+	}
 }
 
 func getLastMessage(messages []chatMessage, pendingToolIDs []string, logger *slog.Logger) (*genai.Content, error) {

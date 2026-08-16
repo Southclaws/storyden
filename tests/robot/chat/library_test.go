@@ -20,7 +20,6 @@ import (
 	authsession "github.com/Southclaws/storyden/app/services/authentication/session"
 	robot_tools "github.com/Southclaws/storyden/app/services/semdex/robot/tools"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
-	"github.com/Southclaws/storyden/app/transports/sse"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -37,7 +36,6 @@ func TestRobotChatLibraryPageList(t *testing.T) {
 		},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelLibraryPageList),
-		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,
@@ -149,7 +147,6 @@ func TestRobotChatLibrarySearchPages(t *testing.T) {
 		},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelLibrarySearchPages),
-		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,

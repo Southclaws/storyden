@@ -9,8 +9,8 @@
  */
 import type { RobotChatContext } from "./robotChatContext";
 import type { RobotChatRequestData } from "./robotChatRequestData";
+import type { RobotChatRequestMessagesItem } from "./robotChatRequestMessagesItem";
 import type { RobotWorkspaceMountRequest } from "./robotWorkspaceMountRequest";
-import type { UIMessage } from "./uIMessage";
 
 export interface RobotChatRequest {
   /** Unique identifier for this chat request */
@@ -26,7 +26,7 @@ export interface RobotChatRequest {
    */
   robotId?: string;
   /** Array of chat messages in the conversation */
-  messages: UIMessage[];
+  messages: RobotChatRequestMessagesItem[];
   /** Additional data for the chat request */
   data?: RobotChatRequestData;
   /** Context about the page/item the user is viewing */

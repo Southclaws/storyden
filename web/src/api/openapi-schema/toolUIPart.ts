@@ -13,27 +13,14 @@ import type { ToolUIPartInputAvailable } from "./toolUIPartInputAvailable";
 import type { ToolUIPartInputStreaming } from "./toolUIPartInputStreaming";
 import type { ToolUIPartOutputAvailable } from "./toolUIPartOutputAvailable";
 import type { ToolUIPartOutputError } from "./toolUIPartOutputError";
-import type { ToolUIPartType } from "./toolUIPartType";
 
 /**
  * A tool invocation part (dynamic-tool format matching Vercel AI SDK)
  */
 export type ToolUIPart =
-  | (ToolUIPartInputStreaming & {
-      type: ToolUIPartType;
-    })
-  | (ToolUIPartInputAvailable & {
-      type: ToolUIPartType;
-    })
-  | (ToolUIPartApprovalRequested & {
-      type: ToolUIPartType;
-    })
-  | (ToolUIPartApprovalResponded & {
-      type: ToolUIPartType;
-    })
-  | (ToolUIPartOutputAvailable & {
-      type: ToolUIPartType;
-    })
-  | (ToolUIPartOutputError & {
-      type: ToolUIPartType;
-    });
+  | ToolUIPartInputStreaming
+  | ToolUIPartInputAvailable
+  | ToolUIPartApprovalRequested
+  | ToolUIPartApprovalResponded
+  | ToolUIPartOutputAvailable
+  | ToolUIPartOutputError;

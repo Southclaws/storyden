@@ -22,7 +22,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/presentation"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
-	"github.com/Southclaws/storyden/app/transports/sse"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -39,7 +38,6 @@ func TestRobotPresentationMarkupRenderCard(t *testing.T) {
 		},
 		e2e.Setup(),
 		robot_tests.WithRobotSettings(mockModelAck),
-		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,

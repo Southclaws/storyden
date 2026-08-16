@@ -91,7 +91,7 @@ func doChat(
 	})
 	require.NoError(t, err)
 
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, ts.URL+"/sse/chat", bytes.NewReader(body))
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, ts.URL+"/api/robots/sessions", bytes.NewReader(body))
 	require.NoError(t, err)
 	httpReq.Header.Set("Content-Type", "application/json")
 	require.NoError(t, session(ctx, httpReq))
@@ -149,7 +149,7 @@ func doChatToolOutputs(
 	body, err := json.Marshal(requestBody)
 	require.NoError(t, err)
 
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, ts.URL+"/sse/chat", bytes.NewReader(body))
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, ts.URL+"/api/robots/sessions", bytes.NewReader(body))
 	require.NoError(t, err)
 	httpReq.Header.Set("Content-Type", "application/json")
 	require.NoError(t, session(ctx, httpReq))
@@ -246,7 +246,7 @@ func doChatWithRobotStatus(
 	})
 	require.NoError(t, err)
 
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, ts.URL+"/sse/chat", bytes.NewReader(body))
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, ts.URL+"/api/robots/sessions", bytes.NewReader(body))
 	require.NoError(t, err)
 	httpReq.Header.Set("Content-Type", "application/json")
 	require.NoError(t, session(ctx, httpReq))
@@ -283,7 +283,7 @@ func doChatToolOutputsStatus(
 	body, err := json.Marshal(requestBody)
 	require.NoError(t, err)
 
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, ts.URL+"/sse/chat", bytes.NewReader(body))
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, ts.URL+"/api/robots/sessions", bytes.NewReader(body))
 	require.NoError(t, err)
 	httpReq.Header.Set("Content-Type", "application/json")
 	require.NoError(t, session(ctx, httpReq))

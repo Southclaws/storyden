@@ -1,4 +1,4 @@
-package sse
+package bindings
 
 import (
 	"bytes"
@@ -242,59 +242,112 @@ func readProjectedTurn(
 	return result, nil
 }
 
-func newDurableReadHandler(
-	logger *slog.Logger,
-	coordinator *session_coordinator.Coordinator,
-	sessions *robot_session.Repository,
-	robotQuerier *robot_querier.Querier,
-	toolRegistry *tools.Registry,
-) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-		accountID, err := session.GetAccountID(ctx)
-		if err != nil {
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-			return
-		}
-		sessionXID, err := xid.FromString(r.PathValue("sessionID"))
-		if err != nil {
-			http.Error(w, "invalid Robot session ID", http.StatusBadRequest)
-			return
-		}
-		turnXID, err := xid.FromString(r.PathValue("turnID"))
-		if err != nil {
-			http.Error(w, "invalid Robot turn ID", http.StatusBadRequest)
-			return
-		}
-		sessionID := robot.SessionID(sessionXID)
-		turnID := robot.TurnID(turnXID)
-		allowed, err := sessions.CanReadTurn(ctx, sessionID, turnID, accountID)
-		if err != nil {
-			logger.Error("Robot turn stream authorisation", slog.String("error", err.Error()))
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
-		}
-		if !allowed {
-			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-			return
-		}
-		offset, err := parseStreamOffset(r.URL.Query().Get("offset"))
-		if err != nil {
-			http.Error(w, "invalid durable stream offset", http.StatusBadRequest)
-			return
-		}
-		switch r.URL.Query().Get("live") {
-		case "":
-			serveDurableCatchUp(ctx, w, r, logger, sessions, robotQuerier, toolRegistry, sessionID, turnID, offset)
-		case "sse":
-			serveDurableLive(ctx, w, logger, coordinator, sessions, robotQuerier, toolRegistry, sessionID, turnID, offset)
-		default:
-			http.Error(w, "unsupported durable stream live mode", http.StatusBadRequest)
-		}
-	})
+type robotSessionTurnGetResponse struct {
+	robots  *Robots
+	ctx     context.Context
+	request openapi.RobotSessionTurnGetRequestObject
 }
 
-func serveDurableCatchUp(ctx context.Context, w http.ResponseWriter, r *http.Request, logger *slog.Logger, sessions *robot_session.Repository, robotQuerier *robot_querier.Querier, toolRegistry *tools.Registry, sessionID robot.SessionID, turnID robot.TurnID, offset uint64) {
+func (response robotSessionTurnGetResponse) VisitRobotSessionTurnGetResponse(w http.ResponseWriter) error {
+	offset := ""
+	if response.request.Params.Offset != nil {
+		offset = string(*response.request.Params.Offset)
+	}
+	live := ""
+	if response.request.Params.Live != nil {
+		live = string(*response.request.Params.Live)
+	}
+	response.robots.serveSessionTurn(
+		response.ctx,
+		w,
+		string(response.request.SessionId),
+		string(response.request.TurnId),
+		offset,
+		live,
+		false,
+	)
+	return nil
+}
+
+type robotSessionTurnHeadResponse struct {
+	robots  *Robots
+	ctx     context.Context
+	request openapi.RobotSessionTurnHeadRequestObject
+}
+
+func (response robotSessionTurnHeadResponse) VisitRobotSessionTurnHeadResponse(w http.ResponseWriter) error {
+	offset := ""
+	if response.request.Params.Offset != nil {
+		offset = string(*response.request.Params.Offset)
+	}
+	response.robots.serveSessionTurn(
+		response.ctx,
+		w,
+		string(response.request.SessionId),
+		string(response.request.TurnId),
+		offset,
+		"",
+		true,
+	)
+	return nil
+}
+
+func (r *Robots) RobotSessionTurnGet(ctx context.Context, request openapi.RobotSessionTurnGetRequestObject) (openapi.RobotSessionTurnGetResponseObject, error) {
+	return robotSessionTurnGetResponse{robots: r, ctx: ctx, request: request}, nil
+}
+
+func (r *Robots) RobotSessionTurnHead(ctx context.Context, request openapi.RobotSessionTurnHeadRequestObject) (openapi.RobotSessionTurnHeadResponseObject, error) {
+	return robotSessionTurnHeadResponse{robots: r, ctx: ctx, request: request}, nil
+}
+
+func (r *Robots) serveSessionTurn(ctx context.Context, w http.ResponseWriter, sessionValue, turnValue, offsetValue, live string, head bool) {
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+	sessionXID, err := xid.FromString(sessionValue)
+	if err != nil {
+		http.Error(w, "invalid Robot session ID", http.StatusBadRequest)
+		return
+	}
+	turnXID, err := xid.FromString(turnValue)
+	if err != nil {
+		http.Error(w, "invalid Robot turn ID", http.StatusBadRequest)
+		return
+	}
+	sessionID := robot.SessionID(sessionXID)
+	turnID := robot.TurnID(turnXID)
+	allowed, err := r.sessionRepo.CanReadTurn(ctx, sessionID, turnID, accountID)
+	if err != nil {
+		r.logger.Error("Robot turn stream authorisation", slog.String("error", err.Error()))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	if !allowed {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+	offset, err := parseStreamOffset(offsetValue)
+	if err != nil {
+		http.Error(w, "invalid durable stream offset", http.StatusBadRequest)
+		return
+	}
+	if head {
+		serveDurableCatchUp(ctx, w, r.logger, r.sessionRepo, r.robotQuerier, r.tools, sessionID, turnID, offset, true)
+		return
+	}
+	switch live {
+	case "":
+		serveDurableCatchUp(ctx, w, r.logger, r.sessionRepo, r.robotQuerier, r.tools, sessionID, turnID, offset, false)
+	case "sse":
+		serveDurableLive(ctx, w, r.logger, r.coordinator, r.sessionRepo, r.robotQuerier, r.tools, sessionID, turnID, offset)
+	default:
+		http.Error(w, "unsupported durable stream live mode", http.StatusBadRequest)
+	}
+}
+
+func serveDurableCatchUp(ctx context.Context, w http.ResponseWriter, logger *slog.Logger, sessions *robot_session.Repository, robotQuerier *robot_querier.Querier, toolRegistry *tools.Registry, sessionID robot.SessionID, turnID robot.TurnID, offset uint64, head bool) {
 	result, err := readProjectedTurn(ctx, logger, sessions, robotQuerier, toolRegistry, sessionID, turnID, offset)
 	if err != nil {
 		writeDurableReadError(w, err, logger)
@@ -308,7 +361,7 @@ func serveDurableCatchUp(ctx context.Context, w http.ResponseWriter, r *http.Req
 	if result.closed {
 		header.Set(headerStreamClosed, "true")
 	}
-	if r.Method == http.MethodHead {
+	if head {
 		w.WriteHeader(http.StatusOK)
 		return
 	}

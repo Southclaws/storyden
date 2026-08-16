@@ -8,12 +8,9 @@
  * OpenAPI spec version: v1.26.15-post
  */
 
-/**
- * Type identifier for dynamic tool calls
- */
-export type ToolUIPartBaseType =
-  (typeof ToolUIPartBaseType)[keyof typeof ToolUIPartBaseType];
+export type RobotStreamLiveQueryParameter =
+  (typeof RobotStreamLiveQueryParameter)[keyof typeof RobotStreamLiveQueryParameter];
 
-export const ToolUIPartBaseType = {
-  "dynamic-tool": "dynamic-tool",
+export const RobotStreamLiveQueryParameter = {
+  sse: "sse",
 } as const;

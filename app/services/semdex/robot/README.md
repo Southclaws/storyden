@@ -12,7 +12,7 @@ but remain valid chat entrypoints so their behaviour can be exercised directly.
 
 ## Runtime Contract
 
-- `/sse/chat` accepts an optional Robot selector when creating a session and
+- `/api/robots/sessions` accepts an optional Robot selector when creating a session and
   defaults to `denbot`. The chosen root Robot is immutable for that session.
 - `robot_switch` and active-Robot session state do not exist.
 - Custom Robots can also be invoked directly by internal/plugin `robot_run`

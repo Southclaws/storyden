@@ -20,7 +20,6 @@ import type {
   InternalServerErrorResponse,
   NotFoundResponse,
   RobotChatStartBody,
-  RobotChatStreamResponse,
   RobotCreateBody,
   RobotCreateOKResponse,
   RobotGetOKResponse,
@@ -40,6 +39,12 @@ import type {
   RobotProvidersListOKResponse,
   RobotSessionGetOKResponse,
   RobotSessionGetParams,
+  RobotSessionStreamCreatedResponse,
+  RobotSessionStreamFoundResponse,
+  RobotSessionTurnGetParams,
+  RobotSessionTurnHeadParams,
+  RobotSessionTurnMetadataResponse,
+  RobotSessionTurnReadResponse,
   RobotSessionsListOKResponse,
   RobotSessionsListParams,
   RobotToolsListOKResponse,
@@ -584,83 +589,6 @@ export const useRobotToolsetDelete = <
   const swrKey =
     swrOptions?.swrKey ?? getRobotToolsetDeleteMutationKey(toolsetId);
   const swrFn = getRobotToolsetDeleteMutationFetcher(toolsetId, requestOptions);
-
-  const query = useSWRMutation(swrKey, swrFn, swrOptions);
-
-  return {
-    swrKey,
-    ...query,
-  };
-};
-export const getRobotChatSSEUrl = () => {
-  return `/robots/chat/sse`;
-};
-
-/**
- * Send a message to a Robot and receive its response. This endpoint
- * manages sessions automatically, creating new sessions as needed or
- * continuing existing sessions based on the provided session ID.
- *
- * New sessions use Denbot unless `robotId` selects a custom Robot. The
- * selected Robot remains the root for that session. Denbot can search for
- * Toolsets, load specialist capabilities, and
- * delegate bounded work to custom Robots without leaving its session.
- *
- * Each message sent to the Robot is processed according to its playbook
- * and available tools, allowing it to perform actions or retrieve data
- * as part of the conversation. The response from the Robot includes its
- * reply message along with any actions taken during the interaction.
- *
- * This endpoint is a Server Sent Events (SSE) stream, meaning that the
- * response is streamed back to the client in real-time as the Robot
- * generates its reply.
- */
-export const robotChatSSE = async (
-  robotChatStartBody?: RobotChatStartBody,
-  options?: Parameters<typeof fetcher>[1],
-): Promise<RobotChatStreamResponse> => {
-  return fetcher<RobotChatStreamResponse>(getRobotChatSSEUrl(), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(robotChatStartBody),
-  });
-};
-
-export const getRobotChatSSEMutationFetcher = (
-  options?: SecondParameter<typeof fetcher>,
-) => {
-  return (_: Key, { arg }: { arg: RobotChatStartBody | undefined }) => {
-    return robotChatSSE(arg, options);
-  };
-};
-export const getRobotChatSSEMutationKey = () => [`/robots/chat/sse`] as const;
-
-export type RobotChatSSEMutationResult = NonNullable<
-  Awaited<ReturnType<typeof robotChatSSE>>
->;
-
-export const useRobotChatSSE = <
-  TError =
-    | UnauthorisedResponse
-    | ForbiddenResponse
-    | NotFoundResponse
-    | ConflictResponse
-    | InternalServerErrorResponse,
->(options?: {
-  swr?: SWRMutationConfiguration<
-    Awaited<ReturnType<typeof robotChatSSE>>,
-    TError,
-    Key,
-    RobotChatStartBody | undefined,
-    Awaited<ReturnType<typeof robotChatSSE>>
-  > & { swrKey?: string };
-  request?: SecondParameter<typeof fetcher>;
-}) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
-
-  const swrKey = swrOptions?.swrKey ?? getRobotChatSSEMutationKey();
-  const swrFn = getRobotChatSSEMutationFetcher(requestOptions);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
@@ -1767,6 +1695,81 @@ export const useRobotDelete = <
     ...query,
   };
 };
+export const getRobotSessionCreateUrl = () => {
+  return `/robots/sessions`;
+};
+
+/**
+ * Start a turn in a Robot session. The session is created when it does
+ * not already exist. New sessions use Denbot unless `robotId` selects a
+ * custom Robot, which then remains the root Robot for the session.
+ *
+ * The turn runs asynchronously. The response identifies the turn stream
+ * that clients can read immediately and resume later.
+ * @summary Start a Robot session turn
+ */
+export const robotSessionCreate = async (
+  robotChatStartBody: RobotChatStartBody,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<RobotSessionStreamCreatedResponse> => {
+  return fetcher<RobotSessionStreamCreatedResponse>(
+    getRobotSessionCreateUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(robotChatStartBody),
+    },
+  );
+};
+
+export const getRobotSessionCreateMutationFetcher = (
+  options?: SecondParameter<typeof fetcher>,
+) => {
+  return (_: Key, { arg }: { arg: RobotChatStartBody }) => {
+    return robotSessionCreate(arg, options);
+  };
+};
+export const getRobotSessionCreateMutationKey = () =>
+  [`/robots/sessions`] as const;
+
+export type RobotSessionCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof robotSessionCreate>>
+>;
+
+/**
+ * @summary Start a Robot session turn
+ */
+export const useRobotSessionCreate = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | ConflictResponse
+    | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof robotSessionCreate>>,
+    TError,
+    Key,
+    RobotChatStartBody,
+    Awaited<ReturnType<typeof robotSessionCreate>>
+  > & { swrKey?: string };
+  request?: SecondParameter<typeof fetcher>;
+}) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getRobotSessionCreateMutationKey();
+  const swrFn = getRobotSessionCreateMutationFetcher(requestOptions);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
 export const getRobotSessionsListUrl = (params?: RobotSessionsListParams) => {
   const normalizedParams = new URLSearchParams();
 
@@ -1841,6 +1844,285 @@ export const useRobotSessionsList = <
     swrFn,
     swrOptions,
   );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getRobotSessionStreamUrl = (sessionId: string) => {
+  return `/robots/sessions/${sessionId}/stream`;
+};
+
+/**
+ * Locate the active or most recent resumable turn for a Robot session.
+ * A session without a resumable turn returns no content.
+ * @summary Resume a Robot session stream
+ */
+export const robotSessionStream = async (
+  sessionId: string,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<RobotSessionStreamFoundResponse | void> => {
+  return fetcher<RobotSessionStreamFoundResponse | void>(
+    getRobotSessionStreamUrl(sessionId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export const getRobotSessionStreamKey = (sessionId: string) =>
+  [`/robots/sessions/${sessionId}/stream`] as const;
+
+export type RobotSessionStreamQueryResult = NonNullable<
+  Awaited<ReturnType<typeof robotSessionStream>>
+>;
+
+/**
+ * @summary Resume a Robot session stream
+ */
+export const useRobotSessionStream = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
+>(
+  sessionId: string,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof robotSessionStream>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const isEnabled =
+    swrOptions?.enabled !== false &&
+    sessionId !== null &&
+    sessionId !== undefined;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getRobotSessionStreamKey(sessionId) : null));
+  const swrFn = () => robotSessionStream(sessionId, requestOptions);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getRobotSessionTurnGetUrl = (
+  sessionId: string,
+  turnId: string,
+  params?: RobotSessionTurnGetParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/robots/sessions/${sessionId}/turns/${turnId}?${stringifiedParams}`
+    : `/robots/sessions/${sessionId}/turns/${turnId}`;
+};
+
+/**
+ * Read persisted turn events after an offset, optionally attaching to the
+ * live tail using Server-Sent Events.
+ * @summary Read a Robot session turn stream
+ */
+export const robotSessionTurnGet = async (
+  sessionId: string,
+  turnId: string,
+  params?: RobotSessionTurnGetParams,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<RobotSessionTurnReadResponse> => {
+  return fetcher<RobotSessionTurnReadResponse>(
+    getRobotSessionTurnGetUrl(sessionId, turnId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export const getRobotSessionTurnGetKey = (
+  sessionId: string,
+  turnId: string,
+  params?: RobotSessionTurnGetParams,
+) =>
+  [
+    `/robots/sessions/${sessionId}/turns/${turnId}`,
+    ...(params ? [params] : []),
+  ] as const;
+
+export type RobotSessionTurnGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof robotSessionTurnGet>>
+>;
+
+/**
+ * @summary Read a Robot session turn stream
+ */
+export const useRobotSessionTurnGet = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  sessionId: string,
+  turnId: string,
+  params?: RobotSessionTurnGetParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof robotSessionTurnGet>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const isEnabled =
+    swrOptions?.enabled !== false &&
+    sessionId !== null &&
+    sessionId !== undefined &&
+    turnId !== null &&
+    turnId !== undefined;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() =>
+      isEnabled ? getRobotSessionTurnGetKey(sessionId, turnId, params) : null);
+  const swrFn = () =>
+    robotSessionTurnGet(sessionId, turnId, params, requestOptions);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getRobotSessionTurnHeadUrl = (
+  sessionId: string,
+  turnId: string,
+  params?: RobotSessionTurnHeadParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/robots/sessions/${sessionId}/turns/${turnId}?${stringifiedParams}`
+    : `/robots/sessions/${sessionId}/turns/${turnId}`;
+};
+
+/**
+ * Read the current stream offset and state without returning events.
+ * @summary Inspect a Robot session turn stream
+ */
+export const robotSessionTurnHead = async (
+  sessionId: string,
+  turnId: string,
+  params?: RobotSessionTurnHeadParams,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<RobotSessionTurnMetadataResponse> => {
+  return fetcher<RobotSessionTurnMetadataResponse>(
+    getRobotSessionTurnHeadUrl(sessionId, turnId, params),
+    {
+      ...options,
+      method: "HEAD",
+    },
+  );
+};
+
+export const getRobotSessionTurnHeadMutationFetcher = (
+  sessionId: string,
+  turnId: string,
+  params?: RobotSessionTurnHeadParams,
+  options?: SecondParameter<typeof fetcher>,
+) => {
+  return (_: Key, __: { arg: Arguments }) => {
+    return robotSessionTurnHead(sessionId, turnId, params, options);
+  };
+};
+export const getRobotSessionTurnHeadMutationKey = (
+  sessionId: string,
+  turnId: string,
+  params?: RobotSessionTurnHeadParams,
+) =>
+  [
+    `/robots/sessions/${sessionId}/turns/${turnId}`,
+    ...(params ? [params] : []),
+  ] as const;
+
+export type RobotSessionTurnHeadMutationResult = NonNullable<
+  Awaited<ReturnType<typeof robotSessionTurnHead>>
+>;
+
+/**
+ * @summary Inspect a Robot session turn stream
+ */
+export const useRobotSessionTurnHead = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  sessionId: string,
+  turnId: string,
+  params?: RobotSessionTurnHeadParams,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof robotSessionTurnHead>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof robotSessionTurnHead>>
+    > & { swrKey?: string };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ??
+    getRobotSessionTurnHeadMutationKey(sessionId, turnId, params);
+  const swrFn = getRobotSessionTurnHeadMutationFetcher(
+    sessionId,
+    turnId,
+    params,
+    requestOptions,
+  );
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
   return {
     swrKey,

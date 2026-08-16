@@ -9,15 +9,6 @@
  */
 
 /**
- * The type of the message part
+ * Message-part type, including statically named `tool-*` parts.
  */
-export type UIMessagePartType =
-  (typeof UIMessagePartType)[keyof typeof UIMessagePartType];
-
-export const UIMessagePartType = {
-  text: "text",
-  reasoning: "reasoning",
-  "dynamic-tool": "dynamic-tool",
-  file: "file",
-  "data-render_card": "data-render_card",
-} as const;
+export type UIMessagePartType = string;

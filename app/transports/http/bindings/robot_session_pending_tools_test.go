@@ -1,4 +1,4 @@
-package sse
+package bindings
 
 import (
 	"encoding/json"

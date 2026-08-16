@@ -21,7 +21,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
-	"github.com/Southclaws/storyden/app/transports/sse"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -61,7 +60,7 @@ func startSession(t *testing.T, ctx context.Context, ts *httptest.Server, sessio
 	})
 	require.NoError(t, err)
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, ts.URL+"/sse/chat", bytes.NewReader(body))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, ts.URL+"/api/robots/sessions", bytes.NewReader(body))
 	require.NoError(t, err)
 	req.Header.Set("Content-Type", "application/json")
 	require.NoError(t, session(ctx, req))
@@ -80,7 +79,7 @@ func startSession(t *testing.T, ctx context.Context, ts *httptest.Server, sessio
 	return sessionID
 }
 
-func TestRobotChatSSERequiresAuthWhenRobotsDisabled(t *testing.T) {
+func TestRobotSessionCreateRequiresAuthWhenRobotsDisabled(t *testing.T) {
 	t.Parallel()
 
 	integration.Test(
@@ -89,14 +88,13 @@ func TestRobotChatSSERequiresAuthWhenRobotsDisabled(t *testing.T) {
 			LanguageModelProvider: "mock",
 		},
 		e2e.Setup(),
-		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,
 			ts *httptest.Server,
 		) {
 			lc.Append(fx.StartHook(func() {
-				req, err := http.NewRequestWithContext(root, http.MethodPost, ts.URL+"/sse/chat", strings.NewReader(`{}`))
+				req, err := http.NewRequestWithContext(root, http.MethodPost, ts.URL+"/api/robots/sessions", strings.NewReader(`{}`))
 				require.NoError(t, err)
 				req.Header.Set("Content-Type", "application/json")
 
@@ -126,7 +124,6 @@ func TestRobotSessionsVisibility(t *testing.T) {
 		},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModel),
-		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,

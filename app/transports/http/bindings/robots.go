@@ -3,6 +3,7 @@ package bindings
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"slices"
 	"strconv"
 	"strings"
@@ -36,6 +37,7 @@ import (
 	robotservice "github.com/Southclaws/storyden/app/services/semdex/robot"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry/denbot"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/mcpclient"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/session_coordinator"
 	robot_tools "github.com/Southclaws/storyden/app/services/semdex/robot/tools"
 	robot_toolsets "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
@@ -44,6 +46,8 @@ import (
 )
 
 type Robots struct {
+	logger             *slog.Logger
+	coordinator        *session_coordinator.Coordinator
 	robotQuerier       *robot_querier.Querier
 	robotWriter        *robot_writer.Writer
 	workspaceRepo      *robot_workspace.Repository
@@ -59,6 +63,8 @@ type Robots struct {
 }
 
 func NewRobots(
+	logger *slog.Logger,
+	coordinator *session_coordinator.Coordinator,
 	robotQuerier *robot_querier.Querier,
 	robotWriter *robot_writer.Writer,
 	workspaceRepo *robot_workspace.Repository,
@@ -73,6 +79,8 @@ func NewRobots(
 	mcpManager *mcpclient.Manager,
 ) Robots {
 	return Robots{
+		logger:             logger,
+		coordinator:        coordinator,
 		robotQuerier:       robotQuerier,
 		robotWriter:        robotWriter,
 		workspaceRepo:      workspaceRepo,
@@ -180,10 +188,6 @@ func (r *Robots) RobotCreate(ctx context.Context, request openapi.RobotCreateReq
 	return openapi.RobotCreate200JSONResponse{
 		RobotCreateOKJSONResponse: openapi.RobotCreateOKJSONResponse(serialiseRobot(created)),
 	}, nil
-}
-
-func (r *Robots) RobotChatSSE(ctx context.Context, request openapi.RobotChatSSERequestObject) (openapi.RobotChatSSEResponseObject, error) {
-	return nil, fault.New("bindings layer should not be hit, this is a bug.", fctx.With(ctx))
 }
 
 func (r *Robots) RobotProvidersList(ctx context.Context, request openapi.RobotProvidersListRequestObject) (openapi.RobotProvidersListResponseObject, error) {

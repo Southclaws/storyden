@@ -215,7 +215,7 @@ entire files.
 ## Evaluation
 
 Use [EVAL_PLAYBOOK.md](./EVAL_PLAYBOOK.md) for the manual end-to-end eval loop:
-run a local backend, authenticate, attach a Robot workspace, send `/sse/chat`
+run a local backend, authenticate, attach a Robot workspace, send `/api/robots/sessions`
 requests to Denbot with `system.plugin_studio` available, inspect transcripts and workspace state, improve
 tool contracts or validation, and rerun the same prompt.
 

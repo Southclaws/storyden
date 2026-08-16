@@ -3907,37 +3907,6 @@ paths:
         "403": { $ref: "#/components/responses/Forbidden" }
         "200": { description: OK }
 
-  /robots/chat/sse:
-    post:
-      operationId: RobotChatSSE
-      description: |
-        Send a message to a Robot and receive its response. This endpoint
-        manages sessions automatically, creating new sessions as needed or
-        continuing existing sessions based on the provided session ID.
-
-        New sessions use Denbot unless `robotId` selects a custom Robot. The
-        selected Robot remains the root for that session. Denbot can search for
-        Toolsets, load specialist capabilities, and
-        delegate bounded work to custom Robots without leaving its session.
-
-        Each message sent to the Robot is processed according to its playbook
-        and available tools, allowing it to perform actions or retrieve data
-        as part of the conversation. The response from the Robot includes its
-        reply message along with any actions taken during the interaction.
-
-        This endpoint is a Server Sent Events (SSE) stream, meaning that the
-        response is streamed back to the client in real-time as the Robot
-        generates its reply.
-      tags: [robots]
-      requestBody: { $ref: "#/components/requestBodies/RobotChatStart" }
-      responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "409": { $ref: "#/components/responses/Conflict" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "403": { $ref: "#/components/responses/Forbidden" }
-        "200": { $ref: "#/components/responses/RobotChatStream" }
-
   /robots/providers:
     get:
       operationId: RobotProvidersList
@@ -4166,6 +4135,26 @@ paths:
         "200": { description: OK }
 
   /robots/sessions:
+    post:
+      operationId: RobotSessionCreate
+      summary: Start a Robot session turn
+      description: |
+        Start a turn in a Robot session. The session is created when it does
+        not already exist. New sessions use Denbot unless `robotId` selects a
+        custom Robot, which then remains the root Robot for the session.
+
+        The turn runs asynchronously. The response identifies the turn stream
+        that clients can read immediately and resume later.
+      tags: [robots]
+      requestBody: { $ref: "#/components/requestBodies/RobotChatStart" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "201": { $ref: "#/components/responses/RobotSessionStreamCreated" }
     get:
       operationId: RobotSessionsList
       summary: List robot sessions
@@ -4188,6 +4177,62 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/RobotSessionsListOK" }
+
+  /robots/sessions/{session_id}/stream:
+    get:
+      operationId: RobotSessionStream
+      summary: Resume a Robot session stream
+      description: |
+        Locate the active or most recent resumable turn for a Robot session.
+        A session without a resumable turn returns no content.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotSessionIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotSessionStreamFound" }
+        "204": { description: No resumable turn exists for this session. }
+
+  /robots/sessions/{session_id}/turns/{turn_id}:
+    get:
+      operationId: RobotSessionTurnGet
+      summary: Read a Robot session turn stream
+      description: |
+        Read persisted turn events after an offset, optionally attaching to the
+        live tail using Server-Sent Events.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotSessionIDParam"
+        - $ref: "#/components/parameters/RobotTurnIDParam"
+        - $ref: "#/components/parameters/RobotStreamOffsetQuery"
+        - $ref: "#/components/parameters/RobotStreamLiveQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/RobotSessionTurnRead" }
+    head:
+      operationId: RobotSessionTurnHead
+      summary: Inspect a Robot session turn stream
+      description: |
+        Read the current stream offset and state without returning events.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotSessionIDParam"
+        - $ref: "#/components/parameters/RobotTurnIDParam"
+        - $ref: "#/components/parameters/RobotStreamOffsetQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/RobotSessionTurnMetadata" }
 
   /robots/sessions/{session_id}:
     get:
@@ -5106,6 +5151,31 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
 
+    RobotTurnIDParam:
+      description: Robot turn ID
+      in: path
+      name: turn_id
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    RobotStreamOffsetQuery:
+      description: |
+        Read events after this stream offset. Use `-1` to start at beginning.
+      in: query
+      name: offset
+      schema:
+        type: string
+        default: "-1"
+
+    RobotStreamLiveQuery:
+      description: Attach to the live stream tail after catching up.
+      in: query
+      name: live
+      schema:
+        type: string
+        enum: [sse]
+
     RobotWorkspaceIDParam:
       description: Robot workspace ID
       in: path
@@ -5580,6 +5650,7 @@ components:
           schema: { $ref: "#/components/schemas/RobotToolsetMutableProps" }
 
     RobotChatStart:
+      required: true
       content:
         application/json:
           schema: { $ref: "#/components/schemas/RobotChatRequest" }
@@ -6649,12 +6720,48 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/RobotToolset" }
 
-    RobotChatStream:
-      description: Server-sent events stream of robot chat responses.
+    RobotSessionStreamCreated:
+      description: Robot turn started.
+      headers:
+        Location:
+          description: Relative URL of the turn stream.
+          schema: { type: string }
       content:
-        text/event-stream:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotSessionStreamReference" }
+
+    RobotSessionStreamFound:
+      description: Resumable Robot turn stream located.
+      headers:
+        Location:
+          description: Relative URL of the turn stream.
+          schema: { type: string }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotSessionStreamReference" }
+
+    RobotSessionTurnRead:
+      description: |
+        Persisted Robot turn events, optionally followed by a live SSE tail.
+      headers:
+        Stream-Next-Offset: { $ref: "#/components/headers/Stream-Next-Offset" }
+        Stream-Up-To-Date: { $ref: "#/components/headers/Stream-Up-To-Date" }
+        Stream-Closed: { $ref: "#/components/headers/Stream-Closed" }
+        Stream-Cursor: { $ref: "#/components/headers/Stream-Cursor" }
+      content:
+        application/json:
           schema:
-            $ref: "#/components/schemas/StreamPart"
+            type: array
+            items: { $ref: "#/components/schemas/StreamPart" }
+        text/event-stream:
+          schema: { type: string }
+
+    RobotSessionTurnMetadata:
+      description: Current Robot turn stream state.
+      headers:
+        Stream-Next-Offset: { $ref: "#/components/headers/Stream-Next-Offset" }
+        Stream-Up-To-Date: { $ref: "#/components/headers/Stream-Up-To-Date" }
+        Stream-Closed: { $ref: "#/components/headers/Stream-Closed" }
 
     RobotProvidersListOK:
       description: Robot providers retrieved.
@@ -6790,6 +6897,19 @@ components:
         pointer per RFC 9728.
       schema:
         type: string
+    Stream-Next-Offset:
+      description: Offset to use for the next read.
+      required: true
+      schema: { type: string }
+    Stream-Up-To-Date:
+      description: Whether the response has caught up to current stream tail.
+      schema: { type: boolean }
+    Stream-Closed:
+      description: Whether the turn stream has completed permanently.
+      schema: { type: boolean }
+    Stream-Cursor:
+      description: Cursor identifying a live stream attachment.
+      schema: { type: string }
 
   schemas:
     #
@@ -12021,22 +12141,17 @@ components:
         - $ref: "#/components/schemas/ToolUIPart"
         - $ref: "#/components/schemas/FileUIPart"
         - $ref: "#/components/schemas/DataPart"
-      discriminator:
-        propertyName: type
-        mapping:
-          text: "#/components/schemas/TextUIPart"
-          reasoning: "#/components/schemas/ReasoningUIPart"
-          "dynamic-tool": "#/components/schemas/ToolUIPart"
-          file: "#/components/schemas/FileUIPart"
-          "data-render_card": "#/components/schemas/DataPart"
       description: |
         A part of a UIMessage. Can be text, reasoning, tool invocation, file, or custom data.
       required: [type]
       properties:
         type:
-          type: string
+          $ref: "#/components/schemas/UIMessagePartType"
           description: The type of the message part
-          enum: [text, reasoning, dynamic-tool, file, data-render_card]
+
+    UIMessagePartType:
+      type: string
+      description: Message-part type, including statically named `tool-*` parts.
 
     TextUIPart:
       type: object
@@ -12095,8 +12210,8 @@ components:
       properties:
         type:
           type: string
-          enum: [dynamic-tool]
-          description: Type identifier for dynamic tool calls
+          pattern: "^(dynamic-tool|tool-.+)$"
+          description: Dynamic or statically named tool-call type identifier
         toolCallId:
           type: string
           description: Unique ID for this tool call
@@ -12857,7 +12972,9 @@ components:
           type: array
           description: Array of chat messages in the conversation
           items:
-            $ref: "#/components/schemas/UIMessage"
+            type: object
+            additionalProperties: true
+            x-go-type: UIMessage
         data:
           type: object
           description: Additional data for the chat request
@@ -12957,6 +13074,14 @@ components:
           required: [sessions]
           properties:
             sessions: { $ref: "#/components/schemas/RobotSessionList" }
+
+    RobotSessionStreamReference:
+      type: object
+      required: [streamUrl]
+      properties:
+        streamUrl:
+          type: string
+          description: Relative URL of the Robot turn stream.
 
     # -
     # Vercel Streaming Protocol

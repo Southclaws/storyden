@@ -8,9 +8,7 @@
  * OpenAPI spec version: v1.26.15-post
  */
 
-export type ToolUIPartType =
-  (typeof ToolUIPartType)[keyof typeof ToolUIPartType];
-
-export const ToolUIPartType = {
-  "dynamic-tool": "dynamic-tool",
-} as const;
+/**
+ * Current Robot turn stream state.
+ */
+export type RobotSessionTurnMetadataResponse = void;

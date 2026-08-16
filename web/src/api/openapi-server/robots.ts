@@ -14,7 +14,6 @@ import type {
   InternalServerErrorResponse,
   NotFoundResponse,
   RobotChatStartBody,
-  RobotChatStreamResponse,
   RobotCreateBody,
   RobotCreateOKResponse,
   RobotGetOKResponse,
@@ -34,6 +33,12 @@ import type {
   RobotProvidersListOKResponse,
   RobotSessionGetOKResponse,
   RobotSessionGetParams,
+  RobotSessionStreamCreatedResponse,
+  RobotSessionStreamFoundResponse,
+  RobotSessionTurnGetParams,
+  RobotSessionTurnHeadParams,
+  RobotSessionTurnMetadataResponse,
+  RobotSessionTurnReadResponse,
   RobotSessionsListOKResponse,
   RobotSessionsListParams,
   RobotToolsListOKResponse,
@@ -567,84 +572,6 @@ export const robotToolsetDelete = async (
       method: "DELETE",
     },
   );
-};
-
-export type robotChatSSEResponse200 = {
-  data: RobotChatStreamResponse;
-  status: 200;
-};
-
-export type robotChatSSEResponse401 = {
-  data: UnauthorisedResponse;
-  status: 401;
-};
-
-export type robotChatSSEResponse403 = {
-  data: ForbiddenResponse;
-  status: 403;
-};
-
-export type robotChatSSEResponse404 = {
-  data: NotFoundResponse;
-  status: 404;
-};
-
-export type robotChatSSEResponse409 = {
-  data: ConflictResponse;
-  status: 409;
-};
-
-export type robotChatSSEResponseDefault = {
-  data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 401 | 403 | 404 | 409>;
-};
-
-export type robotChatSSEResponseSuccess = robotChatSSEResponse200 & {
-  headers: Headers;
-};
-export type robotChatSSEResponseError = (
-  | robotChatSSEResponse401
-  | robotChatSSEResponse403
-  | robotChatSSEResponse404
-  | robotChatSSEResponse409
-  | robotChatSSEResponseDefault
-) & {
-  headers: Headers;
-};
-
-export const getRobotChatSSEUrl = () => {
-  return `/robots/chat/sse`;
-};
-
-/**
- * Send a message to a Robot and receive its response. This endpoint
- * manages sessions automatically, creating new sessions as needed or
- * continuing existing sessions based on the provided session ID.
- *
- * New sessions use Denbot unless `robotId` selects a custom Robot. The
- * selected Robot remains the root for that session. Denbot can search for
- * Toolsets, load specialist capabilities, and
- * delegate bounded work to custom Robots without leaving its session.
- *
- * Each message sent to the Robot is processed according to its playbook
- * and available tools, allowing it to perform actions or retrieve data
- * as part of the conversation. The response from the Robot includes its
- * reply message along with any actions taken during the interaction.
- *
- * This endpoint is a Server Sent Events (SSE) stream, meaning that the
- * response is streamed back to the client in real-time as the Robot
- * generates its reply.
- */
-export const robotChatSSE = async (
-  robotChatStartBody?: RobotChatStartBody,
-  options?: Parameters<typeof fetcher>[1],
-): Promise<robotChatSSEResponseSuccess> => {
-  return fetcher<robotChatSSEResponseSuccess>(getRobotChatSSEUrl(), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(robotChatStartBody),
-  });
 };
 
 export type robotProvidersListResponse200 = {
@@ -1569,6 +1496,84 @@ export const robotDelete = async (
   });
 };
 
+export type robotSessionCreateResponse201 = {
+  data: RobotSessionStreamCreatedResponse;
+  status: 201;
+};
+
+export type robotSessionCreateResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type robotSessionCreateResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type robotSessionCreateResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type robotSessionCreateResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type robotSessionCreateResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type robotSessionCreateResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 201 | 400 | 401 | 403 | 404 | 409>;
+};
+
+export type robotSessionCreateResponseSuccess =
+  robotSessionCreateResponse201 & {
+    headers: Headers;
+  };
+export type robotSessionCreateResponseError = (
+  | robotSessionCreateResponse400
+  | robotSessionCreateResponse401
+  | robotSessionCreateResponse403
+  | robotSessionCreateResponse404
+  | robotSessionCreateResponse409
+  | robotSessionCreateResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getRobotSessionCreateUrl = () => {
+  return `/robots/sessions`;
+};
+
+/**
+ * Start a turn in a Robot session. The session is created when it does
+ * not already exist. New sessions use Denbot unless `robotId` selects a
+ * custom Robot, which then remains the root Robot for the session.
+ *
+ * The turn runs asynchronously. The response identifies the turn stream
+ * that clients can read immediately and resume later.
+ * @summary Start a Robot session turn
+ */
+export const robotSessionCreate = async (
+  robotChatStartBody: RobotChatStartBody,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<robotSessionCreateResponseSuccess> => {
+  return fetcher<robotSessionCreateResponseSuccess>(
+    getRobotSessionCreateUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(robotChatStartBody),
+    },
+  );
+};
+
 export type robotSessionsListResponse200 = {
   data: RobotSessionsListOKResponse;
   status: 200;
@@ -1631,6 +1636,239 @@ export const robotSessionsList = async (
     {
       ...options,
       method: "GET",
+    },
+  );
+};
+
+export type robotSessionStreamResponse200 = {
+  data: RobotSessionStreamFoundResponse;
+  status: 200;
+};
+
+export type robotSessionStreamResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type robotSessionStreamResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type robotSessionStreamResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type robotSessionStreamResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type robotSessionStreamResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 204 | 400 | 401 | 403>;
+};
+
+export type robotSessionStreamResponseSuccess = (
+  robotSessionStreamResponse200 | robotSessionStreamResponse204
+) & {
+  headers: Headers;
+};
+export type robotSessionStreamResponseError = (
+  | robotSessionStreamResponse400
+  | robotSessionStreamResponse401
+  | robotSessionStreamResponse403
+  | robotSessionStreamResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getRobotSessionStreamUrl = (sessionId: string) => {
+  return `/robots/sessions/${sessionId}/stream`;
+};
+
+/**
+ * Locate the active or most recent resumable turn for a Robot session.
+ * A session without a resumable turn returns no content.
+ * @summary Resume a Robot session stream
+ */
+export const robotSessionStream = async (
+  sessionId: string,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<robotSessionStreamResponseSuccess> => {
+  return fetcher<robotSessionStreamResponseSuccess>(
+    getRobotSessionStreamUrl(sessionId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export type robotSessionTurnGetResponse200 = {
+  data: RobotSessionTurnReadResponse;
+  status: 200;
+};
+
+export type robotSessionTurnGetResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type robotSessionTurnGetResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type robotSessionTurnGetResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type robotSessionTurnGetResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type robotSessionTurnGetResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 403 | 404>;
+};
+
+export type robotSessionTurnGetResponseSuccess =
+  robotSessionTurnGetResponse200 & {
+    headers: Headers;
+  };
+export type robotSessionTurnGetResponseError = (
+  | robotSessionTurnGetResponse400
+  | robotSessionTurnGetResponse401
+  | robotSessionTurnGetResponse403
+  | robotSessionTurnGetResponse404
+  | robotSessionTurnGetResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getRobotSessionTurnGetUrl = (
+  sessionId: string,
+  turnId: string,
+  params?: RobotSessionTurnGetParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/robots/sessions/${sessionId}/turns/${turnId}?${stringifiedParams}`
+    : `/robots/sessions/${sessionId}/turns/${turnId}`;
+};
+
+/**
+ * Read persisted turn events after an offset, optionally attaching to the
+ * live tail using Server-Sent Events.
+ * @summary Read a Robot session turn stream
+ */
+export const robotSessionTurnGet = async (
+  sessionId: string,
+  turnId: string,
+  params?: RobotSessionTurnGetParams,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<robotSessionTurnGetResponseSuccess> => {
+  return fetcher<robotSessionTurnGetResponseSuccess>(
+    getRobotSessionTurnGetUrl(sessionId, turnId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export type robotSessionTurnHeadResponse200 = {
+  data: RobotSessionTurnMetadataResponse;
+  status: 200;
+};
+
+export type robotSessionTurnHeadResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type robotSessionTurnHeadResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type robotSessionTurnHeadResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type robotSessionTurnHeadResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type robotSessionTurnHeadResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 403 | 404>;
+};
+
+export type robotSessionTurnHeadResponseSuccess =
+  robotSessionTurnHeadResponse200 & {
+    headers: Headers;
+  };
+export type robotSessionTurnHeadResponseError = (
+  | robotSessionTurnHeadResponse400
+  | robotSessionTurnHeadResponse401
+  | robotSessionTurnHeadResponse403
+  | robotSessionTurnHeadResponse404
+  | robotSessionTurnHeadResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getRobotSessionTurnHeadUrl = (
+  sessionId: string,
+  turnId: string,
+  params?: RobotSessionTurnHeadParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/robots/sessions/${sessionId}/turns/${turnId}?${stringifiedParams}`
+    : `/robots/sessions/${sessionId}/turns/${turnId}`;
+};
+
+/**
+ * Read the current stream offset and state without returning events.
+ * @summary Inspect a Robot session turn stream
+ */
+export const robotSessionTurnHead = async (
+  sessionId: string,
+  turnId: string,
+  params?: RobotSessionTurnHeadParams,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<robotSessionTurnHeadResponseSuccess> => {
+  return fetcher<robotSessionTurnHeadResponseSuccess>(
+    getRobotSessionTurnHeadUrl(sessionId, turnId, params),
+    {
+      ...options,
+      method: "HEAD",
     },
   );
 };

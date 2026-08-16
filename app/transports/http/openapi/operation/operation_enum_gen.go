@@ -228,7 +228,6 @@ var (
 	OperationIDRobotToolsetGet                        = OperationID{`RobotToolsetGet`}
 	OperationIDRobotToolsetUpdate                     = OperationID{`RobotToolsetUpdate`}
 	OperationIDRobotToolsetDelete                     = OperationID{`RobotToolsetDelete`}
-	OperationIDRobotChatSSE                           = OperationID{`RobotChatSSE`}
 	OperationIDRobotProvidersList                     = OperationID{`RobotProvidersList`}
 	OperationIDRobotProviderUpdate                    = OperationID{`RobotProviderUpdate`}
 	OperationIDRobotProviderModelsRefresh             = OperationID{`RobotProviderModelsRefresh`}
@@ -245,7 +244,11 @@ var (
 	OperationIDRobotGet                               = OperationID{`RobotGet`}
 	OperationIDRobotUpdate                            = OperationID{`RobotUpdate`}
 	OperationIDRobotDelete                            = OperationID{`RobotDelete`}
+	OperationIDRobotSessionCreate                     = OperationID{`RobotSessionCreate`}
 	OperationIDRobotSessionsList                      = OperationID{`RobotSessionsList`}
+	OperationIDRobotSessionStream                     = OperationID{`RobotSessionStream`}
+	OperationIDRobotSessionTurnGet                    = OperationID{`RobotSessionTurnGet`}
+	OperationIDRobotSessionTurnHead                   = OperationID{`RobotSessionTurnHead`}
 	OperationIDRobotSessionGet                        = OperationID{`RobotSessionGet`}
 	OperationIDRobotMCPServersList                    = OperationID{`RobotMCPServersList`}
 	OperationIDRobotMCPServerCreate                   = OperationID{`RobotMCPServerCreate`}
@@ -725,8 +728,6 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDRobotToolsetUpdate, nil
 	case string(`RobotToolsetDelete`):
 		return OperationIDRobotToolsetDelete, nil
-	case string(`RobotChatSSE`):
-		return OperationIDRobotChatSSE, nil
 	case string(`RobotProvidersList`):
 		return OperationIDRobotProvidersList, nil
 	case string(`RobotProviderUpdate`):
@@ -759,8 +760,16 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDRobotUpdate, nil
 	case string(`RobotDelete`):
 		return OperationIDRobotDelete, nil
+	case string(`RobotSessionCreate`):
+		return OperationIDRobotSessionCreate, nil
 	case string(`RobotSessionsList`):
 		return OperationIDRobotSessionsList, nil
+	case string(`RobotSessionStream`):
+		return OperationIDRobotSessionStream, nil
+	case string(`RobotSessionTurnGet`):
+		return OperationIDRobotSessionTurnGet, nil
+	case string(`RobotSessionTurnHead`):
+		return OperationIDRobotSessionTurnHead, nil
 	case string(`RobotSessionGet`):
 		return OperationIDRobotSessionGet, nil
 	case string(`RobotMCPServersList`):

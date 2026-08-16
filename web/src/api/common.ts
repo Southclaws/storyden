@@ -4,7 +4,7 @@ import { z } from "zod";
 import { getAPIAddress } from "@/config";
 
 export type Options = {
-  method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+  method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD";
   headers?: HeadersInit;
   params?: Record<string, string | string[] | boolean>;
   body?: unknown;

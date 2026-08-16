@@ -207,8 +207,8 @@ func validationGoFailureNextAction(result ValidateResult) string {
 		text := strings.ToLower(strings.Join([]string{check.Message, check.Output, check.Error}, "\n"))
 		switch {
 		case strings.Contains(text, "robotrunwithresponse") ||
-			strings.Contains(text, "robotchatssewithresponse") ||
-			strings.Contains(text, "robotchatsse"):
+			strings.Contains(text, "robotsessioncreatewithresponse") ||
+			strings.Contains(text, "robotsessioncreate"):
 			return "Replace generated HTTP robot chat calls with pl.RunRobot(ctx, robotID, message), ensure manifest access.permissions includes USE_ROBOTS, then rerun plugin_validate."
 		case strings.Contains(text, "undefined") ||
 			strings.Contains(text, "unknown field") ||

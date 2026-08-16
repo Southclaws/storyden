@@ -7,21 +7,11 @@
  *
  * OpenAPI spec version: v1.26.15-post
  */
-import type { ArbitraryData } from "./arbitraryData";
+import type { RobotStreamOffsetQueryParameter } from "./robotStreamOffsetQueryParameter";
 
-export interface ToolUIPartBase {
+export type RobotSessionTurnHeadParams = {
   /**
-   * Dynamic or statically named tool-call type identifier
-   * @pattern ^(dynamic-tool|tool-.+)$
+   * Read events after this stream offset. Use `-1` to start at beginning.
    */
-  type: string;
-  /** Unique ID for this tool call */
-  toolCallId: string;
-  /** Name of the tool being called */
-  toolName: string;
-  /** Optional title for the tool call */
-  title?: string;
-  /** Whether the tool was executed by the provider */
-  providerExecuted?: boolean;
-  callProviderMetadata?: ArbitraryData;
-}
+  offset?: RobotStreamOffsetQueryParameter;
+};

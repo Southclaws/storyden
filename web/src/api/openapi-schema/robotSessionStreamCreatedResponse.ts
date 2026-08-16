@@ -7,13 +7,9 @@
  *
  * OpenAPI spec version: v1.26.15-post
  */
+import type { RobotSessionStreamReference } from "./robotSessionStreamReference";
 
 /**
- * Custom data part types, e.g. "data-weather".
- * @pattern ^data-[A-Za-z0-9][A-Za-z0-9._-]*$
+ * Robot turn started.
  */
-export type DataPartType = (typeof DataPartType)[keyof typeof DataPartType];
-
-export const DataPartType = {
-  "data-render_card": "data-render_card",
-} as const;
+export type RobotSessionStreamCreatedResponse = RobotSessionStreamReference;

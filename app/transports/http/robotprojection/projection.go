@@ -211,6 +211,7 @@ func TextUIPart(text string) (openapi.UIMessagePart, error) {
 	if err := uiPart.FromTextUIPart(textPart); err != nil {
 		return openapi.UIMessagePart{}, fmt.Errorf("create text part: %w", err)
 	}
+	uiPart.Type = openapi.UIMessagePartType("text")
 
 	return uiPart, nil
 }
@@ -225,6 +226,7 @@ func ReasoningUIPart(text string) (openapi.UIMessagePart, error) {
 	if err := uiPart.FromReasoningUIPart(reasoningPart); err != nil {
 		return openapi.UIMessagePart{}, fmt.Errorf("create reasoning part: %w", err)
 	}
+	uiPart.Type = openapi.UIMessagePartType("reasoning")
 	return uiPart, nil
 }
 
@@ -262,7 +264,6 @@ func FunctionCallToUIPart(fc *genai.FunctionCall, toolMetadata ToolMetadataResol
 	if err := uiPart.FromToolUIPart(toolPart); err != nil {
 		return openapi.UIMessagePart{}, fmt.Errorf("create UI message part from tool part: %w", err)
 	}
-
 	uiPart.Type = openapi.UIMessagePartType("tool-" + fc.Name)
 
 	return uiPart, nil
@@ -296,7 +297,6 @@ func ConfirmationFunctionCallToUIPart(fc *genai.FunctionCall, toolMetadata ToolM
 	if err := uiPart.FromToolUIPart(toolPart); err != nil {
 		return openapi.UIMessagePart{}, fmt.Errorf("create UI message part from approval part: %w", err)
 	}
-
 	uiPart.Type = openapi.UIMessagePartType("tool-" + original.Name)
 
 	return uiPart, nil
@@ -320,7 +320,6 @@ func FunctionResponseToUIPart(fr *genai.FunctionResponse) (openapi.UIMessagePart
 	if err := uiPart.FromToolUIPart(toolPart); err != nil {
 		return openapi.UIMessagePart{}, fmt.Errorf("create UI message part from tool part: %w", err)
 	}
-
 	uiPart.Type = openapi.UIMessagePartType("tool-" + fr.Name)
 
 	return openapi.UIMessagePart(uiPart), nil

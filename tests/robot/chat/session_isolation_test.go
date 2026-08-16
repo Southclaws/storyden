@@ -14,7 +14,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
-	"github.com/Southclaws/storyden/app/transports/sse"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -30,7 +29,6 @@ func TestRobotSessionGetSharedAcrossRobotUsers(t *testing.T) {
 		},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelAck),
-		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,
@@ -79,7 +77,6 @@ func TestRobotSessionsListNoFilterReturnsAllSessions(t *testing.T) {
 		},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelAck),
-		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,
@@ -132,7 +129,6 @@ func TestSSEChatCanContinueSessionCreatedByAnotherRobotUser(t *testing.T) {
 		},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelAck),
-		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,

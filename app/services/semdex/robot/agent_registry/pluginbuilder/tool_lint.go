@@ -140,11 +140,14 @@ func lintUnsupportedStorydenSDKCall(path string, fset *token.FileSet, call *ast.
 			Line:    fset.Position(selector.Sel.Pos()).Line,
 			Message: "Storyden generated HTTP API has no RobotRunWithResponse plugin API; use pl.RunRobot(ctx, robotID, message) and add USE_ROBOTS access instead",
 		}, true
-	case "RobotChatSSE", "RobotChatSSEWithResponse":
+	case "RobotSessionCreate", "RobotSessionCreateWithResponse",
+		"RobotSessionStream", "RobotSessionStreamWithResponse",
+		"RobotSessionTurnGet", "RobotSessionTurnGetWithResponse",
+		"RobotSessionTurnHead", "RobotSessionTurnHeadWithResponse":
 		return PluginLintIssue{
 			Path:    path,
 			Line:    fset.Position(selector.Sel.Pos()).Line,
-			Message: "Storyden RobotChatSSE is a UI streaming endpoint, not plugin-to-host robot execution; use pl.RunRobot(ctx, robotID, message) and use the returned summary",
+			Message: "Storyden Robot session streaming APIs are UI endpoints, not plugin-to-host robot execution; use pl.RunRobot(ctx, robotID, message) and use the returned summary",
 		}, true
 	default:
 		return PluginLintIssue{}, false

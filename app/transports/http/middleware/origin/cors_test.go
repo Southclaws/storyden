@@ -85,7 +85,7 @@ func TestCORSExposesDurableStreamHeaders(t *testing.T) {
 	handler := New(cfg).WithCORS()(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
-	request := httptest.NewRequest(http.MethodGet, "https://api.example.com/sse/sessions/example/turns/example", nil)
+	request := httptest.NewRequest(http.MethodGet, "https://api.example.com/api/robots/sessions/example/turns/example", nil)
 	request.Header.Set("Origin", "https://app.example.com")
 	recorder := httptest.NewRecorder()
 

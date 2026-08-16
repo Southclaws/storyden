@@ -7,9 +7,16 @@
  *
  * OpenAPI spec version: v1.26.15-post
  */
-import type { StreamPart } from "./streamPart";
+import type { RobotStreamLiveQueryParameter } from "./robotStreamLiveQueryParameter";
+import type { RobotStreamOffsetQueryParameter } from "./robotStreamOffsetQueryParameter";
 
-/**
- * Server-sent events stream of robot chat responses.
- */
-export type RobotChatStreamResponse = StreamPart;
+export type RobotSessionTurnGetParams = {
+  /**
+   * Read events after this stream offset. Use `-1` to start at beginning.
+   */
+  offset?: RobotStreamOffsetQueryParameter;
+  /**
+   * Attach to the live stream tail after catching up.
+   */
+  live?: RobotStreamLiveQueryParameter;
+};

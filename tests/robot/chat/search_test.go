@@ -16,7 +16,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
-	"github.com/Southclaws/storyden/app/transports/sse"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -32,7 +31,6 @@ func TestRobotChatContentSearch(t *testing.T) {
 		},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelContentSearch),
-		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,
@@ -100,7 +98,6 @@ func TestRobotChatThreadSearch(t *testing.T) {
 		},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelThreadSearch),
-		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,
@@ -159,7 +156,6 @@ func TestRobotChatReplySearch(t *testing.T) {
 		},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelReplySearch),
-		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,
@@ -222,7 +218,6 @@ func TestRobotChatPostSearch(t *testing.T) {
 		},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelPostSearch),
-		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,
@@ -281,7 +276,6 @@ func TestRobotChatMemberSearch(t *testing.T) {
 		},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelMemberSearch),
-		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,
