@@ -175,7 +175,6 @@ func (q *Repository) RequestTurnCancellation(ctx context.Context, sessionID robo
 				SetStatus(ent_robot_session_turn.StatusCancelled).
 				SetCancelRequestedAt(now).
 				SetFinishedAt(now).
-				SetErrorText("Robot turn cancelled").
 				Exec(ctx); err != nil {
 				return err
 			}
@@ -200,7 +199,6 @@ func (q *Repository) RequestTurnCancellation(ctx context.Context, sessionID robo
 				SetTurnID(xid.ID(turnID)).
 				SetSequence(sequence).
 				SetEventKind(ent_robot_session_message.EventKindTurnCancelled).
-				SetErrorText("Robot turn cancelled").
 				Save(ctx); err != nil {
 				return err
 			}

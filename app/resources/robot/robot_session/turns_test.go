@@ -169,7 +169,12 @@ func TestQueuedTurnCanBeCancelledBeforeExecution(t *testing.T) {
 			require.Len(t, events, 2)
 			assert.Equal(t, robot.SessionEventTurnQueued, events[0].Kind)
 			assert.Equal(t, robot.SessionEventTurnCancelled, events[1].Kind)
+			assert.False(t, events[1].ErrorText.Ok(), "cancellation is not a turn error")
 			assert.True(t, closed)
+
+			stored, err := db.RobotSessionTurn.Get(ctx, xid.ID(turnID))
+			require.NoError(t, err)
+			assert.Nil(t, stored.ErrorText)
 		}))
 	}))
 }

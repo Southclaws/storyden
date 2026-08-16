@@ -354,10 +354,8 @@ test.describe("Robot Chat — mock LLM stream", () => {
       await expect(cancelButton).toBeVisible({ timeout: 15000 });
       await cancelButton.click();
 
-      await expect(page.getByText("Robot turn cancelled")).toBeVisible({
-        timeout: 15000,
-      });
       await expect(cancelButton).toHaveCount(0);
+      await expect(page.getByText("Robot turn cancelled")).toHaveCount(0);
       await expect(
         page.getByText("This cancelled response must not appear."),
       ).toHaveCount(0);

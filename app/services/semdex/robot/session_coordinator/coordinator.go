@@ -163,7 +163,7 @@ func (c *Coordinator) handleCancelTurn(ctx context.Context, command *CommandCanc
 	if disposition.Finished {
 		if err := c.bus.PublishNamed(ctx, sessionTopic(command.SessionID), EventRobotTurn{
 			TurnID: command.TurnID, SessionID: command.SessionID, Sequence: 1,
-			Kind: EventKindCancelled, ErrorText: "Robot turn cancelled",
+			Kind: EventKindCancelled,
 		}); err != nil {
 			return err
 		}
@@ -671,13 +671,13 @@ func (c *Coordinator) executeTurn(ctx context.Context, command *turnCommand) err
 	}
 	cancelTurn := func(sequence uint64) {
 		_ = c.sessions.ReleaseExecution(context.WithoutCancel(ctx), *lease)
-		if err := c.sessions.FinishTurn(context.WithoutCancel(ctx), sessionID, robotresource.TurnID(command.TurnID), robotresource.TurnStatusCancelled, "Robot turn cancelled"); err != nil {
+		if err := c.sessions.FinishTurn(context.WithoutCancel(ctx), sessionID, robotresource.TurnID(command.TurnID), robotresource.TurnStatusCancelled, ""); err != nil {
 			fail(err, sequence)
 			return
 		}
 		publish(EventRobotTurn{
 			TurnID: command.TurnID, SessionID: command.SessionID, Sequence: sequence,
-			Kind: EventKindCancelled, ErrorText: "Robot turn cancelled",
+			Kind: EventKindCancelled,
 		})
 		c.completeDelegation(context.WithoutCancel(ctx), command, map[string]any{
 			"status": "cancelled", "summary": "The delegated task was cancelled.",

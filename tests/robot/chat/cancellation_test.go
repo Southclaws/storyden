@@ -116,6 +116,9 @@ func TestRobotRunningTurnCanBeCancelled(t *testing.T) {
 				assert.Condition(t, func() bool {
 					for _, event := range read.Items {
 						if event.EventKind == openapi.TurnCancelled && event.TurnId != nil && string(*event.TurnId) == turnID {
+							for _, part := range event.Parts {
+								assert.NotEqual(t, "error", part.Type, "cancellation should not be projected as an error")
+							}
 							return true
 						}
 					}

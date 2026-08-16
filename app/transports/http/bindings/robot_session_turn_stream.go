@@ -191,12 +191,15 @@ func (p *turnProjector) project(event robot.SessionEvent, toolRegistry *tools.Re
 	case robot.SessionEventTurnBlocked:
 		p.finish()
 
-	case robot.SessionEventTurnFailed, robot.SessionEventTurnCancelled:
+	case robot.SessionEventTurnFailed:
 		message := event.ErrorText.Or("Robot turn failed")
 		p.delegations.Fail(message)
 		errorPart := openapi.StreamPart{}
 		_ = errorPart.FromErrorPart(openapi.ErrorPart{ErrorText: message})
 		_ = p.collector.Send(errorPart)
+
+	case robot.SessionEventTurnCancelled:
+		p.finish()
 	}
 	return p.collector.take()
 }
