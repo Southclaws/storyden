@@ -14,9 +14,14 @@ import (
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/integration"
+	"github.com/Southclaws/storyden/tests"
 )
 
 func TestRunnableSessionLimitAppliesAfterSessionDeduplication(t *testing.T) {
+	if tests.IsSharedPostgresDatabase() {
+		t.Skip("skipping global runnable session ordering assertion on shared postgres database")
+	}
+
 	t.Parallel()
 
 	integration.Test(t, nil, fx.Invoke(func(

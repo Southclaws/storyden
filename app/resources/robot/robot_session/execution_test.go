@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
 	"github.com/Southclaws/storyden/internal/ent"
+	ent_robot_session_message "github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	"github.com/Southclaws/storyden/internal/integration"
 )
 
@@ -117,9 +118,11 @@ func TestExecutionLeaseFencesExpiredWorker(t *testing.T) {
 				&adksession.Event{InvocationID: "stale-worker"},
 			)
 			require.ErrorIs(t, err, robot_session.ErrLeaseLost)
-			messageCount, err := db.RobotSessionMessage.Query().Count(ctx)
+			messageExists, err := db.RobotSessionMessage.Query().
+				Where(ent_robot_session_message.SessionIDEQ(xid.ID(sessionID))).
+				Exist(ctx)
 			require.NoError(t, err)
-			assert.Zero(t, messageCount)
+			assert.False(t, messageExists)
 			require.ErrorIs(t, repo.ReleaseExecution(ctx, *stale), robot_session.ErrLeaseLost)
 			require.NoError(t, repo.ReleaseExecution(ctx, *current))
 		}))
