@@ -3,6 +3,10 @@ import { getAccountAddRoleMutationKey } from "../src/api/openapi-client/accounts
 import { getAdminSettingsUpdateMutationKey } from "../src/api/openapi-client/admin";
 import { getCategoryCreateMutationKey } from "../src/api/openapi-client/categories";
 import { getNodeCreateMutationKey } from "../src/api/openapi-client/nodes";
+import {
+  getPluginAddMutationKey,
+  getPluginDeleteMutationKey,
+} from "../src/api/openapi-client/plugins";
 import { getReplyCreateMutationKey } from "../src/api/openapi-client/replies";
 import {
   getRobotCreateMutationKey,
@@ -19,6 +23,8 @@ import {
   CategoryCreateOKResponse,
   NodeCreateBody,
   NodeCreateOKResponse,
+  PluginGetOKResponse,
+  PluginInitialProps,
   ReplyCreateBody,
   ReplyCreateOKResponse,
   RobotCreateBody,
@@ -49,6 +55,10 @@ export type AccessKeyClient = {
     replyCreateBody: ReplyCreateBody,
   ) => Promise<ReplyCreateOKResponse>;
   nodeCreate: (nodeCreateBody: NodeCreateBody) => Promise<NodeCreateOKResponse>;
+  pluginAdd: (
+    pluginInitialProps: PluginInitialProps,
+  ) => Promise<PluginGetOKResponse>;
+  pluginDelete: (pluginInstanceId: string) => Promise<void>;
   robotCreate: (
     robotCreateBody: RobotCreateBody,
   ) => Promise<RobotCreateOKResponse>;
@@ -107,6 +117,21 @@ export function createAccessKeyClient(accessKey: string): AccessKeyClient {
         key: getNodeCreateMutationKey(),
         method: "POST",
         body: nodeCreateBody,
+      });
+    },
+    pluginAdd: async (pluginInitialProps) => {
+      return await requestWithAccessKey<PluginGetOKResponse>({
+        accessKey,
+        key: getPluginAddMutationKey(),
+        method: "POST",
+        body: pluginInitialProps,
+      });
+    },
+    pluginDelete: async (pluginInstanceId) => {
+      await requestWithAccessKey<void>({
+        accessKey,
+        key: getPluginDeleteMutationKey(pluginInstanceId),
+        method: "DELETE",
       });
     },
     robotCreate: async (robotCreateBody) => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePluginList } from "@/api/openapi-client/plugins";
-import { PluginSettings } from "@/components/admin/PluginSettings/PluginSettings";
+import { PluginSettingsIndex } from "@/components/admin/PluginSettings/PluginSettingsIndex";
 import { Unready } from "@/components/site/Unready";
 
 export function PluginSettingsScreen() {
@@ -10,5 +10,5 @@ export function PluginSettingsScreen() {
     return <Unready error={error} />;
   }
 
-  return <PluginSettings plugins={data.plugins} />;
+  return <PluginSettingsIndex plugins={data.plugins} />;
 }
