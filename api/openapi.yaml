@@ -4258,6 +4258,28 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "200": { $ref: "#/components/responses/RobotSessionTurnMetadata" }
 
+  /robots/sessions/{session_id}/turns/{turn_id}/cancellation:
+    put:
+      operationId: RobotSessionTurnCancel
+      summary: Request cancellation of a Robot session turn
+      description: |
+        Create the singleton cancellation request for a queued, running, or
+        blocked Robot turn. The operation is idempotent and asynchronous:
+        accepted cancellation is reflected by a `turn_cancelled` event on the
+        session stream. Cancelling a turn does not remove other queued messages,
+        which remain eligible for later turns.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotSessionIDParam"
+        - $ref: "#/components/parameters/RobotTurnIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "202": { description: Cancellation request accepted. }
+
   /robots/sessions/{session_id}:
     get:
       operationId: RobotSessionGet
@@ -12124,6 +12146,9 @@ components:
         stream_offset:
           type: string
           description: Event offset covered by this session snapshot.
+        active_turn_id:
+          $ref: "#/components/schemas/Identifier"
+          description: The running or blocked turn, when the session is currently active.
         root_robot_id:
           type: string
           description: Root Robot selected when this session was created, including built-in Robot IDs.

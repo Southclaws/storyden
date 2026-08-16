@@ -51,9 +51,10 @@ type mockStep struct {
 }
 
 type mockMatcher struct {
-	Contains   string `yaml:"contains"`
-	ToolResult string `yaml:"tool_result"`
-	Any        bool   `yaml:"any"`
+	Contains         string `yaml:"contains"`
+	ToolResult       string `yaml:"tool_result"`
+	ToolResultStatus string `yaml:"tool_result_status"`
+	Any              bool   `yaml:"any"`
 }
 
 type mockResponse struct {
@@ -143,8 +144,13 @@ func matchesMockContent(mat mockMatcher, c *genai.Content) bool {
 
 	case mat.ToolResult != "":
 		for _, part := range c.Parts {
-			if part != nil && part.FunctionResponse != nil &&
-				part.FunctionResponse.Name == mat.ToolResult {
+			if part == nil || part.FunctionResponse == nil || part.FunctionResponse.Name != mat.ToolResult {
+				continue
+			}
+			if mat.ToolResultStatus == "" {
+				return true
+			}
+			if status, _ := part.FunctionResponse.Response["status"].(string); status == mat.ToolResultStatus {
 				return true
 			}
 		}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 )
 
@@ -19,5 +20,6 @@ type SessionInput struct {
 	SourceKind string
 	BatchKey   string
 	InputData  json.RawMessage
+	NotBefore  opt.Optional[time.Time]
 	CreatedAt  time.Time
 }

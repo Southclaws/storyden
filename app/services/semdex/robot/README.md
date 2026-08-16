@@ -18,33 +18,36 @@ but remain valid chat entrypoints so their behaviour can be exercised directly.
 - Custom Robots can also be invoked directly by internal/plugin `robot_run`
   workflows when an explicit specialist run is the intended API operation.
 - Denbot and delegated Robots share one ADK session and one mounted workspace.
-- Delegated events retain their database Robot attribution and ADK `Branch`.
-  `IsolationScope` is also persisted when ADK supplies one.
+- Delegated events retain their database Robot attribution. Storyden assigns
+  the parent function-call ID as their authoritative isolation scope.
 - Branched specialist output is projected as collapsed reasoning in the UI.
   Denbot's synthesis remains the visible assistant answer.
 
 ## Agent Topology
 
-`runner.go` resolves the built-in Denbot definition and attaches every
-available database-backed Robot as an ADK sub-agent:
+`runner.go` resolves the built-in Denbot definition and exposes every available
+database-backed Robot as an asynchronous function tool:
 
 - Denbot uses `llmagent.ModeChat` and owns the user conversation.
-- Specialists use `llmagent.ModeSingleTurn`.
-- ADK exposes each specialist as a generated agent tool named
-  `robot_<database-xid>`.
+- Specialists run in separately leased unattended session turns.
+- Each specialist tool is named `robot_<database-xid>` and immediately returns
+  a pending asynchronous result.
 - `robot_search` returns that callable delegation name with the Robot's purpose
   and configured Toolsets.
-- A specialist receives only the delegated request, its playbook, its model,
-  and its assigned direct tools and Toolsets. Its result returns to Denbot as
-  a tool result.
+- A specialist receives the delegated request as its active task alongside the
+  shared session history, its playbook, its model, and its assigned direct
+  tools and Toolsets. Its instruction limits it to that bounded task. It
+  finishes with `robot_run_finish`; that result updates the original
+  delegation and starts a later Denbot turn for synthesis.
 - Every Robot receives shared execution guidance that prevents unchanged tool
   calls from being repeated when neither their inputs nor underlying state have
   changed. This belongs to the runtime identity instruction rather than any
   individual Toolset, so custom Toolsets and direct tools inherit it too.
 
-Single-turn delegation intentionally avoids chat hand-off semantics. It gives
-Denbot evidence to synthesize and automatically returns control in the same
-invocation.
+Delegation never hands the visible conversation to the specialist. The initial
+call returns `pending`, the specialist transcript arrives asynchronously on the
+session stream, and Denbot remains the visible coordinator when the completion
+starts a later turn.
 
 ## Toolsets
 
@@ -172,8 +175,8 @@ must continue to respect the workspace's `allow_untrusted_commands` policy.
 
 - Tool permission checks run immediately before execution using the current
   account session.
-- Confirmation-required tools still pause the SSE flow and resume from the
-  client-supplied approval.
+- Confirmation-required tools block their turn and resume from a later
+  client-supplied approval input.
 - Unattended runs disable confirmation-only side effects and block tools that
   need live client input.
 - Specialist construction failures are logged and skipped so one unavailable

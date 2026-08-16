@@ -30,13 +30,17 @@ func (RobotSessionInput) Fields() []ent.Field {
 		field.String("source_kind"),
 		field.String("batch_key").Comment("Inputs with the same key may be claimed by one turn."),
 		field.JSON("input_data", json.RawMessage{}),
+		field.Time("not_before").
+			Optional().
+			Nillable().
+			Comment("Earliest time this input may be claimed by a turn."),
 		field.Enum("status").Values("queued", "claimed", "cancelled").Default("queued"),
 	}
 }
 
 func (RobotSessionInput) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("session_id", "status", "sequence"),
+		index.Fields("session_id", "status", "not_before", "sequence"),
 		index.Fields("session_id", "turn_id", "sequence"),
 	}
 }

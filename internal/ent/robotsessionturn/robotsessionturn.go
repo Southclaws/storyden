@@ -38,6 +38,8 @@ const (
 	FieldStartedAt = "started_at"
 	// FieldFinishedAt holds the string denoting the finished_at field in the database.
 	FieldFinishedAt = "finished_at"
+	// FieldCancelRequestedAt holds the string denoting the cancel_requested_at field in the database.
+	FieldCancelRequestedAt = "cancel_requested_at"
 	// FieldErrorText holds the string denoting the error_text field in the database.
 	FieldErrorText = "error_text"
 	// EdgeSession holds the string denoting the session edge name in mutations.
@@ -85,6 +87,7 @@ var Columns = []string{
 	FieldContinuationOfTurnID,
 	FieldStartedAt,
 	FieldFinishedAt,
+	FieldCancelRequestedAt,
 	FieldErrorText,
 }
 
@@ -197,6 +200,11 @@ func ByStartedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByFinishedAt orders the results by the finished_at field.
 func ByFinishedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldFinishedAt, opts...).ToFunc()
+}
+
+// ByCancelRequestedAt orders the results by the cancel_requested_at field.
+func ByCancelRequestedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCancelRequestedAt, opts...).ToFunc()
 }
 
 // ByErrorText orders the results by the error_text field.

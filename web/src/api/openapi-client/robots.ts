@@ -2263,6 +2263,92 @@ export const useRobotSessionTurnHead = <
     ...query,
   };
 };
+export const getRobotSessionTurnCancelUrl = (
+  sessionId: string,
+  turnId: string,
+) => {
+  return `/robots/sessions/${sessionId}/turns/${turnId}/cancellation`;
+};
+
+/**
+ * Create the singleton cancellation request for a queued, running, or
+ * blocked Robot turn. The operation is idempotent and asynchronous:
+ * accepted cancellation is reflected by a `turn_cancelled` event on the
+ * session stream. Cancelling a turn does not remove other queued messages,
+ * which remain eligible for later turns.
+ * @summary Request cancellation of a Robot session turn
+ */
+export const robotSessionTurnCancel = async (
+  sessionId: string,
+  turnId: string,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<void> => {
+  return fetcher<void>(getRobotSessionTurnCancelUrl(sessionId, turnId), {
+    ...options,
+    method: "PUT",
+  });
+};
+
+export const getRobotSessionTurnCancelMutationFetcher = (
+  sessionId: string,
+  turnId: string,
+  options?: SecondParameter<typeof fetcher>,
+) => {
+  return (_: Key, __: { arg: Arguments }) => {
+    return robotSessionTurnCancel(sessionId, turnId, options);
+  };
+};
+export const getRobotSessionTurnCancelMutationKey = (
+  sessionId: string,
+  turnId: string,
+) => [`/robots/sessions/${sessionId}/turns/${turnId}/cancellation`] as const;
+
+export type RobotSessionTurnCancelMutationResult = NonNullable<
+  Awaited<ReturnType<typeof robotSessionTurnCancel>>
+>;
+
+/**
+ * @summary Request cancellation of a Robot session turn
+ */
+export const useRobotSessionTurnCancel = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  sessionId: string,
+  turnId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof robotSessionTurnCancel>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof robotSessionTurnCancel>>
+    > & { swrKey?: string };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ??
+    getRobotSessionTurnCancelMutationKey(sessionId, turnId);
+  const swrFn = getRobotSessionTurnCancelMutationFetcher(
+    sessionId,
+    turnId,
+    requestOptions,
+  );
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
 export const getRobotSessionGetUrl = (
   sessionId: string,
   params?: RobotSessionGetParams,

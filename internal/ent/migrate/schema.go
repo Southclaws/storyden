@@ -1583,6 +1583,7 @@ var (
 		{Name: "source_kind", Type: field.TypeString},
 		{Name: "batch_key", Type: field.TypeString},
 		{Name: "input_data", Type: field.TypeJSON},
+		{Name: "not_before", Type: field.TypeTime, Nullable: true},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"queued", "claimed", "cancelled"}, Default: "queued"},
 		{Name: "account_id", Type: field.TypeString, Size: 20},
 		{Name: "session_id", Type: field.TypeString, Size: 20},
@@ -1596,33 +1597,33 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "robot_session_inputs_accounts_robot_session_inputs",
-				Columns:    []*schema.Column{RobotSessionInputsColumns[8]},
+				Columns:    []*schema.Column{RobotSessionInputsColumns[9]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "robot_session_inputs_robot_sessions_inputs",
-				Columns:    []*schema.Column{RobotSessionInputsColumns[9]},
+				Columns:    []*schema.Column{RobotSessionInputsColumns[10]},
 				RefColumns: []*schema.Column{RobotSessionsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "robot_session_inputs_robot_session_turns_inputs",
-				Columns:    []*schema.Column{RobotSessionInputsColumns[10]},
+				Columns:    []*schema.Column{RobotSessionInputsColumns[11]},
 				RefColumns: []*schema.Column{RobotSessionTurnsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "robotsessioninput_session_id_status_sequence",
+				Name:    "robotsessioninput_session_id_status_not_before_sequence",
 				Unique:  false,
-				Columns: []*schema.Column{RobotSessionInputsColumns[9], RobotSessionInputsColumns[7], RobotSessionInputsColumns[3]},
+				Columns: []*schema.Column{RobotSessionInputsColumns[10], RobotSessionInputsColumns[8], RobotSessionInputsColumns[7], RobotSessionInputsColumns[3]},
 			},
 			{
 				Name:    "robotsessioninput_session_id_turn_id_sequence",
 				Unique:  false,
-				Columns: []*schema.Column{RobotSessionInputsColumns[9], RobotSessionInputsColumns[10], RobotSessionInputsColumns[3]},
+				Columns: []*schema.Column{RobotSessionInputsColumns[10], RobotSessionInputsColumns[11], RobotSessionInputsColumns[3]},
 			},
 		},
 	}
@@ -1700,6 +1701,7 @@ var (
 		{Name: "continuation_of_turn_id", Type: field.TypeString, Nullable: true},
 		{Name: "started_at", Type: field.TypeTime, Nullable: true},
 		{Name: "finished_at", Type: field.TypeTime, Nullable: true},
+		{Name: "cancel_requested_at", Type: field.TypeTime, Nullable: true},
 		{Name: "error_text", Type: field.TypeString, Nullable: true},
 		{Name: "initiated_by_account_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "session_id", Type: field.TypeString, Size: 20},
@@ -1712,13 +1714,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "robot_session_turns_accounts_initiated_robot_turns",
-				Columns:    []*schema.Column{RobotSessionTurnsColumns[11]},
+				Columns:    []*schema.Column{RobotSessionTurnsColumns[12]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "robot_session_turns_robot_sessions_turns",
-				Columns:    []*schema.Column{RobotSessionTurnsColumns[12]},
+				Columns:    []*schema.Column{RobotSessionTurnsColumns[13]},
 				RefColumns: []*schema.Column{RobotSessionsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -1727,12 +1729,12 @@ var (
 			{
 				Name:    "robotsessionturn_session_id_status_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{RobotSessionTurnsColumns[12], RobotSessionTurnsColumns[6], RobotSessionTurnsColumns[1]},
+				Columns: []*schema.Column{RobotSessionTurnsColumns[13], RobotSessionTurnsColumns[6], RobotSessionTurnsColumns[1]},
 			},
 			{
 				Name:    "robotsessionturn_initiated_by_account_id_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{RobotSessionTurnsColumns[11], RobotSessionTurnsColumns[1]},
+				Columns: []*schema.Column{RobotSessionTurnsColumns[12], RobotSessionTurnsColumns[1]},
 			},
 		},
 	}

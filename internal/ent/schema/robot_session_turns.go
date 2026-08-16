@@ -46,6 +46,10 @@ func (RobotSessionTurn) Fields() []ent.Field {
 		field.Time("finished_at").
 			Optional().
 			Nillable(),
+		field.Time("cancel_requested_at").
+			Optional().
+			Nillable().
+			Comment("Set when a member explicitly requests cancellation of this turn."),
 		field.String("error_text").
 			Optional().
 			Nillable(),

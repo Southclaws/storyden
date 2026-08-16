@@ -37,7 +37,12 @@ test.describe("Robot Chat — specialist delegation", () => {
     respond:
       delay_ms: 5000
       text: "The specialist found the delegated evidence."
-      finish: "stop"
+      tool_calls:
+        - id: call_specialist_finish
+          name: robot_run_finish
+          args:
+            status: completed
+            summary: "The specialist found the delegated evidence."
   - match:
       contains: "test the specialist directly"
     respond:
@@ -76,9 +81,15 @@ ${specialistTranscript}
       coordinatorScriptPath,
       `steps:
   - match:
-      tool_result: ${delegatedAgentName}
+      contains: "asynchronous specialist result"
     respond:
       text: "Denbot synthesised the specialist evidence."
+      finish: "stop"
+  - match:
+      tool_result: ${delegatedAgentName}
+      tool_result_status: pending
+    respond:
+      text: "The specialist is working asynchronously."
       finish: "stop"
   - match:
       contains: "delegate this research"

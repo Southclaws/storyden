@@ -80,6 +80,7 @@ export function RobotSessionScreen(props: Props) {
         initialMessages={messages}
         initialNextBefore={session?.message_list.next_before}
         initialStreamOffset={session?.stream_offset}
+        initialActiveTurnID={session?.active_turn_id}
         initialRootRobotID={rootRobotID}
         initialSelectedWorkspaceID={session?.active_workspace?.workspace_id}
       >

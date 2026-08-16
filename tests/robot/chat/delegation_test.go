@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
@@ -19,6 +20,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/ent"
+	ent_robot_session_message "github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
 	"github.com/Southclaws/storyden/tests"
@@ -28,7 +31,8 @@ import (
 func TestDenbotDelegatesToSpecialistInSameSession(t *testing.T) {
 	t.Parallel()
 
-	integration.Test(t,
+	integration.Test(
+		t,
 		&config.Config{LanguageModelProvider: "mock"},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelAck),
@@ -52,7 +56,12 @@ func TestDenbotDelegatesToSpecialistInSameSession(t *testing.T) {
       tool_result: content_search
     respond:
       text: "Specialist found the delegated result."
-      finish: "stop"
+      tool_calls:
+        - id: call_specialist_finish
+          name: robot_run_finish
+          args:
+            status: completed
+            summary: "Specialist found the delegated result."
   - match:
       any: true
     respond:
@@ -65,7 +74,8 @@ func TestDenbotDelegatesToSpecialistInSameSession(t *testing.T) {
 				defer os.Remove(specialistScriptPath)
 
 				specialistName := "research-specialist-" + xid.New().String()
-				specialist := tests.AssertRequest(cl.RobotCreateWithResponse(root,
+				specialist := tests.AssertRequest(cl.RobotCreateWithResponse(
+					root,
 					openapi.RobotCreateJSONRequestBody{
 						Name:        specialistName,
 						Description: "Finds a bounded piece of evidence for Denbot",
@@ -83,9 +93,15 @@ func TestDenbotDelegatesToSpecialistInSameSession(t *testing.T) {
 				scriptPath := filepath.Join("..", "scripts", scriptName)
 				writeScript(t, scriptPath, `steps:
   - match:
-      tool_result: `+agentName+`
+      contains: "asynchronous specialist result"
     respond:
       text: "Denbot synthesized the specialist result."
+      finish: "stop"
+  - match:
+      tool_result: `+agentName+`
+      tool_result_status: pending
+    respond:
+      text: "The specialist is working asynchronously."
       finish: "stop"
   - match:
       contains: "delegate this"
@@ -100,32 +116,63 @@ func TestDenbotDelegatesToSpecialistInSameSession(t *testing.T) {
 				require.NoError(t, robot.SetRobotSettings(root, settingsRepo, "mock/../scripts/"+scriptName))
 
 				sessionID := xid.New().String()
-				stream := doChat(t, root, ts, adminSession, sessionID, "", "delegate this")
+				accepted := enqueueChatMessage(t, root, ts, adminSession, sessionID, "", "delegate this")
+				readCtx, cancel := context.WithTimeout(root, 20*time.Second)
+				defer cancel()
+				completedTurns := 0
+				read, err := robot.ReadDurableJSONUntil(
+					readCtx,
+					ts.URL+accepted.location,
+					adminSession,
+					"-1",
+					func(event openapi.RobotSessionStreamEvent) bool {
+						if event.EventKind == openapi.TurnCompleted {
+							completedTurns++
+						}
+						return completedTurns == 3
+					},
+				)
+				require.NoError(t, err)
+				stream := &fullResponse{}
+				for _, event := range read.Items {
+					stream.parts = append(stream.parts, event.Parts...)
+				}
 				assert.NotContains(t, collectToolCalls(stream), agentName)
-				assert.Equal(t, "Denbot synthesized the specialist result.", strings.Join(collectTextDeltas(stream), ""))
+				assert.Contains(t, strings.Join(collectTextDeltas(stream), ""), "The specialist is working asynchronously.")
+				assert.Contains(t, strings.Join(collectTextDeltas(stream), ""), "Denbot synthesized the specialist result.")
 				assert.NotContains(t, strings.Join(collectReasoningDeltas(stream), ""), "Specialist found the delegated result.")
 
 				delegations := collectDelegations(stream)
 				require.NotEmpty(t, delegations)
-				delegation := delegations[len(delegations)-1]
+				delegation := delegations[0]
 				assert.Equal(t, "call_delegate_1", delegation.StreamID)
 				assert.Equal(t, "call_delegate_1", delegation.CallID)
 				assert.Equal(t, specialistID, string(delegation.Robot.Id))
 				assert.Equal(t, specialistName, delegation.Robot.Name)
 				assert.Equal(t, "Find the delegated result.", delegation.Request)
-				assert.Equal(t, "completed", delegation.Status)
+				assert.Condition(t, func() bool {
+					for _, observed := range delegations {
+						if observed.Status == "completed" {
+							return true
+						}
+					}
+					return false
+				}, "delegation should complete in a later turn")
 				var delegatedText strings.Builder
-				for _, message := range delegation.Messages {
-					for _, part := range message.Parts {
-						textPart, err := part.AsTextUIPart()
-						if err == nil {
-							delegatedText.WriteString(textPart.Text)
+				for _, observed := range delegations {
+					for _, message := range observed.Messages {
+						for _, part := range message.Parts {
+							textPart, err := part.AsTextUIPart()
+							if err == nil {
+								delegatedText.WriteString(textPart.Text)
+							}
 						}
 					}
 				}
 				assert.Contains(t, delegatedText.String(), "Specialist found the delegated result.")
 
-				session := tests.AssertRequest(cl.RobotSessionGetWithResponse(root,
+				session := tests.AssertRequest(cl.RobotSessionGetWithResponse(
+					root,
 					openapi.RobotSessionIDParam(sessionID),
 					&openapi.RobotSessionGetParams{},
 					adminSession,
@@ -159,10 +206,127 @@ func TestDenbotDelegatesToSpecialistInSameSession(t *testing.T) {
 				toolInputs := collectSessionToolInputs(delegatedMessages)
 				toolCallIDs := make(map[string]struct{})
 				for _, input := range toolInputs {
+					if input.ToolName == "robot_run_finish" {
+						continue
+					}
 					assert.Equal(t, "content_search", input.ToolName)
 					toolCallIDs[input.ToolCallId] = struct{}{}
 				}
 				assert.Equal(t, map[string]struct{}{"call_specialist_search": {}}, toolCallIDs)
+			}))
+		}),
+	)
+}
+
+func TestFailedDelegationDoesNotCaptureLaterUserMessages(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(
+		t,
+		&config.Config{LanguageModelProvider: "mock"},
+		e2e.Setup(),
+		robot.WithRobotSettings(mockModelAck),
+		fx.Invoke(func(
+			lc fx.Lifecycle,
+			root context.Context,
+			ts *httptest.Server,
+			cl *openapi.ClientWithResponses,
+			sh *e2e.SessionHelper,
+			aw *account_writer.Writer,
+			settingsRepo *settings.SettingsRepository,
+			db *ent.Client,
+		) {
+			lc.Append(fx.StartHook(func() {
+				adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+				adminSession := sh.WithSession(adminCtx)
+
+				specialistScriptName := "robot-chat-failing-specialist-" + xid.New().String() + ".yaml"
+				specialistScriptPath := filepath.Join("..", "scripts", specialistScriptName)
+				writeScript(t, specialistScriptPath, `steps:
+  - match:
+      any: true
+    respond:
+      delay_ms: 500
+      error: "invalid_request_error: openai api error"
+`)
+				defer os.Remove(specialistScriptPath)
+
+				specialist := tests.AssertRequest(cl.RobotCreateWithResponse(
+					root,
+					openapi.RobotCreateJSONRequestBody{
+						Name:        "failing-specialist-" + xid.New().String(),
+						Description: "Fails a delegated request after accepting it",
+						Playbook:    "Attempt only the delegated request.",
+						Model:       robotModelPtr("mock/../scripts/" + specialistScriptName),
+					},
+					adminSession,
+				))(t, http.StatusOK)
+				require.NotNil(t, specialist.JSON200)
+
+				agentName := "robot_" + string(specialist.JSON200.Id)
+				rootScriptName := "robot-chat-failed-delegation-root-" + xid.New().String() + ".yaml"
+				rootScriptPath := filepath.Join("..", "scripts", rootScriptName)
+				writeScript(t, rootScriptPath, `steps:
+  - match:
+      contains: "asynchronous specialist result"
+    respond:
+      text: "The failed specialist result was handled."
+      finish: "stop"
+  - match:
+      contains: "unrelated queued message"
+    respond:
+      text: "I can read the unrelated queued message."
+      finish: "stop"
+  - match:
+      tool_result: `+agentName+`
+      tool_result_status: pending
+    respond:
+      text: "The specialist is working asynchronously."
+      finish: "stop"
+  - match:
+      contains: "delegate the failing task"
+    respond:
+      tool_calls:
+        - id: call_failing_delegate
+          name: `+agentName+`
+          args:
+            request: "Attempt the failing task."
+`)
+				defer os.Remove(rootScriptPath)
+				require.NoError(t, robot.SetRobotSettings(root, settingsRepo, "mock/../scripts/"+rootScriptName))
+
+				sessionID := xid.New().String()
+				delegation := enqueueChatMessage(t, root, ts, adminSession, sessionID, "", "delegate the failing task")
+				firstTurn := readDurableChatParts(t, root, ts, adminSession, delegation)
+				assert.Contains(t, strings.Join(collectTextDeltas(firstTurn), ""), "The specialist is working asynchronously.")
+
+				followUp := enqueueChatMessage(t, root, ts, adminSession, sessionID, "", "unrelated queued message")
+				followUpTurn := readDurableChatParts(t, root, ts, adminSession, followUp)
+				assert.Contains(t, strings.Join(collectTextDeltas(followUpTurn), ""), "I can read the unrelated queued message.")
+
+				inputID, err := xid.FromString(string(followUp.reference.MessageId))
+				require.NoError(t, err)
+				input, err := db.RobotSessionInput.Get(root, inputID)
+				require.NoError(t, err)
+				require.NotNil(t, input.TurnID)
+				sessionXID, err := xid.FromString(sessionID)
+				require.NoError(t, err)
+				messages, err := db.RobotSessionMessage.Query().Where(
+					ent_robot_session_message.SessionIDEQ(sessionXID),
+					ent_robot_session_message.TurnIDEQ(*input.TurnID),
+					ent_robot_session_message.HiddenFromProjectionEQ(true),
+				).All(root)
+				require.NoError(t, err)
+
+				var runtimeInput *ent.RobotSessionMessage
+				for _, message := range messages {
+					if message.EventData.ADK().Author == "user" {
+						runtimeInput = message
+						break
+					}
+				}
+				require.NotNil(t, runtimeInput)
+				assert.Empty(t, runtimeInput.IsolationScope)
 			}))
 		}),
 	)

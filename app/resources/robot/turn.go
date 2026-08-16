@@ -28,17 +28,18 @@ const (
 )
 
 type Turn struct {
-	ID          TurnID
-	SessionID   SessionID
-	InitiatorID opt.Optional[account.AccountID]
-	SourceKind  string
-	RobotRef    string
-	InputData   json.RawMessage
-	Status      TurnStatus
-	CreatedAt   time.Time
-	StartedAt   opt.Optional[time.Time]
-	FinishedAt  opt.Optional[time.Time]
-	ErrorText   opt.Optional[string]
+	ID                TurnID
+	SessionID         SessionID
+	InitiatorID       opt.Optional[account.AccountID]
+	SourceKind        string
+	RobotRef          string
+	InputData         json.RawMessage
+	Status            TurnStatus
+	CreatedAt         time.Time
+	StartedAt         opt.Optional[time.Time]
+	FinishedAt        opt.Optional[time.Time]
+	CancelRequestedAt opt.Optional[time.Time]
+	ErrorText         opt.Optional[string]
 }
 
 type SessionEventKind string

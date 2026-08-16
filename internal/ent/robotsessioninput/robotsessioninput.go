@@ -34,6 +34,8 @@ const (
 	FieldBatchKey = "batch_key"
 	// FieldInputData holds the string denoting the input_data field in the database.
 	FieldInputData = "input_data"
+	// FieldNotBefore holds the string denoting the not_before field in the database.
+	FieldNotBefore = "not_before"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// EdgeSession holds the string denoting the session edge name in mutations.
@@ -79,6 +81,7 @@ var Columns = []string{
 	FieldSourceKind,
 	FieldBatchKey,
 	FieldInputData,
+	FieldNotBefore,
 	FieldStatus,
 }
 
@@ -178,6 +181,11 @@ func BySourceKind(opts ...sql.OrderTermOption) OrderOption {
 // ByBatchKey orders the results by the batch_key field.
 func ByBatchKey(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldBatchKey, opts...).ToFunc()
+}
+
+// ByNotBefore orders the results by the not_before field.
+func ByNotBefore(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNotBefore, opts...).ToFunc()
 }
 
 // ByStatus orders the results by the status field.

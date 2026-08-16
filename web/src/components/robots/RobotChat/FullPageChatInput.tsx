@@ -5,12 +5,20 @@ import { useRef, useState } from "react";
 import { useRobotChat } from "@/components/site/CommandPalette/RobotChat/RobotChatContext";
 import { RobotChatLoadingStatus } from "@/components/site/CommandPalette/RobotChat/RobotChatLoadingStatus";
 import { IconButton } from "@/components/ui/icon-button";
+import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { HStack, LStack, styled } from "@/styled-system/jsx";
 
 export function FullPageChatInput() {
-  const { activeRobotName, sendMessage, status, queuedMessageCount } =
-    useRobotChat();
+  const {
+    activeRobotName,
+    sendMessage,
+    cancelActiveTurn,
+    canCancelActiveTurn,
+    isCancelling,
+    status,
+    queuedMessageCount,
+  } = useRobotChat();
   const [input, setInput] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -89,6 +97,17 @@ export function FullPageChatInput() {
           >
             <DiscussionIcon />
           </IconButton>
+          {canCancelActiveTurn && (
+            <IconButton
+              aria-label="Cancel Robot response"
+              variant="subtle"
+              type="button"
+              loading={isCancelling}
+              onClick={() => void cancelActiveTurn()}
+            >
+              <CancelIcon />
+            </IconButton>
+          )}
         </HStack>
       </LStack>
     </styled.form>

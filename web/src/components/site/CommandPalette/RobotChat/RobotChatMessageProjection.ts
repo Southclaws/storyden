@@ -199,7 +199,16 @@ function projectDelegations(
       status: "running",
       inserted: false,
     };
-    group.messages.push(message);
+    const visibleParts = (message.parts ?? []).filter((part) => {
+      if (!isDelegationFinishToolPart(part)) {
+        return true;
+      }
+      applyToolResultToDelegationGroup(group, part);
+      return false;
+    });
+    if (visibleParts.length > 0) {
+      group.messages.push({ ...message, parts: visibleParts });
+    }
     group.robot ??= message.robot;
     groups.set(isolationScope, group);
   });
@@ -218,11 +227,8 @@ function projectDelegations(
       if (part.state === "input-available") {
         group.request = readDelegationRequest(part.input);
         group.robot ??= robotReferenceFromToolPart(part);
-      } else if (part.state === "output-available") {
-        group.status = "completed";
-      } else if (part.state === "output-error") {
-        group.status = "failed";
-        group.error = "errorText" in part ? String(part.errorText) : undefined;
+      } else {
+        applyToolResultToDelegationGroup(group, part);
       }
     }
   }
@@ -258,6 +264,45 @@ function projectDelegations(
 
     return [{ ...message, parts }];
   });
+}
+
+function applyToolResultToDelegationGroup(
+  group: DelegationGroup,
+  part: MessagePart,
+) {
+  if (!isToolUIPart(part)) {
+    return;
+  }
+  if (part.state === "output-available") {
+    const status = readToolResultStatus(part.output);
+    if (status === "pending") {
+      return;
+    }
+    group.status =
+      status === "failed" || status === "blocked" || status === "cancelled"
+        ? "failed"
+        : "completed";
+    if (group.status === "failed") {
+      group.error = readToolResultSummary(part.output);
+    }
+  } else if (part.state === "output-error") {
+    group.status = "failed";
+    group.error = "errorText" in part ? String(part.errorText) : undefined;
+  }
+}
+
+function readToolResultStatus(output: unknown): string | undefined {
+  if (!output || typeof output !== "object" || !("status" in output)) {
+    return undefined;
+  }
+  return typeof output.status === "string" ? output.status : undefined;
+}
+
+function readToolResultSummary(output: unknown): string | undefined {
+  if (!output || typeof output !== "object" || !("summary" in output)) {
+    return undefined;
+  }
+  return typeof output.summary === "string" ? output.summary : undefined;
 }
 
 function delegationScope(
@@ -384,6 +429,10 @@ function collectDelegatedToolCallIds(
 
 function isDelegationToolPart(part: MessagePart): boolean {
   return isToolUIPart(part) && getRawToolName(part).startsWith("robot_");
+}
+
+function isDelegationFinishToolPart(part: MessagePart): boolean {
+  return isToolUIPart(part) && getRawToolName(part) === "robot_run_finish";
 }
 
 function readDelegationRequest(input: unknown): string {

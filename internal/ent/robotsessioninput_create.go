@@ -106,6 +106,20 @@ func (_c *RobotSessionInputCreate) SetInputData(v json.RawMessage) *RobotSession
 	return _c
 }
 
+// SetNotBefore sets the "not_before" field.
+func (_c *RobotSessionInputCreate) SetNotBefore(v time.Time) *RobotSessionInputCreate {
+	_c.mutation.SetNotBefore(v)
+	return _c
+}
+
+// SetNillableNotBefore sets the "not_before" field if the given value is not nil.
+func (_c *RobotSessionInputCreate) SetNillableNotBefore(v *time.Time) *RobotSessionInputCreate {
+	if v != nil {
+		_c.SetNotBefore(*v)
+	}
+	return _c
+}
+
 // SetStatus sets the "status" field.
 func (_c *RobotSessionInputCreate) SetStatus(v robotsessioninput.Status) *RobotSessionInputCreate {
 	_c.mutation.SetStatus(v)
@@ -306,6 +320,10 @@ func (_c *RobotSessionInputCreate) createSpec() (*RobotSessionInput, *sqlgraph.C
 	if value, ok := _c.mutation.InputData(); ok {
 		_spec.SetField(robotsessioninput.FieldInputData, field.TypeJSON, value)
 		_node.InputData = value
+	}
+	if value, ok := _c.mutation.NotBefore(); ok {
+		_spec.SetField(robotsessioninput.FieldNotBefore, field.TypeTime, value)
+		_node.NotBefore = &value
 	}
 	if value, ok := _c.mutation.Status(); ok {
 		_spec.SetField(robotsessioninput.FieldStatus, field.TypeEnum, value)
@@ -522,6 +540,24 @@ func (u *RobotSessionInputUpsert) UpdateInputData() *RobotSessionInputUpsert {
 	return u
 }
 
+// SetNotBefore sets the "not_before" field.
+func (u *RobotSessionInputUpsert) SetNotBefore(v time.Time) *RobotSessionInputUpsert {
+	u.Set(robotsessioninput.FieldNotBefore, v)
+	return u
+}
+
+// UpdateNotBefore sets the "not_before" field to the value that was provided on create.
+func (u *RobotSessionInputUpsert) UpdateNotBefore() *RobotSessionInputUpsert {
+	u.SetExcluded(robotsessioninput.FieldNotBefore)
+	return u
+}
+
+// ClearNotBefore clears the value of the "not_before" field.
+func (u *RobotSessionInputUpsert) ClearNotBefore() *RobotSessionInputUpsert {
+	u.SetNull(robotsessioninput.FieldNotBefore)
+	return u
+}
+
 // SetStatus sets the "status" field.
 func (u *RobotSessionInputUpsert) SetStatus(v robotsessioninput.Status) *RobotSessionInputUpsert {
 	u.Set(robotsessioninput.FieldStatus, v)
@@ -708,6 +744,27 @@ func (u *RobotSessionInputUpsertOne) SetInputData(v json.RawMessage) *RobotSessi
 func (u *RobotSessionInputUpsertOne) UpdateInputData() *RobotSessionInputUpsertOne {
 	return u.Update(func(s *RobotSessionInputUpsert) {
 		s.UpdateInputData()
+	})
+}
+
+// SetNotBefore sets the "not_before" field.
+func (u *RobotSessionInputUpsertOne) SetNotBefore(v time.Time) *RobotSessionInputUpsertOne {
+	return u.Update(func(s *RobotSessionInputUpsert) {
+		s.SetNotBefore(v)
+	})
+}
+
+// UpdateNotBefore sets the "not_before" field to the value that was provided on create.
+func (u *RobotSessionInputUpsertOne) UpdateNotBefore() *RobotSessionInputUpsertOne {
+	return u.Update(func(s *RobotSessionInputUpsert) {
+		s.UpdateNotBefore()
+	})
+}
+
+// ClearNotBefore clears the value of the "not_before" field.
+func (u *RobotSessionInputUpsertOne) ClearNotBefore() *RobotSessionInputUpsertOne {
+	return u.Update(func(s *RobotSessionInputUpsert) {
+		s.ClearNotBefore()
 	})
 }
 
@@ -1066,6 +1123,27 @@ func (u *RobotSessionInputUpsertBulk) SetInputData(v json.RawMessage) *RobotSess
 func (u *RobotSessionInputUpsertBulk) UpdateInputData() *RobotSessionInputUpsertBulk {
 	return u.Update(func(s *RobotSessionInputUpsert) {
 		s.UpdateInputData()
+	})
+}
+
+// SetNotBefore sets the "not_before" field.
+func (u *RobotSessionInputUpsertBulk) SetNotBefore(v time.Time) *RobotSessionInputUpsertBulk {
+	return u.Update(func(s *RobotSessionInputUpsert) {
+		s.SetNotBefore(v)
+	})
+}
+
+// UpdateNotBefore sets the "not_before" field to the value that was provided on create.
+func (u *RobotSessionInputUpsertBulk) UpdateNotBefore() *RobotSessionInputUpsertBulk {
+	return u.Update(func(s *RobotSessionInputUpsert) {
+		s.UpdateNotBefore()
+	})
+}
+
+// ClearNotBefore clears the value of the "not_before" field.
+func (u *RobotSessionInputUpsertBulk) ClearNotBefore() *RobotSessionInputUpsertBulk {
+	return u.Update(func(s *RobotSessionInputUpsert) {
+		s.ClearNotBefore()
 	})
 }
 

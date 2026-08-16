@@ -250,6 +250,7 @@ var (
 	OperationIDRobotSessionStreamHead                 = OperationID{`RobotSessionStreamHead`}
 	OperationIDRobotSessionTurnGet                    = OperationID{`RobotSessionTurnGet`}
 	OperationIDRobotSessionTurnHead                   = OperationID{`RobotSessionTurnHead`}
+	OperationIDRobotSessionTurnCancel                 = OperationID{`RobotSessionTurnCancel`}
 	OperationIDRobotSessionGet                        = OperationID{`RobotSessionGet`}
 	OperationIDRobotMCPServersList                    = OperationID{`RobotMCPServersList`}
 	OperationIDRobotMCPServerCreate                   = OperationID{`RobotMCPServerCreate`}
@@ -773,6 +774,8 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDRobotSessionTurnGet, nil
 	case string(`RobotSessionTurnHead`):
 		return OperationIDRobotSessionTurnHead, nil
+	case string(`RobotSessionTurnCancel`):
+		return OperationIDRobotSessionTurnCancel, nil
 	case string(`RobotSessionGet`):
 		return OperationIDRobotSessionGet, nil
 	case string(`RobotMCPServersList`):

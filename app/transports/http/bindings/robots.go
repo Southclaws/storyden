@@ -696,7 +696,10 @@ func (r *Robots) RobotSessionGet(ctx context.Context, request openapi.RobotSessi
 	}
 	return openapi.RobotSessionGet200JSONResponse{
 		RobotSessionGetOKJSONResponse: openapi.RobotSessionGetOKJSONResponse(openapi.RobotSession{
-			Id:              openapi.Identifier(sess.ID.String()),
+			Id: openapi.Identifier(sess.ID.String()),
+			ActiveTurnId: opt.PtrMap(sess.ActiveTurnID, func(id robot.TurnID) openapi.Identifier {
+				return openapi.Identifier(id.String())
+			}),
 			Name:            sess.Name,
 			CreatedAt:       sess.CreatedAt,
 			UpdatedAt:       sess.UpdatedAt,

@@ -96,6 +96,11 @@ func BatchKey(v string) predicate.RobotSessionInput {
 	return predicate.RobotSessionInput(sql.FieldEQ(FieldBatchKey, v))
 }
 
+// NotBefore applies equality check predicate on the "not_before" field. It's identical to NotBeforeEQ.
+func NotBefore(v time.Time) predicate.RobotSessionInput {
+	return predicate.RobotSessionInput(sql.FieldEQ(FieldNotBefore, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.RobotSessionInput {
 	return predicate.RobotSessionInput(sql.FieldEQ(FieldCreatedAt, v))
@@ -564,6 +569,56 @@ func BatchKeyEqualFold(v string) predicate.RobotSessionInput {
 // BatchKeyContainsFold applies the ContainsFold predicate on the "batch_key" field.
 func BatchKeyContainsFold(v string) predicate.RobotSessionInput {
 	return predicate.RobotSessionInput(sql.FieldContainsFold(FieldBatchKey, v))
+}
+
+// NotBeforeEQ applies the EQ predicate on the "not_before" field.
+func NotBeforeEQ(v time.Time) predicate.RobotSessionInput {
+	return predicate.RobotSessionInput(sql.FieldEQ(FieldNotBefore, v))
+}
+
+// NotBeforeNEQ applies the NEQ predicate on the "not_before" field.
+func NotBeforeNEQ(v time.Time) predicate.RobotSessionInput {
+	return predicate.RobotSessionInput(sql.FieldNEQ(FieldNotBefore, v))
+}
+
+// NotBeforeIn applies the In predicate on the "not_before" field.
+func NotBeforeIn(vs ...time.Time) predicate.RobotSessionInput {
+	return predicate.RobotSessionInput(sql.FieldIn(FieldNotBefore, vs...))
+}
+
+// NotBeforeNotIn applies the NotIn predicate on the "not_before" field.
+func NotBeforeNotIn(vs ...time.Time) predicate.RobotSessionInput {
+	return predicate.RobotSessionInput(sql.FieldNotIn(FieldNotBefore, vs...))
+}
+
+// NotBeforeGT applies the GT predicate on the "not_before" field.
+func NotBeforeGT(v time.Time) predicate.RobotSessionInput {
+	return predicate.RobotSessionInput(sql.FieldGT(FieldNotBefore, v))
+}
+
+// NotBeforeGTE applies the GTE predicate on the "not_before" field.
+func NotBeforeGTE(v time.Time) predicate.RobotSessionInput {
+	return predicate.RobotSessionInput(sql.FieldGTE(FieldNotBefore, v))
+}
+
+// NotBeforeLT applies the LT predicate on the "not_before" field.
+func NotBeforeLT(v time.Time) predicate.RobotSessionInput {
+	return predicate.RobotSessionInput(sql.FieldLT(FieldNotBefore, v))
+}
+
+// NotBeforeLTE applies the LTE predicate on the "not_before" field.
+func NotBeforeLTE(v time.Time) predicate.RobotSessionInput {
+	return predicate.RobotSessionInput(sql.FieldLTE(FieldNotBefore, v))
+}
+
+// NotBeforeIsNil applies the IsNil predicate on the "not_before" field.
+func NotBeforeIsNil() predicate.RobotSessionInput {
+	return predicate.RobotSessionInput(sql.FieldIsNull(FieldNotBefore))
+}
+
+// NotBeforeNotNil applies the NotNil predicate on the "not_before" field.
+func NotBeforeNotNil() predicate.RobotSessionInput {
+	return predicate.RobotSessionInput(sql.FieldNotNull(FieldNotBefore))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.

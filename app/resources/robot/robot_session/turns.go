@@ -20,7 +20,15 @@ import (
 	ent_robot_session_view "github.com/Southclaws/storyden/internal/ent/robotsessionview"
 )
 
-var ErrTurnNotFound = errors.New("robot session turn not found")
+var (
+	ErrTurnNotFound       = errors.New("robot session turn not found")
+	ErrTurnNotCancellable = errors.New("robot session turn is not cancellable")
+)
+
+type CancellationDisposition struct {
+	SignalExecution bool
+	Finished        bool
+}
 
 type EnqueueTurnParams struct {
 	ID             robot.TurnID
@@ -135,6 +143,93 @@ func terminalKinds(status robot.TurnStatus) (ent_robot_session_turn.Status, ent_
 	default:
 		return "", "", errors.New("turn status is not terminal")
 	}
+}
+
+func (q *Repository) RequestTurnCancellation(ctx context.Context, sessionID robot.SessionID, turnID robot.TurnID) (CancellationDisposition, error) {
+	disposition := CancellationDisposition{}
+	err := ent.WithTx(ctx, q.db, func(tx *ent.Tx) error {
+		turn, err := tx.RobotSessionTurn.Query().Where(
+			ent_robot_session_turn.IDEQ(xid.ID(turnID)),
+			ent_robot_session_turn.SessionIDEQ(xid.ID(sessionID)),
+		).Only(ctx)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return ErrTurnNotFound
+			}
+			return err
+		}
+
+		now := time.Now()
+		switch turn.Status {
+		case ent_robot_session_turn.StatusRunning:
+			if turn.CancelRequestedAt == nil {
+				if err := tx.RobotSessionTurn.UpdateOneID(turn.ID).SetCancelRequestedAt(now).Exec(ctx); err != nil {
+					return err
+				}
+			}
+			disposition.SignalExecution = true
+			return nil
+
+		case ent_robot_session_turn.StatusQueued, ent_robot_session_turn.StatusBlocked:
+			if err := tx.RobotSessionTurn.UpdateOneID(turn.ID).
+				SetStatus(ent_robot_session_turn.StatusCancelled).
+				SetCancelRequestedAt(now).
+				SetFinishedAt(now).
+				SetErrorText("Robot turn cancelled").
+				Exec(ctx); err != nil {
+				return err
+			}
+			if turn.Status == ent_robot_session_turn.StatusBlocked {
+				if _, err := tx.RobotSession.Update().Where(
+					ent_robot_session.IDEQ(xid.ID(sessionID)),
+					ent_robot_session.ActiveTurnIDEQ(xid.ID(turnID)),
+				).SetExecutionStatus(ent_robot_session.ExecutionStatusIdle).
+					ClearActiveTurnID().
+					ClearLeaseToken().
+					ClearLeaseExpiresAt().
+					Save(ctx); err != nil {
+					return err
+				}
+			}
+			sequence, err := allocateSessionEventSequence(ctx, tx, sessionID, nil)
+			if err != nil {
+				return err
+			}
+			if _, err := tx.RobotSessionMessage.Create().
+				SetSessionID(xid.ID(sessionID)).
+				SetTurnID(xid.ID(turnID)).
+				SetSequence(sequence).
+				SetEventKind(ent_robot_session_message.EventKindTurnCancelled).
+				SetErrorText("Robot turn cancelled").
+				Save(ctx); err != nil {
+				return err
+			}
+			disposition.Finished = true
+			return nil
+
+		case ent_robot_session_turn.StatusCancelled:
+			disposition.Finished = true
+			return nil
+		default:
+			return ErrTurnNotCancellable
+		}
+	})
+	if err != nil {
+		return CancellationDisposition{}, fault.Wrap(err, fctx.With(ctx))
+	}
+	return disposition, nil
+}
+
+func (q *Repository) TurnCancellationRequested(ctx context.Context, sessionID robot.SessionID, turnID robot.TurnID) (bool, error) {
+	exists, err := q.db.RobotSessionTurn.Query().Where(
+		ent_robot_session_turn.IDEQ(xid.ID(turnID)),
+		ent_robot_session_turn.SessionIDEQ(xid.ID(sessionID)),
+		ent_robot_session_turn.CancelRequestedAtNotNil(),
+	).Exist(ctx)
+	if err != nil {
+		return false, fault.Wrap(err, fctx.With(ctx))
+	}
+	return exists, nil
 }
 
 func (q *Repository) ReadTurnEvents(ctx context.Context, sessionID robot.SessionID, turnID robot.TurnID, after uint64, limit int) ([]robot.SessionEvent, uint64, bool, error) {

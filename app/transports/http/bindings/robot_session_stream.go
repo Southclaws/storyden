@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
@@ -583,21 +582,6 @@ func hasPendingConfirmation(event *adksession.Event) bool {
 		}
 	}
 	return false
-}
-
-func streamErrorText(err error) string {
-	raw := strings.TrimSpace(err.Error())
-	issue := strings.TrimSpace(fmsg.GetIssue(err))
-
-	if issue == "" {
-		return raw
-	}
-
-	if raw == "" || raw == issue {
-		return issue
-	}
-
-	return fmt.Sprintf("%s (%s)", issue, raw)
 }
 
 func sendToolCall(ctx context.Context, event *adksession.Event, part *genai.Part, emitter partEmitter, toolRegistry *tools.Registry, logger *slog.Logger) {

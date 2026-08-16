@@ -1979,6 +1979,79 @@ export const robotSessionTurnHead = async (
   );
 };
 
+export type robotSessionTurnCancelResponse202 = {
+  data: void;
+  status: 202;
+};
+
+export type robotSessionTurnCancelResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type robotSessionTurnCancelResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type robotSessionTurnCancelResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type robotSessionTurnCancelResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type robotSessionTurnCancelResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 202 | 400 | 401 | 403 | 404>;
+};
+
+export type robotSessionTurnCancelResponseSuccess =
+  robotSessionTurnCancelResponse202 & {
+    headers: Headers;
+  };
+export type robotSessionTurnCancelResponseError = (
+  | robotSessionTurnCancelResponse400
+  | robotSessionTurnCancelResponse401
+  | robotSessionTurnCancelResponse403
+  | robotSessionTurnCancelResponse404
+  | robotSessionTurnCancelResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getRobotSessionTurnCancelUrl = (
+  sessionId: string,
+  turnId: string,
+) => {
+  return `/robots/sessions/${sessionId}/turns/${turnId}/cancellation`;
+};
+
+/**
+ * Create the singleton cancellation request for a queued, running, or
+ * blocked Robot turn. The operation is idempotent and asynchronous:
+ * accepted cancellation is reflected by a `turn_cancelled` event on the
+ * session stream. Cancelling a turn does not remove other queued messages,
+ * which remain eligible for later turns.
+ * @summary Request cancellation of a Robot session turn
+ */
+export const robotSessionTurnCancel = async (
+  sessionId: string,
+  turnId: string,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<robotSessionTurnCancelResponseSuccess> => {
+  return fetcher<robotSessionTurnCancelResponseSuccess>(
+    getRobotSessionTurnCancelUrl(sessionId, turnId),
+    {
+      ...options,
+      method: "PUT",
+    },
+  );
+};
+
 export type robotSessionGetResponse200 = {
   data: RobotSessionGetOKResponse;
   status: 200;

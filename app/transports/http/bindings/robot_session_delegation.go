@@ -10,6 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/robot/robot_querier"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_ref"
+	"github.com/Southclaws/storyden/app/services/semdex/robot"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/app/transports/http/robotprojection"
 )
@@ -102,7 +103,8 @@ func (d *delegationStream) AppendEvent(event *adksession.Event) bool {
 		d.active[event.IsolationScope] = data
 	}
 
-	parts, err := robotprojection.ADKEventToUIMessageParts(*event, nil, d.toolMetadata)
+	projectedEvent := delegationPresentationEvent(event)
+	parts, err := robotprojection.ADKEventToUIMessageParts(projectedEvent, nil, d.toolMetadata)
 	if err != nil {
 		d.logger.Warn("failed to project delegated Robot event",
 			slog.String("call_id", event.IsolationScope),
@@ -126,15 +128,57 @@ func (d *delegationStream) AppendEvent(event *adksession.Event) bool {
 	return true
 }
 
+func delegationPresentationEvent(event *adksession.Event) adksession.Event {
+	projected := *event
+	if event.LLMResponse.Content == nil {
+		return projected
+	}
+	content := *event.LLMResponse.Content
+	content.Parts = make([]*genai.Part, 0, len(event.LLMResponse.Content.Parts))
+	for _, part := range event.LLMResponse.Content.Parts {
+		if part == nil {
+			continue
+		}
+		if part.FunctionCall != nil && part.FunctionCall.Name == robot.UnattendedFinishToolName() {
+			continue
+		}
+		if part.FunctionResponse != nil && part.FunctionResponse.Name == robot.UnattendedFinishToolName() {
+			continue
+		}
+		content.Parts = append(content.Parts, part)
+	}
+	projected.LLMResponse.Content = &content
+	return projected
+}
+
 func (d *delegationStream) Complete(response *genai.FunctionResponse) bool {
 	if response == nil || response.ID == "" {
 		return false
 	}
 	data, ok := d.active[response.ID]
 	if !ok {
-		return false
+		robotID, isRobot := robot_ref.IDFromAgentName(response.Name)
+		if !isRobot {
+			return false
+		}
+		data = &delegationData{
+			CallID: response.ID, Robot: d.robotReference(robotID),
+			Status: delegationStatusRunning, Messages: []openapi.UIMessage{},
+		}
+		d.active[response.ID] = data
 	}
 
+	status, _ := response.Response["status"].(string)
+	if status == "pending" {
+		d.emit(data)
+		return true
+	}
+	if status == "failed" || status == "cancelled" || status == "blocked" {
+		data.Status = delegationStatusFailed
+		data.Error, _ = response.Response["summary"].(string)
+		d.emit(data)
+		return true
+	}
 	data.Status = delegationStatusCompleted
 	d.emit(data)
 	return true
@@ -147,6 +191,16 @@ func (d *delegationStream) Fail(message string) {
 		}
 		data.Status = delegationStatusFailed
 		data.Error = message
+		d.emit(data)
+	}
+}
+
+func (d *delegationStream) CompleteRunning() {
+	for _, data := range d.active {
+		if data.Status != delegationStatusRunning {
+			continue
+		}
+		data.Status = delegationStatusCompleted
 		d.emit(data)
 	}
 }

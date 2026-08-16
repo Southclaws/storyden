@@ -24,6 +24,7 @@ import {
   getRobotToolsetsListKey,
   getRobotsListKey,
   robotSessionGet,
+  robotSessionTurnCancel,
   useRobotGet,
   useRobotSessionsList,
   useRobotWorkspacesList,
@@ -112,6 +113,9 @@ type RobotChatContextValue = {
   workspacesReady: boolean;
   sessions: RobotSessionList;
   sendMessage: (input: { text: string }) => Promise<void>;
+  cancelActiveTurn: () => Promise<void>;
+  canCancelActiveTurn: boolean;
+  isCancelling: boolean;
   messages: StorydenUIMessage[];
   hasOlderMessages: boolean;
   isLoadingOlderMessages: boolean;
@@ -148,6 +152,7 @@ type RobotChatContextProps = PropsWithChildren<{
   initialMessages?: StorydenUIMessage[];
   initialNextBefore?: string;
   initialStreamOffset?: string;
+  initialActiveTurnID?: string;
   initialRootRobotID?: string;
   initialSelectedWorkspaceID?: string;
 }>;
@@ -158,6 +163,7 @@ export function RobotChatContext({
   initialMessages,
   initialNextBefore,
   initialStreamOffset,
+  initialActiveTurnID,
   initialRootRobotID,
   initialSelectedWorkspaceID,
 }: RobotChatContextProps) {
@@ -186,6 +192,10 @@ export function RobotChatContext({
   );
   const [isLoadingOlderMessages, setIsLoadingOlderMessages] = useState(false);
   const [observerStatus, setObserverStatus] = useState<ChatStatus>("ready");
+  const [activeTurnID, setActiveTurnID] = useState<string | undefined>(
+    initialActiveTurnID,
+  );
+  const [isCancelling, setIsCancelling] = useState(false);
 
   const [errorState, setErrorState] = useState<string | undefined>(undefined);
   const getPageContext = useRobotPageContext();
@@ -489,6 +499,7 @@ export function RobotChatContext({
       if (event.event_kind === "turn_queued") {
         if (!turnID) return;
         activeTurnIDs.add(turnID);
+        setActiveTurnID(turnID);
         queuedParts.set(turnID, parts);
         const claimedInputIDs = new Set(event.input_ids ?? []);
         if (claimedInputIDs.size > 0) {
@@ -519,6 +530,8 @@ export function RobotChatContext({
       if (isTerminalSessionEvent(event)) {
         if (!turnID) return;
         activeTurnIDs.delete(turnID);
+        setActiveTurnID((active) => (active === turnID ? undefined : active));
+        setIsCancelling(false);
         consumers.get(turnID)?.close();
         consumers.delete(turnID);
         queuedParts.delete(turnID);
@@ -662,6 +675,20 @@ export function RobotChatContext({
     sessionId,
   ]);
 
+  const cancelActiveTurn = useCallback(async () => {
+    if (!activeTurnID || isCancelling) {
+      return;
+    }
+
+    setIsCancelling(true);
+    try {
+      await robotSessionTurnCancel(sessionId, activeTurnID);
+    } catch (error) {
+      setIsCancelling(false);
+      setErrorState(deriveError(error));
+    }
+  }, [activeTurnID, isCancelling, sessionId]);
+
   const resolveToolConfirmation = useCallback(
     async (input: {
       approvalId: string;
@@ -725,6 +752,9 @@ export function RobotChatContext({
     workspacesReady: !!workspacesData,
     sessions: sessionsData?.sessions ?? [],
     sendMessage,
+    cancelActiveTurn,
+    canCancelActiveTurn: !!activeTurnID,
+    isCancelling,
     messages: chat.messages,
     hasOlderMessages: Boolean(nextBefore),
     isLoadingOlderMessages,

@@ -41,6 +41,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
+var ErrInternalInvocationUnavailable = errors.New("internal Robot invocation is unavailable")
+
 func Build() fx.Option {
 	return fx.Options(
 		tools.Build(),
@@ -100,11 +102,17 @@ const (
 type RunSource = agent_registry.RunSource
 
 const (
-	SourceInteractiveChat RunSource = agent_registry.SourceInteractiveChat
-	SourcePluginRPC       RunSource = agent_registry.SourcePluginRPC
+	SourceInteractiveChat  RunSource = agent_registry.SourceInteractiveChat
+	SourcePluginRPC        RunSource = agent_registry.SourcePluginRPC
+	SourceScheduled        RunSource = agent_registry.SourceScheduled
+	SourceDelegation       RunSource = agent_registry.SourceDelegation
+	SourceDelegationResult RunSource = agent_registry.SourceDelegationResult
 )
 
-type RunOptions = agent_registry.RunOptions
+type (
+	RunOptions    = agent_registry.RunOptions
+	DelegationRun = agent_registry.DelegationRun
+)
 
 func defaultRunOptions() RunOptions {
 	return RunOptions{
@@ -248,7 +256,8 @@ func (s *Agent) resolveAgentSpec(ctx context.Context, robotRef string) (*resolve
 			spec.DefaultWorkspaceID = opt.New(*entRobot.WorkspaceID)
 		}
 
-		s.logger.Debug("loaded custom robot",
+		s.logger.Debug(
+			"loaded custom robot",
 			slog.String("robot_id", id.String()),
 			slog.String("robot_name", entRobot.Name),
 		)
@@ -366,7 +375,7 @@ func (s *Agent) runResolvedAgent(
 		resolvedToolsets = append(resolvedToolsets, &tools.Toolset{ToolList: []adktool.Tool{finishTool}})
 	}
 
-	beforeToolCallbacks := append([]llmagent.BeforeToolCallback{checkToolRBAC, interceptClientSideTools(s.logger, runOptions)}, s.beforeToolCallbacks...)
+	beforeToolCallbacks := append([]llmagent.BeforeToolCallback{checkToolRBAC, interceptClientSideTools(s.logger, s.toolProvider, runOptions)}, s.beforeToolCallbacks...)
 	currentIdentity := robotIdentity{
 		ID:               spec.DatabaseRobotID,
 		Name:             spec.DisplayName,
@@ -374,21 +383,27 @@ func (s *Agent) runResolvedAgent(
 		Capabilities:     spec.Capabilities,
 		UnavailableTools: missingTools,
 	}
-	identityContext := s.buildRobotIdentityContext(sessionID, currentIdentity, false)
+	identityContext := s.buildRobotIdentityContext(sessionID, currentIdentity, runOptions.Delegation != nil)
 
-	var subAgents []agent.Agent
-	if spec.RobotRef == denbot.ID {
-		var err error
-		subAgents, err = s.buildDelegatedAgents(ctx, userID, sessionID, runOptions)
+	if runOptions.Delegation == nil {
+		backgroundTools, err := newBackgroundToolset()
 		if err != nil {
-			return errorSeq(fmt.Errorf("build delegated Robots: %w", err))
+			return errorSeq(fmt.Errorf("build background tools: %w", err))
 		}
+		resolvedToolsets = append(resolvedToolsets, backgroundTools)
+	}
+
+	if spec.RobotRef == denbot.ID {
+		delegationTools, err := s.buildDelegationToolset(ctx)
+		if err != nil {
+			return errorSeq(fmt.Errorf("build Robot delegation tools: %w", err))
+		}
+		resolvedToolsets = append(resolvedToolsets, delegationTools)
 	}
 
 	llmAgent, err := llmagent.New(llmagent.Config{
 		Name:                      spec.AgentName,
 		Description:               spec.Description,
-		SubAgents:                 subAgents,
 		GlobalInstructionProvider: s.globalInstructionProvider(invocationContext, runOptions),
 		InstructionProvider:       robotInstructionProvider(spec, identityContext),
 		Model:                     llm,
@@ -415,117 +430,6 @@ func (s *Agent) runResolvedAgent(
 	})
 }
 
-func (s *Agent) buildDelegatedAgents(
-	ctx context.Context,
-	userID string,
-	sessionID string,
-	runOptions RunOptions,
-) ([]agent.Agent, error) {
-	robots, err := s.db.Robot.Query().All(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	subAgents := make([]agent.Agent, 0, len(robots))
-	for _, stored := range robots {
-		spec, err := s.resolveAgentSpec(ctx, stored.ID.String())
-		if err != nil {
-			s.logger.Warn("skipping unavailable delegated Robot",
-				slog.String("robot_id", stored.ID.String()),
-				slog.String("error", err.Error()))
-			continue
-		}
-
-		subAgent, err := s.buildDelegatedAgent(ctx, spec, userID, sessionID, runOptions)
-		if err != nil {
-			s.logger.Warn("skipping unavailable delegated Robot",
-				slog.String("robot_id", stored.ID.String()),
-				slog.String("robot_name", stored.Name),
-				slog.String("error", err.Error()))
-			continue
-		}
-		subAgents = append(subAgents, subAgent)
-	}
-
-	return subAgents, nil
-}
-
-func (s *Agent) buildDelegatedAgent(
-	ctx context.Context,
-	spec *resolvedAgentSpec,
-	userID string,
-	sessionID string,
-	runOptions RunOptions,
-) (agent.Agent, error) {
-	modelRef, ok := spec.ModelRef.Get()
-	if !ok {
-		return nil, fmt.Errorf("delegated Robot has no model")
-	}
-	llm, err := s.modelFactory.GetADKModelLLM(ctx, modelRef)
-	if err != nil {
-		return nil, err
-	}
-
-	toolCtx := tools.ContextWithRunContext(ctx, tools.RunContext{
-		RobotID:   spec.DatabaseRobotID,
-		AccountID: userID,
-		SessionID: sessionID,
-	})
-	if runOptions.Mode == ModeUnattended {
-		toolCtx = tools.ContextWithConfirmationDisabled(toolCtx)
-	}
-	resolvedToolsets, missingTools, err := s.toolsets.Build(toolCtx, spec.ToolsetRefs)
-	if err != nil {
-		return nil, err
-	}
-	if len(spec.ToolNames) > 0 {
-		effectiveToolNames, err := s.toolsets.RemoveContainedTools(toolCtx, spec.ToolNames, spec.ToolsetRefs)
-		if err != nil {
-			return nil, fmt.Errorf("compose direct Robot tools: %w", err)
-		}
-		directTools, missingDirectTools := s.toolProvider.GetToolsWithMissing(toolCtx, effectiveToolNames...)
-		missingTools = append(missingTools, missingDirectTools...)
-		if len(directTools) > 0 {
-			resolvedToolsets = append(resolvedToolsets, &tools.Toolset{Registered: directTools, BuildContext: toolCtx})
-		}
-	}
-
-	checkToolRBAC := func(ctx agent.Context, tool adktool.Tool, args map[string]any) (map[string]any, error) {
-		registered, ok := s.toolProvider.FindByADKName(tool.Name())
-		if !ok {
-			return nil, nil
-		}
-		if permission, ok := registered.Definition.RequiredPermission.Get(); ok {
-			if err := session.Authorise(ctx, nil, permission); err != nil {
-				return nil, err
-			}
-		}
-		return nil, nil
-	}
-
-	identity := robotIdentity{
-		ID:               spec.DatabaseRobotID,
-		Name:             spec.DisplayName,
-		Description:      spec.Description,
-		Capabilities:     spec.Capabilities,
-		UnavailableTools: missingTools,
-	}
-	beforeToolCallbacks := append([]llmagent.BeforeToolCallback{checkToolRBAC, interceptClientSideTools(s.logger, runOptions)}, s.beforeToolCallbacks...)
-
-	return llmagent.New(llmagent.Config{
-		Name:                 spec.AgentName,
-		Description:          spec.Description,
-		InstructionProvider:  robotInstructionProvider(spec, s.buildRobotIdentityContext(sessionID, identity, true)),
-		Model:                llm,
-		Mode:                 llmagent.ModeSingleTurn,
-		Toolsets:             resolvedToolsets,
-		BeforeModelCallbacks: s.beforeModelCallbacks,
-		AfterModelCallbacks:  s.afterModelCallbacks,
-		BeforeToolCallbacks:  beforeToolCallbacks,
-		AfterToolCallbacks:   s.afterToolCallbacks,
-	})
-}
-
 func (s *Agent) DefaultLLM(ctx context.Context) (model.LLM, error) {
 	defaultModel, err := s.modelFactory.DefaultModel(ctx)
 	if err != nil {
@@ -544,6 +448,10 @@ func (s *Agent) RunADKAgent(
 	ctx context.Context,
 	req agent_registry.ADKRunRequest,
 ) iter.Seq2[*adksession.Event, error] {
+	ctx = withDelegationAttribution(ctx, req.Options.Delegation)
+	if req.Options.Source == SourceScheduled || req.Options.Source == SourceDelegationResult {
+		ctx = withHiddenRuntimeInput(ctx)
+	}
 	r, err := runner.New(runner.Config{
 		AppName:         req.AppName,
 		Agent:           req.Agent,
@@ -555,7 +463,11 @@ func (s *Agent) RunADKAgent(
 		return errorSeq(fmt.Errorf("create adk runner: %w", err))
 	}
 
-	if err := s.ensureSession(ctx, req.AppName, req.RobotRef, req.UserID, req.SessionID); err != nil {
+	rootRobotRef := req.RobotRef
+	if req.Options.Delegation != nil && req.Options.Delegation.RootRobotRef != "" {
+		rootRobotRef = req.Options.Delegation.RootRobotRef
+	}
+	if err := s.ensureSession(ctx, req.AppName, rootRobotRef, req.UserID, req.SessionID); err != nil {
 		return errorSeq(err)
 	}
 	if err := s.mountWorkspaceForRun(ctx, req.UserID, req.SessionID, req.DefaultWorkspaceID, req.Options); err != nil {
@@ -647,9 +559,9 @@ func (s *Agent) canReuseWorkspaceMount(ctx context.Context, sessionID robot.Sess
 // of tools that should run on the client (e.g., browser-only tools like console_log).
 //
 // HOW IT WORKS:
-// 1. Intercepts long-running tools marked for client handling or confirmation.
+// 1. Intercepts registered Storyden tools marked for client handling.
 // 2. Returns a special marker result {"_client_side_pending": true} instead of executing
-// 3. SSE handler (sse.go) detects this marker and:
+// 3. The session stream projection detects this marker and:
 //   - Emits the tool call to the frontend
 //   - Ends the stream without sending the marker to the LLM
 //
@@ -662,11 +574,12 @@ func (s *Agent) canReuseWorkspaceMount(ctx context.Context, sessionID robot.Sess
 // - Wasting tokens on back-and-forth with placeholder data
 //
 // RELATED: Vercel AI SDK client-side tools, Google ADK tool confirmation (Python-only)
-func interceptClientSideTools(logger *slog.Logger, options RunOptions) llmagent.BeforeToolCallback {
+func interceptClientSideTools(logger *slog.Logger, registry *tools.Registry, options RunOptions) llmagent.BeforeToolCallback {
 	return func(ctx agent.Context, tool adktool.Tool, args map[string]any) (map[string]any, error) {
-		if tool.IsLongRunning() {
+		registered, isRegistered := registry.FindByADKName(tool.Name())
+		if isRegistered && registered.IsClientTool {
 			if options.Mode == ModeUnattended {
-				logger.Info("blocking long-running tool in unattended run",
+				logger.Info("blocking client-side tool in unattended run",
 					slog.String("tool_name", tool.Name()),
 					slog.String("call_id", ctx.FunctionCallID()))
 
@@ -723,7 +636,8 @@ func (s *Agent) ensureSessionAttempt(ctx context.Context, robotName, rootRobotRe
 			return fmt.Errorf("session %s already has root Robot %q", sessionID, storedRootRobotRefString)
 		}
 
-		s.logger.Debug("session exists",
+		s.logger.Debug(
+			"session exists",
 			slog.String("userID", userID),
 			slog.String("sessionID", sessionID),
 			slog.Any("session", get.Session),
@@ -750,7 +664,8 @@ func (s *Agent) ensureSessionAttempt(ctx context.Context, robotName, rootRobotRe
 		}
 		return err
 	}
-	s.logger.Debug("session created",
+	s.logger.Debug(
+		"session created",
 		slog.String("userID", userID),
 		slog.String("sessionID", sessionID),
 		slog.Any("session", create.Session),

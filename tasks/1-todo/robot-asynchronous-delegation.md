@@ -1,97 +1,110 @@
-# Asynchronous Robot delegation
+# Autonomous Robot invocations
 
-Status: deferred
+Status: foundation implemented; product decisions remain
 
-## Context
+## Implemented execution model
 
-Robot delegation currently runs synchronously inside the browser-initiated chat
-request. Denbot invokes a database-backed Robot through ADK `ModeSingleTurn`,
-the specialist completes inside that invocation, and its result returns to
-Denbot for synthesis.
+`session_coordinator.Enqueue` is the common internal invocation boundary. The
+HTTP chat binding, plugin `robot_run`, scheduled work, and delegated specialist
+work all ultimately submit durable session inputs through the coordinator.
+Session execution remains serial: one replica claims a session lease, performs
+one turn, publishes its ordered events, and then signals the next eligible
+input.
 
-ADK v2.2 does not propagate a single-turn delegation's parent function-call ID
-as its isolation scope. Storyden temporarily infers that scope from the most
-recent unresolved Robot function call so delegated events can be attributed and
-grouped in persisted history and the UI.
+Plugin invocation is already a non-browser producer, but its RPC method is
+synchronous because the caller expects a collected structured result. The
+coordinator run wrapper exists for that request/result contract; it is not
+needed for browser compatibility and it does not own execution after enqueue.
 
-This inference relies on sequential execution. It is ambiguous as soon as two
-calls to the same Robot are active concurrently and is not a foundation for
-asynchronous tasks.
+Scheduled inputs use `not_before`. They remain queued until due and are found by
+the normal runnable-session reconciliation pass, so process restarts and
+multi-replica deployments do not lose the wake-up. `check_back_later` is the
+first producer: it returns a pending asynchronous tool result, stores a due
+internal input, and resumes the root Robot in a later turn. The accepting
+worker schedules a best-effort local wake-up; the database-backed runnable
+session reconciliation pass is the crash-safe fallback.
 
-## Current decision
+Specialist delegation uses the same pattern. An asynchronous `robot_<id>` tool:
 
-- Keep synchronous specialist delegation on `ModeSingleTurn` for the current
-  Robots milestone.
-- Keep `inferDelegationIsolationScope` only as a temporary compatibility shim.
-- Do not expand the inference algorithm to support parallel or asynchronous
-  execution.
-- Remove the shim when ADK propagates single-turn isolation scopes, or when
-  Storyden replaces single-turn delegation with an explicitly scoped dispatch
-  path.
+1. enqueues an unattended specialist input with a stable ID derived from the
+   session and function-call ID;
+2. immediately returns `pending` to the coordinator Robot;
+3. runs the specialist in a separately leased turn;
+4. requires the specialist to finish through `robot_run_finish`;
+5. enqueues that structured result as an authoritative internal input tied to
+   the original function-call ID;
+6. starts another root-Robot turn to synthesize the result.
 
-## What ADK task mode provides
+The coordinator assigns the original function-call ID as the specialist's
+isolation scope before the first child event is stored. Attribution no longer
+depends on transcript order or ADK single-turn delegation behavior.
 
-`ModeTask` provides useful execution semantics for work that may span multiple
-agent steps or user turns:
+Manual cancellation is also a coordinator command. The database records a
+cancellation request, pubsub wakes the replica that owns the active lease, and
+the worker emits a durable `turn_cancelled` event. A database check in the lease
+heartbeat covers a missed pubsub notification. Cancelling one turn leaves later
+queued inputs intact.
 
-- the parent function-call ID is used as a stable run ID and isolation scope;
-- the task owns a private conversational history within the shared session;
-- an unresolved task can pause and be resumed on a later runner invocation;
-- the task explicitly completes through `finish_task`;
-- an output schema can validate the completion payload before it returns to the
-  coordinator;
-- long-running tool interruptions and human confirmation can suspend the task
-  without closing its delegation call.
+## Decisions still open
 
-Task mode is resumable orchestration, not a background job runtime. ADK still
-runs a task when Storyden invokes the runner. It does not schedule detached work,
-persist an application-level queue, wake an idle browser, retry abandoned jobs,
-or provide a bidirectional client transport.
+### Invocation authority
 
-## Required Storyden architecture
+An autonomous input currently retains the initiating account ID, root Robot,
+session, workspace request, source, invocation context, and a stable input ID.
+At execution time the worker reloads that account and its current roles; missing
+accounts fail the turn rather than inheriting the worker's internal context.
+Before adding external schedules or resource listeners, decide whether that
+current-authority policy is the final contract or whether some authority should
+be snapshotted:
 
-Before asynchronous delegation is exposed, introduce an application-level task
-resource keyed by a stable task ID rather than reconstructing ownership from
-session transcript order. It should record at least:
+- whether deleted, banned, or permission-reduced accounts invalidate pending
+  work;
+- whether a scheduled run uses current membership and tool permissions;
+- whether integrations act as an account, a service principal, or a distinct
+  actor type;
+- what attribution a multiplayer session displays for system-originated work.
+- whether every member who can view a shared session may cancel its active turn,
+  or cancellation requires a narrower session role. The current endpoint uses
+  the existing session-view permission.
 
-- parent Robot session and originating message/function-call IDs;
-- delegated Robot identity and immutable execution input;
-- lifecycle state such as queued, running, waiting, completed, failed and
-  cancelled;
-- ADK run/isolation scope and resume information;
-- timestamps, progress and terminal result or failure;
-- delivery cursor or event sequence for reconnecting clients.
+### Definition and environment drift
 
-Execution should be owned by a durable worker/scheduler rather than the HTTP
-request lifecycle. A bidirectional or server-push transport can then subscribe
-the browser to task and session events, while persisted event sequences allow
-replay after disconnects. The transport must be an observation and command
-channel, not the owner of task execution.
+Decide whether delayed work uses the Robot definition, model, Toolsets,
+workspace mount, and invocation context captured at enqueue time or their latest
+values at execution time. The current implementation stores the requested
+Robot and workspace identity but resolves the Robot definition when it runs.
 
-Timers should enqueue or resume a task by its durable ID. They must not scan chat
-history to guess which delegation is active.
+### Scheduling contract
 
-## ADK integration questions
+`check_back_later` is deliberately small. Product limits still need decisions:
 
-- Use `ModeTask` where a specialist must ask follow-up questions, wait for human
-  input, survive across invocations, or return validated structured output.
-- Decide whether fire-and-forget work is represented by the same task agent
-  behind a Storyden scheduler or by an explicit workflow node controlled by the
-  task service.
-- Verify concurrent dispatch of the same configured Robot before enabling
-  parallel fan-out; ADK Go currently has an open shared-agent state race for
-  parallel `single_turn` calls.
-- Define cancellation and deadline propagation through Storyden workers, ADK
-  contexts and tools.
-- Define whether a resumed task uses the Robot definition captured at creation
-  or the latest edited definition.
-- Keep task progress distinct from model reasoning, tool calls and final chat
-  messages in both persistence and UI projection.
+- maximum pending timers per account/session and rate limits;
+- required wake-up precision and how much scheduler load is acceptable;
+- retention and expiration for very old pending work;
+- editing, listing, and cancelling scheduled inputs before they become turns;
+- behavior when the target session or Robot is deleted.
 
-## Removal criteria for the temporary shim
+### Delegation lifecycle
 
-Delete `inferDelegationIsolationScope` and the split live/stored event handling
-when all delegated runs receive their scope from an authoritative execution ID
-before the first child event is produced. Add coverage for two simultaneous
-delegations to the same Robot to prove attribution does not depend on event
-order.
+The first implementation serializes all work in a session. Before parallel
+fan-out, define:
+
+- whether sibling delegations may execute concurrently and how they consume a
+  shared workspace safely;
+- whether cancelling the root request cascades to already-enqueued specialist
+  work;
+- retry policy after process loss or external side effects;
+- progress events distinct from model reasoning and tool calls;
+- UI and API inspection of pending/failed specialist tasks;
+- whether a specialist may itself delegate or schedule follow-up work.
+
+ADK task mode remains useful for a specialist that must suspend and resume its
+private workflow, but it is not the durable scheduler. Storyden's input queue,
+leases, event log, and pubsub remain the ownership boundary.
+
+### Plugin result delivery
+
+Plugin `robot_run` remains synchronous even though its execution is detached
+from the RPC context after enqueue. A future asynchronous plugin contract needs
+a durable invocation ID plus polling, webhook, pubsub, or stream-based result
+delivery semantics. That is a separate API decision from the session runtime.

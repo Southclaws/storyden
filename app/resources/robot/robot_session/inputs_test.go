@@ -104,6 +104,54 @@ func TestQueuedInputsRemainIndividualWhenMaterialisedAsOneTurn(t *testing.T) {
 	}))
 }
 
+func TestQueuedInputsBecomeRunnableAtTheirScheduledTime(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, fx.Invoke(func(
+		lc fx.Lifecycle,
+		ctx context.Context,
+		db *ent.Client,
+		repo *robot_session.Repository,
+	) {
+		lc.Append(fx.StartHook(func() {
+			owner, err := db.Account.Create().SetHandle("scheduled-input-owner").SetName("Scheduled Input Owner").Save(ctx)
+			require.NoError(t, err)
+			ownerID := account.AccountID(owner.ID)
+			sessionID := robot.SessionID(xid.New())
+			require.NoError(t, createSession(ctx, repo, sessionID, ownerID))
+
+			futureID := robot.InputID(xid.New())
+			require.NoError(t, repo.EnqueueInput(ctx, robot_session.EnqueueInputParams{
+				ID: futureID, SessionID: sessionID, AccountID: ownerID,
+				SourceKind: "scheduled", BatchKey: "scheduled", InputData: json.RawMessage(`{}`),
+				NotBefore: opt.New(time.Now().Add(time.Hour)),
+			}))
+
+			queued, err := repo.QueuedInputs(ctx, sessionID, 20)
+			require.NoError(t, err)
+			assert.Empty(t, queued)
+			runnable, err := repo.RunnableSessionIDs(ctx, 20)
+			require.NoError(t, err)
+			assert.NotContains(t, runnable, sessionID)
+
+			dueID := robot.InputID(xid.New())
+			require.NoError(t, repo.EnqueueInput(ctx, robot_session.EnqueueInputParams{
+				ID: dueID, SessionID: sessionID, AccountID: ownerID,
+				SourceKind: "scheduled", BatchKey: "scheduled", InputData: json.RawMessage(`{}`),
+				NotBefore: opt.New(time.Now().Add(-time.Second)),
+			}))
+
+			queued, err = repo.QueuedInputs(ctx, sessionID, 20)
+			require.NoError(t, err)
+			require.Len(t, queued, 1)
+			assert.Equal(t, dueID, queued[0].ID)
+			runnable, err = repo.RunnableSessionIDs(ctx, 20)
+			require.NoError(t, err)
+			assert.Contains(t, runnable, sessionID)
+		}))
+	}))
+}
+
 func createSession(ctx context.Context, repo *robot_session.Repository, sessionID robot.SessionID, ownerID account.AccountID) error {
 	_, err := repo.Create(ctx, sessionID, "Queued inputs", ownerID, nil)
 	return err

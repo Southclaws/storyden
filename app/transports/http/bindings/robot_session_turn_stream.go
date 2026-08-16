@@ -74,6 +74,7 @@ type turnProjector struct {
 	collector          *partCollector
 	delegations        *delegationStream
 	projectionFinished bool
+	hasDelegatedEvents bool
 }
 
 func newTurnProjector(
@@ -117,12 +118,20 @@ func (p *turnProjector) project(event robot.SessionEvent, toolRegistry *tools.Re
 		}
 		adkEvent := &message.Event
 		if adkEvent.Author == "user" {
+			if adkEvent.LLMResponse.Content != nil {
+				for _, part := range adkEvent.LLMResponse.Content.Parts {
+					if part != nil && part.FunctionResponse != nil {
+						p.delegations.Complete(part.FunctionResponse)
+					}
+				}
+			}
 			break
 		}
 		if adkEvent.LLMResponse.Content == nil {
 			break
 		}
 		delegatedEvent := p.delegations.AppendEvent(adkEvent)
+		p.hasDelegatedEvents = p.hasDelegatedEvents || delegatedEvent
 		for partIndex, part := range adkEvent.LLMResponse.Content.Parts {
 			if part == nil {
 				continue
@@ -166,6 +175,9 @@ func (p *turnProjector) project(event robot.SessionEvent, toolRegistry *tools.Re
 		}
 
 	case robot.SessionEventTurnCompleted:
+		if p.hasDelegatedEvents {
+			p.delegations.CompleteRunning()
+		}
 		if !p.projectionFinished {
 			if sess, _, err := p.sessions.Get(p.ctx, p.sessionID, robot.NewMessageCursorParams(opt.NewEmpty[robot.MessageID](), 1)); err == nil {
 				data := openapi.StreamPart{}
@@ -445,6 +457,33 @@ func (r *Robots) RobotSessionTurnGet(ctx context.Context, request openapi.RobotS
 
 func (r *Robots) RobotSessionTurnHead(ctx context.Context, request openapi.RobotSessionTurnHeadRequestObject) (openapi.RobotSessionTurnHeadResponseObject, error) {
 	return robotSessionTurnHeadResponse{robots: r, ctx: ctx, request: request}, nil
+}
+
+func (r *Robots) RobotSessionTurnCancel(ctx context.Context, request openapi.RobotSessionTurnCancelRequestObject) (openapi.RobotSessionTurnCancelResponseObject, error) {
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return openapi.RobotSessionTurnCancel401Response{}, nil
+	}
+	sessionID, err := robot.NewSessionID(string(request.SessionId))
+	if err != nil {
+		return openapi.RobotSessionTurnCancel400Response{}, nil
+	}
+	turnXID, err := xid.FromString(string(request.TurnId))
+	if err != nil {
+		return openapi.RobotSessionTurnCancel400Response{}, nil
+	}
+	turnID := robot.TurnID(turnXID)
+	allowed, err := r.sessionRepo.CanReadTurn(ctx, sessionID, turnID, accountID)
+	if err != nil {
+		return nil, err
+	}
+	if !allowed {
+		return openapi.RobotSessionTurnCancel404Response{}, nil
+	}
+	if err := r.coordinator.Cancel(ctx, sessionID, turnID); err != nil {
+		return nil, err
+	}
+	return openapi.RobotSessionTurnCancel202Response{}, nil
 }
 
 func (r *Robots) serveSessionTurn(ctx context.Context, w http.ResponseWriter, sessionValue, turnValue, offsetValue, live string, head bool) {

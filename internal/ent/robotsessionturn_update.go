@@ -195,6 +195,26 @@ func (_u *RobotSessionTurnUpdate) ClearFinishedAt() *RobotSessionTurnUpdate {
 	return _u
 }
 
+// SetCancelRequestedAt sets the "cancel_requested_at" field.
+func (_u *RobotSessionTurnUpdate) SetCancelRequestedAt(v time.Time) *RobotSessionTurnUpdate {
+	_u.mutation.SetCancelRequestedAt(v)
+	return _u
+}
+
+// SetNillableCancelRequestedAt sets the "cancel_requested_at" field if the given value is not nil.
+func (_u *RobotSessionTurnUpdate) SetNillableCancelRequestedAt(v *time.Time) *RobotSessionTurnUpdate {
+	if v != nil {
+		_u.SetCancelRequestedAt(*v)
+	}
+	return _u
+}
+
+// ClearCancelRequestedAt clears the value of the "cancel_requested_at" field.
+func (_u *RobotSessionTurnUpdate) ClearCancelRequestedAt() *RobotSessionTurnUpdate {
+	_u.mutation.ClearCancelRequestedAt()
+	return _u
+}
+
 // SetErrorText sets the "error_text" field.
 func (_u *RobotSessionTurnUpdate) SetErrorText(v string) *RobotSessionTurnUpdate {
 	_u.mutation.SetErrorText(v)
@@ -399,6 +419,12 @@ func (_u *RobotSessionTurnUpdate) sqlSave(ctx context.Context) (_node int, err e
 	}
 	if _u.mutation.FinishedAtCleared() {
 		_spec.ClearField(robotsessionturn.FieldFinishedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.CancelRequestedAt(); ok {
+		_spec.SetField(robotsessionturn.FieldCancelRequestedAt, field.TypeTime, value)
+	}
+	if _u.mutation.CancelRequestedAtCleared() {
+		_spec.ClearField(robotsessionturn.FieldCancelRequestedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.ErrorText(); ok {
 		_spec.SetField(robotsessionturn.FieldErrorText, field.TypeString, value)
@@ -691,6 +717,26 @@ func (_u *RobotSessionTurnUpdateOne) ClearFinishedAt() *RobotSessionTurnUpdateOn
 	return _u
 }
 
+// SetCancelRequestedAt sets the "cancel_requested_at" field.
+func (_u *RobotSessionTurnUpdateOne) SetCancelRequestedAt(v time.Time) *RobotSessionTurnUpdateOne {
+	_u.mutation.SetCancelRequestedAt(v)
+	return _u
+}
+
+// SetNillableCancelRequestedAt sets the "cancel_requested_at" field if the given value is not nil.
+func (_u *RobotSessionTurnUpdateOne) SetNillableCancelRequestedAt(v *time.Time) *RobotSessionTurnUpdateOne {
+	if v != nil {
+		_u.SetCancelRequestedAt(*v)
+	}
+	return _u
+}
+
+// ClearCancelRequestedAt clears the value of the "cancel_requested_at" field.
+func (_u *RobotSessionTurnUpdateOne) ClearCancelRequestedAt() *RobotSessionTurnUpdateOne {
+	_u.mutation.ClearCancelRequestedAt()
+	return _u
+}
+
 // SetErrorText sets the "error_text" field.
 func (_u *RobotSessionTurnUpdateOne) SetErrorText(v string) *RobotSessionTurnUpdateOne {
 	_u.mutation.SetErrorText(v)
@@ -925,6 +971,12 @@ func (_u *RobotSessionTurnUpdateOne) sqlSave(ctx context.Context) (_node *RobotS
 	}
 	if _u.mutation.FinishedAtCleared() {
 		_spec.ClearField(robotsessionturn.FieldFinishedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.CancelRequestedAt(); ok {
+		_spec.SetField(robotsessionturn.FieldCancelRequestedAt, field.TypeTime, value)
+	}
+	if _u.mutation.CancelRequestedAtCleared() {
+		_spec.ClearField(robotsessionturn.FieldCancelRequestedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.ErrorText(); ok {
 		_spec.SetField(robotsessionturn.FieldErrorText, field.TypeString, value)

@@ -344,4 +344,149 @@ describe("projectRobotMessages", () => {
       },
     });
   });
+
+  it("keeps an asynchronous delegation running until its completed result arrives", () => {
+    const baseMessages = [
+      {
+        id: "coordinator-call",
+        role: "assistant",
+        parts: [
+          {
+            type: "tool-robot_d9n7eodo2dtgv230rpng",
+            toolCallId: "call_async_delegate",
+            state: "input-available",
+            input: { request: "Inspect the thread." },
+          },
+          {
+            type: "tool-robot_d9n7eodo2dtgv230rpng",
+            toolCallId: "call_async_delegate",
+            state: "output-available",
+            output: { status: "pending" },
+          },
+        ],
+      },
+      {
+        id: "specialist-progress",
+        role: "assistant",
+        branch: "robot_d9n7eodo2dtgv230rpng",
+        isolation_scope: "call_async_delegate",
+        robot: {
+          id: "d9n7eodo2dtgv230rpng",
+          name: "Thread Researcher",
+        },
+        parts: [{ type: "text", text: "Inspecting now.", state: "done" }],
+      },
+    ] as unknown as StorydenUIMessage[];
+
+    const pending = projectRobotMessages(baseMessages);
+    expect(pending[0]?.parts[0]).toMatchObject({
+      type: "data-delegation",
+      data: { status: "running" },
+    });
+
+    const completed = projectRobotMessages([
+      ...baseMessages,
+      {
+        id: "coordinator-result",
+        role: "assistant",
+        parts: [
+          {
+            type: "tool-robot_d9n7eodo2dtgv230rpng",
+            toolCallId: "call_async_delegate",
+            state: "output-available",
+            output: {
+              status: "completed",
+              summary: "The thread was inspected.",
+            },
+          },
+        ],
+      },
+    ] as unknown as StorydenUIMessage[]);
+    expect(completed[0]?.parts[0]).toMatchObject({
+      type: "data-delegation",
+      data: { status: "completed" },
+    });
+  });
+
+  it("uses the specialist finish result after hydration without rendering the runtime tool", () => {
+    const messages = [
+      {
+        id: "coordinator-call",
+        role: "assistant",
+        parts: [
+          {
+            type: "tool-robot_d9n7eodo2dtgv230rpng",
+            toolCallId: "call_async_delegate",
+            state: "input-available",
+            input: { request: "Inspect the thread." },
+          },
+          {
+            type: "tool-robot_d9n7eodo2dtgv230rpng",
+            toolCallId: "call_async_delegate",
+            state: "output-available",
+            output: { status: "pending" },
+          },
+        ],
+      },
+      {
+        id: "specialist-result",
+        role: "assistant",
+        branch: "robot_d9n7eodo2dtgv230rpng",
+        isolation_scope: "call_async_delegate",
+        robot: {
+          id: "d9n7eodo2dtgv230rpng",
+          name: "Thread Researcher",
+        },
+        parts: [
+          { type: "text", text: "The thread was inspected.", state: "done" },
+          {
+            type: "tool-robot_run_finish",
+            toolCallId: "call_specialist_finish",
+            state: "input-available",
+            input: {
+              status: "completed",
+              summary: "The thread was inspected.",
+            },
+          },
+        ],
+      },
+      {
+        id: "specialist-finish-output",
+        role: "assistant",
+        branch: "robot_d9n7eodo2dtgv230rpng",
+        isolation_scope: "call_async_delegate",
+        robot: {
+          id: "d9n7eodo2dtgv230rpng",
+          name: "Thread Researcher",
+        },
+        parts: [
+          {
+            type: "tool-robot_run_finish",
+            toolCallId: "call_specialist_finish",
+            state: "output-available",
+            output: {
+              status: "completed",
+              summary: "The thread was inspected.",
+            },
+          },
+        ],
+      },
+    ] as unknown as StorydenUIMessage[];
+
+    const projected = projectRobotMessages(messages);
+
+    expect(projected[0]?.parts[0]).toMatchObject({
+      type: "data-delegation",
+      data: {
+        status: "completed",
+        messages: [
+          {
+            id: "specialist-result",
+            parts: [{ type: "text", text: "The thread was inspected." }],
+          },
+        ],
+      },
+    });
+    expect(JSON.stringify(projected)).not.toContain("robot_run_finish");
+  });
 });

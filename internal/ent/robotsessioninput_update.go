@@ -150,6 +150,26 @@ func (_u *RobotSessionInputUpdate) AppendInputData(v json.RawMessage) *RobotSess
 	return _u
 }
 
+// SetNotBefore sets the "not_before" field.
+func (_u *RobotSessionInputUpdate) SetNotBefore(v time.Time) *RobotSessionInputUpdate {
+	_u.mutation.SetNotBefore(v)
+	return _u
+}
+
+// SetNillableNotBefore sets the "not_before" field if the given value is not nil.
+func (_u *RobotSessionInputUpdate) SetNillableNotBefore(v *time.Time) *RobotSessionInputUpdate {
+	if v != nil {
+		_u.SetNotBefore(*v)
+	}
+	return _u
+}
+
+// ClearNotBefore clears the value of the "not_before" field.
+func (_u *RobotSessionInputUpdate) ClearNotBefore() *RobotSessionInputUpdate {
+	_u.mutation.ClearNotBefore()
+	return _u
+}
+
 // SetStatus sets the "status" field.
 func (_u *RobotSessionInputUpdate) SetStatus(v robotsessioninput.Status) *RobotSessionInputUpdate {
 	_u.mutation.SetStatus(v)
@@ -294,6 +314,12 @@ func (_u *RobotSessionInputUpdate) sqlSave(ctx context.Context) (_node int, err 
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, robotsessioninput.FieldInputData, value)
 		})
+	}
+	if value, ok := _u.mutation.NotBefore(); ok {
+		_spec.SetField(robotsessioninput.FieldNotBefore, field.TypeTime, value)
+	}
+	if _u.mutation.NotBeforeCleared() {
+		_spec.ClearField(robotsessioninput.FieldNotBefore, field.TypeTime)
 	}
 	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(robotsessioninput.FieldStatus, field.TypeEnum, value)
@@ -522,6 +548,26 @@ func (_u *RobotSessionInputUpdateOne) AppendInputData(v json.RawMessage) *RobotS
 	return _u
 }
 
+// SetNotBefore sets the "not_before" field.
+func (_u *RobotSessionInputUpdateOne) SetNotBefore(v time.Time) *RobotSessionInputUpdateOne {
+	_u.mutation.SetNotBefore(v)
+	return _u
+}
+
+// SetNillableNotBefore sets the "not_before" field if the given value is not nil.
+func (_u *RobotSessionInputUpdateOne) SetNillableNotBefore(v *time.Time) *RobotSessionInputUpdateOne {
+	if v != nil {
+		_u.SetNotBefore(*v)
+	}
+	return _u
+}
+
+// ClearNotBefore clears the value of the "not_before" field.
+func (_u *RobotSessionInputUpdateOne) ClearNotBefore() *RobotSessionInputUpdateOne {
+	_u.mutation.ClearNotBefore()
+	return _u
+}
+
 // SetStatus sets the "status" field.
 func (_u *RobotSessionInputUpdateOne) SetStatus(v robotsessioninput.Status) *RobotSessionInputUpdateOne {
 	_u.mutation.SetStatus(v)
@@ -696,6 +742,12 @@ func (_u *RobotSessionInputUpdateOne) sqlSave(ctx context.Context) (_node *Robot
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, robotsessioninput.FieldInputData, value)
 		})
+	}
+	if value, ok := _u.mutation.NotBefore(); ok {
+		_spec.SetField(robotsessioninput.FieldNotBefore, field.TypeTime, value)
+	}
+	if _u.mutation.NotBeforeCleared() {
+		_spec.ClearField(robotsessioninput.FieldNotBefore, field.TypeTime)
 	}
 	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(robotsessioninput.FieldStatus, field.TypeEnum, value)

@@ -314,4 +314,61 @@ test.describe("Robot Chat — mock LLM stream", () => {
       await setupRobotProviderWithScript(DEFAULT_ROBOT_MODEL);
     }
   });
+
+  test("a running turn can be cancelled without blocking the next message", async ({
+    page,
+  }) => {
+    const suffix = Date.now();
+    const scriptName = `e2e-manual-cancellation-${suffix}.yaml`;
+    const scriptPath = `${ROBOT_SCRIPT_DIR}/${scriptName}`;
+
+    try {
+      await writeFile(
+        scriptPath,
+        `steps:
+  - match:
+      contains: "cancel this response"
+    respond:
+      delay_ms: 5000
+      text: "This cancelled response must not appear."
+      finish: "stop"
+  - match:
+      any: true
+    respond:
+      text: "The follow-up completed after cancellation."
+      finish: "stop"
+`,
+      );
+
+      await setupRobotProviderWithScript(`mock/../robot/scripts/${scriptName}`);
+      await page.goto("/robots/chats/new");
+
+      await sendMessage(page, "cancel this response");
+      const cancelButton = page.getByRole("button", {
+        name: "Cancel Robot response",
+      });
+      await expect(cancelButton).toBeVisible({ timeout: 15000 });
+
+      await waitForPersistedChatRoute(page);
+      await page.reload();
+      await expect(cancelButton).toBeVisible({ timeout: 15000 });
+      await cancelButton.click();
+
+      await expect(page.getByText("Robot turn cancelled")).toBeVisible({
+        timeout: 15000,
+      });
+      await expect(cancelButton).toHaveCount(0);
+      await expect(
+        page.getByText("This cancelled response must not appear."),
+      ).toHaveCount(0);
+
+      await sendMessage(page, "continue after cancellation");
+      await expect(
+        page.getByText("The follow-up completed after cancellation."),
+      ).toBeVisible({ timeout: 15000 });
+    } finally {
+      await unlink(scriptPath).catch(() => undefined);
+      await setupRobotProviderWithScript(DEFAULT_ROBOT_MODEL);
+    }
+  });
 });

@@ -47036,6 +47036,7 @@ type RobotSessionInputMutation struct {
 	batch_key        *string
 	input_data       *json.RawMessage
 	appendinput_data json.RawMessage
+	not_before       *time.Time
 	status           *robotsessioninput.Status
 	clearedFields    map[string]struct{}
 	session          *xid.ID
@@ -47525,6 +47526,55 @@ func (m *RobotSessionInputMutation) ResetInputData() {
 	m.appendinput_data = nil
 }
 
+// SetNotBefore sets the "not_before" field.
+func (m *RobotSessionInputMutation) SetNotBefore(t time.Time) {
+	m.not_before = &t
+}
+
+// NotBefore returns the value of the "not_before" field in the mutation.
+func (m *RobotSessionInputMutation) NotBefore() (r time.Time, exists bool) {
+	v := m.not_before
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNotBefore returns the old "not_before" field's value of the RobotSessionInput entity.
+// If the RobotSessionInput object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotSessionInputMutation) OldNotBefore(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNotBefore is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNotBefore requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNotBefore: %w", err)
+	}
+	return oldValue.NotBefore, nil
+}
+
+// ClearNotBefore clears the value of the "not_before" field.
+func (m *RobotSessionInputMutation) ClearNotBefore() {
+	m.not_before = nil
+	m.clearedFields[robotsessioninput.FieldNotBefore] = struct{}{}
+}
+
+// NotBeforeCleared returns if the "not_before" field was cleared in this mutation.
+func (m *RobotSessionInputMutation) NotBeforeCleared() bool {
+	_, ok := m.clearedFields[robotsessioninput.FieldNotBefore]
+	return ok
+}
+
+// ResetNotBefore resets all changes to the "not_before" field.
+func (m *RobotSessionInputMutation) ResetNotBefore() {
+	m.not_before = nil
+	delete(m.clearedFields, robotsessioninput.FieldNotBefore)
+}
+
 // SetStatus sets the "status" field.
 func (m *RobotSessionInputMutation) SetStatus(r robotsessioninput.Status) {
 	m.status = &r
@@ -47676,7 +47726,7 @@ func (m *RobotSessionInputMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RobotSessionInputMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.created_at != nil {
 		fields = append(fields, robotsessioninput.FieldCreatedAt)
 	}
@@ -47703,6 +47753,9 @@ func (m *RobotSessionInputMutation) Fields() []string {
 	}
 	if m.input_data != nil {
 		fields = append(fields, robotsessioninput.FieldInputData)
+	}
+	if m.not_before != nil {
+		fields = append(fields, robotsessioninput.FieldNotBefore)
 	}
 	if m.status != nil {
 		fields = append(fields, robotsessioninput.FieldStatus)
@@ -47733,6 +47786,8 @@ func (m *RobotSessionInputMutation) Field(name string) (ent.Value, bool) {
 		return m.BatchKey()
 	case robotsessioninput.FieldInputData:
 		return m.InputData()
+	case robotsessioninput.FieldNotBefore:
+		return m.NotBefore()
 	case robotsessioninput.FieldStatus:
 		return m.Status()
 	}
@@ -47762,6 +47817,8 @@ func (m *RobotSessionInputMutation) OldField(ctx context.Context, name string) (
 		return m.OldBatchKey(ctx)
 	case robotsessioninput.FieldInputData:
 		return m.OldInputData(ctx)
+	case robotsessioninput.FieldNotBefore:
+		return m.OldNotBefore(ctx)
 	case robotsessioninput.FieldStatus:
 		return m.OldStatus(ctx)
 	}
@@ -47836,6 +47893,13 @@ func (m *RobotSessionInputMutation) SetField(name string, value ent.Value) error
 		}
 		m.SetInputData(v)
 		return nil
+	case robotsessioninput.FieldNotBefore:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNotBefore(v)
+		return nil
 	case robotsessioninput.FieldStatus:
 		v, ok := value.(robotsessioninput.Status)
 		if !ok {
@@ -47891,6 +47955,9 @@ func (m *RobotSessionInputMutation) ClearedFields() []string {
 	if m.FieldCleared(robotsessioninput.FieldTurnID) {
 		fields = append(fields, robotsessioninput.FieldTurnID)
 	}
+	if m.FieldCleared(robotsessioninput.FieldNotBefore) {
+		fields = append(fields, robotsessioninput.FieldNotBefore)
+	}
 	return fields
 }
 
@@ -47907,6 +47974,9 @@ func (m *RobotSessionInputMutation) ClearField(name string) error {
 	switch name {
 	case robotsessioninput.FieldTurnID:
 		m.ClearTurnID()
+		return nil
+	case robotsessioninput.FieldNotBefore:
+		m.ClearNotBefore()
 		return nil
 	}
 	return fmt.Errorf("unknown RobotSessionInput nullable field %s", name)
@@ -47942,6 +48012,9 @@ func (m *RobotSessionInputMutation) ResetField(name string) error {
 		return nil
 	case robotsessioninput.FieldInputData:
 		m.ResetInputData()
+		return nil
+	case robotsessioninput.FieldNotBefore:
+		m.ResetNotBefore()
 		return nil
 	case robotsessioninput.FieldStatus:
 		m.ResetStatus()
@@ -49569,6 +49642,7 @@ type RobotSessionTurnMutation struct {
 	continuation_of_turn_id *xid.ID
 	started_at              *time.Time
 	finished_at             *time.Time
+	cancel_requested_at     *time.Time
 	error_text              *string
 	clearedFields           map[string]struct{}
 	session                 *xid.ID
@@ -50164,6 +50238,55 @@ func (m *RobotSessionTurnMutation) ResetFinishedAt() {
 	delete(m.clearedFields, robotsessionturn.FieldFinishedAt)
 }
 
+// SetCancelRequestedAt sets the "cancel_requested_at" field.
+func (m *RobotSessionTurnMutation) SetCancelRequestedAt(t time.Time) {
+	m.cancel_requested_at = &t
+}
+
+// CancelRequestedAt returns the value of the "cancel_requested_at" field in the mutation.
+func (m *RobotSessionTurnMutation) CancelRequestedAt() (r time.Time, exists bool) {
+	v := m.cancel_requested_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCancelRequestedAt returns the old "cancel_requested_at" field's value of the RobotSessionTurn entity.
+// If the RobotSessionTurn object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotSessionTurnMutation) OldCancelRequestedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCancelRequestedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCancelRequestedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCancelRequestedAt: %w", err)
+	}
+	return oldValue.CancelRequestedAt, nil
+}
+
+// ClearCancelRequestedAt clears the value of the "cancel_requested_at" field.
+func (m *RobotSessionTurnMutation) ClearCancelRequestedAt() {
+	m.cancel_requested_at = nil
+	m.clearedFields[robotsessionturn.FieldCancelRequestedAt] = struct{}{}
+}
+
+// CancelRequestedAtCleared returns if the "cancel_requested_at" field was cleared in this mutation.
+func (m *RobotSessionTurnMutation) CancelRequestedAtCleared() bool {
+	_, ok := m.clearedFields[robotsessionturn.FieldCancelRequestedAt]
+	return ok
+}
+
+// ResetCancelRequestedAt resets all changes to the "cancel_requested_at" field.
+func (m *RobotSessionTurnMutation) ResetCancelRequestedAt() {
+	m.cancel_requested_at = nil
+	delete(m.clearedFields, robotsessionturn.FieldCancelRequestedAt)
+}
+
 // SetErrorText sets the "error_text" field.
 func (m *RobotSessionTurnMutation) SetErrorText(s string) {
 	m.error_text = &s
@@ -50368,7 +50491,7 @@ func (m *RobotSessionTurnMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RobotSessionTurnMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.created_at != nil {
 		fields = append(fields, robotsessionturn.FieldCreatedAt)
 	}
@@ -50401,6 +50524,9 @@ func (m *RobotSessionTurnMutation) Fields() []string {
 	}
 	if m.finished_at != nil {
 		fields = append(fields, robotsessionturn.FieldFinishedAt)
+	}
+	if m.cancel_requested_at != nil {
+		fields = append(fields, robotsessionturn.FieldCancelRequestedAt)
 	}
 	if m.error_text != nil {
 		fields = append(fields, robotsessionturn.FieldErrorText)
@@ -50435,6 +50561,8 @@ func (m *RobotSessionTurnMutation) Field(name string) (ent.Value, bool) {
 		return m.StartedAt()
 	case robotsessionturn.FieldFinishedAt:
 		return m.FinishedAt()
+	case robotsessionturn.FieldCancelRequestedAt:
+		return m.CancelRequestedAt()
 	case robotsessionturn.FieldErrorText:
 		return m.ErrorText()
 	}
@@ -50468,6 +50596,8 @@ func (m *RobotSessionTurnMutation) OldField(ctx context.Context, name string) (e
 		return m.OldStartedAt(ctx)
 	case robotsessionturn.FieldFinishedAt:
 		return m.OldFinishedAt(ctx)
+	case robotsessionturn.FieldCancelRequestedAt:
+		return m.OldCancelRequestedAt(ctx)
 	case robotsessionturn.FieldErrorText:
 		return m.OldErrorText(ctx)
 	}
@@ -50556,6 +50686,13 @@ func (m *RobotSessionTurnMutation) SetField(name string, value ent.Value) error 
 		}
 		m.SetFinishedAt(v)
 		return nil
+	case robotsessionturn.FieldCancelRequestedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCancelRequestedAt(v)
+		return nil
 	case robotsessionturn.FieldErrorText:
 		v, ok := value.(string)
 		if !ok {
@@ -50608,6 +50745,9 @@ func (m *RobotSessionTurnMutation) ClearedFields() []string {
 	if m.FieldCleared(robotsessionturn.FieldFinishedAt) {
 		fields = append(fields, robotsessionturn.FieldFinishedAt)
 	}
+	if m.FieldCleared(robotsessionturn.FieldCancelRequestedAt) {
+		fields = append(fields, robotsessionturn.FieldCancelRequestedAt)
+	}
 	if m.FieldCleared(robotsessionturn.FieldErrorText) {
 		fields = append(fields, robotsessionturn.FieldErrorText)
 	}
@@ -50639,6 +50779,9 @@ func (m *RobotSessionTurnMutation) ClearField(name string) error {
 		return nil
 	case robotsessionturn.FieldFinishedAt:
 		m.ClearFinishedAt()
+		return nil
+	case robotsessionturn.FieldCancelRequestedAt:
+		m.ClearCancelRequestedAt()
 		return nil
 	case robotsessionturn.FieldErrorText:
 		m.ClearErrorText()
@@ -50683,6 +50826,9 @@ func (m *RobotSessionTurnMutation) ResetField(name string) error {
 		return nil
 	case robotsessionturn.FieldFinishedAt:
 		m.ResetFinishedAt()
+		return nil
+	case robotsessionturn.FieldCancelRequestedAt:
+		m.ResetCancelRequestedAt()
 		return nil
 	case robotsessionturn.FieldErrorText:
 		m.ResetErrorText()

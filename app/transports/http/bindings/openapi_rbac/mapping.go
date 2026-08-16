@@ -872,6 +872,10 @@ func (m *Mapping) RobotSessionTurnHead() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionUseRobots
 }
 
+func (m *Mapping) RobotSessionTurnCancel() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUseRobots
+}
+
 func (m *Mapping) RobotProvidersList() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageRobots
 }

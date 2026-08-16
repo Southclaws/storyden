@@ -6,7 +6,6 @@ import (
 	"iter"
 	"time"
 
-	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
@@ -216,28 +215,26 @@ func (s *sessionStorage) AppendEvent(ctx context.Context, sess adksession.Sessio
 
 	storedEvent := event
 	liveEvent := event
-	inferredScope := ""
-	if event.IsolationScope == "" {
-		inferredScope = inferDelegationIsolationScope(ourSession.events, event)
-		if inferredScope != "" {
-			// TODO(robot-async-delegation): This is a temporary ADK 2.2
-			// compatibility shim. SingleTurnTool does not propagate the parent
-			// function-call ID as the delegated run's isolation scope. Inferring
-			// the most recent unresolved call only works while delegations are
-			// sequential and must not be used for concurrent or asynchronous
-			// tasks. See tasks/1-todo/robot-asynchronous-delegation.md.
-			//
-			// The delegated agent's next model step expects its own tool history
-			// to remain unscoped, so keep the live history intact while decorating
-			// the stored event and streamed event with the Robot call ID used for
-			// attribution and hydration.
-			storedCopy := *event
-			storedCopy.IsolationScope = inferredScope
-			storedEvent = &storedCopy
+	if event.Author == "user" && hasHiddenRuntimeInput(ctx) {
+		event.Branch = ""
+		event.IsolationScope = ""
+	}
+	if attribution, ok := delegationAttributionFromContext(ctx); ok {
+		// The normal chat flow must see its own input and tool results on the
+		// following model step. Scope only the persisted/streamed representation;
+		// ADK treats a scope on ModeChat events as belonging to another flow.
+		liveCopy := *event
+		liveCopy.Branch = ""
+		liveCopy.IsolationScope = ""
+		liveEvent = &liveCopy
 
-			liveCopy := *event
-			liveEvent = &liveCopy
-		}
+		storedCopy := *event
+		storedCopy.Branch = attribution.ToolName
+		storedCopy.IsolationScope = attribution.CallID
+		storedEvent = &storedCopy
+
+		event.Branch = attribution.ToolName
+		event.IsolationScope = attribution.CallID
 	}
 
 	var accountIDOpt opt.Optional[account.AccountID]
@@ -247,6 +244,11 @@ func (s *sessionStorage) AppendEvent(ctx context.Context, sess adksession.Sessio
 			return fault.Wrap(err, fctx.With(ctx))
 		}
 		accountIDOpt = opt.New(account.AccountID(accountID))
+	}
+	if event.Author == "user" && hasHiddenRuntimeInput(ctx) {
+		ourSession.events = append(ourSession.events.(adkEvents), liveEvent)
+		ourSession.lastUpdateTime = event.Timestamp
+		return nil
 	}
 
 	actorOpt := opt.NewEmpty[robot.Actor]()
@@ -271,45 +273,8 @@ func (s *sessionStorage) AppendEvent(ctx context.Context, sess adksession.Sessio
 
 	ourSession.events = append(ourSession.events.(adkEvents), liveEvent)
 	ourSession.lastUpdateTime = event.Timestamp
-	if inferredScope != "" {
-		event.IsolationScope = inferredScope
-	}
 
 	return nil
-}
-
-func inferDelegationIsolationScope(events adksession.Events, event *adksession.Event) string {
-	if event == nil || event.Branch == "" {
-		return ""
-	}
-	if _, ok := robot_ref.IDFromAgentName(event.Author); !ok {
-		return ""
-	}
-
-	closedCalls := make(map[string]bool)
-	for i := events.Len() - 1; i >= 0; i-- {
-		previous := events.At(i)
-		if previous == nil || previous.LLMResponse.Content == nil {
-			continue
-		}
-		for _, part := range previous.LLMResponse.Content.Parts {
-			if part == nil {
-				continue
-			}
-			if part.FunctionResponse != nil {
-				closedCalls[part.FunctionResponse.ID] = true
-				continue
-			}
-			if part.FunctionCall == nil || part.FunctionCall.Name != event.Author {
-				continue
-			}
-			if !closedCalls[part.FunctionCall.ID] {
-				return part.FunctionCall.ID
-			}
-		}
-	}
-
-	return ""
 }
 
 func (s *sessionStorage) actorForEvent(ctx context.Context, event *adksession.Event) (opt.Optional[robot.Actor], error) {
@@ -375,11 +340,22 @@ func (s *sessionStorage) mapToADKSessionForUser(sess *robot.Session, events adks
 }
 
 func mapToADKEventsFromMessages(messages []*robot.Message) adksession.Events {
-	events := dt.Map(messages, func(m *robot.Message) *adksession.Event {
-		return &m.Event
-	})
+	events := make(adkEvents, 0, len(messages))
+	for _, message := range messages {
+		if message == nil {
+			continue
+		}
+		if _, delegated := message.IsolationScope.Get(); delegated {
+			// Storyden's asynchronous delegation uses the scope to group the
+			// specialist transcript in the client. It is not an ADK task scope:
+			// exposing it here makes ADK treat the delegation as resumable and
+			// route later user inputs back into the completed specialist task.
+			continue
+		}
+		events = append(events, &message.Event)
+	}
 
-	return adkEvents(events)
+	return events
 }
 
 func getDefaultSessionName() string {

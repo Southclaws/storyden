@@ -133,3 +133,43 @@ func TestQueuedTurnClaimIsIdempotentAndRecoverable(t *testing.T) {
 		}))
 	}))
 }
+
+func TestQueuedTurnCanBeCancelledBeforeExecution(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, fx.Invoke(func(
+		lc fx.Lifecycle,
+		ctx context.Context,
+		db *ent.Client,
+		repo *robot_session.Repository,
+	) {
+		lc.Append(fx.StartHook(func() {
+			owner, err := db.Account.Create().SetHandle("turn-cancellation-owner").SetName("Turn Cancellation Owner").Save(ctx)
+			require.NoError(t, err)
+			sessionID := robot.SessionID(xid.New())
+			ownerID := account.AccountID(owner.ID)
+			_, err = repo.Create(ctx, sessionID, "Cancelled queued turn", ownerID, nil)
+			require.NoError(t, err)
+			turnID := robot.TurnID(xid.New())
+			require.NoError(t, repo.EnqueueTurn(ctx, robot_session.EnqueueTurnParams{
+				ID: turnID, SessionID: sessionID, InitiatorID: opt.New(ownerID), SourceKind: "user_message", RobotRef: "denbot", InputData: json.RawMessage(`{}`),
+			}))
+
+			disposition, err := repo.RequestTurnCancellation(ctx, sessionID, turnID)
+			require.NoError(t, err)
+			assert.True(t, disposition.Finished)
+			assert.False(t, disposition.SignalExecution)
+
+			turn, err := repo.NextQueuedTurn(ctx, sessionID)
+			assert.ErrorIs(t, err, robot_session.ErrTurnNotFound)
+			assert.Nil(t, turn)
+
+			events, _, closed, err := repo.ReadTurnEvents(ctx, sessionID, turnID, 0, 20)
+			require.NoError(t, err)
+			require.Len(t, events, 2)
+			assert.Equal(t, robot.SessionEventTurnQueued, events[0].Kind)
+			assert.Equal(t, robot.SessionEventTurnCancelled, events[1].Kind)
+			assert.True(t, closed)
+		}))
+	}))
+}

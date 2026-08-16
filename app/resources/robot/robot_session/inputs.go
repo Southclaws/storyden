@@ -31,12 +31,16 @@ type EnqueueInputParams struct {
 	SourceKind   string
 	BatchKey     string
 	InputData    json.RawMessage
+	NotBefore    opt.Optional[time.Time]
 	VisibleEvent opt.Optional[*adksession.Event]
 }
 
 // EnqueueInput durably records one submission and, for human messages, appends
 // its individually visible representation to the ordered session log.
 func (q *Repository) EnqueueInput(ctx context.Context, params EnqueueInputParams) error {
+	notBefore := opt.Map(params.NotBefore, func(value time.Time) time.Time {
+		return value.UTC()
+	})
 	err := ent.WithTx(ctx, q.db, func(tx *ent.Tx) error {
 		sequence, err := allocateSessionEventSequence(ctx, tx, params.SessionID, nil)
 		if err != nil {
@@ -50,6 +54,7 @@ func (q *Repository) EnqueueInput(ctx context.Context, params EnqueueInputParams
 			SetSourceKind(params.SourceKind).
 			SetBatchKey(params.BatchKey).
 			SetInputData(params.InputData).
+			SetNillableNotBefore(notBefore.Ptr()).
 			Save(ctx); err != nil {
 			return err
 		}
@@ -96,6 +101,10 @@ func (q *Repository) QueuedInputs(ctx context.Context, sessionID robot.SessionID
 		Where(
 			ent_robot_session_input.SessionIDEQ(xid.ID(sessionID)),
 			ent_robot_session_input.StatusEQ(ent_robot_session_input.StatusQueued),
+			ent_robot_session_input.Or(
+				ent_robot_session_input.NotBeforeIsNil(),
+				ent_robot_session_input.NotBeforeLTE(time.Now().UTC()),
+			),
 		).
 		Order(ent_robot_session_input.BySequence(sql.OrderAsc())).
 		Limit(limit).
@@ -108,7 +117,7 @@ func (q *Repository) QueuedInputs(ctx context.Context, sessionID robot.SessionID
 		inputs[i] = robot.SessionInput{
 			ID: robot.InputID(row.ID), SessionID: robot.SessionID(row.SessionID), AccountID: row.AccountID,
 			Sequence: row.Sequence, SourceKind: row.SourceKind, BatchKey: row.BatchKey,
-			InputData: row.InputData, CreatedAt: row.CreatedAt,
+			InputData: row.InputData, NotBefore: opt.NewPtr(row.NotBefore), CreatedAt: row.CreatedAt,
 		}
 	}
 	return inputs, nil
@@ -246,7 +255,13 @@ func (q *Repository) RunnableSessionIDs(ctx context.Context, limit int) ([]robot
 	}
 	var inputSessionIDs []xid.ID
 	err := q.db.RobotSessionInput.Query().
-		Where(ent_robot_session_input.StatusEQ(ent_robot_session_input.StatusQueued)).
+		Where(
+			ent_robot_session_input.StatusEQ(ent_robot_session_input.StatusQueued),
+			ent_robot_session_input.Or(
+				ent_robot_session_input.NotBeforeIsNil(),
+				ent_robot_session_input.NotBeforeLTE(time.Now().UTC()),
+			),
+		).
 		Modify(func(selector *sql.Selector) {
 			selector.OrderExpr(sql.Expr(sql.Min(selector.C(ent_robot_session_input.FieldSequence))))
 		}).
@@ -314,7 +329,8 @@ func mapTurn(row *ent.RobotSessionTurn) *robot.Turn {
 		InitiatorID: opt.Map(opt.NewPtr(row.InitiatedByAccountID), func(id xid.ID) account.AccountID { return account.AccountID(id) }),
 		SourceKind:  row.SourceKind, RobotRef: row.RobotRef, InputData: row.InputData,
 		Status: robot.TurnStatus(row.Status), CreatedAt: row.CreatedAt,
-		StartedAt: opt.NewPtr(row.StartedAt), FinishedAt: opt.NewPtr(row.FinishedAt), ErrorText: opt.NewPtr(row.ErrorText),
+		StartedAt: opt.NewPtr(row.StartedAt), FinishedAt: opt.NewPtr(row.FinishedAt),
+		CancelRequestedAt: opt.NewPtr(row.CancelRequestedAt), ErrorText: opt.NewPtr(row.ErrorText),
 	}
 }
 

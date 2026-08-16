@@ -40,6 +40,8 @@ type RobotSessionInput struct {
 	BatchKey string `json:"batch_key,omitempty"`
 	// InputData holds the value of the "input_data" field.
 	InputData json.RawMessage `json:"input_data,omitempty"`
+	// Earliest time this input may be claimed by a turn.
+	NotBefore *time.Time `json:"not_before,omitempty"`
 	// Status holds the value of the "status" field.
 	Status robotsessioninput.Status `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -107,7 +109,7 @@ func (*RobotSessionInput) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case robotsessioninput.FieldSourceKind, robotsessioninput.FieldBatchKey, robotsessioninput.FieldStatus:
 			values[i] = new(sql.NullString)
-		case robotsessioninput.FieldCreatedAt, robotsessioninput.FieldUpdatedAt:
+		case robotsessioninput.FieldCreatedAt, robotsessioninput.FieldUpdatedAt, robotsessioninput.FieldNotBefore:
 			values[i] = new(sql.NullTime)
 		case robotsessioninput.FieldID, robotsessioninput.FieldSessionID, robotsessioninput.FieldAccountID:
 			values[i] = new(xid.ID)
@@ -188,6 +190,13 @@ func (_m *RobotSessionInput) assignValues(columns []string, values []any) error 
 				if err := json.Unmarshal(*value, &_m.InputData); err != nil {
 					return fmt.Errorf("unmarshal field input_data: %w", err)
 				}
+			}
+		case robotsessioninput.FieldNotBefore:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field not_before", values[i])
+			} else if value.Valid {
+				_m.NotBefore = new(time.Time)
+				*_m.NotBefore = value.Time
 			}
 		case robotsessioninput.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -274,6 +283,11 @@ func (_m *RobotSessionInput) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("input_data=")
 	builder.WriteString(fmt.Sprintf("%v", _m.InputData))
+	builder.WriteString(", ")
+	if v := _m.NotBefore; v != nil {
+		builder.WriteString("not_before=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Status))

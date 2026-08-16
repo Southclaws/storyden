@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"sort"
 	"sync"
+	"time"
 
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
@@ -24,9 +25,19 @@ const (
 type RunSource string
 
 const (
-	SourceInteractiveChat RunSource = "interactive_chat"
-	SourcePluginRPC       RunSource = "plugin_rpc"
+	SourceInteractiveChat  RunSource = "interactive_chat"
+	SourcePluginRPC        RunSource = "plugin_rpc"
+	SourceScheduled        RunSource = "scheduled"
+	SourceDelegation       RunSource = "delegation"
+	SourceDelegationResult RunSource = "delegation_result"
 )
+
+type DelegationRun struct {
+	CallID       string `json:"call_id"`
+	ToolName     string `json:"tool_name"`
+	Request      string `json:"request"`
+	RootRobotRef string `json:"root_robot_ref"`
+}
 
 type WorkspaceMountSpec struct {
 	WorkspaceID         opt.Optional[robotresource.WorkspaceID]
@@ -38,7 +49,9 @@ type RunOptions struct {
 	Mode   RunMode
 	Source RunSource
 
-	Workspace opt.Optional[WorkspaceMountSpec]
+	Workspace  opt.Optional[WorkspaceMountSpec]
+	NotBefore  time.Time
+	Delegation *DelegationRun
 }
 
 type ADKRunRequest struct {

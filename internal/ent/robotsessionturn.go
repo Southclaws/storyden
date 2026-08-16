@@ -43,6 +43,8 @@ type RobotSessionTurn struct {
 	StartedAt *time.Time `json:"started_at,omitempty"`
 	// FinishedAt holds the value of the "finished_at" field.
 	FinishedAt *time.Time `json:"finished_at,omitempty"`
+	// Set when a member explicitly requests cancellation of this turn.
+	CancelRequestedAt *time.Time `json:"cancel_requested_at,omitempty"`
 	// ErrorText holds the value of the "error_text" field.
 	ErrorText *string `json:"error_text,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -106,7 +108,7 @@ func (*RobotSessionTurn) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case robotsessionturn.FieldSourceKind, robotsessionturn.FieldRobotRef, robotsessionturn.FieldStatus, robotsessionturn.FieldErrorText:
 			values[i] = new(sql.NullString)
-		case robotsessionturn.FieldCreatedAt, robotsessionturn.FieldUpdatedAt, robotsessionturn.FieldStartedAt, robotsessionturn.FieldFinishedAt:
+		case robotsessionturn.FieldCreatedAt, robotsessionturn.FieldUpdatedAt, robotsessionturn.FieldStartedAt, robotsessionturn.FieldFinishedAt, robotsessionturn.FieldCancelRequestedAt:
 			values[i] = new(sql.NullTime)
 		case robotsessionturn.FieldID, robotsessionturn.FieldSessionID:
 			values[i] = new(xid.ID)
@@ -202,6 +204,13 @@ func (_m *RobotSessionTurn) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.FinishedAt = new(time.Time)
 				*_m.FinishedAt = value.Time
+			}
+		case robotsessionturn.FieldCancelRequestedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field cancel_requested_at", values[i])
+			} else if value.Valid {
+				_m.CancelRequestedAt = new(time.Time)
+				*_m.CancelRequestedAt = value.Time
 			}
 		case robotsessionturn.FieldErrorText:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -299,6 +308,11 @@ func (_m *RobotSessionTurn) String() string {
 	builder.WriteString(", ")
 	if v := _m.FinishedAt; v != nil {
 		builder.WriteString("finished_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	if v := _m.CancelRequestedAt; v != nil {
+		builder.WriteString("cancel_requested_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
