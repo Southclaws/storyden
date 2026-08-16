@@ -1,35 +1,73 @@
 import { describe, expect, it, vi } from "vitest";
 import type { UIMessageChunk } from "ai";
 
-import { createDurableChatTransport } from "./durable-chat-transport";
+import type { RobotSessionStreamEvent } from "./openapi-schema/robotSessionStreamEvent";
+
+import {
+  createDurableChatTransport,
+  observeRobotSession,
+} from "./durable-chat-transport";
 
 describe("createDurableChatTransport", () => {
-  it("uses the configured fetch client for the durable stream read", async () => {
-    const fetchClient = vi.fn<typeof fetch>(async (input, init) => {
-      const url = input.toString();
-      if (init?.method === "POST") {
-        return new Response(
-          JSON.stringify({ streamUrl: "http://api.test/api/robots/sessions/session-1/turns/turn-1" }),
-          {
-            status: 201,
-            headers: {
-              "Content-Type": "application/json",
-              Location: "http://api.test/api/robots/sessions/session-1/turns/turn-1",
-            },
-          },
-        );
-      }
+  it("submits a command without coupling it to the response stream", async () => {
+    const onCommandAccepted = vi.fn();
+    const fetchClient = vi.fn<typeof fetch>(async () => {
+      return new Response(
+        JSON.stringify({
+          streamUrl:
+            "http://api.test/api/robots/sessions/session-1/turns/turn-1",
+          sessionId: "session-1",
+          turnId: "turn-1",
+        }),
+        { status: 201, headers: { "Content-Type": "application/json" } },
+      );
+    });
+    const transport = createDurableChatTransport({
+      api: "http://api.test/api/robots/sessions",
+      fetchClient,
+      onCommandAccepted,
+    });
 
-      expect(url).toContain("/api/robots/sessions/session-1/turns/turn-1?offset=-1");
+    const response = await transport.sendMessages({
+      trigger: "submit-message",
+      chatId: "session-1",
+      messageId: undefined,
+      messages: [{ id: "message-1", role: "user", parts: [] }],
+      abortSignal: undefined,
+    });
+
+    const chunks: UIMessageChunk[] = [];
+    for await (const chunk of response) chunks.push(chunk);
+    expect(chunks).toEqual([]);
+    expect(fetchClient).toHaveBeenCalledTimes(1);
+    expect(onCommandAccepted).toHaveBeenCalledWith({
+      sessionId: "session-1",
+      turnId: "turn-1",
+      clientMessageId: "message-1",
+      clientMessageRole: "user",
+    });
+  });
+});
+
+describe("observeRobotSession", () => {
+  it("starts the session feed from the snapshot offset", async () => {
+    const fetchClient = vi.fn<typeof fetch>(async (input) => {
+      expect(input.toString()).toContain(
+        "/api/robots/sessions/session-1/stream?offset=0000000000000000_0000000000000042",
+      );
       return new Response(
         JSON.stringify([
-          { type: "start", messageId: "response-1" },
-          { type: "finish" },
+          {
+            sequence: 43,
+            turn_id: "turn-1",
+            event_kind: "turn_completed",
+            parts: [],
+          },
         ]),
         {
           headers: {
             "Content-Type": "application/json",
-            "Stream-Next-Offset": "0000000000000000_0000000000000002",
+            "Stream-Next-Offset": "0000000000000000_0000000000000043",
             "Stream-Up-To-Date": "true",
             "Stream-Closed": "true",
           },
@@ -37,27 +75,21 @@ describe("createDurableChatTransport", () => {
       );
     });
 
-    const transport = createDurableChatTransport({
-      api: "http://api.test/api/robots/sessions",
+    const events = await observeRobotSession({
+      url: "http://api.test/api/robots/sessions/session-1/stream",
+      offset: "0000000000000000_0000000000000042",
       fetchClient,
     });
-    const response = await transport.sendMessages({
-      trigger: "submit-message",
-      chatId: "session-1",
-      messageId: undefined,
-      messages: [],
-      abortSignal: undefined,
-    });
 
-    const chunks: UIMessageChunk[] = [];
-    for await (const chunk of response) {
-      chunks.push(chunk);
-    }
-
-    expect(chunks).toEqual([
-      { type: "start", messageId: "response-1" },
-      { type: "finish" },
+    const received: RobotSessionStreamEvent[] = [];
+    for await (const event of events) received.push(event);
+    expect(received).toEqual([
+      {
+        sequence: 43,
+        turn_id: "turn-1",
+        event_kind: "turn_completed",
+        parts: [],
+      },
     ]);
-    expect(fetchClient).toHaveBeenCalledTimes(2);
   });
 });

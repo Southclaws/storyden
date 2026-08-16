@@ -63,3 +63,16 @@ export const Variants: Story = {
     </>
   ),
 };
+
+export const UnbreakableContent: Story = {
+  render: () => (
+    <div style={{ maxWidth: "24rem" }}>
+      <Admonition value kind="failure" title="Workspace setup failed">
+        failed to install sd CLI in sprite workspace: go:
+        github.com/Southclaws/storyden/cmd/sd@main: git init --bare in
+        /root/go/pkg/mod/cache/vcs/724fbb39ff95e06c93947ebaea8d314af24a9fa3cbf2c9cf48e82b196866eb07:
+        exit status 128
+      </Admonition>
+    </div>
+  ),
+};

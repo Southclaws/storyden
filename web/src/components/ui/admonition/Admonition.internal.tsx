@@ -43,7 +43,14 @@ export function Admonition(props: PropsWithChildren<AdmonitionProps>) {
       unmountOnExit
     >
       <_Admonition {...admonitionVariantProps} {...elementProps}>
-        <VStack alignItems="start">
+        <VStack
+          alignItems="start"
+          className={css({
+            "&, & :where(*)": { overflowWrap: "anywhere" },
+          })}
+          flex="1"
+          minW="0"
+        >
           {title && <styled.h1 fontWeight="bold">{title}</styled.h1>}
           {children}
         </VStack>
@@ -51,6 +58,7 @@ export function Admonition(props: PropsWithChildren<AdmonitionProps>) {
           type="button"
           size="sm"
           variant="ghost"
+          flexShrink="0"
           aria-label="Close"
           onClick={handleClose}
         >

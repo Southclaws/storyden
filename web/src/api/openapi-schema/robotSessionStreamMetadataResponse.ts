@@ -7,9 +7,8 @@
  *
  * OpenAPI spec version: v1.26.15-post
  */
-import type { RobotSessionStreamReference } from "./robotSessionStreamReference";
 
 /**
- * Resumable Robot turn stream located.
+ * Current Robot session stream state.
  */
-export type RobotSessionStreamFoundResponse = RobotSessionStreamReference;
+export type RobotSessionStreamMetadataResponse = void;

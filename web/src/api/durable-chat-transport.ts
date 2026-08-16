@@ -1,14 +1,26 @@
 import { stream } from "@durable-streams/client";
-import type {
-  ChatTransport,
-  UIMessage,
-  UIMessageChunk,
-} from "ai";
+import type { ChatTransport, UIMessage } from "ai";
+
+import type { RobotSessionStreamEvent } from "./openapi-schema/robotSessionStreamEvent";
+
+export type CommandAccepted = {
+  sessionId: string;
+  turnId: string;
+  clientMessageId?: string;
+  clientMessageRole?: string;
+};
 
 type DurableChatTransportOptions = {
   api: string;
-  reconnectApi?: string;
   headers?: HeadersInit;
+  fetchClient?: typeof fetch;
+  onCommandAccepted?: (command: CommandAccepted) => void;
+};
+
+type ObserveSessionOptions = {
+  url: string;
+  offset: string;
+  signal?: AbortSignal;
   fetchClient?: typeof fetch;
 };
 
@@ -17,90 +29,50 @@ function mergeHeaders(headers?: HeadersInit) {
   return Object.fromEntries(new Headers(headers).entries());
 }
 
-function parseBodyStreamURL(body: unknown) {
-  if (
-    body &&
-    typeof body === "object" &&
-    "streamUrl" in body &&
-    typeof body.streamUrl === "string" &&
-    body.streamUrl.length > 0
-  ) {
-    return body.streamUrl;
-  }
-  return undefined;
-}
-
-async function parseJSON(response: Response) {
-  if (!response.headers.get("content-type")?.includes("application/json")) {
-    return;
-  }
-  try {
-    return (await response.json()) as unknown;
-  } catch {
-    return;
-  }
-}
-
-function resolveStreamURL(streamURL: string, responseURL: string, requestURL: string) {
-  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(streamURL)) {
-    return streamURL;
-  }
-
-  for (const baseURL of [responseURL, requestURL, window.location.href]) {
-    if (!baseURL) continue;
-    try {
-      return new URL(streamURL, baseURL).toString();
-    } catch {
-      continue;
-    }
-  }
-  throw new Error(`Failed to resolve durable stream URL "${streamURL}".`);
-}
-
-function toReadableStream<T>(iterable: AsyncIterable<T>) {
-  const iterator = iterable[Symbol.asyncIterator]();
-  return new ReadableStream<T>({
-    async pull(controller) {
-      const result = await iterator.next();
-      if (result.done) {
-        controller.close();
-        return;
-      }
-      controller.enqueue(result.value);
-    },
-    async cancel() {
-      await iterator.return?.();
+function emptyMessageStream() {
+  return new ReadableStream<never>({
+    start(controller) {
+      controller.close();
     },
   });
 }
 
-async function readUIMessageChunks(
-  streamURL: string,
-  abortSignal: AbortSignal | undefined,
-  fetchClient: typeof fetch,
-) {
-  const response = await stream<UIMessageChunk>({
-    url: streamURL,
+function parseCommandAccepted(body: unknown): CommandAccepted | undefined {
+  if (
+    !body ||
+    typeof body !== "object" ||
+    !("sessionId" in body) ||
+    !("turnId" in body) ||
+    typeof body.sessionId !== "string" ||
+    typeof body.turnId !== "string"
+  ) {
+    return;
+  }
+  return { sessionId: body.sessionId, turnId: body.turnId };
+}
+
+export async function observeRobotSession({
+  url,
+  offset,
+  signal,
+  fetchClient = fetch,
+}: ObserveSessionOptions) {
+  const response = await stream<RobotSessionStreamEvent>({
+    url,
+    offset,
     live: "sse",
     json: true,
-    signal: abortSignal,
+    signal,
     fetch: fetchClient,
   });
-  return toReadableStream(response.jsonStream());
-}
-
-async function streamURLFromResponse(response: Response) {
-  return (
-    response.headers.get("Location") ??
-    parseBodyStreamURL(await parseJSON(response))
-  );
+  return response.jsonStream();
 }
 
 export function createDurableChatTransport<UI_MESSAGE extends UIMessage>({
   api,
-  reconnectApi,
   headers,
   fetchClient = fetch,
+  onCommandAccepted,
 }: DurableChatTransportOptions): ChatTransport<UI_MESSAGE> {
   return {
     async sendMessages({
@@ -133,46 +105,21 @@ export function createDurableChatTransport<UI_MESSAGE extends UIMessage>({
         throw new Error(errorText || `HTTP error ${response.status}`);
       }
 
-      const streamURL = await streamURLFromResponse(response);
-      if (!streamURL) {
-        throw new Error("Durable stream URL missing from chat response.");
+      const accepted = parseCommandAccepted(await response.json());
+      if (!accepted) {
+        throw new Error("Robot turn identity missing from command response.");
       }
-      return readUIMessageChunks(
-        resolveStreamURL(streamURL, response.url, api),
-        abortSignal,
-        fetchClient,
-      );
+      const clientMessage = messages[messages.length - 1];
+      onCommandAccepted?.({
+        ...accepted,
+        clientMessageId: clientMessage?.id,
+        clientMessageRole: clientMessage?.role,
+      });
+      return emptyMessageStream();
     },
 
-    async reconnectToStream({ chatId, headers: requestHeaders }) {
-      const endpoint =
-        reconnectApi ?? `${api.replace(/\/$/, "")}/${chatId}/stream`;
-      const response = await fetchClient(endpoint, {
-        method: "GET",
-        headers: {
-          ...mergeHeaders(headers),
-          ...mergeHeaders(requestHeaders),
-        },
-      });
-      if (response.status === httpStatusNoContent) {
-        return null;
-      }
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || `HTTP error ${response.status}`);
-      }
-
-      const streamURL = await streamURLFromResponse(response);
-      if (!streamURL) {
-        throw new Error("Durable stream URL missing from reconnect response.");
-      }
-      return readUIMessageChunks(
-        resolveStreamURL(streamURL, response.url, endpoint),
-        undefined,
-        fetchClient,
-      );
+    async reconnectToStream() {
+      return null;
     },
   };
 }
-
-const httpStatusNoContent = 204;

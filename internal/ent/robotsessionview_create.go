@@ -80,20 +80,6 @@ func (_c *RobotSessionViewCreate) SetNillableLastAccessedAt(v *time.Time) *Robot
 	return _c
 }
 
-// SetResumeTurnID sets the "resume_turn_id" field.
-func (_c *RobotSessionViewCreate) SetResumeTurnID(v xid.ID) *RobotSessionViewCreate {
-	_c.mutation.SetResumeTurnID(v)
-	return _c
-}
-
-// SetNillableResumeTurnID sets the "resume_turn_id" field if the given value is not nil.
-func (_c *RobotSessionViewCreate) SetNillableResumeTurnID(v *xid.ID) *RobotSessionViewCreate {
-	if v != nil {
-		_c.SetResumeTurnID(*v)
-	}
-	return _c
-}
-
 // SetLastSeenEventSequence sets the "last_seen_event_sequence" field.
 func (_c *RobotSessionViewCreate) SetLastSeenEventSequence(v uint64) *RobotSessionViewCreate {
 	_c.mutation.SetLastSeenEventSequence(v)
@@ -268,10 +254,6 @@ func (_c *RobotSessionViewCreate) createSpec() (*RobotSessionView, *sqlgraph.Cre
 		_spec.SetField(robotsessionview.FieldLastAccessedAt, field.TypeTime, value)
 		_node.LastAccessedAt = value
 	}
-	if value, ok := _c.mutation.ResumeTurnID(); ok {
-		_spec.SetField(robotsessionview.FieldResumeTurnID, field.TypeString, value)
-		_node.ResumeTurnID = &value
-	}
 	if value, ok := _c.mutation.LastSeenEventSequence(); ok {
 		_spec.SetField(robotsessionview.FieldLastSeenEventSequence, field.TypeUint64, value)
 		_node.LastSeenEventSequence = value
@@ -410,24 +392,6 @@ func (u *RobotSessionViewUpsert) UpdateLastAccessedAt() *RobotSessionViewUpsert 
 	return u
 }
 
-// SetResumeTurnID sets the "resume_turn_id" field.
-func (u *RobotSessionViewUpsert) SetResumeTurnID(v xid.ID) *RobotSessionViewUpsert {
-	u.Set(robotsessionview.FieldResumeTurnID, v)
-	return u
-}
-
-// UpdateResumeTurnID sets the "resume_turn_id" field to the value that was provided on create.
-func (u *RobotSessionViewUpsert) UpdateResumeTurnID() *RobotSessionViewUpsert {
-	u.SetExcluded(robotsessionview.FieldResumeTurnID)
-	return u
-}
-
-// ClearResumeTurnID clears the value of the "resume_turn_id" field.
-func (u *RobotSessionViewUpsert) ClearResumeTurnID() *RobotSessionViewUpsert {
-	u.SetNull(robotsessionview.FieldResumeTurnID)
-	return u
-}
-
 // SetLastSeenEventSequence sets the "last_seen_event_sequence" field.
 func (u *RobotSessionViewUpsert) SetLastSeenEventSequence(v uint64) *RobotSessionViewUpsert {
 	u.Set(robotsessionview.FieldLastSeenEventSequence, v)
@@ -550,27 +514,6 @@ func (u *RobotSessionViewUpsertOne) SetLastAccessedAt(v time.Time) *RobotSession
 func (u *RobotSessionViewUpsertOne) UpdateLastAccessedAt() *RobotSessionViewUpsertOne {
 	return u.Update(func(s *RobotSessionViewUpsert) {
 		s.UpdateLastAccessedAt()
-	})
-}
-
-// SetResumeTurnID sets the "resume_turn_id" field.
-func (u *RobotSessionViewUpsertOne) SetResumeTurnID(v xid.ID) *RobotSessionViewUpsertOne {
-	return u.Update(func(s *RobotSessionViewUpsert) {
-		s.SetResumeTurnID(v)
-	})
-}
-
-// UpdateResumeTurnID sets the "resume_turn_id" field to the value that was provided on create.
-func (u *RobotSessionViewUpsertOne) UpdateResumeTurnID() *RobotSessionViewUpsertOne {
-	return u.Update(func(s *RobotSessionViewUpsert) {
-		s.UpdateResumeTurnID()
-	})
-}
-
-// ClearResumeTurnID clears the value of the "resume_turn_id" field.
-func (u *RobotSessionViewUpsertOne) ClearResumeTurnID() *RobotSessionViewUpsertOne {
-	return u.Update(func(s *RobotSessionViewUpsert) {
-		s.ClearResumeTurnID()
 	})
 }
 
@@ -866,27 +809,6 @@ func (u *RobotSessionViewUpsertBulk) SetLastAccessedAt(v time.Time) *RobotSessio
 func (u *RobotSessionViewUpsertBulk) UpdateLastAccessedAt() *RobotSessionViewUpsertBulk {
 	return u.Update(func(s *RobotSessionViewUpsert) {
 		s.UpdateLastAccessedAt()
-	})
-}
-
-// SetResumeTurnID sets the "resume_turn_id" field.
-func (u *RobotSessionViewUpsertBulk) SetResumeTurnID(v xid.ID) *RobotSessionViewUpsertBulk {
-	return u.Update(func(s *RobotSessionViewUpsert) {
-		s.SetResumeTurnID(v)
-	})
-}
-
-// UpdateResumeTurnID sets the "resume_turn_id" field to the value that was provided on create.
-func (u *RobotSessionViewUpsertBulk) UpdateResumeTurnID() *RobotSessionViewUpsertBulk {
-	return u.Update(func(s *RobotSessionViewUpsert) {
-		s.UpdateResumeTurnID()
-	})
-}
-
-// ClearResumeTurnID clears the value of the "resume_turn_id" field.
-func (u *RobotSessionViewUpsertBulk) ClearResumeTurnID() *RobotSessionViewUpsertBulk {
-	return u.Update(func(s *RobotSessionViewUpsert) {
-		s.ClearResumeTurnID()
 	})
 }
 

@@ -26,8 +26,9 @@ func NewSessionID(s string) (SessionID, error) {
 
 type Session struct {
 	session_ref.Ref
-	Messages Messages
-	State    map[string]any
+	Messages      Messages
+	State         map[string]any
+	EventSequence uint64
 }
 
 func MapSession(s *ent.RobotSession, messages []*ent.RobotSessionMessage) (*Session, error) {
@@ -49,8 +50,9 @@ func MapSession(s *ent.RobotSession, messages []*ent.RobotSessionMessage) (*Sess
 			UpdatedAt: s.UpdatedAt,
 			Human:     *user,
 		},
-		Messages: mappedMessages,
-		State:    s.State,
+		Messages:      mappedMessages,
+		State:         s.State,
+		EventSequence: s.NextEventSequence,
 	}, nil
 }
 

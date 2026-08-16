@@ -1903,7 +1903,7 @@ func init() {
 	// robotsessionview.DefaultLastAccessedAt holds the default value on creation for the last_accessed_at field.
 	robotsessionview.DefaultLastAccessedAt = robotsessionviewDescLastAccessedAt.Default.(func() time.Time)
 	// robotsessionviewDescLastSeenEventSequence is the schema descriptor for last_seen_event_sequence field.
-	robotsessionviewDescLastSeenEventSequence := robotsessionviewFields[4].Descriptor()
+	robotsessionviewDescLastSeenEventSequence := robotsessionviewFields[3].Descriptor()
 	// robotsessionview.DefaultLastSeenEventSequence holds the default value on creation for the last_seen_event_sequence field.
 	robotsessionview.DefaultLastSeenEventSequence = robotsessionviewDescLastSeenEventSequence.Default.(uint64)
 	// robotsessionviewDescID is the schema descriptor for id field.

@@ -11,6 +11,10 @@ steps:
     respond:
       error: "simulated LLM provider failure"
   - match:
+      contains: "trigger long unbreakable error"
+    respond:
+      error: "failed to install sd CLI in sprite workspace: go: github.com/Southclaws/storyden/cmd/sd@main: git init --bare in /root/go/pkg/mod/cache/vcs/724fbb39ff95e06c93947ebaea8d314af24a9fa3cbf2c9cf48e82b196866eb07: exit status 128: fatal: unable to access '/root/go/pkg/mod/cache/vcs/724fbb39ff95e06c93947ebaea8d314af24a9fa3cbf2c9cf48e82b196866eb07/config': Permission denied exit status 1"
+  - match:
       contains: "show thought"
     respond:
       thought: "I should verify the evidence before answering."

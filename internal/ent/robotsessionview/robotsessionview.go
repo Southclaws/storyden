@@ -25,8 +25,6 @@ const (
 	FieldAccountID = "account_id"
 	// FieldLastAccessedAt holds the string denoting the last_accessed_at field in the database.
 	FieldLastAccessedAt = "last_accessed_at"
-	// FieldResumeTurnID holds the string denoting the resume_turn_id field in the database.
-	FieldResumeTurnID = "resume_turn_id"
 	// FieldLastSeenEventSequence holds the string denoting the last_seen_event_sequence field in the database.
 	FieldLastSeenEventSequence = "last_seen_event_sequence"
 	// EdgeSession holds the string denoting the session edge name in mutations.
@@ -59,7 +57,6 @@ var Columns = []string{
 	FieldSessionID,
 	FieldAccountID,
 	FieldLastAccessedAt,
-	FieldResumeTurnID,
 	FieldLastSeenEventSequence,
 }
 
@@ -121,11 +118,6 @@ func ByAccountID(opts ...sql.OrderTermOption) OrderOption {
 // ByLastAccessedAt orders the results by the last_accessed_at field.
 func ByLastAccessedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLastAccessedAt, opts...).ToFunc()
-}
-
-// ByResumeTurnID orders the results by the resume_turn_id field.
-func ByResumeTurnID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldResumeTurnID, opts...).ToFunc()
 }
 
 // ByLastSeenEventSequence orders the results by the last_seen_event_sequence field.

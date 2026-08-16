@@ -49385,7 +49385,6 @@ type RobotSessionViewMutation struct {
 	created_at                  *time.Time
 	updated_at                  *time.Time
 	last_accessed_at            *time.Time
-	resume_turn_id              *xid.ID
 	last_seen_event_sequence    *uint64
 	addlast_seen_event_sequence *int64
 	clearedFields               map[string]struct{}
@@ -49682,55 +49681,6 @@ func (m *RobotSessionViewMutation) ResetLastAccessedAt() {
 	m.last_accessed_at = nil
 }
 
-// SetResumeTurnID sets the "resume_turn_id" field.
-func (m *RobotSessionViewMutation) SetResumeTurnID(x xid.ID) {
-	m.resume_turn_id = &x
-}
-
-// ResumeTurnID returns the value of the "resume_turn_id" field in the mutation.
-func (m *RobotSessionViewMutation) ResumeTurnID() (r xid.ID, exists bool) {
-	v := m.resume_turn_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldResumeTurnID returns the old "resume_turn_id" field's value of the RobotSessionView entity.
-// If the RobotSessionView object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RobotSessionViewMutation) OldResumeTurnID(ctx context.Context) (v *xid.ID, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldResumeTurnID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldResumeTurnID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldResumeTurnID: %w", err)
-	}
-	return oldValue.ResumeTurnID, nil
-}
-
-// ClearResumeTurnID clears the value of the "resume_turn_id" field.
-func (m *RobotSessionViewMutation) ClearResumeTurnID() {
-	m.resume_turn_id = nil
-	m.clearedFields[robotsessionview.FieldResumeTurnID] = struct{}{}
-}
-
-// ResumeTurnIDCleared returns if the "resume_turn_id" field was cleared in this mutation.
-func (m *RobotSessionViewMutation) ResumeTurnIDCleared() bool {
-	_, ok := m.clearedFields[robotsessionview.FieldResumeTurnID]
-	return ok
-}
-
-// ResetResumeTurnID resets all changes to the "resume_turn_id" field.
-func (m *RobotSessionViewMutation) ResetResumeTurnID() {
-	m.resume_turn_id = nil
-	delete(m.clearedFields, robotsessionview.FieldResumeTurnID)
-}
-
 // SetLastSeenEventSequence sets the "last_seen_event_sequence" field.
 func (m *RobotSessionViewMutation) SetLastSeenEventSequence(u uint64) {
 	m.last_seen_event_sequence = &u
@@ -49875,7 +49825,7 @@ func (m *RobotSessionViewMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RobotSessionViewMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 6)
 	if m.created_at != nil {
 		fields = append(fields, robotsessionview.FieldCreatedAt)
 	}
@@ -49890,9 +49840,6 @@ func (m *RobotSessionViewMutation) Fields() []string {
 	}
 	if m.last_accessed_at != nil {
 		fields = append(fields, robotsessionview.FieldLastAccessedAt)
-	}
-	if m.resume_turn_id != nil {
-		fields = append(fields, robotsessionview.FieldResumeTurnID)
 	}
 	if m.last_seen_event_sequence != nil {
 		fields = append(fields, robotsessionview.FieldLastSeenEventSequence)
@@ -49915,8 +49862,6 @@ func (m *RobotSessionViewMutation) Field(name string) (ent.Value, bool) {
 		return m.AccountID()
 	case robotsessionview.FieldLastAccessedAt:
 		return m.LastAccessedAt()
-	case robotsessionview.FieldResumeTurnID:
-		return m.ResumeTurnID()
 	case robotsessionview.FieldLastSeenEventSequence:
 		return m.LastSeenEventSequence()
 	}
@@ -49938,8 +49883,6 @@ func (m *RobotSessionViewMutation) OldField(ctx context.Context, name string) (e
 		return m.OldAccountID(ctx)
 	case robotsessionview.FieldLastAccessedAt:
 		return m.OldLastAccessedAt(ctx)
-	case robotsessionview.FieldResumeTurnID:
-		return m.OldResumeTurnID(ctx)
 	case robotsessionview.FieldLastSeenEventSequence:
 		return m.OldLastSeenEventSequence(ctx)
 	}
@@ -49985,13 +49928,6 @@ func (m *RobotSessionViewMutation) SetField(name string, value ent.Value) error 
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetLastAccessedAt(v)
-		return nil
-	case robotsessionview.FieldResumeTurnID:
-		v, ok := value.(xid.ID)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetResumeTurnID(v)
 		return nil
 	case robotsessionview.FieldLastSeenEventSequence:
 		v, ok := value.(uint64)
@@ -50044,11 +49980,7 @@ func (m *RobotSessionViewMutation) AddField(name string, value ent.Value) error 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *RobotSessionViewMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(robotsessionview.FieldResumeTurnID) {
-		fields = append(fields, robotsessionview.FieldResumeTurnID)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -50061,11 +49993,6 @@ func (m *RobotSessionViewMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *RobotSessionViewMutation) ClearField(name string) error {
-	switch name {
-	case robotsessionview.FieldResumeTurnID:
-		m.ClearResumeTurnID()
-		return nil
-	}
 	return fmt.Errorf("unknown RobotSessionView nullable field %s", name)
 }
 
@@ -50087,9 +50014,6 @@ func (m *RobotSessionViewMutation) ResetField(name string) error {
 		return nil
 	case robotsessionview.FieldLastAccessedAt:
 		m.ResetLastAccessedAt()
-		return nil
-	case robotsessionview.FieldResumeTurnID:
-		m.ResetResumeTurnID()
 		return nil
 	case robotsessionview.FieldLastSeenEventSequence:
 		m.ResetLastSeenEventSequence()

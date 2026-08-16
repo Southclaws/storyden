@@ -1688,7 +1688,6 @@ var (
 		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "last_accessed_at", Type: field.TypeTime},
-		{Name: "resume_turn_id", Type: field.TypeString, Nullable: true},
 		{Name: "last_seen_event_sequence", Type: field.TypeUint64, Default: 0},
 		{Name: "account_id", Type: field.TypeString, Size: 20},
 		{Name: "session_id", Type: field.TypeString, Size: 20},
@@ -1701,13 +1700,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "robot_session_views_accounts_robot_session_views",
-				Columns:    []*schema.Column{RobotSessionViewsColumns[6]},
+				Columns:    []*schema.Column{RobotSessionViewsColumns[5]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "robot_session_views_robot_sessions_views",
-				Columns:    []*schema.Column{RobotSessionViewsColumns[7]},
+				Columns:    []*schema.Column{RobotSessionViewsColumns[6]},
 				RefColumns: []*schema.Column{RobotSessionsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -1716,12 +1715,12 @@ var (
 			{
 				Name:    "robotsessionview_session_id_account_id",
 				Unique:  true,
-				Columns: []*schema.Column{RobotSessionViewsColumns[7], RobotSessionViewsColumns[6]},
+				Columns: []*schema.Column{RobotSessionViewsColumns[6], RobotSessionViewsColumns[5]},
 			},
 			{
 				Name:    "robotsessionview_account_id_last_accessed_at",
 				Unique:  false,
-				Columns: []*schema.Column{RobotSessionViewsColumns[6], RobotSessionViewsColumns[3]},
+				Columns: []*schema.Column{RobotSessionViewsColumns[5], RobotSessionViewsColumns[3]},
 			},
 		},
 	}

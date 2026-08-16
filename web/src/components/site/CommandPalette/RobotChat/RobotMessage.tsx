@@ -5,7 +5,7 @@ import { useNodeGet } from "@/api/openapi-client/nodes";
 import { usePostLocationGet } from "@/api/openapi-client/posts";
 import { useProfileGet } from "@/api/openapi-client/profiles";
 import { useThreadGet } from "@/api/openapi-client/threads";
-import { Reply, Thread } from "@/api/openapi-schema";
+import { ProfileReference, Thread } from "@/api/openapi-schema";
 import { RobotRenderCardData, StorydenUIMessage } from "@/api/robots-types";
 import { ContentComposerMarkdown } from "@/components/content/ContentComposerMarkdown/ContentComposerMarkdown";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
@@ -41,6 +41,8 @@ type Props = {
   id: string;
   role: StorydenUIMessage["role"];
   parts: readonly StorydenUIMessage["parts"][number][];
+  author?: ProfileReference;
+  isCurrentMemberMessage?: boolean;
   isNewestUserMessage?: boolean;
 };
 
@@ -48,10 +50,17 @@ export function RobotMessage({
   id,
   role,
   parts,
+  author,
+  isCurrentMemberMessage = false,
   isNewestUserMessage = false,
 }: Props) {
   const isUser = role === "user";
-  const authorLabel = isUser ? "You" : "Robot";
+  const isOwnMessage = isUser && (!author || isCurrentMemberMessage);
+  let authorLabel = "Robot";
+  if (isUser) {
+    authorLabel =
+      author && !isCurrentMemberMessage ? `@${author.handle}` : "You";
+  }
 
   return (
     <VStack
@@ -65,6 +74,9 @@ export function RobotMessage({
       alignItems={isUser ? "flex-end" : "flex-start"}
       className={isNewestUserMessage ? styles["newestUserMessage"] : undefined}
     >
+      {isUser && author && !isOwnMessage && (
+        <MemberBadge profile={author} avatar="hidden" size="xs" name="handle" />
+      )}
       {renderMessageParts(parts, isUser)}
     </VStack>
   );

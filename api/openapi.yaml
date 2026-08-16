@@ -4181,20 +4181,43 @@ paths:
   /robots/sessions/{session_id}/stream:
     get:
       operationId: RobotSessionStream
-      summary: Resume a Robot session stream
+      summary: Read a Robot session event stream
       description: |
-        Locate the active or most recent resumable turn for a Robot session.
-        A session without a resumable turn returns no content.
+        Read persisted events after an offset and optionally remain attached to
+        the live session tail. The stream remains open while the session is idle
+        so turns started by other members or background work are observable.
       tags: [robots]
       parameters:
         - $ref: "#/components/parameters/RobotSessionIDParam"
+        - $ref: "#/components/parameters/RobotStreamOffsetQuery"
+        - $ref: "#/components/parameters/RobotStreamLiveQuery"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "403": { $ref: "#/components/responses/Forbidden" }
-        "200": { $ref: "#/components/responses/RobotSessionStreamFound" }
-        "204": { description: No resumable turn exists for this session. }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/RobotSessionStreamRead" }
+    head:
+      operationId: RobotSessionStreamHead
+      summary: Inspect a Robot session event stream
+      description: |
+        Inspect the session event stream without reading any events. The
+        supplied offset represents the last event already observed by the
+        caller. The response reports the offset to use for the next read and
+        whether that position is caught up with the stream's current tail.
+        This request returns immediately and does not wait for future events.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotSessionIDParam"
+        - $ref: "#/components/parameters/RobotStreamOffsetQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/RobotSessionStreamMetadata" }
 
   /robots/sessions/{session_id}/turns/{turn_id}:
     get:
@@ -6730,15 +6753,25 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/RobotSessionStreamReference" }
 
-    RobotSessionStreamFound:
-      description: Resumable Robot turn stream located.
+    RobotSessionStreamRead:
+      description: Persisted Robot session events, optionally followed by a live SSE tail.
       headers:
-        Location:
-          description: Relative URL of the turn stream.
-          schema: { type: string }
+        Stream-Next-Offset: { $ref: "#/components/headers/Stream-Next-Offset" }
+        Stream-Up-To-Date: { $ref: "#/components/headers/Stream-Up-To-Date" }
+        Stream-Cursor: { $ref: "#/components/headers/Stream-Cursor" }
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/RobotSessionStreamReference" }
+          schema:
+            type: array
+            items: { $ref: "#/components/schemas/RobotSessionStreamEvent" }
+        text/event-stream:
+          schema: { type: string }
+
+    RobotSessionStreamMetadata:
+      description: Current Robot session stream state.
+      headers:
+        Stream-Next-Offset: { $ref: "#/components/headers/Stream-Next-Offset" }
+        Stream-Up-To-Date: { $ref: "#/components/headers/Stream-Up-To-Date" }
 
     RobotSessionTurnRead:
       description: |
@@ -12084,9 +12117,12 @@ components:
 
     RobotSessionProps:
       type: object
-      required: [message_list]
+      required: [message_list, stream_offset]
       properties:
         message_list: { $ref: "#/components/schemas/PaginatedRobotMessageList" }
+        stream_offset:
+          type: string
+          description: Event offset covered by this session snapshot.
         root_robot_id:
           type: string
           description: Root Robot selected when this session was created, including built-in Robot IDs.
@@ -13077,11 +13113,44 @@ components:
 
     RobotSessionStreamReference:
       type: object
-      required: [streamUrl]
+      required: [streamUrl, sessionId, turnId]
       properties:
         streamUrl:
           type: string
           description: Relative URL of the Robot turn stream.
+        sessionId:
+          $ref: "#/components/schemas/Identifier"
+        turnId:
+          $ref: "#/components/schemas/Identifier"
+
+    RobotSessionStreamEventKind:
+      type: string
+      enum:
+        [
+          message,
+          turn_queued,
+          turn_completed,
+          turn_blocked,
+          turn_failed,
+          turn_cancelled,
+        ]
+
+    RobotSessionStreamEvent:
+      type: object
+      required: [sequence, turn_id, event_kind, parts]
+      properties:
+        sequence:
+          type: integer
+          format: uint64
+        turn_id:
+          $ref: "#/components/schemas/Identifier"
+        event_kind:
+          $ref: "#/components/schemas/RobotSessionStreamEventKind"
+        message:
+          $ref: "#/components/schemas/RobotSessionMessage"
+        parts:
+          type: array
+          items: { $ref: "#/components/schemas/StreamPart" }
 
     # -
     # Vercel Streaming Protocol

@@ -7,14 +7,16 @@
  *
  * OpenAPI spec version: v1.26.15-post
  */
-import type { PaginatedRobotMessageList } from "./paginatedRobotMessageList";
-import type { RobotWorkspaceMount } from "./robotWorkspaceMount";
+import type { RobotStreamLiveQueryParameter } from "./robotStreamLiveQueryParameter";
+import type { RobotStreamOffsetQueryParameter } from "./robotStreamOffsetQueryParameter";
 
-export interface RobotSessionProps {
-  message_list: PaginatedRobotMessageList;
-  /** Event offset covered by this session snapshot. */
-  stream_offset: string;
-  /** Root Robot selected when this session was created, including built-in Robot IDs. */
-  root_robot_id?: string;
-  active_workspace?: RobotWorkspaceMount;
-}
+export type RobotSessionStreamParams = {
+  /**
+   * Read events after this stream offset. Use `-1` to start at beginning.
+   */
+  offset?: RobotStreamOffsetQueryParameter;
+  /**
+   * Attach to the live stream tail after catching up.
+   */
+  live?: RobotStreamLiveQueryParameter;
+};

@@ -156,30 +156,72 @@ func (q *Repository) ReadTurnEvents(ctx context.Context, sessionID robot.Session
 		return nil, after, false, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	events := make([]robot.SessionEvent, 0, len(rows))
+	events, err := mapSessionEvents(rows)
+	if err != nil {
+		return nil, after, false, err
+	}
 	next := after
 	closed := false
+	for index, row := range rows {
+		next = events[index].Sequence
+		if row.EventKind != ent_robot_session_message.EventKindMessage && row.EventKind != ent_robot_session_message.EventKindTurnQueued {
+			closed = true
+		}
+	}
+	return events, next, closed, nil
+}
+
+func (q *Repository) ReadSessionEvents(ctx context.Context, sessionID robot.SessionID, after uint64, limit int) ([]robot.SessionEvent, uint64, error) {
+	if limit <= 0 {
+		limit = robot.SessionEventPageSize
+	}
+	rows, err := q.db.RobotSessionMessage.Query().
+		Where(
+			ent_robot_session_message.SessionIDEQ(xid.ID(sessionID)),
+			ent_robot_session_message.SequenceGT(after),
+		).
+		WithRobot(func(query *ent.RobotQuery) { query.WithAuthor() }).
+		WithAuthor().
+		Order(ent.Asc(ent_robot_session_message.FieldSequence)).
+		Limit(limit).
+		All(ctx)
+	if err != nil {
+		return nil, after, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	events, err := mapSessionEvents(rows)
+	if err != nil {
+		return nil, after, fault.Wrap(err, fctx.With(ctx))
+	}
+	next := after
+	if len(rows) > 0 {
+		next = rows[len(rows)-1].Sequence
+	}
+	return events, next, nil
+}
+
+func mapSessionEvents(rows []*ent.RobotSessionMessage) ([]robot.SessionEvent, error) {
+	events := make([]robot.SessionEvent, 0, len(rows))
 	for _, row := range rows {
-		next = row.Sequence
+		if row.TurnID == nil {
+			continue
+		}
 		event := robot.SessionEvent{
 			Sequence:  row.Sequence,
 			Kind:      robot.SessionEventKind(row.EventKind),
-			TurnID:    turnID,
+			TurnID:    robot.TurnID(*row.TurnID),
 			ErrorText: opt.NewPtr(row.ErrorText),
 		}
 		if row.EventKind == ent_robot_session_message.EventKindMessage {
 			message, err := robot.MapMessage(row)
 			if err != nil {
-				return nil, after, false, fault.Wrap(err, fctx.With(ctx))
+				return nil, err
 			}
 			event.Message = opt.New(message)
 		}
-		if row.EventKind != ent_robot_session_message.EventKindMessage && row.EventKind != ent_robot_session_message.EventKindTurnQueued {
-			closed = true
-		}
 		events = append(events, event)
 	}
-	return events, next, closed, nil
+	return events, nil
 }
 
 func (q *Repository) CanReadTurn(ctx context.Context, sessionID robot.SessionID, turnID robot.TurnID, accountID account.AccountID) (bool, error) {
@@ -192,6 +234,15 @@ func (q *Repository) CanReadTurn(ctx context.Context, sessionID robot.SessionID,
 	if err != nil || !exists {
 		return false, err
 	}
+	return q.db.RobotSessionView.Query().
+		Where(
+			ent_robot_session_view.SessionIDEQ(xid.ID(sessionID)),
+			ent_robot_session_view.AccountIDEQ(xid.ID(accountID)),
+		).
+		Exist(ctx)
+}
+
+func (q *Repository) CanReadSession(ctx context.Context, sessionID robot.SessionID, accountID account.AccountID) (bool, error) {
 	return q.db.RobotSessionView.Query().
 		Where(
 			ent_robot_session_view.SessionIDEQ(xid.ID(sessionID)),
@@ -231,40 +282,53 @@ func (q *Repository) BlockedTurn(ctx context.Context, sessionID robot.SessionID)
 	return robot.TurnID(*session.ActiveTurnID), nil
 }
 
-func (q *Repository) SetResumeTurn(ctx context.Context, sessionID robot.SessionID, accountID account.AccountID, turnID *robot.TurnID) error {
-	update := q.db.RobotSessionView.Update().Where(
-		ent_robot_session_view.SessionIDEQ(xid.ID(sessionID)),
-		ent_robot_session_view.AccountIDEQ(xid.ID(accountID)),
-	)
-	if turnID == nil {
-		update.ClearResumeTurnID()
-	} else {
-		update.SetResumeTurnID(xid.ID(*turnID))
-	}
-	updated, err := update.Save(ctx)
+func (q *Repository) SessionStreamOffset(ctx context.Context, sessionID robot.SessionID, snapshotSequence uint64) (uint64, error) {
+	activeTurnIDs, err := q.db.RobotSessionTurn.Query().
+		Where(
+			ent_robot_session_turn.SessionIDEQ(xid.ID(sessionID)),
+			ent_robot_session_turn.StatusIn(ent_robot_session_turn.StatusQueued, ent_robot_session_turn.StatusRunning),
+		).
+		IDs(ctx)
 	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
+		return 0, fault.Wrap(err, fctx.With(ctx))
 	}
-	if updated != 1 {
-		return ErrTurnNotFound
+	if len(activeTurnIDs) == 0 {
+		return snapshotSequence, nil
 	}
-	return nil
+	queued, err := q.db.RobotSessionMessage.Query().
+		Where(
+			ent_robot_session_message.SessionIDEQ(xid.ID(sessionID)),
+			ent_robot_session_message.EventKindEQ(ent_robot_session_message.EventKindTurnQueued),
+			ent_robot_session_message.SequenceLTE(snapshotSequence),
+			ent_robot_session_message.TurnIDIn(activeTurnIDs...),
+		).
+		Order(ent.Asc(ent_robot_session_message.FieldSequence)).
+		First(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return snapshotSequence, nil
+		}
+		return 0, fault.Wrap(err, fctx.With(ctx))
+	}
+	if queued.Sequence == 0 {
+		return 0, nil
+	}
+	return queued.Sequence - 1, nil
 }
 
-func (q *Repository) ResumeTurn(ctx context.Context, sessionID robot.SessionID, accountID account.AccountID) (robot.TurnID, error) {
-	view, err := q.db.RobotSessionView.Query().
+func (q *Repository) AcknowledgeSessionEvents(ctx context.Context, sessionID robot.SessionID, accountID account.AccountID, sequence uint64) error {
+	_, err := q.db.RobotSessionView.Update().
 		Where(
 			ent_robot_session_view.SessionIDEQ(xid.ID(sessionID)),
 			ent_robot_session_view.AccountIDEQ(xid.ID(accountID)),
+			ent_robot_session_view.LastSeenEventSequenceLT(sequence),
 		).
-		Only(ctx)
+		SetLastSeenEventSequence(sequence).
+		Save(ctx)
 	if err != nil {
-		return robot.TurnID{}, ErrTurnNotFound
+		return fault.Wrap(err, fctx.With(ctx))
 	}
-	if view.ResumeTurnID == nil {
-		return robot.TurnID{}, ErrTurnNotFound
-	}
-	return robot.TurnID(*view.ResumeTurnID), nil
+	return nil
 }
 
 func allocateSessionEventSequence(ctx context.Context, tx *ent.Tx, sessionID robot.SessionID, lease *ExecutionLease) (uint64, error) {

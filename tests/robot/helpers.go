@@ -39,6 +39,14 @@ type DurableJSONRead[T any] struct {
 // and the catch-up/live requests so authenticated integration tests exercise
 // the same protocol path as a real client.
 func ReadDurableJSON[T any](ctx context.Context, streamURL string, edit openapi.RequestEditorFn) (*DurableJSONRead[T], error) {
+	return readDurableJSON[T](ctx, streamURL, edit, "", nil)
+}
+
+func ReadDurableJSONUntil[T any](ctx context.Context, streamURL string, edit openapi.RequestEditorFn, offset string, stop func(T) bool) (*DurableJSONRead[T], error) {
+	return readDurableJSON[T](ctx, streamURL, edit, offset, stop)
+}
+
+func readDurableJSON[T any](ctx context.Context, streamURL string, edit openapi.RequestEditorFn, offset string, stop func(T) bool) (*DurableJSONRead[T], error) {
 	httpClient := &http.Client{Transport: requestEditorTransport{
 		base: http.DefaultTransport,
 		edit: edit,
@@ -57,7 +65,11 @@ func ReadDurableJSON[T any](ctx context.Context, streamURL string, edit openapi.
 		return nil, errors.New("durable stream HEAD response is missing Stream-Next-Offset")
 	}
 
-	iterator := stream.Read(ctx, durablestreams.WithLive(durablestreams.LiveModeSSE))
+	options := []durablestreams.ReadOption{durablestreams.WithLive(durablestreams.LiveModeSSE)}
+	if offset != "" {
+		options = append(options, durablestreams.WithOffset(durablestreams.Offset(offset)))
+	}
+	iterator := stream.Read(ctx, options...)
 	defer iterator.Close()
 
 	result := &DurableJSONRead[T]{}
@@ -74,7 +86,12 @@ func ReadDurableJSON[T any](ctx context.Context, streamURL string, edit openapi.
 			if err := json.Unmarshal(chunk.Data, &batch); err != nil {
 				return nil, fmt.Errorf("decode durable stream JSON batch: %w", err)
 			}
-			result.Items = append(result.Items, batch...)
+			for _, item := range batch {
+				result.Items = append(result.Items, item)
+				if stop != nil && stop(item) {
+					return result, nil
+				}
+			}
 		}
 		if chunk.Cursor != "" {
 			result.UsedLiveSSE = true

@@ -860,6 +860,10 @@ func (m *Mapping) RobotSessionStream() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionUseRobots
 }
 
+func (m *Mapping) RobotSessionStreamHead() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUseRobots
+}
+
 func (m *Mapping) RobotSessionTurnGet() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionUseRobots
 }

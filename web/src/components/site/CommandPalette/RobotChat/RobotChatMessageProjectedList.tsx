@@ -1,4 +1,5 @@
 import { StorydenUIMessage } from "@/api/robots-types";
+import { useSession } from "@/auth";
 
 import { EmptyState } from "../../EmptyState";
 
@@ -8,6 +9,7 @@ import { RobotMessage } from "./RobotMessage";
 
 export function RobotChatMessageProjectedList() {
   const { messages } = useRobotChat();
+  const session = useSession();
 
   if (messages.length === 0) {
     return (
@@ -26,6 +28,8 @@ export function RobotChatMessageProjectedList() {
       id={message.id}
       role={message.role}
       parts={message.parts ?? []}
+      author={message.author}
+      isCurrentMemberMessage={message.author?.id === session?.id}
       isNewestUserMessage={message.id === latestUserMessageId}
     />
   ));

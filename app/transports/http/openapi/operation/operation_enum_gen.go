@@ -247,6 +247,7 @@ var (
 	OperationIDRobotSessionCreate                     = OperationID{`RobotSessionCreate`}
 	OperationIDRobotSessionsList                      = OperationID{`RobotSessionsList`}
 	OperationIDRobotSessionStream                     = OperationID{`RobotSessionStream`}
+	OperationIDRobotSessionStreamHead                 = OperationID{`RobotSessionStreamHead`}
 	OperationIDRobotSessionTurnGet                    = OperationID{`RobotSessionTurnGet`}
 	OperationIDRobotSessionTurnHead                   = OperationID{`RobotSessionTurnHead`}
 	OperationIDRobotSessionGet                        = OperationID{`RobotSessionGet`}
@@ -766,6 +767,8 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDRobotSessionsList, nil
 	case string(`RobotSessionStream`):
 		return OperationIDRobotSessionStream, nil
+	case string(`RobotSessionStreamHead`):
+		return OperationIDRobotSessionStreamHead, nil
 	case string(`RobotSessionTurnGet`):
 		return OperationIDRobotSessionTurnGet, nil
 	case string(`RobotSessionTurnHead`):

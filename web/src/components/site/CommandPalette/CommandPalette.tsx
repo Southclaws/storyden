@@ -43,6 +43,7 @@ function CommandPaletteDialog() {
         initialSelectedWorkspaceID={sessionState.activeWorkspaceID}
         initialMessages={sessionState.messages}
         initialNextBefore={sessionState.nextBefore}
+        initialStreamOffset={sessionState.streamOffset}
       >
         {loadingState.isLoading || loadingState.error ? (
           <UnreadyBanner error={loadingState.error} />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
+import { ChatStatus, UIMessageChunk, readUIMessageStream } from "ai";
 import type { JSONSchema7 } from "json-schema";
 import {
   PropsWithChildren,
@@ -14,7 +15,11 @@ import {
 } from "react";
 import { useSWRConfig } from "swr";
 
-import { createDurableChatTransport } from "@/api/durable-chat-transport";
+import {
+  createDurableChatTransport,
+  observeRobotSession,
+} from "@/api/durable-chat-transport";
+import type { CommandAccepted } from "@/api/durable-chat-transport";
 import {
   getRobotToolsetsListKey,
   getRobotsListKey,
@@ -24,7 +29,11 @@ import {
   useRobotWorkspacesList,
 } from "@/api/openapi-client/robots";
 import { getThreadListKey } from "@/api/openapi-client/threads";
-import { RobotSessionList, RobotWorkspaceList } from "@/api/openapi-schema";
+import {
+  RobotSessionList,
+  RobotSessionStreamEvent,
+  RobotWorkspaceList,
+} from "@/api/openapi-schema";
 import {
   TOOL_NAMES,
   ToolInputMap,
@@ -137,6 +146,7 @@ type RobotChatContextProps = PropsWithChildren<{
   initialSessionID?: string;
   initialMessages?: StorydenUIMessage[];
   initialNextBefore?: string;
+  initialStreamOffset?: string;
   initialRootRobotID?: string;
   initialSelectedWorkspaceID?: string;
 }>;
@@ -146,6 +156,7 @@ export function RobotChatContext({
   initialSessionID,
   initialMessages,
   initialNextBefore,
+  initialStreamOffset,
   initialRootRobotID,
   initialSelectedWorkspaceID,
 }: RobotChatContextProps) {
@@ -165,13 +176,16 @@ export function RobotChatContext({
     initialSelectedWorkspaceID,
   );
   const autoSubmittedToolOutputIDsRef = useRef<Set<string>>(new Set());
+  const pendingTurnMessages = useMemo(() => new Map<string, string>(), []);
   const [sessionId] = useState(() => initialSessionID ?? generateXid());
+  const [streamStartOffset] = useState(initialStreamOffset ?? "-1");
   const [isSessionConfirmed, setIsSessionConfirmed] =
     useState(!!initialSessionID);
   const [nextBefore, setNextBefore] = useState<string | undefined>(
     initialNextBefore,
   );
   const [isLoadingOlderMessages, setIsLoadingOlderMessages] = useState(false);
+  const [observerStatus, setObserverStatus] = useState<ChatStatus>("ready");
 
   const [errorState, setErrorState] = useState<string | undefined>(undefined);
   const getPageContext = useRobotPageContext();
@@ -197,8 +211,8 @@ export function RobotChatContext({
     }
   }, [handleSetSelectedWorkspaceID, selectedWorkspaceID, workspacesData]);
 
-  const transport = useMemo(() => {
-    const fetchClient: typeof fetch = async (input, init) => {
+  const fetchClient = useMemo<typeof fetch>(() => {
+    return async (input, init) => {
       let request: RequestInit = {
         ...init,
         credentials: "include",
@@ -226,12 +240,28 @@ export function RobotChatContext({
 
       return fetch(input, request);
     };
+  }, [getPageContext, rootRobotID, selectedWorkspaceID]);
 
+  const handleCommandAccepted = useCallback(
+    (command: CommandAccepted) => {
+      if (command.sessionId !== sessionId) {
+        return;
+      }
+      if (command.clientMessageRole === "user" && command.clientMessageId) {
+        pendingTurnMessages.set(command.turnId, command.clientMessageId);
+      }
+      setIsSessionConfirmed(true);
+    },
+    [pendingTurnMessages, sessionId],
+  );
+
+  const transport = useMemo(() => {
     return createDurableChatTransport<StorydenUIMessage>({
       api: `${API_ADDRESS}/api/robots/sessions`,
       fetchClient,
+      onCommandAccepted: handleCommandAccepted,
     });
-  }, [getPageContext, rootRobotID, selectedWorkspaceID]);
+  }, [fetchClient, handleCommandAccepted]);
 
   const handleToolCall = useCallback(
     async ({ toolCall }: HandleToolCallOptions) => {
@@ -271,18 +301,8 @@ export function RobotChatContext({
     [mutate],
   );
 
-  const chat = useChat<StorydenUIMessage>({
-    id: sessionId,
-    messages: initialMessages,
-    transport,
-    resume: true,
-    onError: async (e) => {
-      console.error("[RobotChat] Chat error:", e);
-      setErrorState(deriveError(e));
-    },
-    onData: async (message) => {
-      console.debug(`[RobotChat] Session data`, message);
-
+  const handleStreamData = useCallback(
+    (message: { type: string; data: unknown }) => {
       switch (message.type) {
         case "data-session_id": {
           if (message.data === sessionId) {
@@ -291,38 +311,38 @@ export function RobotChatContext({
           break;
         }
         case "data-session_name": {
-          // Mark session as confirmed when we receive session name from backend
           setIsSessionConfirmed(true);
-
-          if (!sessionsData) return;
-
-          if (typeof message.data !== "string") return;
+          if (!sessionsData || typeof message.data !== "string") return;
 
           const sessionName = message.data;
           const newData = {
             ...sessionsData,
-            sessions: sessionsData?.sessions.map((r) => {
-              if (r.id === sessionId) {
-                if (r.name === sessionName) {
-                  return r;
-                }
-
-                console.debug(
-                  `[RobotChat] Session name updated: ${sessionName}`,
-                );
-
-                return {
-                  ...r,
-                  name: sessionName,
-                };
-              }
-              return r;
-            }),
+            sessions: sessionsData.sessions.map((session) =>
+              session.id === sessionId
+                ? { ...session, name: sessionName }
+                : session,
+            ),
           };
           mutateSessionList(newData, { revalidate: true });
           break;
         }
       }
+    },
+    [mutateSessionList, sessionId, sessionsData, setIsSessionConfirmed],
+  );
+
+  const chat = useChat<StorydenUIMessage>({
+    id: sessionId,
+    messages: initialMessages,
+    transport,
+    resume: false,
+    onError: async (e) => {
+      console.error("[RobotChat] Chat error:", e);
+      setErrorState(deriveError(e));
+    },
+    onData: async (message) => {
+      console.debug(`[RobotChat] Session data`, message);
+      handleStreamData(message);
     },
     onToolCall: async (p) => {
       try {
@@ -387,6 +407,149 @@ export function RobotChatContext({
       return true;
     },
   });
+
+  const observerCallbacksRef = useRef({ handleStreamData, handleToolCall });
+  const setMessagesRef = useRef(chat.setMessages);
+  const observerFetchClient = useMemo<typeof fetch>(() => {
+    return (input, init) => fetch(input, { ...init, credentials: "include" });
+  }, []);
+
+  useEffect(() => {
+    observerCallbacksRef.current = { handleStreamData, handleToolCall };
+    setMessagesRef.current = chat.setMessages;
+  }, [chat.setMessages, handleStreamData, handleToolCall]);
+
+  useEffect(() => {
+    if (!isSessionConfirmed) {
+      return;
+    }
+
+    const abortController = new AbortController();
+    const consumers = new Map<string, TurnMessageConsumer>();
+    const queuedParts = new Map<string, UIMessageChunk[]>();
+    const handledToolCallIDs = new Set<string>();
+    const activeTurnIDs = new Set<string>();
+
+    const updateTurnMessage = (message: StorydenUIMessage) => {
+      setMessagesRef.current((messages) => upsertMessage(messages, message));
+      for (const part of message.parts) {
+        if (
+          !part.type.startsWith("tool-") ||
+          !("toolCallId" in part) ||
+          !part.toolCallId ||
+          !("state" in part) ||
+          part.state === "output-available" ||
+          part.state === "output-error" ||
+          part.state === "approval-responded" ||
+          handledToolCallIDs.has(part.toolCallId)
+        ) {
+          continue;
+        }
+        handledToolCallIDs.add(part.toolCallId);
+        void observerCallbacksRef.current
+          .handleToolCall({
+            toolCall: {
+              toolCallId: part.toolCallId,
+              toolName: part.type.replace(/^tool-/, ""),
+              input: "input" in part ? part.input : undefined,
+            },
+          })
+          .catch((error) => setErrorState(deriveError(error)));
+      }
+    };
+
+    const consumerFor = (turnID: string) => {
+      let consumer = consumers.get(turnID);
+      if (consumer) {
+        return consumer;
+      }
+      consumer = createTurnMessageConsumer(updateTurnMessage, (error) =>
+        setErrorState(deriveError(error)),
+      );
+      consumers.set(turnID, consumer);
+      for (const part of queuedParts.get(turnID) ?? []) {
+        consumer.push(part);
+      }
+      queuedParts.delete(turnID);
+      return consumer;
+    };
+
+    const handleEvent = (event: RobotSessionStreamEvent) => {
+      const turnID = event.turn_id;
+      const parts = event.parts as UIMessageChunk[];
+      for (const part of parts) {
+        if (part.type.startsWith("data-") && "data" in part) {
+          observerCallbacksRef.current.handleStreamData({
+            type: part.type,
+            data: part.data,
+          });
+        }
+        if (part.type === "error") {
+          setErrorState(part.errorText);
+        }
+      }
+
+      if (event.event_kind === "turn_queued") {
+        activeTurnIDs.add(turnID);
+        queuedParts.set(turnID, parts);
+        setObserverStatus("submitted");
+        return;
+      }
+
+      if (event.message) {
+        setMessagesRef.current((messages) =>
+          mergeSessionMessage(
+            messages,
+            event.message as StorydenUIMessage,
+            pendingTurnMessages.get(turnID),
+          ),
+        );
+      } else if (parts.length > 0) {
+        setObserverStatus("streaming");
+        const consumer = consumerFor(turnID);
+        for (const part of parts) {
+          consumer.push(part);
+        }
+      }
+
+      if (isTerminalSessionEvent(event)) {
+        pendingTurnMessages.delete(turnID);
+        activeTurnIDs.delete(turnID);
+        consumers.get(turnID)?.close();
+        consumers.delete(turnID);
+        queuedParts.delete(turnID);
+        setObserverStatus(activeTurnIDs.size === 0 ? "ready" : "streaming");
+      }
+    };
+
+    void consumeRobotSession(
+      {
+        url: `${API_ADDRESS}/api/robots/sessions/${sessionId}/stream`,
+        offset: streamStartOffset,
+        signal: abortController.signal,
+        fetchClient: observerFetchClient,
+      },
+      handleEvent,
+    ).catch((error) => {
+      if (!abortController.signal.aborted) {
+        setObserverStatus("error");
+        setErrorState(deriveError(error));
+      }
+    });
+
+    return () => {
+      abortController.abort();
+      for (const consumer of consumers.values()) {
+        consumer.close();
+      }
+    };
+  }, [
+    isSessionConfirmed,
+    observerFetchClient,
+    pendingTurnMessages,
+    sessionId,
+    streamStartOffset,
+  ]);
 
   const initialMessagesSignature = useMemo(
     () => messageListSignature(initialMessages),
@@ -560,7 +723,7 @@ export function RobotChatContext({
     hasOlderMessages: Boolean(nextBefore),
     isLoadingOlderMessages,
     loadOlderMessages,
-    status: chat.status,
+    status: observerStatus === "ready" ? chat.status : observerStatus,
     errorState,
     handleDismissError,
     isSessionConfirmed,
@@ -569,6 +732,124 @@ export function RobotChatContext({
   };
 
   return <context.Provider value={value}>{children}</context.Provider>;
+}
+
+type TurnMessageConsumer = {
+  push: (part: UIMessageChunk) => void;
+  close: () => void;
+};
+
+async function consumeRobotSession(
+  options: Parameters<typeof observeRobotSession>[0],
+  onEvent: (event: RobotSessionStreamEvent) => void,
+) {
+  const events = await observeRobotSession(options);
+  for await (const event of events) {
+    onEvent(event);
+  }
+}
+
+function createTurnMessageConsumer(
+  onMessage: (message: StorydenUIMessage) => void,
+  onError: (error: unknown) => void,
+): TurnMessageConsumer {
+  let controller: ReadableStreamDefaultController<UIMessageChunk> | undefined;
+  let closed = false;
+  const input = new ReadableStream<UIMessageChunk>({
+    start(streamController) {
+      controller = streamController;
+    },
+  });
+  const messages = readUIMessageStream<StorydenUIMessage>({
+    stream: input,
+    onError,
+    terminateOnError: true,
+  });
+  void (async () => {
+    try {
+      for await (const message of messages) {
+        onMessage(message);
+      }
+    } catch (error) {
+      onError(error);
+    }
+  })();
+
+  return {
+    push(part) {
+      if (!closed) {
+        controller?.enqueue(part);
+      }
+    },
+    close() {
+      if (!closed) {
+        closed = true;
+        controller?.close();
+      }
+    },
+  };
+}
+
+function upsertMessage(
+  messages: readonly StorydenUIMessage[],
+  incoming: StorydenUIMessage,
+) {
+  const existingIndex = messages.findIndex(
+    (message) => message.id === incoming.id,
+  );
+  if (existingIndex === -1) {
+    return [...messages, incoming];
+  }
+  return messages.map((message, index) =>
+    index === existingIndex ? incoming : message,
+  );
+}
+
+function mergeSessionMessage(
+  messages: readonly StorydenUIMessage[],
+  incoming: StorydenUIMessage,
+  pendingMessageID?: string,
+) {
+  const persistedIndex = messages.findIndex(
+    (message) => message.id === incoming.id,
+  );
+  if (persistedIndex !== -1) {
+    return messages.map((message, index) =>
+      index === persistedIndex ? incoming : message,
+    );
+  }
+
+  let optimisticIndex = pendingMessageID
+    ? messages.findIndex((message) => message.id === pendingMessageID)
+    : -1;
+  if (optimisticIndex === -1 && incoming.role === "user") {
+    const incomingSignature = messageContentSignature(incoming);
+    optimisticIndex = messages.findLastIndex(
+      (message) =>
+        message.role === "user" &&
+        !message.created_at &&
+        messageContentSignature(message) === incomingSignature,
+    );
+  }
+  if (optimisticIndex === -1) {
+    return [...messages, incoming];
+  }
+  return messages.map((message, index) =>
+    index === optimisticIndex ? incoming : message,
+  );
+}
+
+function messageContentSignature(message: StorydenUIMessage) {
+  return JSON.stringify({ role: message.role, parts: message.parts });
+}
+
+function isTerminalSessionEvent(event: RobotSessionStreamEvent) {
+  return (
+    event.event_kind === "turn_completed" ||
+    event.event_kind === "turn_blocked" ||
+    event.event_kind === "turn_failed" ||
+    event.event_kind === "turn_cancelled"
+  );
 }
 
 function messageListSignature(messages?: readonly StorydenUIMessage[]) {

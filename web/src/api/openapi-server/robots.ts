@@ -34,7 +34,10 @@ import type {
   RobotSessionGetOKResponse,
   RobotSessionGetParams,
   RobotSessionStreamCreatedResponse,
-  RobotSessionStreamFoundResponse,
+  RobotSessionStreamHeadParams,
+  RobotSessionStreamMetadataResponse,
+  RobotSessionStreamParams,
+  RobotSessionStreamReadResponse,
   RobotSessionTurnGetParams,
   RobotSessionTurnHeadParams,
   RobotSessionTurnMetadataResponse,
@@ -1641,13 +1644,8 @@ export const robotSessionsList = async (
 };
 
 export type robotSessionStreamResponse200 = {
-  data: RobotSessionStreamFoundResponse;
+  data: RobotSessionStreamReadResponse;
   status: 200;
-};
-
-export type robotSessionStreamResponse204 = {
-  data: void;
-  status: 204;
 };
 
 export type robotSessionStreamResponse400 = {
@@ -1665,43 +1663,150 @@ export type robotSessionStreamResponse403 = {
   status: 403;
 };
 
-export type robotSessionStreamResponseDefault = {
-  data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 204 | 400 | 401 | 403>;
+export type robotSessionStreamResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
 };
 
-export type robotSessionStreamResponseSuccess = (
-  robotSessionStreamResponse200 | robotSessionStreamResponse204
-) & {
-  headers: Headers;
+export type robotSessionStreamResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 403 | 404>;
 };
+
+export type robotSessionStreamResponseSuccess =
+  robotSessionStreamResponse200 & {
+    headers: Headers;
+  };
 export type robotSessionStreamResponseError = (
   | robotSessionStreamResponse400
   | robotSessionStreamResponse401
   | robotSessionStreamResponse403
+  | robotSessionStreamResponse404
   | robotSessionStreamResponseDefault
 ) & {
   headers: Headers;
 };
 
-export const getRobotSessionStreamUrl = (sessionId: string) => {
-  return `/robots/sessions/${sessionId}/stream`;
+export const getRobotSessionStreamUrl = (
+  sessionId: string,
+  params?: RobotSessionStreamParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/robots/sessions/${sessionId}/stream?${stringifiedParams}`
+    : `/robots/sessions/${sessionId}/stream`;
 };
 
 /**
- * Locate the active or most recent resumable turn for a Robot session.
- * A session without a resumable turn returns no content.
- * @summary Resume a Robot session stream
+ * Read persisted events after an offset and optionally remain attached to
+ * the live session tail. The stream remains open while the session is idle
+ * so turns started by other members or background work are observable.
+ * @summary Read a Robot session event stream
  */
 export const robotSessionStream = async (
   sessionId: string,
+  params?: RobotSessionStreamParams,
   options?: Parameters<typeof fetcher>[1],
 ): Promise<robotSessionStreamResponseSuccess> => {
   return fetcher<robotSessionStreamResponseSuccess>(
-    getRobotSessionStreamUrl(sessionId),
+    getRobotSessionStreamUrl(sessionId, params),
     {
       ...options,
       method: "GET",
+    },
+  );
+};
+
+export type robotSessionStreamHeadResponse200 = {
+  data: RobotSessionStreamMetadataResponse;
+  status: 200;
+};
+
+export type robotSessionStreamHeadResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type robotSessionStreamHeadResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type robotSessionStreamHeadResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type robotSessionStreamHeadResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type robotSessionStreamHeadResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 403 | 404>;
+};
+
+export type robotSessionStreamHeadResponseSuccess =
+  robotSessionStreamHeadResponse200 & {
+    headers: Headers;
+  };
+export type robotSessionStreamHeadResponseError = (
+  | robotSessionStreamHeadResponse400
+  | robotSessionStreamHeadResponse401
+  | robotSessionStreamHeadResponse403
+  | robotSessionStreamHeadResponse404
+  | robotSessionStreamHeadResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getRobotSessionStreamHeadUrl = (
+  sessionId: string,
+  params?: RobotSessionStreamHeadParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/robots/sessions/${sessionId}/stream?${stringifiedParams}`
+    : `/robots/sessions/${sessionId}/stream`;
+};
+
+/**
+ * Inspect the session event stream without reading any events. The
+ * supplied offset represents the last event already observed by the
+ * caller. The response reports the offset to use for the next read and
+ * whether that position is caught up with the stream's current tail.
+ * This request returns immediately and does not wait for future events.
+ * @summary Inspect a Robot session event stream
+ */
+export const robotSessionStreamHead = async (
+  sessionId: string,
+  params?: RobotSessionStreamHeadParams,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<robotSessionStreamHeadResponseSuccess> => {
+  return fetcher<robotSessionStreamHeadResponseSuccess>(
+    getRobotSessionStreamHeadUrl(sessionId, params),
+    {
+      ...options,
+      method: "HEAD",
     },
   );
 };

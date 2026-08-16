@@ -34,6 +34,7 @@ const (
 type EventKind string
 
 const (
+	EventKindQueued    EventKind = "queued"
 	EventKindOutput    EventKind = "output"
 	EventKindBlocked   EventKind = "blocked"
 	EventKindCompleted EventKind = "completed"
@@ -207,6 +208,19 @@ func (c *Coordinator) Start(
 	return robotresource.TurnID(turnID), nil
 }
 
+func (c *Coordinator) publishSessionWake(ctx context.Context, sessionID string, turnID xid.ID) {
+	if err := c.bus.PublishNamed(ctx, sessionTopic(sessionID), EventRobotTurn{
+		TurnID:    turnID,
+		SessionID: sessionID,
+		Kind:      EventKindQueued,
+	}); err != nil {
+		c.logger.Warn("failed to publish Robot session wake",
+			slog.String("session_id", sessionID),
+			slog.String("turn_id", turnID.String()),
+			slog.String("error", err.Error()))
+	}
+}
+
 func (c *Coordinator) prepareTurn(
 	ctx context.Context,
 	turnID xid.ID,
@@ -270,6 +284,7 @@ func (c *Coordinator) prepareTurn(
 	}); err != nil {
 		return nil, err
 	}
+	c.publishSessionWake(ctx, sessionID, turnID)
 	return command, nil
 }
 
@@ -446,6 +461,20 @@ func (c *Coordinator) SubscribeTurn(ctx context.Context, sessionID string, turnI
 		}
 		if event.TurnID != xid.ID(turnID) {
 			return nil
+		}
+		select {
+		case wake <- struct{}{}:
+		default:
+		}
+		return nil
+	})
+}
+
+func (c *Coordinator) SubscribeSession(ctx context.Context, sessionID string, handlerName string, wake chan<- struct{}) (*pubsub.Subscription, error) {
+	return pubsub.SubscribeEphemeralNamed(ctx, c.bus, sessionTopic(sessionID), handlerName, func(_ context.Context, payload json.RawMessage) error {
+		var event EventRobotTurn
+		if err := json.Unmarshal(payload, &event); err != nil {
+			return err
 		}
 		select {
 		case wake <- struct{}{}:

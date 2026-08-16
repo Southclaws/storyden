@@ -3,7 +3,6 @@ package bindings
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -17,7 +16,6 @@ import (
 	"google.golang.org/genai"
 
 	"github.com/Southclaws/storyden/app/resources/robot"
-	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	storydenagent "github.com/Southclaws/storyden/app/services/semdex/robot"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry/denbot"
@@ -44,6 +42,13 @@ func (f robotSessionCreateResponseFunc) VisitRobotSessionCreateResponse(w http.R
 type robotSessionStreamResponseFunc func(http.ResponseWriter)
 
 func (f robotSessionStreamResponseFunc) VisitRobotSessionStreamResponse(w http.ResponseWriter) error {
+	f(w)
+	return nil
+}
+
+type robotSessionStreamHeadResponseFunc func(http.ResponseWriter)
+
+func (f robotSessionStreamHeadResponseFunc) VisitRobotSessionStreamHeadResponse(w http.ResponseWriter) error {
 	f(w)
 	return nil
 }
@@ -204,48 +209,80 @@ func (r *Robots) createSessionTurn(ctx context.Context, w http.ResponseWriter, b
 	w.Header().Set("Cache-Control", "no-store")
 	w.Header().Set("Location", streamPath)
 	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode(map[string]string{"streamUrl": streamPath})
+	_ = json.NewEncoder(w).Encode(openapi.RobotSessionStreamReference{
+		StreamUrl: streamPath,
+		SessionId: openapi.Identifier(robotSessionID.String()),
+		TurnId:    openapi.Identifier(turnID.String()),
+	})
 }
 
 func (r *Robots) RobotSessionStream(ctx context.Context, request openapi.RobotSessionStreamRequestObject) (openapi.RobotSessionStreamResponseObject, error) {
 	return robotSessionStreamResponseFunc(func(w http.ResponseWriter) {
-		accountID, err := session.GetAccountID(ctx)
-		if err != nil {
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-			return
+		offsetValue := ""
+		if request.Params.Offset != nil {
+			offsetValue = string(*request.Params.Offset)
 		}
-		sessionID, err := robot.NewSessionID(string(request.SessionId))
-		if err != nil {
-			http.Error(w, "invalid session ID: must be a valid xid", http.StatusBadRequest)
-			return
+		live := ""
+		if request.Params.Live != nil {
+			live = string(*request.Params.Live)
 		}
-		turnID, err := r.sessionRepo.ResumeTurn(ctx, sessionID, accountID)
-		if err != nil {
-			if errors.Is(err, robot_session.ErrTurnNotFound) {
-				w.WriteHeader(http.StatusNoContent)
-				return
-			}
-			r.logger.Error("Robot session stream reconnect", slog.String("error", err.Error()))
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
-		}
-		allowed, err := r.sessionRepo.CanReadTurn(ctx, sessionID, turnID, accountID)
-		if err != nil {
-			r.logger.Error("Robot session stream reconnect authorisation", slog.String("error", err.Error()))
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
-		}
-		if !allowed {
-			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
-			return
-		}
-
-		streamPath := "/api/robots/sessions/" + sessionID.String() + "/turns/" + turnID.String()
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Cache-Control", "no-store")
-		w.Header().Set("Location", streamPath)
-		_ = json.NewEncoder(w).Encode(map[string]string{"streamUrl": streamPath})
+		r.serveSessionEvents(ctx, w, string(request.SessionId), offsetValue, live, false)
 	}), nil
+}
+
+func (r *Robots) RobotSessionStreamHead(ctx context.Context, request openapi.RobotSessionStreamHeadRequestObject) (openapi.RobotSessionStreamHeadResponseObject, error) {
+	return robotSessionStreamHeadResponseFunc(func(w http.ResponseWriter) {
+		offsetValue := ""
+		if request.Params.Offset != nil {
+			offsetValue = string(*request.Params.Offset)
+		}
+		r.serveSessionEvents(ctx, w, string(request.SessionId), offsetValue, "", true)
+	}), nil
+}
+
+func (r *Robots) serveSessionEvents(ctx context.Context, w http.ResponseWriter, sessionValue, offsetValue, live string, head bool) {
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+	sessionID, err := robot.NewSessionID(sessionValue)
+	if err != nil {
+		http.Error(w, "invalid session ID: must be a valid xid", http.StatusBadRequest)
+		return
+	}
+	allowed, err := r.sessionRepo.CanReadSession(ctx, sessionID, accountID)
+	if err != nil {
+		r.logger.Error("Robot session stream authorisation", slog.String("error", err.Error()))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	if !allowed {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+	offset, err := parseStreamOffset(offsetValue)
+	if err != nil {
+		http.Error(w, "invalid stream offset", http.StatusBadRequest)
+		return
+	}
+	if err := r.sessionRepo.AcknowledgeSessionEvents(ctx, sessionID, accountID, offset); err != nil {
+		r.logger.Error("Robot session stream acknowledgement", slog.String("error", err.Error()))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	if head {
+		serveSessionCatchUp(ctx, w, r.logger, r.sessionRepo, r.robotQuerier, r.tools, sessionID, offset, true)
+		return
+	}
+	switch live {
+	case "":
+		serveSessionCatchUp(ctx, w, r.logger, r.sessionRepo, r.robotQuerier, r.tools, sessionID, offset, false)
+	case "sse":
+		serveSessionLive(ctx, w, r.logger, r.coordinator, r.sessionRepo, r.robotQuerier, r.tools, sessionID, offset)
+	default:
+		http.Error(w, "unsupported stream live mode", http.StatusBadRequest)
+	}
 }
 
 func normalizeChatPartTypes(messages []chatMessage) {

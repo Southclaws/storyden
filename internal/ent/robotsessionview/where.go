@@ -81,11 +81,6 @@ func LastAccessedAt(v time.Time) predicate.RobotSessionView {
 	return predicate.RobotSessionView(sql.FieldEQ(FieldLastAccessedAt, v))
 }
 
-// ResumeTurnID applies equality check predicate on the "resume_turn_id" field. It's identical to ResumeTurnIDEQ.
-func ResumeTurnID(v xid.ID) predicate.RobotSessionView {
-	return predicate.RobotSessionView(sql.FieldEQ(FieldResumeTurnID, v))
-}
-
 // LastSeenEventSequence applies equality check predicate on the "last_seen_event_sequence" field. It's identical to LastSeenEventSequenceEQ.
 func LastSeenEventSequence(v uint64) predicate.RobotSessionView {
 	return predicate.RobotSessionView(sql.FieldEQ(FieldLastSeenEventSequence, v))
@@ -349,86 +344,6 @@ func LastAccessedAtLT(v time.Time) predicate.RobotSessionView {
 // LastAccessedAtLTE applies the LTE predicate on the "last_accessed_at" field.
 func LastAccessedAtLTE(v time.Time) predicate.RobotSessionView {
 	return predicate.RobotSessionView(sql.FieldLTE(FieldLastAccessedAt, v))
-}
-
-// ResumeTurnIDEQ applies the EQ predicate on the "resume_turn_id" field.
-func ResumeTurnIDEQ(v xid.ID) predicate.RobotSessionView {
-	return predicate.RobotSessionView(sql.FieldEQ(FieldResumeTurnID, v))
-}
-
-// ResumeTurnIDNEQ applies the NEQ predicate on the "resume_turn_id" field.
-func ResumeTurnIDNEQ(v xid.ID) predicate.RobotSessionView {
-	return predicate.RobotSessionView(sql.FieldNEQ(FieldResumeTurnID, v))
-}
-
-// ResumeTurnIDIn applies the In predicate on the "resume_turn_id" field.
-func ResumeTurnIDIn(vs ...xid.ID) predicate.RobotSessionView {
-	return predicate.RobotSessionView(sql.FieldIn(FieldResumeTurnID, vs...))
-}
-
-// ResumeTurnIDNotIn applies the NotIn predicate on the "resume_turn_id" field.
-func ResumeTurnIDNotIn(vs ...xid.ID) predicate.RobotSessionView {
-	return predicate.RobotSessionView(sql.FieldNotIn(FieldResumeTurnID, vs...))
-}
-
-// ResumeTurnIDGT applies the GT predicate on the "resume_turn_id" field.
-func ResumeTurnIDGT(v xid.ID) predicate.RobotSessionView {
-	return predicate.RobotSessionView(sql.FieldGT(FieldResumeTurnID, v))
-}
-
-// ResumeTurnIDGTE applies the GTE predicate on the "resume_turn_id" field.
-func ResumeTurnIDGTE(v xid.ID) predicate.RobotSessionView {
-	return predicate.RobotSessionView(sql.FieldGTE(FieldResumeTurnID, v))
-}
-
-// ResumeTurnIDLT applies the LT predicate on the "resume_turn_id" field.
-func ResumeTurnIDLT(v xid.ID) predicate.RobotSessionView {
-	return predicate.RobotSessionView(sql.FieldLT(FieldResumeTurnID, v))
-}
-
-// ResumeTurnIDLTE applies the LTE predicate on the "resume_turn_id" field.
-func ResumeTurnIDLTE(v xid.ID) predicate.RobotSessionView {
-	return predicate.RobotSessionView(sql.FieldLTE(FieldResumeTurnID, v))
-}
-
-// ResumeTurnIDContains applies the Contains predicate on the "resume_turn_id" field.
-func ResumeTurnIDContains(v xid.ID) predicate.RobotSessionView {
-	vc := v.String()
-	return predicate.RobotSessionView(sql.FieldContains(FieldResumeTurnID, vc))
-}
-
-// ResumeTurnIDHasPrefix applies the HasPrefix predicate on the "resume_turn_id" field.
-func ResumeTurnIDHasPrefix(v xid.ID) predicate.RobotSessionView {
-	vc := v.String()
-	return predicate.RobotSessionView(sql.FieldHasPrefix(FieldResumeTurnID, vc))
-}
-
-// ResumeTurnIDHasSuffix applies the HasSuffix predicate on the "resume_turn_id" field.
-func ResumeTurnIDHasSuffix(v xid.ID) predicate.RobotSessionView {
-	vc := v.String()
-	return predicate.RobotSessionView(sql.FieldHasSuffix(FieldResumeTurnID, vc))
-}
-
-// ResumeTurnIDIsNil applies the IsNil predicate on the "resume_turn_id" field.
-func ResumeTurnIDIsNil() predicate.RobotSessionView {
-	return predicate.RobotSessionView(sql.FieldIsNull(FieldResumeTurnID))
-}
-
-// ResumeTurnIDNotNil applies the NotNil predicate on the "resume_turn_id" field.
-func ResumeTurnIDNotNil() predicate.RobotSessionView {
-	return predicate.RobotSessionView(sql.FieldNotNull(FieldResumeTurnID))
-}
-
-// ResumeTurnIDEqualFold applies the EqualFold predicate on the "resume_turn_id" field.
-func ResumeTurnIDEqualFold(v xid.ID) predicate.RobotSessionView {
-	vc := v.String()
-	return predicate.RobotSessionView(sql.FieldEqualFold(FieldResumeTurnID, vc))
-}
-
-// ResumeTurnIDContainsFold applies the ContainsFold predicate on the "resume_turn_id" field.
-func ResumeTurnIDContainsFold(v xid.ID) predicate.RobotSessionView {
-	vc := v.String()
-	return predicate.RobotSessionView(sql.FieldContainsFold(FieldResumeTurnID, vc))
 }
 
 // LastSeenEventSequenceEQ applies the EQ predicate on the "last_seen_event_sequence" field.

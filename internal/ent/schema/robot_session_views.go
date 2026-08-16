@@ -26,11 +26,6 @@ func (RobotSessionView) Fields() []ent.Field {
 		field.String("session_id").GoType(xid.ID{}),
 		field.String("account_id").GoType(xid.ID{}),
 		field.Time("last_accessed_at").Default(time.Now),
-		field.String("resume_turn_id").
-			GoType(xid.ID{}).
-			Optional().
-			Nillable().
-			Comment("Turn this account should resume after loading session history."),
 		field.Uint64("last_seen_event_sequence").
 			Default(0).
 			Comment("Last session event the member has acknowledged."),

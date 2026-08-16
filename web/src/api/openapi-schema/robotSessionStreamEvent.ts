@@ -7,14 +7,15 @@
  *
  * OpenAPI spec version: v1.26.15-post
  */
-import type { PaginatedRobotMessageList } from "./paginatedRobotMessageList";
-import type { RobotWorkspaceMount } from "./robotWorkspaceMount";
+import type { Identifier } from "./identifier";
+import type { RobotSessionMessage } from "./robotSessionMessage";
+import type { RobotSessionStreamEventKind } from "./robotSessionStreamEventKind";
+import type { StreamPart } from "./streamPart";
 
-export interface RobotSessionProps {
-  message_list: PaginatedRobotMessageList;
-  /** Event offset covered by this session snapshot. */
-  stream_offset: string;
-  /** Root Robot selected when this session was created, including built-in Robot IDs. */
-  root_robot_id?: string;
-  active_workspace?: RobotWorkspaceMount;
+export interface RobotSessionStreamEvent {
+  sequence: number;
+  turn_id: Identifier;
+  event_kind: RobotSessionStreamEventKind;
+  message?: RobotSessionMessage;
+  parts: StreamPart[];
 }

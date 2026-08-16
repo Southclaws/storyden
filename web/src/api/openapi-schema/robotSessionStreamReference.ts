@@ -7,8 +7,11 @@
  *
  * OpenAPI spec version: v1.26.15-post
  */
+import type { Identifier } from "./identifier";
 
 export interface RobotSessionStreamReference {
   /** Relative URL of the Robot turn stream. */
   streamUrl: string;
+  sessionId: Identifier;
+  turnId: Identifier;
 }

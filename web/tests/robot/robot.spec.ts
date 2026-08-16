@@ -134,6 +134,41 @@ test.describe("Robot Chat — mock LLM stream", () => {
     ).toBeVisible({ timeout: 15000 });
   });
 
+  test("long unbreakable errors remain contained with a visible close button", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 480, height: 800 });
+    await sendMessage(page, "trigger long unbreakable error");
+
+    const unbreakablePath =
+      "/root/go/pkg/mod/cache/vcs/724fbb39ff95e06c93947ebaea8d314af24a9fa3cbf2c9cf48e82b196866eb07";
+    const admonition = page.locator("aside").filter({
+      hasText: unbreakablePath,
+    });
+    const closeButton = admonition.getByRole("button", { name: "Close" });
+
+    await expect(admonition).toBeVisible({ timeout: 15000 });
+    await expect(closeButton).toBeVisible();
+
+    const geometry = await admonition.evaluate((element) => {
+      const close = element.querySelector("button");
+      if (!close) {
+        throw new Error("Admonition close button is missing");
+      }
+      const containerBounds = element.getBoundingClientRect();
+      const closeBounds = close.getBoundingClientRect();
+      return {
+        clientWidth: element.clientWidth,
+        scrollWidth: element.scrollWidth,
+        closeRight: closeBounds.right,
+        containerRight: containerBounds.right,
+      };
+    });
+
+    expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.clientWidth);
+    expect(geometry.closeRight).toBeLessThanOrEqual(geometry.containerRight);
+  });
+
   test("model thought is hidden until expanded", async ({ page }) => {
     await sendMessage(page, "show thought");
 
