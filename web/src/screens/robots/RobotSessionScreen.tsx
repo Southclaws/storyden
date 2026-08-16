@@ -1,7 +1,7 @@
 "use client";
 
 import { formatDistanceToNow } from "date-fns";
-import { useEffect } from "react";
+import { type CSSProperties, useEffect } from "react";
 
 import { useRobotSessionGet } from "@/api/openapi-client/robots";
 import { RobotSession } from "@/api/openapi-schema";
@@ -19,6 +19,7 @@ import { UnreadyBanner } from "@/components/site/Unready";
 import { PageHeading } from "@/components/ui/page-heading";
 import { css } from "@/styled-system/css";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { token } from "@/styled-system/tokens";
 
 type Props = {
   sessionId?: string;
@@ -27,9 +28,19 @@ type Props = {
   initialRobotID?: string;
 };
 
+const mobileViewportStyle = {
+  "--robot-session-screen-mobile-height": `calc(${token("sizes.viewportHeight")} - var(--navigation-topbar-height))`,
+} as CSSProperties;
+
 const containerStyles = css({
-  height: "viewportHeight",
-  maxHeight: "viewportHeight",
+  height: {
+    base: "var(--robot-session-screen-mobile-height)",
+    md: "viewportHeight",
+  },
+  maxHeight: {
+    base: "var(--robot-session-screen-mobile-height)",
+    md: "viewportHeight",
+  },
   minHeight: "0",
   display: "flex",
   flexDirection: "column",
@@ -59,7 +70,11 @@ export function RobotSessionScreen(props: Props) {
     ? props.initialRobotID
     : session?.root_robot_id;
   return (
-    <div className={containerStyles}>
+    <div
+      className={containerStyles}
+      data-testid="robot-session-screen"
+      style={mobileViewportStyle}
+    >
       <RobotChatContext
         initialSessionID={session?.id}
         initialMessages={messages}

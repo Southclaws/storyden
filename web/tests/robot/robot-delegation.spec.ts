@@ -260,5 +260,64 @@ ${specialistTranscript}
     expect(finalResponseBox!.y + finalResponseBox!.height).toBeLessThanOrEqual(
       composerBox!.y + 1,
     );
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.reload();
+    await expect(finalResponse).toBeVisible({ timeout: 15000 });
+    await delegation.locator("summary").first().click();
+
+    await expect
+      .poll(() =>
+        page.evaluate(() => ({
+          clientHeight: document.scrollingElement?.clientHeight ?? 0,
+          scrollHeight: document.scrollingElement?.scrollHeight ?? 0,
+        })),
+      )
+      .toEqual({ clientHeight: 844, scrollHeight: 844 });
+
+    const sessionScreenBox = await page
+      .getByTestId("robot-session-screen")
+      .boundingBox();
+    expect(sessionScreenBox).not.toBeNull();
+    expect(sessionScreenBox!.y + sessionScreenBox!.height).toBeLessThanOrEqual(
+      844,
+    );
+
+    const mobileScreenHeight = await page
+      .getByTestId("robot-session-screen")
+      .evaluate((element) => {
+        const rootStyles = getComputedStyle(document.documentElement);
+        const appNavigationHeight = Number.parseFloat(
+          rootStyles.getPropertyValue("--app-nav-h"),
+        );
+        const topBarHeightProbe = document.createElement("div");
+        topBarHeightProbe.style.height = "var(--navigation-topbar-height)";
+        topBarHeightProbe.style.position = "fixed";
+        topBarHeightProbe.style.visibility = "hidden";
+        document.body.append(topBarHeightProbe);
+        const topBarHeight = topBarHeightProbe.getBoundingClientRect().height;
+        topBarHeightProbe.remove();
+
+        return {
+          actual: element.getBoundingClientRect().height,
+          expected: window.innerHeight - appNavigationHeight - topBarHeight,
+        };
+      });
+    expect(mobileScreenHeight.actual).toBe(mobileScreenHeight.expected);
+
+    const workspacePicker = page.getByRole("combobox");
+    const workspacePickerBox = await workspacePicker.boundingBox();
+    expect(workspacePickerBox).not.toBeNull();
+    expect(
+      workspacePickerBox!.y + workspacePickerBox!.height,
+    ).toBeLessThanOrEqual(844);
+
+    await expect
+      .poll(() =>
+        messageViewport.evaluate(
+          (element) => element.scrollHeight > element.clientHeight,
+        ),
+      )
+      .toBe(true);
   });
 });
