@@ -506,7 +506,7 @@ export function RobotChatContext({
 
       if (event.message) {
         setMessagesRef.current((messages) =>
-          mergeSessionMessage(messages, event.message as StorydenUIMessage),
+          upsertMessage(messages, event.message as StorydenUIMessage),
         );
       } else if (parts.length > 0 && turnID) {
         setObserverStatus("streaming");
@@ -812,44 +812,6 @@ function upsertMessage(
   return messages.map((message, index) =>
     index === existingIndex ? incoming : message,
   );
-}
-
-function mergeSessionMessage(
-  messages: readonly StorydenUIMessage[],
-  incoming: StorydenUIMessage,
-  pendingMessageID?: string,
-) {
-  const persistedIndex = messages.findIndex(
-    (message) => message.id === incoming.id,
-  );
-  if (persistedIndex !== -1) {
-    return messages.map((message, index) =>
-      index === persistedIndex ? incoming : message,
-    );
-  }
-
-  let optimisticIndex = pendingMessageID
-    ? messages.findIndex((message) => message.id === pendingMessageID)
-    : -1;
-  if (optimisticIndex === -1 && incoming.role === "user") {
-    const incomingSignature = messageContentSignature(incoming);
-    optimisticIndex = messages.findLastIndex(
-      (message) =>
-        message.role === "user" &&
-        !message.created_at &&
-        messageContentSignature(message) === incomingSignature,
-    );
-  }
-  if (optimisticIndex === -1) {
-    return [...messages, incoming];
-  }
-  return messages.map((message, index) =>
-    index === optimisticIndex ? incoming : message,
-  );
-}
-
-function messageContentSignature(message: StorydenUIMessage) {
-  return JSON.stringify({ role: message.role, parts: message.parts });
 }
 
 function isTerminalSessionEvent(event: RobotSessionStreamEvent) {

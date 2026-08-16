@@ -38,14 +38,6 @@ type EnqueueInputParams struct {
 // its individually visible representation to the ordered session log.
 func (q *Repository) EnqueueInput(ctx context.Context, params EnqueueInputParams) error {
 	err := ent.WithTx(ctx, q.db, func(tx *ent.Tx) error {
-		exists, err := tx.RobotSessionInput.Query().Where(ent_robot_session_input.IDEQ(xid.ID(params.ID))).Exist(ctx)
-		if err != nil {
-			return err
-		}
-		if exists {
-			return nil
-		}
-
 		sequence, err := allocateSessionEventSequence(ctx, tx, params.SessionID, nil)
 		if err != nil {
 			return err
@@ -80,6 +72,17 @@ func (q *Repository) EnqueueInput(ctx context.Context, params EnqueueInputParams
 		)
 	})
 	if err != nil {
+		if ent.IsConstraintError(err) {
+			exists, lookupErr := q.db.RobotSessionInput.Query().
+				Where(ent_robot_session_input.IDEQ(xid.ID(params.ID))).
+				Exist(ctx)
+			if lookupErr != nil {
+				return fault.Wrap(lookupErr, fctx.With(ctx))
+			}
+			if exists {
+				return nil
+			}
+		}
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 	return nil
@@ -241,19 +244,27 @@ func (q *Repository) RunnableSessionIDs(ctx context.Context, limit int) ([]robot
 	if limit <= 0 {
 		limit = robot.SessionEventPageSize
 	}
-	inputRows, err := q.db.RobotSessionInput.Query().
+	var inputSessionIDs []xid.ID
+	err := q.db.RobotSessionInput.Query().
 		Where(ent_robot_session_input.StatusEQ(ent_robot_session_input.StatusQueued)).
-		Order(ent_robot_session_input.BySequence(sql.OrderAsc())).
+		Modify(func(selector *sql.Selector) {
+			selector.OrderExpr(sql.Expr(sql.Min(selector.C(ent_robot_session_input.FieldSequence))))
+		}).
 		Limit(limit).
-		All(ctx)
+		GroupBy(ent_robot_session_input.FieldSessionID).
+		Scan(ctx, &inputSessionIDs)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-	turnRows, err := q.db.RobotSessionTurn.Query().
+	var turnSessionIDs []xid.ID
+	err = q.db.RobotSessionTurn.Query().
 		Where(ent_robot_session_turn.StatusEQ(ent_robot_session_turn.StatusQueued)).
-		Order(ent_robot_session_turn.ByCreatedAt(sql.OrderAsc())).
+		Modify(func(selector *sql.Selector) {
+			selector.OrderExpr(sql.Expr(sql.Min(selector.C(ent_robot_session_turn.FieldCreatedAt))))
+		}).
 		Limit(limit).
-		All(ctx)
+		GroupBy(ent_robot_session_turn.FieldSessionID).
+		Scan(ctx, &turnSessionIDs)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -272,8 +283,8 @@ func (q *Repository) RunnableSessionIDs(ctx context.Context, limit int) ([]robot
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	unique := make(map[xid.ID]struct{}, len(inputRows)+len(turnRows)+len(recoverableSessions))
-	capacity := len(inputRows) + len(turnRows) + len(recoverableSessions)
+	unique := make(map[xid.ID]struct{}, len(inputSessionIDs)+len(turnSessionIDs)+len(recoverableSessions))
+	capacity := len(inputSessionIDs) + len(turnSessionIDs) + len(recoverableSessions)
 	if capacity > limit {
 		capacity = limit
 	}
@@ -285,11 +296,11 @@ func (q *Repository) RunnableSessionIDs(ctx context.Context, limit int) ([]robot
 		unique[id] = struct{}{}
 		result = append(result, robot.SessionID(id))
 	}
-	for _, row := range inputRows {
-		appendID(row.SessionID)
+	for _, id := range inputSessionIDs {
+		appendID(id)
 	}
-	for _, row := range turnRows {
-		appendID(row.SessionID)
+	for _, id := range turnSessionIDs {
+		appendID(id)
 	}
 	for _, id := range recoverableSessions {
 		appendID(id)
@@ -312,10 +323,10 @@ func (q *Repository) HasRunningExecution(ctx context.Context, sessionID robot.Se
 	if err != nil {
 		return false, fault.Wrap(err, fctx.With(ctx))
 	}
-	if row.ExecutionStatus == "idle" {
+	if row.ExecutionStatus == ent_robot_session.ExecutionStatusIdle {
 		return false, nil
 	}
-	if row.ExecutionStatus == "running" && row.LeaseExpiresAt != nil && row.LeaseExpiresAt.Before(time.Now()) {
+	if row.ExecutionStatus == ent_robot_session.ExecutionStatusRunning && row.LeaseExpiresAt != nil && row.LeaseExpiresAt.Before(time.Now()) {
 		return false, nil
 	}
 	return true, nil

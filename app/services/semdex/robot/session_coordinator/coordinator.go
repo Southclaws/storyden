@@ -40,7 +40,6 @@ const (
 	EventKindBlocked   EventKind = "blocked"
 	EventKindCompleted EventKind = "completed"
 	EventKindFailed    EventKind = "failed"
-	EventKindBusy      EventKind = "busy"
 )
 
 type CommandEnqueueMessage struct {
@@ -69,14 +68,13 @@ type turnCommand struct {
 }
 
 type EventRobotTurn struct {
-	TurnID          xid.ID            `json:"turn_id"`
-	SessionID       string            `json:"session_id"`
-	Sequence        uint64            `json:"sequence"`
-	LeaseGeneration uint64            `json:"lease_generation,omitempty"`
-	Kind            EventKind         `json:"kind"`
-	Event           *adksession.Event `json:"event,omitempty"`
-	ErrorText       string            `json:"error_text,omitempty"`
-	InputIDs        []xid.ID          `json:"input_ids,omitempty"`
+	TurnID    xid.ID            `json:"turn_id"`
+	SessionID string            `json:"session_id"`
+	Sequence  uint64            `json:"sequence"`
+	Kind      EventKind         `json:"kind"`
+	Event     *adksession.Event `json:"event,omitempty"`
+	ErrorText string            `json:"error_text,omitempty"`
+	InputIDs  []xid.ID          `json:"input_ids,omitempty"`
 }
 
 type Coordinator struct {
@@ -482,17 +480,16 @@ func (c *Coordinator) executeTurn(ctx context.Context, command *turnCommand) err
 	}
 	sessionXID, sessionParseErr := xid.FromString(command.SessionID)
 	sessionID := robotresource.SessionID(sessionXID)
-	fail := func(err error, sequence uint64, leaseGeneration uint64) {
+	fail := func(err error, sequence uint64) {
 		if sessionParseErr == nil {
 			_ = c.sessions.FinishTurn(context.WithoutCancel(ctx), sessionID, robotresource.TurnID(command.TurnID), robotresource.TurnStatusFailed, err.Error())
 		}
 		publish(EventRobotTurn{
-			TurnID:          command.TurnID,
-			SessionID:       command.SessionID,
-			Sequence:        sequence,
-			LeaseGeneration: leaseGeneration,
-			Kind:            EventKindFailed,
-			ErrorText:       err.Error(),
+			TurnID:    command.TurnID,
+			SessionID: command.SessionID,
+			Sequence:  sequence,
+			Kind:      EventKindFailed,
+			ErrorText: err.Error(),
 		})
 		if sessionParseErr == nil {
 			_ = c.bus.SendCommand(context.WithoutCancel(ctx), &CommandStartNextTurn{SessionID: command.SessionID})
@@ -500,7 +497,7 @@ func (c *Coordinator) executeTurn(ctx context.Context, command *turnCommand) err
 	}
 
 	if sessionParseErr != nil {
-		fail(sessionParseErr, 1, 0)
+		fail(sessionParseErr, 1)
 		return nil
 	}
 
@@ -542,7 +539,7 @@ func (c *Coordinator) executeTurn(ctx context.Context, command *turnCommand) err
 	) {
 		if runErr != nil {
 			_ = c.sessions.ReleaseExecution(context.WithoutCancel(ctx), *lease)
-			fail(runErr, sequence+1, lease.Generation)
+			fail(runErr, sequence+1)
 			return nil
 		}
 		if event == nil {
@@ -553,11 +550,11 @@ func (c *Coordinator) executeTurn(ctx context.Context, command *turnCommand) err
 		if len(pendingIDs) > 0 {
 			if err := c.sessions.StorePendingClientTools(runCtx, sessionID, pendingIDs); err != nil {
 				_ = c.sessions.ReleaseExecution(context.WithoutCancel(ctx), *lease)
-				fail(err, sequence+1, lease.Generation)
+				fail(err, sequence+1)
 				return nil
 			}
 			if err := c.sessions.BlockExecution(context.WithoutCancel(ctx), *lease); err != nil {
-				fail(err, sequence+1, lease.Generation)
+				fail(err, sequence+1)
 				return nil
 			}
 			blocked = true
@@ -565,12 +562,11 @@ func (c *Coordinator) executeTurn(ctx context.Context, command *turnCommand) err
 
 		sequence++
 		if !publish(EventRobotTurn{
-			TurnID:          command.TurnID,
-			SessionID:       command.SessionID,
-			Sequence:        sequence,
-			LeaseGeneration: lease.Generation,
-			Kind:            EventKindOutput,
-			Event:           event,
+			TurnID:    command.TurnID,
+			SessionID: command.SessionID,
+			Sequence:  sequence,
+			Kind:      EventKindOutput,
+			Event:     event,
 		}) {
 			if !blocked {
 				_ = c.sessions.ReleaseExecution(context.WithoutCancel(ctx), *lease)
@@ -589,20 +585,19 @@ func (c *Coordinator) executeTurn(ctx context.Context, command *turnCommand) err
 		terminal = EventKindBlocked
 		turnStatus = robotresource.TurnStatusBlocked
 	} else if err := c.sessions.ReleaseExecution(context.WithoutCancel(ctx), *lease); err != nil {
-		fail(err, sequence+1, lease.Generation)
+		fail(err, sequence+1)
 		return nil
 	}
 	if err := c.sessions.FinishTurn(context.WithoutCancel(ctx), sessionID, robotresource.TurnID(command.TurnID), turnStatus, ""); err != nil {
-		fail(err, sequence+1, lease.Generation)
+		fail(err, sequence+1)
 		return nil
 	}
 
 	publish(EventRobotTurn{
-		TurnID:          command.TurnID,
-		SessionID:       command.SessionID,
-		Sequence:        sequence + 1,
-		LeaseGeneration: lease.Generation,
-		Kind:            terminal,
+		TurnID:    command.TurnID,
+		SessionID: command.SessionID,
+		Sequence:  sequence + 1,
+		Kind:      terminal,
 	})
 	_ = c.bus.SendCommand(context.WithoutCancel(ctx), &CommandStartNextTurn{SessionID: command.SessionID})
 	return nil
