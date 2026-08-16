@@ -202,6 +202,12 @@ func TestOAuthHeadlessAuthorizationCodeFlow(t *testing.T) {
 					RequestId: &requestID,
 				}, oauthBearer))(t, http.StatusForbidden)
 				r.Nil(consent.JSON200)
+
+				submit := tests.AssertRequest(cl.OAuthAuthoriseConsentSubmitWithResponse(root, openapi.OAuthAuthoriseConsentSubmitJSONRequestBody{
+					RequestId: string(requestID),
+					Decision:  openapi.OAuthAuthoriseDecisionApprove,
+				}, oauthBearer))(t, http.StatusForbidden)
+				r.Nil(submit.JSON200)
 			})
 		}))
 	}))

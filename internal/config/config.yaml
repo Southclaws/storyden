@@ -485,6 +485,7 @@
     - env: OAUTH_AUTHORISATION_LOGIN_URL
       name: OAuthAuthorisationLoginURL
       type: net/url.URL
+      documented_default: "{PUBLIC_WEB_ADDRESS}/login"
       description: |-
         Frontend URL to redirect unauthenticated users to when starting the OAuth Authorization Code flow without a session. Defaults to `{PUBLIC_WEB_ADDRESS}/login` when unset.
 

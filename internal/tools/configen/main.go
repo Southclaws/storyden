@@ -34,12 +34,13 @@ type Section struct {
 }
 
 type ConfigOption struct {
-	Env         string  `yaml:"env"`
-	Name        string  `yaml:"name"`
-	Description string  `yaml:"description"`
-	Type        string  `yaml:"type"`
-	Required    bool    `yaml:"required"`
-	Default     *string `yaml:"default"`
+	Env               string  `yaml:"env"`
+	Name              string  `yaml:"name"`
+	Description       string  `yaml:"description"`
+	Type              string  `yaml:"type"`
+	Required          bool    `yaml:"required"`
+	Default           *string `yaml:"default"`
+	DocumentedDefault *string `yaml:"documented_default"`
 }
 
 func run(filename, outputPkgFile, outputDocFile string) error {
@@ -118,12 +119,17 @@ The term "Settings" is distinct from these and refers to runtime-configurable va
 					g.Id(fieldName).Qual(path, sym).Tag(tags)
 				}
 
+				documentedDefault := f.Default
+				if f.DocumentedDefault != nil {
+					documentedDefault = f.DocumentedDefault
+				}
+
 				properties := fmt.Sprintf(`<table>
 <tr><td>type</td><td>%s</td></tr>
 <tr><td>default</td><td>%s</td></tr>
 </table>
 
-`, getNonTechnicalTypeName(f.Type), getPrettyDefault(f.Default))
+`, getNonTechnicalTypeName(f.Type), getPrettyDefault(documentedDefault))
 
 				// Generate markdown documentation
 				markdown.WriteString(fmt.Sprintf("### `%s`\n\n", f.Env))
