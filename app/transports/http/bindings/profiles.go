@@ -179,34 +179,19 @@ func (p *Profiles) ProfileFollowersGet(ctx context.Context, request openapi.Prof
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	pageSize := 50
+	params := deserialisePageParams(request.Params.Page, 50)
 
-	page := opt.NewPtrMap(request.Params.Page, func(s string) int {
-		v, err := strconv.ParseInt(s, 10, 32)
-		if err != nil {
-			return 0
-		}
-
-		return max(1, int(v))
-	}).Or(1)
-
-	// API is 1-indexed, internally it's 0-indexed.
-	page = max(0, page-1)
-
-	result, err := p.followQuerier.GetFollowers(ctx, targetID, page, pageSize)
+	result, err := p.followQuerier.GetFollowers(ctx, targetID, params)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// API is 1-indexed, internally it's 0-indexed.
-	page = result.CurrentPage + 1
-
 	return openapi.ProfileFollowersGet200JSONResponse{
 		ProfileFollowersGetOKJSONResponse: openapi.ProfileFollowersGetOKJSONResponse{
-			CurrentPage: page,
-			Followers:   dt.Map(result.Profiles, serialiseProfileReferencePtr),
+			CurrentPage: result.CurrentPage,
+			Followers:   dt.Map(result.Items, serialiseProfileReferencePtr),
 			NextPage:    result.NextPage.Ptr(),
-			PageSize:    pageSize,
+			PageSize:    result.Size,
 			Results:     result.Results,
 			TotalPages:  result.TotalPages,
 		},
@@ -219,34 +204,19 @@ func (p *Profiles) ProfileFollowingGet(ctx context.Context, request openapi.Prof
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	pageSize := 50
+	params := deserialisePageParams(request.Params.Page, 50)
 
-	page := opt.NewPtrMap(request.Params.Page, func(s string) int {
-		v, err := strconv.ParseInt(s, 10, 32)
-		if err != nil {
-			return 0
-		}
-
-		return max(1, int(v))
-	}).Or(1)
-
-	// API is 1-indexed, internally it's 0-indexed.
-	page = max(0, page-1)
-
-	result, err := p.followQuerier.GetFollowing(ctx, targetID, page, pageSize)
+	result, err := p.followQuerier.GetFollowing(ctx, targetID, params)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// API is 1-indexed, internally it's 0-indexed.
-	page = result.CurrentPage + 1
-
 	return openapi.ProfileFollowingGet200JSONResponse{
 		ProfileFollowingGetOKJSONResponse: openapi.ProfileFollowingGetOKJSONResponse{
-			CurrentPage: page,
-			Following:   dt.Map(result.Profiles, serialiseProfileReferencePtr),
+			CurrentPage: result.CurrentPage,
+			Following:   dt.Map(result.Items, serialiseProfileReferencePtr),
 			NextPage:    result.NextPage.Ptr(),
-			PageSize:    pageSize,
+			PageSize:    result.Size,
 			Results:     result.Results,
 			TotalPages:  result.TotalPages,
 		},

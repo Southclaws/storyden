@@ -3,7 +3,6 @@ package bindings
 import (
 	"context"
 	"net/url"
-	"strconv"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -59,16 +58,7 @@ func (i *Links) LinkCreate(ctx context.Context, request openapi.LinkCreateReques
 }
 
 func (i *Links) LinkList(ctx context.Context, request openapi.LinkListRequestObject) (openapi.LinkListResponseObject, error) {
-	pageSize := 50
-
-	page := opt.NewPtrMap(request.Params.Page, func(s string) int {
-		v, err := strconv.ParseInt(s, 10, 32)
-		if err != nil {
-			return 0
-		}
-
-		return max(1, int(v))
-	}).Or(1)
+	params := deserialisePageParams(request.Params.Page, 50)
 
 	opts := []link_querier.Filter{}
 
@@ -76,25 +66,19 @@ func (i *Links) LinkList(ctx context.Context, request openapi.LinkListRequestObj
 		opts = append(opts, link_querier.WithKeyword(*v))
 	}
 
-	// API is 1-indexed, internally it's 0-indexed.
-	page = max(0, page-1)
-
-	result, err := i.linkQuerier.Search(ctx, page, pageSize, opts...)
+	result, err := i.linkQuerier.Search(ctx, params, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// API is 1-indexed, internally it's 0-indexed.
-	page = result.CurrentPage + 1
-
 	return openapi.LinkList200JSONResponse{
 		LinkListOKJSONResponse: openapi.LinkListOKJSONResponse{
-			PageSize:    pageSize,
+			PageSize:    result.Size,
 			Results:     result.Results,
 			TotalPages:  result.TotalPages,
-			CurrentPage: page,
+			CurrentPage: result.CurrentPage,
 			NextPage:    result.NextPage.Ptr(),
-			Links:       serialiseLinkRefs(result.Links),
+			Links:       serialiseLinkRefs(result.Items),
 		},
 	}, nil
 }

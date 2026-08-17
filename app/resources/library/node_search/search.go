@@ -16,7 +16,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
-	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_account "github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/node"
@@ -30,7 +29,6 @@ type Search interface {
 type query struct {
 	nameContains    string
 	contentContains string
-	visibility      []visibility.Visibility
 	authors         []account.AccountID
 	tags            []tag_ref.Name
 }
@@ -46,12 +44,6 @@ func WithNameContains(s string) Option {
 func WithContentContains(s string) Option {
 	return func(q *query) {
 		q.contentContains = s
-	}
-}
-
-func WithVisibility(v []visibility.Visibility) Option {
-	return func(q *query) {
-		q.visibility = v
 	}
 }
 
@@ -127,7 +119,7 @@ func (s *service) Search(ctx context.Context, params pagination.Parameters, opts
 			cq.WithOwner()
 		}).
 		WithPrimaryImage().
-		Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc())).
+		Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc()), node.ByID(sql.OrderDesc())).
 		Limit(params.Limit()).
 		Offset(params.Offset())
 

@@ -78,11 +78,13 @@ func (d *Querier) List(
 	if queryOptions.ignorePinned {
 		query.Order(
 			ent.Desc(ent_post.FieldLastReplyAt),
+			ent.Desc(ent_post.FieldID),
 		)
 	} else {
 		query.Order(
 			ent.Desc(ent_post.FieldPinnedRank),
 			ent.Desc(ent_post.FieldLastReplyAt),
+			ent.Desc(ent_post.FieldID),
 		)
 	}
 

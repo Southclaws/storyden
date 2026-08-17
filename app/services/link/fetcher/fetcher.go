@@ -21,6 +21,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/message"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
 	"github.com/Southclaws/storyden/app/services/link/scrape"
 	"github.com/Southclaws/storyden/internal/infrastructure/httpsafe"
@@ -71,15 +72,15 @@ func (s *Fetcher) Fetch(ctx context.Context, u url.URL) (*link_ref.LinkRef, erro
 		return nil, fault.Wrap(errEmptyLink, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	r, err := s.lq.Search(ctx, 0, 1, link_querier.WithURL(u.String()))
+	r, err := s.lq.Search(ctx, pagination.NewPageParams(1, 1), link_querier.WithURL(u.String()))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-	if len(r.Links) > 0 {
+	if len(r.Items) > 0 {
 		if err := s.bus.SendCommand(ctx, &message.CommandScrapeLink{URL: u}); err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
-		return r.Links[0], nil
+		return r.Items[0], nil
 	}
 
 	lr, _, err := s.ScrapeAndStore(ctx, u)

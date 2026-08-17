@@ -2,34 +2,36 @@ package bindings
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/like"
 	"github.com/Southclaws/storyden/app/resources/like/item_like"
 	"github.com/Southclaws/storyden/app/resources/like/like_querier"
 	"github.com/Southclaws/storyden/app/resources/like/profile_like"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/like/post_liker"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
 type Likes struct {
-	likeQuerier *like_querier.LikeQuerier
-	postLiker   *post_liker.PostLiker
+	likeQuerier  *like_querier.LikeQuerier
+	postLiker    *post_liker.PostLiker
+	profileQuery *profile_querier.Querier
 }
 
 func NewLikes(
 	likeQuerier *like_querier.LikeQuerier,
 	postLiker *post_liker.PostLiker,
+	profileQuery *profile_querier.Querier,
 ) Likes {
 	return Likes{
-		likeQuerier: likeQuerier,
-		postLiker:   postLiker,
+		likeQuerier:  likeQuerier,
+		postLiker:    postLiker,
+		profileQuery: profileQuery,
 	}
 }
 
@@ -83,41 +85,26 @@ func (h *Likes) LikePostRemove(ctx context.Context, request openapi.LikePostRemo
 }
 
 func (h *Likes) LikeProfileGet(ctx context.Context, request openapi.LikeProfileGetRequestObject) (openapi.LikeProfileGetResponseObject, error) {
-	accountID, err := session.GetAccountID(ctx)
+	accountID, err := openapi.ResolveHandle(ctx, h.profileQuery, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	pageSize := 50
+	params := deserialisePageParams(request.Params.Page, 50)
 
-	page := opt.NewPtrMap(request.Params.Page, func(s string) int {
-		v, err := strconv.ParseInt(s, 10, 32)
-		if err != nil {
-			return 0
-		}
-
-		return max(1, int(v))
-	}).Or(1)
-
-	// API is 1-indexed, internally it's 0-indexed.
-	page = max(0, page-1)
-
-	result, err := h.likeQuerier.GetProfileLikes(ctx, accountID, page, pageSize)
+	result, err := h.likeQuerier.GetProfileLikes(ctx, accountID, params)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	// API is 1-indexed, internally it's 0-indexed.
-	page = result.CurrentPage + 1
 
 	return openapi.LikeProfileGet200JSONResponse{
 		LikeProfileGetOKJSONResponse: openapi.LikeProfileGetOKJSONResponse{
-			PageSize:    pageSize,
+			PageSize:    result.Size,
 			Results:     result.Results,
 			TotalPages:  result.TotalPages,
-			CurrentPage: page,
+			CurrentPage: result.CurrentPage,
 			NextPage:    result.NextPage.Ptr(),
-			Likes:       dt.Map(result.Likes, serialiseProfileLike),
+			Likes:       dt.Map(result.Items, serialiseProfileLike),
 		},
 	}, nil
 }
