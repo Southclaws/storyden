@@ -120,6 +120,7 @@ func TestEveryToolHasDisplayTitle(t *testing.T) {
 func TestSessionLoadToolsExposeFrontendMetadata(t *testing.T) {
 	toolLoad := GetToolLoadTool()
 	require.NotNil(t, toolLoad)
+	assert.True(t, toolLoad.Internal)
 	assert.Equal(t, "Load Tools", toolLoad.Title)
 	assert.False(t, toolLoad.Annotations.ReadOnlyHint)
 	assert.False(t, toolLoad.Annotations.DestructiveHint)
@@ -128,11 +129,17 @@ func TestSessionLoadToolsExposeFrontendMetadata(t *testing.T) {
 
 	toolsetLoad := GetToolsetLoadTool()
 	require.NotNil(t, toolsetLoad)
+	assert.True(t, toolsetLoad.Internal)
 	assert.Equal(t, "Load Toolsets", toolsetLoad.Title)
 	assert.False(t, toolsetLoad.Annotations.ReadOnlyHint)
 	assert.False(t, toolsetLoad.Annotations.DestructiveHint)
 	assert.True(t, toolsetLoad.Annotations.IdempotentHint)
 	assert.False(t, toolsetLoad.Annotations.OpenWorldHint)
+}
+
+func TestInternalToolMetadata(t *testing.T) {
+	assert.True(t, GetLibraryRequestPageTool().Internal)
+	assert.False(t, GetLibraryPageGetTool().Internal)
 }
 
 func TestCapabilityDiscoverySchemasAreProgressive(t *testing.T) {

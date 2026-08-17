@@ -599,6 +599,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolToolLoad",
       "x-storyden": {
+        "internal": true,
         "toolsets": []
       },
       "x-storyden-tool": {
@@ -1792,6 +1793,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolToolsetLoad",
       "x-storyden": {
+        "internal": true,
         "toolsets": []
       },
       "x-storyden-tool": {
@@ -2791,6 +2793,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibraryRequestPage",
       "x-storyden": {
+        "internal": true,
         "toolsets": [
           "system.library"
         ]

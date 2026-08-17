@@ -38,6 +38,19 @@ Plugin Studio is the deliberate exception: its private tools are constructed
 in Go rather than declared in these schemas, so its membership remains beside
 its runtime builder while its public identity lives in the Toolsets package.
 
+## Internal tools
+
+Set `x-storyden.internal: true` for tools that are available only inside
+Storyden Robot conversations and must not be exported by Storyden's MCP server:
+
+```yaml
+x-storyden:
+  internal: true
+  toolsets: []
+```
+
+Omit `internal` for tools that external MCP clients may discover and call.
+
 ---
 
 ## 1. Tool Naming

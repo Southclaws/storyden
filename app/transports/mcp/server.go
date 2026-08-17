@@ -115,6 +115,8 @@ func bindTool(s *sdkmcp.Server, t *robot_tools.Tool) {
 			OpenWorldHint:   &def.Annotations.OpenWorldHint,
 		},
 	}, func(ctx context.Context, req *sdkmcp.CallToolRequest) (*sdkmcp.CallToolResult, error) {
+		ctx = robot_tools.ContextWithToolAudience(ctx, robot_tools.ToolAudienceMCP)
+
 		args := req.Params.Arguments
 		if args == nil {
 			args = json.RawMessage(`{}`)
@@ -147,7 +149,7 @@ func shouldExportTool(t *robot_tools.Tool) bool {
 		return false
 	}
 
-	if t.IsClientTool || t.Handler == nil {
+	if t.Definition.Internal || t.IsClientTool || t.Handler == nil {
 		return false
 	}
 

@@ -1323,6 +1323,7 @@
       "title": "library_request_page",
       "type": "object",
       "x-storyden": {
+        "internal": true,
         "toolsets": [
           "system.library"
         ]
@@ -3083,6 +3084,7 @@
       "title": "tool_load",
       "type": "object",
       "x-storyden": {
+        "internal": true,
         "toolsets": []
       },
       "x-storyden-tool": {
@@ -3570,6 +3572,7 @@
       "title": "toolset_load",
       "type": "object",
       "x-storyden": {
+        "internal": true,
         "toolsets": []
       },
       "x-storyden-tool": {

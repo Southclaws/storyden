@@ -332,6 +332,7 @@ func (s *Agent) runResolvedAgent(
 		return nil, nil
 	}
 
+	ctx = tools.ContextWithToolAudience(ctx, tools.ToolAudienceRobot)
 	toolCtx := tools.ContextWithRunContext(ctx, tools.RunContext{
 		RobotID:   spec.DatabaseRobotID,
 		AccountID: userID,
