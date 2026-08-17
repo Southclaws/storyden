@@ -16,7 +16,7 @@
     "mcp-schema": "tsx ./generate-ts.js"
   },
   "dependencies": {
-    "@ai-sdk/react": "4.0.50",
+    "@ai-sdk/react": "4.0.61",
     "@ark-ui/react": "5.37.2",
     "@dnd-kit/core": "6.3.1",
     "@dnd-kit/sortable": "10.0.0",
@@ -40,7 +40,7 @@
     "@tiptap/suggestion": "3.29.2",
     "@use-gesture/react": "10.3.1",
     "@zag-js/popper": "1.43.0",
-    "ai": "7.0.47",
+    "ai": "7.0.58",
     "babel-plugin-react-compiler": "1.0.0",
     "chroma-js": "3.2.0",
     "cmdk": "1.1.1",
