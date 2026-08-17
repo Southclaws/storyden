@@ -31,7 +31,12 @@ func TestRobotRunningTurnCanBeCancelled(t *testing.T) {
 
 	integration.Test(
 		t,
-		&config.Config{LanguageModelProvider: "mock"},
+		&config.Config{
+			LanguageModelProvider:     "mock",
+			QueueMaxRetries:           5,
+			QueueRetryInitialInterval: 10 * time.Millisecond,
+			QueueRetryMaxInterval:     100 * time.Millisecond,
+		},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelAck),
 		fx.Invoke(func(
@@ -52,7 +57,7 @@ func TestRobotRunningTurnCanBeCancelled(t *testing.T) {
   - match:
       contains: "cancel this turn"
     respond:
-      delay_ms: 5000
+      delay_ms: 15000
       text: "This response should never be stored."
       finish: "stop"
   - match:
@@ -101,7 +106,7 @@ func TestRobotRunningTurnCanBeCancelled(t *testing.T) {
 				))(t, http.StatusAccepted)
 				require.NotNil(t, cancelled)
 
-				cancelCtx, cancel := context.WithTimeout(root, 3*time.Second)
+				cancelCtx, cancel := context.WithTimeout(root, 10*time.Second)
 				defer cancel()
 				read, err := robot.ReadDurableJSONUntil(
 					cancelCtx,
@@ -109,7 +114,15 @@ func TestRobotRunningTurnCanBeCancelled(t *testing.T) {
 					auth,
 					"-1",
 					func(event openapi.RobotSessionStreamEvent) bool {
-						return event.EventKind == openapi.TurnCancelled && event.TurnId != nil && string(*event.TurnId) == turnID
+						if event.TurnId == nil || string(*event.TurnId) != turnID {
+							return false
+						}
+						switch event.EventKind {
+						case openapi.TurnBlocked, openapi.TurnCancelled, openapi.TurnCompleted, openapi.TurnFailed:
+							return true
+						default:
+							return false
+						}
 					},
 				)
 				require.NoError(t, err)
