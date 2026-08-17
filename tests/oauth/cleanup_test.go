@@ -100,6 +100,7 @@ func TestOAuthCleanup(t *testing.T) {
 					return hex.EncodeToString(sum[:])
 				}
 				now := time.Now()
+				cleanupNow := now.Add(60 * 24 * time.Hour)
 
 				create := func(hash string, expiresAt time.Time) {
 					_, err := ow.CreateRefreshToken(root, oauth_writer.RefreshTokenCreate{
@@ -112,18 +113,18 @@ func TestOAuthCleanup(t *testing.T) {
 					r.NoError(err)
 				}
 
-				create(staleHash, now.Add(-30*24*time.Hour))
-				create(recentlyExpiredHash, now.Add(-time.Hour))
-				create(liveHash, now.Add(24*time.Hour))
+				create(staleHash, cleanupNow.Add(-30*24*time.Hour))
+				create(recentlyExpiredHash, cleanupNow.Add(-time.Hour))
+				create(liveHash, cleanupNow.Add(24*time.Hour))
 
-				// A stale, rotated parent must survive cleanup while its child is still
-				// retained, so reuse detection can revoke the whole token family.
+				// An expired, rotated parent must survive the simulated cleanup while its
+				// child is retained, so reuse detection can revoke the whole token family.
 				parent, err := ow.CreateRefreshToken(root, oauth_writer.RefreshTokenCreate{
 					ClientID:  client.ID,
 					AccountID: owner.ID,
 					TokenHash: hashToken(rotatedParentToken),
 					Scope:     "openid",
-					ExpiresAt: now.Add(-30 * 24 * time.Hour),
+					ExpiresAt: now.Add(-time.Hour),
 				})
 				r.NoError(err)
 				child, err := ow.CreateRefreshToken(root, oauth_writer.RefreshTokenCreate{
@@ -131,14 +132,14 @@ func TestOAuthCleanup(t *testing.T) {
 					AccountID: owner.ID,
 					TokenHash: hashToken(rotatedChildToken),
 					Scope:     "openid",
-					ExpiresAt: now.Add(24 * time.Hour),
+					ExpiresAt: cleanupNow.Add(24 * time.Hour),
 				})
 				r.NoError(err)
 				rotated, err := ow.RevokeRefreshToken(root, parent.ID, now, opt.New(child.ID))
 				r.NoError(err)
 				r.True(rotated)
 
-				deleted, err := ow.DeleteExpiredRefreshTokens(root, now.Add(-7*24*time.Hour))
+				deleted, err := ow.DeleteExpiredRefreshTokens(root, cleanupNow.Add(-7*24*time.Hour))
 				r.NoError(err)
 				a.GreaterOrEqual(1, deleted, "only rows past the retention window go")
 
