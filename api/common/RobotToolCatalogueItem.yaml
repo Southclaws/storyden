@@ -1,6 +1,6 @@
 $schema: http://json-schema.org/draft-07/schema#
 type: object
-description: A tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.
+description: An individually composable tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.
 required: [id, name, description]
 additionalProperties: false
 properties:

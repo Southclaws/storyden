@@ -1,0 +1,42 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolDocumentClose
+x-storyden:
+  internal: true
+  toolset_only: true
+  toolsets:
+    - system.documents
+x-storyden-tool:
+  title: Close Document
+  annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false }
+title: document_close
+description: Remove an open document snapshot from this conversation without changing its source.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolDocumentCloseInput" }
+  output: { $ref: "#/definitions/ToolDocumentCloseOutput" }
+definitions:
+  ToolDocumentCloseInput:
+    type: object
+    properties:
+      document_id:
+        type: string
+        description: Open document identifier; omit to close the active document.
+    additionalProperties: false
+  ToolDocumentCloseOutput:
+    type: object
+    required: [document_id, remaining, next_action]
+    additionalProperties: false
+    properties:
+      document_id:
+        type: string
+        description: Identifier of the removed document snapshot.
+      remaining:
+        type: integer
+        description: Number of document snapshots still available for navigation.
+      active_document_id:
+        type: string
+        description: Newly active document identifier when another snapshot remains.
+      next_action:
+        type: string
+        description: Recommended action after the snapshot was removed.

@@ -30,6 +30,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/library/node_visibility"
 	"github.com/Southclaws/storyden/app/services/library/nodetree"
 	"github.com/Southclaws/storyden/app/services/search/searcher"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/documents"
 	"github.com/Southclaws/storyden/app/services/tag/autotagger"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/deletable"
@@ -92,6 +93,7 @@ func newLibraryTools(
 	registry.Register(t.newLibraryPageTreeTool())
 	registry.Register(t.newLibraryRequestPageTool())
 	registry.Register(t.newLibraryPageGetTool())
+	registry.Register(t.newLibraryPageOpenTool())
 	registry.Register(t.newLibraryPageCreateTool())
 	registry.Register(t.newLibraryPageUpdateTool())
 	registry.Register(t.newLibrarySearchPagesTool())
@@ -242,19 +244,59 @@ func (lt *libraryTools) ExecuteLibraryPageGet(ctx context.Context, args mcp.Tool
 		return nil, err
 	}
 
+	content, nextAction := contentForAudience(ctx,
+		node.Content.OrZero().Plaintext(),
+		fmt.Sprintf("If this page looks relevant to the current task, call library_page_open with id %q to inspect its document.", node.GetID().String()),
+	)
+
 	output := mcp.ToolLibraryPageGetOutput{
 		BrowserUrl:  datagraph.CanonicalResolveMarkURL(lt.webAddress, datagraph.KindNode, node.Mark.Mark).String(),
 		Id:          node.GetID().String(),
 		Slug:        node.Mark.Slug(),
 		Name:        node.Name,
 		Description: node.Description.Ptr(),
-		Content:     node.Content.OrZero().Plaintext(),
+		Content:     content,
+		NextAction:  nextAction,
 		Tags:        dt.Map(node.Tags, func(t *tag_ref.Tag) string { return t.Name.String() }),
 		ChildPages:  dt.Map(node.Nodes, func(n *library.Node) string { return n.Mark.Slug() }),
 		Visibility:  mcp.ToolLibraryPageGetOutputVisibility(node.Visibility.String()),
 	}
 
 	return &output, nil
+}
+
+func (lt *libraryTools) newLibraryPageOpenTool() *Tool {
+	toolDef := mcp.GetLibraryPageOpenTool()
+
+	return &Tool{
+		Definition: toolDef,
+		Builder: func(context.Context) (tool.Tool, error) {
+			return functiontool.New(
+				functiontool.Config{
+					Name:        toolDef.Name,
+					Description: toolDef.Description,
+					InputSchema: toolDef.InputSchema,
+				},
+				func(ctx adkagent.Context, args mcp.ToolLibraryPageOpenInput) (*mcp.RobotDocumentProjectionYaml, error) {
+					node, err := lt.nodeReader.GetBySlug(ctx, library.NewKey(args.Id), nil)
+					if err != nil {
+						return nil, err
+					}
+					projection, err := documents.Open(
+						ctx.State(),
+						documents.SourceTypeLibraryPage,
+						node.GetID().String(),
+						node.Name,
+						node.Content.OrZero(),
+					)
+					if err != nil {
+						return nil, err
+					}
+					return mapDocumentProjection(projection), nil
+				},
+			)
+		},
+	}
 }
 
 func (lt *libraryTools) newLibraryPageCreateTool() *Tool {

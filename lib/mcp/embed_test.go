@@ -42,6 +42,10 @@ func TestGetRobotSearchTool(t *testing.T) {
 func TestAllToolSchemasResolve(t *testing.T) {
 	tools := []*ToolDefinition{
 		toolContentSearch,
+		toolDocumentClose,
+		toolDocumentGet,
+		toolDocumentList,
+		toolDocumentSearch,
 		toolRobotSearch,
 		toolToolSearch,
 		toolToolGet,
@@ -60,6 +64,7 @@ func TestAllToolSchemasResolve(t *testing.T) {
 		toolToolsetUpdate,
 		toolLibraryPageTree,
 		toolLibraryPageGet,
+		toolLibraryPageOpen,
 		toolLibraryPageCreate,
 		toolLibraryPageUpdate,
 		toolLibrarySearchPages,
@@ -68,8 +73,11 @@ func TestAllToolSchemasResolve(t *testing.T) {
 		toolLibraryPagePropertiesUpdate,
 		toolTagList,
 		toolLinkCreate,
+		toolWebFetch,
+		toolWebOpen,
 		toolThreadCreate,
 		toolThreadGet,
+		toolThreadOpen,
 		toolThreadList,
 		toolThreadUpdate,
 		toolThreadReply,
@@ -139,7 +147,27 @@ func TestSessionLoadToolsExposeFrontendMetadata(t *testing.T) {
 
 func TestInternalToolMetadata(t *testing.T) {
 	assert.True(t, GetLibraryRequestPageTool().Internal)
+	assert.True(t, GetDocumentGetTool().Internal)
+	assert.True(t, GetDocumentSearchTool().Internal)
+	assert.True(t, GetDocumentListTool().Internal)
+	assert.True(t, GetDocumentCloseTool().Internal)
+	assert.True(t, GetLibraryPageOpenTool().Internal)
+	assert.True(t, GetThreadOpenTool().Internal)
+	assert.True(t, GetWebOpenTool().Internal)
 	assert.False(t, GetLibraryPageGetTool().Internal)
+	assert.False(t, GetWebFetchTool().Internal)
+}
+
+func TestDocumentNavigationToolsAreToolsetOnly(t *testing.T) {
+	for _, tool := range []*ToolDefinition{
+		GetDocumentGetTool(),
+		GetDocumentSearchTool(),
+		GetDocumentListTool(),
+		GetDocumentCloseTool(),
+	} {
+		assert.True(t, tool.ToolsetOnly, tool.Name)
+		assert.Equal(t, []string{"system.documents"}, tool.Toolsets, tool.Name)
+	}
 }
 
 func TestCapabilityDiscoverySchemasAreProgressive(t *testing.T) {
@@ -154,7 +182,7 @@ func TestCapabilityDiscoverySchemasAreProgressive(t *testing.T) {
 	toolGet := GetToolGetTool()
 	require.NotNil(t, toolGet.OutputSchema)
 	assert.ElementsMatch(t,
-		[]string{"id", "name", "description", "input_schema", "output_schema", "requires_confirmation", "requires_workspace"},
+		[]string{"id", "name", "description", "input_schema", "output_schema", "toolsets", "toolset_only", "requires_confirmation", "requires_workspace"},
 		schemaPropertyNames(toolGet.OutputSchema),
 	)
 	assert.NotContains(t, toolGet.OutputSchema.Properties, "source")

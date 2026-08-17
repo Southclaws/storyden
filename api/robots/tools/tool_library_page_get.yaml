@@ -11,8 +11,8 @@ x-storyden-tool:
     destructiveHint: false
     idempotentHint: true
     openWorldHint: false
-title: get_library_page
-description: Retrieve a library page with its content and workflow visibility by ID.
+title: library_page_get
+description: Retrieve Library page metadata by ID and indicate how to inspect its document when needed.
 type: object
 required:
   - input
@@ -42,7 +42,6 @@ definitions:
       - tags
       - child_pages
       - browser_url
-      - content
       - visibility
     properties:
       browser_url:
@@ -62,7 +61,10 @@ definitions:
         description: Brief description of the page
       content:
         type: string
-        description: Plain-text page body for evaluating or summarising the page.
+        description: Plain-text page body included for external MCP callers.
+      next_action:
+        type: string
+        description: Conditional instruction for a Robot to open this page when it is relevant.
       tags:
         type: array
         description: Tags associated with this page

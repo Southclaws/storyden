@@ -1,0 +1,27 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolWebOpen
+x-storyden:
+  internal: true
+  toolsets: []
+x-storyden-tool:
+  title: Open Web Page
+  annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true }
+title: web_open
+description: Fetch a web page as the active document snapshot without storing it in Storyden's link index.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolWebOpenInput" }
+  output: { $ref: "#/definitions/ToolWebOpenOutput" }
+definitions:
+  ToolWebOpenInput:
+    type: object
+    required: [url]
+    properties:
+      url:
+        type: string
+        format: uri
+        description: HTTP or HTTPS page URL to fetch and open.
+    additionalProperties: false
+  ToolWebOpenOutput:
+    $ref: "../../common/RobotDocumentProjection.yaml"

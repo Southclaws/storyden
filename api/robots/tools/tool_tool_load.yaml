@@ -7,7 +7,7 @@ x-storyden-tool:
   title: Load Tools
   annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false }
 title: tool_load
-description: Activate one or more individual tools for the current Denbot conversation after inspecting their schemas and runtime preconditions with tool_get. Workspace-dependent tools cannot be loaded until the conversation has an active workspace.
+description: Activate one or more individual tools that are not already callable in the current Denbot conversation after inspecting their schemas and runtime preconditions with tool_get. Tools marked toolset_only must be activated through a declared Toolset. Workspace-dependent tools cannot be loaded until the conversation has an active workspace.
 type: object
 required: [input, output]
 properties:
@@ -22,7 +22,7 @@ definitions:
         type: array
         minItems: 1
         items: { type: string }
-        description: Stable tool IDs inspected with tool_get.
+        description: Stable tool IDs inspected with tool_get that are not currently callable and are not marked toolset_only.
     additionalProperties: false
   ToolToolLoadOutput:
     type: object

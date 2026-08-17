@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_content_search"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_discussions"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_documents"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_library"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_robot_studio"
 )
@@ -41,6 +42,7 @@ func Definition() agent_registry.Definition {
 		Instruction: instruction,
 		ToolsetRefs: []string{
 			system_content_search.ID,
+			system_documents.ID,
 			system_discussions.ID,
 			system_library.ID,
 			system_robot_studio.ID,

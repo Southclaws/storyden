@@ -1,0 +1,78 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolDocumentList
+x-storyden:
+  internal: true
+  toolset_only: true
+  toolsets:
+    - system.documents
+x-storyden-tool:
+  title: List Open Documents
+  annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
+title: document_list
+description: List document snapshots currently available for navigation in this conversation.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolDocumentListInput" }
+  output: { $ref: "#/definitions/ToolDocumentListOutput" }
+definitions:
+  ToolDocumentListInput:
+    type: object
+    additionalProperties: false
+  ToolDocumentListOutput:
+    type: object
+    required: [documents, next_action]
+    additionalProperties: false
+    properties:
+      documents:
+        type: array
+        description: Open document snapshots with their navigation identifiers and active status.
+        items:
+          $ref: "#/definitions/OpenDocument"
+      next_action:
+        type: string
+        description: Recommended action for selecting or opening a document.
+  OpenDocument:
+    type: object
+    required: [document_id, source_type, source_id, title, active, active_node_id, page, total_pages]
+    additionalProperties: false
+    properties:
+      document_id:
+        type: string
+        description: Conversation-local identifier accepted by document navigation tools.
+      source_type:
+        type: string
+        enum: [library_page, thread, web]
+        description: Origin kind used to distinguish documents with similar titles.
+      source_id:
+        type: string
+        description: Source identifier or URL used to open this snapshot.
+      title:
+        type: string
+        description: Document title for selecting the intended snapshot.
+      active:
+        type: boolean
+        description: Whether tools use this document when document_id is omitted.
+      active_node_id:
+        type: string
+        description: Most recently inspected structural location in this snapshot.
+      page:
+        type: integer
+        minimum: 1
+        description: Most recently inspected structural page at this location.
+      total_pages:
+        type: integer
+        minimum: 1
+        description: Number of structural pages at the most recently inspected location.
+      item_start:
+        type: integer
+        minimum: 1
+        description: First structural item shown by the current cursor page.
+      item_end:
+        type: integer
+        minimum: 1
+        description: Final structural item shown by the current cursor page.
+      total_items:
+        type: integer
+        minimum: 1
+        description: Total structural items at the current cursor location.

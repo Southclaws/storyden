@@ -79,6 +79,47 @@ func (j *DatagraphItemKindYaml) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
+type DocumentSearchMatch struct {
+	// Structural role such as heading, paragraph, list item, code, table, or image.
+	Kind string `json:"kind" yaml:"kind" mapstructure:"kind"`
+
+	// Structural location accepted by document_get and scoped document_search.
+	NodeId string `json:"node_id" yaml:"node_id" mapstructure:"node_id"`
+
+	// Heading path that locates this match within the document.
+	Path string `json:"path" yaml:"path" mapstructure:"path"`
+
+	// Bounded matching text used to judge relevance before expanding the location.
+	Preview string `json:"preview" yaml:"preview" mapstructure:"preview"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *DocumentSearchMatch) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["kind"]; raw != nil && !ok {
+		return fmt.Errorf("field kind in DocumentSearchMatch: required")
+	}
+	if _, ok := raw["node_id"]; raw != nil && !ok {
+		return fmt.Errorf("field node_id in DocumentSearchMatch: required")
+	}
+	if _, ok := raw["path"]; raw != nil && !ok {
+		return fmt.Errorf("field path in DocumentSearchMatch: required")
+	}
+	if _, ok := raw["preview"]; raw != nil && !ok {
+		return fmt.Errorf("field preview in DocumentSearchMatch: required")
+	}
+	type Plain DocumentSearchMatch
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = DocumentSearchMatch(plain)
+	return nil
+}
+
 type LibraryPageSearchItem struct {
 	// Browser URL for this resource. Always present this as a Markdown link when
 	// showing results to the user.
@@ -261,6 +302,127 @@ func (j *MemberSearchItem) UnmarshalJSON(value []byte) error {
 		return err
 	}
 	*j = MemberSearchItem(plain)
+	return nil
+}
+
+type OpenDocument struct {
+	// Whether tools use this document when document_id is omitted.
+	Active bool `json:"active" yaml:"active" mapstructure:"active"`
+
+	// Most recently inspected structural location in this snapshot.
+	ActiveNodeId string `json:"active_node_id" yaml:"active_node_id" mapstructure:"active_node_id"`
+
+	// Conversation-local identifier accepted by document navigation tools.
+	DocumentId string `json:"document_id" yaml:"document_id" mapstructure:"document_id"`
+
+	// Final structural item shown by the current cursor page.
+	ItemEnd *int `json:"item_end,omitempty" yaml:"item_end,omitempty" mapstructure:"item_end,omitempty"`
+
+	// First structural item shown by the current cursor page.
+	ItemStart *int `json:"item_start,omitempty" yaml:"item_start,omitempty" mapstructure:"item_start,omitempty"`
+
+	// Most recently inspected structural page at this location.
+	Page int `json:"page" yaml:"page" mapstructure:"page"`
+
+	// Source identifier or URL used to open this snapshot.
+	SourceId string `json:"source_id" yaml:"source_id" mapstructure:"source_id"`
+
+	// Origin kind used to distinguish documents with similar titles.
+	SourceType OpenDocumentSourceType `json:"source_type" yaml:"source_type" mapstructure:"source_type"`
+
+	// Document title for selecting the intended snapshot.
+	Title string `json:"title" yaml:"title" mapstructure:"title"`
+
+	// Total structural items at the current cursor location.
+	TotalItems *int `json:"total_items,omitempty" yaml:"total_items,omitempty" mapstructure:"total_items,omitempty"`
+
+	// Number of structural pages at the most recently inspected location.
+	TotalPages int `json:"total_pages" yaml:"total_pages" mapstructure:"total_pages"`
+}
+
+type OpenDocumentSourceType string
+
+const OpenDocumentSourceTypeLibraryPage OpenDocumentSourceType = "library_page"
+const OpenDocumentSourceTypeThread OpenDocumentSourceType = "thread"
+const OpenDocumentSourceTypeWeb OpenDocumentSourceType = "web"
+
+var enumValues_OpenDocumentSourceType = []interface{}{
+	"library_page",
+	"thread",
+	"web",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *OpenDocumentSourceType) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_OpenDocumentSourceType {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_OpenDocumentSourceType, v)
+	}
+	*j = OpenDocumentSourceType(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *OpenDocument) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["active"]; raw != nil && !ok {
+		return fmt.Errorf("field active in OpenDocument: required")
+	}
+	if _, ok := raw["active_node_id"]; raw != nil && !ok {
+		return fmt.Errorf("field active_node_id in OpenDocument: required")
+	}
+	if _, ok := raw["document_id"]; raw != nil && !ok {
+		return fmt.Errorf("field document_id in OpenDocument: required")
+	}
+	if _, ok := raw["page"]; raw != nil && !ok {
+		return fmt.Errorf("field page in OpenDocument: required")
+	}
+	if _, ok := raw["source_id"]; raw != nil && !ok {
+		return fmt.Errorf("field source_id in OpenDocument: required")
+	}
+	if _, ok := raw["source_type"]; raw != nil && !ok {
+		return fmt.Errorf("field source_type in OpenDocument: required")
+	}
+	if _, ok := raw["title"]; raw != nil && !ok {
+		return fmt.Errorf("field title in OpenDocument: required")
+	}
+	if _, ok := raw["total_pages"]; raw != nil && !ok {
+		return fmt.Errorf("field total_pages in OpenDocument: required")
+	}
+	type Plain OpenDocument
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if plain.ItemEnd != nil && 1 > *plain.ItemEnd {
+		return fmt.Errorf("field %s: must be >= %v", "item_end", 1)
+	}
+	if plain.ItemStart != nil && 1 > *plain.ItemStart {
+		return fmt.Errorf("field %s: must be >= %v", "item_start", 1)
+	}
+	if 1 > plain.Page {
+		return fmt.Errorf("field %s: must be >= %v", "page", 1)
+	}
+	if plain.TotalItems != nil && 1 > *plain.TotalItems {
+		return fmt.Errorf("field %s: must be >= %v", "total_items", 1)
+	}
+	if 1 > plain.TotalPages {
+		return fmt.Errorf("field %s: must be >= %v", "total_pages", 1)
+	}
+	*j = OpenDocument(plain)
 	return nil
 }
 
@@ -672,6 +834,154 @@ func (j *ReplySearchItem) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
+// A bounded view into an open document with stable identifiers for further
+// navigation.
+type RobotDocumentProjectionYaml struct {
+	// Conversation-local document identifier accepted by document navigation tools.
+	DocumentId string `json:"document_id" yaml:"document_id" mapstructure:"document_id"`
+
+	// One-indexed position of the final structural item shown on this page.
+	ItemEnd *int `json:"item_end,omitempty" yaml:"item_end,omitempty" mapstructure:"item_end,omitempty"`
+
+	// One-indexed position of the first structural item shown on this page.
+	ItemStart *int `json:"item_start,omitempty" yaml:"item_start,omitempty" mapstructure:"item_start,omitempty"`
+
+	// Recommended document navigation action when more detail is needed.
+	NextAction string `json:"next_action" yaml:"next_action" mapstructure:"next_action"`
+
+	// Next structural page when one exists.
+	NextPage *int `json:"next_page,omitempty" yaml:"next_page,omitempty" mapstructure:"next_page,omitempty"`
+
+	// Structural location represented by this projection.
+	NodeId string `json:"node_id" yaml:"node_id" mapstructure:"node_id"`
+
+	// One-indexed structural page currently shown for this location.
+	Page int `json:"page" yaml:"page" mapstructure:"page"`
+
+	// Previous structural page when one exists.
+	PreviousPage *int `json:"previous_page,omitempty" yaml:"previous_page,omitempty" mapstructure:"previous_page,omitempty"`
+
+	// Bounded plain-text outline, preview, or complete leaf content for this
+	// location.
+	Projection string `json:"projection" yaml:"projection" mapstructure:"projection"`
+
+	// Source identifier or URL used to open this snapshot.
+	SourceId string `json:"source_id" yaml:"source_id" mapstructure:"source_id"`
+
+	// Origin kind used to distinguish documents with similar titles.
+	SourceType RobotDocumentProjectionYamlSourceType `json:"source_type" yaml:"source_type" mapstructure:"source_type"`
+
+	// Document title for identifying the current result.
+	Title string `json:"title" yaml:"title" mapstructure:"title"`
+
+	// Total number of structural items available at this location.
+	TotalItems *int `json:"total_items,omitempty" yaml:"total_items,omitempty" mapstructure:"total_items,omitempty"`
+
+	// Number of structural pages available for this location.
+	TotalPages int `json:"total_pages" yaml:"total_pages" mapstructure:"total_pages"`
+
+	// Whether additional content exists beyond this projection.
+	Truncated bool `json:"truncated" yaml:"truncated" mapstructure:"truncated"`
+}
+
+type RobotDocumentProjectionYamlSourceType string
+
+const RobotDocumentProjectionYamlSourceTypeLibraryPage RobotDocumentProjectionYamlSourceType = "library_page"
+const RobotDocumentProjectionYamlSourceTypeThread RobotDocumentProjectionYamlSourceType = "thread"
+const RobotDocumentProjectionYamlSourceTypeWeb RobotDocumentProjectionYamlSourceType = "web"
+
+var enumValues_RobotDocumentProjectionYamlSourceType = []interface{}{
+	"library_page",
+	"thread",
+	"web",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *RobotDocumentProjectionYamlSourceType) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_RobotDocumentProjectionYamlSourceType {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_RobotDocumentProjectionYamlSourceType, v)
+	}
+	*j = RobotDocumentProjectionYamlSourceType(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *RobotDocumentProjectionYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["document_id"]; raw != nil && !ok {
+		return fmt.Errorf("field document_id in RobotDocumentProjectionYaml: required")
+	}
+	if _, ok := raw["next_action"]; raw != nil && !ok {
+		return fmt.Errorf("field next_action in RobotDocumentProjectionYaml: required")
+	}
+	if _, ok := raw["node_id"]; raw != nil && !ok {
+		return fmt.Errorf("field node_id in RobotDocumentProjectionYaml: required")
+	}
+	if _, ok := raw["page"]; raw != nil && !ok {
+		return fmt.Errorf("field page in RobotDocumentProjectionYaml: required")
+	}
+	if _, ok := raw["projection"]; raw != nil && !ok {
+		return fmt.Errorf("field projection in RobotDocumentProjectionYaml: required")
+	}
+	if _, ok := raw["source_id"]; raw != nil && !ok {
+		return fmt.Errorf("field source_id in RobotDocumentProjectionYaml: required")
+	}
+	if _, ok := raw["source_type"]; raw != nil && !ok {
+		return fmt.Errorf("field source_type in RobotDocumentProjectionYaml: required")
+	}
+	if _, ok := raw["title"]; raw != nil && !ok {
+		return fmt.Errorf("field title in RobotDocumentProjectionYaml: required")
+	}
+	if _, ok := raw["total_pages"]; raw != nil && !ok {
+		return fmt.Errorf("field total_pages in RobotDocumentProjectionYaml: required")
+	}
+	if _, ok := raw["truncated"]; raw != nil && !ok {
+		return fmt.Errorf("field truncated in RobotDocumentProjectionYaml: required")
+	}
+	type Plain RobotDocumentProjectionYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if plain.ItemEnd != nil && 1 > *plain.ItemEnd {
+		return fmt.Errorf("field %s: must be >= %v", "item_end", 1)
+	}
+	if plain.ItemStart != nil && 1 > *plain.ItemStart {
+		return fmt.Errorf("field %s: must be >= %v", "item_start", 1)
+	}
+	if plain.NextPage != nil && 1 > *plain.NextPage {
+		return fmt.Errorf("field %s: must be >= %v", "next_page", 1)
+	}
+	if 1 > plain.Page {
+		return fmt.Errorf("field %s: must be >= %v", "page", 1)
+	}
+	if plain.PreviousPage != nil && 1 > *plain.PreviousPage {
+		return fmt.Errorf("field %s: must be >= %v", "previous_page", 1)
+	}
+	if plain.TotalItems != nil && 1 > *plain.TotalItems {
+		return fmt.Errorf("field %s: must be >= %v", "total_items", 1)
+	}
+	if 1 > plain.TotalPages {
+		return fmt.Errorf("field %s: must be >= %v", "total_pages", 1)
+	}
+	*j = RobotDocumentProjectionYaml(plain)
+	return nil
+}
+
 type RobotItem struct {
 	// Human-readable description of the Robot's purpose
 	Description *string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
@@ -745,8 +1055,8 @@ func (j *RobotSearchResult) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
-// A tool candidate returned by capability discovery; use its ID with tool_get
-// before choosing or loading it.
+// An individually composable tool candidate returned by capability discovery; use
+// its ID with tool_get before choosing or loading it.
 type RobotToolCatalogueItemYaml struct {
 	// The outcome this tool can achieve, used to decide whether its full schema is
 	// worth inspecting.
@@ -1171,6 +1481,325 @@ func (j *ToolContentSearchYaml) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
+type ToolDocumentCloseInput struct {
+	// Open document identifier; omit to close the active document.
+	DocumentId *string `json:"document_id,omitempty" yaml:"document_id,omitempty" mapstructure:"document_id,omitempty"`
+}
+
+type ToolDocumentCloseOutput struct {
+	// Newly active document identifier when another snapshot remains.
+	ActiveDocumentId *string `json:"active_document_id,omitempty" yaml:"active_document_id,omitempty" mapstructure:"active_document_id,omitempty"`
+
+	// Identifier of the removed document snapshot.
+	DocumentId string `json:"document_id" yaml:"document_id" mapstructure:"document_id"`
+
+	// Recommended action after the snapshot was removed.
+	NextAction string `json:"next_action" yaml:"next_action" mapstructure:"next_action"`
+
+	// Number of document snapshots still available for navigation.
+	Remaining int `json:"remaining" yaml:"remaining" mapstructure:"remaining"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolDocumentCloseOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["document_id"]; raw != nil && !ok {
+		return fmt.Errorf("field document_id in ToolDocumentCloseOutput: required")
+	}
+	if _, ok := raw["next_action"]; raw != nil && !ok {
+		return fmt.Errorf("field next_action in ToolDocumentCloseOutput: required")
+	}
+	if _, ok := raw["remaining"]; raw != nil && !ok {
+		return fmt.Errorf("field remaining in ToolDocumentCloseOutput: required")
+	}
+	type Plain ToolDocumentCloseOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolDocumentCloseOutput(plain)
+	return nil
+}
+
+// Remove an open document snapshot from this conversation without changing its
+// source.
+type ToolDocumentCloseYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolDocumentCloseInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolDocumentCloseOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolDocumentCloseYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolDocumentCloseYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolDocumentCloseYaml: required")
+	}
+	type Plain ToolDocumentCloseYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolDocumentCloseYaml(plain)
+	return nil
+}
+
+type ToolDocumentGetInput struct {
+	// Open document identifier; omit to inspect the active document.
+	DocumentId *string `json:"document_id,omitempty" yaml:"document_id,omitempty" mapstructure:"document_id,omitempty"`
+
+	// Structural location returned by an outline or search result; omit to continue
+	// from that document's current node.
+	NodeId *string `json:"node_id,omitempty" yaml:"node_id,omitempty" mapstructure:"node_id,omitempty"`
+
+	// One-indexed structural page to inspect; omit to retain the current page when
+	// node_id is also omitted, or use the first page of a specified node.
+	Page *int `json:"page,omitempty" yaml:"page,omitempty" mapstructure:"page,omitempty"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolDocumentGetInput) UnmarshalJSON(value []byte) error {
+	type Plain ToolDocumentGetInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if plain.Page != nil && 1 > *plain.Page {
+		return fmt.Errorf("field %s: must be >= %v", "page", 1)
+	}
+	*j = ToolDocumentGetInput(plain)
+	return nil
+}
+
+// Inspect one structural page of the active document or a specified location and
+// make it the current document cursor.
+type ToolDocumentGetYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolDocumentGetInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolDocumentGetYamlOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+type ToolDocumentGetYamlOutput interface{}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolDocumentGetYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolDocumentGetYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolDocumentGetYaml: required")
+	}
+	type Plain ToolDocumentGetYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolDocumentGetYaml(plain)
+	return nil
+}
+
+type ToolDocumentListOutput struct {
+	// Open document snapshots with their navigation identifiers and active status.
+	Documents []OpenDocument `json:"documents" yaml:"documents" mapstructure:"documents"`
+
+	// Recommended action for selecting or opening a document.
+	NextAction string `json:"next_action" yaml:"next_action" mapstructure:"next_action"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolDocumentListOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["documents"]; raw != nil && !ok {
+		return fmt.Errorf("field documents in ToolDocumentListOutput: required")
+	}
+	if _, ok := raw["next_action"]; raw != nil && !ok {
+		return fmt.Errorf("field next_action in ToolDocumentListOutput: required")
+	}
+	type Plain ToolDocumentListOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolDocumentListOutput(plain)
+	return nil
+}
+
+// List document snapshots currently available for navigation in this conversation.
+type ToolDocumentListYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input map[string]interface{} `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolDocumentListOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolDocumentListYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolDocumentListYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolDocumentListYaml: required")
+	}
+	type Plain ToolDocumentListYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolDocumentListYaml(plain)
+	return nil
+}
+
+type ToolDocumentSearchInput struct {
+	// Open document identifier; omit to search the active document.
+	DocumentId *string `json:"document_id,omitempty" yaml:"document_id,omitempty" mapstructure:"document_id,omitempty"`
+
+	// Maximum number of matching locations to return; omit to use ten.
+	MaxResults *int `json:"max_results,omitempty" yaml:"max_results,omitempty" mapstructure:"max_results,omitempty"`
+
+	// Structural locations whose subtrees bound the search; omit to search the whole
+	// document.
+	NodeIds []string `json:"node_ids,omitempty" yaml:"node_ids,omitempty" mapstructure:"node_ids,omitempty"`
+
+	// Plain-text terms that must all occur in each matching structural location.
+	Query string `json:"query" yaml:"query" mapstructure:"query"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolDocumentSearchInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["query"]; raw != nil && !ok {
+		return fmt.Errorf("field query in ToolDocumentSearchInput: required")
+	}
+	type Plain ToolDocumentSearchInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if plain.MaxResults != nil && 50 < *plain.MaxResults {
+		return fmt.Errorf("field %s: must be <= %v", "max_results", 50)
+	}
+	if plain.MaxResults != nil && 1 > *plain.MaxResults {
+		return fmt.Errorf("field %s: must be >= %v", "max_results", 1)
+	}
+	if plain.NodeIds != nil && len(plain.NodeIds) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "node_ids", 1)
+	}
+	if len(plain.Query) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "query", 1)
+	}
+	*j = ToolDocumentSearchInput(plain)
+	return nil
+}
+
+type ToolDocumentSearchOutput struct {
+	// Open document searched by this call.
+	DocumentId string `json:"document_id" yaml:"document_id" mapstructure:"document_id"`
+
+	// Matching locations ranked by whole-term relevance, then document order, with
+	// enough context to choose the smallest sufficient location before using
+	// document_get.
+	Matches []DocumentSearchMatch `json:"matches" yaml:"matches" mapstructure:"matches"`
+
+	// Recommended action for inspecting a selected match or refining the search.
+	NextAction string `json:"next_action" yaml:"next_action" mapstructure:"next_action"`
+
+	// Normalized query used to select matches.
+	Query string `json:"query" yaml:"query" mapstructure:"query"`
+
+	// Whether more matching locations exist beyond this result.
+	Truncated bool `json:"truncated" yaml:"truncated" mapstructure:"truncated"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolDocumentSearchOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["document_id"]; raw != nil && !ok {
+		return fmt.Errorf("field document_id in ToolDocumentSearchOutput: required")
+	}
+	if _, ok := raw["matches"]; raw != nil && !ok {
+		return fmt.Errorf("field matches in ToolDocumentSearchOutput: required")
+	}
+	if _, ok := raw["next_action"]; raw != nil && !ok {
+		return fmt.Errorf("field next_action in ToolDocumentSearchOutput: required")
+	}
+	if _, ok := raw["query"]; raw != nil && !ok {
+		return fmt.Errorf("field query in ToolDocumentSearchOutput: required")
+	}
+	if _, ok := raw["truncated"]; raw != nil && !ok {
+		return fmt.Errorf("field truncated in ToolDocumentSearchOutput: required")
+	}
+	type Plain ToolDocumentSearchOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolDocumentSearchOutput(plain)
+	return nil
+}
+
+// Search structural locations within the active document or selected open
+// document. Whole-term matches are returned before substring-only matches, with
+// document order preserved within each relevance tier.
+type ToolDocumentSearchYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolDocumentSearchInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolDocumentSearchOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolDocumentSearchYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolDocumentSearchYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolDocumentSearchYaml: required")
+	}
+	type Plain ToolDocumentSearchYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolDocumentSearchYaml(plain)
+	return nil
+}
+
 type ToolLibraryPageCreateInput struct {
 	// The content of the page in HTML format
 	Content *string `json:"content,omitempty" yaml:"content,omitempty" mapstructure:"content,omitempty"`
@@ -1354,8 +1983,8 @@ type ToolLibraryPageGetOutput struct {
 	// Slugs of child pages
 	ChildPages []string `json:"child_pages" yaml:"child_pages" mapstructure:"child_pages"`
 
-	// Plain-text page body for evaluating or summarising the page.
-	Content string `json:"content" yaml:"content" mapstructure:"content"`
+	// Plain-text page body included for external MCP callers.
+	Content *string `json:"content,omitempty" yaml:"content,omitempty" mapstructure:"content,omitempty"`
 
 	// Brief description of the page
 	Description *string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
@@ -1365,6 +1994,9 @@ type ToolLibraryPageGetOutput struct {
 
 	// Display name of the page
 	Name string `json:"name" yaml:"name" mapstructure:"name"`
+
+	// Conditional instruction for a Robot to open this page when it is relevant.
+	NextAction *string `json:"next_action,omitempty" yaml:"next_action,omitempty" mapstructure:"next_action,omitempty"`
 
 	// URL-friendly identifier for the page
 	Slug string `json:"slug" yaml:"slug" mapstructure:"slug"`
@@ -1420,9 +2052,6 @@ func (j *ToolLibraryPageGetOutput) UnmarshalJSON(value []byte) error {
 	if _, ok := raw["child_pages"]; raw != nil && !ok {
 		return fmt.Errorf("field child_pages in ToolLibraryPageGetOutput: required")
 	}
-	if _, ok := raw["content"]; raw != nil && !ok {
-		return fmt.Errorf("field content in ToolLibraryPageGetOutput: required")
-	}
 	if _, ok := raw["id"]; raw != nil && !ok {
 		return fmt.Errorf("field id in ToolLibraryPageGetOutput: required")
 	}
@@ -1447,7 +2076,8 @@ func (j *ToolLibraryPageGetOutput) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
-// Retrieve a library page with its content and workflow visibility by ID.
+// Retrieve Library page metadata by ID and indicate how to inspect its document
+// when needed.
 type ToolLibraryPageGetYaml struct {
 	// Input corresponds to the JSON schema field "input".
 	Input ToolLibraryPageGetInput `json:"input" yaml:"input" mapstructure:"input"`
@@ -1504,6 +2134,65 @@ func (j *ToolLibraryPageListYaml) UnmarshalJSON(value []byte) error {
 		return err
 	}
 	*j = ToolLibraryPageListYaml(plain)
+	return nil
+}
+
+type ToolLibraryPageOpenInput struct {
+	// Library page ID or slug returned by Library discovery tools.
+	Id string `json:"id" yaml:"id" mapstructure:"id"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolLibraryPageOpenInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["id"]; raw != nil && !ok {
+		return fmt.Errorf("field id in ToolLibraryPageOpenInput: required")
+	}
+	type Plain ToolLibraryPageOpenInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if len(plain.Id) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "id", 1)
+	}
+	*j = ToolLibraryPageOpenInput(plain)
+	return nil
+}
+
+// Open a Library page as the active document snapshot and return its initial
+// bounded projection.
+type ToolLibraryPageOpenYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolLibraryPageOpenInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolLibraryPageOpenYamlOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+type ToolLibraryPageOpenYamlOutput interface{}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolLibraryPageOpenYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolLibraryPageOpenYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolLibraryPageOpenYaml: required")
+	}
+	type Plain ToolLibraryPageOpenYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolLibraryPageOpenYaml(plain)
 	return nil
 }
 
@@ -3434,14 +4123,17 @@ type ToolThreadGetOutput struct {
 	// Category name
 	Category string `json:"category" yaml:"category" mapstructure:"category"`
 
-	// Thread content as plain text
-	Content string `json:"content" yaml:"content" mapstructure:"content"`
+	// Plain-text thread body included for external MCP callers.
+	Content *string `json:"content,omitempty" yaml:"content,omitempty" mapstructure:"content,omitempty"`
 
 	// Creation timestamp
 	CreatedAt string `json:"created_at" yaml:"created_at" mapstructure:"created_at"`
 
 	// Unique identifier for the thread
 	Id string `json:"id" yaml:"id" mapstructure:"id"`
+
+	// Conditional instruction for a Robot to open this thread when it is relevant.
+	NextAction *string `json:"next_action,omitempty" yaml:"next_action,omitempty" mapstructure:"next_action,omitempty"`
 
 	// Slug corresponds to the JSON schema field "slug".
 	Slug string `json:"slug" yaml:"slug" mapstructure:"slug"`
@@ -3474,9 +4166,6 @@ func (j *ToolThreadGetOutput) UnmarshalJSON(value []byte) error {
 	if _, ok := raw["category"]; raw != nil && !ok {
 		return fmt.Errorf("field category in ToolThreadGetOutput: required")
 	}
-	if _, ok := raw["content"]; raw != nil && !ok {
-		return fmt.Errorf("field content in ToolThreadGetOutput: required")
-	}
 	if _, ok := raw["created_at"]; raw != nil && !ok {
 		return fmt.Errorf("field created_at in ToolThreadGetOutput: required")
 	}
@@ -3504,8 +4193,8 @@ func (j *ToolThreadGetOutput) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
-// Get a specific thread with its content. Returns the thread details including
-// author, content, and category information.
+// Retrieve discussion thread metadata by ID and indicate how to inspect its
+// document when needed.
 type ToolThreadGetYaml struct {
 	// Input corresponds to the JSON schema field "input".
 	Input ToolThreadGetInput `json:"input" yaml:"input" mapstructure:"input"`
@@ -3661,6 +4350,65 @@ func (j *ToolThreadListYaml) UnmarshalJSON(value []byte) error {
 		return err
 	}
 	*j = ToolThreadListYaml(plain)
+	return nil
+}
+
+type ToolThreadOpenInput struct {
+	// Thread ID or slug returned by discussion discovery tools.
+	Id string `json:"id" yaml:"id" mapstructure:"id"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolThreadOpenInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["id"]; raw != nil && !ok {
+		return fmt.Errorf("field id in ToolThreadOpenInput: required")
+	}
+	type Plain ToolThreadOpenInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if len(plain.Id) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "id", 1)
+	}
+	*j = ToolThreadOpenInput(plain)
+	return nil
+}
+
+// Open a discussion thread and all currently visible replies as one active
+// document snapshot, then return its initial bounded projection.
+type ToolThreadOpenYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolThreadOpenInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolThreadOpenYamlOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+type ToolThreadOpenYamlOutput interface{}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolThreadOpenYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolThreadOpenYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolThreadOpenYaml: required")
+	}
+	type Plain ToolThreadOpenYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolThreadOpenYaml(plain)
 	return nil
 }
 
@@ -4079,7 +4827,8 @@ type ToolToolGetOutput struct {
 	// The outcome the tool is designed to achieve and when it should be selected.
 	Description string `json:"description" yaml:"description" mapstructure:"description"`
 
-	// Stable tool identifier accepted by tool_load and Robot configuration tools.
+	// Stable tool identifier accepted by tool_load and Robot configuration tools
+	// unless toolset_only is true.
 	Id string `json:"id" yaml:"id" mapstructure:"id"`
 
 	// Complete JSON Schema for arguments that must be supplied when calling the tool.
@@ -4097,6 +4846,14 @@ type ToolToolGetOutput struct {
 	// Whether the conversation must have an active Robot workspace before this tool
 	// can be loaded or used.
 	RequiresWorkspace bool `json:"requires_workspace" yaml:"requires_workspace" mapstructure:"requires_workspace"`
+
+	// Whether this capability must be loaded or assigned through one of its Toolsets
+	// instead of as an individual tool.
+	ToolsetOnly bool `json:"toolset_only" yaml:"toolset_only" mapstructure:"toolset_only"`
+
+	// Built-in Toolsets that provide this tool together with their specialist
+	// instruction and related capabilities.
+	Toolsets []string `json:"toolsets" yaml:"toolsets" mapstructure:"toolsets"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -4123,6 +4880,12 @@ func (j *ToolToolGetOutput) UnmarshalJSON(value []byte) error {
 	if _, ok := raw["requires_workspace"]; raw != nil && !ok {
 		return fmt.Errorf("field requires_workspace in ToolToolGetOutput: required")
 	}
+	if _, ok := raw["toolset_only"]; raw != nil && !ok {
+		return fmt.Errorf("field toolset_only in ToolToolGetOutput: required")
+	}
+	if _, ok := raw["toolsets"]; raw != nil && !ok {
+		return fmt.Errorf("field toolsets in ToolToolGetOutput: required")
+	}
 	type Plain ToolToolGetOutput
 	var plain Plain
 	if err := json.Unmarshal(value, &plain); err != nil {
@@ -4132,9 +4895,9 @@ func (j *ToolToolGetOutput) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
-// Get the full schema and runtime preconditions of one tool after finding its ID
-// with tool_search. This is inspection only; it does not load or activate the
-// tool.
+// Get the full schema, Toolset membership, and runtime preconditions of one tool
+// after finding its ID with tool_search. This is inspection only; it does not load
+// or activate the tool.
 type ToolToolGetYaml struct {
 	// Input corresponds to the JSON schema field "input".
 	Input ToolToolGetInput `json:"input" yaml:"input" mapstructure:"input"`
@@ -4165,7 +4928,8 @@ func (j *ToolToolGetYaml) UnmarshalJSON(value []byte) error {
 }
 
 type ToolToolLoadInput struct {
-	// Stable tool IDs inspected with tool_get.
+	// Stable tool IDs inspected with tool_get that are not currently callable and are
+	// not marked toolset_only.
 	Tools []string `json:"tools" yaml:"tools" mapstructure:"tools"`
 }
 
@@ -4219,10 +4983,11 @@ func (j *ToolToolLoadOutput) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
-// Activate one or more individual tools for the current Denbot conversation after
-// inspecting their schemas and runtime preconditions with tool_get.
-// Workspace-dependent tools cannot be loaded until the conversation has an active
-// workspace.
+// Activate one or more individual tools that are not already callable in the
+// current Denbot conversation after inspecting their schemas and runtime
+// preconditions with tool_get. Tools marked toolset_only must be activated through
+// a declared Toolset. Workspace-dependent tools cannot be loaded until the
+// conversation has an active workspace.
 type ToolToolLoadYaml struct {
 	// Input corresponds to the JSON schema field "input".
 	Input ToolToolLoadInput `json:"input" yaml:"input" mapstructure:"input"`
@@ -4989,5 +5754,156 @@ func (j *ToolToolsetUpdateYaml) UnmarshalJSON(value []byte) error {
 		return err
 	}
 	*j = ToolToolsetUpdateYaml(plain)
+	return nil
+}
+
+type ToolWebFetchInput struct {
+	// HTTP or HTTPS page URL to fetch.
+	Url string `json:"url" yaml:"url" mapstructure:"url"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolWebFetchInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["url"]; raw != nil && !ok {
+		return fmt.Errorf("field url in ToolWebFetchInput: required")
+	}
+	type Plain ToolWebFetchInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolWebFetchInput(plain)
+	return nil
+}
+
+type ToolWebFetchOutput struct {
+	// Plain-text page content included for external MCP callers.
+	Content *string `json:"content,omitempty" yaml:"content,omitempty" mapstructure:"content,omitempty"`
+
+	// Page summary when exposed by the fetched document metadata.
+	Description *string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
+
+	// Resolved favicon URL when exposed by the fetched document.
+	FaviconUrl *string `json:"favicon_url,omitempty" yaml:"favicon_url,omitempty" mapstructure:"favicon_url,omitempty"`
+
+	// Resolved representative image URL when exposed by the fetched document.
+	ImageUrl *string `json:"image_url,omitempty" yaml:"image_url,omitempty" mapstructure:"image_url,omitempty"`
+
+	// Conditional instruction for a Robot to open this page when it is relevant.
+	NextAction *string `json:"next_action,omitempty" yaml:"next_action,omitempty" mapstructure:"next_action,omitempty"`
+
+	// Page title when exposed by the fetched document metadata.
+	Title *string `json:"title,omitempty" yaml:"title,omitempty" mapstructure:"title,omitempty"`
+
+	// Page URL supplied to the safe web fetcher.
+	Url string `json:"url" yaml:"url" mapstructure:"url"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolWebFetchOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["url"]; raw != nil && !ok {
+		return fmt.Errorf("field url in ToolWebFetchOutput: required")
+	}
+	type Plain ToolWebFetchOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolWebFetchOutput(plain)
+	return nil
+}
+
+// Fetch a web page for metadata without adding it to Storyden or opening a
+// navigable document snapshot.
+type ToolWebFetchYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolWebFetchInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolWebFetchOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolWebFetchYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolWebFetchYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolWebFetchYaml: required")
+	}
+	type Plain ToolWebFetchYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolWebFetchYaml(plain)
+	return nil
+}
+
+type ToolWebOpenInput struct {
+	// HTTP or HTTPS page URL to fetch and open.
+	Url string `json:"url" yaml:"url" mapstructure:"url"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolWebOpenInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["url"]; raw != nil && !ok {
+		return fmt.Errorf("field url in ToolWebOpenInput: required")
+	}
+	type Plain ToolWebOpenInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolWebOpenInput(plain)
+	return nil
+}
+
+// Fetch a web page as the active document snapshot without storing it in
+// Storyden's link index.
+type ToolWebOpenYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolWebOpenInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolWebOpenYamlOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+type ToolWebOpenYamlOutput interface{}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolWebOpenYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolWebOpenYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolWebOpenYaml: required")
+	}
+	type Plain ToolWebOpenYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolWebOpenYaml(plain)
 	return nil
 }

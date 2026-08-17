@@ -106,19 +106,21 @@ func TestRobotChatLibraryPageList(t *testing.T) {
 				})
 
 				t.Run("gets_page_content_and_visibility", func(t *testing.T) {
-					tool, err := toolRegistry.GetTool(adminCtx, "get_library_page")
+					tool, err := toolRegistry.GetTool(adminCtx, "library_page_get")
 					require.NoError(t, err)
 
 					input, err := json.Marshal(mcp.ToolLibraryPageGetInput{
 						Id: string(reviewPage.JSON200.Id),
 					})
 					require.NoError(t, err)
-					rawOutput, err := tool.Handler(adminCtx, input)
+					mcpCtx := robot_tools.ContextWithToolAudience(adminCtx, robot_tools.ToolAudienceMCP)
+					rawOutput, err := tool.Handler(mcpCtx, input)
 					require.NoError(t, err)
 
 					var output mcp.ToolLibraryPageGetOutput
 					require.NoError(t, json.Unmarshal(rawOutput, &output))
-					assert.Equal(t, "This page is ready for a substantive review.", output.Content)
+					require.NotNil(t, output.Content)
+					assert.Equal(t, "This page is ready for a substantive review.", *output.Content)
 					assert.Equal(t, "review", string(output.Visibility))
 				})
 

@@ -4,8 +4,9 @@ package system_library
 
 var ToolNames = []string{
 	"create_library_page",
-	"get_library_page",
+	"library_page_get",
 	"library_page_list",
+	"library_page_open",
 	"library_page_properties_update",
 	"library_page_property_schema_get",
 	"library_page_property_schema_update",

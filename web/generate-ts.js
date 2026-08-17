@@ -12,6 +12,28 @@ const outputDir = path.join(__dirname, "..", "web", "src", "api");
 const outputPathTs = path.join(outputDir, "robots.ts");
 const outputPathJson = path.join(outputDir, "robots.json");
 
+function referencedTypeName(toolSchema, property, fallback) {
+  const propertyRef = property?.$ref;
+  if (!propertyRef) {
+    return fallback;
+  }
+
+  const propertyType = propertyRef.split("/").pop();
+  const localDefinition = toolSchema.definitions?.[propertyType];
+
+  // json-schema-to-typescript collapses a definition that only aliases an
+  // external schema into the external schema's exported type. Follow that
+  // alias so the generated tool maps reference the type that actually exists.
+  if (localDefinition?.$ref) {
+    const [externalPath, fragment] = localDefinition.$ref.split("#");
+    if (externalPath && !fragment) {
+      return path.basename(externalPath, path.extname(externalPath));
+    }
+  }
+
+  return propertyType;
+}
+
 async function generate() {
   // Load original schema with $refs intact for TypeScript generation
   const schema = yaml.parse(fs.readFileSync(schemaPath, "utf8"));
@@ -69,18 +91,21 @@ export const TOOL_NAMES = [${toolNames
         def.title && def.properties?.input && def.properties?.output,
     )
     .map(([key, def]) => {
-      // The input/output might still have $ref, or might be inlined
-      // Look for the ref first, or extract from the schema
-      let inputRef = def.properties.input.$ref?.split("/").pop();
-      let outputRef = def.properties.output.$ref?.split("/").pop();
-
-      // If no ref (fully dereferenced), look in the definitions for matching types
-      if (!inputRef) {
-        inputRef = `Tool${key.replace(/^Tool/, "")}Input`;
-      }
-      if (!outputRef) {
-        outputRef = `Tool${key.replace(/^Tool/, "")}Output`;
-      }
+      const fallbackInput = `Tool${key.replace(/^Tool/, "")}Input`;
+      const fallbackOutput = `Tool${key.replace(/^Tool/, "")}Output`;
+      const toolRef = schema.definitions[key].$ref;
+      const toolSchemaPath = path.resolve(path.dirname(schemaPath), toolRef);
+      const toolSchema = yaml.parse(fs.readFileSync(toolSchemaPath, "utf8"));
+      const inputRef = referencedTypeName(
+        toolSchema,
+        toolSchema.properties.input,
+        fallbackInput,
+      );
+      const outputRef = referencedTypeName(
+        toolSchema,
+        toolSchema.properties.output,
+        fallbackOutput,
+      );
 
       return { name: def.title, inputType: inputRef, outputType: outputRef };
     });

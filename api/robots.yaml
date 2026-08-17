@@ -3,6 +3,18 @@ definitions:
   ToolContentSearch:
     $ref: "./robots/tools/tool_content_search.yaml"
 
+  ToolDocumentGet:
+    $ref: "./robots/tools/tool_document_get.yaml"
+
+  ToolDocumentSearch:
+    $ref: "./robots/tools/tool_document_search.yaml"
+
+  ToolDocumentList:
+    $ref: "./robots/tools/tool_document_list.yaml"
+
+  ToolDocumentClose:
+    $ref: "./robots/tools/tool_document_close.yaml"
+
   ToolToolSearch:
     $ref: "./robots/tools/tool_tool_search.yaml"
 
@@ -60,6 +72,9 @@ definitions:
   ToolLibraryPageGet:
     $ref: "./robots/tools/tool_library_page_get.yaml"
 
+  ToolLibraryPageOpen:
+    $ref: "./robots/tools/tool_library_page_open.yaml"
+
   ToolLibraryPageCreate:
     $ref: "./robots/tools/tool_library_page_create.yaml"
 
@@ -84,6 +99,12 @@ definitions:
   ToolLinkCreate:
     $ref: "./robots/tools/tool_link_create.yaml"
 
+  ToolWebFetch:
+    $ref: "./robots/tools/tool_web_fetch.yaml"
+
+  ToolWebOpen:
+    $ref: "./robots/tools/tool_web_open.yaml"
+
   ToolThreadCreate:
     $ref: "./robots/tools/tool_thread_create.yaml"
 
@@ -92,6 +113,9 @@ definitions:
 
   ToolThreadGet:
     $ref: "./robots/tools/tool_thread_get.yaml"
+
+  ToolThreadOpen:
+    $ref: "./robots/tools/tool_thread_open.yaml"
 
   ToolThreadUpdate:
     $ref: "./robots/tools/tool_thread_update.yaml"

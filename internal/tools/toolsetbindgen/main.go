@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"go/ast"
 	"go/format"
+	"go/parser"
+	"go/token"
 	"log"
 	"os"
 	"path/filepath"
@@ -19,9 +22,10 @@ const toolsetsImportPath = "github.com/Southclaws/storyden/app/services/semdex/r
 var systemToolsetIDPattern = regexp.MustCompile(`^system\.[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)*$`)
 
 type toolsetBinding struct {
-	ID          string
-	PackageName string
-	ToolNames   []string
+	ID                     string
+	PackageName            string
+	ToolNames              []string
+	HasInstructionProvider bool
 }
 
 func main() {
@@ -99,6 +103,15 @@ func parseToolsetBindings(data []byte) ([]toolsetBinding, error) {
 		if !ok {
 			return nil, fmt.Errorf("%s x-storyden.toolsets must be a string array", definitionName)
 		}
+		if toolsetOnlyRaw, exists := extension["toolset_only"]; exists {
+			toolsetOnly, ok := toolsetOnlyRaw.(bool)
+			if !ok {
+				return nil, fmt.Errorf("%s x-storyden.toolset_only must be a boolean", definitionName)
+			}
+			if toolsetOnly && len(toolsets) == 0 {
+				return nil, fmt.Errorf("%s x-storyden.toolset_only requires at least one x-storyden.toolsets entry", definitionName)
+			}
+		}
 		for _, raw := range toolsets {
 			id, ok := raw.(string)
 			if !ok {
@@ -144,7 +157,8 @@ func isToolDefinitionName(name string) bool {
 
 func writeBindings(outputDir string, bindings []toolsetBinding) error {
 	generatedPackages := make(map[string]struct{}, len(bindings))
-	for _, binding := range bindings {
+	for i := range bindings {
+		binding := &bindings[i]
 		packageDir := filepath.Join(outputDir, binding.PackageName)
 		definitionPath := filepath.Join(packageDir, "definition.go")
 		if _, err := os.Stat(definitionPath); err != nil {
@@ -153,7 +167,12 @@ func writeBindings(outputDir string, bindings []toolsetBinding) error {
 			}
 			return err
 		}
-		generated, err := renderToolNames(binding)
+		hasInstructionProvider, err := definitionHasInstructionProvider(definitionPath)
+		if err != nil {
+			return err
+		}
+		binding.HasInstructionProvider = hasInstructionProvider
+		generated, err := renderToolNames(*binding)
 		if err != nil {
 			return err
 		}
@@ -174,6 +193,20 @@ func writeBindings(outputDir string, bindings []toolsetBinding) error {
 		return fmt.Errorf("write generated system Toolset bindings: %w", err)
 	}
 	return nil
+}
+
+func definitionHasInstructionProvider(filename string) (bool, error) {
+	parsed, err := parser.ParseFile(token.NewFileSet(), filename, nil, 0)
+	if err != nil {
+		return false, fmt.Errorf("parse Toolset definition %s: %w", filename, err)
+	}
+	for _, declaration := range parsed.Decls {
+		function, ok := declaration.(*ast.FuncDecl)
+		if ok && function.Recv == nil && function.Name.Name == "InstructionProvider" {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 func removeStaleBindings(outputDir string, generatedPackages map[string]struct{}) error {
@@ -248,7 +281,11 @@ func systemDefinitions() []Definition {
 			ID: {{.PackageName}}.ID,
 			Name: {{.PackageName}}.Name,
 			Description: {{.PackageName}}.Description,
+			{{- if .HasInstructionProvider}}
+			InstructionProvider: {{.PackageName}}.InstructionProvider,
+			{{- else}}
 			Instruction: {{.PackageName}}.Instruction,
+			{{- end}}
 			ToolNames: append([]string(nil), {{.PackageName}}.ToolNames...),
 			Source: SourceSystem,
 		},

@@ -18,9 +18,27 @@ import (
 
 	robotresource "github.com/Southclaws/storyden/app/resources/robot"
 	robottools "github.com/Southclaws/storyden/app/services/semdex/robot/tools"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_documents"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspacestate"
 	"github.com/Southclaws/storyden/lib/mcp"
 )
+
+func TestSystemDocumentsToolsetOwnsNavigationInstruction(t *testing.T) {
+	definitions := systemDefinitions()
+	for _, definition := range definitions {
+		if definition.ID != system_documents.ID {
+			continue
+		}
+		assert.ElementsMatch(t, []string{"document_close", "document_get", "document_list", "document_search"}, definition.ToolNames)
+		require.NotNil(t, definition.InstructionProvider)
+		instruction, err := definition.InstructionProvider(&toolsetReadonlyContext{Context: context.Background(), state: toolsetReadonlyState{}})
+		require.NoError(t, err)
+		assert.Contains(t, instruction, "document_get")
+		assert.Contains(t, instruction, "document_search")
+		return
+	}
+	t.Fatalf("%s is not registered", system_documents.ID)
+}
 
 func TestBuildDeduplicatesToolsSharedByMultipleToolsets(t *testing.T) {
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))

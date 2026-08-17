@@ -12546,6 +12546,7 @@ components:
         - description
         - requires_confirmation
         - requires_workspace
+        - toolset_only
       properties:
         id:
           type: string
@@ -12569,6 +12570,9 @@ components:
         requires_workspace:
           type: boolean
           description: Whether this tool is only available to Robot sessions with an active workspace.
+        toolset_only:
+          type: boolean
+          description: Whether this tool must be assigned through a Toolset rather than directly to a Robot.
 
     RobotToolInfoList:
       type: array

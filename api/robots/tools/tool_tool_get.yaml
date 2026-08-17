@@ -8,7 +8,7 @@ x-storyden-tool:
   role: USE_ROBOTS
   annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
 title: tool_get
-description: Get the full schema and runtime preconditions of one tool after finding its ID with tool_search. This is inspection only; it does not load or activate the tool.
+description: Get the full schema, Toolset membership, and runtime preconditions of one tool after finding its ID with tool_search. This is inspection only; it does not load or activate the tool.
 type: object
 required: [input, output]
 properties:
@@ -25,11 +25,11 @@ definitions:
     additionalProperties: false
   ToolToolGetOutput:
     type: object
-    required: [id, name, description, input_schema, requires_confirmation, requires_workspace]
+    required: [id, name, description, input_schema, toolsets, toolset_only, requires_confirmation, requires_workspace]
     properties:
       id:
         type: string
-        description: Stable tool identifier accepted by tool_load and Robot configuration tools.
+        description: Stable tool identifier accepted by tool_load and Robot configuration tools unless toolset_only is true.
       name:
         type: string
         description: Human-readable title for explaining or confirming the selected capability.
@@ -44,6 +44,13 @@ definitions:
         type: object
         description: Complete JSON Schema for the tool result when the tool declares one.
         additionalProperties: true
+      toolsets:
+        type: array
+        description: Built-in Toolsets that provide this tool together with their specialist instruction and related capabilities.
+        items: { type: string }
+      toolset_only:
+        type: boolean
+        description: Whether this capability must be loaded or assigned through one of its Toolsets instead of as an individual tool.
       requires_confirmation:
         type: boolean
         description: Whether a run must pause for human approval before executing this tool.

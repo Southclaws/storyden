@@ -54,6 +54,23 @@ type CatalogueTool struct {
 	Available            bool
 	RequiresConfirmation bool
 	RequiresWorkspace    bool
+	ToolsetOnly          bool
+}
+
+type ToolsetOnlyError struct {
+	ToolName string
+	Toolsets []string
+}
+
+func (e *ToolsetOnlyError) Error() string {
+	if len(e.Toolsets) == 0 {
+		return fmt.Sprintf("tool %q is Toolset-only and can only be provided by its declared Toolset", e.ToolName)
+	}
+	return fmt.Sprintf(
+		"tool %q is Toolset-only and can only be provided by its declared Toolset; use Toolset %s instead",
+		e.ToolName,
+		strings.Join(e.Toolsets, " or "),
+	)
 }
 
 func Build() fx.Option {
@@ -61,6 +78,7 @@ func Build() fx.Option {
 		fx.Provide(NewRegistry),
 		fx.Invoke(
 			NewRegistry,
+			newDocumentTools,
 			newToolDiscoveryTools,
 			newRobotTools,
 			newToolsetTools,
@@ -209,6 +227,7 @@ func (p *Registry) ListCatalogue(ctx context.Context) []CatalogueTool {
 			Available:            true,
 			RequiresConfirmation: tool.Definition.RequiresConfirmation,
 			RequiresWorkspace:    tool.Definition.RequiresWorkspace,
+			ToolsetOnly:          tool.Definition.ToolsetOnly,
 		})
 		return true
 	})
@@ -230,6 +249,7 @@ func (p *Registry) ListCatalogue(ctx context.Context) []CatalogueTool {
 			Available:            true,
 			RequiresConfirmation: tool.Definition.RequiresConfirmation,
 			RequiresWorkspace:    tool.Definition.RequiresWorkspace,
+			ToolsetOnly:          tool.Definition.ToolsetOnly,
 		})
 		return true
 	})
@@ -262,6 +282,9 @@ func (p *Registry) SearchCatalogue(query string, maxResults int) []CatalogueTool
 
 	results := make([]scoredTool, 0)
 	p.tools.Range(func(_ string, tool *Tool) bool {
+		if tool.Definition.ToolsetOnly {
+			return true
+		}
 		name := tool.Definition.Title
 		if strings.TrimSpace(name) == "" {
 			name = tool.Definition.Name
@@ -300,6 +323,19 @@ func (p *Registry) SearchCatalogue(query string, maxResults int) []CatalogueTool
 		tools = append(tools, result.tool)
 	}
 	return tools
+}
+
+// ValidateStandaloneTool rejects capabilities that only make sense when their
+// declared Toolset and its instruction are present.
+func (p *Registry) ValidateStandaloneTool(name string) error {
+	tool, ok := p.loadTool(name)
+	if !ok || !tool.Definition.ToolsetOnly {
+		return nil
+	}
+	return &ToolsetOnlyError{
+		ToolName: tool.Definition.Name,
+		Toolsets: slices.Clone(tool.Definition.Toolsets),
+	}
 }
 
 func toolLexicalScore(query searchscore.Query, tool CatalogueTool) int {

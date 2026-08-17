@@ -6,6 +6,10 @@
 
 export interface MCPTools {
   ToolContentSearch?: ContentSearch;
+  ToolDocumentGet?: DocumentGet;
+  ToolDocumentSearch?: DocumentSearch;
+  ToolDocumentList?: DocumentList;
+  ToolDocumentClose?: DocumentClose;
   ToolToolSearch?: ToolSearch;
   ToolToolGet?: ToolGet;
   ToolToolLoad?: ToolLoad;
@@ -24,7 +28,8 @@ export interface MCPTools {
   ToolToolsetDelete?: ToolsetDelete;
   ToolLibraryPageTree?: LibraryPageList;
   ToolLibraryRequestPage?: LibraryRequestPage;
-  ToolLibraryPageGet?: GetLibraryPage;
+  ToolLibraryPageGet?: LibraryPageGet;
+  ToolLibraryPageOpen?: LibraryPageOpen;
   ToolLibraryPageCreate?: CreateLibraryPage;
   ToolLibraryPageUpdate?: UpdateLibraryPage;
   ToolLibrarySearchPages?: LibrarySearchPages;
@@ -33,9 +38,12 @@ export interface MCPTools {
   ToolLibraryPagePropertiesUpdate?: LibraryPagePropertiesUpdate;
   ToolTagList?: TagList;
   ToolLinkCreate?: LinkCreate;
+  ToolWebFetch?: WebFetch;
+  ToolWebOpen?: WebOpen;
   ToolThreadCreate?: ThreadCreate;
   ToolThreadList?: ThreadList;
   ToolThreadGet?: ThreadGet;
+  ToolThreadOpen?: ThreadOpen;
   ToolThreadUpdate?: ThreadUpdate;
   ToolThreadReply?: ThreadReply;
   ToolCategoryList?: CategoryList;
@@ -116,6 +124,258 @@ export interface SearchedItem {
   description?: string;
 }
 /**
+ * Inspect one structural page of the active document or a specified location and make it the current document cursor.
+ */
+export interface DocumentGet {
+  input: ToolDocumentGetInput;
+  output: RobotDocumentProjection;
+  [k: string]: unknown;
+}
+export interface ToolDocumentGetInput {
+  /**
+   * Open document identifier; omit to inspect the active document.
+   */
+  document_id?: string;
+  /**
+   * Structural location returned by an outline or search result; omit to continue from that document's current node.
+   */
+  node_id?: string;
+  /**
+   * One-indexed structural page to inspect; omit to retain the current page when node_id is also omitted, or use the first page of a specified node.
+   */
+  page?: number;
+}
+/**
+ * A bounded view into an open document with stable identifiers for further navigation.
+ */
+export interface RobotDocumentProjection {
+  /**
+   * Conversation-local document identifier accepted by document navigation tools.
+   */
+  document_id: string;
+  /**
+   * Origin kind used to distinguish documents with similar titles.
+   */
+  source_type: "library_page" | "thread" | "web";
+  /**
+   * Source identifier or URL used to open this snapshot.
+   */
+  source_id: string;
+  /**
+   * Document title for identifying the current result.
+   */
+  title: string;
+  /**
+   * Structural location represented by this projection.
+   */
+  node_id: string;
+  /**
+   * One-indexed structural page currently shown for this location.
+   */
+  page: number;
+  /**
+   * Number of structural pages available for this location.
+   */
+  total_pages: number;
+  /**
+   * Previous structural page when one exists.
+   */
+  previous_page?: number;
+  /**
+   * Next structural page when one exists.
+   */
+  next_page?: number;
+  /**
+   * One-indexed position of the first structural item shown on this page.
+   */
+  item_start?: number;
+  /**
+   * One-indexed position of the final structural item shown on this page.
+   */
+  item_end?: number;
+  /**
+   * Total number of structural items available at this location.
+   */
+  total_items?: number;
+  /**
+   * Bounded plain-text outline, preview, or complete leaf content for this location.
+   */
+  projection: string;
+  /**
+   * Whether additional content exists beyond this projection.
+   */
+  truncated: boolean;
+  /**
+   * Recommended document navigation action when more detail is needed.
+   */
+  next_action: string;
+}
+/**
+ * Search structural locations within the active document or selected open document. Whole-term matches are returned before substring-only matches, with document order preserved within each relevance tier.
+ */
+export interface DocumentSearch {
+  input: ToolDocumentSearchInput;
+  output: ToolDocumentSearchOutput;
+  [k: string]: unknown;
+}
+export interface ToolDocumentSearchInput {
+  /**
+   * Plain-text terms that must all occur in each matching structural location.
+   */
+  query: string;
+  /**
+   * Open document identifier; omit to search the active document.
+   */
+  document_id?: string;
+  /**
+   * Structural locations whose subtrees bound the search; omit to search the whole document.
+   *
+   * @minItems 1
+   */
+  node_ids?: [string, ...string[]];
+  /**
+   * Maximum number of matching locations to return; omit to use ten.
+   */
+  max_results?: number;
+}
+export interface ToolDocumentSearchOutput {
+  /**
+   * Open document searched by this call.
+   */
+  document_id: string;
+  /**
+   * Normalized query used to select matches.
+   */
+  query: string;
+  /**
+   * Matching locations ranked by whole-term relevance, then document order, with enough context to choose the smallest sufficient location before using document_get.
+   */
+  matches: DocumentSearchMatch[];
+  /**
+   * Whether more matching locations exist beyond this result.
+   */
+  truncated: boolean;
+  /**
+   * Recommended action for inspecting a selected match or refining the search.
+   */
+  next_action: string;
+}
+export interface DocumentSearchMatch {
+  /**
+   * Structural location accepted by document_get and scoped document_search.
+   */
+  node_id: string;
+  /**
+   * Structural role such as heading, paragraph, list item, code, table, or image.
+   */
+  kind: string;
+  /**
+   * Heading path that locates this match within the document.
+   */
+  path: string;
+  /**
+   * Bounded matching text used to judge relevance before expanding the location.
+   */
+  preview: string;
+}
+/**
+ * List document snapshots currently available for navigation in this conversation.
+ */
+export interface DocumentList {
+  input: ToolDocumentListInput;
+  output: ToolDocumentListOutput;
+  [k: string]: unknown;
+}
+export interface ToolDocumentListInput {}
+export interface ToolDocumentListOutput {
+  /**
+   * Open document snapshots with their navigation identifiers and active status.
+   */
+  documents: OpenDocument[];
+  /**
+   * Recommended action for selecting or opening a document.
+   */
+  next_action: string;
+}
+export interface OpenDocument {
+  /**
+   * Conversation-local identifier accepted by document navigation tools.
+   */
+  document_id: string;
+  /**
+   * Origin kind used to distinguish documents with similar titles.
+   */
+  source_type: "library_page" | "thread" | "web";
+  /**
+   * Source identifier or URL used to open this snapshot.
+   */
+  source_id: string;
+  /**
+   * Document title for selecting the intended snapshot.
+   */
+  title: string;
+  /**
+   * Whether tools use this document when document_id is omitted.
+   */
+  active: boolean;
+  /**
+   * Most recently inspected structural location in this snapshot.
+   */
+  active_node_id: string;
+  /**
+   * Most recently inspected structural page at this location.
+   */
+  page: number;
+  /**
+   * Number of structural pages at the most recently inspected location.
+   */
+  total_pages: number;
+  /**
+   * First structural item shown by the current cursor page.
+   */
+  item_start?: number;
+  /**
+   * Final structural item shown by the current cursor page.
+   */
+  item_end?: number;
+  /**
+   * Total structural items at the current cursor location.
+   */
+  total_items?: number;
+}
+/**
+ * Remove an open document snapshot from this conversation without changing its source.
+ */
+export interface DocumentClose {
+  input: ToolDocumentCloseInput;
+  output: ToolDocumentCloseOutput;
+  [k: string]: unknown;
+}
+export interface ToolDocumentCloseInput {
+  /**
+   * Open document identifier; omit to close the active document.
+   */
+  document_id?: string;
+}
+export interface ToolDocumentCloseOutput {
+  /**
+   * Identifier of the removed document snapshot.
+   */
+  document_id: string;
+  /**
+   * Number of document snapshots still available for navigation.
+   */
+  remaining: number;
+  /**
+   * Newly active document identifier when another snapshot remains.
+   */
+  active_document_id?: string;
+  /**
+   * Recommended action after the snapshot was removed.
+   */
+  next_action: string;
+}
+/**
  * Search for individual tools that can perform one narrow task. Use tool_get to inspect a candidate's schema before loading it or assigning it to a Robot.
  */
 export interface ToolSearch {
@@ -144,7 +404,7 @@ export interface ToolToolSearchOutput {
   next_action: string;
 }
 /**
- * A tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.
+ * An individually composable tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.
  */
 export interface RobotToolCatalogueItem {
   /**
@@ -161,7 +421,7 @@ export interface RobotToolCatalogueItem {
   description: string;
 }
 /**
- * Get the full schema and runtime preconditions of one tool after finding its ID with tool_search. This is inspection only; it does not load or activate the tool.
+ * Get the full schema, Toolset membership, and runtime preconditions of one tool after finding its ID with tool_search. This is inspection only; it does not load or activate the tool.
  */
 export interface ToolGet {
   input: ToolToolGetInput;
@@ -176,7 +436,7 @@ export interface ToolToolGetInput {
 }
 export interface ToolToolGetOutput {
   /**
-   * Stable tool identifier accepted by tool_load and Robot configuration tools.
+   * Stable tool identifier accepted by tool_load and Robot configuration tools unless toolset_only is true.
    */
   id: string;
   /**
@@ -200,6 +460,14 @@ export interface ToolToolGetOutput {
     [k: string]: unknown;
   };
   /**
+   * Built-in Toolsets that provide this tool together with their specialist instruction and related capabilities.
+   */
+  toolsets: string[];
+  /**
+   * Whether this capability must be loaded or assigned through one of its Toolsets instead of as an individual tool.
+   */
+  toolset_only: boolean;
+  /**
    * Whether a run must pause for human approval before executing this tool.
    */
   requires_confirmation: boolean;
@@ -209,7 +477,7 @@ export interface ToolToolGetOutput {
   requires_workspace: boolean;
 }
 /**
- * Activate one or more individual tools for the current Denbot conversation after inspecting their schemas and runtime preconditions with tool_get. Workspace-dependent tools cannot be loaded until the conversation has an active workspace.
+ * Activate one or more individual tools that are not already callable in the current Denbot conversation after inspecting their schemas and runtime preconditions with tool_get. Tools marked toolset_only must be activated through a declared Toolset. Workspace-dependent tools cannot be loaded until the conversation has an active workspace.
  */
 export interface ToolLoad {
   input: ToolToolLoadInput;
@@ -218,7 +486,7 @@ export interface ToolLoad {
 }
 export interface ToolToolLoadInput {
   /**
-   * Stable tool IDs inspected with tool_get.
+   * Stable tool IDs inspected with tool_get that are not currently callable and are not marked toolset_only.
    *
    * @minItems 1
    */
@@ -733,9 +1001,9 @@ export interface ToolLibraryRequestPageOutput {
   browser_url?: string;
 }
 /**
- * Retrieve a library page with its content and workflow visibility by ID.
+ * Retrieve Library page metadata by ID and indicate how to inspect its document when needed.
  */
-export interface GetLibraryPage {
+export interface LibraryPageGet {
   input: ToolLibraryPageGetInput;
   output: ToolLibraryPageGetOutput;
   [k: string]: unknown;
@@ -768,9 +1036,13 @@ export interface ToolLibraryPageGetOutput {
    */
   description?: string;
   /**
-   * Plain-text page body for evaluating or summarising the page.
+   * Plain-text page body included for external MCP callers.
    */
-  content: string;
+  content?: string;
+  /**
+   * Conditional instruction for a Robot to open this page when it is relevant.
+   */
+  next_action?: string;
   /**
    * Tags associated with this page
    */
@@ -783,6 +1055,20 @@ export interface ToolLibraryPageGetOutput {
    * Current publishing workflow state.
    */
   visibility: "draft" | "review" | "published";
+}
+/**
+ * Open a Library page as the active document snapshot and return its initial bounded projection.
+ */
+export interface LibraryPageOpen {
+  input: ToolLibraryPageOpenInput;
+  output: RobotDocumentProjection;
+  [k: string]: unknown;
+}
+export interface ToolLibraryPageOpenInput {
+  /**
+   * Library page ID or slug returned by Library discovery tools.
+   */
+  id: string;
 }
 /**
  * Create a new page in the library. A slug will be generated automatically if not provided.
@@ -1163,6 +1449,64 @@ export interface ToolLinkCreateOutput {
   plain_text?: string;
 }
 /**
+ * Fetch a web page for metadata without adding it to Storyden or opening a navigable document snapshot.
+ */
+export interface WebFetch {
+  input: ToolWebFetchInput;
+  output: ToolWebFetchOutput;
+  [k: string]: unknown;
+}
+export interface ToolWebFetchInput {
+  /**
+   * HTTP or HTTPS page URL to fetch.
+   */
+  url: string;
+}
+export interface ToolWebFetchOutput {
+  /**
+   * Page URL supplied to the safe web fetcher.
+   */
+  url: string;
+  /**
+   * Page title when exposed by the fetched document metadata.
+   */
+  title?: string;
+  /**
+   * Page summary when exposed by the fetched document metadata.
+   */
+  description?: string;
+  /**
+   * Resolved favicon URL when exposed by the fetched document.
+   */
+  favicon_url?: string;
+  /**
+   * Resolved representative image URL when exposed by the fetched document.
+   */
+  image_url?: string;
+  /**
+   * Plain-text page content included for external MCP callers.
+   */
+  content?: string;
+  /**
+   * Conditional instruction for a Robot to open this page when it is relevant.
+   */
+  next_action?: string;
+}
+/**
+ * Fetch a web page as the active document snapshot without storing it in Storyden's link index.
+ */
+export interface WebOpen {
+  input: ToolWebOpenInput;
+  output: RobotDocumentProjection;
+  [k: string]: unknown;
+}
+export interface ToolWebOpenInput {
+  /**
+   * HTTP or HTTPS page URL to fetch and open.
+   */
+  url: string;
+}
+/**
  * Create a new discussion thread in the forum. Threads are discussions organized by category with tags for better discovery.
  */
 export interface ThreadCreate {
@@ -1296,7 +1640,7 @@ export interface ThreadSummary {
   category: string;
 }
 /**
- * Get a specific thread with its content. Returns the thread details including author, content, and category information.
+ * Retrieve discussion thread metadata by ID and indicate how to inspect its document when needed.
  */
 export interface ThreadGet {
   input: ToolThreadGetInput;
@@ -1325,9 +1669,13 @@ export interface ToolThreadGetOutput {
   slug: string;
   title: string;
   /**
-   * Thread content as plain text
+   * Plain-text thread body included for external MCP callers.
    */
-  content: string;
+  content?: string;
+  /**
+   * Conditional instruction for a Robot to open this thread when it is relevant.
+   */
+  next_action?: string;
   visibility: string;
   /**
    * Author handle
@@ -1346,6 +1694,20 @@ export interface ToolThreadGetOutput {
    * Associated URL if present
    */
   url?: string;
+}
+/**
+ * Open a discussion thread and all currently visible replies as one active document snapshot, then return its initial bounded projection.
+ */
+export interface ThreadOpen {
+  input: ToolThreadOpenInput;
+  output: RobotDocumentProjection;
+  [k: string]: unknown;
+}
+export interface ToolThreadOpenInput {
+  /**
+   * Thread ID or slug returned by discussion discovery tools.
+   */
+  id: string;
 }
 /**
  * Update an existing thread's properties
@@ -1727,12 +2089,16 @@ export interface MemberSearchItem {
   bio?: string;
 }
 
-export type ToolName = "content_search" | "tool_search" | "tool_get" | "tool_load" | "robot_create" | "robot_list" | "robot_get" | "robot_update" | "robot_delete" | "robot_search" | "toolset_search" | "toolset_load" | "toolset_create" | "toolset_list" | "toolset_get" | "toolset_update" | "toolset_delete" | "library_page_list" | "library_request_page" | "get_library_page" | "create_library_page" | "update_library_page" | "library_search_pages" | "library_page_property_schema_get" | "library_page_property_schema_update" | "library_page_properties_update" | "tag_list" | "link_create" | "thread_create" | "thread_list" | "thread_get" | "thread_update" | "thread_reply" | "category_list" | "thread_search" | "reply_search" | "post_search" | "member_search";
+export type ToolName = "content_search" | "document_get" | "document_search" | "document_list" | "document_close" | "tool_search" | "tool_get" | "tool_load" | "robot_create" | "robot_list" | "robot_get" | "robot_update" | "robot_delete" | "robot_search" | "toolset_search" | "toolset_load" | "toolset_create" | "toolset_list" | "toolset_get" | "toolset_update" | "toolset_delete" | "library_page_list" | "library_request_page" | "library_page_get" | "library_page_open" | "create_library_page" | "update_library_page" | "library_search_pages" | "library_page_property_schema_get" | "library_page_property_schema_update" | "library_page_properties_update" | "tag_list" | "link_create" | "web_fetch" | "web_open" | "thread_create" | "thread_list" | "thread_get" | "thread_open" | "thread_update" | "thread_reply" | "category_list" | "thread_search" | "reply_search" | "post_search" | "member_search";
 
-export const TOOL_NAMES = ["content_search", "tool_search", "tool_get", "tool_load", "robot_create", "robot_list", "robot_get", "robot_update", "robot_delete", "robot_search", "toolset_search", "toolset_load", "toolset_create", "toolset_list", "toolset_get", "toolset_update", "toolset_delete", "library_page_list", "library_request_page", "get_library_page", "create_library_page", "update_library_page", "library_search_pages", "library_page_property_schema_get", "library_page_property_schema_update", "library_page_properties_update", "tag_list", "link_create", "thread_create", "thread_list", "thread_get", "thread_update", "thread_reply", "category_list", "thread_search", "reply_search", "post_search", "member_search"] as const;
+export const TOOL_NAMES = ["content_search", "document_get", "document_search", "document_list", "document_close", "tool_search", "tool_get", "tool_load", "robot_create", "robot_list", "robot_get", "robot_update", "robot_delete", "robot_search", "toolset_search", "toolset_load", "toolset_create", "toolset_list", "toolset_get", "toolset_update", "toolset_delete", "library_page_list", "library_request_page", "library_page_get", "library_page_open", "create_library_page", "update_library_page", "library_search_pages", "library_page_property_schema_get", "library_page_property_schema_update", "library_page_properties_update", "tag_list", "link_create", "web_fetch", "web_open", "thread_create", "thread_list", "thread_get", "thread_open", "thread_update", "thread_reply", "category_list", "thread_search", "reply_search", "post_search", "member_search"] as const;
 
 export type ToolInputMap = {
   "content_search": ToolContentSearchInput;
+  "document_get": ToolDocumentGetInput;
+  "document_search": ToolDocumentSearchInput;
+  "document_list": ToolDocumentListInput;
+  "document_close": ToolDocumentCloseInput;
   "tool_search": ToolToolSearchInput;
   "tool_get": ToolToolGetInput;
   "tool_load": ToolToolLoadInput;
@@ -1751,7 +2117,8 @@ export type ToolInputMap = {
   "toolset_delete": ToolToolsetDeleteInput;
   "library_page_list": ToolLibraryPageTreeInput;
   "library_request_page": ToolLibraryRequestPageInput;
-  "get_library_page": ToolLibraryPageGetInput;
+  "library_page_get": ToolLibraryPageGetInput;
+  "library_page_open": ToolLibraryPageOpenInput;
   "create_library_page": ToolLibraryPageCreateInput;
   "update_library_page": ToolLibraryPageUpdateInput;
   "library_search_pages": ToolLibrarySearchPagesInput;
@@ -1760,9 +2127,12 @@ export type ToolInputMap = {
   "library_page_properties_update": ToolLibraryPagePropertiesUpdateInput;
   "tag_list": ToolTagListInput;
   "link_create": ToolLinkCreateInput;
+  "web_fetch": ToolWebFetchInput;
+  "web_open": ToolWebOpenInput;
   "thread_create": ToolThreadCreateInput;
   "thread_list": ToolThreadListInput;
   "thread_get": ToolThreadGetInput;
+  "thread_open": ToolThreadOpenInput;
   "thread_update": ToolThreadUpdateInput;
   "thread_reply": ToolThreadReplyInput;
   "category_list": ToolCategoryListInput;
@@ -1774,6 +2144,10 @@ export type ToolInputMap = {
 
 export type ToolOutputMap = {
   "content_search": ToolContentSearchOutput;
+  "document_get": RobotDocumentProjection;
+  "document_search": ToolDocumentSearchOutput;
+  "document_list": ToolDocumentListOutput;
+  "document_close": ToolDocumentCloseOutput;
   "tool_search": ToolToolSearchOutput;
   "tool_get": ToolToolGetOutput;
   "tool_load": ToolToolLoadOutput;
@@ -1792,7 +2166,8 @@ export type ToolOutputMap = {
   "toolset_delete": ToolToolsetDeleteOutput;
   "library_page_list": ToolLibraryPageTreeOutput;
   "library_request_page": ToolLibraryRequestPageOutput;
-  "get_library_page": ToolLibraryPageGetOutput;
+  "library_page_get": ToolLibraryPageGetOutput;
+  "library_page_open": RobotDocumentProjection;
   "create_library_page": ToolLibraryPageCreateOutput;
   "update_library_page": ToolLibraryPageUpdateOutput;
   "library_search_pages": ToolLibrarySearchPagesOutput;
@@ -1801,9 +2176,12 @@ export type ToolOutputMap = {
   "library_page_properties_update": ToolLibraryPagePropertiesUpdateOutput;
   "tag_list": ToolTagListOutput;
   "link_create": ToolLinkCreateOutput;
+  "web_fetch": ToolWebFetchOutput;
+  "web_open": RobotDocumentProjection;
   "thread_create": ToolThreadCreateOutput;
   "thread_list": ToolThreadListOutput;
   "thread_get": ToolThreadGetOutput;
+  "thread_open": RobotDocumentProjection;
   "thread_update": ToolThreadUpdateOutput;
   "thread_reply": ToolThreadReplyOutput;
   "category_list": ToolCategoryListOutput;
@@ -1816,6 +2194,22 @@ export type StorydenTools = {
   "content_search": {
     input: ToolContentSearchInput;
     output: ToolContentSearchOutput;
+  };
+  "document_get": {
+    input: ToolDocumentGetInput;
+    output: RobotDocumentProjection;
+  };
+  "document_search": {
+    input: ToolDocumentSearchInput;
+    output: ToolDocumentSearchOutput;
+  };
+  "document_list": {
+    input: ToolDocumentListInput;
+    output: ToolDocumentListOutput;
+  };
+  "document_close": {
+    input: ToolDocumentCloseInput;
+    output: ToolDocumentCloseOutput;
   };
   "tool_search": {
     input: ToolToolSearchInput;
@@ -1889,9 +2283,13 @@ export type StorydenTools = {
     input: ToolLibraryRequestPageInput;
     output: ToolLibraryRequestPageOutput;
   };
-  "get_library_page": {
+  "library_page_get": {
     input: ToolLibraryPageGetInput;
     output: ToolLibraryPageGetOutput;
+  };
+  "library_page_open": {
+    input: ToolLibraryPageOpenInput;
+    output: RobotDocumentProjection;
   };
   "create_library_page": {
     input: ToolLibraryPageCreateInput;
@@ -1925,6 +2323,14 @@ export type StorydenTools = {
     input: ToolLinkCreateInput;
     output: ToolLinkCreateOutput;
   };
+  "web_fetch": {
+    input: ToolWebFetchInput;
+    output: ToolWebFetchOutput;
+  };
+  "web_open": {
+    input: ToolWebOpenInput;
+    output: RobotDocumentProjection;
+  };
   "thread_create": {
     input: ToolThreadCreateInput;
     output: ToolThreadCreateOutput;
@@ -1936,6 +2342,10 @@ export type StorydenTools = {
   "thread_get": {
     input: ToolThreadGetInput;
     output: ToolThreadGetOutput;
+  };
+  "thread_open": {
+    input: ToolThreadOpenInput;
+    output: RobotDocumentProjection;
   };
   "thread_update": {
     input: ToolThreadUpdateInput;

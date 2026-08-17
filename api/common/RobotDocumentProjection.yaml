@@ -1,0 +1,59 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+description: A bounded view into an open document with stable identifiers for further navigation.
+required: [document_id, source_type, source_id, title, node_id, page, total_pages, projection, truncated, next_action]
+additionalProperties: false
+properties:
+  document_id:
+    type: string
+    description: Conversation-local document identifier accepted by document navigation tools.
+  source_type:
+    type: string
+    enum: [library_page, thread, web]
+    description: Origin kind used to distinguish documents with similar titles.
+  source_id:
+    type: string
+    description: Source identifier or URL used to open this snapshot.
+  title:
+    type: string
+    description: Document title for identifying the current result.
+  node_id:
+    type: string
+    description: Structural location represented by this projection.
+  page:
+    type: integer
+    minimum: 1
+    description: One-indexed structural page currently shown for this location.
+  total_pages:
+    type: integer
+    minimum: 1
+    description: Number of structural pages available for this location.
+  previous_page:
+    type: integer
+    minimum: 1
+    description: Previous structural page when one exists.
+  next_page:
+    type: integer
+    minimum: 1
+    description: Next structural page when one exists.
+  item_start:
+    type: integer
+    minimum: 1
+    description: One-indexed position of the first structural item shown on this page.
+  item_end:
+    type: integer
+    minimum: 1
+    description: One-indexed position of the final structural item shown on this page.
+  total_items:
+    type: integer
+    minimum: 1
+    description: Total number of structural items available at this location.
+  projection:
+    type: string
+    description: Bounded plain-text outline, preview, or complete leaf content for this location.
+  truncated:
+    type: boolean
+    description: Whether additional content exists beyond this projection.
+  next_action:
+    type: string
+    description: Recommended document navigation action when more detail is needed.

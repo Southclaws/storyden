@@ -105,13 +105,20 @@ func TestShouldExportToolSkipsExternalMCPTools(t *testing.T) {
 		},
 	}
 	internalTool := &robot_tools.Tool{
-		Definition: storydenmcp.GetLibraryRequestPageTool(),
+		Definition: storydenmcp.GetDocumentGetTool(),
+		Handler: func(context.Context, json.RawMessage) (json.RawMessage, error) {
+			return json.RawMessage(`{}`), nil
+		},
+	}
+	webFetchTool := &robot_tools.Tool{
+		Definition: storydenmcp.GetWebFetchTool(),
 		Handler: func(context.Context, json.RawMessage) (json.RawMessage, error) {
 			return json.RawMessage(`{}`), nil
 		},
 	}
 
 	assert.True(t, shouldExportTool(nativeTool))
+	assert.True(t, shouldExportTool(webFetchTool))
 	assert.False(t, shouldExportTool(externalTool))
 	assert.False(t, shouldExportTool(internalTool))
 }

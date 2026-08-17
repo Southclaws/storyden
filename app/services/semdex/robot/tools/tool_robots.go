@@ -112,6 +112,9 @@ func (rt *robotTools) ExecuteCreateRobot(ctx context.Context, args mcp.ToolRobot
 	if invalid := rt.invalidToolNames(directTools); len(invalid) > 0 {
 		return nil, fmt.Errorf("invalid tool names: %s", strings.Join(invalid, ", "))
 	}
+	if err := rt.toolsets.ValidateDirectTools(ctx, directTools, args.Toolsets); err != nil {
+		return nil, err
+	}
 
 	model, err := rt.modelFactory.DefaultModel(ctx)
 	if err != nil {

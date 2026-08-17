@@ -259,6 +259,9 @@ func (r *Registry) ValidateDirectTools(ctx context.Context, toolNames, refs []st
 	}
 
 	for _, name := range toolNames {
+		if err := r.tools.ValidateStandaloneTool(name); err != nil {
+			return err
+		}
 		for _, def := range definitions {
 			if slices.ContainsFunc(def.ToolNames, func(toolsetTool string) bool {
 				return r.tools.CanonicalName(toolsetTool) == r.tools.CanonicalName(name)

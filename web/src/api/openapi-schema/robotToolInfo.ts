@@ -24,4 +24,6 @@ export interface RobotToolInfo {
   requires_confirmation: boolean;
   /** Whether this tool is only available to Robot sessions with an active workspace. */
   requires_workspace: boolean;
+  /** Whether this tool must be assigned through a Toolset rather than directly to a Robot. */
+  toolset_only: boolean;
 }

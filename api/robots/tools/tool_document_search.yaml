@@ -1,0 +1,79 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolDocumentSearch
+x-storyden:
+  internal: true
+  toolset_only: true
+  toolsets:
+    - system.documents
+x-storyden-tool:
+  title: Search Document
+  annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
+title: document_search
+description: Search structural locations within the active document or selected open document. Whole-term matches are returned before substring-only matches, with document order preserved within each relevance tier.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolDocumentSearchInput" }
+  output: { $ref: "#/definitions/ToolDocumentSearchOutput" }
+definitions:
+  ToolDocumentSearchInput:
+    type: object
+    required: [query]
+    properties:
+      query:
+        type: string
+        minLength: 1
+        description: Plain-text terms that must all occur in each matching structural location.
+      document_id:
+        type: string
+        description: Open document identifier; omit to search the active document.
+      node_ids:
+        type: array
+        minItems: 1
+        items: { type: string }
+        description: Structural locations whose subtrees bound the search; omit to search the whole document.
+      max_results:
+        type: integer
+        minimum: 1
+        maximum: 50
+        description: Maximum number of matching locations to return; omit to use ten.
+    additionalProperties: false
+  ToolDocumentSearchOutput:
+    type: object
+    required: [document_id, query, matches, truncated, next_action]
+    additionalProperties: false
+    properties:
+      document_id:
+        type: string
+        description: Open document searched by this call.
+      query:
+        type: string
+        description: Normalized query used to select matches.
+      matches:
+        type: array
+        description: Matching locations ranked by whole-term relevance, then document order, with enough context to choose the smallest sufficient location before using document_get.
+        items:
+          $ref: "#/definitions/DocumentSearchMatch"
+      truncated:
+        type: boolean
+        description: Whether more matching locations exist beyond this result.
+      next_action:
+        type: string
+        description: Recommended action for inspecting a selected match or refining the search.
+  DocumentSearchMatch:
+    type: object
+    required: [node_id, kind, path, preview]
+    additionalProperties: false
+    properties:
+      node_id:
+        type: string
+        description: Structural location accepted by document_get and scoped document_search.
+      kind:
+        type: string
+        description: Structural role such as heading, paragraph, list item, code, table, or image.
+      path:
+        type: string
+        description: Heading path that locates this match within the document.
+      preview:
+        type: string
+        description: Bounded matching text used to judge relevance before expanding the location.

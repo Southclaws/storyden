@@ -10,6 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry/denbot"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_documents"
 )
 
 func TestResolveAgentSpecResolvesDenbot(t *testing.T) {
@@ -29,7 +30,7 @@ func TestResolveAgentSpecResolvesDenbot(t *testing.T) {
 	assert.Equal(t, "denbot", spec.AgentName)
 	assert.Equal(t, "Denbot", spec.DisplayName)
 	assert.False(t, spec.DatabaseRobotID.Ok())
-	assert.NotEmpty(t, spec.ToolsetRefs)
+	assert.Contains(t, spec.ToolsetRefs, system_documents.ID)
 }
 
 func TestResolveAgentSpecRejectsUnknownBuiltin(t *testing.T) {

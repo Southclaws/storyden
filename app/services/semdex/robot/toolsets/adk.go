@@ -270,7 +270,7 @@ func (r *Registry) Discovery(ctx context.Context, baseRefs ...string) (tool.Tool
 
 	loadTools, err := functiontool.New(functiontool.Config{
 		Name:        "tool_load",
-		Description: "Activate one or more individual tools for this conversation after inspecting their schemas and runtime preconditions with tool_get. Workspace-dependent tools require an active workspace. The tools become available on the next model step.",
+		Description: "Activate one or more individual tools that are not already available in this conversation after inspecting their schemas and runtime preconditions with tool_get. Never include currently callable tools. A tool marked toolset_only must be activated through one of its declared Toolsets instead. Workspace-dependent tools require an active workspace. Newly loaded tools become available on the next model step.",
 	}, func(ctx agent.Context, input mcp.ToolToolLoadInput) (mcp.ToolToolLoadOutput, error) {
 		refs := uniqueStrings(input.Tools)
 		if len(refs) == 0 {
@@ -282,6 +282,9 @@ func (r *Registry) Discovery(ctx context.Context, baseRefs ...string) (tool.Tool
 		for _, ref := range refs {
 			selected, err := r.tools.GetTool(ctx, ref)
 			if err != nil {
+				return mcp.ToolToolLoadOutput{}, err
+			}
+			if err := r.tools.ValidateStandaloneTool(ref); err != nil {
 				return mcp.ToolToolLoadOutput{}, err
 			}
 			if selected.Definition.RequiresWorkspace && !workspacestate.Available(ctx.ReadonlyState()) {
@@ -650,7 +653,7 @@ func stringStateValues(state interface{ Get(string) (any, error) }, key string) 
 }
 
 func discoveryInstruction() string {
-	return "Additional capabilities use progressive disclosure. Search Toolsets when a task needs a coherent capability bundle, then inspect the selected Toolset with toolset_get before loading it. Search individual tools for a narrow task, inspect the selected schema with tool_get, then activate it with tool_load. Inspection identifies capabilities that require an active workspace; do not load those capabilities until a workspace is mounted. Load only what the current task needs."
+	return "Additional capabilities use progressive disclosure. Call only capabilities currently present in your tool list; never guess an unavailable tool name. Search Toolsets when a task needs a coherent capability bundle, then inspect the selected Toolset with toolset_get before loading it. Search individual tools for a narrow task, inspect the selected schema with tool_get, then activate it with tool_load only if it is not already callable. If tool_get reports toolset_only, load one of its declared Toolsets instead of the individual tool. Inspection identifies capabilities that require an active workspace; do not load those capabilities until a workspace is mounted. Load only what the current task needs."
 }
 
 func workspaceRequiredInstruction(kind, name, id string) string {

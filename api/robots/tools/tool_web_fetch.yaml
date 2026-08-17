@@ -1,0 +1,53 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolWebFetch
+x-storyden:
+  toolsets: []
+x-storyden-tool:
+  title: Fetch Web Page
+  annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: false, openWorldHint: true }
+title: web_fetch
+description: Fetch a web page for metadata without adding it to Storyden or opening a navigable document snapshot.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolWebFetchInput" }
+  output: { $ref: "#/definitions/ToolWebFetchOutput" }
+definitions:
+  ToolWebFetchInput:
+    type: object
+    required: [url]
+    properties:
+      url:
+        type: string
+        format: uri
+        description: HTTP or HTTPS page URL to fetch.
+    additionalProperties: false
+  ToolWebFetchOutput:
+    type: object
+    required: [url]
+    additionalProperties: false
+    properties:
+      url:
+        type: string
+        format: uri
+        description: Page URL supplied to the safe web fetcher.
+      title:
+        type: string
+        description: Page title when exposed by the fetched document metadata.
+      description:
+        type: string
+        description: Page summary when exposed by the fetched document metadata.
+      favicon_url:
+        type: string
+        format: uri
+        description: Resolved favicon URL when exposed by the fetched document.
+      image_url:
+        type: string
+        format: uri
+        description: Resolved representative image URL when exposed by the fetched document.
+      content:
+        type: string
+        description: Plain-text page content included for external MCP callers.
+      next_action:
+        type: string
+        description: Conditional instruction for a Robot to open this page when it is relevant.

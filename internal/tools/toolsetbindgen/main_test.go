@@ -69,6 +69,32 @@ func TestParseToolsetBindingsRequiresExplicitMembershipArray(t *testing.T) {
 	assert.EqualError(t, err, "ToolLinkCreate must declare x-storyden.toolsets")
 }
 
+func TestParseToolsetBindingsValidatesToolsetOnlyMetadata(t *testing.T) {
+	_, err := parseToolsetBindings([]byte(`{
+  "definitions": {
+    "ToolDocumentGet": {
+      "title": "document_get",
+      "x-storyden-tool": {"title": "Inspect document"},
+      "x-storyden": {"toolsets": [], "toolset_only": true}
+    }
+  }
+}`))
+	require.Error(t, err)
+	assert.EqualError(t, err, "ToolDocumentGet x-storyden.toolset_only requires at least one x-storyden.toolsets entry")
+
+	_, err = parseToolsetBindings([]byte(`{
+  "definitions": {
+    "ToolDocumentGet": {
+      "title": "document_get",
+      "x-storyden-tool": {"title": "Inspect document"},
+      "x-storyden": {"toolsets": ["system.documents"], "toolset_only": "yes"}
+    }
+  }
+}`))
+	require.Error(t, err)
+	assert.EqualError(t, err, "ToolDocumentGet x-storyden.toolset_only must be a boolean")
+}
+
 func TestWriteBindingsTargetsDefinitionPackages(t *testing.T) {
 	outputDir := t.TempDir()
 	definitionDir := filepath.Join(outputDir, "system_discussions")
@@ -96,4 +122,27 @@ func TestWriteBindingsTargetsDefinitionPackages(t *testing.T) {
 	require.NoError(t, err)
 	assert.Contains(t, string(registrations), `system_discussions.ID`)
 	assert.Contains(t, string(registrations), `system_discussions.Instruction`)
+}
+
+func TestWriteBindingsUsesOptionalInstructionProvider(t *testing.T) {
+	outputDir := t.TempDir()
+	definitionDir := filepath.Join(outputDir, "system_documents")
+	require.NoError(t, os.MkdirAll(definitionDir, 0o755))
+	require.NoError(t, os.WriteFile(
+		filepath.Join(definitionDir, "definition.go"),
+		[]byte("package system_documents\n\nfunc InstructionProvider() {}\n"),
+		0o644,
+	))
+
+	err := writeBindings(outputDir, []toolsetBinding{{
+		ID:          "system.documents",
+		PackageName: "system_documents",
+		ToolNames:   []string{"document_get"},
+	}})
+	require.NoError(t, err)
+
+	registrations, err := os.ReadFile(filepath.Join(outputDir, "system_bindings_gen.go"))
+	require.NoError(t, err)
+	assert.Contains(t, string(registrations), `InstructionProvider: system_documents.InstructionProvider`)
+	assert.NotContains(t, string(registrations), `Instruction: system_documents.Instruction`)
 }

@@ -38,6 +38,7 @@ export function RobotToolsetConfigurationForm(props: RobotToolsetFormProps) {
 
     if (
       !tool.available ||
+      tool.toolset_only ||
       (normalizedQuery && !label.toLowerCase().includes(normalizedQuery))
     ) {
       return [];

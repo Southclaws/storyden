@@ -10,6 +10,7 @@ var ToolNames = []string{
 	"thread_create",
 	"thread_get",
 	"thread_list",
+	"thread_open",
 	"thread_reply",
 	"thread_search",
 	"thread_update",

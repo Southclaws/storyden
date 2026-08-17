@@ -5,8 +5,13 @@ package mcp
 var (
 	toolCategoryList                    *ToolDefinition
 	toolContentSearch                   *ToolDefinition
+	toolDocumentClose                   *ToolDefinition
+	toolDocumentGet                     *ToolDefinition
+	toolDocumentList                    *ToolDefinition
+	toolDocumentSearch                  *ToolDefinition
 	toolLibraryPageCreate               *ToolDefinition
 	toolLibraryPageGet                  *ToolDefinition
+	toolLibraryPageOpen                 *ToolDefinition
 	toolLibraryPagePropertiesUpdate     *ToolDefinition
 	toolLibraryPagePropertySchemaGet    *ToolDefinition
 	toolLibraryPagePropertySchemaUpdate *ToolDefinition
@@ -28,6 +33,7 @@ var (
 	toolThreadCreate                    *ToolDefinition
 	toolThreadGet                       *ToolDefinition
 	toolThreadList                      *ToolDefinition
+	toolThreadOpen                      *ToolDefinition
 	toolThreadReply                     *ToolDefinition
 	toolThreadSearch                    *ToolDefinition
 	toolThreadUpdate                    *ToolDefinition
@@ -41,14 +47,21 @@ var (
 	toolToolsetLoad                     *ToolDefinition
 	toolToolsetSearch                   *ToolDefinition
 	toolToolsetUpdate                   *ToolDefinition
+	toolWebFetch                        *ToolDefinition
+	toolWebOpen                         *ToolDefinition
 	toolNamesEnum                       []any
 )
 
 func initAllTools() {
 	toolCategoryList = initTool("CategoryList")
 	toolContentSearch = initTool("ContentSearch")
+	toolDocumentClose = initTool("DocumentClose")
+	toolDocumentGet = initTool("DocumentGet")
+	toolDocumentList = initTool("DocumentList")
+	toolDocumentSearch = initTool("DocumentSearch")
 	toolLibraryPageCreate = initTool("LibraryPageCreate")
 	toolLibraryPageGet = initTool("LibraryPageGet")
+	toolLibraryPageOpen = initTool("LibraryPageOpen")
 	toolLibraryPagePropertiesUpdate = initTool("LibraryPagePropertiesUpdate")
 	toolLibraryPagePropertySchemaGet = initTool("LibraryPagePropertySchemaGet")
 	toolLibraryPagePropertySchemaUpdate = initTool("LibraryPagePropertySchemaUpdate")
@@ -70,6 +83,7 @@ func initAllTools() {
 	toolThreadCreate = initTool("ThreadCreate")
 	toolThreadGet = initTool("ThreadGet")
 	toolThreadList = initTool("ThreadList")
+	toolThreadOpen = initTool("ThreadOpen")
 	toolThreadReply = initTool("ThreadReply")
 	toolThreadSearch = initTool("ThreadSearch")
 	toolThreadUpdate = initTool("ThreadUpdate")
@@ -83,6 +97,8 @@ func initAllTools() {
 	toolToolsetLoad = initTool("ToolsetLoad")
 	toolToolsetSearch = initTool("ToolsetSearch")
 	toolToolsetUpdate = initTool("ToolsetUpdate")
+	toolWebFetch = initTool("WebFetch")
+	toolWebOpen = initTool("WebOpen")
 
 	names := AllToolNames()
 	toolNamesEnum = make([]any, len(names))
@@ -96,8 +112,13 @@ func AllToolNames() []string {
 	return []string{
 		toolCategoryList.Name,
 		toolContentSearch.Name,
+		toolDocumentClose.Name,
+		toolDocumentGet.Name,
+		toolDocumentList.Name,
+		toolDocumentSearch.Name,
 		toolLibraryPageCreate.Name,
 		toolLibraryPageGet.Name,
+		toolLibraryPageOpen.Name,
 		toolLibraryPagePropertiesUpdate.Name,
 		toolLibraryPagePropertySchemaGet.Name,
 		toolLibraryPagePropertySchemaUpdate.Name,
@@ -119,6 +140,7 @@ func AllToolNames() []string {
 		toolThreadCreate.Name,
 		toolThreadGet.Name,
 		toolThreadList.Name,
+		toolThreadOpen.Name,
 		toolThreadReply.Name,
 		toolThreadSearch.Name,
 		toolThreadUpdate.Name,
@@ -132,6 +154,8 @@ func AllToolNames() []string {
 		toolToolsetLoad.Name,
 		toolToolsetSearch.Name,
 		toolToolsetUpdate.Name,
+		toolWebFetch.Name,
+		toolWebOpen.Name,
 	}
 }
 
@@ -143,12 +167,32 @@ func GetContentSearchTool() *ToolDefinition {
 	return toolContentSearch
 }
 
+func GetDocumentCloseTool() *ToolDefinition {
+	return toolDocumentClose
+}
+
+func GetDocumentGetTool() *ToolDefinition {
+	return toolDocumentGet
+}
+
+func GetDocumentListTool() *ToolDefinition {
+	return toolDocumentList
+}
+
+func GetDocumentSearchTool() *ToolDefinition {
+	return toolDocumentSearch
+}
+
 func GetLibraryPageCreateTool() *ToolDefinition {
 	return toolLibraryPageCreate
 }
 
 func GetLibraryPageGetTool() *ToolDefinition {
 	return toolLibraryPageGet
+}
+
+func GetLibraryPageOpenTool() *ToolDefinition {
+	return toolLibraryPageOpen
 }
 
 func GetLibraryPagePropertiesUpdateTool() *ToolDefinition {
@@ -235,6 +279,10 @@ func GetThreadListTool() *ToolDefinition {
 	return toolThreadList
 }
 
+func GetThreadOpenTool() *ToolDefinition {
+	return toolThreadOpen
+}
+
 func GetThreadReplyTool() *ToolDefinition {
 	return toolThreadReply
 }
@@ -285,4 +333,12 @@ func GetToolsetSearchTool() *ToolDefinition {
 
 func GetToolsetUpdateTool() *ToolDefinition {
 	return toolToolsetUpdate
+}
+
+func GetWebFetchTool() *ToolDefinition {
+	return toolWebFetch
+}
+
+func GetWebOpenTool() *ToolDefinition {
+	return toolWebOpen
 }

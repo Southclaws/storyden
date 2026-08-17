@@ -12,8 +12,7 @@ x-storyden-tool:
     idempotentHint: true
     openWorldHint: false
 title: thread_get
-description: Get a specific thread with its content. Returns the thread details
-  including author, content, and category information.
+description: Retrieve discussion thread metadata by ID and indicate how to inspect its document when needed.
 type: object
 required:
   - input
@@ -44,7 +43,6 @@ definitions:
       - id
       - slug
       - title
-      - content
       - visibility
       - author
       - category
@@ -64,7 +62,10 @@ definitions:
         type: string
       content:
         type: string
-        description: Thread content as plain text
+        description: Plain-text thread body included for external MCP callers.
+      next_action:
+        type: string
+        description: Conditional instruction for a Robot to open this thread when it is relevant.
       visibility:
         type: string
       author:

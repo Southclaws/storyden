@@ -87,7 +87,11 @@ export function RobotConfigurationForm(props: Props) {
   );
   const normalizedToolQuery = toolQuery.trim().toLowerCase();
   const filteredToolOptions = availableTools.flatMap((tool) => {
-    if (!tool.available || selectedToolsetTools.has(tool.id)) {
+    if (
+      !tool.available ||
+      tool.toolset_only ||
+      selectedToolsetTools.has(tool.id)
+    ) {
       return [];
     }
     const label = tool.name ?? tool.id;

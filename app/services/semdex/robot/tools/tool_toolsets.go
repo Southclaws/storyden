@@ -80,6 +80,9 @@ func (t *toolsetTools) create(ctx context.Context, input mcp.ToolToolsetCreateIn
 	if invalid := t.invalidTools(input.Tools); len(invalid) > 0 {
 		return nil, fmt.Errorf("unknown tools: %s", strings.Join(invalid, ", "))
 	}
+	if err := t.validateStandaloneTools(input.Tools); err != nil {
+		return nil, err
+	}
 	authorID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, err
@@ -165,6 +168,9 @@ func (t *toolsetTools) update(ctx context.Context, input mcp.ToolToolsetUpdateIn
 		if invalid := t.invalidTools(input.Tools); len(invalid) > 0 {
 			return nil, fmt.Errorf("unknown tools: %s", strings.Join(invalid, ", "))
 		}
+		if err := t.validateStandaloneTools(input.Tools); err != nil {
+			return nil, err
+		}
 	}
 	if err := t.authoriseMutation(ctx, id); err != nil {
 		return nil, err
@@ -178,6 +184,15 @@ func (t *toolsetTools) update(ctx context.Context, input mcp.ToolToolsetUpdateIn
 		return nil, err
 	}
 	return &mcp.ToolToolsetUpdateOutput{Id: updated.ID.String(), Name: updated.Name}, nil
+}
+
+func (t *toolsetTools) validateStandaloneTools(names []string) error {
+	for _, name := range names {
+		if err := t.registry.ValidateStandaloneTool(name); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (t *toolsetTools) newDeleteTool() *Tool {

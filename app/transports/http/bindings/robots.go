@@ -141,6 +141,9 @@ func (r *Robots) RobotCreate(ctx context.Context, request openapi.RobotCreateReq
 		if err := r.validateRobotToolsForCreate(directTools); err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 		}
+		if err := r.toolsets.ValidateDirectTools(ctx, directTools, selectedToolsets); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
 		opts = append(opts, robot_writer.WithTools(mapRobotToolNames(directTools)))
 	}
 	if workspaceID := request.Body.WorkspaceId; workspaceID != nil {
@@ -1202,6 +1205,10 @@ func (r *Robots) validateToolNames(toolNames []string) error {
 	for _, name := range toolNames {
 		if !r.tools.HasTool(name) {
 			invalid = append(invalid, name)
+			continue
+		}
+		if err := r.tools.ValidateStandaloneTool(name); err != nil {
+			return err
 		}
 	}
 	if len(invalid) > 0 {
@@ -1270,6 +1277,7 @@ func serialiseRobotToolInfo(tool robot_tools.CatalogueTool) openapi.RobotToolInf
 		Available:            tool.Available,
 		RequiresConfirmation: tool.RequiresConfirmation,
 		RequiresWorkspace:    tool.RequiresWorkspace,
+		ToolsetOnly:          tool.ToolsetOnly,
 	}
 }
 

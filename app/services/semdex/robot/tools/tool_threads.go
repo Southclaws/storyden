@@ -1,13 +1,16 @@
 package tools
 
 import (
+	"bytes"
 	"context"
 	"fmt"
-	adkagent "google.golang.org/adk/v2/agent"
+	stdhtml "html"
 	"log/slog"
 	"net/url"
 	"time"
 
+	xhtml "golang.org/x/net/html"
+	adkagent "google.golang.org/adk/v2/agent"
 	"google.golang.org/adk/v2/tool"
 	"google.golang.org/adk/v2/tool/functiontool"
 
@@ -21,12 +24,15 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
+	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	reply_service "github.com/Southclaws/storyden/app/services/reply"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/documents"
 	thread_service "github.com/Southclaws/storyden/app/services/thread"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
 	"github.com/Southclaws/storyden/internal/config"
@@ -63,6 +69,7 @@ func newThreadTools(
 	registry.Register(t.newThreadCreateTool())
 	registry.Register(t.newThreadListTool())
 	registry.Register(t.newThreadGetTool())
+	registry.Register(t.newThreadOpenTool())
 	registry.Register(t.newThreadUpdateTool())
 	registry.Register(t.newThreadReplyTool())
 	registry.Register(t.newCategoryListTool())
@@ -289,12 +296,18 @@ func (tt *threadTools) ExecuteThreadGet(ctx context.Context, args mcp.ToolThread
 		urlStr = &webLink.URL
 	}
 
+	content, nextAction := contentForAudience(ctx,
+		thread.Content.Plaintext(),
+		fmt.Sprintf("If this thread looks relevant to the current task, call thread_open with id %q to inspect its document.", thread.ID.String()),
+	)
+
 	output := mcp.ToolThreadGetOutput{
 		BrowserUrl: datagraph.CanonicalResolveURL(tt.webAddress, datagraph.KindThread, fmt.Sprintf("%s-%s", thread.ID.String(), thread.Slug)).String(),
 		Id:         thread.ID.String(),
 		Slug:       thread.Slug,
 		Title:      thread.Title,
-		Content:    thread.Content.Plaintext(),
+		Content:    content,
+		NextAction: nextAction,
 		CreatedAt:  thread.CreatedAt.Format(time.RFC3339),
 		Visibility: thread.Visibility.String(),
 		Author:     thread.Author.Handle,
@@ -304,6 +317,112 @@ func (tt *threadTools) ExecuteThreadGet(ctx context.Context, args mcp.ToolThread
 	}
 
 	return &output, nil
+}
+
+func (tt *threadTools) newThreadOpenTool() *Tool {
+	toolDef := mcp.GetThreadOpenTool()
+
+	return &Tool{
+		Definition: toolDef,
+		Builder: func(context.Context) (tool.Tool, error) {
+			return functiontool.New(
+				functiontool.Config{
+					Name:        toolDef.Name,
+					Description: toolDef.Description,
+					InputSchema: toolDef.InputSchema,
+				},
+				func(ctx adkagent.Context, args mcp.ToolThreadOpenInput) (*mcp.RobotDocumentProjectionYaml, error) {
+					postID, err := tt.thread_mark_svc.Lookup(ctx, args.Id)
+					if err != nil {
+						return nil, fault.Wrap(err, fctx.With(ctx))
+					}
+					opened, content, err := loadThreadDocument(ctx, tt.thread_svc, postID)
+					if err != nil {
+						return nil, fault.Wrap(err, fctx.With(ctx))
+					}
+					projection, err := documents.Open(
+						ctx.State(),
+						documents.SourceTypeThread,
+						opened.ID.String(),
+						opened.Title,
+						content,
+					)
+					if err != nil {
+						return nil, err
+					}
+					return mapDocumentProjection(projection), nil
+				},
+			)
+		},
+	}
+}
+
+type threadDocumentReader interface {
+	Get(context.Context, post.ID, pagination.Parameters) (*thread.Thread, error)
+}
+
+func loadThreadDocument(ctx context.Context, reader threadDocumentReader, threadID post.ID) (*thread.Thread, datagraph.Content, error) {
+	opened, err := reader.Get(ctx, threadID, pagination.NewPageParams(1, reply.RepliesPerPage))
+	if err != nil {
+		return nil, datagraph.Content{}, err
+	}
+
+	replies := append([]*reply.Reply(nil), opened.Replies.Items...)
+	for page := 2; page <= opened.Replies.TotalPages; page++ {
+		pageResult, err := reader.Get(ctx, threadID, pagination.NewPageParams(uint(page), reply.RepliesPerPage))
+		if err != nil {
+			return nil, datagraph.Content{}, err
+		}
+		replies = append(replies, pageResult.Replies.Items...)
+	}
+
+	content, err := composeThreadDocument(opened, replies)
+	if err != nil {
+		return nil, datagraph.Content{}, err
+	}
+	return opened, content, nil
+}
+
+func composeThreadDocument(opened *thread.Thread, replies []*reply.Reply) (datagraph.Content, error) {
+	var document bytes.Buffer
+	document.WriteString("<section><h2>Original post by @")
+	document.WriteString(stdhtml.EscapeString(opened.Author.Handle))
+	document.WriteString("</h2>")
+	if err := appendContentHTML(&document, opened.Content); err != nil {
+		return datagraph.Content{}, err
+	}
+	document.WriteString("</section>")
+
+	if len(replies) > 0 {
+		document.WriteString("<section><h2>Replies</h2>")
+		for index, item := range replies {
+			document.WriteString("<article><h3>Reply ")
+			document.WriteString(fmt.Sprintf("%d", index+1))
+			document.WriteString(" by @")
+			document.WriteString(stdhtml.EscapeString(item.Author.Handle))
+			document.WriteString("</h3>")
+			if err := appendContentHTML(&document, item.Content); err != nil {
+				return datagraph.Content{}, err
+			}
+			document.WriteString("</article>")
+		}
+		document.WriteString("</section>")
+	}
+
+	return datagraph.NewRichText(document.String())
+}
+
+func appendContentHTML(destination *bytes.Buffer, content datagraph.Content) error {
+	root := content.HTMLTree()
+	if root == nil {
+		return nil
+	}
+	for child := root.FirstChild; child != nil; child = child.NextSibling {
+		if err := xhtml.Render(destination, child); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (tt *threadTools) mapThreadSummary(t *thread.Thread) mcp.ThreadSummary {

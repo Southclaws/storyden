@@ -94,10 +94,11 @@ describe("RobotConfigurationForm", () => {
             callable_name: "thread_get",
             name: "Get thread",
             description: "Get a discussion thread",
-          source: "native",
-          available: true,
-          requires_confirmation: false,
-          requires_workspace: false,
+            source: "native",
+            available: true,
+            requires_confirmation: false,
+            requires_workspace: false,
+            toolset_only: false,
           },
         ],
       },
@@ -116,10 +117,10 @@ describe("RobotConfigurationForm", () => {
             description: "Discussion tools",
             instruction: "Use discussion data as the source of truth.",
             tools: ["thread_get"],
-          source: "system",
-          editable: false,
-          usage_count: 0,
-          requires_workspace: false,
+            source: "system",
+            editable: false,
+            usage_count: 0,
+            requires_workspace: false,
           },
         ],
       },
@@ -144,6 +145,42 @@ describe("RobotConfigurationForm", () => {
 
     expect(
       screen.queryByRole("button", { name: "Remove Get thread" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("omits Toolset-only capabilities from individual tool selection", async () => {
+    const user = userEvent.setup();
+    vi.mocked(useRobotToolsList).mockReturnValue({
+      data: {
+        tools: [
+          {
+            id: "document_get",
+            callable_name: "document_get",
+            name: "Inspect document",
+            description: "Inspect part of an open document",
+            source: "native",
+            available: true,
+            requires_confirmation: false,
+            requires_workspace: false,
+            toolset_only: true,
+          },
+        ],
+      },
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+      swrKey: ["/robots/tools"],
+    });
+
+    render(<RobotConfigurationForm robot={robot} />);
+
+    await user.click(
+      screen.getByRole("button", { name: "Select individual tools" }),
+    );
+
+    expect(
+      screen.queryByRole("menuitem", { name: "Inspect document" }),
     ).not.toBeInTheDocument();
   });
 });

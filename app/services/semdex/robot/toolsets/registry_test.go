@@ -16,6 +16,7 @@ import (
 	robottoolsets "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/integration"
+	"github.com/Southclaws/storyden/lib/mcp"
 )
 
 func TestRegistrySearchesAcrossSystemPluginAndCustomToolsets(t *testing.T) {
@@ -118,4 +119,16 @@ func TestRegistryComposesDirectToolsWithToolsets(t *testing.T) {
 	err = registry.ValidateDirectTools(ctx, []string{"thread_read"}, []string{"system.thread_reader"})
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), `tool "thread_read"`)
+
+	documentGet := &robottools.Tool{Definition: &mcp.ToolDefinition{
+		Name:        "document_get",
+		Title:       "Inspect document",
+		Description: "Inspect part of an open document.",
+		ToolsetOnly: true,
+		Toolsets:    []string{"system.documents"},
+	}}
+	require.NoError(t, toolRegistry.Register(documentGet))
+	err = registry.ValidateDirectTools(ctx, []string{"document_get"}, nil)
+	require.Error(t, err)
+	assert.EqualError(t, err, `tool "document_get" is Toolset-only and can only be provided by its declared Toolset; use Toolset system.documents instead`)
 }

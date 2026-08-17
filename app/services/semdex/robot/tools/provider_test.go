@@ -79,6 +79,30 @@ func TestRegistrySearchCatalogueReturnsCanonicalToolSummaries(t *testing.T) {
 	assert.NotEqual(t, "legacy_thread_read", results[0].ID)
 }
 
+func TestRegistryOmitsToolsetOnlyToolsFromIndividualDiscovery(t *testing.T) {
+	registry := NewRegistry(slog.New(slog.NewTextHandler(io.Discard, nil)))
+	tool := testTool("document_get", "document_get")
+	tool.Definition.ToolsetOnly = true
+	tool.Definition.Toolsets = []string{"system.documents"}
+	require.NoError(t, registry.Register(tool))
+
+	assert.Empty(t, registry.SearchCatalogue("document", 5))
+	err := registry.ValidateStandaloneTool("document_get")
+	require.Error(t, err)
+	assert.EqualError(t, err, `tool "document_get" is Toolset-only and can only be provided by its declared Toolset; use Toolset system.documents instead`)
+}
+
+func TestToolGetReturnsEmptyToolsetArray(t *testing.T) {
+	registry := NewRegistry(slog.New(slog.NewTextHandler(io.Discard, nil)))
+	require.NoError(t, registry.Register(&Tool{Definition: mcp.GetWebOpenTool()}))
+	discovery := newToolDiscoveryTools(registry)
+
+	result, err := discovery.get(context.Background(), mcp.ToolToolGetInput{Id: "web_open"})
+	require.NoError(t, err)
+	require.NotNil(t, result.Toolsets)
+	assert.Empty(t, result.Toolsets)
+}
+
 func TestRegistryRejectsToolsWithoutDisplayTitles(t *testing.T) {
 	registry := NewRegistry(slog.New(slog.NewTextHandler(io.Discard, nil)))
 

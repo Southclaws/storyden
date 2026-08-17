@@ -98,6 +98,8 @@ func (t *toolDiscoveryTools) get(ctx context.Context, input mcp.ToolToolGetInput
 		Description:          selected.Definition.Description,
 		InputSchema:          inputSchema,
 		OutputSchema:         outputSchema,
+		Toolsets:             append([]string{}, selected.Definition.Toolsets...),
+		ToolsetOnly:          selected.Definition.ToolsetOnly,
 		RequiresConfirmation: selected.Definition.RequiresConfirmation,
 		RequiresWorkspace:    selected.Definition.RequiresWorkspace,
 	}, nil

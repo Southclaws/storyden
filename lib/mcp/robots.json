@@ -23,6 +23,34 @@
       ],
       "type": "object"
     },
+    "DocumentSearchMatch": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "description": "Structural role such as heading, paragraph, list item, code, table, or image.",
+          "type": "string"
+        },
+        "node_id": {
+          "description": "Structural location accepted by document_get and scoped document_search.",
+          "type": "string"
+        },
+        "path": {
+          "description": "Heading path that locates this match within the document.",
+          "type": "string"
+        },
+        "preview": {
+          "description": "Bounded matching text used to judge relevance before expanding the location.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "node_id",
+        "kind",
+        "path",
+        "preview"
+      ],
+      "type": "object"
+    },
     "LibraryPageSearchItem": {
       "additionalProperties": false,
       "properties": {
@@ -142,6 +170,76 @@
         "handle",
         "name",
         "browser_url"
+      ],
+      "type": "object"
+    },
+    "OpenDocument": {
+      "additionalProperties": false,
+      "properties": {
+        "active": {
+          "description": "Whether tools use this document when document_id is omitted.",
+          "type": "boolean"
+        },
+        "active_node_id": {
+          "description": "Most recently inspected structural location in this snapshot.",
+          "type": "string"
+        },
+        "document_id": {
+          "description": "Conversation-local identifier accepted by document navigation tools.",
+          "type": "string"
+        },
+        "item_end": {
+          "description": "Final structural item shown by the current cursor page.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "item_start": {
+          "description": "First structural item shown by the current cursor page.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "page": {
+          "description": "Most recently inspected structural page at this location.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "source_id": {
+          "description": "Source identifier or URL used to open this snapshot.",
+          "type": "string"
+        },
+        "source_type": {
+          "description": "Origin kind used to distinguish documents with similar titles.",
+          "enum": [
+            "library_page",
+            "thread",
+            "web"
+          ],
+          "type": "string"
+        },
+        "title": {
+          "description": "Document title for selecting the intended snapshot.",
+          "type": "string"
+        },
+        "total_items": {
+          "description": "Total structural items at the current cursor location.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "total_pages": {
+          "description": "Number of structural pages at the most recently inspected location.",
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "document_id",
+        "source_type",
+        "source_id",
+        "title",
+        "active",
+        "active_node_id",
+        "page",
+        "total_pages"
       ],
       "type": "object"
     },
@@ -694,6 +792,382 @@
       ],
       "type": "object"
     },
+    "ToolDocumentClose": {
+      "$id": "ToolDocumentClose",
+      "description": "Remove an open document snapshot from this conversation without changing its source.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolDocumentCloseInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolDocumentCloseOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "document_close",
+      "type": "object",
+      "x-storyden": {
+        "internal": true,
+        "toolset_only": true,
+        "toolsets": [
+          "system.documents"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false,
+          "readOnlyHint": false
+        },
+        "title": "Close Document"
+      }
+    },
+    "ToolDocumentCloseInput": {
+      "additionalProperties": false,
+      "properties": {
+        "document_id": {
+          "description": "Open document identifier; omit to close the active document.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ToolDocumentCloseOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "active_document_id": {
+          "description": "Newly active document identifier when another snapshot remains.",
+          "type": "string"
+        },
+        "document_id": {
+          "description": "Identifier of the removed document snapshot.",
+          "type": "string"
+        },
+        "next_action": {
+          "description": "Recommended action after the snapshot was removed.",
+          "type": "string"
+        },
+        "remaining": {
+          "description": "Number of document snapshots still available for navigation.",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "document_id",
+        "remaining",
+        "next_action"
+      ],
+      "type": "object"
+    },
+    "ToolDocumentGet": {
+      "$id": "ToolDocumentGet",
+      "description": "Inspect one structural page of the active document or a specified location and make it the current document cursor.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolDocumentGetInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolDocumentGetOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "document_get",
+      "type": "object",
+      "x-storyden": {
+        "internal": true,
+        "toolset_only": true,
+        "toolsets": [
+          "system.documents"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": false
+        },
+        "title": "Inspect Document"
+      }
+    },
+    "ToolDocumentGetInput": {
+      "additionalProperties": false,
+      "properties": {
+        "document_id": {
+          "description": "Open document identifier; omit to inspect the active document.",
+          "type": "string"
+        },
+        "node_id": {
+          "description": "Structural location returned by an outline or search result; omit to continue from that document's current node.",
+          "type": "string"
+        },
+        "page": {
+          "description": "One-indexed structural page to inspect; omit to retain the current page when node_id is also omitted, or use the first page of a specified node.",
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "ToolDocumentGetOutput": {
+      "additionalProperties": false,
+      "description": "A bounded view into an open document with stable identifiers for further navigation.",
+      "properties": {
+        "document_id": {
+          "description": "Conversation-local document identifier accepted by document navigation tools.",
+          "type": "string"
+        },
+        "item_end": {
+          "description": "One-indexed position of the final structural item shown on this page.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "item_start": {
+          "description": "One-indexed position of the first structural item shown on this page.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "next_action": {
+          "description": "Recommended document navigation action when more detail is needed.",
+          "type": "string"
+        },
+        "next_page": {
+          "description": "Next structural page when one exists.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "node_id": {
+          "description": "Structural location represented by this projection.",
+          "type": "string"
+        },
+        "page": {
+          "description": "One-indexed structural page currently shown for this location.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "previous_page": {
+          "description": "Previous structural page when one exists.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "projection": {
+          "description": "Bounded plain-text outline, preview, or complete leaf content for this location.",
+          "type": "string"
+        },
+        "source_id": {
+          "description": "Source identifier or URL used to open this snapshot.",
+          "type": "string"
+        },
+        "source_type": {
+          "description": "Origin kind used to distinguish documents with similar titles.",
+          "enum": [
+            "library_page",
+            "thread",
+            "web"
+          ],
+          "type": "string"
+        },
+        "title": {
+          "description": "Document title for identifying the current result.",
+          "type": "string"
+        },
+        "total_items": {
+          "description": "Total number of structural items available at this location.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "total_pages": {
+          "description": "Number of structural pages available for this location.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "truncated": {
+          "description": "Whether additional content exists beyond this projection.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "document_id",
+        "source_type",
+        "source_id",
+        "title",
+        "node_id",
+        "page",
+        "total_pages",
+        "projection",
+        "truncated",
+        "next_action"
+      ],
+      "type": "object"
+    },
+    "ToolDocumentList": {
+      "$id": "ToolDocumentList",
+      "description": "List document snapshots currently available for navigation in this conversation.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolDocumentListInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolDocumentListOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "document_list",
+      "type": "object",
+      "x-storyden": {
+        "internal": true,
+        "toolset_only": true,
+        "toolsets": [
+          "system.documents"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        },
+        "title": "List Open Documents"
+      }
+    },
+    "ToolDocumentListInput": {
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ToolDocumentListOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "documents": {
+          "description": "Open document snapshots with their navigation identifiers and active status.",
+          "items": {
+            "$ref": "#/definitions/OpenDocument"
+          },
+          "type": "array"
+        },
+        "next_action": {
+          "description": "Recommended action for selecting or opening a document.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "documents",
+        "next_action"
+      ],
+      "type": "object"
+    },
+    "ToolDocumentSearch": {
+      "$id": "ToolDocumentSearch",
+      "description": "Search structural locations within the active document or selected open document. Whole-term matches are returned before substring-only matches, with document order preserved within each relevance tier.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolDocumentSearchInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolDocumentSearchOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "document_search",
+      "type": "object",
+      "x-storyden": {
+        "internal": true,
+        "toolset_only": true,
+        "toolsets": [
+          "system.documents"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        },
+        "title": "Search Document"
+      }
+    },
+    "ToolDocumentSearchInput": {
+      "additionalProperties": false,
+      "properties": {
+        "document_id": {
+          "description": "Open document identifier; omit to search the active document.",
+          "type": "string"
+        },
+        "max_results": {
+          "description": "Maximum number of matching locations to return; omit to use ten.",
+          "maximum": 50,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "node_ids": {
+          "description": "Structural locations whose subtrees bound the search; omit to search the whole document.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "query": {
+          "description": "Plain-text terms that must all occur in each matching structural location.",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "ToolDocumentSearchOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "document_id": {
+          "description": "Open document searched by this call.",
+          "type": "string"
+        },
+        "matches": {
+          "description": "Matching locations ranked by whole-term relevance, then document order, with enough context to choose the smallest sufficient location before using document_get.",
+          "items": {
+            "$ref": "#/definitions/DocumentSearchMatch"
+          },
+          "type": "array"
+        },
+        "next_action": {
+          "description": "Recommended action for inspecting a selected match or refining the search.",
+          "type": "string"
+        },
+        "query": {
+          "description": "Normalized query used to select matches.",
+          "type": "string"
+        },
+        "truncated": {
+          "description": "Whether more matching locations exist beyond this result.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "document_id",
+        "query",
+        "matches",
+        "truncated",
+        "next_action"
+      ],
+      "type": "object"
+    },
     "ToolLibraryPageCreate": {
       "$id": "ToolLibraryPageCreate",
       "description": "Create a new page in the library. A slug will be generated automatically if not provided.",
@@ -803,7 +1277,7 @@
     },
     "ToolLibraryPageGet": {
       "$id": "ToolLibraryPageGet",
-      "description": "Retrieve a library page with its content and workflow visibility by ID.",
+      "description": "Retrieve Library page metadata by ID and indicate how to inspect its document when needed.",
       "properties": {
         "input": {
           "$ref": "#/definitions/ToolLibraryPageGetInput"
@@ -816,7 +1290,7 @@
         "input",
         "output"
       ],
-      "title": "get_library_page",
+      "title": "library_page_get",
       "type": "object",
       "x-storyden": {
         "toolsets": [
@@ -863,7 +1337,7 @@
           "type": "array"
         },
         "content": {
-          "description": "Plain-text page body for evaluating or summarising the page.",
+          "description": "Plain-text page body included for external MCP callers.",
           "type": "string"
         },
         "description": {
@@ -876,6 +1350,10 @@
         },
         "name": {
           "description": "Display name of the page",
+          "type": "string"
+        },
+        "next_action": {
+          "description": "Conditional instruction for a Robot to open this page when it is relevant.",
           "type": "string"
         },
         "slug": {
@@ -906,8 +1384,146 @@
         "tags",
         "child_pages",
         "browser_url",
-        "content",
         "visibility"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPageOpen": {
+      "$id": "ToolLibraryPageOpen",
+      "description": "Open a Library page as the active document snapshot and return its initial bounded projection.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolLibraryPageOpenInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolLibraryPageOpenOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "library_page_open",
+      "type": "object",
+      "x-storyden": {
+        "internal": true,
+        "toolsets": [
+          "system.library"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": false
+        },
+        "role": "READ_PUBLISHED_LIBRARY",
+        "title": "Open Library Page"
+      }
+    },
+    "ToolLibraryPageOpenInput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Library page ID or slug returned by Library discovery tools.",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPageOpenOutput": {
+      "additionalProperties": false,
+      "description": "A bounded view into an open document with stable identifiers for further navigation.",
+      "properties": {
+        "document_id": {
+          "description": "Conversation-local document identifier accepted by document navigation tools.",
+          "type": "string"
+        },
+        "item_end": {
+          "description": "One-indexed position of the final structural item shown on this page.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "item_start": {
+          "description": "One-indexed position of the first structural item shown on this page.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "next_action": {
+          "description": "Recommended document navigation action when more detail is needed.",
+          "type": "string"
+        },
+        "next_page": {
+          "description": "Next structural page when one exists.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "node_id": {
+          "description": "Structural location represented by this projection.",
+          "type": "string"
+        },
+        "page": {
+          "description": "One-indexed structural page currently shown for this location.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "previous_page": {
+          "description": "Previous structural page when one exists.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "projection": {
+          "description": "Bounded plain-text outline, preview, or complete leaf content for this location.",
+          "type": "string"
+        },
+        "source_id": {
+          "description": "Source identifier or URL used to open this snapshot.",
+          "type": "string"
+        },
+        "source_type": {
+          "description": "Origin kind used to distinguish documents with similar titles.",
+          "enum": [
+            "library_page",
+            "thread",
+            "web"
+          ],
+          "type": "string"
+        },
+        "title": {
+          "description": "Document title for identifying the current result.",
+          "type": "string"
+        },
+        "total_items": {
+          "description": "Total number of structural items available at this location.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "total_pages": {
+          "description": "Number of structural pages available for this location.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "truncated": {
+          "description": "Whether additional content exists beyond this projection.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "document_id",
+        "source_type",
+        "source_id",
+        "title",
+        "node_id",
+        "page",
+        "total_pages",
+        "projection",
+        "truncated",
+        "next_action"
       ],
       "type": "object"
     },
@@ -2463,7 +3079,7 @@
     },
     "ToolThreadGet": {
       "$id": "ToolThreadGet",
-      "description": "Get a specific thread with its content. Returns the thread details including author, content, and category information.",
+      "description": "Retrieve discussion thread metadata by ID and indicate how to inspect its document when needed.",
       "properties": {
         "input": {
           "$ref": "#/definitions/ToolThreadGetInput"
@@ -2529,7 +3145,7 @@
           "type": "string"
         },
         "content": {
-          "description": "Thread content as plain text",
+          "description": "Plain-text thread body included for external MCP callers.",
           "type": "string"
         },
         "created_at": {
@@ -2538,6 +3154,10 @@
         },
         "id": {
           "description": "Unique identifier for the thread",
+          "type": "string"
+        },
+        "next_action": {
+          "description": "Conditional instruction for a Robot to open this thread when it is relevant.",
           "type": "string"
         },
         "slug": {
@@ -2564,7 +3184,6 @@
         "id",
         "slug",
         "title",
-        "content",
         "visibility",
         "author",
         "category",
@@ -2658,6 +3277,145 @@
         "current_page",
         "total_pages",
         "total_results"
+      ],
+      "type": "object"
+    },
+    "ToolThreadOpen": {
+      "$id": "ToolThreadOpen",
+      "description": "Open a discussion thread and all currently visible replies as one active document snapshot, then return its initial bounded projection.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolThreadOpenInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolThreadOpenOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "thread_open",
+      "type": "object",
+      "x-storyden": {
+        "internal": true,
+        "toolsets": [
+          "system.discussions"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": false
+        },
+        "role": "READ_PUBLISHED_THREADS",
+        "title": "Open Thread"
+      }
+    },
+    "ToolThreadOpenInput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Thread ID or slug returned by discussion discovery tools.",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "ToolThreadOpenOutput": {
+      "additionalProperties": false,
+      "description": "A bounded view into an open document with stable identifiers for further navigation.",
+      "properties": {
+        "document_id": {
+          "description": "Conversation-local document identifier accepted by document navigation tools.",
+          "type": "string"
+        },
+        "item_end": {
+          "description": "One-indexed position of the final structural item shown on this page.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "item_start": {
+          "description": "One-indexed position of the first structural item shown on this page.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "next_action": {
+          "description": "Recommended document navigation action when more detail is needed.",
+          "type": "string"
+        },
+        "next_page": {
+          "description": "Next structural page when one exists.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "node_id": {
+          "description": "Structural location represented by this projection.",
+          "type": "string"
+        },
+        "page": {
+          "description": "One-indexed structural page currently shown for this location.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "previous_page": {
+          "description": "Previous structural page when one exists.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "projection": {
+          "description": "Bounded plain-text outline, preview, or complete leaf content for this location.",
+          "type": "string"
+        },
+        "source_id": {
+          "description": "Source identifier or URL used to open this snapshot.",
+          "type": "string"
+        },
+        "source_type": {
+          "description": "Origin kind used to distinguish documents with similar titles.",
+          "enum": [
+            "library_page",
+            "thread",
+            "web"
+          ],
+          "type": "string"
+        },
+        "title": {
+          "description": "Document title for identifying the current result.",
+          "type": "string"
+        },
+        "total_items": {
+          "description": "Total number of structural items available at this location.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "total_pages": {
+          "description": "Number of structural pages available for this location.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "truncated": {
+          "description": "Whether additional content exists beyond this projection.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "document_id",
+        "source_type",
+        "source_id",
+        "title",
+        "node_id",
+        "page",
+        "total_pages",
+        "projection",
+        "truncated",
+        "next_action"
       ],
       "type": "object"
     },
@@ -2978,7 +3736,7 @@
     },
     "ToolToolGet": {
       "$id": "ToolToolGet",
-      "description": "Get the full schema and runtime preconditions of one tool after finding its ID with tool_search. This is inspection only; it does not load or activate the tool.",
+      "description": "Get the full schema, Toolset membership, and runtime preconditions of one tool after finding its ID with tool_search. This is inspection only; it does not load or activate the tool.",
       "properties": {
         "input": {
           "$ref": "#/definitions/ToolToolGetInput"
@@ -3030,7 +3788,7 @@
           "type": "string"
         },
         "id": {
-          "description": "Stable tool identifier accepted by tool_load and Robot configuration tools.",
+          "description": "Stable tool identifier accepted by tool_load and Robot configuration tools unless toolset_only is true.",
           "type": "string"
         },
         "input_schema": {
@@ -3054,6 +3812,17 @@
         "requires_workspace": {
           "description": "Whether the conversation must have an active Robot workspace before this tool can be loaded or used.",
           "type": "boolean"
+        },
+        "toolset_only": {
+          "description": "Whether this capability must be loaded or assigned through one of its Toolsets instead of as an individual tool.",
+          "type": "boolean"
+        },
+        "toolsets": {
+          "description": "Built-in Toolsets that provide this tool together with their specialist instruction and related capabilities.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         }
       },
       "required": [
@@ -3061,6 +3830,8 @@
         "name",
         "description",
         "input_schema",
+        "toolsets",
+        "toolset_only",
         "requires_confirmation",
         "requires_workspace"
       ],
@@ -3068,7 +3839,7 @@
     },
     "ToolToolLoad": {
       "$id": "ToolToolLoad",
-      "description": "Activate one or more individual tools for the current Denbot conversation after inspecting their schemas and runtime preconditions with tool_get. Workspace-dependent tools cannot be loaded until the conversation has an active workspace.",
+      "description": "Activate one or more individual tools that are not already callable in the current Denbot conversation after inspecting their schemas and runtime preconditions with tool_get. Tools marked toolset_only must be activated through a declared Toolset. Workspace-dependent tools cannot be loaded until the conversation has an active workspace.",
       "properties": {
         "input": {
           "$ref": "#/definitions/ToolToolLoadInput"
@@ -3101,7 +3872,7 @@
       "additionalProperties": false,
       "properties": {
         "tools": {
-          "description": "Stable tool IDs inspected with tool_get.",
+          "description": "Stable tool IDs inspected with tool_get that are not currently callable and are not marked toolset_only.",
           "items": {
             "type": "string"
           },
@@ -3121,7 +3892,7 @@
           "description": "Tools activated for subsequent model steps in this conversation.",
           "items": {
             "additionalProperties": false,
-            "description": "A tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.",
+            "description": "An individually composable tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.",
             "properties": {
               "description": {
                 "description": "The outcome this tool can achieve, used to decide whether its full schema is worth inspecting.",
@@ -3220,7 +3991,7 @@
           "description": "Ranked tool candidates with enough context to choose which one to inspect.",
           "items": {
             "additionalProperties": false,
-            "description": "A tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.",
+            "description": "An individually composable tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.",
             "properties": {
               "description": {
                 "description": "The outcome this tool can achieve, used to decide whether its full schema is worth inspecting.",
@@ -3814,6 +4585,226 @@
       "required": [
         "id",
         "name"
+      ],
+      "type": "object"
+    },
+    "ToolWebFetch": {
+      "$id": "ToolWebFetch",
+      "description": "Fetch a web page for metadata without adding it to Storyden or opening a navigable document snapshot.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolWebFetchInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolWebFetchOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "web_fetch",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": []
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": true,
+          "readOnlyHint": true
+        },
+        "title": "Fetch Web Page"
+      }
+    },
+    "ToolWebFetchInput": {
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "description": "HTTP or HTTPS page URL to fetch.",
+          "format": "uri",
+          "type": "string"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "type": "object"
+    },
+    "ToolWebFetchOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "description": "Plain-text page content included for external MCP callers.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Page summary when exposed by the fetched document metadata.",
+          "type": "string"
+        },
+        "favicon_url": {
+          "description": "Resolved favicon URL when exposed by the fetched document.",
+          "format": "uri",
+          "type": "string"
+        },
+        "image_url": {
+          "description": "Resolved representative image URL when exposed by the fetched document.",
+          "format": "uri",
+          "type": "string"
+        },
+        "next_action": {
+          "description": "Conditional instruction for a Robot to open this page when it is relevant.",
+          "type": "string"
+        },
+        "title": {
+          "description": "Page title when exposed by the fetched document metadata.",
+          "type": "string"
+        },
+        "url": {
+          "description": "Page URL supplied to the safe web fetcher.",
+          "format": "uri",
+          "type": "string"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "type": "object"
+    },
+    "ToolWebOpen": {
+      "$id": "ToolWebOpen",
+      "description": "Fetch a web page as the active document snapshot without storing it in Storyden's link index.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolWebOpenInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolWebOpenOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "web_open",
+      "type": "object",
+      "x-storyden": {
+        "internal": true,
+        "toolsets": []
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": true,
+          "readOnlyHint": false
+        },
+        "title": "Open Web Page"
+      }
+    },
+    "ToolWebOpenInput": {
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "description": "HTTP or HTTPS page URL to fetch and open.",
+          "format": "uri",
+          "type": "string"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "type": "object"
+    },
+    "ToolWebOpenOutput": {
+      "additionalProperties": false,
+      "description": "A bounded view into an open document with stable identifiers for further navigation.",
+      "properties": {
+        "document_id": {
+          "description": "Conversation-local document identifier accepted by document navigation tools.",
+          "type": "string"
+        },
+        "item_end": {
+          "description": "One-indexed position of the final structural item shown on this page.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "item_start": {
+          "description": "One-indexed position of the first structural item shown on this page.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "next_action": {
+          "description": "Recommended document navigation action when more detail is needed.",
+          "type": "string"
+        },
+        "next_page": {
+          "description": "Next structural page when one exists.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "node_id": {
+          "description": "Structural location represented by this projection.",
+          "type": "string"
+        },
+        "page": {
+          "description": "One-indexed structural page currently shown for this location.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "previous_page": {
+          "description": "Previous structural page when one exists.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "projection": {
+          "description": "Bounded plain-text outline, preview, or complete leaf content for this location.",
+          "type": "string"
+        },
+        "source_id": {
+          "description": "Source identifier or URL used to open this snapshot.",
+          "type": "string"
+        },
+        "source_type": {
+          "description": "Origin kind used to distinguish documents with similar titles.",
+          "enum": [
+            "library_page",
+            "thread",
+            "web"
+          ],
+          "type": "string"
+        },
+        "title": {
+          "description": "Document title for identifying the current result.",
+          "type": "string"
+        },
+        "total_items": {
+          "description": "Total number of structural items available at this location.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "total_pages": {
+          "description": "Number of structural pages available for this location.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "truncated": {
+          "description": "Whether additional content exists beyond this projection.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "document_id",
+        "source_type",
+        "source_id",
+        "title",
+        "node_id",
+        "page",
+        "total_pages",
+        "projection",
+        "truncated",
+        "next_action"
       ],
       "type": "object"
     }

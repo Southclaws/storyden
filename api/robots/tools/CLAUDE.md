@@ -51,6 +51,24 @@ x-storyden:
 
 Omit `internal` for tools that external MCP clients may discover and call.
 
+## Toolset-only tools
+
+Set `x-storyden.toolset_only: true` when a tool depends on the complete Toolset
+that owns it and must not be assigned to a Robot or loaded into a conversation
+as an individual tool:
+
+```yaml
+x-storyden:
+  internal: true
+  toolset_only: true
+  toolsets:
+    - system.documents
+```
+
+Toolset-only tools may only be provided by the built-in Toolsets declared in
+`x-storyden.toolsets`. Individual-tool discovery, custom Toolset authoring, and
+Robot configuration surfaces must direct callers to an owning Toolset instead.
+
 ---
 
 ## 1. Tool Naming

@@ -114,8 +114,17 @@ function RobotToolCallContent({ part }: Props) {
     return null;
   }
 
+  if (part.state === "output-error") {
+    return <RobotToolError error={part.errorText} />;
+  }
+
   if (!part.output) {
     return null;
+  }
+
+  const outputError = readToolOutputError(part.output);
+  if (outputError) {
+    return <RobotToolError error={outputError} />;
   }
 
   if (!isToolType(part.type)) {
@@ -128,6 +137,18 @@ function RobotToolCallContent({ part }: Props) {
     case "tool-reply_search":
     case "tool-post_search":
       return <p>{part.output.results} results found</p>;
+
+    case "tool-document_search":
+      return <p>{part.output.matches.length} document locations found</p>;
+
+    case "tool-document_list":
+      return <p>{part.output.documents.length} documents open</p>;
+
+    case "tool-document_close":
+      return <p>Closed document</p>;
+
+    case "tool-document_get":
+      return null;
 
     case "tool-member_search":
       return <p>{part.output.results} members found</p>;
@@ -190,7 +211,8 @@ function RobotToolCallContent({ part }: Props) {
     case "tool-library_request_page":
       return <p>Selected "{part.output.name}"</p>;
 
-    case "tool-get_library_page":
+    case "tool-library_page_get":
+    case "tool-library_page_open":
       return null;
 
     case "tool-create_library_page":
@@ -214,6 +236,10 @@ function RobotToolCallContent({ part }: Props) {
     case "tool-link_create":
       return <p>Created link</p>;
 
+    case "tool-web_fetch":
+    case "tool-web_open":
+      return null;
+
     case "tool-thread_create":
       return <p>Created "{part.output.title}"</p>;
 
@@ -221,6 +247,7 @@ function RobotToolCallContent({ part }: Props) {
       return null;
 
     case "tool-thread_get":
+    case "tool-thread_open":
       return null;
 
     case "tool-thread_update":
@@ -234,11 +261,57 @@ function RobotToolCallContent({ part }: Props) {
   }
 }
 
+function RobotToolError({ error }: { error: string }) {
+  return (
+    <Text
+      role="alert"
+      variant="supporting"
+      color="status.danger.content"
+      overflowWrap="anywhere"
+    >
+      {summarizeToolError(error)}
+    </Text>
+  );
+}
+
+function summarizeToolError(error: string): string {
+  const firstLine = error.split(/\r?\n/, 1)[0]?.trim() || "Tool failed";
+  const unavailableTool = firstLine.match(
+    /^tool ['"]([^'"]+)['"] not found\.?$/i,
+  );
+
+  if (unavailableTool) {
+    return `“${unavailableTool[1]}” isn’t available in this conversation.`;
+  }
+
+  const toolsetOnly = firstLine.match(
+    /^tool ['"]([^'"]+)['"] is Toolset-only.+use Toolset ([^ ]+) instead$/i,
+  );
+
+  if (toolsetOnly) {
+    return `“${toolsetOnly[1]}” can’t be loaded individually; load ${toolsetOnly[2]} instead.`;
+  }
+
+  const characters = Array.from(firstLine);
+  if (characters.length <= 240) {
+    return firstLine;
+  }
+
+  return `${characters.slice(0, 239).join("").trimEnd()}…`;
+}
+
 function RobotToolCallStatus({ part }: Props) {
   const { messages } = useRobotChat();
 
   if (!isToolUIPart(part)) {
     return null;
+  }
+
+  if (
+    part.state === "output-error" ||
+    (part.state === "output-available" && readToolOutputError(part.output))
+  ) {
+    return <span>Error</span>;
   }
 
   const confirmationResolution = getToolConfirmationResolution(part, messages);
@@ -259,11 +332,31 @@ function RobotToolCallStatus({ part }: Props) {
     )
     .with("input-streaming", () => "Running tool")
     .with("output-available", () => "Tool complete")
-    .with("output-error", () => "Error")
     .with("output-denied", () => "Denied")
     .otherwise(() => "Tool complete");
 
   return <span>{label}</span>;
+}
+
+function readToolOutputError(output: unknown): string | undefined {
+  if (!output || typeof output !== "object" || !("error" in output)) {
+    return undefined;
+  }
+
+  if (typeof output.error === "string") {
+    return output.error.trim() || "Tool failed";
+  }
+
+  if (
+    output.error &&
+    typeof output.error === "object" &&
+    "message" in output.error &&
+    typeof output.error.message === "string"
+  ) {
+    return output.error.message.trim() || "Tool failed";
+  }
+
+  return "Tool failed";
 }
 
 function RobotToolConfirmation({ part }: Props) {
