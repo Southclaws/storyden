@@ -27,6 +27,7 @@ var (
 	EventNodeVersionCreated   = Event{eventNodeVersionCreated}
 	EventNodeVersionApplied   = Event{eventNodeVersionApplied}
 	EventNodeVersionDeleted   = Event{eventNodeVersionDeleted}
+	EventTrailRunAttention    = Event{eventTrailRunAttention}
 )
 
 func (r Event) Format(f fmt.State, verb rune) {
@@ -96,6 +97,8 @@ func NewEvent(__iNpUt__ string) (Event, error) {
 		return EventNodeVersionApplied, nil
 	case string(eventNodeVersionDeleted):
 		return EventNodeVersionDeleted, nil
+	case string(eventTrailRunAttention):
+		return EventTrailRunAttention, nil
 	default:
 		return Event{}, fmt.Errorf("invalid value for type 'Event': '%s'", __iNpUt__)
 	}

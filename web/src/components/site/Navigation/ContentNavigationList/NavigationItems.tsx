@@ -12,6 +12,7 @@ import {
   type Account,
   type CategoryListOKResponse,
   type NodeListResult,
+  Permission,
 } from "@/api/openapi-schema";
 import { CategoryList } from "@/components/category/CategoryList/CategoryList";
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
@@ -44,6 +45,7 @@ import {
   replaceCustomNavigationLink,
 } from "@/lib/settings/navigation";
 import { useNavigationMutation } from "@/lib/settings/navigation-client";
+import { hasPermission } from "@/utils/permissions";
 import { generateXid } from "@/utils/xid";
 
 import { Anchor } from "../Anchors/Anchor";
@@ -74,9 +76,10 @@ export function NavigationItems(props: Props) {
     null,
   );
   const [isCreatingCustomLink, setCreatingCustomLink] = useState(false);
-  const visibleItems = props.navigation.items.filter(
-    (item) => item.type !== "robots" || props.robotsEnabled,
-  );
+  const visibleItems = props.navigation.items.filter((item) => {
+    if (item.type === "robots") return props.robotsEnabled;
+    return true;
+  });
   const itemKeys = visibleItems.map(getNavigationItemKey);
 
   const moveItem = useCallback(
@@ -343,7 +346,19 @@ function NavigationItemContent({
         />
       );
     case "robots":
-      return <RobotsAnchor />;
+      return (
+        <RobotsAnchor
+          route={
+            hasPermission(
+              session,
+              Permission.USE_ROBOTS,
+              Permission.MANAGE_ROBOTS,
+            )
+              ? "/robots"
+              : "/robots/trails"
+          }
+        />
+      );
     case "collections":
       return <CollectionsAnchor />;
     case "links":

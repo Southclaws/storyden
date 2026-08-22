@@ -38,6 +38,10 @@ const (
 	FieldNextEventSequence = "next_event_sequence"
 	// FieldLeaseExpiresAt holds the string denoting the lease_expires_at field in the database.
 	FieldLeaseExpiresAt = "lease_expires_at"
+	// FieldOriginKind holds the string denoting the origin_kind field in the database.
+	FieldOriginKind = "origin_kind"
+	// FieldOriginID holds the string denoting the origin_id field in the database.
+	FieldOriginID = "origin_id"
 	// EdgeCreator holds the string denoting the creator edge name in mutations.
 	EdgeCreator = "creator"
 	// EdgeViews holds the string denoting the views edge name in mutations.
@@ -101,6 +105,8 @@ var Columns = []string{
 	FieldLeaseGeneration,
 	FieldNextEventSequence,
 	FieldLeaseExpiresAt,
+	FieldOriginKind,
+	FieldOriginID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -156,6 +162,32 @@ func ExecutionStatusValidator(es ExecutionStatus) error {
 		return nil
 	default:
 		return fmt.Errorf("robotsession: invalid enum value for execution_status field: %q", es)
+	}
+}
+
+// OriginKind defines the type for the "origin_kind" enum field.
+type OriginKind string
+
+// OriginKindInteractive is the default value of the OriginKind enum.
+const DefaultOriginKind = OriginKindInteractive
+
+// OriginKind values.
+const (
+	OriginKindInteractive OriginKind = "interactive"
+	OriginKindTrailAction OriginKind = "trail_action"
+)
+
+func (ok OriginKind) String() string {
+	return string(ok)
+}
+
+// OriginKindValidator is a validator for the "origin_kind" field enum values. It is called by the builders before save.
+func OriginKindValidator(ok OriginKind) error {
+	switch ok {
+	case OriginKindInteractive, OriginKindTrailAction:
+		return nil
+	default:
+		return fmt.Errorf("robotsession: invalid enum value for origin_kind field: %q", ok)
 	}
 }
 
@@ -215,6 +247,16 @@ func ByNextEventSequence(opts ...sql.OrderTermOption) OrderOption {
 // ByLeaseExpiresAt orders the results by the lease_expires_at field.
 func ByLeaseExpiresAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLeaseExpiresAt, opts...).ToFunc()
+}
+
+// ByOriginKind orders the results by the origin_kind field.
+func ByOriginKind(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOriginKind, opts...).ToFunc()
+}
+
+// ByOriginID orders the results by the origin_id field.
+func ByOriginID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOriginID, opts...).ToFunc()
 }
 
 // ByCreatorField orders the results by creator field.

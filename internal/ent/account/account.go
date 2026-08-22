@@ -136,6 +136,10 @@ const (
 	EdgeRobotSessionInputs = "robot_session_inputs"
 	// EdgeInitiatedRobotTurns holds the string denoting the initiated_robot_turns edge name in mutations.
 	EdgeInitiatedRobotTurns = "initiated_robot_turns"
+	// EdgeCreatedTrails holds the string denoting the created_trails edge name in mutations.
+	EdgeCreatedTrails = "created_trails"
+	// EdgeInitiatedTrailRuns holds the string denoting the initiated_trail_runs edge name in mutations.
+	EdgeInitiatedTrailRuns = "initiated_trail_runs"
 	// EdgeAccountRoles holds the string denoting the account_roles edge name in mutations.
 	EdgeAccountRoles = "account_roles"
 	// Table holds the table name of the account in the database.
@@ -458,6 +462,20 @@ const (
 	InitiatedRobotTurnsInverseTable = "robot_session_turns"
 	// InitiatedRobotTurnsColumn is the table column denoting the initiated_robot_turns relation/edge.
 	InitiatedRobotTurnsColumn = "initiated_by_account_id"
+	// CreatedTrailsTable is the table that holds the created_trails relation/edge.
+	CreatedTrailsTable = "trails"
+	// CreatedTrailsInverseTable is the table name for the Trail entity.
+	// It exists in this package in order to avoid circular dependency with the "trail" package.
+	CreatedTrailsInverseTable = "trails"
+	// CreatedTrailsColumn is the table column denoting the created_trails relation/edge.
+	CreatedTrailsColumn = "account_id"
+	// InitiatedTrailRunsTable is the table that holds the initiated_trail_runs relation/edge.
+	InitiatedTrailRunsTable = "trail_runs"
+	// InitiatedTrailRunsInverseTable is the table name for the TrailRun entity.
+	// It exists in this package in order to avoid circular dependency with the "trailrun" package.
+	InitiatedTrailRunsInverseTable = "trail_runs"
+	// InitiatedTrailRunsColumn is the table column denoting the initiated_trail_runs relation/edge.
+	InitiatedTrailRunsColumn = "initiated_by_id"
 	// AccountRolesTable is the table that holds the account_roles relation/edge.
 	AccountRolesTable = "account_roles"
 	// AccountRolesInverseTable is the table name for the AccountRoles entity.
@@ -1282,6 +1300,34 @@ func ByInitiatedRobotTurns(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOpti
 	}
 }
 
+// ByCreatedTrailsCount orders the results by created_trails count.
+func ByCreatedTrailsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCreatedTrailsStep(), opts...)
+	}
+}
+
+// ByCreatedTrails orders the results by created_trails terms.
+func ByCreatedTrails(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCreatedTrailsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByInitiatedTrailRunsCount orders the results by initiated_trail_runs count.
+func ByInitiatedTrailRunsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newInitiatedTrailRunsStep(), opts...)
+	}
+}
+
+// ByInitiatedTrailRuns orders the results by initiated_trail_runs terms.
+func ByInitiatedTrailRuns(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newInitiatedTrailRunsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByAccountRolesCount orders the results by account_roles count.
 func ByAccountRolesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -1615,6 +1661,20 @@ func newInitiatedRobotTurnsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(InitiatedRobotTurnsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, InitiatedRobotTurnsTable, InitiatedRobotTurnsColumn),
+	)
+}
+func newCreatedTrailsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CreatedTrailsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, CreatedTrailsTable, CreatedTrailsColumn),
+	)
+}
+func newInitiatedTrailRunsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(InitiatedTrailRunsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, InitiatedTrailRunsTable, InitiatedTrailRunsColumn),
 	)
 }
 func newAccountRolesStep() *sqlgraph.Step {

@@ -30,7 +30,7 @@ export function EmptyState({
     : (unauthenticatedLabel ?? "Please log in to contribute.");
 
   return (
-    <Center className={vstack(props)} p="8" gap="2" color="text.muted">
+    <Center className={vstack(props)} w="full" p="8" gap="2" color="text.muted">
       {icon || <EmptyIcon />}
 
       <VStack gap="1" textAlign="center" fontStyle="italic">

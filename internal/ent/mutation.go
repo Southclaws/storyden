@@ -68,6 +68,11 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/ent/setting"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/trail"
+	"github.com/Southclaws/storyden/internal/ent/trailaction"
+	"github.com/Southclaws/storyden/internal/ent/trailactionrun"
+	"github.com/Southclaws/storyden/internal/ent/trailrun"
+	"github.com/Southclaws/storyden/internal/ent/trailschedulerlease"
 	"github.com/Southclaws/storyden/internal/ent/warning"
 	"github.com/rs/xid"
 )
@@ -134,6 +139,11 @@ const (
 	TypeSession                      = "Session"
 	TypeSetting                      = "Setting"
 	TypeTag                          = "Tag"
+	TypeTrail                        = "Trail"
+	TypeTrailAction                  = "TrailAction"
+	TypeTrailActionRun               = "TrailActionRun"
+	TypeTrailRun                     = "TrailRun"
+	TypeTrailSchedulerLease          = "TrailSchedulerLease"
 	TypeWarning                      = "Warning"
 )
 
@@ -295,6 +305,12 @@ type AccountMutation struct {
 	initiated_robot_turns                       map[xid.ID]struct{}
 	removedinitiated_robot_turns                map[xid.ID]struct{}
 	clearedinitiated_robot_turns                bool
+	created_trails                              map[xid.ID]struct{}
+	removedcreated_trails                       map[xid.ID]struct{}
+	clearedcreated_trails                       bool
+	initiated_trail_runs                        map[xid.ID]struct{}
+	removedinitiated_trail_runs                 map[xid.ID]struct{}
+	clearedinitiated_trail_runs                 bool
 	account_roles                               map[xid.ID]struct{}
 	removedaccount_roles                        map[xid.ID]struct{}
 	clearedaccount_roles                        bool
@@ -3475,6 +3491,114 @@ func (m *AccountMutation) ResetInitiatedRobotTurns() {
 	m.removedinitiated_robot_turns = nil
 }
 
+// AddCreatedTrailIDs adds the "created_trails" edge to the Trail entity by ids.
+func (m *AccountMutation) AddCreatedTrailIDs(ids ...xid.ID) {
+	if m.created_trails == nil {
+		m.created_trails = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.created_trails[ids[i]] = struct{}{}
+	}
+}
+
+// ClearCreatedTrails clears the "created_trails" edge to the Trail entity.
+func (m *AccountMutation) ClearCreatedTrails() {
+	m.clearedcreated_trails = true
+}
+
+// CreatedTrailsCleared reports if the "created_trails" edge to the Trail entity was cleared.
+func (m *AccountMutation) CreatedTrailsCleared() bool {
+	return m.clearedcreated_trails
+}
+
+// RemoveCreatedTrailIDs removes the "created_trails" edge to the Trail entity by IDs.
+func (m *AccountMutation) RemoveCreatedTrailIDs(ids ...xid.ID) {
+	if m.removedcreated_trails == nil {
+		m.removedcreated_trails = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.created_trails, ids[i])
+		m.removedcreated_trails[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCreatedTrails returns the removed IDs of the "created_trails" edge to the Trail entity.
+func (m *AccountMutation) RemovedCreatedTrailsIDs() (ids []xid.ID) {
+	for id := range m.removedcreated_trails {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CreatedTrailsIDs returns the "created_trails" edge IDs in the mutation.
+func (m *AccountMutation) CreatedTrailsIDs() (ids []xid.ID) {
+	for id := range m.created_trails {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetCreatedTrails resets all changes to the "created_trails" edge.
+func (m *AccountMutation) ResetCreatedTrails() {
+	m.created_trails = nil
+	m.clearedcreated_trails = false
+	m.removedcreated_trails = nil
+}
+
+// AddInitiatedTrailRunIDs adds the "initiated_trail_runs" edge to the TrailRun entity by ids.
+func (m *AccountMutation) AddInitiatedTrailRunIDs(ids ...xid.ID) {
+	if m.initiated_trail_runs == nil {
+		m.initiated_trail_runs = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.initiated_trail_runs[ids[i]] = struct{}{}
+	}
+}
+
+// ClearInitiatedTrailRuns clears the "initiated_trail_runs" edge to the TrailRun entity.
+func (m *AccountMutation) ClearInitiatedTrailRuns() {
+	m.clearedinitiated_trail_runs = true
+}
+
+// InitiatedTrailRunsCleared reports if the "initiated_trail_runs" edge to the TrailRun entity was cleared.
+func (m *AccountMutation) InitiatedTrailRunsCleared() bool {
+	return m.clearedinitiated_trail_runs
+}
+
+// RemoveInitiatedTrailRunIDs removes the "initiated_trail_runs" edge to the TrailRun entity by IDs.
+func (m *AccountMutation) RemoveInitiatedTrailRunIDs(ids ...xid.ID) {
+	if m.removedinitiated_trail_runs == nil {
+		m.removedinitiated_trail_runs = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.initiated_trail_runs, ids[i])
+		m.removedinitiated_trail_runs[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedInitiatedTrailRuns returns the removed IDs of the "initiated_trail_runs" edge to the TrailRun entity.
+func (m *AccountMutation) RemovedInitiatedTrailRunsIDs() (ids []xid.ID) {
+	for id := range m.removedinitiated_trail_runs {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// InitiatedTrailRunsIDs returns the "initiated_trail_runs" edge IDs in the mutation.
+func (m *AccountMutation) InitiatedTrailRunsIDs() (ids []xid.ID) {
+	for id := range m.initiated_trail_runs {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetInitiatedTrailRuns resets all changes to the "initiated_trail_runs" edge.
+func (m *AccountMutation) ResetInitiatedTrailRuns() {
+	m.initiated_trail_runs = nil
+	m.clearedinitiated_trail_runs = false
+	m.removedinitiated_trail_runs = nil
+}
+
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by ids.
 func (m *AccountMutation) AddAccountRoleIDs(ids ...xid.ID) {
 	if m.account_roles == nil {
@@ -3928,7 +4052,7 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 47)
+	edges := make([]string, 0, 49)
 	if m.sessions != nil {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -4066,6 +4190,12 @@ func (m *AccountMutation) AddedEdges() []string {
 	}
 	if m.initiated_robot_turns != nil {
 		edges = append(edges, account.EdgeInitiatedRobotTurns)
+	}
+	if m.created_trails != nil {
+		edges = append(edges, account.EdgeCreatedTrails)
+	}
+	if m.initiated_trail_runs != nil {
+		edges = append(edges, account.EdgeInitiatedTrailRuns)
 	}
 	if m.account_roles != nil {
 		edges = append(edges, account.EdgeAccountRoles)
@@ -4351,6 +4481,18 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeCreatedTrails:
+		ids := make([]ent.Value, 0, len(m.created_trails))
+		for id := range m.created_trails {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeInitiatedTrailRuns:
+		ids := make([]ent.Value, 0, len(m.initiated_trail_runs))
+		for id := range m.initiated_trail_runs {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeAccountRoles:
 		ids := make([]ent.Value, 0, len(m.account_roles))
 		for id := range m.account_roles {
@@ -4363,7 +4505,7 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 47)
+	edges := make([]string, 0, 49)
 	if m.removedsessions != nil {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -4498,6 +4640,12 @@ func (m *AccountMutation) RemovedEdges() []string {
 	}
 	if m.removedinitiated_robot_turns != nil {
 		edges = append(edges, account.EdgeInitiatedRobotTurns)
+	}
+	if m.removedcreated_trails != nil {
+		edges = append(edges, account.EdgeCreatedTrails)
+	}
+	if m.removedinitiated_trail_runs != nil {
+		edges = append(edges, account.EdgeInitiatedTrailRuns)
 	}
 	if m.removedaccount_roles != nil {
 		edges = append(edges, account.EdgeAccountRoles)
@@ -4779,6 +4927,18 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeCreatedTrails:
+		ids := make([]ent.Value, 0, len(m.removedcreated_trails))
+		for id := range m.removedcreated_trails {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeInitiatedTrailRuns:
+		ids := make([]ent.Value, 0, len(m.removedinitiated_trail_runs))
+		for id := range m.removedinitiated_trail_runs {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeAccountRoles:
 		ids := make([]ent.Value, 0, len(m.removedaccount_roles))
 		for id := range m.removedaccount_roles {
@@ -4791,7 +4951,7 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 47)
+	edges := make([]string, 0, 49)
 	if m.clearedsessions {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -4930,6 +5090,12 @@ func (m *AccountMutation) ClearedEdges() []string {
 	if m.clearedinitiated_robot_turns {
 		edges = append(edges, account.EdgeInitiatedRobotTurns)
 	}
+	if m.clearedcreated_trails {
+		edges = append(edges, account.EdgeCreatedTrails)
+	}
+	if m.clearedinitiated_trail_runs {
+		edges = append(edges, account.EdgeInitiatedTrailRuns)
+	}
 	if m.clearedaccount_roles {
 		edges = append(edges, account.EdgeAccountRoles)
 	}
@@ -5032,6 +5198,10 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearedrobot_session_inputs
 	case account.EdgeInitiatedRobotTurns:
 		return m.clearedinitiated_robot_turns
+	case account.EdgeCreatedTrails:
+		return m.clearedcreated_trails
+	case account.EdgeInitiatedTrailRuns:
+		return m.clearedinitiated_trail_runs
 	case account.EdgeAccountRoles:
 		return m.clearedaccount_roles
 	}
@@ -5190,6 +5360,12 @@ func (m *AccountMutation) ResetEdge(name string) error {
 		return nil
 	case account.EdgeInitiatedRobotTurns:
 		m.ResetInitiatedRobotTurns()
+		return nil
+	case account.EdgeCreatedTrails:
+		m.ResetCreatedTrails()
+		return nil
+	case account.EdgeInitiatedTrailRuns:
+		m.ResetInitiatedTrailRuns()
 		return nil
 	case account.EdgeAccountRoles:
 		m.ResetAccountRoles()
@@ -24089,6 +24265,7 @@ type NotificationMutation struct {
 	created_at     *time.Time
 	deleted_at     *time.Time
 	event_type     *string
+	target         *string
 	datagraph_kind *string
 	datagraph_id   *xid.ID
 	read           *bool
@@ -24325,6 +24502,55 @@ func (m *NotificationMutation) OldEventType(ctx context.Context) (v string, err 
 // ResetEventType resets all changes to the "event_type" field.
 func (m *NotificationMutation) ResetEventType() {
 	m.event_type = nil
+}
+
+// SetTarget sets the "target" field.
+func (m *NotificationMutation) SetTarget(s string) {
+	m.target = &s
+}
+
+// Target returns the value of the "target" field in the mutation.
+func (m *NotificationMutation) Target() (r string, exists bool) {
+	v := m.target
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTarget returns the old "target" field's value of the Notification entity.
+// If the Notification object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NotificationMutation) OldTarget(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTarget is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTarget requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTarget: %w", err)
+	}
+	return oldValue.Target, nil
+}
+
+// ClearTarget clears the value of the "target" field.
+func (m *NotificationMutation) ClearTarget() {
+	m.target = nil
+	m.clearedFields[notification.FieldTarget] = struct{}{}
+}
+
+// TargetCleared returns if the "target" field was cleared in this mutation.
+func (m *NotificationMutation) TargetCleared() bool {
+	_, ok := m.clearedFields[notification.FieldTarget]
+	return ok
+}
+
+// ResetTarget resets all changes to the "target" field.
+func (m *NotificationMutation) ResetTarget() {
+	m.target = nil
+	delete(m.clearedFields, notification.FieldTarget)
 }
 
 // SetDatagraphKind sets the "datagraph_kind" field.
@@ -24660,7 +24886,7 @@ func (m *NotificationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NotificationMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.created_at != nil {
 		fields = append(fields, notification.FieldCreatedAt)
 	}
@@ -24669,6 +24895,9 @@ func (m *NotificationMutation) Fields() []string {
 	}
 	if m.event_type != nil {
 		fields = append(fields, notification.FieldEventType)
+	}
+	if m.target != nil {
+		fields = append(fields, notification.FieldTarget)
 	}
 	if m.datagraph_kind != nil {
 		fields = append(fields, notification.FieldDatagraphKind)
@@ -24699,6 +24928,8 @@ func (m *NotificationMutation) Field(name string) (ent.Value, bool) {
 		return m.DeletedAt()
 	case notification.FieldEventType:
 		return m.EventType()
+	case notification.FieldTarget:
+		return m.Target()
 	case notification.FieldDatagraphKind:
 		return m.DatagraphKind()
 	case notification.FieldDatagraphID:
@@ -24724,6 +24955,8 @@ func (m *NotificationMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldDeletedAt(ctx)
 	case notification.FieldEventType:
 		return m.OldEventType(ctx)
+	case notification.FieldTarget:
+		return m.OldTarget(ctx)
 	case notification.FieldDatagraphKind:
 		return m.OldDatagraphKind(ctx)
 	case notification.FieldDatagraphID:
@@ -24763,6 +24996,13 @@ func (m *NotificationMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetEventType(v)
+		return nil
+	case notification.FieldTarget:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTarget(v)
 		return nil
 	case notification.FieldDatagraphKind:
 		v, ok := value.(string)
@@ -24832,6 +25072,9 @@ func (m *NotificationMutation) ClearedFields() []string {
 	if m.FieldCleared(notification.FieldDeletedAt) {
 		fields = append(fields, notification.FieldDeletedAt)
 	}
+	if m.FieldCleared(notification.FieldTarget) {
+		fields = append(fields, notification.FieldTarget)
+	}
 	if m.FieldCleared(notification.FieldDatagraphKind) {
 		fields = append(fields, notification.FieldDatagraphKind)
 	}
@@ -24858,6 +25101,9 @@ func (m *NotificationMutation) ClearField(name string) error {
 	case notification.FieldDeletedAt:
 		m.ClearDeletedAt()
 		return nil
+	case notification.FieldTarget:
+		m.ClearTarget()
+		return nil
 	case notification.FieldDatagraphKind:
 		m.ClearDatagraphKind()
 		return nil
@@ -24883,6 +25129,9 @@ func (m *NotificationMutation) ResetField(name string) error {
 		return nil
 	case notification.FieldEventType:
 		m.ResetEventType()
+		return nil
+	case notification.FieldTarget:
+		m.ResetTarget()
 		return nil
 	case notification.FieldDatagraphKind:
 		m.ResetDatagraphKind()
@@ -45619,6 +45868,8 @@ type RobotSessionMutation struct {
 	next_event_sequence    *uint64
 	addnext_event_sequence *int64
 	lease_expires_at       *time.Time
+	origin_kind            *robotsession.OriginKind
+	origin_id              *xid.ID
 	clearedFields          map[string]struct{}
 	creator                *xid.ID
 	clearedcreator         bool
@@ -46231,6 +46482,91 @@ func (m *RobotSessionMutation) ResetLeaseExpiresAt() {
 	delete(m.clearedFields, robotsession.FieldLeaseExpiresAt)
 }
 
+// SetOriginKind sets the "origin_kind" field.
+func (m *RobotSessionMutation) SetOriginKind(rk robotsession.OriginKind) {
+	m.origin_kind = &rk
+}
+
+// OriginKind returns the value of the "origin_kind" field in the mutation.
+func (m *RobotSessionMutation) OriginKind() (r robotsession.OriginKind, exists bool) {
+	v := m.origin_kind
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOriginKind returns the old "origin_kind" field's value of the RobotSession entity.
+// If the RobotSession object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotSessionMutation) OldOriginKind(ctx context.Context) (v robotsession.OriginKind, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOriginKind is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOriginKind requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOriginKind: %w", err)
+	}
+	return oldValue.OriginKind, nil
+}
+
+// ResetOriginKind resets all changes to the "origin_kind" field.
+func (m *RobotSessionMutation) ResetOriginKind() {
+	m.origin_kind = nil
+}
+
+// SetOriginID sets the "origin_id" field.
+func (m *RobotSessionMutation) SetOriginID(x xid.ID) {
+	m.origin_id = &x
+}
+
+// OriginID returns the value of the "origin_id" field in the mutation.
+func (m *RobotSessionMutation) OriginID() (r xid.ID, exists bool) {
+	v := m.origin_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOriginID returns the old "origin_id" field's value of the RobotSession entity.
+// If the RobotSession object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotSessionMutation) OldOriginID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOriginID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOriginID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOriginID: %w", err)
+	}
+	return oldValue.OriginID, nil
+}
+
+// ClearOriginID clears the value of the "origin_id" field.
+func (m *RobotSessionMutation) ClearOriginID() {
+	m.origin_id = nil
+	m.clearedFields[robotsession.FieldOriginID] = struct{}{}
+}
+
+// OriginIDCleared returns if the "origin_id" field was cleared in this mutation.
+func (m *RobotSessionMutation) OriginIDCleared() bool {
+	_, ok := m.clearedFields[robotsession.FieldOriginID]
+	return ok
+}
+
+// ResetOriginID resets all changes to the "origin_id" field.
+func (m *RobotSessionMutation) ResetOriginID() {
+	m.origin_id = nil
+	delete(m.clearedFields, robotsession.FieldOriginID)
+}
+
 // SetCreatorID sets the "creator" edge to the Account entity by id.
 func (m *RobotSessionMutation) SetCreatorID(id xid.ID) {
 	m.creator = &id
@@ -46521,7 +46857,7 @@ func (m *RobotSessionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RobotSessionMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 13)
 	if m.created_at != nil {
 		fields = append(fields, robotsession.FieldCreatedAt)
 	}
@@ -46555,6 +46891,12 @@ func (m *RobotSessionMutation) Fields() []string {
 	if m.lease_expires_at != nil {
 		fields = append(fields, robotsession.FieldLeaseExpiresAt)
 	}
+	if m.origin_kind != nil {
+		fields = append(fields, robotsession.FieldOriginKind)
+	}
+	if m.origin_id != nil {
+		fields = append(fields, robotsession.FieldOriginID)
+	}
 	return fields
 }
 
@@ -46585,6 +46927,10 @@ func (m *RobotSessionMutation) Field(name string) (ent.Value, bool) {
 		return m.NextEventSequence()
 	case robotsession.FieldLeaseExpiresAt:
 		return m.LeaseExpiresAt()
+	case robotsession.FieldOriginKind:
+		return m.OriginKind()
+	case robotsession.FieldOriginID:
+		return m.OriginID()
 	}
 	return nil, false
 }
@@ -46616,6 +46962,10 @@ func (m *RobotSessionMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldNextEventSequence(ctx)
 	case robotsession.FieldLeaseExpiresAt:
 		return m.OldLeaseExpiresAt(ctx)
+	case robotsession.FieldOriginKind:
+		return m.OldOriginKind(ctx)
+	case robotsession.FieldOriginID:
+		return m.OldOriginID(ctx)
 	}
 	return nil, fmt.Errorf("unknown RobotSession field %s", name)
 }
@@ -46702,6 +47052,20 @@ func (m *RobotSessionMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetLeaseExpiresAt(v)
 		return nil
+	case robotsession.FieldOriginKind:
+		v, ok := value.(robotsession.OriginKind)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOriginKind(v)
+		return nil
+	case robotsession.FieldOriginID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOriginID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown RobotSession field %s", name)
 }
@@ -46771,6 +47135,9 @@ func (m *RobotSessionMutation) ClearedFields() []string {
 	if m.FieldCleared(robotsession.FieldLeaseExpiresAt) {
 		fields = append(fields, robotsession.FieldLeaseExpiresAt)
 	}
+	if m.FieldCleared(robotsession.FieldOriginID) {
+		fields = append(fields, robotsession.FieldOriginID)
+	}
 	return fields
 }
 
@@ -46796,6 +47163,9 @@ func (m *RobotSessionMutation) ClearField(name string) error {
 		return nil
 	case robotsession.FieldLeaseExpiresAt:
 		m.ClearLeaseExpiresAt()
+		return nil
+	case robotsession.FieldOriginID:
+		m.ClearOriginID()
 		return nil
 	}
 	return fmt.Errorf("unknown RobotSession nullable field %s", name)
@@ -46837,6 +47207,12 @@ func (m *RobotSessionMutation) ResetField(name string) error {
 		return nil
 	case robotsession.FieldLeaseExpiresAt:
 		m.ResetLeaseExpiresAt()
+		return nil
+	case robotsession.FieldOriginKind:
+		m.ResetOriginKind()
+		return nil
+	case robotsession.FieldOriginID:
+		m.ResetOriginID()
 		return nil
 	}
 	return fmt.Errorf("unknown RobotSession field %s", name)
@@ -56983,6 +57359,4843 @@ func (m *TagMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Tag edge %s", name)
+}
+
+// TrailMutation represents an operation that mutates the Trail nodes in the graph.
+type TrailMutation struct {
+	config
+	op                   Op
+	typ                  string
+	id                   *xid.ID
+	created_at           *time.Time
+	updated_at           *time.Time
+	name                 *string
+	description          *string
+	status               *trail.Status
+	trigger_type         *string
+	trigger_config       *json.RawMessage
+	appendtrigger_config json.RawMessage
+	next_occurrence_at   *time.Time
+	last_occurrence_at   *time.Time
+	clearedFields        map[string]struct{}
+	creator              *xid.ID
+	clearedcreator       bool
+	actions              map[xid.ID]struct{}
+	removedactions       map[xid.ID]struct{}
+	clearedactions       bool
+	runs                 map[xid.ID]struct{}
+	removedruns          map[xid.ID]struct{}
+	clearedruns          bool
+	done                 bool
+	oldValue             func(context.Context) (*Trail, error)
+	predicates           []predicate.Trail
+}
+
+var _ ent.Mutation = (*TrailMutation)(nil)
+
+// trailOption allows management of the mutation configuration using functional options.
+type trailOption func(*TrailMutation)
+
+// newTrailMutation creates new mutation for the Trail entity.
+func newTrailMutation(c config, op Op, opts ...trailOption) *TrailMutation {
+	m := &TrailMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeTrail,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withTrailID sets the ID field of the mutation.
+func withTrailID(id xid.ID) trailOption {
+	return func(m *TrailMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Trail
+		)
+		m.oldValue = func(ctx context.Context) (*Trail, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Trail.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withTrail sets the old Trail of the mutation.
+func withTrail(node *Trail) trailOption {
+	return func(m *TrailMutation) {
+		m.oldValue = func(context.Context) (*Trail, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m TrailMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m TrailMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Trail entities.
+func (m *TrailMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *TrailMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *TrailMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Trail.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *TrailMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *TrailMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Trail entity.
+// If the Trail object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *TrailMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *TrailMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *TrailMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Trail entity.
+// If the Trail object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *TrailMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetAccountID sets the "account_id" field.
+func (m *TrailMutation) SetAccountID(x xid.ID) {
+	m.creator = &x
+}
+
+// AccountID returns the value of the "account_id" field in the mutation.
+func (m *TrailMutation) AccountID() (r xid.ID, exists bool) {
+	v := m.creator
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccountID returns the old "account_id" field's value of the Trail entity.
+// If the Trail object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailMutation) OldAccountID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccountID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccountID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccountID: %w", err)
+	}
+	return oldValue.AccountID, nil
+}
+
+// ResetAccountID resets all changes to the "account_id" field.
+func (m *TrailMutation) ResetAccountID() {
+	m.creator = nil
+}
+
+// SetName sets the "name" field.
+func (m *TrailMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *TrailMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Trail entity.
+// If the Trail object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *TrailMutation) ResetName() {
+	m.name = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *TrailMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *TrailMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the Trail entity.
+// If the Trail object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *TrailMutation) ResetDescription() {
+	m.description = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *TrailMutation) SetStatus(t trail.Status) {
+	m.status = &t
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *TrailMutation) Status() (r trail.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Trail entity.
+// If the Trail object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailMutation) OldStatus(ctx context.Context) (v trail.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *TrailMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetTriggerType sets the "trigger_type" field.
+func (m *TrailMutation) SetTriggerType(s string) {
+	m.trigger_type = &s
+}
+
+// TriggerType returns the value of the "trigger_type" field in the mutation.
+func (m *TrailMutation) TriggerType() (r string, exists bool) {
+	v := m.trigger_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTriggerType returns the old "trigger_type" field's value of the Trail entity.
+// If the Trail object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailMutation) OldTriggerType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTriggerType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTriggerType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTriggerType: %w", err)
+	}
+	return oldValue.TriggerType, nil
+}
+
+// ResetTriggerType resets all changes to the "trigger_type" field.
+func (m *TrailMutation) ResetTriggerType() {
+	m.trigger_type = nil
+}
+
+// SetTriggerConfig sets the "trigger_config" field.
+func (m *TrailMutation) SetTriggerConfig(jm json.RawMessage) {
+	m.trigger_config = &jm
+	m.appendtrigger_config = nil
+}
+
+// TriggerConfig returns the value of the "trigger_config" field in the mutation.
+func (m *TrailMutation) TriggerConfig() (r json.RawMessage, exists bool) {
+	v := m.trigger_config
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTriggerConfig returns the old "trigger_config" field's value of the Trail entity.
+// If the Trail object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailMutation) OldTriggerConfig(ctx context.Context) (v json.RawMessage, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTriggerConfig is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTriggerConfig requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTriggerConfig: %w", err)
+	}
+	return oldValue.TriggerConfig, nil
+}
+
+// AppendTriggerConfig adds jm to the "trigger_config" field.
+func (m *TrailMutation) AppendTriggerConfig(jm json.RawMessage) {
+	m.appendtrigger_config = append(m.appendtrigger_config, jm...)
+}
+
+// AppendedTriggerConfig returns the list of values that were appended to the "trigger_config" field in this mutation.
+func (m *TrailMutation) AppendedTriggerConfig() (json.RawMessage, bool) {
+	if len(m.appendtrigger_config) == 0 {
+		return nil, false
+	}
+	return m.appendtrigger_config, true
+}
+
+// ResetTriggerConfig resets all changes to the "trigger_config" field.
+func (m *TrailMutation) ResetTriggerConfig() {
+	m.trigger_config = nil
+	m.appendtrigger_config = nil
+}
+
+// SetNextOccurrenceAt sets the "next_occurrence_at" field.
+func (m *TrailMutation) SetNextOccurrenceAt(t time.Time) {
+	m.next_occurrence_at = &t
+}
+
+// NextOccurrenceAt returns the value of the "next_occurrence_at" field in the mutation.
+func (m *TrailMutation) NextOccurrenceAt() (r time.Time, exists bool) {
+	v := m.next_occurrence_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNextOccurrenceAt returns the old "next_occurrence_at" field's value of the Trail entity.
+// If the Trail object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailMutation) OldNextOccurrenceAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNextOccurrenceAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNextOccurrenceAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNextOccurrenceAt: %w", err)
+	}
+	return oldValue.NextOccurrenceAt, nil
+}
+
+// ClearNextOccurrenceAt clears the value of the "next_occurrence_at" field.
+func (m *TrailMutation) ClearNextOccurrenceAt() {
+	m.next_occurrence_at = nil
+	m.clearedFields[trail.FieldNextOccurrenceAt] = struct{}{}
+}
+
+// NextOccurrenceAtCleared returns if the "next_occurrence_at" field was cleared in this mutation.
+func (m *TrailMutation) NextOccurrenceAtCleared() bool {
+	_, ok := m.clearedFields[trail.FieldNextOccurrenceAt]
+	return ok
+}
+
+// ResetNextOccurrenceAt resets all changes to the "next_occurrence_at" field.
+func (m *TrailMutation) ResetNextOccurrenceAt() {
+	m.next_occurrence_at = nil
+	delete(m.clearedFields, trail.FieldNextOccurrenceAt)
+}
+
+// SetLastOccurrenceAt sets the "last_occurrence_at" field.
+func (m *TrailMutation) SetLastOccurrenceAt(t time.Time) {
+	m.last_occurrence_at = &t
+}
+
+// LastOccurrenceAt returns the value of the "last_occurrence_at" field in the mutation.
+func (m *TrailMutation) LastOccurrenceAt() (r time.Time, exists bool) {
+	v := m.last_occurrence_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastOccurrenceAt returns the old "last_occurrence_at" field's value of the Trail entity.
+// If the Trail object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailMutation) OldLastOccurrenceAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastOccurrenceAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastOccurrenceAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastOccurrenceAt: %w", err)
+	}
+	return oldValue.LastOccurrenceAt, nil
+}
+
+// ClearLastOccurrenceAt clears the value of the "last_occurrence_at" field.
+func (m *TrailMutation) ClearLastOccurrenceAt() {
+	m.last_occurrence_at = nil
+	m.clearedFields[trail.FieldLastOccurrenceAt] = struct{}{}
+}
+
+// LastOccurrenceAtCleared returns if the "last_occurrence_at" field was cleared in this mutation.
+func (m *TrailMutation) LastOccurrenceAtCleared() bool {
+	_, ok := m.clearedFields[trail.FieldLastOccurrenceAt]
+	return ok
+}
+
+// ResetLastOccurrenceAt resets all changes to the "last_occurrence_at" field.
+func (m *TrailMutation) ResetLastOccurrenceAt() {
+	m.last_occurrence_at = nil
+	delete(m.clearedFields, trail.FieldLastOccurrenceAt)
+}
+
+// SetCreatorID sets the "creator" edge to the Account entity by id.
+func (m *TrailMutation) SetCreatorID(id xid.ID) {
+	m.creator = &id
+}
+
+// ClearCreator clears the "creator" edge to the Account entity.
+func (m *TrailMutation) ClearCreator() {
+	m.clearedcreator = true
+	m.clearedFields[trail.FieldAccountID] = struct{}{}
+}
+
+// CreatorCleared reports if the "creator" edge to the Account entity was cleared.
+func (m *TrailMutation) CreatorCleared() bool {
+	return m.clearedcreator
+}
+
+// CreatorID returns the "creator" edge ID in the mutation.
+func (m *TrailMutation) CreatorID() (id xid.ID, exists bool) {
+	if m.creator != nil {
+		return *m.creator, true
+	}
+	return
+}
+
+// CreatorIDs returns the "creator" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CreatorID instead. It exists only for internal usage by the builders.
+func (m *TrailMutation) CreatorIDs() (ids []xid.ID) {
+	if id := m.creator; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCreator resets all changes to the "creator" edge.
+func (m *TrailMutation) ResetCreator() {
+	m.creator = nil
+	m.clearedcreator = false
+}
+
+// AddActionIDs adds the "actions" edge to the TrailAction entity by ids.
+func (m *TrailMutation) AddActionIDs(ids ...xid.ID) {
+	if m.actions == nil {
+		m.actions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.actions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearActions clears the "actions" edge to the TrailAction entity.
+func (m *TrailMutation) ClearActions() {
+	m.clearedactions = true
+}
+
+// ActionsCleared reports if the "actions" edge to the TrailAction entity was cleared.
+func (m *TrailMutation) ActionsCleared() bool {
+	return m.clearedactions
+}
+
+// RemoveActionIDs removes the "actions" edge to the TrailAction entity by IDs.
+func (m *TrailMutation) RemoveActionIDs(ids ...xid.ID) {
+	if m.removedactions == nil {
+		m.removedactions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.actions, ids[i])
+		m.removedactions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedActions returns the removed IDs of the "actions" edge to the TrailAction entity.
+func (m *TrailMutation) RemovedActionsIDs() (ids []xid.ID) {
+	for id := range m.removedactions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ActionsIDs returns the "actions" edge IDs in the mutation.
+func (m *TrailMutation) ActionsIDs() (ids []xid.ID) {
+	for id := range m.actions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetActions resets all changes to the "actions" edge.
+func (m *TrailMutation) ResetActions() {
+	m.actions = nil
+	m.clearedactions = false
+	m.removedactions = nil
+}
+
+// AddRunIDs adds the "runs" edge to the TrailRun entity by ids.
+func (m *TrailMutation) AddRunIDs(ids ...xid.ID) {
+	if m.runs == nil {
+		m.runs = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.runs[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRuns clears the "runs" edge to the TrailRun entity.
+func (m *TrailMutation) ClearRuns() {
+	m.clearedruns = true
+}
+
+// RunsCleared reports if the "runs" edge to the TrailRun entity was cleared.
+func (m *TrailMutation) RunsCleared() bool {
+	return m.clearedruns
+}
+
+// RemoveRunIDs removes the "runs" edge to the TrailRun entity by IDs.
+func (m *TrailMutation) RemoveRunIDs(ids ...xid.ID) {
+	if m.removedruns == nil {
+		m.removedruns = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.runs, ids[i])
+		m.removedruns[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRuns returns the removed IDs of the "runs" edge to the TrailRun entity.
+func (m *TrailMutation) RemovedRunsIDs() (ids []xid.ID) {
+	for id := range m.removedruns {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RunsIDs returns the "runs" edge IDs in the mutation.
+func (m *TrailMutation) RunsIDs() (ids []xid.ID) {
+	for id := range m.runs {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRuns resets all changes to the "runs" edge.
+func (m *TrailMutation) ResetRuns() {
+	m.runs = nil
+	m.clearedruns = false
+	m.removedruns = nil
+}
+
+// Where appends a list predicates to the TrailMutation builder.
+func (m *TrailMutation) Where(ps ...predicate.Trail) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the TrailMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *TrailMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Trail, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *TrailMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *TrailMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Trail).
+func (m *TrailMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *TrailMutation) Fields() []string {
+	fields := make([]string, 0, 10)
+	if m.created_at != nil {
+		fields = append(fields, trail.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, trail.FieldUpdatedAt)
+	}
+	if m.creator != nil {
+		fields = append(fields, trail.FieldAccountID)
+	}
+	if m.name != nil {
+		fields = append(fields, trail.FieldName)
+	}
+	if m.description != nil {
+		fields = append(fields, trail.FieldDescription)
+	}
+	if m.status != nil {
+		fields = append(fields, trail.FieldStatus)
+	}
+	if m.trigger_type != nil {
+		fields = append(fields, trail.FieldTriggerType)
+	}
+	if m.trigger_config != nil {
+		fields = append(fields, trail.FieldTriggerConfig)
+	}
+	if m.next_occurrence_at != nil {
+		fields = append(fields, trail.FieldNextOccurrenceAt)
+	}
+	if m.last_occurrence_at != nil {
+		fields = append(fields, trail.FieldLastOccurrenceAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *TrailMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case trail.FieldCreatedAt:
+		return m.CreatedAt()
+	case trail.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case trail.FieldAccountID:
+		return m.AccountID()
+	case trail.FieldName:
+		return m.Name()
+	case trail.FieldDescription:
+		return m.Description()
+	case trail.FieldStatus:
+		return m.Status()
+	case trail.FieldTriggerType:
+		return m.TriggerType()
+	case trail.FieldTriggerConfig:
+		return m.TriggerConfig()
+	case trail.FieldNextOccurrenceAt:
+		return m.NextOccurrenceAt()
+	case trail.FieldLastOccurrenceAt:
+		return m.LastOccurrenceAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *TrailMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case trail.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case trail.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case trail.FieldAccountID:
+		return m.OldAccountID(ctx)
+	case trail.FieldName:
+		return m.OldName(ctx)
+	case trail.FieldDescription:
+		return m.OldDescription(ctx)
+	case trail.FieldStatus:
+		return m.OldStatus(ctx)
+	case trail.FieldTriggerType:
+		return m.OldTriggerType(ctx)
+	case trail.FieldTriggerConfig:
+		return m.OldTriggerConfig(ctx)
+	case trail.FieldNextOccurrenceAt:
+		return m.OldNextOccurrenceAt(ctx)
+	case trail.FieldLastOccurrenceAt:
+		return m.OldLastOccurrenceAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown Trail field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TrailMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case trail.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case trail.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case trail.FieldAccountID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccountID(v)
+		return nil
+	case trail.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case trail.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case trail.FieldStatus:
+		v, ok := value.(trail.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case trail.FieldTriggerType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTriggerType(v)
+		return nil
+	case trail.FieldTriggerConfig:
+		v, ok := value.(json.RawMessage)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTriggerConfig(v)
+		return nil
+	case trail.FieldNextOccurrenceAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNextOccurrenceAt(v)
+		return nil
+	case trail.FieldLastOccurrenceAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastOccurrenceAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Trail field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *TrailMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *TrailMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TrailMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Trail numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *TrailMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(trail.FieldNextOccurrenceAt) {
+		fields = append(fields, trail.FieldNextOccurrenceAt)
+	}
+	if m.FieldCleared(trail.FieldLastOccurrenceAt) {
+		fields = append(fields, trail.FieldLastOccurrenceAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *TrailMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *TrailMutation) ClearField(name string) error {
+	switch name {
+	case trail.FieldNextOccurrenceAt:
+		m.ClearNextOccurrenceAt()
+		return nil
+	case trail.FieldLastOccurrenceAt:
+		m.ClearLastOccurrenceAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Trail nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *TrailMutation) ResetField(name string) error {
+	switch name {
+	case trail.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case trail.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case trail.FieldAccountID:
+		m.ResetAccountID()
+		return nil
+	case trail.FieldName:
+		m.ResetName()
+		return nil
+	case trail.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case trail.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case trail.FieldTriggerType:
+		m.ResetTriggerType()
+		return nil
+	case trail.FieldTriggerConfig:
+		m.ResetTriggerConfig()
+		return nil
+	case trail.FieldNextOccurrenceAt:
+		m.ResetNextOccurrenceAt()
+		return nil
+	case trail.FieldLastOccurrenceAt:
+		m.ResetLastOccurrenceAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Trail field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *TrailMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.creator != nil {
+		edges = append(edges, trail.EdgeCreator)
+	}
+	if m.actions != nil {
+		edges = append(edges, trail.EdgeActions)
+	}
+	if m.runs != nil {
+		edges = append(edges, trail.EdgeRuns)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *TrailMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case trail.EdgeCreator:
+		if id := m.creator; id != nil {
+			return []ent.Value{*id}
+		}
+	case trail.EdgeActions:
+		ids := make([]ent.Value, 0, len(m.actions))
+		for id := range m.actions {
+			ids = append(ids, id)
+		}
+		return ids
+	case trail.EdgeRuns:
+		ids := make([]ent.Value, 0, len(m.runs))
+		for id := range m.runs {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *TrailMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.removedactions != nil {
+		edges = append(edges, trail.EdgeActions)
+	}
+	if m.removedruns != nil {
+		edges = append(edges, trail.EdgeRuns)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *TrailMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case trail.EdgeActions:
+		ids := make([]ent.Value, 0, len(m.removedactions))
+		for id := range m.removedactions {
+			ids = append(ids, id)
+		}
+		return ids
+	case trail.EdgeRuns:
+		ids := make([]ent.Value, 0, len(m.removedruns))
+		for id := range m.removedruns {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *TrailMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedcreator {
+		edges = append(edges, trail.EdgeCreator)
+	}
+	if m.clearedactions {
+		edges = append(edges, trail.EdgeActions)
+	}
+	if m.clearedruns {
+		edges = append(edges, trail.EdgeRuns)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *TrailMutation) EdgeCleared(name string) bool {
+	switch name {
+	case trail.EdgeCreator:
+		return m.clearedcreator
+	case trail.EdgeActions:
+		return m.clearedactions
+	case trail.EdgeRuns:
+		return m.clearedruns
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *TrailMutation) ClearEdge(name string) error {
+	switch name {
+	case trail.EdgeCreator:
+		m.ClearCreator()
+		return nil
+	}
+	return fmt.Errorf("unknown Trail unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *TrailMutation) ResetEdge(name string) error {
+	switch name {
+	case trail.EdgeCreator:
+		m.ResetCreator()
+		return nil
+	case trail.EdgeActions:
+		m.ResetActions()
+		return nil
+	case trail.EdgeRuns:
+		m.ResetRuns()
+		return nil
+	}
+	return fmt.Errorf("unknown Trail edge %s", name)
+}
+
+// TrailActionMutation represents an operation that mutates the TrailAction nodes in the graph.
+type TrailActionMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *xid.ID
+	created_at    *time.Time
+	updated_at    *time.Time
+	kind          *string
+	position      *int
+	addposition   *int
+	_config       *json.RawMessage
+	append_config json.RawMessage
+	archived_at   *time.Time
+	clearedFields map[string]struct{}
+	trail         *xid.ID
+	clearedtrail  bool
+	runs          map[xid.ID]struct{}
+	removedruns   map[xid.ID]struct{}
+	clearedruns   bool
+	done          bool
+	oldValue      func(context.Context) (*TrailAction, error)
+	predicates    []predicate.TrailAction
+}
+
+var _ ent.Mutation = (*TrailActionMutation)(nil)
+
+// trailactionOption allows management of the mutation configuration using functional options.
+type trailactionOption func(*TrailActionMutation)
+
+// newTrailActionMutation creates new mutation for the TrailAction entity.
+func newTrailActionMutation(c config, op Op, opts ...trailactionOption) *TrailActionMutation {
+	m := &TrailActionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeTrailAction,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withTrailActionID sets the ID field of the mutation.
+func withTrailActionID(id xid.ID) trailactionOption {
+	return func(m *TrailActionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *TrailAction
+		)
+		m.oldValue = func(ctx context.Context) (*TrailAction, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().TrailAction.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withTrailAction sets the old TrailAction of the mutation.
+func withTrailAction(node *TrailAction) trailactionOption {
+	return func(m *TrailActionMutation) {
+		m.oldValue = func(context.Context) (*TrailAction, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m TrailActionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m TrailActionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of TrailAction entities.
+func (m *TrailActionMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *TrailActionMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *TrailActionMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().TrailAction.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *TrailActionMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *TrailActionMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the TrailAction entity.
+// If the TrailAction object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *TrailActionMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *TrailActionMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *TrailActionMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the TrailAction entity.
+// If the TrailAction object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *TrailActionMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetTrailID sets the "trail_id" field.
+func (m *TrailActionMutation) SetTrailID(x xid.ID) {
+	m.trail = &x
+}
+
+// TrailID returns the value of the "trail_id" field in the mutation.
+func (m *TrailActionMutation) TrailID() (r xid.ID, exists bool) {
+	v := m.trail
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTrailID returns the old "trail_id" field's value of the TrailAction entity.
+// If the TrailAction object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionMutation) OldTrailID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTrailID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTrailID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTrailID: %w", err)
+	}
+	return oldValue.TrailID, nil
+}
+
+// ResetTrailID resets all changes to the "trail_id" field.
+func (m *TrailActionMutation) ResetTrailID() {
+	m.trail = nil
+}
+
+// SetKind sets the "kind" field.
+func (m *TrailActionMutation) SetKind(s string) {
+	m.kind = &s
+}
+
+// Kind returns the value of the "kind" field in the mutation.
+func (m *TrailActionMutation) Kind() (r string, exists bool) {
+	v := m.kind
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldKind returns the old "kind" field's value of the TrailAction entity.
+// If the TrailAction object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionMutation) OldKind(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldKind is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldKind requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldKind: %w", err)
+	}
+	return oldValue.Kind, nil
+}
+
+// ResetKind resets all changes to the "kind" field.
+func (m *TrailActionMutation) ResetKind() {
+	m.kind = nil
+}
+
+// SetPosition sets the "position" field.
+func (m *TrailActionMutation) SetPosition(i int) {
+	m.position = &i
+	m.addposition = nil
+}
+
+// Position returns the value of the "position" field in the mutation.
+func (m *TrailActionMutation) Position() (r int, exists bool) {
+	v := m.position
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPosition returns the old "position" field's value of the TrailAction entity.
+// If the TrailAction object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionMutation) OldPosition(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPosition is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPosition requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPosition: %w", err)
+	}
+	return oldValue.Position, nil
+}
+
+// AddPosition adds i to the "position" field.
+func (m *TrailActionMutation) AddPosition(i int) {
+	if m.addposition != nil {
+		*m.addposition += i
+	} else {
+		m.addposition = &i
+	}
+}
+
+// AddedPosition returns the value that was added to the "position" field in this mutation.
+func (m *TrailActionMutation) AddedPosition() (r int, exists bool) {
+	v := m.addposition
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPosition resets all changes to the "position" field.
+func (m *TrailActionMutation) ResetPosition() {
+	m.position = nil
+	m.addposition = nil
+}
+
+// SetConfig sets the "config" field.
+func (m *TrailActionMutation) SetConfig(jm json.RawMessage) {
+	m._config = &jm
+	m.append_config = nil
+}
+
+// Config returns the value of the "config" field in the mutation.
+func (m *TrailActionMutation) Config() (r json.RawMessage, exists bool) {
+	v := m._config
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldConfig returns the old "config" field's value of the TrailAction entity.
+// If the TrailAction object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionMutation) OldConfig(ctx context.Context) (v json.RawMessage, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldConfig is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldConfig requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldConfig: %w", err)
+	}
+	return oldValue.Config, nil
+}
+
+// AppendConfig adds jm to the "config" field.
+func (m *TrailActionMutation) AppendConfig(jm json.RawMessage) {
+	m.append_config = append(m.append_config, jm...)
+}
+
+// AppendedConfig returns the list of values that were appended to the "config" field in this mutation.
+func (m *TrailActionMutation) AppendedConfig() (json.RawMessage, bool) {
+	if len(m.append_config) == 0 {
+		return nil, false
+	}
+	return m.append_config, true
+}
+
+// ResetConfig resets all changes to the "config" field.
+func (m *TrailActionMutation) ResetConfig() {
+	m._config = nil
+	m.append_config = nil
+}
+
+// SetArchivedAt sets the "archived_at" field.
+func (m *TrailActionMutation) SetArchivedAt(t time.Time) {
+	m.archived_at = &t
+}
+
+// ArchivedAt returns the value of the "archived_at" field in the mutation.
+func (m *TrailActionMutation) ArchivedAt() (r time.Time, exists bool) {
+	v := m.archived_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldArchivedAt returns the old "archived_at" field's value of the TrailAction entity.
+// If the TrailAction object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionMutation) OldArchivedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldArchivedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldArchivedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldArchivedAt: %w", err)
+	}
+	return oldValue.ArchivedAt, nil
+}
+
+// ClearArchivedAt clears the value of the "archived_at" field.
+func (m *TrailActionMutation) ClearArchivedAt() {
+	m.archived_at = nil
+	m.clearedFields[trailaction.FieldArchivedAt] = struct{}{}
+}
+
+// ArchivedAtCleared returns if the "archived_at" field was cleared in this mutation.
+func (m *TrailActionMutation) ArchivedAtCleared() bool {
+	_, ok := m.clearedFields[trailaction.FieldArchivedAt]
+	return ok
+}
+
+// ResetArchivedAt resets all changes to the "archived_at" field.
+func (m *TrailActionMutation) ResetArchivedAt() {
+	m.archived_at = nil
+	delete(m.clearedFields, trailaction.FieldArchivedAt)
+}
+
+// ClearTrail clears the "trail" edge to the Trail entity.
+func (m *TrailActionMutation) ClearTrail() {
+	m.clearedtrail = true
+	m.clearedFields[trailaction.FieldTrailID] = struct{}{}
+}
+
+// TrailCleared reports if the "trail" edge to the Trail entity was cleared.
+func (m *TrailActionMutation) TrailCleared() bool {
+	return m.clearedtrail
+}
+
+// TrailIDs returns the "trail" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// TrailID instead. It exists only for internal usage by the builders.
+func (m *TrailActionMutation) TrailIDs() (ids []xid.ID) {
+	if id := m.trail; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetTrail resets all changes to the "trail" edge.
+func (m *TrailActionMutation) ResetTrail() {
+	m.trail = nil
+	m.clearedtrail = false
+}
+
+// AddRunIDs adds the "runs" edge to the TrailActionRun entity by ids.
+func (m *TrailActionMutation) AddRunIDs(ids ...xid.ID) {
+	if m.runs == nil {
+		m.runs = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.runs[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRuns clears the "runs" edge to the TrailActionRun entity.
+func (m *TrailActionMutation) ClearRuns() {
+	m.clearedruns = true
+}
+
+// RunsCleared reports if the "runs" edge to the TrailActionRun entity was cleared.
+func (m *TrailActionMutation) RunsCleared() bool {
+	return m.clearedruns
+}
+
+// RemoveRunIDs removes the "runs" edge to the TrailActionRun entity by IDs.
+func (m *TrailActionMutation) RemoveRunIDs(ids ...xid.ID) {
+	if m.removedruns == nil {
+		m.removedruns = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.runs, ids[i])
+		m.removedruns[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRuns returns the removed IDs of the "runs" edge to the TrailActionRun entity.
+func (m *TrailActionMutation) RemovedRunsIDs() (ids []xid.ID) {
+	for id := range m.removedruns {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RunsIDs returns the "runs" edge IDs in the mutation.
+func (m *TrailActionMutation) RunsIDs() (ids []xid.ID) {
+	for id := range m.runs {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRuns resets all changes to the "runs" edge.
+func (m *TrailActionMutation) ResetRuns() {
+	m.runs = nil
+	m.clearedruns = false
+	m.removedruns = nil
+}
+
+// Where appends a list predicates to the TrailActionMutation builder.
+func (m *TrailActionMutation) Where(ps ...predicate.TrailAction) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the TrailActionMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *TrailActionMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.TrailAction, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *TrailActionMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *TrailActionMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (TrailAction).
+func (m *TrailActionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *TrailActionMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.created_at != nil {
+		fields = append(fields, trailaction.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, trailaction.FieldUpdatedAt)
+	}
+	if m.trail != nil {
+		fields = append(fields, trailaction.FieldTrailID)
+	}
+	if m.kind != nil {
+		fields = append(fields, trailaction.FieldKind)
+	}
+	if m.position != nil {
+		fields = append(fields, trailaction.FieldPosition)
+	}
+	if m._config != nil {
+		fields = append(fields, trailaction.FieldConfig)
+	}
+	if m.archived_at != nil {
+		fields = append(fields, trailaction.FieldArchivedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *TrailActionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case trailaction.FieldCreatedAt:
+		return m.CreatedAt()
+	case trailaction.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case trailaction.FieldTrailID:
+		return m.TrailID()
+	case trailaction.FieldKind:
+		return m.Kind()
+	case trailaction.FieldPosition:
+		return m.Position()
+	case trailaction.FieldConfig:
+		return m.Config()
+	case trailaction.FieldArchivedAt:
+		return m.ArchivedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *TrailActionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case trailaction.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case trailaction.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case trailaction.FieldTrailID:
+		return m.OldTrailID(ctx)
+	case trailaction.FieldKind:
+		return m.OldKind(ctx)
+	case trailaction.FieldPosition:
+		return m.OldPosition(ctx)
+	case trailaction.FieldConfig:
+		return m.OldConfig(ctx)
+	case trailaction.FieldArchivedAt:
+		return m.OldArchivedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown TrailAction field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TrailActionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case trailaction.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case trailaction.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case trailaction.FieldTrailID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTrailID(v)
+		return nil
+	case trailaction.FieldKind:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetKind(v)
+		return nil
+	case trailaction.FieldPosition:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPosition(v)
+		return nil
+	case trailaction.FieldConfig:
+		v, ok := value.(json.RawMessage)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetConfig(v)
+		return nil
+	case trailaction.FieldArchivedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetArchivedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown TrailAction field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *TrailActionMutation) AddedFields() []string {
+	var fields []string
+	if m.addposition != nil {
+		fields = append(fields, trailaction.FieldPosition)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *TrailActionMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case trailaction.FieldPosition:
+		return m.AddedPosition()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TrailActionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case trailaction.FieldPosition:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPosition(v)
+		return nil
+	}
+	return fmt.Errorf("unknown TrailAction numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *TrailActionMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(trailaction.FieldArchivedAt) {
+		fields = append(fields, trailaction.FieldArchivedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *TrailActionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *TrailActionMutation) ClearField(name string) error {
+	switch name {
+	case trailaction.FieldArchivedAt:
+		m.ClearArchivedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown TrailAction nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *TrailActionMutation) ResetField(name string) error {
+	switch name {
+	case trailaction.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case trailaction.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case trailaction.FieldTrailID:
+		m.ResetTrailID()
+		return nil
+	case trailaction.FieldKind:
+		m.ResetKind()
+		return nil
+	case trailaction.FieldPosition:
+		m.ResetPosition()
+		return nil
+	case trailaction.FieldConfig:
+		m.ResetConfig()
+		return nil
+	case trailaction.FieldArchivedAt:
+		m.ResetArchivedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown TrailAction field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *TrailActionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.trail != nil {
+		edges = append(edges, trailaction.EdgeTrail)
+	}
+	if m.runs != nil {
+		edges = append(edges, trailaction.EdgeRuns)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *TrailActionMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case trailaction.EdgeTrail:
+		if id := m.trail; id != nil {
+			return []ent.Value{*id}
+		}
+	case trailaction.EdgeRuns:
+		ids := make([]ent.Value, 0, len(m.runs))
+		for id := range m.runs {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *TrailActionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.removedruns != nil {
+		edges = append(edges, trailaction.EdgeRuns)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *TrailActionMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case trailaction.EdgeRuns:
+		ids := make([]ent.Value, 0, len(m.removedruns))
+		for id := range m.removedruns {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *TrailActionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedtrail {
+		edges = append(edges, trailaction.EdgeTrail)
+	}
+	if m.clearedruns {
+		edges = append(edges, trailaction.EdgeRuns)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *TrailActionMutation) EdgeCleared(name string) bool {
+	switch name {
+	case trailaction.EdgeTrail:
+		return m.clearedtrail
+	case trailaction.EdgeRuns:
+		return m.clearedruns
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *TrailActionMutation) ClearEdge(name string) error {
+	switch name {
+	case trailaction.EdgeTrail:
+		m.ClearTrail()
+		return nil
+	}
+	return fmt.Errorf("unknown TrailAction unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *TrailActionMutation) ResetEdge(name string) error {
+	switch name {
+	case trailaction.EdgeTrail:
+		m.ResetTrail()
+		return nil
+	case trailaction.EdgeRuns:
+		m.ResetRuns()
+		return nil
+	}
+	return fmt.Errorf("unknown TrailAction edge %s", name)
+}
+
+// TrailActionRunMutation represents an operation that mutates the TrailActionRun nodes in the graph.
+type TrailActionRunMutation struct {
+	config
+	op               Op
+	typ              string
+	id               *xid.ID
+	created_at       *time.Time
+	updated_at       *time.Time
+	kind             *string
+	_config          *json.RawMessage
+	append_config    json.RawMessage
+	status           *trailactionrun.Status
+	lease_token      *string
+	lease_expires_at *time.Time
+	output           *json.RawMessage
+	appendoutput     json.RawMessage
+	target           *json.RawMessage
+	appendtarget     json.RawMessage
+	error_text       *string
+	started_at       *time.Time
+	finished_at      *time.Time
+	notified_at      *time.Time
+	clearedFields    map[string]struct{}
+	run              *xid.ID
+	clearedrun       bool
+	action           *xid.ID
+	clearedaction    bool
+	done             bool
+	oldValue         func(context.Context) (*TrailActionRun, error)
+	predicates       []predicate.TrailActionRun
+}
+
+var _ ent.Mutation = (*TrailActionRunMutation)(nil)
+
+// trailactionrunOption allows management of the mutation configuration using functional options.
+type trailactionrunOption func(*TrailActionRunMutation)
+
+// newTrailActionRunMutation creates new mutation for the TrailActionRun entity.
+func newTrailActionRunMutation(c config, op Op, opts ...trailactionrunOption) *TrailActionRunMutation {
+	m := &TrailActionRunMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeTrailActionRun,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withTrailActionRunID sets the ID field of the mutation.
+func withTrailActionRunID(id xid.ID) trailactionrunOption {
+	return func(m *TrailActionRunMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *TrailActionRun
+		)
+		m.oldValue = func(ctx context.Context) (*TrailActionRun, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().TrailActionRun.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withTrailActionRun sets the old TrailActionRun of the mutation.
+func withTrailActionRun(node *TrailActionRun) trailactionrunOption {
+	return func(m *TrailActionRunMutation) {
+		m.oldValue = func(context.Context) (*TrailActionRun, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m TrailActionRunMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m TrailActionRunMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of TrailActionRun entities.
+func (m *TrailActionRunMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *TrailActionRunMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *TrailActionRunMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().TrailActionRun.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *TrailActionRunMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *TrailActionRunMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the TrailActionRun entity.
+// If the TrailActionRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionRunMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *TrailActionRunMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *TrailActionRunMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *TrailActionRunMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the TrailActionRun entity.
+// If the TrailActionRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionRunMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *TrailActionRunMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetRunID sets the "run_id" field.
+func (m *TrailActionRunMutation) SetRunID(x xid.ID) {
+	m.run = &x
+}
+
+// RunID returns the value of the "run_id" field in the mutation.
+func (m *TrailActionRunMutation) RunID() (r xid.ID, exists bool) {
+	v := m.run
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRunID returns the old "run_id" field's value of the TrailActionRun entity.
+// If the TrailActionRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionRunMutation) OldRunID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRunID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRunID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRunID: %w", err)
+	}
+	return oldValue.RunID, nil
+}
+
+// ResetRunID resets all changes to the "run_id" field.
+func (m *TrailActionRunMutation) ResetRunID() {
+	m.run = nil
+}
+
+// SetActionID sets the "action_id" field.
+func (m *TrailActionRunMutation) SetActionID(x xid.ID) {
+	m.action = &x
+}
+
+// ActionID returns the value of the "action_id" field in the mutation.
+func (m *TrailActionRunMutation) ActionID() (r xid.ID, exists bool) {
+	v := m.action
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActionID returns the old "action_id" field's value of the TrailActionRun entity.
+// If the TrailActionRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionRunMutation) OldActionID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldActionID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldActionID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActionID: %w", err)
+	}
+	return oldValue.ActionID, nil
+}
+
+// ResetActionID resets all changes to the "action_id" field.
+func (m *TrailActionRunMutation) ResetActionID() {
+	m.action = nil
+}
+
+// SetKind sets the "kind" field.
+func (m *TrailActionRunMutation) SetKind(s string) {
+	m.kind = &s
+}
+
+// Kind returns the value of the "kind" field in the mutation.
+func (m *TrailActionRunMutation) Kind() (r string, exists bool) {
+	v := m.kind
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldKind returns the old "kind" field's value of the TrailActionRun entity.
+// If the TrailActionRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionRunMutation) OldKind(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldKind is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldKind requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldKind: %w", err)
+	}
+	return oldValue.Kind, nil
+}
+
+// ResetKind resets all changes to the "kind" field.
+func (m *TrailActionRunMutation) ResetKind() {
+	m.kind = nil
+}
+
+// SetConfig sets the "config" field.
+func (m *TrailActionRunMutation) SetConfig(jm json.RawMessage) {
+	m._config = &jm
+	m.append_config = nil
+}
+
+// Config returns the value of the "config" field in the mutation.
+func (m *TrailActionRunMutation) Config() (r json.RawMessage, exists bool) {
+	v := m._config
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldConfig returns the old "config" field's value of the TrailActionRun entity.
+// If the TrailActionRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionRunMutation) OldConfig(ctx context.Context) (v json.RawMessage, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldConfig is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldConfig requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldConfig: %w", err)
+	}
+	return oldValue.Config, nil
+}
+
+// AppendConfig adds jm to the "config" field.
+func (m *TrailActionRunMutation) AppendConfig(jm json.RawMessage) {
+	m.append_config = append(m.append_config, jm...)
+}
+
+// AppendedConfig returns the list of values that were appended to the "config" field in this mutation.
+func (m *TrailActionRunMutation) AppendedConfig() (json.RawMessage, bool) {
+	if len(m.append_config) == 0 {
+		return nil, false
+	}
+	return m.append_config, true
+}
+
+// ResetConfig resets all changes to the "config" field.
+func (m *TrailActionRunMutation) ResetConfig() {
+	m._config = nil
+	m.append_config = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *TrailActionRunMutation) SetStatus(t trailactionrun.Status) {
+	m.status = &t
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *TrailActionRunMutation) Status() (r trailactionrun.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the TrailActionRun entity.
+// If the TrailActionRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionRunMutation) OldStatus(ctx context.Context) (v trailactionrun.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *TrailActionRunMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetLeaseToken sets the "lease_token" field.
+func (m *TrailActionRunMutation) SetLeaseToken(s string) {
+	m.lease_token = &s
+}
+
+// LeaseToken returns the value of the "lease_token" field in the mutation.
+func (m *TrailActionRunMutation) LeaseToken() (r string, exists bool) {
+	v := m.lease_token
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLeaseToken returns the old "lease_token" field's value of the TrailActionRun entity.
+// If the TrailActionRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionRunMutation) OldLeaseToken(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLeaseToken is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLeaseToken requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLeaseToken: %w", err)
+	}
+	return oldValue.LeaseToken, nil
+}
+
+// ClearLeaseToken clears the value of the "lease_token" field.
+func (m *TrailActionRunMutation) ClearLeaseToken() {
+	m.lease_token = nil
+	m.clearedFields[trailactionrun.FieldLeaseToken] = struct{}{}
+}
+
+// LeaseTokenCleared returns if the "lease_token" field was cleared in this mutation.
+func (m *TrailActionRunMutation) LeaseTokenCleared() bool {
+	_, ok := m.clearedFields[trailactionrun.FieldLeaseToken]
+	return ok
+}
+
+// ResetLeaseToken resets all changes to the "lease_token" field.
+func (m *TrailActionRunMutation) ResetLeaseToken() {
+	m.lease_token = nil
+	delete(m.clearedFields, trailactionrun.FieldLeaseToken)
+}
+
+// SetLeaseExpiresAt sets the "lease_expires_at" field.
+func (m *TrailActionRunMutation) SetLeaseExpiresAt(t time.Time) {
+	m.lease_expires_at = &t
+}
+
+// LeaseExpiresAt returns the value of the "lease_expires_at" field in the mutation.
+func (m *TrailActionRunMutation) LeaseExpiresAt() (r time.Time, exists bool) {
+	v := m.lease_expires_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLeaseExpiresAt returns the old "lease_expires_at" field's value of the TrailActionRun entity.
+// If the TrailActionRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionRunMutation) OldLeaseExpiresAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLeaseExpiresAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLeaseExpiresAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLeaseExpiresAt: %w", err)
+	}
+	return oldValue.LeaseExpiresAt, nil
+}
+
+// ClearLeaseExpiresAt clears the value of the "lease_expires_at" field.
+func (m *TrailActionRunMutation) ClearLeaseExpiresAt() {
+	m.lease_expires_at = nil
+	m.clearedFields[trailactionrun.FieldLeaseExpiresAt] = struct{}{}
+}
+
+// LeaseExpiresAtCleared returns if the "lease_expires_at" field was cleared in this mutation.
+func (m *TrailActionRunMutation) LeaseExpiresAtCleared() bool {
+	_, ok := m.clearedFields[trailactionrun.FieldLeaseExpiresAt]
+	return ok
+}
+
+// ResetLeaseExpiresAt resets all changes to the "lease_expires_at" field.
+func (m *TrailActionRunMutation) ResetLeaseExpiresAt() {
+	m.lease_expires_at = nil
+	delete(m.clearedFields, trailactionrun.FieldLeaseExpiresAt)
+}
+
+// SetOutput sets the "output" field.
+func (m *TrailActionRunMutation) SetOutput(jm json.RawMessage) {
+	m.output = &jm
+	m.appendoutput = nil
+}
+
+// Output returns the value of the "output" field in the mutation.
+func (m *TrailActionRunMutation) Output() (r json.RawMessage, exists bool) {
+	v := m.output
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOutput returns the old "output" field's value of the TrailActionRun entity.
+// If the TrailActionRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionRunMutation) OldOutput(ctx context.Context) (v json.RawMessage, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOutput is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOutput requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOutput: %w", err)
+	}
+	return oldValue.Output, nil
+}
+
+// AppendOutput adds jm to the "output" field.
+func (m *TrailActionRunMutation) AppendOutput(jm json.RawMessage) {
+	m.appendoutput = append(m.appendoutput, jm...)
+}
+
+// AppendedOutput returns the list of values that were appended to the "output" field in this mutation.
+func (m *TrailActionRunMutation) AppendedOutput() (json.RawMessage, bool) {
+	if len(m.appendoutput) == 0 {
+		return nil, false
+	}
+	return m.appendoutput, true
+}
+
+// ClearOutput clears the value of the "output" field.
+func (m *TrailActionRunMutation) ClearOutput() {
+	m.output = nil
+	m.appendoutput = nil
+	m.clearedFields[trailactionrun.FieldOutput] = struct{}{}
+}
+
+// OutputCleared returns if the "output" field was cleared in this mutation.
+func (m *TrailActionRunMutation) OutputCleared() bool {
+	_, ok := m.clearedFields[trailactionrun.FieldOutput]
+	return ok
+}
+
+// ResetOutput resets all changes to the "output" field.
+func (m *TrailActionRunMutation) ResetOutput() {
+	m.output = nil
+	m.appendoutput = nil
+	delete(m.clearedFields, trailactionrun.FieldOutput)
+}
+
+// SetTarget sets the "target" field.
+func (m *TrailActionRunMutation) SetTarget(jm json.RawMessage) {
+	m.target = &jm
+	m.appendtarget = nil
+}
+
+// Target returns the value of the "target" field in the mutation.
+func (m *TrailActionRunMutation) Target() (r json.RawMessage, exists bool) {
+	v := m.target
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTarget returns the old "target" field's value of the TrailActionRun entity.
+// If the TrailActionRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionRunMutation) OldTarget(ctx context.Context) (v json.RawMessage, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTarget is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTarget requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTarget: %w", err)
+	}
+	return oldValue.Target, nil
+}
+
+// AppendTarget adds jm to the "target" field.
+func (m *TrailActionRunMutation) AppendTarget(jm json.RawMessage) {
+	m.appendtarget = append(m.appendtarget, jm...)
+}
+
+// AppendedTarget returns the list of values that were appended to the "target" field in this mutation.
+func (m *TrailActionRunMutation) AppendedTarget() (json.RawMessage, bool) {
+	if len(m.appendtarget) == 0 {
+		return nil, false
+	}
+	return m.appendtarget, true
+}
+
+// ClearTarget clears the value of the "target" field.
+func (m *TrailActionRunMutation) ClearTarget() {
+	m.target = nil
+	m.appendtarget = nil
+	m.clearedFields[trailactionrun.FieldTarget] = struct{}{}
+}
+
+// TargetCleared returns if the "target" field was cleared in this mutation.
+func (m *TrailActionRunMutation) TargetCleared() bool {
+	_, ok := m.clearedFields[trailactionrun.FieldTarget]
+	return ok
+}
+
+// ResetTarget resets all changes to the "target" field.
+func (m *TrailActionRunMutation) ResetTarget() {
+	m.target = nil
+	m.appendtarget = nil
+	delete(m.clearedFields, trailactionrun.FieldTarget)
+}
+
+// SetErrorText sets the "error_text" field.
+func (m *TrailActionRunMutation) SetErrorText(s string) {
+	m.error_text = &s
+}
+
+// ErrorText returns the value of the "error_text" field in the mutation.
+func (m *TrailActionRunMutation) ErrorText() (r string, exists bool) {
+	v := m.error_text
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldErrorText returns the old "error_text" field's value of the TrailActionRun entity.
+// If the TrailActionRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionRunMutation) OldErrorText(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldErrorText is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldErrorText requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldErrorText: %w", err)
+	}
+	return oldValue.ErrorText, nil
+}
+
+// ClearErrorText clears the value of the "error_text" field.
+func (m *TrailActionRunMutation) ClearErrorText() {
+	m.error_text = nil
+	m.clearedFields[trailactionrun.FieldErrorText] = struct{}{}
+}
+
+// ErrorTextCleared returns if the "error_text" field was cleared in this mutation.
+func (m *TrailActionRunMutation) ErrorTextCleared() bool {
+	_, ok := m.clearedFields[trailactionrun.FieldErrorText]
+	return ok
+}
+
+// ResetErrorText resets all changes to the "error_text" field.
+func (m *TrailActionRunMutation) ResetErrorText() {
+	m.error_text = nil
+	delete(m.clearedFields, trailactionrun.FieldErrorText)
+}
+
+// SetStartedAt sets the "started_at" field.
+func (m *TrailActionRunMutation) SetStartedAt(t time.Time) {
+	m.started_at = &t
+}
+
+// StartedAt returns the value of the "started_at" field in the mutation.
+func (m *TrailActionRunMutation) StartedAt() (r time.Time, exists bool) {
+	v := m.started_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStartedAt returns the old "started_at" field's value of the TrailActionRun entity.
+// If the TrailActionRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionRunMutation) OldStartedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStartedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStartedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStartedAt: %w", err)
+	}
+	return oldValue.StartedAt, nil
+}
+
+// ClearStartedAt clears the value of the "started_at" field.
+func (m *TrailActionRunMutation) ClearStartedAt() {
+	m.started_at = nil
+	m.clearedFields[trailactionrun.FieldStartedAt] = struct{}{}
+}
+
+// StartedAtCleared returns if the "started_at" field was cleared in this mutation.
+func (m *TrailActionRunMutation) StartedAtCleared() bool {
+	_, ok := m.clearedFields[trailactionrun.FieldStartedAt]
+	return ok
+}
+
+// ResetStartedAt resets all changes to the "started_at" field.
+func (m *TrailActionRunMutation) ResetStartedAt() {
+	m.started_at = nil
+	delete(m.clearedFields, trailactionrun.FieldStartedAt)
+}
+
+// SetFinishedAt sets the "finished_at" field.
+func (m *TrailActionRunMutation) SetFinishedAt(t time.Time) {
+	m.finished_at = &t
+}
+
+// FinishedAt returns the value of the "finished_at" field in the mutation.
+func (m *TrailActionRunMutation) FinishedAt() (r time.Time, exists bool) {
+	v := m.finished_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFinishedAt returns the old "finished_at" field's value of the TrailActionRun entity.
+// If the TrailActionRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionRunMutation) OldFinishedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFinishedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFinishedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFinishedAt: %w", err)
+	}
+	return oldValue.FinishedAt, nil
+}
+
+// ClearFinishedAt clears the value of the "finished_at" field.
+func (m *TrailActionRunMutation) ClearFinishedAt() {
+	m.finished_at = nil
+	m.clearedFields[trailactionrun.FieldFinishedAt] = struct{}{}
+}
+
+// FinishedAtCleared returns if the "finished_at" field was cleared in this mutation.
+func (m *TrailActionRunMutation) FinishedAtCleared() bool {
+	_, ok := m.clearedFields[trailactionrun.FieldFinishedAt]
+	return ok
+}
+
+// ResetFinishedAt resets all changes to the "finished_at" field.
+func (m *TrailActionRunMutation) ResetFinishedAt() {
+	m.finished_at = nil
+	delete(m.clearedFields, trailactionrun.FieldFinishedAt)
+}
+
+// SetNotifiedAt sets the "notified_at" field.
+func (m *TrailActionRunMutation) SetNotifiedAt(t time.Time) {
+	m.notified_at = &t
+}
+
+// NotifiedAt returns the value of the "notified_at" field in the mutation.
+func (m *TrailActionRunMutation) NotifiedAt() (r time.Time, exists bool) {
+	v := m.notified_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNotifiedAt returns the old "notified_at" field's value of the TrailActionRun entity.
+// If the TrailActionRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailActionRunMutation) OldNotifiedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNotifiedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNotifiedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNotifiedAt: %w", err)
+	}
+	return oldValue.NotifiedAt, nil
+}
+
+// ClearNotifiedAt clears the value of the "notified_at" field.
+func (m *TrailActionRunMutation) ClearNotifiedAt() {
+	m.notified_at = nil
+	m.clearedFields[trailactionrun.FieldNotifiedAt] = struct{}{}
+}
+
+// NotifiedAtCleared returns if the "notified_at" field was cleared in this mutation.
+func (m *TrailActionRunMutation) NotifiedAtCleared() bool {
+	_, ok := m.clearedFields[trailactionrun.FieldNotifiedAt]
+	return ok
+}
+
+// ResetNotifiedAt resets all changes to the "notified_at" field.
+func (m *TrailActionRunMutation) ResetNotifiedAt() {
+	m.notified_at = nil
+	delete(m.clearedFields, trailactionrun.FieldNotifiedAt)
+}
+
+// ClearRun clears the "run" edge to the TrailRun entity.
+func (m *TrailActionRunMutation) ClearRun() {
+	m.clearedrun = true
+	m.clearedFields[trailactionrun.FieldRunID] = struct{}{}
+}
+
+// RunCleared reports if the "run" edge to the TrailRun entity was cleared.
+func (m *TrailActionRunMutation) RunCleared() bool {
+	return m.clearedrun
+}
+
+// RunIDs returns the "run" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// RunID instead. It exists only for internal usage by the builders.
+func (m *TrailActionRunMutation) RunIDs() (ids []xid.ID) {
+	if id := m.run; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetRun resets all changes to the "run" edge.
+func (m *TrailActionRunMutation) ResetRun() {
+	m.run = nil
+	m.clearedrun = false
+}
+
+// ClearAction clears the "action" edge to the TrailAction entity.
+func (m *TrailActionRunMutation) ClearAction() {
+	m.clearedaction = true
+	m.clearedFields[trailactionrun.FieldActionID] = struct{}{}
+}
+
+// ActionCleared reports if the "action" edge to the TrailAction entity was cleared.
+func (m *TrailActionRunMutation) ActionCleared() bool {
+	return m.clearedaction
+}
+
+// ActionIDs returns the "action" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ActionID instead. It exists only for internal usage by the builders.
+func (m *TrailActionRunMutation) ActionIDs() (ids []xid.ID) {
+	if id := m.action; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAction resets all changes to the "action" edge.
+func (m *TrailActionRunMutation) ResetAction() {
+	m.action = nil
+	m.clearedaction = false
+}
+
+// Where appends a list predicates to the TrailActionRunMutation builder.
+func (m *TrailActionRunMutation) Where(ps ...predicate.TrailActionRun) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the TrailActionRunMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *TrailActionRunMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.TrailActionRun, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *TrailActionRunMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *TrailActionRunMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (TrailActionRun).
+func (m *TrailActionRunMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *TrailActionRunMutation) Fields() []string {
+	fields := make([]string, 0, 15)
+	if m.created_at != nil {
+		fields = append(fields, trailactionrun.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, trailactionrun.FieldUpdatedAt)
+	}
+	if m.run != nil {
+		fields = append(fields, trailactionrun.FieldRunID)
+	}
+	if m.action != nil {
+		fields = append(fields, trailactionrun.FieldActionID)
+	}
+	if m.kind != nil {
+		fields = append(fields, trailactionrun.FieldKind)
+	}
+	if m._config != nil {
+		fields = append(fields, trailactionrun.FieldConfig)
+	}
+	if m.status != nil {
+		fields = append(fields, trailactionrun.FieldStatus)
+	}
+	if m.lease_token != nil {
+		fields = append(fields, trailactionrun.FieldLeaseToken)
+	}
+	if m.lease_expires_at != nil {
+		fields = append(fields, trailactionrun.FieldLeaseExpiresAt)
+	}
+	if m.output != nil {
+		fields = append(fields, trailactionrun.FieldOutput)
+	}
+	if m.target != nil {
+		fields = append(fields, trailactionrun.FieldTarget)
+	}
+	if m.error_text != nil {
+		fields = append(fields, trailactionrun.FieldErrorText)
+	}
+	if m.started_at != nil {
+		fields = append(fields, trailactionrun.FieldStartedAt)
+	}
+	if m.finished_at != nil {
+		fields = append(fields, trailactionrun.FieldFinishedAt)
+	}
+	if m.notified_at != nil {
+		fields = append(fields, trailactionrun.FieldNotifiedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *TrailActionRunMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case trailactionrun.FieldCreatedAt:
+		return m.CreatedAt()
+	case trailactionrun.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case trailactionrun.FieldRunID:
+		return m.RunID()
+	case trailactionrun.FieldActionID:
+		return m.ActionID()
+	case trailactionrun.FieldKind:
+		return m.Kind()
+	case trailactionrun.FieldConfig:
+		return m.Config()
+	case trailactionrun.FieldStatus:
+		return m.Status()
+	case trailactionrun.FieldLeaseToken:
+		return m.LeaseToken()
+	case trailactionrun.FieldLeaseExpiresAt:
+		return m.LeaseExpiresAt()
+	case trailactionrun.FieldOutput:
+		return m.Output()
+	case trailactionrun.FieldTarget:
+		return m.Target()
+	case trailactionrun.FieldErrorText:
+		return m.ErrorText()
+	case trailactionrun.FieldStartedAt:
+		return m.StartedAt()
+	case trailactionrun.FieldFinishedAt:
+		return m.FinishedAt()
+	case trailactionrun.FieldNotifiedAt:
+		return m.NotifiedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *TrailActionRunMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case trailactionrun.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case trailactionrun.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case trailactionrun.FieldRunID:
+		return m.OldRunID(ctx)
+	case trailactionrun.FieldActionID:
+		return m.OldActionID(ctx)
+	case trailactionrun.FieldKind:
+		return m.OldKind(ctx)
+	case trailactionrun.FieldConfig:
+		return m.OldConfig(ctx)
+	case trailactionrun.FieldStatus:
+		return m.OldStatus(ctx)
+	case trailactionrun.FieldLeaseToken:
+		return m.OldLeaseToken(ctx)
+	case trailactionrun.FieldLeaseExpiresAt:
+		return m.OldLeaseExpiresAt(ctx)
+	case trailactionrun.FieldOutput:
+		return m.OldOutput(ctx)
+	case trailactionrun.FieldTarget:
+		return m.OldTarget(ctx)
+	case trailactionrun.FieldErrorText:
+		return m.OldErrorText(ctx)
+	case trailactionrun.FieldStartedAt:
+		return m.OldStartedAt(ctx)
+	case trailactionrun.FieldFinishedAt:
+		return m.OldFinishedAt(ctx)
+	case trailactionrun.FieldNotifiedAt:
+		return m.OldNotifiedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown TrailActionRun field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TrailActionRunMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case trailactionrun.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case trailactionrun.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case trailactionrun.FieldRunID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRunID(v)
+		return nil
+	case trailactionrun.FieldActionID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActionID(v)
+		return nil
+	case trailactionrun.FieldKind:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetKind(v)
+		return nil
+	case trailactionrun.FieldConfig:
+		v, ok := value.(json.RawMessage)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetConfig(v)
+		return nil
+	case trailactionrun.FieldStatus:
+		v, ok := value.(trailactionrun.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case trailactionrun.FieldLeaseToken:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLeaseToken(v)
+		return nil
+	case trailactionrun.FieldLeaseExpiresAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLeaseExpiresAt(v)
+		return nil
+	case trailactionrun.FieldOutput:
+		v, ok := value.(json.RawMessage)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOutput(v)
+		return nil
+	case trailactionrun.FieldTarget:
+		v, ok := value.(json.RawMessage)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTarget(v)
+		return nil
+	case trailactionrun.FieldErrorText:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetErrorText(v)
+		return nil
+	case trailactionrun.FieldStartedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStartedAt(v)
+		return nil
+	case trailactionrun.FieldFinishedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFinishedAt(v)
+		return nil
+	case trailactionrun.FieldNotifiedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNotifiedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown TrailActionRun field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *TrailActionRunMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *TrailActionRunMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TrailActionRunMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown TrailActionRun numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *TrailActionRunMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(trailactionrun.FieldLeaseToken) {
+		fields = append(fields, trailactionrun.FieldLeaseToken)
+	}
+	if m.FieldCleared(trailactionrun.FieldLeaseExpiresAt) {
+		fields = append(fields, trailactionrun.FieldLeaseExpiresAt)
+	}
+	if m.FieldCleared(trailactionrun.FieldOutput) {
+		fields = append(fields, trailactionrun.FieldOutput)
+	}
+	if m.FieldCleared(trailactionrun.FieldTarget) {
+		fields = append(fields, trailactionrun.FieldTarget)
+	}
+	if m.FieldCleared(trailactionrun.FieldErrorText) {
+		fields = append(fields, trailactionrun.FieldErrorText)
+	}
+	if m.FieldCleared(trailactionrun.FieldStartedAt) {
+		fields = append(fields, trailactionrun.FieldStartedAt)
+	}
+	if m.FieldCleared(trailactionrun.FieldFinishedAt) {
+		fields = append(fields, trailactionrun.FieldFinishedAt)
+	}
+	if m.FieldCleared(trailactionrun.FieldNotifiedAt) {
+		fields = append(fields, trailactionrun.FieldNotifiedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *TrailActionRunMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *TrailActionRunMutation) ClearField(name string) error {
+	switch name {
+	case trailactionrun.FieldLeaseToken:
+		m.ClearLeaseToken()
+		return nil
+	case trailactionrun.FieldLeaseExpiresAt:
+		m.ClearLeaseExpiresAt()
+		return nil
+	case trailactionrun.FieldOutput:
+		m.ClearOutput()
+		return nil
+	case trailactionrun.FieldTarget:
+		m.ClearTarget()
+		return nil
+	case trailactionrun.FieldErrorText:
+		m.ClearErrorText()
+		return nil
+	case trailactionrun.FieldStartedAt:
+		m.ClearStartedAt()
+		return nil
+	case trailactionrun.FieldFinishedAt:
+		m.ClearFinishedAt()
+		return nil
+	case trailactionrun.FieldNotifiedAt:
+		m.ClearNotifiedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown TrailActionRun nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *TrailActionRunMutation) ResetField(name string) error {
+	switch name {
+	case trailactionrun.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case trailactionrun.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case trailactionrun.FieldRunID:
+		m.ResetRunID()
+		return nil
+	case trailactionrun.FieldActionID:
+		m.ResetActionID()
+		return nil
+	case trailactionrun.FieldKind:
+		m.ResetKind()
+		return nil
+	case trailactionrun.FieldConfig:
+		m.ResetConfig()
+		return nil
+	case trailactionrun.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case trailactionrun.FieldLeaseToken:
+		m.ResetLeaseToken()
+		return nil
+	case trailactionrun.FieldLeaseExpiresAt:
+		m.ResetLeaseExpiresAt()
+		return nil
+	case trailactionrun.FieldOutput:
+		m.ResetOutput()
+		return nil
+	case trailactionrun.FieldTarget:
+		m.ResetTarget()
+		return nil
+	case trailactionrun.FieldErrorText:
+		m.ResetErrorText()
+		return nil
+	case trailactionrun.FieldStartedAt:
+		m.ResetStartedAt()
+		return nil
+	case trailactionrun.FieldFinishedAt:
+		m.ResetFinishedAt()
+		return nil
+	case trailactionrun.FieldNotifiedAt:
+		m.ResetNotifiedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown TrailActionRun field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *TrailActionRunMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.run != nil {
+		edges = append(edges, trailactionrun.EdgeRun)
+	}
+	if m.action != nil {
+		edges = append(edges, trailactionrun.EdgeAction)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *TrailActionRunMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case trailactionrun.EdgeRun:
+		if id := m.run; id != nil {
+			return []ent.Value{*id}
+		}
+	case trailactionrun.EdgeAction:
+		if id := m.action; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *TrailActionRunMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *TrailActionRunMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *TrailActionRunMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedrun {
+		edges = append(edges, trailactionrun.EdgeRun)
+	}
+	if m.clearedaction {
+		edges = append(edges, trailactionrun.EdgeAction)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *TrailActionRunMutation) EdgeCleared(name string) bool {
+	switch name {
+	case trailactionrun.EdgeRun:
+		return m.clearedrun
+	case trailactionrun.EdgeAction:
+		return m.clearedaction
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *TrailActionRunMutation) ClearEdge(name string) error {
+	switch name {
+	case trailactionrun.EdgeRun:
+		m.ClearRun()
+		return nil
+	case trailactionrun.EdgeAction:
+		m.ClearAction()
+		return nil
+	}
+	return fmt.Errorf("unknown TrailActionRun unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *TrailActionRunMutation) ResetEdge(name string) error {
+	switch name {
+	case trailactionrun.EdgeRun:
+		m.ResetRun()
+		return nil
+	case trailactionrun.EdgeAction:
+		m.ResetAction()
+		return nil
+	}
+	return fmt.Errorf("unknown TrailActionRun edge %s", name)
+}
+
+// TrailRunMutation represents an operation that mutates the TrailRun nodes in the graph.
+type TrailRunMutation struct {
+	config
+	op                    Op
+	typ                   string
+	id                    *xid.ID
+	created_at            *time.Time
+	updated_at            *time.Time
+	kind                  *trailrun.Kind
+	trigger_payload       *json.RawMessage
+	appendtrigger_payload json.RawMessage
+	scheduled_for         *time.Time
+	status                *trailrun.Status
+	finished_at           *time.Time
+	clearedFields         map[string]struct{}
+	trail                 *xid.ID
+	clearedtrail          bool
+	initiator             *xid.ID
+	clearedinitiator      bool
+	action_runs           map[xid.ID]struct{}
+	removedaction_runs    map[xid.ID]struct{}
+	clearedaction_runs    bool
+	done                  bool
+	oldValue              func(context.Context) (*TrailRun, error)
+	predicates            []predicate.TrailRun
+}
+
+var _ ent.Mutation = (*TrailRunMutation)(nil)
+
+// trailrunOption allows management of the mutation configuration using functional options.
+type trailrunOption func(*TrailRunMutation)
+
+// newTrailRunMutation creates new mutation for the TrailRun entity.
+func newTrailRunMutation(c config, op Op, opts ...trailrunOption) *TrailRunMutation {
+	m := &TrailRunMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeTrailRun,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withTrailRunID sets the ID field of the mutation.
+func withTrailRunID(id xid.ID) trailrunOption {
+	return func(m *TrailRunMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *TrailRun
+		)
+		m.oldValue = func(ctx context.Context) (*TrailRun, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().TrailRun.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withTrailRun sets the old TrailRun of the mutation.
+func withTrailRun(node *TrailRun) trailrunOption {
+	return func(m *TrailRunMutation) {
+		m.oldValue = func(context.Context) (*TrailRun, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m TrailRunMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m TrailRunMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of TrailRun entities.
+func (m *TrailRunMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *TrailRunMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *TrailRunMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().TrailRun.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *TrailRunMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *TrailRunMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the TrailRun entity.
+// If the TrailRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailRunMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *TrailRunMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *TrailRunMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *TrailRunMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the TrailRun entity.
+// If the TrailRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailRunMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *TrailRunMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetTrailID sets the "trail_id" field.
+func (m *TrailRunMutation) SetTrailID(x xid.ID) {
+	m.trail = &x
+}
+
+// TrailID returns the value of the "trail_id" field in the mutation.
+func (m *TrailRunMutation) TrailID() (r xid.ID, exists bool) {
+	v := m.trail
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTrailID returns the old "trail_id" field's value of the TrailRun entity.
+// If the TrailRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailRunMutation) OldTrailID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTrailID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTrailID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTrailID: %w", err)
+	}
+	return oldValue.TrailID, nil
+}
+
+// ResetTrailID resets all changes to the "trail_id" field.
+func (m *TrailRunMutation) ResetTrailID() {
+	m.trail = nil
+}
+
+// SetInitiatedByID sets the "initiated_by_id" field.
+func (m *TrailRunMutation) SetInitiatedByID(x xid.ID) {
+	m.initiator = &x
+}
+
+// InitiatedByID returns the value of the "initiated_by_id" field in the mutation.
+func (m *TrailRunMutation) InitiatedByID() (r xid.ID, exists bool) {
+	v := m.initiator
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldInitiatedByID returns the old "initiated_by_id" field's value of the TrailRun entity.
+// If the TrailRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailRunMutation) OldInitiatedByID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldInitiatedByID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldInitiatedByID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldInitiatedByID: %w", err)
+	}
+	return oldValue.InitiatedByID, nil
+}
+
+// ClearInitiatedByID clears the value of the "initiated_by_id" field.
+func (m *TrailRunMutation) ClearInitiatedByID() {
+	m.initiator = nil
+	m.clearedFields[trailrun.FieldInitiatedByID] = struct{}{}
+}
+
+// InitiatedByIDCleared returns if the "initiated_by_id" field was cleared in this mutation.
+func (m *TrailRunMutation) InitiatedByIDCleared() bool {
+	_, ok := m.clearedFields[trailrun.FieldInitiatedByID]
+	return ok
+}
+
+// ResetInitiatedByID resets all changes to the "initiated_by_id" field.
+func (m *TrailRunMutation) ResetInitiatedByID() {
+	m.initiator = nil
+	delete(m.clearedFields, trailrun.FieldInitiatedByID)
+}
+
+// SetKind sets the "kind" field.
+func (m *TrailRunMutation) SetKind(t trailrun.Kind) {
+	m.kind = &t
+}
+
+// Kind returns the value of the "kind" field in the mutation.
+func (m *TrailRunMutation) Kind() (r trailrun.Kind, exists bool) {
+	v := m.kind
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldKind returns the old "kind" field's value of the TrailRun entity.
+// If the TrailRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailRunMutation) OldKind(ctx context.Context) (v trailrun.Kind, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldKind is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldKind requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldKind: %w", err)
+	}
+	return oldValue.Kind, nil
+}
+
+// ResetKind resets all changes to the "kind" field.
+func (m *TrailRunMutation) ResetKind() {
+	m.kind = nil
+}
+
+// SetTriggerPayload sets the "trigger_payload" field.
+func (m *TrailRunMutation) SetTriggerPayload(jm json.RawMessage) {
+	m.trigger_payload = &jm
+	m.appendtrigger_payload = nil
+}
+
+// TriggerPayload returns the value of the "trigger_payload" field in the mutation.
+func (m *TrailRunMutation) TriggerPayload() (r json.RawMessage, exists bool) {
+	v := m.trigger_payload
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTriggerPayload returns the old "trigger_payload" field's value of the TrailRun entity.
+// If the TrailRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailRunMutation) OldTriggerPayload(ctx context.Context) (v json.RawMessage, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTriggerPayload is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTriggerPayload requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTriggerPayload: %w", err)
+	}
+	return oldValue.TriggerPayload, nil
+}
+
+// AppendTriggerPayload adds jm to the "trigger_payload" field.
+func (m *TrailRunMutation) AppendTriggerPayload(jm json.RawMessage) {
+	m.appendtrigger_payload = append(m.appendtrigger_payload, jm...)
+}
+
+// AppendedTriggerPayload returns the list of values that were appended to the "trigger_payload" field in this mutation.
+func (m *TrailRunMutation) AppendedTriggerPayload() (json.RawMessage, bool) {
+	if len(m.appendtrigger_payload) == 0 {
+		return nil, false
+	}
+	return m.appendtrigger_payload, true
+}
+
+// ResetTriggerPayload resets all changes to the "trigger_payload" field.
+func (m *TrailRunMutation) ResetTriggerPayload() {
+	m.trigger_payload = nil
+	m.appendtrigger_payload = nil
+}
+
+// SetScheduledFor sets the "scheduled_for" field.
+func (m *TrailRunMutation) SetScheduledFor(t time.Time) {
+	m.scheduled_for = &t
+}
+
+// ScheduledFor returns the value of the "scheduled_for" field in the mutation.
+func (m *TrailRunMutation) ScheduledFor() (r time.Time, exists bool) {
+	v := m.scheduled_for
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldScheduledFor returns the old "scheduled_for" field's value of the TrailRun entity.
+// If the TrailRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailRunMutation) OldScheduledFor(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldScheduledFor is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldScheduledFor requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldScheduledFor: %w", err)
+	}
+	return oldValue.ScheduledFor, nil
+}
+
+// ClearScheduledFor clears the value of the "scheduled_for" field.
+func (m *TrailRunMutation) ClearScheduledFor() {
+	m.scheduled_for = nil
+	m.clearedFields[trailrun.FieldScheduledFor] = struct{}{}
+}
+
+// ScheduledForCleared returns if the "scheduled_for" field was cleared in this mutation.
+func (m *TrailRunMutation) ScheduledForCleared() bool {
+	_, ok := m.clearedFields[trailrun.FieldScheduledFor]
+	return ok
+}
+
+// ResetScheduledFor resets all changes to the "scheduled_for" field.
+func (m *TrailRunMutation) ResetScheduledFor() {
+	m.scheduled_for = nil
+	delete(m.clearedFields, trailrun.FieldScheduledFor)
+}
+
+// SetStatus sets the "status" field.
+func (m *TrailRunMutation) SetStatus(t trailrun.Status) {
+	m.status = &t
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *TrailRunMutation) Status() (r trailrun.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the TrailRun entity.
+// If the TrailRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailRunMutation) OldStatus(ctx context.Context) (v trailrun.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *TrailRunMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetFinishedAt sets the "finished_at" field.
+func (m *TrailRunMutation) SetFinishedAt(t time.Time) {
+	m.finished_at = &t
+}
+
+// FinishedAt returns the value of the "finished_at" field in the mutation.
+func (m *TrailRunMutation) FinishedAt() (r time.Time, exists bool) {
+	v := m.finished_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFinishedAt returns the old "finished_at" field's value of the TrailRun entity.
+// If the TrailRun object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailRunMutation) OldFinishedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFinishedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFinishedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFinishedAt: %w", err)
+	}
+	return oldValue.FinishedAt, nil
+}
+
+// ClearFinishedAt clears the value of the "finished_at" field.
+func (m *TrailRunMutation) ClearFinishedAt() {
+	m.finished_at = nil
+	m.clearedFields[trailrun.FieldFinishedAt] = struct{}{}
+}
+
+// FinishedAtCleared returns if the "finished_at" field was cleared in this mutation.
+func (m *TrailRunMutation) FinishedAtCleared() bool {
+	_, ok := m.clearedFields[trailrun.FieldFinishedAt]
+	return ok
+}
+
+// ResetFinishedAt resets all changes to the "finished_at" field.
+func (m *TrailRunMutation) ResetFinishedAt() {
+	m.finished_at = nil
+	delete(m.clearedFields, trailrun.FieldFinishedAt)
+}
+
+// ClearTrail clears the "trail" edge to the Trail entity.
+func (m *TrailRunMutation) ClearTrail() {
+	m.clearedtrail = true
+	m.clearedFields[trailrun.FieldTrailID] = struct{}{}
+}
+
+// TrailCleared reports if the "trail" edge to the Trail entity was cleared.
+func (m *TrailRunMutation) TrailCleared() bool {
+	return m.clearedtrail
+}
+
+// TrailIDs returns the "trail" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// TrailID instead. It exists only for internal usage by the builders.
+func (m *TrailRunMutation) TrailIDs() (ids []xid.ID) {
+	if id := m.trail; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetTrail resets all changes to the "trail" edge.
+func (m *TrailRunMutation) ResetTrail() {
+	m.trail = nil
+	m.clearedtrail = false
+}
+
+// SetInitiatorID sets the "initiator" edge to the Account entity by id.
+func (m *TrailRunMutation) SetInitiatorID(id xid.ID) {
+	m.initiator = &id
+}
+
+// ClearInitiator clears the "initiator" edge to the Account entity.
+func (m *TrailRunMutation) ClearInitiator() {
+	m.clearedinitiator = true
+	m.clearedFields[trailrun.FieldInitiatedByID] = struct{}{}
+}
+
+// InitiatorCleared reports if the "initiator" edge to the Account entity was cleared.
+func (m *TrailRunMutation) InitiatorCleared() bool {
+	return m.InitiatedByIDCleared() || m.clearedinitiator
+}
+
+// InitiatorID returns the "initiator" edge ID in the mutation.
+func (m *TrailRunMutation) InitiatorID() (id xid.ID, exists bool) {
+	if m.initiator != nil {
+		return *m.initiator, true
+	}
+	return
+}
+
+// InitiatorIDs returns the "initiator" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// InitiatorID instead. It exists only for internal usage by the builders.
+func (m *TrailRunMutation) InitiatorIDs() (ids []xid.ID) {
+	if id := m.initiator; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetInitiator resets all changes to the "initiator" edge.
+func (m *TrailRunMutation) ResetInitiator() {
+	m.initiator = nil
+	m.clearedinitiator = false
+}
+
+// AddActionRunIDs adds the "action_runs" edge to the TrailActionRun entity by ids.
+func (m *TrailRunMutation) AddActionRunIDs(ids ...xid.ID) {
+	if m.action_runs == nil {
+		m.action_runs = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.action_runs[ids[i]] = struct{}{}
+	}
+}
+
+// ClearActionRuns clears the "action_runs" edge to the TrailActionRun entity.
+func (m *TrailRunMutation) ClearActionRuns() {
+	m.clearedaction_runs = true
+}
+
+// ActionRunsCleared reports if the "action_runs" edge to the TrailActionRun entity was cleared.
+func (m *TrailRunMutation) ActionRunsCleared() bool {
+	return m.clearedaction_runs
+}
+
+// RemoveActionRunIDs removes the "action_runs" edge to the TrailActionRun entity by IDs.
+func (m *TrailRunMutation) RemoveActionRunIDs(ids ...xid.ID) {
+	if m.removedaction_runs == nil {
+		m.removedaction_runs = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.action_runs, ids[i])
+		m.removedaction_runs[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedActionRuns returns the removed IDs of the "action_runs" edge to the TrailActionRun entity.
+func (m *TrailRunMutation) RemovedActionRunsIDs() (ids []xid.ID) {
+	for id := range m.removedaction_runs {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ActionRunsIDs returns the "action_runs" edge IDs in the mutation.
+func (m *TrailRunMutation) ActionRunsIDs() (ids []xid.ID) {
+	for id := range m.action_runs {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetActionRuns resets all changes to the "action_runs" edge.
+func (m *TrailRunMutation) ResetActionRuns() {
+	m.action_runs = nil
+	m.clearedaction_runs = false
+	m.removedaction_runs = nil
+}
+
+// Where appends a list predicates to the TrailRunMutation builder.
+func (m *TrailRunMutation) Where(ps ...predicate.TrailRun) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the TrailRunMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *TrailRunMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.TrailRun, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *TrailRunMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *TrailRunMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (TrailRun).
+func (m *TrailRunMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *TrailRunMutation) Fields() []string {
+	fields := make([]string, 0, 9)
+	if m.created_at != nil {
+		fields = append(fields, trailrun.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, trailrun.FieldUpdatedAt)
+	}
+	if m.trail != nil {
+		fields = append(fields, trailrun.FieldTrailID)
+	}
+	if m.initiator != nil {
+		fields = append(fields, trailrun.FieldInitiatedByID)
+	}
+	if m.kind != nil {
+		fields = append(fields, trailrun.FieldKind)
+	}
+	if m.trigger_payload != nil {
+		fields = append(fields, trailrun.FieldTriggerPayload)
+	}
+	if m.scheduled_for != nil {
+		fields = append(fields, trailrun.FieldScheduledFor)
+	}
+	if m.status != nil {
+		fields = append(fields, trailrun.FieldStatus)
+	}
+	if m.finished_at != nil {
+		fields = append(fields, trailrun.FieldFinishedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *TrailRunMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case trailrun.FieldCreatedAt:
+		return m.CreatedAt()
+	case trailrun.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case trailrun.FieldTrailID:
+		return m.TrailID()
+	case trailrun.FieldInitiatedByID:
+		return m.InitiatedByID()
+	case trailrun.FieldKind:
+		return m.Kind()
+	case trailrun.FieldTriggerPayload:
+		return m.TriggerPayload()
+	case trailrun.FieldScheduledFor:
+		return m.ScheduledFor()
+	case trailrun.FieldStatus:
+		return m.Status()
+	case trailrun.FieldFinishedAt:
+		return m.FinishedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *TrailRunMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case trailrun.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case trailrun.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case trailrun.FieldTrailID:
+		return m.OldTrailID(ctx)
+	case trailrun.FieldInitiatedByID:
+		return m.OldInitiatedByID(ctx)
+	case trailrun.FieldKind:
+		return m.OldKind(ctx)
+	case trailrun.FieldTriggerPayload:
+		return m.OldTriggerPayload(ctx)
+	case trailrun.FieldScheduledFor:
+		return m.OldScheduledFor(ctx)
+	case trailrun.FieldStatus:
+		return m.OldStatus(ctx)
+	case trailrun.FieldFinishedAt:
+		return m.OldFinishedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown TrailRun field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TrailRunMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case trailrun.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case trailrun.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case trailrun.FieldTrailID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTrailID(v)
+		return nil
+	case trailrun.FieldInitiatedByID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetInitiatedByID(v)
+		return nil
+	case trailrun.FieldKind:
+		v, ok := value.(trailrun.Kind)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetKind(v)
+		return nil
+	case trailrun.FieldTriggerPayload:
+		v, ok := value.(json.RawMessage)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTriggerPayload(v)
+		return nil
+	case trailrun.FieldScheduledFor:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetScheduledFor(v)
+		return nil
+	case trailrun.FieldStatus:
+		v, ok := value.(trailrun.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case trailrun.FieldFinishedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFinishedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown TrailRun field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *TrailRunMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *TrailRunMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TrailRunMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown TrailRun numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *TrailRunMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(trailrun.FieldInitiatedByID) {
+		fields = append(fields, trailrun.FieldInitiatedByID)
+	}
+	if m.FieldCleared(trailrun.FieldScheduledFor) {
+		fields = append(fields, trailrun.FieldScheduledFor)
+	}
+	if m.FieldCleared(trailrun.FieldFinishedAt) {
+		fields = append(fields, trailrun.FieldFinishedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *TrailRunMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *TrailRunMutation) ClearField(name string) error {
+	switch name {
+	case trailrun.FieldInitiatedByID:
+		m.ClearInitiatedByID()
+		return nil
+	case trailrun.FieldScheduledFor:
+		m.ClearScheduledFor()
+		return nil
+	case trailrun.FieldFinishedAt:
+		m.ClearFinishedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown TrailRun nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *TrailRunMutation) ResetField(name string) error {
+	switch name {
+	case trailrun.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case trailrun.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case trailrun.FieldTrailID:
+		m.ResetTrailID()
+		return nil
+	case trailrun.FieldInitiatedByID:
+		m.ResetInitiatedByID()
+		return nil
+	case trailrun.FieldKind:
+		m.ResetKind()
+		return nil
+	case trailrun.FieldTriggerPayload:
+		m.ResetTriggerPayload()
+		return nil
+	case trailrun.FieldScheduledFor:
+		m.ResetScheduledFor()
+		return nil
+	case trailrun.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case trailrun.FieldFinishedAt:
+		m.ResetFinishedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown TrailRun field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *TrailRunMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.trail != nil {
+		edges = append(edges, trailrun.EdgeTrail)
+	}
+	if m.initiator != nil {
+		edges = append(edges, trailrun.EdgeInitiator)
+	}
+	if m.action_runs != nil {
+		edges = append(edges, trailrun.EdgeActionRuns)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *TrailRunMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case trailrun.EdgeTrail:
+		if id := m.trail; id != nil {
+			return []ent.Value{*id}
+		}
+	case trailrun.EdgeInitiator:
+		if id := m.initiator; id != nil {
+			return []ent.Value{*id}
+		}
+	case trailrun.EdgeActionRuns:
+		ids := make([]ent.Value, 0, len(m.action_runs))
+		for id := range m.action_runs {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *TrailRunMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.removedaction_runs != nil {
+		edges = append(edges, trailrun.EdgeActionRuns)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *TrailRunMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case trailrun.EdgeActionRuns:
+		ids := make([]ent.Value, 0, len(m.removedaction_runs))
+		for id := range m.removedaction_runs {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *TrailRunMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedtrail {
+		edges = append(edges, trailrun.EdgeTrail)
+	}
+	if m.clearedinitiator {
+		edges = append(edges, trailrun.EdgeInitiator)
+	}
+	if m.clearedaction_runs {
+		edges = append(edges, trailrun.EdgeActionRuns)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *TrailRunMutation) EdgeCleared(name string) bool {
+	switch name {
+	case trailrun.EdgeTrail:
+		return m.clearedtrail
+	case trailrun.EdgeInitiator:
+		return m.clearedinitiator
+	case trailrun.EdgeActionRuns:
+		return m.clearedaction_runs
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *TrailRunMutation) ClearEdge(name string) error {
+	switch name {
+	case trailrun.EdgeTrail:
+		m.ClearTrail()
+		return nil
+	case trailrun.EdgeInitiator:
+		m.ClearInitiator()
+		return nil
+	}
+	return fmt.Errorf("unknown TrailRun unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *TrailRunMutation) ResetEdge(name string) error {
+	switch name {
+	case trailrun.EdgeTrail:
+		m.ResetTrail()
+		return nil
+	case trailrun.EdgeInitiator:
+		m.ResetInitiator()
+		return nil
+	case trailrun.EdgeActionRuns:
+		m.ResetActionRuns()
+		return nil
+	}
+	return fmt.Errorf("unknown TrailRun edge %s", name)
+}
+
+// TrailSchedulerLeaseMutation represents an operation that mutates the TrailSchedulerLease nodes in the graph.
+type TrailSchedulerLeaseMutation struct {
+	config
+	op               Op
+	typ              string
+	id               *int
+	lease_token      *string
+	lease_expires_at *time.Time
+	clearedFields    map[string]struct{}
+	done             bool
+	oldValue         func(context.Context) (*TrailSchedulerLease, error)
+	predicates       []predicate.TrailSchedulerLease
+}
+
+var _ ent.Mutation = (*TrailSchedulerLeaseMutation)(nil)
+
+// trailschedulerleaseOption allows management of the mutation configuration using functional options.
+type trailschedulerleaseOption func(*TrailSchedulerLeaseMutation)
+
+// newTrailSchedulerLeaseMutation creates new mutation for the TrailSchedulerLease entity.
+func newTrailSchedulerLeaseMutation(c config, op Op, opts ...trailschedulerleaseOption) *TrailSchedulerLeaseMutation {
+	m := &TrailSchedulerLeaseMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeTrailSchedulerLease,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withTrailSchedulerLeaseID sets the ID field of the mutation.
+func withTrailSchedulerLeaseID(id int) trailschedulerleaseOption {
+	return func(m *TrailSchedulerLeaseMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *TrailSchedulerLease
+		)
+		m.oldValue = func(ctx context.Context) (*TrailSchedulerLease, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().TrailSchedulerLease.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withTrailSchedulerLease sets the old TrailSchedulerLease of the mutation.
+func withTrailSchedulerLease(node *TrailSchedulerLease) trailschedulerleaseOption {
+	return func(m *TrailSchedulerLeaseMutation) {
+		m.oldValue = func(context.Context) (*TrailSchedulerLease, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m TrailSchedulerLeaseMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m TrailSchedulerLeaseMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of TrailSchedulerLease entities.
+func (m *TrailSchedulerLeaseMutation) SetID(id int) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *TrailSchedulerLeaseMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *TrailSchedulerLeaseMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().TrailSchedulerLease.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetLeaseToken sets the "lease_token" field.
+func (m *TrailSchedulerLeaseMutation) SetLeaseToken(s string) {
+	m.lease_token = &s
+}
+
+// LeaseToken returns the value of the "lease_token" field in the mutation.
+func (m *TrailSchedulerLeaseMutation) LeaseToken() (r string, exists bool) {
+	v := m.lease_token
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLeaseToken returns the old "lease_token" field's value of the TrailSchedulerLease entity.
+// If the TrailSchedulerLease object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailSchedulerLeaseMutation) OldLeaseToken(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLeaseToken is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLeaseToken requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLeaseToken: %w", err)
+	}
+	return oldValue.LeaseToken, nil
+}
+
+// ClearLeaseToken clears the value of the "lease_token" field.
+func (m *TrailSchedulerLeaseMutation) ClearLeaseToken() {
+	m.lease_token = nil
+	m.clearedFields[trailschedulerlease.FieldLeaseToken] = struct{}{}
+}
+
+// LeaseTokenCleared returns if the "lease_token" field was cleared in this mutation.
+func (m *TrailSchedulerLeaseMutation) LeaseTokenCleared() bool {
+	_, ok := m.clearedFields[trailschedulerlease.FieldLeaseToken]
+	return ok
+}
+
+// ResetLeaseToken resets all changes to the "lease_token" field.
+func (m *TrailSchedulerLeaseMutation) ResetLeaseToken() {
+	m.lease_token = nil
+	delete(m.clearedFields, trailschedulerlease.FieldLeaseToken)
+}
+
+// SetLeaseExpiresAt sets the "lease_expires_at" field.
+func (m *TrailSchedulerLeaseMutation) SetLeaseExpiresAt(t time.Time) {
+	m.lease_expires_at = &t
+}
+
+// LeaseExpiresAt returns the value of the "lease_expires_at" field in the mutation.
+func (m *TrailSchedulerLeaseMutation) LeaseExpiresAt() (r time.Time, exists bool) {
+	v := m.lease_expires_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLeaseExpiresAt returns the old "lease_expires_at" field's value of the TrailSchedulerLease entity.
+// If the TrailSchedulerLease object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrailSchedulerLeaseMutation) OldLeaseExpiresAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLeaseExpiresAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLeaseExpiresAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLeaseExpiresAt: %w", err)
+	}
+	return oldValue.LeaseExpiresAt, nil
+}
+
+// ClearLeaseExpiresAt clears the value of the "lease_expires_at" field.
+func (m *TrailSchedulerLeaseMutation) ClearLeaseExpiresAt() {
+	m.lease_expires_at = nil
+	m.clearedFields[trailschedulerlease.FieldLeaseExpiresAt] = struct{}{}
+}
+
+// LeaseExpiresAtCleared returns if the "lease_expires_at" field was cleared in this mutation.
+func (m *TrailSchedulerLeaseMutation) LeaseExpiresAtCleared() bool {
+	_, ok := m.clearedFields[trailschedulerlease.FieldLeaseExpiresAt]
+	return ok
+}
+
+// ResetLeaseExpiresAt resets all changes to the "lease_expires_at" field.
+func (m *TrailSchedulerLeaseMutation) ResetLeaseExpiresAt() {
+	m.lease_expires_at = nil
+	delete(m.clearedFields, trailschedulerlease.FieldLeaseExpiresAt)
+}
+
+// Where appends a list predicates to the TrailSchedulerLeaseMutation builder.
+func (m *TrailSchedulerLeaseMutation) Where(ps ...predicate.TrailSchedulerLease) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the TrailSchedulerLeaseMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *TrailSchedulerLeaseMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.TrailSchedulerLease, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *TrailSchedulerLeaseMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *TrailSchedulerLeaseMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (TrailSchedulerLease).
+func (m *TrailSchedulerLeaseMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *TrailSchedulerLeaseMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.lease_token != nil {
+		fields = append(fields, trailschedulerlease.FieldLeaseToken)
+	}
+	if m.lease_expires_at != nil {
+		fields = append(fields, trailschedulerlease.FieldLeaseExpiresAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *TrailSchedulerLeaseMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case trailschedulerlease.FieldLeaseToken:
+		return m.LeaseToken()
+	case trailschedulerlease.FieldLeaseExpiresAt:
+		return m.LeaseExpiresAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *TrailSchedulerLeaseMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case trailschedulerlease.FieldLeaseToken:
+		return m.OldLeaseToken(ctx)
+	case trailschedulerlease.FieldLeaseExpiresAt:
+		return m.OldLeaseExpiresAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown TrailSchedulerLease field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TrailSchedulerLeaseMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case trailschedulerlease.FieldLeaseToken:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLeaseToken(v)
+		return nil
+	case trailschedulerlease.FieldLeaseExpiresAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLeaseExpiresAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown TrailSchedulerLease field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *TrailSchedulerLeaseMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *TrailSchedulerLeaseMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TrailSchedulerLeaseMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown TrailSchedulerLease numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *TrailSchedulerLeaseMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(trailschedulerlease.FieldLeaseToken) {
+		fields = append(fields, trailschedulerlease.FieldLeaseToken)
+	}
+	if m.FieldCleared(trailschedulerlease.FieldLeaseExpiresAt) {
+		fields = append(fields, trailschedulerlease.FieldLeaseExpiresAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *TrailSchedulerLeaseMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *TrailSchedulerLeaseMutation) ClearField(name string) error {
+	switch name {
+	case trailschedulerlease.FieldLeaseToken:
+		m.ClearLeaseToken()
+		return nil
+	case trailschedulerlease.FieldLeaseExpiresAt:
+		m.ClearLeaseExpiresAt()
+		return nil
+	}
+	return fmt.Errorf("unknown TrailSchedulerLease nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *TrailSchedulerLeaseMutation) ResetField(name string) error {
+	switch name {
+	case trailschedulerlease.FieldLeaseToken:
+		m.ResetLeaseToken()
+		return nil
+	case trailschedulerlease.FieldLeaseExpiresAt:
+		m.ResetLeaseExpiresAt()
+		return nil
+	}
+	return fmt.Errorf("unknown TrailSchedulerLease field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *TrailSchedulerLeaseMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *TrailSchedulerLeaseMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *TrailSchedulerLeaseMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *TrailSchedulerLeaseMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *TrailSchedulerLeaseMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *TrailSchedulerLeaseMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *TrailSchedulerLeaseMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown TrailSchedulerLease unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *TrailSchedulerLeaseMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown TrailSchedulerLease edge %s", name)
 }
 
 // WarningMutation represents an operation that mutates the Warning nodes in the graph.

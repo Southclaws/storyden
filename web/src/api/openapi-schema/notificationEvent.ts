@@ -31,4 +31,5 @@ export const NotificationEvent = {
   node_version_created: "node_version_created",
   node_version_applied: "node_version_applied",
   node_version_deleted: "node_version_deleted",
+  trail_run_attention: "trail_run_attention",
 } as const;

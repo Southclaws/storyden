@@ -65,6 +65,26 @@ func (_u *NotificationUpdate) SetNillableEventType(v *string) *NotificationUpdat
 	return _u
 }
 
+// SetTarget sets the "target" field.
+func (_u *NotificationUpdate) SetTarget(v string) *NotificationUpdate {
+	_u.mutation.SetTarget(v)
+	return _u
+}
+
+// SetNillableTarget sets the "target" field if the given value is not nil.
+func (_u *NotificationUpdate) SetNillableTarget(v *string) *NotificationUpdate {
+	if v != nil {
+		_u.SetTarget(*v)
+	}
+	return _u
+}
+
+// ClearTarget clears the value of the "target" field.
+func (_u *NotificationUpdate) ClearTarget() *NotificationUpdate {
+	_u.mutation.ClearTarget()
+	return _u
+}
+
 // SetDatagraphKind sets the "datagraph_kind" field.
 func (_u *NotificationUpdate) SetDatagraphKind(v string) *NotificationUpdate {
 	_u.mutation.SetDatagraphKind(v)
@@ -262,6 +282,12 @@ func (_u *NotificationUpdate) sqlSave(ctx context.Context) (_node int, err error
 	if value, ok := _u.mutation.EventType(); ok {
 		_spec.SetField(notification.FieldEventType, field.TypeString, value)
 	}
+	if value, ok := _u.mutation.Target(); ok {
+		_spec.SetField(notification.FieldTarget, field.TypeString, value)
+	}
+	if _u.mutation.TargetCleared() {
+		_spec.ClearField(notification.FieldTarget, field.TypeString)
+	}
 	if value, ok := _u.mutation.DatagraphKind(); ok {
 		_spec.SetField(notification.FieldDatagraphKind, field.TypeString, value)
 	}
@@ -388,6 +414,26 @@ func (_u *NotificationUpdateOne) SetNillableEventType(v *string) *NotificationUp
 	if v != nil {
 		_u.SetEventType(*v)
 	}
+	return _u
+}
+
+// SetTarget sets the "target" field.
+func (_u *NotificationUpdateOne) SetTarget(v string) *NotificationUpdateOne {
+	_u.mutation.SetTarget(v)
+	return _u
+}
+
+// SetNillableTarget sets the "target" field if the given value is not nil.
+func (_u *NotificationUpdateOne) SetNillableTarget(v *string) *NotificationUpdateOne {
+	if v != nil {
+		_u.SetTarget(*v)
+	}
+	return _u
+}
+
+// ClearTarget clears the value of the "target" field.
+func (_u *NotificationUpdateOne) ClearTarget() *NotificationUpdateOne {
+	_u.mutation.ClearTarget()
 	return _u
 }
 
@@ -617,6 +663,12 @@ func (_u *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificati
 	}
 	if value, ok := _u.mutation.EventType(); ok {
 		_spec.SetField(notification.FieldEventType, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.Target(); ok {
+		_spec.SetField(notification.FieldTarget, field.TypeString, value)
+	}
+	if _u.mutation.TargetCleared() {
+		_spec.ClearField(notification.FieldTarget, field.TypeString)
 	}
 	if value, ok := _u.mutation.DatagraphKind(); ok {
 		_spec.SetField(notification.FieldDatagraphKind, field.TypeString, value)

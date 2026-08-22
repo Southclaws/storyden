@@ -21,4 +21,5 @@ const (
 	eventNodeVersionCreated   eventEnum = "node_version_created"
 	eventNodeVersionApplied   eventEnum = "node_version_applied"
 	eventNodeVersionDeleted   eventEnum = "node_version_deleted"
+	eventTrailRunAttention    eventEnum = "trail_run_attention"
 )

@@ -21,6 +21,8 @@ const (
 	FieldDeletedAt = "deleted_at"
 	// FieldEventType holds the string denoting the event_type field in the database.
 	FieldEventType = "event_type"
+	// FieldTarget holds the string denoting the target field in the database.
+	FieldTarget = "target"
 	// FieldDatagraphKind holds the string denoting the datagraph_kind field in the database.
 	FieldDatagraphKind = "datagraph_kind"
 	// FieldDatagraphID holds the string denoting the datagraph_id field in the database.
@@ -59,6 +61,7 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldDeletedAt,
 	FieldEventType,
+	FieldTarget,
 	FieldDatagraphKind,
 	FieldDatagraphID,
 	FieldRead,
@@ -106,6 +109,11 @@ func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByEventType orders the results by the event_type field.
 func ByEventType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEventType, opts...).ToFunc()
+}
+
+// ByTarget orders the results by the target field.
+func ByTarget(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTarget, opts...).ToFunc()
 }
 
 // ByDatagraphKind orders the results by the datagraph_kind field.

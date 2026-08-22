@@ -7,6 +7,7 @@ import (
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"github.com/rs/xid"
 )
 
@@ -62,6 +63,23 @@ func (RobotSession) Fields() []ent.Field {
 			Optional().
 			Nillable().
 			Comment("Expiry used to recover a session after an interrupted execution."),
+
+		field.Enum("origin_kind").
+			Values("interactive", "trail_action").
+			Default("interactive").
+			Comment("Product surface that owns this session."),
+
+		field.String("origin_id").
+			GoType(xid.ID{}).
+			Optional().
+			Nillable(),
+	}
+}
+
+func (RobotSession) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("origin_kind", "created_at"),
+		index.Fields("origin_kind", "origin_id"),
 	}
 }
 

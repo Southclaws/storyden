@@ -7,11 +7,19 @@ export const RobotsID = "robots";
 export const RobotsRoute = "/robots";
 export const RobotsLabel = "Robots";
 
-export function RobotsAnchor(props: AnchorProps & LinkButtonStyleProps) {
+type RobotsAnchorProps = AnchorProps &
+  LinkButtonStyleProps & {
+    route?: string;
+  };
+
+export function RobotsAnchor({
+  route = RobotsRoute,
+  ...props
+}: RobotsAnchorProps) {
   return (
     <Anchor
       id={RobotsID}
-      route={RobotsRoute}
+      route={route}
       label={RobotsLabel}
       icon={<RobotIcon />}
       {...props}

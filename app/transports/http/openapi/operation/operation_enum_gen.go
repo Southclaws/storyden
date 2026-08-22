@@ -259,6 +259,15 @@ var (
 	OperationIDRobotMCPServerUpdate                   = OperationID{`RobotMCPServerUpdate`}
 	OperationIDRobotMCPServerDelete                   = OperationID{`RobotMCPServerDelete`}
 	OperationIDRobotMCPServerRefresh                  = OperationID{`RobotMCPServerRefresh`}
+	OperationIDTrailList                              = OperationID{`TrailList`}
+	OperationIDTrailCreate                            = OperationID{`TrailCreate`}
+	OperationIDTrailSchedulePreview                   = OperationID{`TrailSchedulePreview`}
+	OperationIDTrailGet                               = OperationID{`TrailGet`}
+	OperationIDTrailUpdate                            = OperationID{`TrailUpdate`}
+	OperationIDTrailRunList                           = OperationID{`TrailRunList`}
+	OperationIDTrailRunNow                            = OperationID{`TrailRunNow`}
+	OperationIDTrailRunGet                            = OperationID{`TrailRunGet`}
+	OperationIDTrailActionRunCancel                   = OperationID{`TrailActionRunCancel`}
 )
 
 func (r OperationID) Format(f fmt.State, verb rune) {
@@ -792,6 +801,24 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDRobotMCPServerDelete, nil
 	case string(`RobotMCPServerRefresh`):
 		return OperationIDRobotMCPServerRefresh, nil
+	case string(`TrailList`):
+		return OperationIDTrailList, nil
+	case string(`TrailCreate`):
+		return OperationIDTrailCreate, nil
+	case string(`TrailSchedulePreview`):
+		return OperationIDTrailSchedulePreview, nil
+	case string(`TrailGet`):
+		return OperationIDTrailGet, nil
+	case string(`TrailUpdate`):
+		return OperationIDTrailUpdate, nil
+	case string(`TrailRunList`):
+		return OperationIDTrailRunList, nil
+	case string(`TrailRunNow`):
+		return OperationIDTrailRunNow, nil
+	case string(`TrailRunGet`):
+		return OperationIDTrailRunGet, nil
+	case string(`TrailActionRunCancel`):
+		return OperationIDTrailActionRunCancel, nil
 	default:
 		return OperationID{}, fmt.Errorf("invalid value for type 'OperationID': '%s'", __iNpUt__)
 	}

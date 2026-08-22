@@ -37,6 +37,7 @@ oneOf:
   - $ref: "#/$defs/MANAGE_MODERATION_NOTES"
   - $ref: "#/$defs/USE_ROBOTS"
   - $ref: "#/$defs/MANAGE_ROBOTS"
+  - $ref: "#/$defs/MANAGE_TRAILS"
   - $ref: "#/$defs/ADMINISTRATOR"
 
 $defs:
@@ -231,6 +232,12 @@ $defs:
     const: MANAGE_ROBOTS
     title: Manage robots
     description: Create, edit and delete robots.
+
+  MANAGE_TRAILS:
+    type: string
+    const: MANAGE_TRAILS
+    title: Manage Trails
+    description: Create, edit, run, and inspect scheduled automations.
 
   ADMINISTRATOR:
     type: string

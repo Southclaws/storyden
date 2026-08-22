@@ -250,6 +250,15 @@ type OperationPermissions interface {
 	RobotMCPServerUpdate() (bool, *rbac.Permission)
 	RobotMCPServerDelete() (bool, *rbac.Permission)
 	RobotMCPServerRefresh() (bool, *rbac.Permission)
+	TrailList() (bool, *rbac.Permission)
+	TrailCreate() (bool, *rbac.Permission)
+	TrailSchedulePreview() (bool, *rbac.Permission)
+	TrailGet() (bool, *rbac.Permission)
+	TrailUpdate() (bool, *rbac.Permission)
+	TrailRunList() (bool, *rbac.Permission)
+	TrailRunNow() (bool, *rbac.Permission)
+	TrailRunGet() (bool, *rbac.Permission)
+	TrailActionRunCancel() (bool, *rbac.Permission)
 }
 
 func GetOperationPermission(optable OperationPermissions, op string) (bool, *rbac.Permission) {
@@ -748,6 +757,24 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.RobotMCPServerDelete()
 	case "RobotMCPServerRefresh":
 		return optable.RobotMCPServerRefresh()
+	case "TrailList":
+		return optable.TrailList()
+	case "TrailCreate":
+		return optable.TrailCreate()
+	case "TrailSchedulePreview":
+		return optable.TrailSchedulePreview()
+	case "TrailGet":
+		return optable.TrailGet()
+	case "TrailUpdate":
+		return optable.TrailUpdate()
+	case "TrailRunList":
+		return optable.TrailRunList()
+	case "TrailRunNow":
+		return optable.TrailRunNow()
+	case "TrailRunGet":
+		return optable.TrailRunGet()
+	case "TrailActionRunCancel":
+		return optable.TrailActionRunCancel()
 	default:
 		panic("unknown operation, must re-run rbacgen")
 	}

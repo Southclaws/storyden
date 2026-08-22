@@ -844,6 +844,42 @@ func (m *Mapping) EventParticipantRemove() (bool, *rbac.Permission) {
 	return true, nil
 }
 
+func (m *Mapping) TrailList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageTrails
+}
+
+func (m *Mapping) TrailCreate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageTrails
+}
+
+func (m *Mapping) TrailSchedulePreview() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageTrails
+}
+
+func (m *Mapping) TrailGet() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageTrails
+}
+
+func (m *Mapping) TrailUpdate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageTrails
+}
+
+func (m *Mapping) TrailRunList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageTrails
+}
+
+func (m *Mapping) TrailRunNow() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageTrails
+}
+
+func (m *Mapping) TrailRunGet() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageTrails
+}
+
+func (m *Mapping) TrailActionRunCancel() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageTrails
+}
+
 func (m *Mapping) RobotsList() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionUseRobots
 }

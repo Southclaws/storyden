@@ -126,6 +126,7 @@ func (n *Querier) hydrateRefs(ctx context.Context, refs notification.Notificatio
 				Source: r.Source,
 				Time:   r.Time,
 				Read:   r.Read,
+				Target: r.Target,
 			}
 		}
 
@@ -145,6 +146,7 @@ func (n *Querier) hydrateRefs(ctx context.Context, refs notification.Notificatio
 				Source: r.Source,
 				Time:   r.Time,
 				Read:   r.Read,
+				Target: r.Target,
 			}
 		case datagraph.KindNode:
 			node := nodeLookup[library.NodeID(itemRef.ID)]
@@ -159,6 +161,7 @@ func (n *Querier) hydrateRefs(ctx context.Context, refs notification.Notificatio
 				Source: r.Source,
 				Time:   r.Time,
 				Read:   r.Read,
+				Target: r.Target,
 			}
 		case datagraph.KindProfile:
 			p := profileLookup[account.AccountID(itemRef.ID)]
@@ -173,6 +176,7 @@ func (n *Querier) hydrateRefs(ctx context.Context, refs notification.Notificatio
 				Source: r.Source,
 				Time:   r.Time,
 				Read:   r.Read,
+				Target: r.Target,
 			}
 		default:
 			n.logger.Warn("unsupported notification datagraph kind",
@@ -187,6 +191,7 @@ func (n *Querier) hydrateRefs(ctx context.Context, refs notification.Notificatio
 			Source: r.Source,
 			Time:   r.Time,
 			Read:   r.Read,
+			Target: r.Target,
 		}
 	})
 

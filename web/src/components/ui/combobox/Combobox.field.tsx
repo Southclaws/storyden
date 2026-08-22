@@ -135,6 +135,7 @@ function ComboboxFieldControl<Item extends ComboboxFieldItem>({
           ref={fieldRef}
           name={name}
           placeholder={placeholder}
+          aria-label={ariaLabel}
           asChild
         >
           <Input size="sm" />

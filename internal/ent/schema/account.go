@@ -192,5 +192,11 @@ func (Account) Edges() []ent.Edge {
 
 		edge.To("initiated_robot_turns", RobotSessionTurn.Type).
 			Annotations(entsql.OnDelete(entsql.SetNull)),
+
+		edge.To("created_trails", Trail.Type).
+			Annotations(entsql.OnDelete(entsql.Restrict)),
+
+		edge.To("initiated_trail_runs", TrailRun.Type).
+			Annotations(entsql.OnDelete(entsql.SetNull)),
 	}
 }

@@ -165,5 +165,20 @@ type Setting func(*sql.Selector)
 // Tag is the predicate function for tag builders.
 type Tag func(*sql.Selector)
 
+// Trail is the predicate function for trail builders.
+type Trail func(*sql.Selector)
+
+// TrailAction is the predicate function for trailaction builders.
+type TrailAction func(*sql.Selector)
+
+// TrailActionRun is the predicate function for trailactionrun builders.
+type TrailActionRun func(*sql.Selector)
+
+// TrailRun is the predicate function for trailrun builders.
+type TrailRun func(*sql.Selector)
+
+// TrailSchedulerLease is the predicate function for trailschedulerlease builders.
+type TrailSchedulerLease func(*sql.Selector)
+
 // Warning is the predicate function for warning builders.
 type Warning func(*sql.Selector)

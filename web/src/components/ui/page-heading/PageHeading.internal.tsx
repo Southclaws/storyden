@@ -8,6 +8,8 @@ export const PageHeading = styled(
       fontSize: "xl",
       fontWeight: "semibold",
       lineHeight: "normal",
+      minWidth: "0",
+      overflowWrap: "anywhere",
     },
   },
   {

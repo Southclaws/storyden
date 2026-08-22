@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { BackAction } from "@/components/site/Action/Back";
+import { Badge } from "@/components/ui/badge";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Button } from "@/components/ui/button";
 
@@ -14,7 +15,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "The canonical top-of-page composition for a page heading, supporting text, return/breadcrumb navigation, and a small action group. Omit it only when the content makes the page identity genuinely obvious. Breadcrumbs describe hierarchy; BackAction describes a return path.",
+          "The canonical top-of-page composition for a page heading, optional supporting text, return or breadcrumb navigation, and a small action group. Supporting text must add decision-relevant context; omit it when the title and page content already explain the task. Breadcrumbs describe hierarchy; BackAction describes a return path.",
       },
     },
   },
@@ -43,6 +44,43 @@ export const BackNavigation: Story = {
     title: "Library",
     back: <BackAction fallbackHref="/" />,
     actions: <Button>New page</Button>,
+  },
+};
+
+export const FullPageForm: Story = {
+  args: {
+    title: "New Trail",
+    back: <BackAction fallbackHref="/robots/trails" />,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Full-page forms use the back action as their exit path. Omit a description when the fields and section headings provide the necessary guidance.",
+      },
+    },
+  },
+};
+
+export const LongIdentity: Story = {
+  args: {
+    title: "W".repeat(120),
+    description: "W".repeat(240),
+    badge: (
+      <Badge colorPalette="green" size="sm">
+        Active
+      </Badge>
+    ),
+    back: <BackAction fallbackHref="/" />,
+    actions: <Button variant="solid">Primary action</Button>,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Long unbroken titles and descriptions wrap inside the available heading space. The return action stays aligned with the first title line and the primary action remains usable.",
+      },
+    },
   },
 };
 

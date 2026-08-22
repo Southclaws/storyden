@@ -60,6 +60,11 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/ent/setting"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/trail"
+	"github.com/Southclaws/storyden/internal/ent/trailaction"
+	"github.com/Southclaws/storyden/internal/ent/trailactionrun"
+	"github.com/Southclaws/storyden/internal/ent/trailrun"
+	"github.com/Southclaws/storyden/internal/ent/trailschedulerlease"
 	"github.com/Southclaws/storyden/internal/ent/warning"
 	"github.com/rs/xid"
 )
@@ -2220,6 +2225,180 @@ func init() {
 			return nil
 		}
 	}()
+	trailMixin := schema.Trail{}.Mixin()
+	trailMixinFields0 := trailMixin[0].Fields()
+	_ = trailMixinFields0
+	trailMixinFields1 := trailMixin[1].Fields()
+	_ = trailMixinFields1
+	trailMixinFields2 := trailMixin[2].Fields()
+	_ = trailMixinFields2
+	trailFields := schema.Trail{}.Fields()
+	_ = trailFields
+	// trailDescCreatedAt is the schema descriptor for created_at field.
+	trailDescCreatedAt := trailMixinFields1[0].Descriptor()
+	// trail.DefaultCreatedAt holds the default value on creation for the created_at field.
+	trail.DefaultCreatedAt = trailDescCreatedAt.Default.(func() time.Time)
+	// trailDescUpdatedAt is the schema descriptor for updated_at field.
+	trailDescUpdatedAt := trailMixinFields2[0].Descriptor()
+	// trail.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	trail.DefaultUpdatedAt = trailDescUpdatedAt.Default.(func() time.Time)
+	// trail.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	trail.UpdateDefaultUpdatedAt = trailDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// trailDescName is the schema descriptor for name field.
+	trailDescName := trailFields[1].Descriptor()
+	// trail.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	trail.NameValidator = trailDescName.Validators[0].(func(string) error)
+	// trailDescDescription is the schema descriptor for description field.
+	trailDescDescription := trailFields[2].Descriptor()
+	// trail.DefaultDescription holds the default value on creation for the description field.
+	trail.DefaultDescription = trailDescDescription.Default.(string)
+	// trailDescID is the schema descriptor for id field.
+	trailDescID := trailMixinFields0[0].Descriptor()
+	// trail.DefaultID holds the default value on creation for the id field.
+	trail.DefaultID = trailDescID.Default.(func() xid.ID)
+	// trail.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	trail.IDValidator = func() func(string) error {
+		validators := trailDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	trailactionMixin := schema.TrailAction{}.Mixin()
+	trailactionMixinFields0 := trailactionMixin[0].Fields()
+	_ = trailactionMixinFields0
+	trailactionMixinFields1 := trailactionMixin[1].Fields()
+	_ = trailactionMixinFields1
+	trailactionMixinFields2 := trailactionMixin[2].Fields()
+	_ = trailactionMixinFields2
+	trailactionFields := schema.TrailAction{}.Fields()
+	_ = trailactionFields
+	// trailactionDescCreatedAt is the schema descriptor for created_at field.
+	trailactionDescCreatedAt := trailactionMixinFields1[0].Descriptor()
+	// trailaction.DefaultCreatedAt holds the default value on creation for the created_at field.
+	trailaction.DefaultCreatedAt = trailactionDescCreatedAt.Default.(func() time.Time)
+	// trailactionDescUpdatedAt is the schema descriptor for updated_at field.
+	trailactionDescUpdatedAt := trailactionMixinFields2[0].Descriptor()
+	// trailaction.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	trailaction.DefaultUpdatedAt = trailactionDescUpdatedAt.Default.(func() time.Time)
+	// trailaction.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	trailaction.UpdateDefaultUpdatedAt = trailactionDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// trailactionDescPosition is the schema descriptor for position field.
+	trailactionDescPosition := trailactionFields[2].Descriptor()
+	// trailaction.DefaultPosition holds the default value on creation for the position field.
+	trailaction.DefaultPosition = trailactionDescPosition.Default.(int)
+	// trailactionDescID is the schema descriptor for id field.
+	trailactionDescID := trailactionMixinFields0[0].Descriptor()
+	// trailaction.DefaultID holds the default value on creation for the id field.
+	trailaction.DefaultID = trailactionDescID.Default.(func() xid.ID)
+	// trailaction.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	trailaction.IDValidator = func() func(string) error {
+		validators := trailactionDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	trailactionrunMixin := schema.TrailActionRun{}.Mixin()
+	trailactionrunMixinFields0 := trailactionrunMixin[0].Fields()
+	_ = trailactionrunMixinFields0
+	trailactionrunMixinFields1 := trailactionrunMixin[1].Fields()
+	_ = trailactionrunMixinFields1
+	trailactionrunMixinFields2 := trailactionrunMixin[2].Fields()
+	_ = trailactionrunMixinFields2
+	trailactionrunFields := schema.TrailActionRun{}.Fields()
+	_ = trailactionrunFields
+	// trailactionrunDescCreatedAt is the schema descriptor for created_at field.
+	trailactionrunDescCreatedAt := trailactionrunMixinFields1[0].Descriptor()
+	// trailactionrun.DefaultCreatedAt holds the default value on creation for the created_at field.
+	trailactionrun.DefaultCreatedAt = trailactionrunDescCreatedAt.Default.(func() time.Time)
+	// trailactionrunDescUpdatedAt is the schema descriptor for updated_at field.
+	trailactionrunDescUpdatedAt := trailactionrunMixinFields2[0].Descriptor()
+	// trailactionrun.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	trailactionrun.DefaultUpdatedAt = trailactionrunDescUpdatedAt.Default.(func() time.Time)
+	// trailactionrun.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	trailactionrun.UpdateDefaultUpdatedAt = trailactionrunDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// trailactionrunDescID is the schema descriptor for id field.
+	trailactionrunDescID := trailactionrunMixinFields0[0].Descriptor()
+	// trailactionrun.DefaultID holds the default value on creation for the id field.
+	trailactionrun.DefaultID = trailactionrunDescID.Default.(func() xid.ID)
+	// trailactionrun.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	trailactionrun.IDValidator = func() func(string) error {
+		validators := trailactionrunDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	trailrunMixin := schema.TrailRun{}.Mixin()
+	trailrunMixinFields0 := trailrunMixin[0].Fields()
+	_ = trailrunMixinFields0
+	trailrunMixinFields1 := trailrunMixin[1].Fields()
+	_ = trailrunMixinFields1
+	trailrunMixinFields2 := trailrunMixin[2].Fields()
+	_ = trailrunMixinFields2
+	trailrunFields := schema.TrailRun{}.Fields()
+	_ = trailrunFields
+	// trailrunDescCreatedAt is the schema descriptor for created_at field.
+	trailrunDescCreatedAt := trailrunMixinFields1[0].Descriptor()
+	// trailrun.DefaultCreatedAt holds the default value on creation for the created_at field.
+	trailrun.DefaultCreatedAt = trailrunDescCreatedAt.Default.(func() time.Time)
+	// trailrunDescUpdatedAt is the schema descriptor for updated_at field.
+	trailrunDescUpdatedAt := trailrunMixinFields2[0].Descriptor()
+	// trailrun.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	trailrun.DefaultUpdatedAt = trailrunDescUpdatedAt.Default.(func() time.Time)
+	// trailrun.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	trailrun.UpdateDefaultUpdatedAt = trailrunDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// trailrunDescID is the schema descriptor for id field.
+	trailrunDescID := trailrunMixinFields0[0].Descriptor()
+	// trailrun.DefaultID holds the default value on creation for the id field.
+	trailrun.DefaultID = trailrunDescID.Default.(func() xid.ID)
+	// trailrun.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	trailrun.IDValidator = func() func(string) error {
+		validators := trailrunDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	trailschedulerleaseFields := schema.TrailSchedulerLease{}.Fields()
+	_ = trailschedulerleaseFields
+	// trailschedulerleaseDescID is the schema descriptor for id field.
+	trailschedulerleaseDescID := trailschedulerleaseFields[0].Descriptor()
+	// trailschedulerlease.DefaultID holds the default value on creation for the id field.
+	trailschedulerlease.DefaultID = trailschedulerleaseDescID.Default.(int)
 	warningMixin := schema.Warning{}.Mixin()
 	warningMixinFields0 := warningMixin[0].Fields()
 	_ = warningMixinFields0

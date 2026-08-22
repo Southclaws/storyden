@@ -38,15 +38,15 @@ func TestNotificationUpdateMany(t *testing.T) {
 			userCtx, userAcc := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			userSession := sh.WithSession(userCtx)
 
-			not1, err := nw.Notification(root, userAcc.ID, notification.EventThreadReply, opt.NewEmpty[datagraph.ItemRef](), opt.New(userAcc.ID))
+			not1, err := nw.Notification(root, userAcc.ID, notification.EventThreadReply, opt.NewEmpty[datagraph.ItemRef](), opt.New(userAcc.ID), opt.NewEmpty[string]())
 			r.NoError(err)
 			r.Equal(false, not1.Read)
 
-			not2, err := nw.Notification(root, userAcc.ID, notification.EventPostLike, opt.NewEmpty[datagraph.ItemRef](), opt.New(userAcc.ID))
+			not2, err := nw.Notification(root, userAcc.ID, notification.EventPostLike, opt.NewEmpty[datagraph.ItemRef](), opt.New(userAcc.ID), opt.NewEmpty[string]())
 			r.NoError(err)
 			r.Equal(false, not2.Read)
 
-			not3, err := nw.Notification(root, userAcc.ID, notification.EventFollow, opt.NewEmpty[datagraph.ItemRef](), opt.New(userAcc.ID))
+			not3, err := nw.Notification(root, userAcc.ID, notification.EventFollow, opt.NewEmpty[datagraph.ItemRef](), opt.New(userAcc.ID), opt.NewEmpty[string]())
 			r.NoError(err)
 			r.Equal(false, not3.Read)
 

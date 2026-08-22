@@ -186,6 +186,12 @@ export const PermissionDetails: Record<Permission, PermissionDetail> = {
     description:
       "Create, edit, and delete Robots and manage Robot configurations.",
   },
+  [Permission.MANAGE_TRAILS]: {
+    value: Permission.MANAGE_TRAILS,
+    name: "Manage Trails",
+    description:
+      "Create, schedule, run, and inspect durable community automations.",
+  },
   [Permission.ADMINISTRATOR]: {
     value: Permission.ADMINISTRATOR,
     name: "Administrator",

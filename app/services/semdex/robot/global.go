@@ -32,7 +32,7 @@ func (s *Agent) globalInstructionProvider(invocationContext InvocationContext, o
 
 		switch options.Source {
 		case SourceScheduled:
-			b.WriteString("\n\n## Deferred Task Resumed\n\nThis turn was started by a completed check_back_later timer. The current internal input contains the task that was deferred. Perform that task now using current Storyden state. Do not schedule it again unless a new delay is genuinely required.\n")
+			b.WriteString("\n\n## Scheduled Invocation\n\nThis turn was started automatically by a scheduled trigger. The current input contains the task to perform. Perform it now using current Storyden state. Do not assume a person is presently available merely because the task is represented as a user message. Do not schedule it again unless a new delay is genuinely required.\n")
 		case SourceDelegationResult:
 			b.WriteString("\n\n## Delegation Result\n\nThis turn was started because an asynchronous specialist finished. The current internal input is the authoritative result of the earlier delegation. Synthesize it for the conversation, clearly reporting failures or blocked work instead of claiming success.\n")
 		}

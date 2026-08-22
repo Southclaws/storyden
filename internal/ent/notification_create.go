@@ -59,6 +59,20 @@ func (_c *NotificationCreate) SetEventType(v string) *NotificationCreate {
 	return _c
 }
 
+// SetTarget sets the "target" field.
+func (_c *NotificationCreate) SetTarget(v string) *NotificationCreate {
+	_c.mutation.SetTarget(v)
+	return _c
+}
+
+// SetNillableTarget sets the "target" field if the given value is not nil.
+func (_c *NotificationCreate) SetNillableTarget(v *string) *NotificationCreate {
+	if v != nil {
+		_c.SetTarget(*v)
+	}
+	return _c
+}
+
 // SetDatagraphKind sets the "datagraph_kind" field.
 func (_c *NotificationCreate) SetDatagraphKind(v string) *NotificationCreate {
 	_c.mutation.SetDatagraphKind(v)
@@ -272,6 +286,10 @@ func (_c *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec)
 		_spec.SetField(notification.FieldEventType, field.TypeString, value)
 		_node.EventType = value
 	}
+	if value, ok := _c.mutation.Target(); ok {
+		_spec.SetField(notification.FieldTarget, field.TypeString, value)
+		_node.Target = &value
+	}
 	if value, ok := _c.mutation.DatagraphKind(); ok {
 		_spec.SetField(notification.FieldDatagraphKind, field.TypeString, value)
 		_node.DatagraphKind = &value
@@ -397,6 +415,24 @@ func (u *NotificationUpsert) SetEventType(v string) *NotificationUpsert {
 // UpdateEventType sets the "event_type" field to the value that was provided on create.
 func (u *NotificationUpsert) UpdateEventType() *NotificationUpsert {
 	u.SetExcluded(notification.FieldEventType)
+	return u
+}
+
+// SetTarget sets the "target" field.
+func (u *NotificationUpsert) SetTarget(v string) *NotificationUpsert {
+	u.Set(notification.FieldTarget, v)
+	return u
+}
+
+// UpdateTarget sets the "target" field to the value that was provided on create.
+func (u *NotificationUpsert) UpdateTarget() *NotificationUpsert {
+	u.SetExcluded(notification.FieldTarget)
+	return u
+}
+
+// ClearTarget clears the value of the "target" field.
+func (u *NotificationUpsert) ClearTarget() *NotificationUpsert {
+	u.SetNull(notification.FieldTarget)
 	return u
 }
 
@@ -561,6 +597,27 @@ func (u *NotificationUpsertOne) SetEventType(v string) *NotificationUpsertOne {
 func (u *NotificationUpsertOne) UpdateEventType() *NotificationUpsertOne {
 	return u.Update(func(s *NotificationUpsert) {
 		s.UpdateEventType()
+	})
+}
+
+// SetTarget sets the "target" field.
+func (u *NotificationUpsertOne) SetTarget(v string) *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.SetTarget(v)
+	})
+}
+
+// UpdateTarget sets the "target" field to the value that was provided on create.
+func (u *NotificationUpsertOne) UpdateTarget() *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.UpdateTarget()
+	})
+}
+
+// ClearTarget clears the value of the "target" field.
+func (u *NotificationUpsertOne) ClearTarget() *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.ClearTarget()
 	})
 }
 
@@ -905,6 +962,27 @@ func (u *NotificationUpsertBulk) SetEventType(v string) *NotificationUpsertBulk 
 func (u *NotificationUpsertBulk) UpdateEventType() *NotificationUpsertBulk {
 	return u.Update(func(s *NotificationUpsert) {
 		s.UpdateEventType()
+	})
+}
+
+// SetTarget sets the "target" field.
+func (u *NotificationUpsertBulk) SetTarget(v string) *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.SetTarget(v)
+	})
+}
+
+// UpdateTarget sets the "target" field to the value that was provided on create.
+func (u *NotificationUpsertBulk) UpdateTarget() *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.UpdateTarget()
+	})
+}
+
+// ClearTarget clears the value of the "target" field.
+func (u *NotificationUpsertBulk) ClearTarget() *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.ClearTarget()
 	})
 }
 

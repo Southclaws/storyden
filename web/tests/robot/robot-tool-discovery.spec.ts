@@ -23,12 +23,7 @@ test.describe("Robot Chat — progressive tool discovery", () => {
 
     await sendMessage(page, "find and load one error tool");
 
-    for (const toolName of [
-      "Tool Search",
-      "Tool Get",
-      "Tool Load",
-      "Throw An Error",
-    ]) {
+    for (const toolName of ["Tool Search", "Tool Get", "Tool Load"]) {
       await expect(
         page
           .locator("summary")
@@ -36,6 +31,12 @@ test.describe("Robot Chat — progressive tool discovery", () => {
           .filter({ hasText: "Tool complete" }),
       ).toBeVisible({ timeout: 15000 });
     }
+    await expect(
+      page
+        .locator("summary")
+        .filter({ hasText: "Throw An Error" })
+        .filter({ hasText: "Error" }),
+    ).toBeVisible({ timeout: 15000 });
     await expect(page.getByText("Loaded 1 tools")).toBeVisible();
     await expect(
       page.getByText(

@@ -20,5 +20,6 @@ export interface Notification {
   event: NotificationEvent;
   item?: DatagraphItem;
   source?: ProfileReference;
+  target?: string;
   status: NotificationStatus;
 }

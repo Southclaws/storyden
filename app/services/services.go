@@ -48,6 +48,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/tag/autotagger"
 	"github.com/Southclaws/storyden/app/services/thread"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
+	"github.com/Southclaws/storyden/app/services/trail"
 )
 
 func Build() fx.Option {
@@ -83,6 +84,7 @@ func Build() fx.Option {
 		generative.Build(),
 		robot.Build(),
 		session_coordinator.Build(),
+		trail.Build(),
 		semdexer.Build(),
 		event.Build(),
 		moderation.Build(),

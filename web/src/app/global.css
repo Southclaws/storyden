@@ -946,7 +946,8 @@ body {
 
     grid-template-rows:
       var(--navigation-content-offset-block)
-      minmax(0, 1fr);
+      minmax(0, 1fr)
+      var(--navigation-content-offset-block);
 
     grid-template-columns:
       var(--navigation-sidebar-width)
@@ -955,7 +956,8 @@ body {
 
     grid-template-areas:
       " .       . .    "
-      " leftbar . main ";
+      " leftbar . main "
+      " .       . .    ";
   }
 
   .navigation__topbar {

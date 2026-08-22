@@ -645,6 +645,66 @@ func (f TagFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) 
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TagMutation", m)
 }
 
+// The TrailFunc type is an adapter to allow the use of ordinary
+// function as Trail mutator.
+type TrailFunc func(context.Context, *ent.TrailMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TrailFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TrailMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TrailMutation", m)
+}
+
+// The TrailActionFunc type is an adapter to allow the use of ordinary
+// function as TrailAction mutator.
+type TrailActionFunc func(context.Context, *ent.TrailActionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TrailActionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TrailActionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TrailActionMutation", m)
+}
+
+// The TrailActionRunFunc type is an adapter to allow the use of ordinary
+// function as TrailActionRun mutator.
+type TrailActionRunFunc func(context.Context, *ent.TrailActionRunMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TrailActionRunFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TrailActionRunMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TrailActionRunMutation", m)
+}
+
+// The TrailRunFunc type is an adapter to allow the use of ordinary
+// function as TrailRun mutator.
+type TrailRunFunc func(context.Context, *ent.TrailRunMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TrailRunFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TrailRunMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TrailRunMutation", m)
+}
+
+// The TrailSchedulerLeaseFunc type is an adapter to allow the use of ordinary
+// function as TrailSchedulerLease mutator.
+type TrailSchedulerLeaseFunc func(context.Context, *ent.TrailSchedulerLeaseMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TrailSchedulerLeaseFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TrailSchedulerLeaseMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TrailSchedulerLeaseMutation", m)
+}
+
 // The WarningFunc type is an adapter to allow the use of ordinary
 // function as Warning mutator.
 type WarningFunc func(context.Context, *ent.WarningMutation) (ent.Value, error)

@@ -39,8 +39,12 @@ export function ContentNavigationList(props: Props) {
   const robotsEnabled =
     settings.ready &&
     hasCapability(InstanceCapability.robots, settings.settings.capabilities) &&
-    hasPermission(session, Permission.USE_ROBOTS, Permission.MANAGE_ROBOTS);
-
+    hasPermission(
+      session,
+      Permission.USE_ROBOTS,
+      Permission.MANAGE_ROBOTS,
+      Permission.MANAGE_TRAILS,
+    );
   return (
     <styled.nav
       aria-label="Site navigation"
