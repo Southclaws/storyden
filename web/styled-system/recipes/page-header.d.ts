@@ -10,7 +10,7 @@ type PageHeaderVariantMap = {
   [key in keyof PageHeaderVariant]: Array<PageHeaderVariant[key]>
 }
 
-type PageHeaderSlot = "root" | "navigation" | "row" | "heading" | "titleGroup" | "actions"
+type PageHeaderSlot = "root" | "navigation" | "row" | "heading" | "titleGroup" | "titleRow" | "actions"
 
 export type PageHeaderVariantProps = {
   [key in keyof PageHeaderVariant]?: ConditionalValue<PageHeaderVariant[key]> | undefined

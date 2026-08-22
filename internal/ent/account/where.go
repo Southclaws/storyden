@@ -1774,6 +1774,52 @@ func HasInitiatedRobotTurnsWith(preds ...predicate.RobotSessionTurn) predicate.A
 	})
 }
 
+// HasCreatedTrails applies the HasEdge predicate on the "created_trails" edge.
+func HasCreatedTrails() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, CreatedTrailsTable, CreatedTrailsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCreatedTrailsWith applies the HasEdge predicate on the "created_trails" edge with a given conditions (other predicates).
+func HasCreatedTrailsWith(preds ...predicate.Trail) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newCreatedTrailsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasInitiatedTrailRuns applies the HasEdge predicate on the "initiated_trail_runs" edge.
+func HasInitiatedTrailRuns() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, InitiatedTrailRunsTable, InitiatedTrailRunsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasInitiatedTrailRunsWith applies the HasEdge predicate on the "initiated_trail_runs" edge with a given conditions (other predicates).
+func HasInitiatedTrailRunsWith(preds ...predicate.TrailRun) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newInitiatedTrailRunsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasAccountRoles applies the HasEdge predicate on the "account_roles" edge.
 func HasAccountRoles() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {

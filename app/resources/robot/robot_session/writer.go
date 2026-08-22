@@ -22,20 +22,40 @@ import (
 	entschema "github.com/Southclaws/storyden/internal/ent/schema"
 )
 
+type CreateOption func(*ent.RobotSessionMutation)
+
+func WithName(name string) CreateOption {
+	return func(m *ent.RobotSessionMutation) {
+		m.SetName(name)
+	}
+}
+
+func WithTrailOrigin(actionRunID xid.ID) CreateOption {
+	return func(m *ent.RobotSessionMutation) {
+		m.SetOriginKind(ent_robot_session.OriginKindTrailAction)
+		m.SetOriginID(actionRunID)
+	}
+}
+
 func (q *Repository) Create(
 	ctx context.Context,
 	sessionID robot.SessionID,
 	name string,
 	accountID account.AccountID,
 	state map[string]any,
+	options ...CreateOption,
 ) (*robot.Session, error) {
 	err := ent.WithTx(ctx, q.db, func(tx *ent.Tx) error {
-		_, err := tx.RobotSession.Create().
+		create := tx.RobotSession.Create().
 			SetID(xid.ID(sessionID)).
 			SetName(name).
 			SetAccountID(xid.ID(accountID)).
-			SetState(state).
-			Save(ctx)
+			SetState(state)
+		mutation := create.Mutation()
+		for _, option := range options {
+			option(mutation)
+		}
+		_, err := create.Save(ctx)
 		if err != nil {
 			return err
 		}

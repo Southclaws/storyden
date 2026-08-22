@@ -65,6 +65,11 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/ent/setting"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/trail"
+	"github.com/Southclaws/storyden/internal/ent/trailaction"
+	"github.com/Southclaws/storyden/internal/ent/trailactionrun"
+	"github.com/Southclaws/storyden/internal/ent/trailrun"
+	"github.com/Southclaws/storyden/internal/ent/trailschedulerlease"
 	"github.com/Southclaws/storyden/internal/ent/warning"
 )
 
@@ -179,6 +184,11 @@ func checkColumn(t, c string) error {
 			session.Table:                      session.ValidColumn,
 			setting.Table:                      setting.ValidColumn,
 			tag.Table:                          tag.ValidColumn,
+			trail.Table:                        trail.ValidColumn,
+			trailaction.Table:                  trailaction.ValidColumn,
+			trailactionrun.Table:               trailactionrun.ValidColumn,
+			trailrun.Table:                     trailrun.ValidColumn,
+			trailschedulerlease.Table:          trailschedulerlease.ValidColumn,
 			warning.Table:                      warning.ValidColumn,
 		})
 	})

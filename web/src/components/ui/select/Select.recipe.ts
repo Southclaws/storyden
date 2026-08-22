@@ -136,6 +136,10 @@ export const select = defineSlotRecipe({
       gap: "1.5",
       width: "full",
     },
+    control: {
+      display: "flex",
+      width: "full",
+    },
     content: selectBaseStyles.content,
     item: selectBaseStyles.item,
     itemGroupLabel: selectBaseStyles.itemGroupLabel,

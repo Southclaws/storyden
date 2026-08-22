@@ -126,6 +126,7 @@ func serialiseNotification(in *notification.Notification) openapi.Notification {
 		Item:      item.Ptr(),
 		Source:    opt.Map(in.Source, serialiseProfileReference).Ptr(),
 		Status:    serialiseNotificationStatus(in.Read),
+		Target:    in.Target.Ptr(),
 	}
 }
 
@@ -136,6 +137,7 @@ func serialiseNotificationRef(in *notification.NotificationRef) openapi.Notifica
 		Event:     openapi.NotificationEvent(in.Event.String()),
 		Source:    opt.Map(in.Source, serialiseProfileReference).Ptr(),
 		Status:    serialiseNotificationStatus(in.Read),
+		Target:    in.Target.Ptr(),
 	}
 }
 

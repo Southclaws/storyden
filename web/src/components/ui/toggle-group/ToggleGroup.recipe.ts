@@ -6,9 +6,10 @@ export const toggleGroup = defineSlotRecipe({
   slots: toggleGroupAnatomy.keys(),
   base: {
     root: {
-      display: "flex",
+      display: "inline-flex",
       overflow: "hidden",
       position: "relative",
+      width: "fit",
       _vertical: {
         flexDirection: "column",
       },

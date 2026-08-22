@@ -31,7 +31,9 @@ func (q *Repository) List(
 	params pagination.Parameters,
 	accountID opt.Optional[account.AccountID],
 ) (*pagination.Result[*session_ref.Ref], error) {
-	query := withCreator(q.db.RobotSession.Query())
+	query := withCreator(q.db.RobotSession.Query().Where(
+		ent_robot_session.OriginKindEQ(ent_robot_session.OriginKindInteractive),
+	))
 
 	if aid, ok := accountID.Get(); ok {
 		query.Where(ent_robot_session.HasViewsWith(ent_robot_session_view.AccountIDEQ(xid.ID(aid))))

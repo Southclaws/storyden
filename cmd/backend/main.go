@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"time"
+	_ "time/tzdata"
 
 	"github.com/joho/godotenv"
 	_ "github.com/joho/godotenv/autoload"

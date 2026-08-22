@@ -2,9 +2,11 @@ import { createListCollection } from "@ark-ui/react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 import { CheckIcon } from "@/components/ui/icons/Check";
 import { SelectIcon } from "@/components/ui/icons/Select";
 import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import * as Select from "@/components/ui/select";
 import { styled } from "@/styled-system/jsx";
 
@@ -22,6 +24,12 @@ const meta = {
   title: "Compositions/Forms/Control Sizing",
   parameters: {
     layout: "fullscreen",
+    docs: {
+      description: {
+        component:
+          "Compares controls at the same declared size in one row. Use this composition when changing shared form recipes: Input, Number Input, Select, Date Picker, and native date or time inputs must keep a consistent visible height and baseline. Width behavior is separate: field controls fill their column while compact choice groups remain intrinsic.",
+      },
+    },
   },
 } satisfies Meta;
 
@@ -66,7 +74,7 @@ function ControlRow({ label, size }: { label: string; size: ControlSize }) {
       gap="3"
       gridTemplateColumns={{
         base: "1fr",
-        md: "8rem 10rem minmax(12rem, 1fr) minmax(12rem, 1fr)",
+        md: "8rem 8rem repeat(5, minmax(8rem, 1fr))",
       }}
       paddingY="4"
     >
@@ -82,7 +90,14 @@ function ControlRow({ label, size }: { label: string; size: ControlSize }) {
         Save
       </Button>
       <Input placeholder="storyden" size={size} />
+      <NumberInput defaultValue="23" size={size} />
       <ExampleSelect size={size} />
+      {size === "sm" ? (
+        <DatePicker />
+      ) : (
+        <styled.span color="text.subtle">Not available</styled.span>
+      )}
+      <Input type="time" defaultValue="09:00" size={size} />
     </styled.div>
   );
 }
@@ -105,8 +120,8 @@ export const ControlSizing: Story = {
           Form control sizing
         </styled.h1>
         <styled.p color="text.muted" fontSize="md" lineHeight="relaxed">
-          Compare Button, Input, and Select sizing in the same form row while
-          tuning dense product defaults.
+          Compare form control sizing in the same row while tuning dense product
+          defaults.
         </styled.p>
       </styled.header>
 
@@ -122,14 +137,17 @@ export const ControlSizing: Story = {
           gap="3"
           gridTemplateColumns={{
             base: "1fr",
-            md: "8rem 10rem minmax(12rem, 1fr) minmax(12rem, 1fr)",
+            md: "8rem 8rem repeat(5, minmax(8rem, 1fr))",
           }}
           paddingBottom="2"
         >
           <styled.div />
           <styled.div>Button</styled.div>
           <styled.div>Input</styled.div>
+          <styled.div>Number Input</styled.div>
           <styled.div>Select</styled.div>
+          <styled.div>Date Picker</styled.div>
+          <styled.div>Time Input</styled.div>
         </styled.div>
         {sizes.map((size) => (
           <ControlRow key={size} label={size.toUpperCase()} size={size} />

@@ -85,12 +85,14 @@ import (
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_querier"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_writer"
+	"github.com/Southclaws/storyden/app/resources/trail"
 )
 
 func Build() fx.Option {
 	return fx.Options(
 		fx.Provide(
 			settings.New,
+			trail.NewRepository,
 			role_assign.New,
 			role_repo.New,
 			role_hydrate.New,

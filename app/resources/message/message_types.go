@@ -63,6 +63,7 @@ type CommandSendNotification struct {
 	Item     *datagraph.Ref
 	TargetID account_ref.ID
 	SourceID opt.Optional[account_ref.ID]
+	Target   opt.Optional[string]
 }
 
 type CommandSendEmail struct {

@@ -91,6 +91,7 @@ type Bindings struct {
 	Events
 	OAuth
 	Robots
+	Trails
 }
 
 // bindingsProviders provides to the application the necessary implementations
@@ -128,6 +129,7 @@ func bindingsProviders() fx.Option {
 		NewEvents,
 		NewOAuth,
 		NewRobots,
+		NewTrails,
 	)
 }
 
@@ -311,7 +313,8 @@ func mount(
 		openapi.ParameterContext,
 	)
 
-	logger.Debug("mounted OpenAPI to service bindings",
+	logger.Debug(
+		"mounted OpenAPI to service bindings",
 		slog.Any("routes", lo.Map(router.Routes(), func(r *echo.Route, _ int) string {
 			return r.Path
 		})),

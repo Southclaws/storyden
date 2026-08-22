@@ -42,6 +42,10 @@ type RobotSession struct {
 	NextEventSequence uint64 `json:"next_event_sequence,omitempty"`
 	// Expiry used to recover a session after an interrupted execution.
 	LeaseExpiresAt *time.Time `json:"lease_expires_at,omitempty"`
+	// Product surface that owns this session.
+	OriginKind robotsession.OriginKind `json:"origin_kind,omitempty"`
+	// OriginID holds the value of the "origin_id" field.
+	OriginID *xid.ID `json:"origin_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RobotSessionQuery when eager-loading is set.
 	Edges        RobotSessionEdges `json:"edges"`
@@ -117,13 +121,13 @@ func (*RobotSession) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case robotsession.FieldActiveTurnID:
+		case robotsession.FieldActiveTurnID, robotsession.FieldOriginID:
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case robotsession.FieldState:
 			values[i] = new([]byte)
 		case robotsession.FieldLeaseGeneration, robotsession.FieldNextEventSequence:
 			values[i] = new(sql.NullInt64)
-		case robotsession.FieldName, robotsession.FieldExecutionStatus, robotsession.FieldLeaseToken:
+		case robotsession.FieldName, robotsession.FieldExecutionStatus, robotsession.FieldLeaseToken, robotsession.FieldOriginKind:
 			values[i] = new(sql.NullString)
 		case robotsession.FieldCreatedAt, robotsession.FieldUpdatedAt, robotsession.FieldLeaseExpiresAt:
 			values[i] = new(sql.NullTime)
@@ -220,6 +224,19 @@ func (_m *RobotSession) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.LeaseExpiresAt = new(time.Time)
 				*_m.LeaseExpiresAt = value.Time
+			}
+		case robotsession.FieldOriginKind:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field origin_kind", values[i])
+			} else if value.Valid {
+				_m.OriginKind = robotsession.OriginKind(value.String)
+			}
+		case robotsession.FieldOriginID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field origin_id", values[i])
+			} else if value.Valid {
+				_m.OriginID = new(xid.ID)
+				*_m.OriginID = *value.S.(*xid.ID)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -319,6 +336,14 @@ func (_m *RobotSession) String() string {
 	if v := _m.LeaseExpiresAt; v != nil {
 		builder.WriteString("lease_expires_at=")
 		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	builder.WriteString("origin_kind=")
+	builder.WriteString(fmt.Sprintf("%v", _m.OriginKind))
+	builder.WriteString(", ")
+	if v := _m.OriginID; v != nil {
+		builder.WriteString("origin_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteByte(')')
 	return builder.String()

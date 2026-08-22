@@ -772,6 +772,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "event_type", Type: field.TypeString},
+		{Name: "target", Type: field.TypeString, Nullable: true},
 		{Name: "datagraph_kind", Type: field.TypeString, Nullable: true},
 		{Name: "datagraph_id", Type: field.TypeString, Nullable: true},
 		{Name: "read", Type: field.TypeBool},
@@ -786,13 +787,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "notifications_accounts_notifications",
-				Columns:    []*schema.Column{NotificationsColumns[7]},
+				Columns:    []*schema.Column{NotificationsColumns[8]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "notifications_accounts_triggered_notifications",
-				Columns:    []*schema.Column{NotificationsColumns[8]},
+				Columns:    []*schema.Column{NotificationsColumns[9]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -1558,6 +1559,8 @@ var (
 		{Name: "lease_generation", Type: field.TypeUint64, Default: 0},
 		{Name: "next_event_sequence", Type: field.TypeUint64, Default: 0},
 		{Name: "lease_expires_at", Type: field.TypeTime, Nullable: true},
+		{Name: "origin_kind", Type: field.TypeEnum, Enums: []string{"interactive", "trail_action"}, Default: "interactive"},
+		{Name: "origin_id", Type: field.TypeString, Nullable: true},
 		{Name: "account_id", Type: field.TypeString, Size: 20},
 	}
 	// RobotSessionsTable holds the schema information for the "robot_sessions" table.
@@ -1568,9 +1571,21 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "robot_sessions_accounts_created_robot_sessions",
-				Columns:    []*schema.Column{RobotSessionsColumns[11]},
+				Columns:    []*schema.Column{RobotSessionsColumns[13]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Restrict,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "robotsession_origin_kind_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{RobotSessionsColumns[11], RobotSessionsColumns[1]},
+			},
+			{
+				Name:    "robotsession_origin_kind_origin_id",
+				Unique:  false,
+				Columns: []*schema.Column{RobotSessionsColumns[11], RobotSessionsColumns[12]},
 			},
 		},
 	}
@@ -1935,6 +1950,196 @@ var (
 		Columns:    TagsColumns,
 		PrimaryKey: []*schema.Column{TagsColumns[0]},
 	}
+	// TrailsColumns holds the columns for the "trails" table.
+	TrailsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "name", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString, Default: ""},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"active", "paused", "finished", "archived"}},
+		{Name: "trigger_type", Type: field.TypeString},
+		{Name: "trigger_config", Type: field.TypeJSON},
+		{Name: "next_occurrence_at", Type: field.TypeTime, Nullable: true},
+		{Name: "last_occurrence_at", Type: field.TypeTime, Nullable: true},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+	}
+	// TrailsTable holds the schema information for the "trails" table.
+	TrailsTable = &schema.Table{
+		Name:       "trails",
+		Columns:    TrailsColumns,
+		PrimaryKey: []*schema.Column{TrailsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "trails_accounts_created_trails",
+				Columns:    []*schema.Column{TrailsColumns[10]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Restrict,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "trail_status_next_occurrence_at",
+				Unique:  false,
+				Columns: []*schema.Column{TrailsColumns[5], TrailsColumns[8]},
+			},
+			{
+				Name:    "trail_account_id_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{TrailsColumns[10], TrailsColumns[2]},
+			},
+		},
+	}
+	// TrailActionsColumns holds the columns for the "trail_actions" table.
+	TrailActionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "kind", Type: field.TypeString},
+		{Name: "position", Type: field.TypeInt, Default: 0},
+		{Name: "config", Type: field.TypeJSON},
+		{Name: "archived_at", Type: field.TypeTime, Nullable: true},
+		{Name: "trail_id", Type: field.TypeString, Size: 20},
+	}
+	// TrailActionsTable holds the schema information for the "trail_actions" table.
+	TrailActionsTable = &schema.Table{
+		Name:       "trail_actions",
+		Columns:    TrailActionsColumns,
+		PrimaryKey: []*schema.Column{TrailActionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "trail_actions_trails_actions",
+				Columns:    []*schema.Column{TrailActionsColumns[7]},
+				RefColumns: []*schema.Column{TrailsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "trailaction_trail_id_position",
+				Unique:  false,
+				Columns: []*schema.Column{TrailActionsColumns[7], TrailActionsColumns[4]},
+			},
+			{
+				Name:    "trailaction_trail_id_archived_at",
+				Unique:  false,
+				Columns: []*schema.Column{TrailActionsColumns[7], TrailActionsColumns[6]},
+			},
+		},
+	}
+	// TrailActionRunsColumns holds the columns for the "trail_action_runs" table.
+	TrailActionRunsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "kind", Type: field.TypeString},
+		{Name: "config", Type: field.TypeJSON},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"queued", "running", "completed", "blocked", "failed", "cancelled"}},
+		{Name: "lease_token", Type: field.TypeString, Nullable: true},
+		{Name: "lease_expires_at", Type: field.TypeTime, Nullable: true},
+		{Name: "output", Type: field.TypeJSON, Nullable: true},
+		{Name: "target", Type: field.TypeJSON, Nullable: true},
+		{Name: "error_text", Type: field.TypeString, Nullable: true},
+		{Name: "started_at", Type: field.TypeTime, Nullable: true},
+		{Name: "finished_at", Type: field.TypeTime, Nullable: true},
+		{Name: "notified_at", Type: field.TypeTime, Nullable: true},
+		{Name: "action_id", Type: field.TypeString, Size: 20},
+		{Name: "run_id", Type: field.TypeString, Size: 20},
+	}
+	// TrailActionRunsTable holds the schema information for the "trail_action_runs" table.
+	TrailActionRunsTable = &schema.Table{
+		Name:       "trail_action_runs",
+		Columns:    TrailActionRunsColumns,
+		PrimaryKey: []*schema.Column{TrailActionRunsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "trail_action_runs_trail_actions_runs",
+				Columns:    []*schema.Column{TrailActionRunsColumns[14]},
+				RefColumns: []*schema.Column{TrailActionsColumns[0]},
+				OnDelete:   schema.Restrict,
+			},
+			{
+				Symbol:     "trail_action_runs_trail_runs_action_runs",
+				Columns:    []*schema.Column{TrailActionRunsColumns[15]},
+				RefColumns: []*schema.Column{TrailRunsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "trailactionrun_run_id_action_id",
+				Unique:  true,
+				Columns: []*schema.Column{TrailActionRunsColumns[15], TrailActionRunsColumns[14]},
+			},
+			{
+				Name:    "trailactionrun_status_lease_expires_at_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{TrailActionRunsColumns[5], TrailActionRunsColumns[7], TrailActionRunsColumns[1]},
+			},
+		},
+	}
+	// TrailRunsColumns holds the columns for the "trail_runs" table.
+	TrailRunsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "kind", Type: field.TypeEnum, Enums: []string{"scheduled", "manual"}},
+		{Name: "trigger_payload", Type: field.TypeJSON},
+		{Name: "scheduled_for", Type: field.TypeTime, Nullable: true},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"queued", "running", "completed", "attention_required", "cancelled", "skipped"}},
+		{Name: "finished_at", Type: field.TypeTime, Nullable: true},
+		{Name: "initiated_by_id", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "trail_id", Type: field.TypeString, Size: 20},
+	}
+	// TrailRunsTable holds the schema information for the "trail_runs" table.
+	TrailRunsTable = &schema.Table{
+		Name:       "trail_runs",
+		Columns:    TrailRunsColumns,
+		PrimaryKey: []*schema.Column{TrailRunsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "trail_runs_accounts_initiated_trail_runs",
+				Columns:    []*schema.Column{TrailRunsColumns[8]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "trail_runs_trails_runs",
+				Columns:    []*schema.Column{TrailRunsColumns[9]},
+				RefColumns: []*schema.Column{TrailsColumns[0]},
+				OnDelete:   schema.Restrict,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "trailrun_trail_id_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{TrailRunsColumns[9], TrailRunsColumns[1]},
+			},
+			{
+				Name:    "trailrun_trail_id_scheduled_for",
+				Unique:  true,
+				Columns: []*schema.Column{TrailRunsColumns[9], TrailRunsColumns[5]},
+			},
+			{
+				Name:    "trailrun_status_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{TrailRunsColumns[6], TrailRunsColumns[1]},
+			},
+		},
+	}
+	// TrailSchedulerLeasesColumns holds the columns for the "trail_scheduler_leases" table.
+	TrailSchedulerLeasesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "lease_token", Type: field.TypeString, Nullable: true},
+		{Name: "lease_expires_at", Type: field.TypeTime, Nullable: true},
+	}
+	// TrailSchedulerLeasesTable holds the schema information for the "trail_scheduler_leases" table.
+	TrailSchedulerLeasesTable = &schema.Table{
+		Name:       "trail_scheduler_leases",
+		Columns:    TrailSchedulerLeasesColumns,
+		PrimaryKey: []*schema.Column{TrailSchedulerLeasesColumns[0]},
+	}
 	// WarningsColumns holds the columns for the "warnings" table.
 	WarningsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -2218,6 +2423,11 @@ var (
 		SessionsTable,
 		SettingsTable,
 		TagsTable,
+		TrailsTable,
+		TrailActionsTable,
+		TrailActionRunsTable,
+		TrailRunsTable,
+		TrailSchedulerLeasesTable,
 		WarningsTable,
 		AccountTagsTable,
 		LinkPostContentReferencesTable,
@@ -2321,6 +2531,12 @@ func init() {
 	RobotWorkspaceInstancesTable.ForeignKeys[0].RefTable = AccountsTable
 	RobotWorkspaceInstancesTable.ForeignKeys[1].RefTable = RobotWorkspacesTable
 	SessionsTable.ForeignKeys[0].RefTable = AccountsTable
+	TrailsTable.ForeignKeys[0].RefTable = AccountsTable
+	TrailActionsTable.ForeignKeys[0].RefTable = TrailsTable
+	TrailActionRunsTable.ForeignKeys[0].RefTable = TrailActionsTable
+	TrailActionRunsTable.ForeignKeys[1].RefTable = TrailRunsTable
+	TrailRunsTable.ForeignKeys[0].RefTable = AccountsTable
+	TrailRunsTable.ForeignKeys[1].RefTable = TrailsTable
 	WarningsTable.ForeignKeys[0].RefTable = AccountsTable
 	WarningsTable.ForeignKeys[1].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[0].RefTable = AccountsTable

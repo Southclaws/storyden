@@ -3,6 +3,9 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardBox } from "@/components/ui/card-box";
+import { FormControl } from "@/components/ui/form-control";
+import { FormLabel } from "@/components/ui/form-label";
+import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/ui/page-header";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Text } from "@/components/ui/text";
@@ -27,7 +30,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Selects the workspace width for the current page without changing the global shell. `content` is the default for reading, forms, feeds, and settings; `wide` is for dashboards, tables, Robots, and multi-column tools; `full` is reserved for canvas-like editors and data tools. Prose remains constrained inside wide layouts.",
+          "Selects the workspace width for the current page without changing the global shell. `content` is the default for reading, forms, feeds, and settings; `wide` is for dashboards, tables, Robots, and multi-column tools; `full` is reserved for canvas-like editors and data tools. Prose remains constrained inside wide layouts. The shell retains a bottom gutter after long page content so final form actions do not touch the viewport edge.",
       },
     },
   },
@@ -107,6 +110,42 @@ function ShellPreview({ width }: { width: PageLayoutWidth }) {
   );
 }
 
+function FormFooterPreview() {
+  return (
+    <div className="navigation__container">
+      <styled.div className="navigation__grid" minH="dvh">
+        <div className="navigation__main">
+          <styled.main minH="full">
+            <PageLayout width="content">
+              <styled.form
+                display="flex"
+                flexDirection="column"
+                gap="6"
+                minH="dvh"
+              >
+                <PageHeader title="New automation" />
+
+                <LStack gap="4" maxW="3xl">
+                  {Array.from({ length: 10 }, (_, index) => (
+                    <FormControl key={index}>
+                      <FormLabel>Field {index + 1}</FormLabel>
+                      <Input aria-label={`Field ${index + 1}`} />
+                    </FormControl>
+                  ))}
+                </LStack>
+
+                <HStack justifyContent="end" marginTop="auto" maxW="3xl">
+                  <Button type="submit">Create</Button>
+                </HStack>
+              </styled.form>
+            </PageLayout>
+          </styled.main>
+        </div>
+      </styled.div>
+    </div>
+  );
+}
+
 export const Playground: Story = {
   render: ({ width = "content" }) => <ShellPreview width={width} />,
 };
@@ -130,4 +169,16 @@ export const Full: Story = {
     width: "full",
   },
   render: ({ width = "full" }) => <ShellPreview width={width} />,
+};
+
+export const FormFooterSpacing: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Scroll to the final action. The navigation shell keeps a visible bottom gutter after long full-page forms.",
+      },
+    },
+  },
+  render: () => <FormFooterPreview />,
 };

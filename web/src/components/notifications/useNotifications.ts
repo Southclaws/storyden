@@ -136,6 +136,13 @@ function mapToItem(n: Notification): NotificationItem {
 function getNotificationContent(n: Notification) {
   const p = n.item && getCommonProperties(n.item);
   switch (n.event) {
+    case "trail_run_attention":
+      return {
+        description: "A Trail run needs your attention",
+        url: n.target
+          ? `/robots/trails?run=${encodeURIComponent(n.target)}`
+          : "/robots/trails/",
+      };
     case "thread_reply":
       return { description: "replied to your post", url: `/t/locate/${p?.id}` };
     case "reply_to_reply":

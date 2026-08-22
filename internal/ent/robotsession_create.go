@@ -167,6 +167,34 @@ func (_c *RobotSessionCreate) SetNillableLeaseExpiresAt(v *time.Time) *RobotSess
 	return _c
 }
 
+// SetOriginKind sets the "origin_kind" field.
+func (_c *RobotSessionCreate) SetOriginKind(v robotsession.OriginKind) *RobotSessionCreate {
+	_c.mutation.SetOriginKind(v)
+	return _c
+}
+
+// SetNillableOriginKind sets the "origin_kind" field if the given value is not nil.
+func (_c *RobotSessionCreate) SetNillableOriginKind(v *robotsession.OriginKind) *RobotSessionCreate {
+	if v != nil {
+		_c.SetOriginKind(*v)
+	}
+	return _c
+}
+
+// SetOriginID sets the "origin_id" field.
+func (_c *RobotSessionCreate) SetOriginID(v xid.ID) *RobotSessionCreate {
+	_c.mutation.SetOriginID(v)
+	return _c
+}
+
+// SetNillableOriginID sets the "origin_id" field if the given value is not nil.
+func (_c *RobotSessionCreate) SetNillableOriginID(v *xid.ID) *RobotSessionCreate {
+	if v != nil {
+		_c.SetOriginID(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *RobotSessionCreate) SetID(v xid.ID) *RobotSessionCreate {
 	_c.mutation.SetID(v)
@@ -311,6 +339,10 @@ func (_c *RobotSessionCreate) defaults() {
 		v := robotsession.DefaultNextEventSequence
 		_c.mutation.SetNextEventSequence(v)
 	}
+	if _, ok := _c.mutation.OriginKind(); !ok {
+		v := robotsession.DefaultOriginKind
+		_c.mutation.SetOriginKind(v)
+	}
 	if _, ok := _c.mutation.ID(); !ok {
 		v := robotsession.DefaultID()
 		_c.mutation.SetID(v)
@@ -344,6 +376,14 @@ func (_c *RobotSessionCreate) check() error {
 	}
 	if _, ok := _c.mutation.NextEventSequence(); !ok {
 		return &ValidationError{Name: "next_event_sequence", err: errors.New(`ent: missing required field "RobotSession.next_event_sequence"`)}
+	}
+	if _, ok := _c.mutation.OriginKind(); !ok {
+		return &ValidationError{Name: "origin_kind", err: errors.New(`ent: missing required field "RobotSession.origin_kind"`)}
+	}
+	if v, ok := _c.mutation.OriginKind(); ok {
+		if err := robotsession.OriginKindValidator(v); err != nil {
+			return &ValidationError{Name: "origin_kind", err: fmt.Errorf(`ent: validator failed for field "RobotSession.origin_kind": %w`, err)}
+		}
 	}
 	if v, ok := _c.mutation.ID(); ok {
 		if err := robotsession.IDValidator(v.String()); err != nil {
@@ -428,6 +468,14 @@ func (_c *RobotSessionCreate) createSpec() (*RobotSession, *sqlgraph.CreateSpec)
 	if value, ok := _c.mutation.LeaseExpiresAt(); ok {
 		_spec.SetField(robotsession.FieldLeaseExpiresAt, field.TypeTime, value)
 		_node.LeaseExpiresAt = &value
+	}
+	if value, ok := _c.mutation.OriginKind(); ok {
+		_spec.SetField(robotsession.FieldOriginKind, field.TypeEnum, value)
+		_node.OriginKind = value
+	}
+	if value, ok := _c.mutation.OriginID(); ok {
+		_spec.SetField(robotsession.FieldOriginID, field.TypeString, value)
+		_node.OriginID = &value
 	}
 	if nodes := _c.mutation.CreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -718,6 +766,36 @@ func (u *RobotSessionUpsert) ClearLeaseExpiresAt() *RobotSessionUpsert {
 	return u
 }
 
+// SetOriginKind sets the "origin_kind" field.
+func (u *RobotSessionUpsert) SetOriginKind(v robotsession.OriginKind) *RobotSessionUpsert {
+	u.Set(robotsession.FieldOriginKind, v)
+	return u
+}
+
+// UpdateOriginKind sets the "origin_kind" field to the value that was provided on create.
+func (u *RobotSessionUpsert) UpdateOriginKind() *RobotSessionUpsert {
+	u.SetExcluded(robotsession.FieldOriginKind)
+	return u
+}
+
+// SetOriginID sets the "origin_id" field.
+func (u *RobotSessionUpsert) SetOriginID(v xid.ID) *RobotSessionUpsert {
+	u.Set(robotsession.FieldOriginID, v)
+	return u
+}
+
+// UpdateOriginID sets the "origin_id" field to the value that was provided on create.
+func (u *RobotSessionUpsert) UpdateOriginID() *RobotSessionUpsert {
+	u.SetExcluded(robotsession.FieldOriginID)
+	return u
+}
+
+// ClearOriginID clears the value of the "origin_id" field.
+func (u *RobotSessionUpsert) ClearOriginID() *RobotSessionUpsert {
+	u.SetNull(robotsession.FieldOriginID)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -948,6 +1026,41 @@ func (u *RobotSessionUpsertOne) UpdateLeaseExpiresAt() *RobotSessionUpsertOne {
 func (u *RobotSessionUpsertOne) ClearLeaseExpiresAt() *RobotSessionUpsertOne {
 	return u.Update(func(s *RobotSessionUpsert) {
 		s.ClearLeaseExpiresAt()
+	})
+}
+
+// SetOriginKind sets the "origin_kind" field.
+func (u *RobotSessionUpsertOne) SetOriginKind(v robotsession.OriginKind) *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.SetOriginKind(v)
+	})
+}
+
+// UpdateOriginKind sets the "origin_kind" field to the value that was provided on create.
+func (u *RobotSessionUpsertOne) UpdateOriginKind() *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.UpdateOriginKind()
+	})
+}
+
+// SetOriginID sets the "origin_id" field.
+func (u *RobotSessionUpsertOne) SetOriginID(v xid.ID) *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.SetOriginID(v)
+	})
+}
+
+// UpdateOriginID sets the "origin_id" field to the value that was provided on create.
+func (u *RobotSessionUpsertOne) UpdateOriginID() *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.UpdateOriginID()
+	})
+}
+
+// ClearOriginID clears the value of the "origin_id" field.
+func (u *RobotSessionUpsertOne) ClearOriginID() *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.ClearOriginID()
 	})
 }
 
@@ -1348,6 +1461,41 @@ func (u *RobotSessionUpsertBulk) UpdateLeaseExpiresAt() *RobotSessionUpsertBulk 
 func (u *RobotSessionUpsertBulk) ClearLeaseExpiresAt() *RobotSessionUpsertBulk {
 	return u.Update(func(s *RobotSessionUpsert) {
 		s.ClearLeaseExpiresAt()
+	})
+}
+
+// SetOriginKind sets the "origin_kind" field.
+func (u *RobotSessionUpsertBulk) SetOriginKind(v robotsession.OriginKind) *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.SetOriginKind(v)
+	})
+}
+
+// UpdateOriginKind sets the "origin_kind" field to the value that was provided on create.
+func (u *RobotSessionUpsertBulk) UpdateOriginKind() *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.UpdateOriginKind()
+	})
+}
+
+// SetOriginID sets the "origin_id" field.
+func (u *RobotSessionUpsertBulk) SetOriginID(v xid.ID) *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.SetOriginID(v)
+	})
+}
+
+// UpdateOriginID sets the "origin_id" field to the value that was provided on create.
+func (u *RobotSessionUpsertBulk) UpdateOriginID() *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.UpdateOriginID()
+	})
+}
+
+// ClearOriginID clears the value of the "origin_id" field.
+func (u *RobotSessionUpsertBulk) ClearOriginID() *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.ClearOriginID()
 	})
 }
 

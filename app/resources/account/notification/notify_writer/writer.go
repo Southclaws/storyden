@@ -31,6 +31,7 @@ func (n *Writer) Notification(ctx context.Context,
 	event notification.Event,
 	item opt.Optional[datagraph.ItemRef],
 	source opt.Optional[account.AccountID],
+	target opt.Optional[string],
 ) (*notification.NotificationRef, error) {
 	create := n.db.Notification.Create()
 
@@ -45,6 +46,9 @@ func (n *Writer) Notification(ctx context.Context,
 	}
 
 	source.Call(func(value account.AccountID) { create.SetSourceAccountID(xid.ID(value)) })
+	if t, ok := target.Get(); ok {
+		create.SetTarget(t)
+	}
 
 	r, err := create.Save(ctx)
 	if err != nil {

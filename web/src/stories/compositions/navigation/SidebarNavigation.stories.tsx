@@ -13,6 +13,7 @@ import { LinkIcon } from "@/components/ui/icons/Link";
 import { RobotIcon } from "@/components/ui/icons/Robot";
 import { SettingsIcon } from "@/components/ui/icons/Settings";
 import { ToolIcon } from "@/components/ui/icons/Tool";
+import { TrailIcon } from "@/components/ui/icons/Trail";
 import { LinkButton } from "@/components/ui/link-button";
 import { styled } from "@/styled-system/jsx";
 
@@ -23,7 +24,7 @@ const meta = {
     docs: {
       description: {
         story:
-          "**Sidebar item row button pattern.** Use a compact, icon-only `action` at the trailing edge only for an operation scoped to that row's destination. It remains a separate, accessible control; use the `plain` button variant so it does not introduce a second hover surface. Keep the shared `4px` end inset used by navigation-tree rows.",
+          "**Sidebar item row button pattern.** Use a compact, icon-only `action` at the trailing edge only for an operation scoped to that row's destination. It remains a separate, accessible control; use the `plain` button variant so it does not introduce a second hover surface. Keep the shared `4px` end inset used by navigation-tree rows. Product areas may own secondary destinations and recent-resource sections: the Robots example places Trails in its local navigation, then lists recent Trails below the Robots section instead of promoting Trails to the site navigation.",
       },
     },
   },
@@ -175,6 +176,22 @@ export const RobotsNavigation: Story = {
               </LinkButton>
             }
           />
+          <SidebarNavigationLink
+            href="/robots/trails"
+            icon={<TrailIcon />}
+            label="Trails"
+            action={
+              <LinkButton
+                aria-label="New Trail"
+                href="/robots/trails/new"
+                px="0"
+                size="sm"
+                variant="plain"
+              >
+                <AddIcon />
+              </LinkButton>
+            }
+          />
         </SidebarNavigationSection>
 
         <SidebarNavigationSection label="Robots">
@@ -188,6 +205,23 @@ export const RobotsNavigation: Story = {
             icon={<RobotIcon />}
             label="Librarian"
           />
+        </SidebarNavigationSection>
+
+        <SidebarNavigationSection label="Recent Trails">
+          {[
+            "Scheduled moderation check",
+            "Monthly photo thread",
+            "Weekly library review",
+            "Daily report digest",
+            "Quarterly welcome refresh",
+          ].map((trail, index) => (
+            <SidebarNavigationLink
+              key={trail}
+              href={`/robots/trails/${index}`}
+              icon={<TrailIcon />}
+              label={trail}
+            />
+          ))}
         </SidebarNavigationSection>
 
         <SidebarNavigationSection label="Recent chats">

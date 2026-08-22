@@ -25,6 +25,8 @@ type Notification struct {
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// EventType holds the value of the "event_type" field.
 	EventType string `json:"event_type,omitempty"`
+	// Target holds the value of the "target" field.
+	Target *string `json:"target,omitempty"`
 	// DatagraphKind holds the value of the "datagraph_kind" field.
 	DatagraphKind *string `json:"datagraph_kind,omitempty"`
 	// The ID of the resource that this notification relates to. This is not a foreign key as notifications can refer to a variety of sources, discriminated by the 'datagraph_kind' field.
@@ -83,7 +85,7 @@ func (*Notification) scanValues(columns []string) ([]any, error) {
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case notification.FieldRead:
 			values[i] = new(sql.NullBool)
-		case notification.FieldEventType, notification.FieldDatagraphKind:
+		case notification.FieldEventType, notification.FieldTarget, notification.FieldDatagraphKind:
 			values[i] = new(sql.NullString)
 		case notification.FieldCreatedAt, notification.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -128,6 +130,13 @@ func (_m *Notification) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field event_type", values[i])
 			} else if value.Valid {
 				_m.EventType = value.String
+			}
+		case notification.FieldTarget:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field target", values[i])
+			} else if value.Valid {
+				_m.Target = new(string)
+				*_m.Target = value.String
 			}
 		case notification.FieldDatagraphKind:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -218,6 +227,11 @@ func (_m *Notification) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("event_type=")
 	builder.WriteString(_m.EventType)
+	builder.WriteString(", ")
+	if v := _m.Target; v != nil {
+		builder.WriteString("target=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	if v := _m.DatagraphKind; v != nil {
 		builder.WriteString("datagraph_kind=")

@@ -69,6 +69,11 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/ent/setting"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/trail"
+	"github.com/Southclaws/storyden/internal/ent/trailaction"
+	"github.com/Southclaws/storyden/internal/ent/trailactionrun"
+	"github.com/Southclaws/storyden/internal/ent/trailrun"
+	"github.com/Southclaws/storyden/internal/ent/trailschedulerlease"
 	"github.com/Southclaws/storyden/internal/ent/warning"
 
 	stdsql "database/sql"
@@ -185,6 +190,16 @@ type Client struct {
 	Setting *SettingClient
 	// Tag is the client for interacting with the Tag builders.
 	Tag *TagClient
+	// Trail is the client for interacting with the Trail builders.
+	Trail *TrailClient
+	// TrailAction is the client for interacting with the TrailAction builders.
+	TrailAction *TrailActionClient
+	// TrailActionRun is the client for interacting with the TrailActionRun builders.
+	TrailActionRun *TrailActionRunClient
+	// TrailRun is the client for interacting with the TrailRun builders.
+	TrailRun *TrailRunClient
+	// TrailSchedulerLease is the client for interacting with the TrailSchedulerLease builders.
+	TrailSchedulerLease *TrailSchedulerLeaseClient
 	// Warning is the client for interacting with the Warning builders.
 	Warning *WarningClient
 }
@@ -251,6 +266,11 @@ func (c *Client) init() {
 	c.Session = NewSessionClient(c.config)
 	c.Setting = NewSettingClient(c.config)
 	c.Tag = NewTagClient(c.config)
+	c.Trail = NewTrailClient(c.config)
+	c.TrailAction = NewTrailActionClient(c.config)
+	c.TrailActionRun = NewTrailActionRunClient(c.config)
+	c.TrailRun = NewTrailRunClient(c.config)
+	c.TrailSchedulerLease = NewTrailSchedulerLeaseClient(c.config)
 	c.Warning = NewWarningClient(c.config)
 }
 
@@ -397,6 +417,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Session:                      NewSessionClient(cfg),
 		Setting:                      NewSettingClient(cfg),
 		Tag:                          NewTagClient(cfg),
+		Trail:                        NewTrailClient(cfg),
+		TrailAction:                  NewTrailActionClient(cfg),
+		TrailActionRun:               NewTrailActionRunClient(cfg),
+		TrailRun:                     NewTrailRunClient(cfg),
+		TrailSchedulerLease:          NewTrailSchedulerLeaseClient(cfg),
 		Warning:                      NewWarningClient(cfg),
 	}, nil
 }
@@ -470,6 +495,11 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Session:                      NewSessionClient(cfg),
 		Setting:                      NewSettingClient(cfg),
 		Tag:                          NewTagClient(cfg),
+		Trail:                        NewTrailClient(cfg),
+		TrailAction:                  NewTrailActionClient(cfg),
+		TrailActionRun:               NewTrailActionRunClient(cfg),
+		TrailRun:                     NewTrailRunClient(cfg),
+		TrailSchedulerLease:          NewTrailSchedulerLeaseClient(cfg),
 		Warning:                      NewWarningClient(cfg),
 	}, nil
 }
@@ -511,7 +541,8 @@ func (c *Client) Use(hooks ...Hook) {
 		c.Report, c.Robot, c.RobotMCPServer, c.RobotMCPTool, c.RobotProviderModel,
 		c.RobotSession, c.RobotSessionInput, c.RobotSessionMessage, c.RobotSessionTurn,
 		c.RobotSessionView, c.RobotToolset, c.RobotWorkspace, c.RobotWorkspaceInstance,
-		c.Role, c.Session, c.Setting, c.Tag, c.Warning,
+		c.Role, c.Session, c.Setting, c.Tag, c.Trail, c.TrailAction, c.TrailActionRun,
+		c.TrailRun, c.TrailSchedulerLease, c.Warning,
 	} {
 		n.Use(hooks...)
 	}
@@ -532,7 +563,8 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.Report, c.Robot, c.RobotMCPServer, c.RobotMCPTool, c.RobotProviderModel,
 		c.RobotSession, c.RobotSessionInput, c.RobotSessionMessage, c.RobotSessionTurn,
 		c.RobotSessionView, c.RobotToolset, c.RobotWorkspace, c.RobotWorkspaceInstance,
-		c.Role, c.Session, c.Setting, c.Tag, c.Warning,
+		c.Role, c.Session, c.Setting, c.Tag, c.Trail, c.TrailAction, c.TrailActionRun,
+		c.TrailRun, c.TrailSchedulerLease, c.Warning,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -647,6 +679,16 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Setting.mutate(ctx, m)
 	case *TagMutation:
 		return c.Tag.mutate(ctx, m)
+	case *TrailMutation:
+		return c.Trail.mutate(ctx, m)
+	case *TrailActionMutation:
+		return c.TrailAction.mutate(ctx, m)
+	case *TrailActionRunMutation:
+		return c.TrailActionRun.mutate(ctx, m)
+	case *TrailRunMutation:
+		return c.TrailRun.mutate(ctx, m)
+	case *TrailSchedulerLeaseMutation:
+		return c.TrailSchedulerLease.mutate(ctx, m)
 	case *WarningMutation:
 		return c.Warning.mutate(ctx, m)
 	default:
@@ -1491,6 +1533,38 @@ func (c *AccountClient) QueryInitiatedRobotTurns(_m *Account) *RobotSessionTurnQ
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(robotsessionturn.Table, robotsessionturn.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.InitiatedRobotTurnsTable, account.InitiatedRobotTurnsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCreatedTrails queries the created_trails edge of a Account.
+func (c *AccountClient) QueryCreatedTrails(_m *Account) *TrailQuery {
+	query := (&TrailClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(trail.Table, trail.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.CreatedTrailsTable, account.CreatedTrailsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryInitiatedTrailRuns queries the initiated_trail_runs edge of a Account.
+func (c *AccountClient) QueryInitiatedTrailRuns(_m *Account) *TrailRunQuery {
+	query := (&TrailRunClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(trailrun.Table, trailrun.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.InitiatedTrailRunsTable, account.InitiatedTrailRunsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -10773,6 +10847,831 @@ func (c *TagClient) mutate(ctx context.Context, m *TagMutation) (Value, error) {
 	}
 }
 
+// TrailClient is a client for the Trail schema.
+type TrailClient struct {
+	config
+}
+
+// NewTrailClient returns a client for the Trail from the given config.
+func NewTrailClient(c config) *TrailClient {
+	return &TrailClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `trail.Hooks(f(g(h())))`.
+func (c *TrailClient) Use(hooks ...Hook) {
+	c.hooks.Trail = append(c.hooks.Trail, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `trail.Intercept(f(g(h())))`.
+func (c *TrailClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Trail = append(c.inters.Trail, interceptors...)
+}
+
+// Create returns a builder for creating a Trail entity.
+func (c *TrailClient) Create() *TrailCreate {
+	mutation := newTrailMutation(c.config, OpCreate)
+	return &TrailCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Trail entities.
+func (c *TrailClient) CreateBulk(builders ...*TrailCreate) *TrailCreateBulk {
+	return &TrailCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *TrailClient) MapCreateBulk(slice any, setFunc func(*TrailCreate, int)) *TrailCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &TrailCreateBulk{err: fmt.Errorf("calling to TrailClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*TrailCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &TrailCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Trail.
+func (c *TrailClient) Update() *TrailUpdate {
+	mutation := newTrailMutation(c.config, OpUpdate)
+	return &TrailUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TrailClient) UpdateOne(_m *Trail) *TrailUpdateOne {
+	mutation := newTrailMutation(c.config, OpUpdateOne, withTrail(_m))
+	return &TrailUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TrailClient) UpdateOneID(id xid.ID) *TrailUpdateOne {
+	mutation := newTrailMutation(c.config, OpUpdateOne, withTrailID(id))
+	return &TrailUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Trail.
+func (c *TrailClient) Delete() *TrailDelete {
+	mutation := newTrailMutation(c.config, OpDelete)
+	return &TrailDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TrailClient) DeleteOne(_m *Trail) *TrailDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TrailClient) DeleteOneID(id xid.ID) *TrailDeleteOne {
+	builder := c.Delete().Where(trail.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TrailDeleteOne{builder}
+}
+
+// Query returns a query builder for Trail.
+func (c *TrailClient) Query() *TrailQuery {
+	return &TrailQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTrail},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Trail entity by its id.
+func (c *TrailClient) Get(ctx context.Context, id xid.ID) (*Trail, error) {
+	return c.Query().Where(trail.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TrailClient) GetX(ctx context.Context, id xid.ID) *Trail {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreator queries the creator edge of a Trail.
+func (c *TrailClient) QueryCreator(_m *Trail) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(trail.Table, trail.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, trail.CreatorTable, trail.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryActions queries the actions edge of a Trail.
+func (c *TrailClient) QueryActions(_m *Trail) *TrailActionQuery {
+	query := (&TrailActionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(trail.Table, trail.FieldID, id),
+			sqlgraph.To(trailaction.Table, trailaction.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, trail.ActionsTable, trail.ActionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRuns queries the runs edge of a Trail.
+func (c *TrailClient) QueryRuns(_m *Trail) *TrailRunQuery {
+	query := (&TrailRunClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(trail.Table, trail.FieldID, id),
+			sqlgraph.To(trailrun.Table, trailrun.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, trail.RunsTable, trail.RunsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *TrailClient) Hooks() []Hook {
+	return c.hooks.Trail
+}
+
+// Interceptors returns the client interceptors.
+func (c *TrailClient) Interceptors() []Interceptor {
+	return c.inters.Trail
+}
+
+func (c *TrailClient) mutate(ctx context.Context, m *TrailMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TrailCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TrailUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TrailUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TrailDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Trail mutation op: %q", m.Op())
+	}
+}
+
+// TrailActionClient is a client for the TrailAction schema.
+type TrailActionClient struct {
+	config
+}
+
+// NewTrailActionClient returns a client for the TrailAction from the given config.
+func NewTrailActionClient(c config) *TrailActionClient {
+	return &TrailActionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `trailaction.Hooks(f(g(h())))`.
+func (c *TrailActionClient) Use(hooks ...Hook) {
+	c.hooks.TrailAction = append(c.hooks.TrailAction, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `trailaction.Intercept(f(g(h())))`.
+func (c *TrailActionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.TrailAction = append(c.inters.TrailAction, interceptors...)
+}
+
+// Create returns a builder for creating a TrailAction entity.
+func (c *TrailActionClient) Create() *TrailActionCreate {
+	mutation := newTrailActionMutation(c.config, OpCreate)
+	return &TrailActionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of TrailAction entities.
+func (c *TrailActionClient) CreateBulk(builders ...*TrailActionCreate) *TrailActionCreateBulk {
+	return &TrailActionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *TrailActionClient) MapCreateBulk(slice any, setFunc func(*TrailActionCreate, int)) *TrailActionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &TrailActionCreateBulk{err: fmt.Errorf("calling to TrailActionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*TrailActionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &TrailActionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for TrailAction.
+func (c *TrailActionClient) Update() *TrailActionUpdate {
+	mutation := newTrailActionMutation(c.config, OpUpdate)
+	return &TrailActionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TrailActionClient) UpdateOne(_m *TrailAction) *TrailActionUpdateOne {
+	mutation := newTrailActionMutation(c.config, OpUpdateOne, withTrailAction(_m))
+	return &TrailActionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TrailActionClient) UpdateOneID(id xid.ID) *TrailActionUpdateOne {
+	mutation := newTrailActionMutation(c.config, OpUpdateOne, withTrailActionID(id))
+	return &TrailActionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for TrailAction.
+func (c *TrailActionClient) Delete() *TrailActionDelete {
+	mutation := newTrailActionMutation(c.config, OpDelete)
+	return &TrailActionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TrailActionClient) DeleteOne(_m *TrailAction) *TrailActionDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TrailActionClient) DeleteOneID(id xid.ID) *TrailActionDeleteOne {
+	builder := c.Delete().Where(trailaction.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TrailActionDeleteOne{builder}
+}
+
+// Query returns a query builder for TrailAction.
+func (c *TrailActionClient) Query() *TrailActionQuery {
+	return &TrailActionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTrailAction},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a TrailAction entity by its id.
+func (c *TrailActionClient) Get(ctx context.Context, id xid.ID) (*TrailAction, error) {
+	return c.Query().Where(trailaction.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TrailActionClient) GetX(ctx context.Context, id xid.ID) *TrailAction {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryTrail queries the trail edge of a TrailAction.
+func (c *TrailActionClient) QueryTrail(_m *TrailAction) *TrailQuery {
+	query := (&TrailClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(trailaction.Table, trailaction.FieldID, id),
+			sqlgraph.To(trail.Table, trail.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, trailaction.TrailTable, trailaction.TrailColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRuns queries the runs edge of a TrailAction.
+func (c *TrailActionClient) QueryRuns(_m *TrailAction) *TrailActionRunQuery {
+	query := (&TrailActionRunClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(trailaction.Table, trailaction.FieldID, id),
+			sqlgraph.To(trailactionrun.Table, trailactionrun.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, trailaction.RunsTable, trailaction.RunsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *TrailActionClient) Hooks() []Hook {
+	return c.hooks.TrailAction
+}
+
+// Interceptors returns the client interceptors.
+func (c *TrailActionClient) Interceptors() []Interceptor {
+	return c.inters.TrailAction
+}
+
+func (c *TrailActionClient) mutate(ctx context.Context, m *TrailActionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TrailActionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TrailActionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TrailActionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TrailActionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown TrailAction mutation op: %q", m.Op())
+	}
+}
+
+// TrailActionRunClient is a client for the TrailActionRun schema.
+type TrailActionRunClient struct {
+	config
+}
+
+// NewTrailActionRunClient returns a client for the TrailActionRun from the given config.
+func NewTrailActionRunClient(c config) *TrailActionRunClient {
+	return &TrailActionRunClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `trailactionrun.Hooks(f(g(h())))`.
+func (c *TrailActionRunClient) Use(hooks ...Hook) {
+	c.hooks.TrailActionRun = append(c.hooks.TrailActionRun, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `trailactionrun.Intercept(f(g(h())))`.
+func (c *TrailActionRunClient) Intercept(interceptors ...Interceptor) {
+	c.inters.TrailActionRun = append(c.inters.TrailActionRun, interceptors...)
+}
+
+// Create returns a builder for creating a TrailActionRun entity.
+func (c *TrailActionRunClient) Create() *TrailActionRunCreate {
+	mutation := newTrailActionRunMutation(c.config, OpCreate)
+	return &TrailActionRunCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of TrailActionRun entities.
+func (c *TrailActionRunClient) CreateBulk(builders ...*TrailActionRunCreate) *TrailActionRunCreateBulk {
+	return &TrailActionRunCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *TrailActionRunClient) MapCreateBulk(slice any, setFunc func(*TrailActionRunCreate, int)) *TrailActionRunCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &TrailActionRunCreateBulk{err: fmt.Errorf("calling to TrailActionRunClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*TrailActionRunCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &TrailActionRunCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for TrailActionRun.
+func (c *TrailActionRunClient) Update() *TrailActionRunUpdate {
+	mutation := newTrailActionRunMutation(c.config, OpUpdate)
+	return &TrailActionRunUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TrailActionRunClient) UpdateOne(_m *TrailActionRun) *TrailActionRunUpdateOne {
+	mutation := newTrailActionRunMutation(c.config, OpUpdateOne, withTrailActionRun(_m))
+	return &TrailActionRunUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TrailActionRunClient) UpdateOneID(id xid.ID) *TrailActionRunUpdateOne {
+	mutation := newTrailActionRunMutation(c.config, OpUpdateOne, withTrailActionRunID(id))
+	return &TrailActionRunUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for TrailActionRun.
+func (c *TrailActionRunClient) Delete() *TrailActionRunDelete {
+	mutation := newTrailActionRunMutation(c.config, OpDelete)
+	return &TrailActionRunDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TrailActionRunClient) DeleteOne(_m *TrailActionRun) *TrailActionRunDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TrailActionRunClient) DeleteOneID(id xid.ID) *TrailActionRunDeleteOne {
+	builder := c.Delete().Where(trailactionrun.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TrailActionRunDeleteOne{builder}
+}
+
+// Query returns a query builder for TrailActionRun.
+func (c *TrailActionRunClient) Query() *TrailActionRunQuery {
+	return &TrailActionRunQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTrailActionRun},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a TrailActionRun entity by its id.
+func (c *TrailActionRunClient) Get(ctx context.Context, id xid.ID) (*TrailActionRun, error) {
+	return c.Query().Where(trailactionrun.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TrailActionRunClient) GetX(ctx context.Context, id xid.ID) *TrailActionRun {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRun queries the run edge of a TrailActionRun.
+func (c *TrailActionRunClient) QueryRun(_m *TrailActionRun) *TrailRunQuery {
+	query := (&TrailRunClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(trailactionrun.Table, trailactionrun.FieldID, id),
+			sqlgraph.To(trailrun.Table, trailrun.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, trailactionrun.RunTable, trailactionrun.RunColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAction queries the action edge of a TrailActionRun.
+func (c *TrailActionRunClient) QueryAction(_m *TrailActionRun) *TrailActionQuery {
+	query := (&TrailActionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(trailactionrun.Table, trailactionrun.FieldID, id),
+			sqlgraph.To(trailaction.Table, trailaction.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, trailactionrun.ActionTable, trailactionrun.ActionColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *TrailActionRunClient) Hooks() []Hook {
+	return c.hooks.TrailActionRun
+}
+
+// Interceptors returns the client interceptors.
+func (c *TrailActionRunClient) Interceptors() []Interceptor {
+	return c.inters.TrailActionRun
+}
+
+func (c *TrailActionRunClient) mutate(ctx context.Context, m *TrailActionRunMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TrailActionRunCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TrailActionRunUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TrailActionRunUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TrailActionRunDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown TrailActionRun mutation op: %q", m.Op())
+	}
+}
+
+// TrailRunClient is a client for the TrailRun schema.
+type TrailRunClient struct {
+	config
+}
+
+// NewTrailRunClient returns a client for the TrailRun from the given config.
+func NewTrailRunClient(c config) *TrailRunClient {
+	return &TrailRunClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `trailrun.Hooks(f(g(h())))`.
+func (c *TrailRunClient) Use(hooks ...Hook) {
+	c.hooks.TrailRun = append(c.hooks.TrailRun, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `trailrun.Intercept(f(g(h())))`.
+func (c *TrailRunClient) Intercept(interceptors ...Interceptor) {
+	c.inters.TrailRun = append(c.inters.TrailRun, interceptors...)
+}
+
+// Create returns a builder for creating a TrailRun entity.
+func (c *TrailRunClient) Create() *TrailRunCreate {
+	mutation := newTrailRunMutation(c.config, OpCreate)
+	return &TrailRunCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of TrailRun entities.
+func (c *TrailRunClient) CreateBulk(builders ...*TrailRunCreate) *TrailRunCreateBulk {
+	return &TrailRunCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *TrailRunClient) MapCreateBulk(slice any, setFunc func(*TrailRunCreate, int)) *TrailRunCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &TrailRunCreateBulk{err: fmt.Errorf("calling to TrailRunClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*TrailRunCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &TrailRunCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for TrailRun.
+func (c *TrailRunClient) Update() *TrailRunUpdate {
+	mutation := newTrailRunMutation(c.config, OpUpdate)
+	return &TrailRunUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TrailRunClient) UpdateOne(_m *TrailRun) *TrailRunUpdateOne {
+	mutation := newTrailRunMutation(c.config, OpUpdateOne, withTrailRun(_m))
+	return &TrailRunUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TrailRunClient) UpdateOneID(id xid.ID) *TrailRunUpdateOne {
+	mutation := newTrailRunMutation(c.config, OpUpdateOne, withTrailRunID(id))
+	return &TrailRunUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for TrailRun.
+func (c *TrailRunClient) Delete() *TrailRunDelete {
+	mutation := newTrailRunMutation(c.config, OpDelete)
+	return &TrailRunDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TrailRunClient) DeleteOne(_m *TrailRun) *TrailRunDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TrailRunClient) DeleteOneID(id xid.ID) *TrailRunDeleteOne {
+	builder := c.Delete().Where(trailrun.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TrailRunDeleteOne{builder}
+}
+
+// Query returns a query builder for TrailRun.
+func (c *TrailRunClient) Query() *TrailRunQuery {
+	return &TrailRunQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTrailRun},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a TrailRun entity by its id.
+func (c *TrailRunClient) Get(ctx context.Context, id xid.ID) (*TrailRun, error) {
+	return c.Query().Where(trailrun.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TrailRunClient) GetX(ctx context.Context, id xid.ID) *TrailRun {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryTrail queries the trail edge of a TrailRun.
+func (c *TrailRunClient) QueryTrail(_m *TrailRun) *TrailQuery {
+	query := (&TrailClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(trailrun.Table, trailrun.FieldID, id),
+			sqlgraph.To(trail.Table, trail.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, trailrun.TrailTable, trailrun.TrailColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryInitiator queries the initiator edge of a TrailRun.
+func (c *TrailRunClient) QueryInitiator(_m *TrailRun) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(trailrun.Table, trailrun.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, trailrun.InitiatorTable, trailrun.InitiatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryActionRuns queries the action_runs edge of a TrailRun.
+func (c *TrailRunClient) QueryActionRuns(_m *TrailRun) *TrailActionRunQuery {
+	query := (&TrailActionRunClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(trailrun.Table, trailrun.FieldID, id),
+			sqlgraph.To(trailactionrun.Table, trailactionrun.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, trailrun.ActionRunsTable, trailrun.ActionRunsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *TrailRunClient) Hooks() []Hook {
+	return c.hooks.TrailRun
+}
+
+// Interceptors returns the client interceptors.
+func (c *TrailRunClient) Interceptors() []Interceptor {
+	return c.inters.TrailRun
+}
+
+func (c *TrailRunClient) mutate(ctx context.Context, m *TrailRunMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TrailRunCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TrailRunUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TrailRunUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TrailRunDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown TrailRun mutation op: %q", m.Op())
+	}
+}
+
+// TrailSchedulerLeaseClient is a client for the TrailSchedulerLease schema.
+type TrailSchedulerLeaseClient struct {
+	config
+}
+
+// NewTrailSchedulerLeaseClient returns a client for the TrailSchedulerLease from the given config.
+func NewTrailSchedulerLeaseClient(c config) *TrailSchedulerLeaseClient {
+	return &TrailSchedulerLeaseClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `trailschedulerlease.Hooks(f(g(h())))`.
+func (c *TrailSchedulerLeaseClient) Use(hooks ...Hook) {
+	c.hooks.TrailSchedulerLease = append(c.hooks.TrailSchedulerLease, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `trailschedulerlease.Intercept(f(g(h())))`.
+func (c *TrailSchedulerLeaseClient) Intercept(interceptors ...Interceptor) {
+	c.inters.TrailSchedulerLease = append(c.inters.TrailSchedulerLease, interceptors...)
+}
+
+// Create returns a builder for creating a TrailSchedulerLease entity.
+func (c *TrailSchedulerLeaseClient) Create() *TrailSchedulerLeaseCreate {
+	mutation := newTrailSchedulerLeaseMutation(c.config, OpCreate)
+	return &TrailSchedulerLeaseCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of TrailSchedulerLease entities.
+func (c *TrailSchedulerLeaseClient) CreateBulk(builders ...*TrailSchedulerLeaseCreate) *TrailSchedulerLeaseCreateBulk {
+	return &TrailSchedulerLeaseCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *TrailSchedulerLeaseClient) MapCreateBulk(slice any, setFunc func(*TrailSchedulerLeaseCreate, int)) *TrailSchedulerLeaseCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &TrailSchedulerLeaseCreateBulk{err: fmt.Errorf("calling to TrailSchedulerLeaseClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*TrailSchedulerLeaseCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &TrailSchedulerLeaseCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for TrailSchedulerLease.
+func (c *TrailSchedulerLeaseClient) Update() *TrailSchedulerLeaseUpdate {
+	mutation := newTrailSchedulerLeaseMutation(c.config, OpUpdate)
+	return &TrailSchedulerLeaseUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TrailSchedulerLeaseClient) UpdateOne(_m *TrailSchedulerLease) *TrailSchedulerLeaseUpdateOne {
+	mutation := newTrailSchedulerLeaseMutation(c.config, OpUpdateOne, withTrailSchedulerLease(_m))
+	return &TrailSchedulerLeaseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TrailSchedulerLeaseClient) UpdateOneID(id int) *TrailSchedulerLeaseUpdateOne {
+	mutation := newTrailSchedulerLeaseMutation(c.config, OpUpdateOne, withTrailSchedulerLeaseID(id))
+	return &TrailSchedulerLeaseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for TrailSchedulerLease.
+func (c *TrailSchedulerLeaseClient) Delete() *TrailSchedulerLeaseDelete {
+	mutation := newTrailSchedulerLeaseMutation(c.config, OpDelete)
+	return &TrailSchedulerLeaseDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TrailSchedulerLeaseClient) DeleteOne(_m *TrailSchedulerLease) *TrailSchedulerLeaseDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TrailSchedulerLeaseClient) DeleteOneID(id int) *TrailSchedulerLeaseDeleteOne {
+	builder := c.Delete().Where(trailschedulerlease.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TrailSchedulerLeaseDeleteOne{builder}
+}
+
+// Query returns a query builder for TrailSchedulerLease.
+func (c *TrailSchedulerLeaseClient) Query() *TrailSchedulerLeaseQuery {
+	return &TrailSchedulerLeaseQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTrailSchedulerLease},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a TrailSchedulerLease entity by its id.
+func (c *TrailSchedulerLeaseClient) Get(ctx context.Context, id int) (*TrailSchedulerLease, error) {
+	return c.Query().Where(trailschedulerlease.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TrailSchedulerLeaseClient) GetX(ctx context.Context, id int) *TrailSchedulerLease {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *TrailSchedulerLeaseClient) Hooks() []Hook {
+	return c.hooks.TrailSchedulerLease
+}
+
+// Interceptors returns the client interceptors.
+func (c *TrailSchedulerLeaseClient) Interceptors() []Interceptor {
+	return c.inters.TrailSchedulerLease
+}
+
+func (c *TrailSchedulerLeaseClient) mutate(ctx context.Context, m *TrailSchedulerLeaseMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TrailSchedulerLeaseCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TrailSchedulerLeaseUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TrailSchedulerLeaseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TrailSchedulerLeaseDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown TrailSchedulerLease mutation op: %q", m.Op())
+	}
+}
+
 // WarningClient is a client for the Warning schema.
 type WarningClient struct {
 	config
@@ -10951,7 +11850,8 @@ type (
 		Robot, RobotMCPServer, RobotMCPTool, RobotProviderModel, RobotSession,
 		RobotSessionInput, RobotSessionMessage, RobotSessionTurn, RobotSessionView,
 		RobotToolset, RobotWorkspace, RobotWorkspaceInstance, Role, Session, Setting,
-		Tag, Warning []ent.Hook
+		Tag, Trail, TrailAction, TrailActionRun, TrailRun, TrailSchedulerLease,
+		Warning []ent.Hook
 	}
 	inters struct {
 		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication, Category,
@@ -10964,7 +11864,8 @@ type (
 		Robot, RobotMCPServer, RobotMCPTool, RobotProviderModel, RobotSession,
 		RobotSessionInput, RobotSessionMessage, RobotSessionTurn, RobotSessionView,
 		RobotToolset, RobotWorkspace, RobotWorkspaceInstance, Role, Session, Setting,
-		Tag, Warning []ent.Interceptor
+		Tag, Trail, TrailAction, TrailActionRun, TrailRun, TrailSchedulerLease,
+		Warning []ent.Interceptor
 	}
 )
 

@@ -18,6 +18,7 @@ func (Notification) Mixin() []ent.Mixin {
 func (Notification) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("event_type"),
+		field.String("target").Optional().Nillable(),
 
 		field.String("datagraph_kind").
 			Optional().

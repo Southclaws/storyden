@@ -53,6 +53,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/schema"
 	"github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/trail"
+	"github.com/Southclaws/storyden/internal/ent/trailrun"
 	"github.com/Southclaws/storyden/internal/ent/warning"
 	"github.com/rs/xid"
 )
@@ -921,6 +923,36 @@ func (_c *AccountCreate) AddInitiatedRobotTurns(v ...*RobotSessionTurn) *Account
 		ids[i] = v[i].ID
 	}
 	return _c.AddInitiatedRobotTurnIDs(ids...)
+}
+
+// AddCreatedTrailIDs adds the "created_trails" edge to the Trail entity by IDs.
+func (_c *AccountCreate) AddCreatedTrailIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddCreatedTrailIDs(ids...)
+	return _c
+}
+
+// AddCreatedTrails adds the "created_trails" edges to the Trail entity.
+func (_c *AccountCreate) AddCreatedTrails(v ...*Trail) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddCreatedTrailIDs(ids...)
+}
+
+// AddInitiatedTrailRunIDs adds the "initiated_trail_runs" edge to the TrailRun entity by IDs.
+func (_c *AccountCreate) AddInitiatedTrailRunIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddInitiatedTrailRunIDs(ids...)
+	return _c
+}
+
+// AddInitiatedTrailRuns adds the "initiated_trail_runs" edges to the TrailRun entity.
+func (_c *AccountCreate) AddInitiatedTrailRuns(v ...*TrailRun) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddInitiatedTrailRunIDs(ids...)
 }
 
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
@@ -1872,6 +1904,38 @@ func (_c *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(robotsessionturn.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.CreatedTrailsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.CreatedTrailsTable,
+			Columns: []string{account.CreatedTrailsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trail.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.InitiatedTrailRunsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.InitiatedTrailRunsTable,
+			Columns: []string{account.InitiatedTrailRunsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trailrun.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

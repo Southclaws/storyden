@@ -197,6 +197,40 @@ func (_u *RobotSessionUpdate) ClearLeaseExpiresAt() *RobotSessionUpdate {
 	return _u
 }
 
+// SetOriginKind sets the "origin_kind" field.
+func (_u *RobotSessionUpdate) SetOriginKind(v robotsession.OriginKind) *RobotSessionUpdate {
+	_u.mutation.SetOriginKind(v)
+	return _u
+}
+
+// SetNillableOriginKind sets the "origin_kind" field if the given value is not nil.
+func (_u *RobotSessionUpdate) SetNillableOriginKind(v *robotsession.OriginKind) *RobotSessionUpdate {
+	if v != nil {
+		_u.SetOriginKind(*v)
+	}
+	return _u
+}
+
+// SetOriginID sets the "origin_id" field.
+func (_u *RobotSessionUpdate) SetOriginID(v xid.ID) *RobotSessionUpdate {
+	_u.mutation.SetOriginID(v)
+	return _u
+}
+
+// SetNillableOriginID sets the "origin_id" field if the given value is not nil.
+func (_u *RobotSessionUpdate) SetNillableOriginID(v *xid.ID) *RobotSessionUpdate {
+	if v != nil {
+		_u.SetOriginID(*v)
+	}
+	return _u
+}
+
+// ClearOriginID clears the value of the "origin_id" field.
+func (_u *RobotSessionUpdate) ClearOriginID() *RobotSessionUpdate {
+	_u.mutation.ClearOriginID()
+	return _u
+}
+
 // SetCreatorID sets the "creator" edge to the Account entity by ID.
 func (_u *RobotSessionUpdate) SetCreatorID(id xid.ID) *RobotSessionUpdate {
 	_u.mutation.SetCreatorID(id)
@@ -406,6 +440,11 @@ func (_u *RobotSessionUpdate) check() error {
 			return &ValidationError{Name: "execution_status", err: fmt.Errorf(`ent: validator failed for field "RobotSession.execution_status": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.OriginKind(); ok {
+		if err := robotsession.OriginKindValidator(v); err != nil {
+			return &ValidationError{Name: "origin_kind", err: fmt.Errorf(`ent: validator failed for field "RobotSession.origin_kind": %w`, err)}
+		}
+	}
 	if _u.mutation.CreatorCleared() && len(_u.mutation.CreatorIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "RobotSession.creator"`)
 	}
@@ -474,6 +513,15 @@ func (_u *RobotSessionUpdate) sqlSave(ctx context.Context) (_node int, err error
 	}
 	if _u.mutation.LeaseExpiresAtCleared() {
 		_spec.ClearField(robotsession.FieldLeaseExpiresAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.OriginKind(); ok {
+		_spec.SetField(robotsession.FieldOriginKind, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.OriginID(); ok {
+		_spec.SetField(robotsession.FieldOriginID, field.TypeString, value)
+	}
+	if _u.mutation.OriginIDCleared() {
+		_spec.ClearField(robotsession.FieldOriginID, field.TypeString)
 	}
 	if _u.mutation.CreatorCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -868,6 +916,40 @@ func (_u *RobotSessionUpdateOne) ClearLeaseExpiresAt() *RobotSessionUpdateOne {
 	return _u
 }
 
+// SetOriginKind sets the "origin_kind" field.
+func (_u *RobotSessionUpdateOne) SetOriginKind(v robotsession.OriginKind) *RobotSessionUpdateOne {
+	_u.mutation.SetOriginKind(v)
+	return _u
+}
+
+// SetNillableOriginKind sets the "origin_kind" field if the given value is not nil.
+func (_u *RobotSessionUpdateOne) SetNillableOriginKind(v *robotsession.OriginKind) *RobotSessionUpdateOne {
+	if v != nil {
+		_u.SetOriginKind(*v)
+	}
+	return _u
+}
+
+// SetOriginID sets the "origin_id" field.
+func (_u *RobotSessionUpdateOne) SetOriginID(v xid.ID) *RobotSessionUpdateOne {
+	_u.mutation.SetOriginID(v)
+	return _u
+}
+
+// SetNillableOriginID sets the "origin_id" field if the given value is not nil.
+func (_u *RobotSessionUpdateOne) SetNillableOriginID(v *xid.ID) *RobotSessionUpdateOne {
+	if v != nil {
+		_u.SetOriginID(*v)
+	}
+	return _u
+}
+
+// ClearOriginID clears the value of the "origin_id" field.
+func (_u *RobotSessionUpdateOne) ClearOriginID() *RobotSessionUpdateOne {
+	_u.mutation.ClearOriginID()
+	return _u
+}
+
 // SetCreatorID sets the "creator" edge to the Account entity by ID.
 func (_u *RobotSessionUpdateOne) SetCreatorID(id xid.ID) *RobotSessionUpdateOne {
 	_u.mutation.SetCreatorID(id)
@@ -1090,6 +1172,11 @@ func (_u *RobotSessionUpdateOne) check() error {
 			return &ValidationError{Name: "execution_status", err: fmt.Errorf(`ent: validator failed for field "RobotSession.execution_status": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.OriginKind(); ok {
+		if err := robotsession.OriginKindValidator(v); err != nil {
+			return &ValidationError{Name: "origin_kind", err: fmt.Errorf(`ent: validator failed for field "RobotSession.origin_kind": %w`, err)}
+		}
+	}
 	if _u.mutation.CreatorCleared() && len(_u.mutation.CreatorIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "RobotSession.creator"`)
 	}
@@ -1175,6 +1262,15 @@ func (_u *RobotSessionUpdateOne) sqlSave(ctx context.Context) (_node *RobotSessi
 	}
 	if _u.mutation.LeaseExpiresAtCleared() {
 		_spec.ClearField(robotsession.FieldLeaseExpiresAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.OriginKind(); ok {
+		_spec.SetField(robotsession.FieldOriginKind, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.OriginID(); ok {
+		_spec.SetField(robotsession.FieldOriginID, field.TypeString, value)
+	}
+	if _u.mutation.OriginIDCleared() {
+		_spec.ClearField(robotsession.FieldOriginID, field.TypeString)
 	}
 	if _u.mutation.CreatorCleared() {
 		edge := &sqlgraph.EdgeSpec{

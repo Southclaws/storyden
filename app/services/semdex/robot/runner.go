@@ -201,12 +201,12 @@ func (s *Agent) Run(
 
 // PrepareSession creates a shared Robot session when needed and records the
 // current account's view before the coordinator attempts to lease it.
-func (s *Agent) PrepareSession(ctx context.Context, robotRef, userID, sessionID string) error {
+func (s *Agent) PrepareSession(ctx context.Context, robotRef, userID, sessionID string, options ...robot_session.CreateOption) error {
 	spec, err := s.resolveAgentSpec(ctx, strings.TrimSpace(robotRef))
 	if err != nil {
 		return err
 	}
-	if err := s.ensureSession(ctx, spec.AppName, spec.RobotRef, userID, sessionID); err != nil {
+	if err := s.ensureSession(ctx, spec.AppName, spec.RobotRef, userID, sessionID, options...); err != nil {
 		return err
 	}
 	sessionXID, err := xid.FromString(sessionID)
@@ -610,11 +610,11 @@ func interceptClientSideTools(logger *slog.Logger, registry *tools.Registry, opt
 	}
 }
 
-func (s *Agent) ensureSession(ctx context.Context, robotName, rootRobotRef, userID, sessionID string) error {
-	return s.ensureSessionAttempt(ctx, robotName, rootRobotRef, userID, sessionID, true)
+func (s *Agent) ensureSession(ctx context.Context, robotName, rootRobotRef, userID, sessionID string, options ...robot_session.CreateOption) error {
+	return s.ensureSessionAttempt(ctx, robotName, rootRobotRef, userID, sessionID, true, options...)
 }
 
-func (s *Agent) ensureSessionAttempt(ctx context.Context, robotName, rootRobotRef, userID, sessionID string, retryCreateRace bool) error {
+func (s *Agent) ensureSessionAttempt(ctx context.Context, robotName, rootRobotRef, userID, sessionID string, retryCreateRace bool, options ...robot_session.CreateOption) error {
 	get, err := s.sessions.Get(ctx, &adksession.GetRequest{
 		AppName:   robotName,
 		UserID:    userID,
@@ -651,25 +651,38 @@ func (s *Agent) ensureSessionAttempt(ctx context.Context, robotName, rootRobotRe
 		return err
 	}
 
-	create, err := s.sessions.Create(ctx, &adksession.CreateRequest{
-		AppName:   robotName,
-		UserID:    userID,
-		SessionID: sessionID,
-		State:     sessionInitialState(rootRobotRef),
-	})
+	sessionXID, err := xid.FromString(sessionID)
+	if err != nil {
+		return err
+	}
+
+	accountXID, err := xid.FromString(userID)
+	if err != nil {
+		return err
+	}
+
+	create, err := s.sessionRepo.Create(
+		ctx,
+		robot.SessionID(sessionXID),
+		getDefaultSessionName(),
+		account.AccountID(accountXID),
+		sessionInitialState(rootRobotRef),
+		options...,
+	)
 	if err != nil {
 		if retryCreateRace && ent.IsConstraintError(err) {
 			// Another command may have created the shared session between Get and
 			// Create. Re-read it and validate the root Robot through the normal path.
-			return s.ensureSessionAttempt(ctx, robotName, rootRobotRef, userID, sessionID, false)
+			return s.ensureSessionAttempt(ctx, robotName, rootRobotRef, userID, sessionID, false, options...)
 		}
 		return err
 	}
+
 	s.logger.Debug(
 		"session created",
 		slog.String("userID", userID),
 		slog.String("sessionID", sessionID),
-		slog.Any("session", create.Session),
+		slog.Any("session", create),
 	)
 
 	return nil

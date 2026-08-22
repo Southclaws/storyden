@@ -3,6 +3,7 @@ package tests
 import (
 	"os"
 	"strings"
+	"testing"
 )
 
 // IsSharedPostgresDatabase reports whether the current integration run uses a
@@ -21,4 +22,14 @@ func IsSharedPostgresDatabase() bool {
 	databaseURL := strings.ToLower(os.Getenv("DATABASE_URL"))
 
 	return strings.HasPrefix(databaseURL, "postgresql://")
+}
+
+// ParallelIfNotSharedPostgres marks a test for parallel execution when its integration database
+// is isolated from other tests. Tests using shared PostgreSQL remain serial.
+func ParallelIfNotSharedPostgres(t *testing.T) {
+	t.Helper()
+
+	if !IsSharedPostgresDatabase() {
+		t.Parallel()
+	}
 }

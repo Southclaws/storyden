@@ -53,6 +53,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/trail"
+	"github.com/Southclaws/storyden/internal/ent/trailrun"
 	"github.com/Southclaws/storyden/internal/ent/warning"
 	"github.com/rs/xid"
 )
@@ -110,6 +112,8 @@ type AccountQuery struct {
 	withRobotMessages                     *RobotSessionMessageQuery
 	withRobotSessionInputs                *RobotSessionInputQuery
 	withInitiatedRobotTurns               *RobotSessionTurnQuery
+	withCreatedTrails                     *TrailQuery
+	withInitiatedTrailRuns                *TrailRunQuery
 	withAccountRoles                      *AccountRolesQuery
 	modifiers                             []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -1160,6 +1164,50 @@ func (_q *AccountQuery) QueryInitiatedRobotTurns() *RobotSessionTurnQuery {
 	return query
 }
 
+// QueryCreatedTrails chains the current query on the "created_trails" edge.
+func (_q *AccountQuery) QueryCreatedTrails() *TrailQuery {
+	query := (&TrailClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(trail.Table, trail.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.CreatedTrailsTable, account.CreatedTrailsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryInitiatedTrailRuns chains the current query on the "initiated_trail_runs" edge.
+func (_q *AccountQuery) QueryInitiatedTrailRuns() *TrailRunQuery {
+	query := (&TrailRunClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(trailrun.Table, trailrun.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.InitiatedTrailRunsTable, account.InitiatedTrailRunsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryAccountRoles chains the current query on the "account_roles" edge.
 func (_q *AccountQuery) QueryAccountRoles() *AccountRolesQuery {
 	query := (&AccountRolesClient{config: _q.config}).Query()
@@ -1420,6 +1468,8 @@ func (_q *AccountQuery) Clone() *AccountQuery {
 		withRobotMessages:                     _q.withRobotMessages.Clone(),
 		withRobotSessionInputs:                _q.withRobotSessionInputs.Clone(),
 		withInitiatedRobotTurns:               _q.withInitiatedRobotTurns.Clone(),
+		withCreatedTrails:                     _q.withCreatedTrails.Clone(),
+		withInitiatedTrailRuns:                _q.withInitiatedTrailRuns.Clone(),
 		withAccountRoles:                      _q.withAccountRoles.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
@@ -1934,6 +1984,28 @@ func (_q *AccountQuery) WithInitiatedRobotTurns(opts ...func(*RobotSessionTurnQu
 	return _q
 }
 
+// WithCreatedTrails tells the query-builder to eager-load the nodes that are connected to
+// the "created_trails" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithCreatedTrails(opts ...func(*TrailQuery)) *AccountQuery {
+	query := (&TrailClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withCreatedTrails = query
+	return _q
+}
+
+// WithInitiatedTrailRuns tells the query-builder to eager-load the nodes that are connected to
+// the "initiated_trail_runs" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithInitiatedTrailRuns(opts ...func(*TrailRunQuery)) *AccountQuery {
+	query := (&TrailRunClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withInitiatedTrailRuns = query
+	return _q
+}
+
 // WithAccountRoles tells the query-builder to eager-load the nodes that are connected to
 // the "account_roles" edge. The optional arguments are used to configure the query builder of the edge.
 func (_q *AccountQuery) WithAccountRoles(opts ...func(*AccountRolesQuery)) *AccountQuery {
@@ -2023,7 +2095,7 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = _q.querySpec()
-		loadedTypes = [47]bool{
+		loadedTypes = [49]bool{
 			_q.withSessions != nil,
 			_q.withPlugins != nil,
 			_q.withEmails != nil,
@@ -2070,6 +2142,8 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 			_q.withRobotMessages != nil,
 			_q.withRobotSessionInputs != nil,
 			_q.withInitiatedRobotTurns != nil,
+			_q.withCreatedTrails != nil,
+			_q.withInitiatedTrailRuns != nil,
 			_q.withAccountRoles != nil,
 		}
 	)
@@ -2438,6 +2512,20 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 			func(n *Account, e *RobotSessionTurn) {
 				n.Edges.InitiatedRobotTurns = append(n.Edges.InitiatedRobotTurns, e)
 			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withCreatedTrails; query != nil {
+		if err := _q.loadCreatedTrails(ctx, query, nodes,
+			func(n *Account) { n.Edges.CreatedTrails = []*Trail{} },
+			func(n *Account, e *Trail) { n.Edges.CreatedTrails = append(n.Edges.CreatedTrails, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withInitiatedTrailRuns; query != nil {
+		if err := _q.loadInitiatedTrailRuns(ctx, query, nodes,
+			func(n *Account) { n.Edges.InitiatedTrailRuns = []*TrailRun{} },
+			func(n *Account, e *TrailRun) { n.Edges.InitiatedTrailRuns = append(n.Edges.InitiatedTrailRuns, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -3927,6 +4015,69 @@ func (_q *AccountQuery) loadInitiatedRobotTurns(ctx context.Context, query *Robo
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "initiated_by_account_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadCreatedTrails(ctx context.Context, query *TrailQuery, nodes []*Account, init func(*Account), assign func(*Account, *Trail)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(trail.FieldAccountID)
+	}
+	query.Where(predicate.Trail(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.CreatedTrailsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AccountID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadInitiatedTrailRuns(ctx context.Context, query *TrailRunQuery, nodes []*Account, init func(*Account), assign func(*Account, *TrailRun)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(trailrun.FieldInitiatedByID)
+	}
+	query.Where(predicate.TrailRun(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.InitiatedTrailRunsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.InitiatedByID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "initiated_by_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "initiated_by_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

@@ -101,6 +101,11 @@ func LeaseExpiresAt(v time.Time) predicate.RobotSession {
 	return predicate.RobotSession(sql.FieldEQ(FieldLeaseExpiresAt, v))
 }
 
+// OriginID applies equality check predicate on the "origin_id" field. It's identical to OriginIDEQ.
+func OriginID(v xid.ID) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldEQ(FieldOriginID, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.RobotSession {
 	return predicate.RobotSession(sql.FieldEQ(FieldCreatedAt, v))
@@ -629,6 +634,106 @@ func LeaseExpiresAtIsNil() predicate.RobotSession {
 // LeaseExpiresAtNotNil applies the NotNil predicate on the "lease_expires_at" field.
 func LeaseExpiresAtNotNil() predicate.RobotSession {
 	return predicate.RobotSession(sql.FieldNotNull(FieldLeaseExpiresAt))
+}
+
+// OriginKindEQ applies the EQ predicate on the "origin_kind" field.
+func OriginKindEQ(v OriginKind) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldEQ(FieldOriginKind, v))
+}
+
+// OriginKindNEQ applies the NEQ predicate on the "origin_kind" field.
+func OriginKindNEQ(v OriginKind) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNEQ(FieldOriginKind, v))
+}
+
+// OriginKindIn applies the In predicate on the "origin_kind" field.
+func OriginKindIn(vs ...OriginKind) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldIn(FieldOriginKind, vs...))
+}
+
+// OriginKindNotIn applies the NotIn predicate on the "origin_kind" field.
+func OriginKindNotIn(vs ...OriginKind) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNotIn(FieldOriginKind, vs...))
+}
+
+// OriginIDEQ applies the EQ predicate on the "origin_id" field.
+func OriginIDEQ(v xid.ID) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldEQ(FieldOriginID, v))
+}
+
+// OriginIDNEQ applies the NEQ predicate on the "origin_id" field.
+func OriginIDNEQ(v xid.ID) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNEQ(FieldOriginID, v))
+}
+
+// OriginIDIn applies the In predicate on the "origin_id" field.
+func OriginIDIn(vs ...xid.ID) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldIn(FieldOriginID, vs...))
+}
+
+// OriginIDNotIn applies the NotIn predicate on the "origin_id" field.
+func OriginIDNotIn(vs ...xid.ID) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNotIn(FieldOriginID, vs...))
+}
+
+// OriginIDGT applies the GT predicate on the "origin_id" field.
+func OriginIDGT(v xid.ID) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldGT(FieldOriginID, v))
+}
+
+// OriginIDGTE applies the GTE predicate on the "origin_id" field.
+func OriginIDGTE(v xid.ID) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldGTE(FieldOriginID, v))
+}
+
+// OriginIDLT applies the LT predicate on the "origin_id" field.
+func OriginIDLT(v xid.ID) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldLT(FieldOriginID, v))
+}
+
+// OriginIDLTE applies the LTE predicate on the "origin_id" field.
+func OriginIDLTE(v xid.ID) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldLTE(FieldOriginID, v))
+}
+
+// OriginIDContains applies the Contains predicate on the "origin_id" field.
+func OriginIDContains(v xid.ID) predicate.RobotSession {
+	vc := v.String()
+	return predicate.RobotSession(sql.FieldContains(FieldOriginID, vc))
+}
+
+// OriginIDHasPrefix applies the HasPrefix predicate on the "origin_id" field.
+func OriginIDHasPrefix(v xid.ID) predicate.RobotSession {
+	vc := v.String()
+	return predicate.RobotSession(sql.FieldHasPrefix(FieldOriginID, vc))
+}
+
+// OriginIDHasSuffix applies the HasSuffix predicate on the "origin_id" field.
+func OriginIDHasSuffix(v xid.ID) predicate.RobotSession {
+	vc := v.String()
+	return predicate.RobotSession(sql.FieldHasSuffix(FieldOriginID, vc))
+}
+
+// OriginIDIsNil applies the IsNil predicate on the "origin_id" field.
+func OriginIDIsNil() predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldIsNull(FieldOriginID))
+}
+
+// OriginIDNotNil applies the NotNil predicate on the "origin_id" field.
+func OriginIDNotNil() predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNotNull(FieldOriginID))
+}
+
+// OriginIDEqualFold applies the EqualFold predicate on the "origin_id" field.
+func OriginIDEqualFold(v xid.ID) predicate.RobotSession {
+	vc := v.String()
+	return predicate.RobotSession(sql.FieldEqualFold(FieldOriginID, vc))
+}
+
+// OriginIDContainsFold applies the ContainsFold predicate on the "origin_id" field.
+func OriginIDContainsFold(v xid.ID) predicate.RobotSession {
+	vc := v.String()
+	return predicate.RobotSession(sql.FieldContainsFold(FieldOriginID, vc))
 }
 
 // HasCreator applies the HasEdge predicate on the "creator" edge.

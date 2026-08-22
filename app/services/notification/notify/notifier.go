@@ -37,7 +37,7 @@ func New(
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
 		_, err := pubsub.SubscribeCommand(ctx, bus, "notify_job.send_notification", func(ctx context.Context, cmd *message.CommandSendNotification) error {
-			if err := n.notify(ctx, cmd.TargetID, cmd.SourceID, cmd.Event, cmd.Item); err != nil {
+			if err := n.notify(ctx, cmd.TargetID, cmd.SourceID, cmd.Event, cmd.Item, cmd.Target); err != nil {
 				logger.Error("failed to notify", slog.String("error", err.Error()))
 				return err
 			}
@@ -67,12 +67,13 @@ func (s *Notifier) notify(ctx context.Context,
 	sourceID opt.Optional[account.AccountID],
 	event notification.Event,
 	item *datagraph.Ref,
+	target opt.Optional[string],
 ) error {
 	itemref := opt.Map(opt.NewPtr(item), func(i datagraph.Ref) datagraph.ItemRef {
 		return &i
 	})
 
-	_, err := s.notifyWriter.Notification(ctx, targetID, event, itemref, sourceID)
+	_, err := s.notifyWriter.Notification(ctx, targetID, event, itemref, sourceID, target)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

@@ -18,6 +18,7 @@ type Notification struct {
 	Source opt.Optional[profile.Ref]
 	Time   time.Time
 	Read   bool
+	Target opt.Optional[string]
 }
 
 type Notifications []*Notification
@@ -33,6 +34,7 @@ type NotificationRef struct {
 	Source  opt.Optional[profile.Ref]
 	Time    time.Time
 	Read    bool
+	Target  opt.Optional[string]
 }
 
 type NotificationRefs []*NotificationRef
@@ -73,5 +75,6 @@ func Map(r *ent.Notification) (*NotificationRef, error) {
 		Source:  source,
 		Time:    r.CreatedAt,
 		Read:    r.Read,
+		Target:  opt.NewPtr(r.Target),
 	}, nil
 }

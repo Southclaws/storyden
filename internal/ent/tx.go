@@ -120,6 +120,16 @@ type Tx struct {
 	Setting *SettingClient
 	// Tag is the client for interacting with the Tag builders.
 	Tag *TagClient
+	// Trail is the client for interacting with the Trail builders.
+	Trail *TrailClient
+	// TrailAction is the client for interacting with the TrailAction builders.
+	TrailAction *TrailActionClient
+	// TrailActionRun is the client for interacting with the TrailActionRun builders.
+	TrailActionRun *TrailActionRunClient
+	// TrailRun is the client for interacting with the TrailRun builders.
+	TrailRun *TrailRunClient
+	// TrailSchedulerLease is the client for interacting with the TrailSchedulerLease builders.
+	TrailSchedulerLease *TrailSchedulerLeaseClient
 	// Warning is the client for interacting with the Warning builders.
 	Warning *WarningClient
 
@@ -306,6 +316,11 @@ func (tx *Tx) init() {
 	tx.Session = NewSessionClient(tx.config)
 	tx.Setting = NewSettingClient(tx.config)
 	tx.Tag = NewTagClient(tx.config)
+	tx.Trail = NewTrailClient(tx.config)
+	tx.TrailAction = NewTrailActionClient(tx.config)
+	tx.TrailActionRun = NewTrailActionRunClient(tx.config)
+	tx.TrailRun = NewTrailRunClient(tx.config)
+	tx.TrailSchedulerLease = NewTrailSchedulerLeaseClient(tx.config)
 	tx.Warning = NewWarningClient(tx.config)
 }
 

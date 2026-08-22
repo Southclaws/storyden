@@ -44,6 +44,7 @@ var (
 	PermissionManageModerationNotes    = Permission{`MANAGE_MODERATION_NOTES`}
 	PermissionUseRobots                = Permission{`USE_ROBOTS`}
 	PermissionManageRobots             = Permission{`MANAGE_ROBOTS`}
+	PermissionManageTrails             = Permission{`MANAGE_TRAILS`}
 	PermissionAdministrator            = Permission{`ADMINISTRATOR`}
 )
 
@@ -148,6 +149,8 @@ func NewPermission(__iNpUt__ string) (Permission, error) {
 		return PermissionUseRobots, nil
 	case string(`MANAGE_ROBOTS`):
 		return PermissionManageRobots, nil
+	case string(`MANAGE_TRAILS`):
+		return PermissionManageTrails, nil
 	case string(`ADMINISTRATOR`):
 		return PermissionAdministrator, nil
 	default:

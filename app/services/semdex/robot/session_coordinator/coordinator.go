@@ -330,19 +330,6 @@ func (c *Coordinator) prepareInput(
 	if err := c.agent.PrepareSession(ctx, robotRef, userID, sessionID); err != nil {
 		return nil, err
 	}
-	sessionXID, err := xid.FromString(sessionID)
-	if err != nil {
-		return nil, err
-	}
-	accountXID, err := xid.FromString(userID)
-	if err != nil {
-		return nil, err
-	}
-	robotSessionID := robotresource.SessionID(sessionXID)
-	accountID := account.AccountID(accountXID)
-	if err := c.sessions.EnsureView(ctx, robotSessionID, accountID); err != nil {
-		return nil, err
-	}
 	command := &CommandEnqueueMessage{
 		InputID:           inputID,
 		SessionID:         sessionID,
@@ -391,8 +378,7 @@ func (c *Coordinator) handleEnqueueMessage(ctx context.Context, command *Command
 	}
 
 	visible := opt.NewEmpty[*adksession.Event]()
-	visibleSource := command.Options.Source == robotservice.SourceInteractiveChat || command.Options.Source == robotservice.SourcePluginRPC
-	if visibleSource && !continuation && command.Content != nil && command.Content.Role == "user" {
+	if shouldProjectUserInput(command, continuation) {
 		visible = opt.New(&adksession.Event{
 			InvocationID: command.InputID.String(),
 			Author:       "user",
@@ -413,6 +399,19 @@ func (c *Coordinator) handleEnqueueMessage(ctx context.Context, command *Command
 		return nil
 	}
 	return c.bus.SendCommand(context.WithoutCancel(ctx), &CommandStartNextTurn{SessionID: command.SessionID})
+}
+
+func shouldProjectUserInput(command *CommandEnqueueMessage, continuation bool) bool {
+	if continuation || command.Content == nil || command.Content.Role != genai.RoleUser {
+		return false
+	}
+
+	switch command.Options.Source {
+	case robotservice.SourceInteractiveChat, robotservice.SourcePluginRPC, robotservice.SourceScheduled:
+		return true
+	default:
+		return false
+	}
 }
 
 func (c *Coordinator) scheduleSessionWake(sessionID string, runAt time.Time) {

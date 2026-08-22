@@ -32,6 +32,18 @@ test("robots is available as a built-in navigation item", () => {
   ]);
 });
 
+test("Trails is not part of the top-level navigation", () => {
+  assert.equal(DefaultNavigationConfig.items, [
+    { type: "categories" },
+    { type: "library" },
+    { type: "robots" },
+    { type: "collections" },
+    { type: "links" },
+    { type: "members" },
+    { type: "roles" },
+  ]);
+});
+
 test("built-in items may only appear once", () => {
   const result = NavigationConfigSchema.safeParse({
     items: [{ type: "categories" }, { type: "categories" }],

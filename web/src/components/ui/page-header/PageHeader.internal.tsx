@@ -11,6 +11,7 @@ import { Text } from "../text";
 export type PageHeaderProps = Omit<HTMLStyledProps<"header">, "title"> & {
   title: ReactNode;
   description?: ReactNode;
+  badge?: ReactNode;
   back?: ReactNode;
   navigation?: ReactNode;
   actions?: ReactNode;
@@ -19,6 +20,7 @@ export type PageHeaderProps = Omit<HTMLStyledProps<"header">, "title"> & {
 export function PageHeader({
   title,
   description,
+  badge,
   back,
   navigation,
   actions,
@@ -34,7 +36,10 @@ export function PageHeader({
         <div className={styles.heading}>
           {back}
           <div className={styles.titleGroup}>
-            <PageHeading>{title}</PageHeading>
+            <div className={styles.titleRow}>
+              <PageHeading>{title}</PageHeading>
+              {badge}
+            </div>
             {description && <Text variant="supporting">{description}</Text>}
           </div>
         </div>
