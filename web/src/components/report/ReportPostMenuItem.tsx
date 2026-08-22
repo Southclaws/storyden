@@ -1,5 +1,6 @@
 import { ProfileReference } from "@/api/openapi-schema";
 import * as Menu from "@/components/ui/menu";
+import { truncateText } from "@/utils/text";
 import { useDisclosure } from "@/utils/useDisclosure";
 
 import { ReportIcon } from "../ui/icons/Report";
@@ -38,18 +39,9 @@ export function ReportPostMenuItem({
         targetId={targetId}
         author={author}
         headline={headline}
-        body={body}
+        body={truncateText(body)}
         {...disclosure}
       />
     </>
   );
-}
-
-export function truncateBody(value: string | undefined, maxLength = 280) {
-  if (!value) return undefined;
-  const trimmed = value.trim();
-  if (trimmed.length <= maxLength) {
-    return trimmed;
-  }
-  return `${trimmed.slice(0, maxLength).trim()}…`;
 }

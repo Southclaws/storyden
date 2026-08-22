@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { RobotIcon } from "@/components/ui/icons/Robot";
 import { Card } from "@/components/ui/surface";
 import { HStack } from "@/styled-system/jsx";
+import { pluralise } from "@/utils/text";
 
 type Props = {
   robot: Robot;
@@ -11,7 +12,7 @@ type Props = {
 
 export function RobotCard({ robot, editHref = `/robots/${robot.id}` }: Props) {
   const toolsetCount = robot.toolsets.length;
-  const toolsetCountLabel = `${toolsetCount} Toolset${toolsetCount === 1 ? "" : "s"}`;
+  const toolsetCountLabel = `${toolsetCount} ${pluralise(toolsetCount, "Toolset")}`;
 
   return (
     <Card

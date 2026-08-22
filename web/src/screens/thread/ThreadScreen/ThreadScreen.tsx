@@ -31,6 +31,7 @@ import { LikeIcon, LikeSavedIcon } from "@/components/ui/icons/Like";
 import { PageHeading } from "@/components/ui/page-heading";
 import { VisibilityBadge } from "@/components/visibility/VisibilityBadge";
 import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
+import { pluralise } from "@/utils/text";
 
 import { Form, Props, useThreadScreen } from "./useThreadScreen";
 
@@ -211,9 +212,9 @@ export function ThreadScreen(props: Props) {
 
 function ThreadStats({ thread }: { thread: Thread }) {
   const likeCount = thread.likes.likes;
-  const likeLabel = likeCount === 1 ? "like" : "likes";
+  const likeLabel = pluralise(likeCount, "like");
   const replyCount = thread.reply_status.replies;
-  const replyLabel = replyCount === 1 ? "reply" : "replies";
+  const replyLabel = pluralise(replyCount, "reply", "replies");
 
   return (
     <HStack gap="4" color="text.subtle">

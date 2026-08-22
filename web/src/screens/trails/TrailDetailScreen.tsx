@@ -1,6 +1,7 @@
 "use client";
 
-import { formatDistanceToNowStrict } from "date-fns";
+import { Portal } from "@ark-ui/react";
+import Link from "next/link";
 import { useState } from "react";
 import { useSWRConfig } from "swr";
 
@@ -19,26 +20,21 @@ import {
   TrailMutableProps,
   TrailRun,
 } from "@/api/openapi-schema";
-import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { BackAction } from "@/components/site/Action/Back";
+import { MoreAction } from "@/components/site/Action/More";
 import { EmptyState } from "@/components/site/EmptyState";
 import { Unready } from "@/components/site/Unready";
 import { Button, ButtonGroup } from "@/components/ui/button";
-import { CardBox } from "@/components/ui/card-box";
-import { CalendarIcon } from "@/components/ui/icons/Calendar";
-import { RobotIcon } from "@/components/ui/icons/Robot";
-import { WarningIcon } from "@/components/ui/icons/Warning";
 import { LinkButton } from "@/components/ui/link-button";
+import * as Menu from "@/components/ui/menu";
 import { PageHeader } from "@/components/ui/page-header";
+import { SectionHeading } from "@/components/ui/section-heading";
 import { Text } from "@/components/ui/text";
-import { describeTrailSchedule, formatOccurrence } from "@/lib/trails";
-import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { pluralise } from "@/utils/text";
 
-import {
-  TrailActionRunStatusBadge,
-  TrailRunStatusBadge,
-  TrailStatusBadge,
-} from "./TrailStatusBadge";
+import { TrailOverview } from "./TrailOverview";
+import { TrailRunCard } from "./TrailRunCard";
 
 type RobotReference = {
   id: string;
@@ -153,71 +149,18 @@ export function TrailDetailView({
   const editable = trail.status !== "archived" && trail.status !== "finished";
 
   return (
-    <LStack gap="6" alignItems="stretch" minWidth="0">
+    <LStack gap="2" alignItems="stretch" minWidth="0">
       <PageHeader
         title={trail.name}
-        description={trail.description || undefined}
-        badge={<TrailStatusBadge status={trail.status} />}
         back={<BackAction fallbackHref="/robots/trails" />}
         actions={
-          <HStack
-            role="group"
-            aria-label="Trail actions"
-            flexWrap="wrap"
-            justifyContent="end"
-          >
-            {trail.status !== "archived" && (
-              <Button
-                variant="ghost"
-                intent="destructive"
-                disabled={busy}
-                onClick={() => onChangeState("archived")}
-              >
-                Archive
-              </Button>
-            )}
-
-            <ButtonGroup attached>
-              {trail.status === "active" ? (
-                <Button
-                  variant="outline"
-                  disabled={busy}
-                  onClick={() => onChangeState("paused")}
-                >
-                  Pause
-                </Button>
-              ) : trail.status === "paused" ? (
-                <Button
-                  variant="outline"
-                  disabled={busy}
-                  onClick={() => onChangeState("active")}
-                >
-                  Resume
-                </Button>
-              ) : null}
-
-              {editable ? (
-                <LinkButton
-                  variant="outline"
-                  href={`/robots/trails/${trail.id}/edit`}
-                >
-                  Edit
-                </LinkButton>
-              ) : (
-                <Button variant="outline" disabled>
-                  Edit
-                </Button>
-              )}
-
-              <Button
-                variant="solid"
-                disabled={busy || trail.status === "archived"}
-                onClick={onRunNow}
-              >
-                Run now
-              </Button>
-            </ButtonGroup>
-          </HStack>
+          <TrailActions
+            trail={trail}
+            editable={editable}
+            busy={busy}
+            onRunNow={onRunNow}
+            onChangeState={onChangeState}
+          />
         }
       />
 
@@ -231,9 +174,7 @@ export function TrailDetailView({
 
       <styled.section aria-labelledby="trail-run-history">
         <WStack alignItems="end" gap="3" mb="3">
-          <styled.h2 id="trail-run-history" fontSize="lg" fontWeight="semibold">
-            Run history
-          </styled.h2>
+          <SectionHeading id="trail-run-history">Run history</SectionHeading>
 
           {runs && runs.length > 0 && (
             <Text as="span" variant="metadata">
@@ -265,360 +206,151 @@ export function TrailDetailView({
   );
 }
 
-function TrailOverview({ trail }: { trail: Trail }) {
+function TrailActions({
+  trail,
+  editable,
+  busy,
+  onRunNow,
+  onChangeState,
+}: Pick<TrailDetailViewProps, "busy" | "onRunNow" | "onChangeState"> & {
+  trail: Trail;
+  editable: boolean;
+}) {
+  const canChangeState = trail.status === "active" || trail.status === "paused";
+  const canArchive = trail.status !== "archived";
+  const hasMenuActions = editable || canChangeState || canArchive;
+
   return (
-    <styled.section
-      aria-label="Trail details"
-      borderBottomWidth="thin"
-      borderColor="border.default"
-      paddingY="4"
-      paddingX={{ base: "0", sm: "1" }}
-    >
-      <styled.div
-        display="grid"
-        gridTemplateColumns={{
-          base: "minmax(0, 1fr) minmax(0, 1fr)",
-          md: "minmax(0, 1fr) auto auto",
-        }}
-        columnGap={{ base: "4", md: "8" }}
-        rowGap="3"
-        alignItems="start"
+    <>
+      <ButtonGroup
+        attached
+        role="group"
+        aria-label="Trail actions"
+        display={{ base: "flex", md: "none" }}
       >
-        <HStack
-          alignItems="start"
-          gap="3"
-          minWidth="0"
-          gridColumn={{ base: "1 / -1", md: "auto" }}
-        >
-          <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            width="9"
-            height="9"
-            flexShrink="0"
-            borderRadius="md"
-            background="background.inset"
-            color="text.muted"
-          >
-            <CalendarIcon width="4" height="4" />
-          </Box>
+        {hasMenuActions && (
+          <Menu.Root lazyMount positioning={{ placement: "bottom-end" }}>
+            <Menu.Trigger asChild>
+              <MoreAction
+                variant="outline"
+                aria-label="More Trail actions"
+                disabled={busy}
+              />
+            </Menu.Trigger>
 
-          <Box minWidth="0">
-            <Text
-              as="span"
-              variant="metadata"
-              fontWeight="bold"
-              textTransform="uppercase"
-              display="block"
-            >
-              Schedule
-            </Text>
-            <Text
-              as="span"
-              fontWeight="semibold"
-              overflowWrap="anywhere"
-              display="block"
-            >
-              {describeTrailSchedule(trail.trigger.schedule)}
-            </Text>
-            <Text as="span" variant="metadata" display="block">
-              {trail.trigger.schedule.timezone}
-            </Text>
-          </Box>
-        </HStack>
+            <Portal>
+              <Menu.Positioner>
+                <Menu.Content minW="36">
+                  {editable && (
+                    <Menu.Item value="edit" asChild>
+                      <Link href={`/robots/trails/${trail.id}/edit`}>Edit</Link>
+                    </Menu.Item>
+                  )}
 
-        <Occurrence
-          label="Last run"
-          value={trail.last_occurrence_at}
-          empty="Not run yet"
-        />
+                  {trail.status === "active" && (
+                    <Menu.Item
+                      value="pause"
+                      onClick={() => onChangeState("paused")}
+                    >
+                      Pause
+                    </Menu.Item>
+                  )}
 
-        <Occurrence
-          label="Next run"
-          value={trail.next_occurrence_at}
-          empty="No future run"
-          emphasis
-        />
-      </styled.div>
+                  {trail.status === "paused" && (
+                    <Menu.Item
+                      value="resume"
+                      onClick={() => onChangeState("active")}
+                    >
+                      Resume
+                    </Menu.Item>
+                  )}
 
-      <WStack alignItems="center" gap="4" flexWrap="wrap" marginTop="4">
-        <HStack gap="2" minWidth="0">
-          <Text as="span" variant="metadata" flexShrink="0">
-            Created by
-          </Text>
-          <MemberBadge
-            profile={trail.created_by}
-            size="xs"
-            name="handle"
-            as="link"
-          />
-        </HStack>
+                  {canArchive && canChangeState && <Menu.Separator />}
 
-        <Text as="span" variant="metadata" flexShrink="0">
-          {trail.actions.length} {pluralise(trail.actions.length, "action")}
-        </Text>
-      </WStack>
-    </styled.section>
-  );
-}
-
-function Occurrence({
-  label,
-  value,
-  empty,
-  emphasis = false,
-}: {
-  label: string;
-  value?: string;
-  empty: string;
-  emphasis?: boolean;
-}) {
-  return (
-    <Box minWidth="0">
-      <Text
-        as="span"
-        variant="metadata"
-        fontWeight="bold"
-        textTransform="uppercase"
-        display="block"
-      >
-        {label}
-      </Text>
-      {value ? (
-        <styled.time
-          dateTime={value}
-          fontSize="sm"
-          fontWeight={emphasis ? "semibold" : "normal"}
-          display="block"
-        >
-          {formatOccurrence(value)}
-        </styled.time>
-      ) : (
-        <Text as="span" variant="supporting" display="block">
-          {empty}
-        </Text>
-      )}
-    </Box>
-  );
-}
-
-function TrailRunCard({
-  run,
-  robotNames,
-  onCancelAction,
-}: {
-  run: TrailRun;
-  robotNames: ReadonlyMap<string, string>;
-  onCancelAction: TrailDetailViewProps["onCancelAction"];
-}) {
-  const occurrence = run.scheduled_for ?? run.createdAt;
-  const relativeOccurrence = formatDistanceToNowStrict(new Date(occurrence), {
-    addSuffix: true,
-  });
-  const runType = run.trigger.kind === "manual" ? "Manual" : "Scheduled";
-
-  return (
-    <CardBox
-      as="article"
-      id={`run-${run.id}`}
-      padding="0"
-      gap="0"
-      overflow="hidden"
-    >
-      <WStack alignItems="start" gap="4" padding="3">
-        <LStack gap="0.5" alignItems="start" minWidth="0">
-          <styled.h3 fontSize="sm" fontWeight="semibold">
-            <styled.time dateTime={occurrence}>
-              {relativeOccurrence}
-            </styled.time>
-          </styled.h3>
-
-          <Text as="span" variant="metadata">
-            {runType} run at{" "}
-            <styled.time dateTime={occurrence}>
-              {formatOccurrence(occurrence)}
-            </styled.time>
-          </Text>
-        </LStack>
-
-        <TrailRunStatusBadge status={run.status} />
-      </WStack>
-
-      {run.status === "skipped" ? (
-        <Text
-          padding="3"
-          borderTopWidth="thin"
-          borderColor="border.default"
-          variant="supporting"
-        >
-          Skipped while the scheduler was offline.
-        </Text>
-      ) : (
-        <styled.ul listStyle="none">
-          {run.actions.map((action) => (
-            <TrailActionRunRow
-              key={action.id}
-              run={run}
-              action={action}
-              showStatus={run.actions.length > 1}
-              robotNames={robotNames}
-              onCancelAction={onCancelAction}
-            />
-          ))}
-        </styled.ul>
-      )}
-    </CardBox>
-  );
-}
-
-function TrailActionRunRow({
-  run,
-  action,
-  showStatus,
-  robotNames,
-  onCancelAction,
-}: {
-  run: TrailRun;
-  action: TrailActionRun;
-  showStatus: boolean;
-  robotNames: ReadonlyMap<string, string>;
-  onCancelAction: TrailDetailViewProps["onCancelAction"];
-}) {
-  const robotAction =
-    action.action.action.type === "robot_run"
-      ? action.action.action
-      : undefined;
-  const invocation =
-    action.target?.type === "robot_run" ? action.target : undefined;
-  const output = invocation?.output;
-  const robotName = robotAction
-    ? (robotNames.get(robotAction.robot_ref) ?? "Robot invocation")
-    : "Trail action";
-
-  return (
-    <styled.li
-      borderTopWidth="thin"
-      borderColor="border.default"
-      padding="3"
-      minWidth="0"
-    >
-      <WStack alignItems="start" gap="3" flexWrap="wrap">
-        <HStack alignItems="start" gap="2" minWidth="0" flex="1">
-          <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            width="8"
-            height="8"
-            flexShrink="0"
-            borderRadius="md"
-            background="background.inset"
-            color="text.muted"
-          >
-            <RobotIcon width="4" height="4" />
-          </Box>
-
-          <LStack gap="0.5" alignItems="start" minWidth="0">
-            <Text as="span" fontWeight="semibold" overflowWrap="anywhere">
-              {robotName}
-            </Text>
-
-            {robotAction && (
-              <Text
-                as="span"
-                variant="metadata"
-                overflowWrap="anywhere"
-                lineClamp="2"
-              >
-                {robotAction.instruction}
-              </Text>
-            )}
-          </LStack>
-        </HStack>
-
-        {(showStatus || action.status === "running") && (
-          <HStack gap="2" flexShrink="0">
-            {showStatus && <TrailActionRunStatusBadge status={action.status} />}
-
-            {action.status === "running" && (
-              <Button
-                size="sm"
-                variant="ghost"
-                intent="destructive"
-                onClick={() => onCancelAction(run, action)}
-              >
-                Cancel
-              </Button>
-            )}
-          </HStack>
+                  {canArchive && (
+                    <Menu.Item
+                      value="archive"
+                      onClick={() => onChangeState("archived")}
+                    >
+                      Archive
+                    </Menu.Item>
+                  )}
+                </Menu.Content>
+              </Menu.Positioner>
+            </Portal>
+          </Menu.Root>
         )}
-      </WStack>
 
-      {(output?.summary || output?.attention || action.error || invocation) && (
-        <LStack
-          gap="2"
-          alignItems="stretch"
-          marginTop="3"
-          paddingLeft={{ base: "0", sm: "10" }}
-          minWidth="0"
+        <Button
+          variant="solid"
+          disabled={busy || trail.status === "archived"}
+          onClick={onRunNow}
         >
-          {output?.summary && (
-            <Text overflowWrap="anywhere">{output.summary}</Text>
-          )}
+          Run now
+        </Button>
+      </ButtonGroup>
 
-          {output?.attention && (
-            <HStack
-              alignItems="start"
-              gap="2"
-              borderWidth="thin"
-              borderColor="status.warning.border"
-              borderRadius="md"
-              background="status.warning.surface"
-              color="status.warning.content"
-              padding="2"
+      <HStack
+        role="group"
+        aria-label="Trail actions"
+        display={{ base: "none", md: "flex" }}
+        flexWrap="wrap"
+        justifyContent="end"
+      >
+        {canArchive && (
+          <Button
+            variant="ghost"
+            intent="destructive"
+            disabled={busy}
+            onClick={() => onChangeState("archived")}
+          >
+            Archive
+          </Button>
+        )}
+
+        <ButtonGroup attached>
+          {trail.status === "active" ? (
+            <Button
+              variant="outline"
+              disabled={busy}
+              onClick={() => onChangeState("paused")}
             >
-              <WarningIcon width="4" height="4" flexShrink="0" />
-              <LStack gap="0" alignItems="start" minWidth="0">
-                <Text as="span" fontWeight="semibold" color="current">
-                  {humanise(output.attention.reason)}
-                </Text>
-                <Text as="span" variant="supporting" color="current">
-                  {output.attention.message}
-                </Text>
-              </LStack>
-            </HStack>
-          )}
+              Pause
+            </Button>
+          ) : trail.status === "paused" ? (
+            <Button
+              variant="outline"
+              disabled={busy}
+              onClick={() => onChangeState("active")}
+            >
+              Resume
+            </Button>
+          ) : null}
 
-          {action.error && (
-            <Text color="status.danger.content" overflowWrap="anywhere">
-              {action.error}
-            </Text>
-          )}
-
-          {invocation && (
+          {editable ? (
             <LinkButton
-              href={`/robots/chats/${invocation.robot_session_id}`}
-              variant="subtle"
-              width="fit"
+              variant="outline"
+              href={`/robots/trails/${trail.id}/edit`}
             >
-              <RobotIcon />
-              View Robot session
+              Edit
             </LinkButton>
+          ) : (
+            <Button variant="outline" disabled>
+              Edit
+            </Button>
           )}
-        </LStack>
-      )}
-    </styled.li>
+
+          <Button
+            variant="solid"
+            disabled={busy || trail.status === "archived"}
+            onClick={onRunNow}
+          >
+            Run now
+          </Button>
+        </ButtonGroup>
+      </HStack>
+    </>
   );
-}
-
-function pluralise(count: number, singular: string): string {
-  return count === 1 ? singular : `${singular}s`;
-}
-
-function humanise(value: string): string {
-  const label = value.replaceAll("_", " ");
-  return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
 function writePayload(

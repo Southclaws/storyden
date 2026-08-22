@@ -1,5 +1,7 @@
 import { UIDataTypes, UIMessage, UIMessagePart, isToolUIPart } from "ai";
 
+import { capitalise } from "@/utils/text";
+
 import { RobotReference } from "./openapi-schema/robotReference";
 import { RobotSessionMessage } from "./openapi-schema/robotSessionMessage";
 import { RobotSessionMessageList } from "./openapi-schema/robotSessionMessageList";
@@ -74,10 +76,7 @@ export function getToolName(
     return "Confirmation";
   }
 
-  return rawName
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+  return rawName.split("_").map(capitalise).join(" ");
 }
 
 export function getRawToolName(part: { type: string }): string {

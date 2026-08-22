@@ -11,6 +11,7 @@ import { CategoryTree } from "@/lib/category/tree";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { linkOverlay } from "@/styled-system/patterns";
 import { getAssetURL } from "@/utils/asset";
+import { pluralise } from "@/utils/text";
 
 import { CategoryMenu } from "../CategoryMenu/CategoryMenu";
 
@@ -24,8 +25,11 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
 
   const hasSubcategories = category.children.length > 0;
 
-  const plural =
-    category.children.length === 1 ? "subcategory" : "subcategories";
+  const subcategoryLabel = pluralise(
+    category.children.length,
+    "subcategory",
+    "subcategories",
+  );
 
   return (
     <CardBox
@@ -78,14 +82,13 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
             <HStack gap="1" color="text.muted" fontSize="sm">
               <DiscussionIcon w="4" />
               <Text as="span" variant="metadata">
-                {category.postCount}{" "}
-                {category.postCount === 1 ? "thread" : "threads"}
+                {category.postCount} {pluralise(category.postCount, "thread")}
               </Text>
               {hasSubcategories && (
                 <HStack gap="1" color="text.muted" fontSize="sm">
                   <CategoryIcon w="4" />
                   <Text as="span" variant="metadata">
-                    {category.children.length} {plural}
+                    {category.children.length} {subcategoryLabel}
                   </Text>
                 </HStack>
               )}

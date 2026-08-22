@@ -35,6 +35,7 @@ import { switchRecipe } from "@/components/ui/switch/Switch.recipe";
 import { table } from "@/components/ui/table/Table.recipe";
 import { tabs } from "@/components/ui/tabs/Tabs.recipe";
 import { text } from "@/components/ui/text/Text.recipe";
+import { textarea } from "@/components/ui/textarea/Textarea.recipe";
 import { toggleGroup } from "@/components/ui/toggle-group/ToggleGroup.recipe";
 import { tooltip } from "@/components/ui/tooltip/Tooltip.recipe";
 import { dragTree } from "@/components/ui/tree-view/DragTree.recipe";
@@ -71,6 +72,12 @@ export default defineConfig({
       checkbox: [{ size: ["sm", "md", "lg"] }],
       combobox: [{ size: ["sm", "md", "lg"] }],
       input: [
+        {
+          size: ["sm", "md", "lg"],
+          variant: ["outline", "ghost", "inset"],
+        },
+      ],
+      textarea: [
         {
           size: ["sm", "md", "lg"],
           variant: ["outline", "ghost", "inset"],
@@ -201,6 +208,7 @@ export default defineConfig({
         input: input,
         multiSelectPicker: multiSelectPicker,
         text: text,
+        textarea: textarea,
         admonition: admonition,
         headingInput: headingInput,
         richCard: richCard,

@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ToolsetIcon } from "@/components/ui/icons/Toolset";
 import { Card } from "@/components/ui/surface";
 import { HStack, WStack } from "@/styled-system/jsx";
+import { pluralise } from "@/utils/text";
 
 export function RobotToolsetCard({ toolset }: { toolset: RobotToolset }) {
   const toolCount = toolset.tools.length;
@@ -22,12 +23,12 @@ export function RobotToolsetCard({ toolset }: { toolset: RobotToolset }) {
             {toolset.source}
           </Badge>
           <Badge size="sm" variant="outline">
-            {toolCount} tool{toolCount === 1 ? "" : "s"}
+            {toolCount} {pluralise(toolCount, "tool")}
           </Badge>
         </HStack>
         {toolset.usage_count > 0 && (
           <Badge size="sm" variant="subtle">
-            {toolset.usage_count} Robot{toolset.usage_count === 1 ? "" : "s"}
+            {toolset.usage_count} {pluralise(toolset.usage_count, "Robot")}
           </Badge>
         )}
       </WStack>

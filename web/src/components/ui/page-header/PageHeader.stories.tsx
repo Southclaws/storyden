@@ -15,7 +15,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "The canonical top-of-page composition for a page heading, optional supporting text, return or breadcrumb navigation, and a small action group. Supporting text must add decision-relevant context; omit it when the title and page content already explain the task. Breadcrumbs describe hierarchy; BackAction describes a return path.",
+          "The canonical top-of-page composition for a page heading, optional supporting text, return or breadcrumb navigation, and a small action group. Use it instead of building a feature-local header row from Flex, Grid, or Stack. Actions remain aligned with the first title line while long identity wraps into the available space. Supporting text must add decision-relevant context; omit it when the title and page content already explain the task. Breadcrumbs describe hierarchy; BackAction describes a return path.",
       },
     },
   },
@@ -78,7 +78,7 @@ export const LongIdentity: Story = {
     docs: {
       description: {
         story:
-          "Long unbroken titles and descriptions wrap inside the available heading space. The return action stays aligned with the first title line and the primary action remains usable.",
+          "Long unbroken titles and descriptions wrap inside the available heading space. The return action and primary action stay aligned with the first title line at every width.",
       },
     },
   },

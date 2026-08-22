@@ -1,8 +1,7 @@
-import { formatDistanceToNow } from "date-fns";
-
 import { CardBox } from "@/components/ui/card-box";
+import { RelativeTime } from "@/components/ui/relative-time";
 import { Text } from "@/components/ui/text";
-import { Box, Flex, HStack, styled } from "@/styled-system/jsx";
+import { Box, Flex, HStack } from "@/styled-system/jsx";
 
 import { BanIcon } from "../ui/icons/BanIcon";
 
@@ -43,11 +42,7 @@ export function ProfileSuspendedBanner({ date }: Props) {
           wordBreak="keep-all"
         >
           This member was suspended&nbsp;
-          <styled.time textWrap="nowrap">
-            {formatDistanceToNow(date, {
-              addSuffix: true,
-            })}
-          </styled.time>
+          <RelativeTime value={date} textWrap="nowrap" />
         </Text>
       </Flex>
     </CardBox>

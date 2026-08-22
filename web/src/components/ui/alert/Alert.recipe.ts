@@ -39,4 +39,31 @@ export const alert = defineSlotRecipe({
       lineHeight: "1.25rem",
     },
   },
+  variants: {
+    tone: {
+      danger: statusTone("danger"),
+      info: statusTone("info"),
+      success: statusTone("success"),
+      warning: statusTone("warning"),
+    },
+  },
 });
+
+function statusTone(status: "danger" | "info" | "success" | "warning") {
+  return {
+    root: {
+      background: `status.${status}.surface`,
+      borderColor: `status.${status}.border`,
+      color: `status.${status}.content`,
+    },
+    description: {
+      color: `status.${status}.content`,
+    },
+    icon: {
+      color: `status.${status}.content`,
+    },
+    title: {
+      color: `status.${status}.content`,
+    },
+  } as const;
+}

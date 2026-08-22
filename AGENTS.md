@@ -24,6 +24,8 @@ Use this as an index, then open only the docs needed for the work at hand.
   - `docs/architecture/` for deeper architecture notes when needed.
   - `internal/config/config.yaml` for runtime configuration surface.
 - Frontend and design system (`web`):
+  - Read `web/AGENTS.md` before editing frontend code. Its Storybook and
+    component-reuse rules are the required frontend entrypoint.
   - `web/panda.config.ts` for Panda setup, tokens, recipes, patterns, and conditions.
   - `web/src/theme/` and `web/src/app/global.css` for semantic tokens and global styling rules.
   - `web/src/app/(dashboard)/**/README.md` for route/domain intent.

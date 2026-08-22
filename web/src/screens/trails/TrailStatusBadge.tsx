@@ -3,28 +3,14 @@ import {
   TrailRunStatus,
   TrailStatus,
 } from "@/api/openapi-schema";
-import { Badge } from "@/components/ui/badge";
+import {
+  StatusBadge,
+  type StatusBadgeTone,
+} from "@/components/ui/status-badge";
 
 type StatusPresentation = {
   label: string;
-  borderColor:
-    | "border.default"
-    | "status.danger.border"
-    | "status.info.border"
-    | "status.success.border"
-    | "status.warning.border";
-  backgroundColor:
-    | "background.controlDisabled"
-    | "status.danger.surface"
-    | "status.info.surface"
-    | "status.success.surface"
-    | "status.warning.surface";
-  color:
-    | "status.danger.content"
-    | "status.info.content"
-    | "status.success.content"
-    | "status.warning.content"
-    | "text.muted";
+  tone: StatusBadgeTone;
 };
 
 const TRAIL_STATUS: Record<TrailStatus, StatusPresentation> = {
@@ -56,11 +42,11 @@ const TRAIL_ACTION_RUN_STATUS: Record<
 };
 
 export function TrailStatusBadge({ status }: { status: TrailStatus }) {
-  return <StatusBadge presentation={TRAIL_STATUS[status]} />;
+  return <MappedStatusBadge presentation={TRAIL_STATUS[status]} />;
 }
 
 export function TrailRunStatusBadge({ status }: { status: TrailRunStatus }) {
-  return <StatusBadge presentation={TRAIL_RUN_STATUS[status]} />;
+  return <MappedStatusBadge presentation={TRAIL_RUN_STATUS[status]} />;
 }
 
 export function TrailActionRunStatusBadge({
@@ -68,63 +54,52 @@ export function TrailActionRunStatusBadge({
 }: {
   status: TrailActionRunStatus;
 }) {
-  return <StatusBadge presentation={TRAIL_ACTION_RUN_STATUS[status]} />;
+  return <MappedStatusBadge presentation={TRAIL_ACTION_RUN_STATUS[status]} />;
 }
 
-function StatusBadge({ presentation }: { presentation: StatusPresentation }) {
+function MappedStatusBadge({
+  presentation,
+}: {
+  presentation: StatusPresentation;
+}) {
   return (
-    <Badge
-      size="sm"
-      borderColor={presentation.borderColor}
-      backgroundColor={presentation.backgroundColor}
-      color={presentation.color}
-    >
+    <StatusBadge size="sm" tone={presentation.tone}>
       {presentation.label}
-    </Badge>
+    </StatusBadge>
   );
 }
 
 function success(label: string): StatusPresentation {
   return {
     label,
-    borderColor: "status.success.border",
-    backgroundColor: "status.success.surface",
-    color: "status.success.content",
+    tone: "success",
   };
 }
 
 function info(label: string): StatusPresentation {
   return {
     label,
-    borderColor: "status.info.border",
-    backgroundColor: "status.info.surface",
-    color: "status.info.content",
+    tone: "info",
   };
 }
 
 function warning(label: string): StatusPresentation {
   return {
     label,
-    borderColor: "status.warning.border",
-    backgroundColor: "status.warning.surface",
-    color: "status.warning.content",
+    tone: "warning",
   };
 }
 
 function danger(label: string): StatusPresentation {
   return {
     label,
-    borderColor: "status.danger.border",
-    backgroundColor: "status.danger.surface",
-    color: "status.danger.content",
+    tone: "danger",
   };
 }
 
 function neutral(label: string): StatusPresentation {
   return {
     label,
-    borderColor: "border.default",
-    backgroundColor: "background.controlDisabled",
-    color: "text.muted",
+    tone: "neutral",
   };
 }

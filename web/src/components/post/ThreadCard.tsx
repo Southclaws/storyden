@@ -11,6 +11,7 @@ import { Box, HStack, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 import { timestamp } from "@/utils/date";
 import { hasPermission } from "@/utils/permissions";
+import { pluralise } from "@/utils/text";
 
 import { CategoryBadge } from "../category/CategoryBadge";
 import { PostReviewBadge } from "../thread/PostReviewBadge";
@@ -46,8 +47,7 @@ export const ThreadReferenceCard = memo(
 
     const hasReplied = thread.reply_status.replied > 0;
     const replyCount = thread.reply_status.replies;
-    const replyCountLabel =
-      replyCount === 1 ? `1 reply` : `${replyCount} replies`;
+    const replyCountLabel = `${replyCount} ${pluralise(replyCount, "reply", "replies")}`;
 
     const replyStatusLabel = hasReplied
       ? `${replyCountLabel} (including you!)`
@@ -57,7 +57,7 @@ export const ThreadReferenceCard = memo(
     const lastReadAt = thread.read_status?.last_read_at;
     const newRepliesLabel =
       newRepliesCount > 0 && lastReadAt
-        ? `${newRepliesCount} ${newRepliesCount === 1 ? "reply" : "replies"} since you last visited ${timestamp(lastReadAt, false)} ago`
+        ? `${newRepliesCount} ${pluralise(newRepliesCount, "reply", "replies")} since you last visited ${timestamp(lastReadAt, false)} ago`
         : undefined;
 
     const isInReview = thread.visibility === Visibility.review;

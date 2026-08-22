@@ -1,6 +1,5 @@
 "use client";
 
-import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -14,8 +13,9 @@ import { UnreadyBanner } from "@/components/site/Unready";
 import { CardBox } from "@/components/ui/card-box";
 import { LinkButton } from "@/components/ui/link-button";
 import { PageHeading } from "@/components/ui/page-heading";
+import { RelativeTime } from "@/components/ui/relative-time";
 import { Text } from "@/components/ui/text";
-import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
+import { HStack, LStack, VStack, WStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 export function RobotSessionListScreen() {
@@ -94,19 +94,17 @@ type RobotSessionCardProps = {
 };
 
 function RobotSessionCard({ session }: RobotSessionCardProps) {
-  const timeAgo = formatDistanceToNow(new Date(session.createdAt), {
-    addSuffix: true,
-  });
-
   return (
     <CardBox>
       <Link href={`/robots/chats/${session.id}`}>
         <LStack gap="2">
           <WStack alignItems="center">
             <Text variant="supporting">{session.name}</Text>
-            <styled.time fontSize="xs" color="text.subtle">
-              {timeAgo}
-            </styled.time>
+            <RelativeTime
+              value={session.createdAt}
+              fontSize="xs"
+              color="text.subtle"
+            />
           </WStack>
 
           <WStack>

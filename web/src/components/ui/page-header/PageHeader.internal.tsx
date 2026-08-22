@@ -34,7 +34,7 @@ export function PageHeader({
       {navigation && <div className={styles.navigation}>{navigation}</div>}
       <div className={styles.row}>
         <div className={styles.heading}>
-          {back}
+          {back && <div className={styles.back}>{back}</div>}
           <div className={styles.titleGroup}>
             <div className={styles.titleRow}>
               <PageHeading>{title}</PageHeading>

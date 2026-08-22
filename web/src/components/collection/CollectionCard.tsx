@@ -3,6 +3,7 @@ import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/surface";
 import { HStack, WStack } from "@/styled-system/jsx";
+import { pluralise } from "@/utils/text";
 
 import { CollectionIcon } from "../ui/icons/Collection";
 
@@ -44,7 +45,7 @@ export function CollectionCard({ collection, hideOwner }: Props) {
 }
 
 function CollectionItems(props: Props) {
-  const itemsLabel = props.collection.item_count === 1 ? "item" : "items";
+  const itemsLabel = pluralise(props.collection.item_count, "item");
   return (
     <Badge size="sm">
       <CollectionIcon />{" "}

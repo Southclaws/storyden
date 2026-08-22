@@ -20,7 +20,8 @@ import { useConfirmation } from "@/components/site/useConfirmation";
 import { Button } from "@/components/ui/button";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { Text } from "@/components/ui/text";
-import { Box, Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { Textarea } from "@/components/ui/textarea";
+import { Box, Flex, HStack, LStack, WStack } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
 
 type ModeratorNotesPanelProps = {
@@ -88,18 +89,13 @@ export function ModeratorNotesPanel({
     <LStack gap="2" minW="0">
       {canManageModerationNotes && (
         <LStack gap="1">
-          <styled.textarea
+          <Textarea
             value={noteDraft}
             onChange={(e) => setNoteDraft(e.target.value)}
             placeholder="Add an internal moderator note…"
             aria-label="Internal moderator note"
             rows={3}
             maxLength={2000}
-            borderWidth="thin"
-            borderRadius="sm"
-            p="2"
-            fontSize="sm"
-            w="full"
           />
           <WStack justifyContent="end">
             <Button

@@ -22,6 +22,7 @@ import { css } from "@/styled-system/css";
 import { Box, Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { cardBox } from "@/styled-system/recipes";
+import { pluralise } from "@/utils/text";
 
 import {
   ALL_EMAIL_STATUSES,
@@ -203,10 +204,7 @@ function EmailItem({
     ? `${email.recipient_name} <${email.recipient_address}>`
     : email.recipient_address;
 
-  const attemptCountLabel =
-    email.attempts.length === 1
-      ? "1 delivery attempt"
-      : `${email.attempts.length} delivery attempts`;
+  const attemptCountLabel = `${email.attempts.length} delivery ${pluralise(email.attempts.length, "attempt")}`;
   const attempts = [...email.attempts].reverse();
 
   return (

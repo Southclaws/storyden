@@ -11,7 +11,8 @@ import { ProfileReference } from "@/api/openapi-schema";
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
-import { HStack, VStack, styled } from "@/styled-system/jsx";
+import { Textarea } from "@/components/ui/textarea";
+import { HStack, VStack } from "@/styled-system/jsx";
 import { useDisclosure } from "@/utils/useDisclosure";
 
 type MemberWarningTriggerProps = {
@@ -68,16 +69,11 @@ export function MemberWarningTrigger({
           <Text variant="supporting">
             Warnings are recorded for internal moderation history.
           </Text>
-          <styled.textarea
+          <Textarea
             rows={5}
             value={reason}
             onChange={(e) => setReason(e.currentTarget.value)}
             placeholder="Clear, specific reason for this warning"
-            width="full"
-            borderWidth="thin"
-            borderRadius="sm"
-            borderColor="border.default"
-            padding="2"
           />
 
           <HStack w="full">

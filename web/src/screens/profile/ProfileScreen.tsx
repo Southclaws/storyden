@@ -1,7 +1,5 @@
 "use client";
 
-import { formatDistanceToNow } from "date-fns";
-
 import { ContentComposerField } from "@/components/content/ContentComposer";
 import { MemberAvatar } from "@/components/member/MemberBadge/MemberAvatar";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
@@ -18,6 +16,7 @@ import { Unready } from "@/components/site/Unready";
 import { CardBox } from "@/components/ui/card-box";
 import { LikeIcon } from "@/components/ui/icons/Like";
 import { Input } from "@/components/ui/input";
+import { RelativeTime } from "@/components/ui/relative-time";
 import { Text } from "@/components/ui/text";
 import { Box, Flex, HStack, LStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
@@ -112,11 +111,7 @@ export function ProfileScreen(props: Props) {
           <HStack gap="1">
             <Text variant="supporting" wordBreak="keep-all">
               Joined{" "}
-              <styled.time textWrap="nowrap">
-                {formatDistanceToNow(new Date(profile.createdAt), {
-                  addSuffix: true,
-                })}
-              </styled.time>
+              <RelativeTime value={profile.createdAt} textWrap="nowrap" />
             </Text>
             <DotSeparator />
             <HStack

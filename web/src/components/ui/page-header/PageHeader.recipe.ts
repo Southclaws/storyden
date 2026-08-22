@@ -7,6 +7,7 @@ export const pageHeader = defineSlotRecipe({
     "navigation",
     "row",
     "heading",
+    "back",
     "titleGroup",
     "titleRow",
     "actions",
@@ -33,7 +34,7 @@ export const pageHeader = defineSlotRecipe({
       alignItems: "start",
       justifyContent: "space-between",
       gap: "2",
-      flexDirection: { base: "column", md: "row" },
+      flexDirection: "row",
     },
     heading: {
       display: "flex",
@@ -41,6 +42,11 @@ export const pageHeader = defineSlotRecipe({
       minWidth: "0",
       alignItems: "start",
       gap: "1",
+    },
+    back: {
+      display: "flex",
+      flex: "none",
+      marginTop: "1",
     },
     titleGroup: {
       display: "flex",
@@ -62,7 +68,7 @@ export const pageHeader = defineSlotRecipe({
       display: "flex",
       flex: "none",
       alignItems: "center",
-      alignSelf: { base: "end", md: "start" },
+      alignSelf: "start",
       flexWrap: "wrap",
       justifyContent: "end",
       gap: "1",

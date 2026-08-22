@@ -17,6 +17,7 @@ import { AddIcon } from "@/components/ui/icons/Add";
 import { MetaGrid, MetaItem } from "@/components/ui/meta-grid";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Text } from "@/components/ui/text";
+import { formatOAuthGrant } from "@/lib/auth/oauth";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { cardBox } from "@/styled-system/recipes";
@@ -159,7 +160,7 @@ function OAuthClientItem({ client, onDelete }: OAuthClientItemProps) {
           </MetaItem>
           <MetaItem label="Type">{client.type}</MetaItem>
           <MetaItem label="Grants">
-            {client.allowed_grants.map(formatGrant).join(", ")}
+            {client.allowed_grants.map(formatOAuthGrant).join(", ")}
           </MetaItem>
         </MetaGrid>
 
@@ -304,24 +305,4 @@ function ConfirmActions({
       {idleLabel}
     </Button>
   );
-}
-
-function formatGrant(grant: string) {
-  if (grant === "client_credentials") {
-    return "client credentials";
-  }
-
-  if (grant === "authorization_code") {
-    return "authorization code";
-  }
-
-  if (grant === "refresh_token") {
-    return "refresh token";
-  }
-
-  if (grant.includes("device_code")) {
-    return "device code";
-  }
-
-  return grant;
 }

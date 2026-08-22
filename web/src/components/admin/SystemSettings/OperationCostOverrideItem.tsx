@@ -5,8 +5,7 @@ import { NumberInput } from "@/components/ui/number-input";
 import { Text } from "@/components/ui/text";
 import { HStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
-
-import { formatSeconds } from "./useSystemSettings";
+import { formatSeconds } from "@/utils/date";
 
 type OperationCostOverrideItemProps = {
   operationId: string;

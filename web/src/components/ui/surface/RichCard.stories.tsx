@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
+import { pluralise } from "@/utils/text";
+
 import { Badge } from "../badge";
 import { IconButton } from "../icon-button";
 import { MoreIcon } from "../icons/More";
@@ -165,7 +167,7 @@ export const GridCounts: Story = {
         return (
           <section key={count}>
             <SectionHeading>
-              {count} {count === 1 ? "card" : "cards"}
+              {count} {pluralise(count, "card")}
             </SectionHeading>
             <Text variant="supporting" marginBottom="2">
               Balanced as {gridLayouts[index]}.

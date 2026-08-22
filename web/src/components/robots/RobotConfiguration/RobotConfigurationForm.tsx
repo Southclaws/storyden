@@ -17,6 +17,7 @@ import {
   MultiSelectPickerItem,
 } from "@/components/ui/multi-select-picker";
 import { Text } from "@/components/ui/text";
+import { Textarea } from "@/components/ui/textarea";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { useDisclosure } from "@/utils/useDisclosure";
@@ -166,26 +167,13 @@ export function RobotConfigurationForm(props: Props) {
 
         <FormControl>
           <FormLabel>Playbook</FormLabel>
-          <styled.textarea
+          <Textarea
             {...form.register("playbook")}
             aria-label="Playbook"
             placeholder="Instructions for the robot..."
             rows={12}
-            w="full"
             minH="48"
-            p="3"
             fontFamily="mono"
-            fontSize="sm"
-            lineHeight="relaxed"
-            borderWidth="thin"
-            borderStyle="solid"
-            borderColor="border.default"
-            borderRadius="sm"
-            resize="vertical"
-            _focus={{
-              outline: "none",
-              borderColor: "accent.solid",
-            }}
           />
           <FormErrorText>
             {form.formState.errors.playbook?.message}

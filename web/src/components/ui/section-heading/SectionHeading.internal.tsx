@@ -9,6 +9,19 @@ export const SectionHeading = styled(
       fontWeight: "bold",
       lineHeight: "normal",
     },
+    variants: {
+      emphasis: {
+        strong: {
+          color: "text.default",
+          fontSize: "lg",
+          fontWeight: "semibold",
+        },
+        subtle: {},
+      },
+    },
+    defaultVariants: {
+      emphasis: "subtle",
+    },
   },
   {
     defaultProps: {

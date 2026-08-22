@@ -1,6 +1,5 @@
 "use client";
 
-import { formatDistanceToNow } from "date-fns";
 import { type CSSProperties, useEffect } from "react";
 
 import { useRobotSessionGet } from "@/api/openapi-client/robots";
@@ -17,8 +16,9 @@ import {
 } from "@/components/site/CommandPalette/RobotChat/RobotChatContext";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { PageHeading } from "@/components/ui/page-heading";
+import { RelativeTime } from "@/components/ui/relative-time";
 import { css } from "@/styled-system/css";
-import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { HStack, LStack, WStack } from "@/styled-system/jsx";
 import { token } from "@/styled-system/tokens";
 
 type Props = {
@@ -149,10 +149,6 @@ function ChatPageHeader({
 }
 
 function StatusText({ session }: { session: RobotSession }) {
-  const timeAgo = formatDistanceToNow(new Date(session.createdAt), {
-    addSuffix: true,
-  });
-
   return (
     <HStack color="text.subtle" fontSize="xs" gap="1">
       <span>chat started by</span>
@@ -162,7 +158,7 @@ function StatusText({ session }: { session: RobotSession }) {
         size="xs"
         name="handle"
       />
-      <styled.time>{timeAgo}</styled.time>
+      <RelativeTime value={session.createdAt} />
     </HStack>
   );
 }

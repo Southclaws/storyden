@@ -4,7 +4,7 @@ import { createListCollection } from "@ark-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
 
 import { useRobotsList } from "@/api/openapi-client/robots";
@@ -20,21 +20,22 @@ import {
   TrailMutableProps,
 } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";
-import { CardBox } from "@/components/ui/card-box";
 import { ComboboxField } from "@/components/ui/combobox";
-import { DatePickerField } from "@/components/ui/date-picker";
 import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
 import { Input } from "@/components/ui/input";
-import { NumberInputField } from "@/components/ui/number-input";
+import { SectionHeading } from "@/components/ui/section-heading";
 import { SelectField } from "@/components/ui/select";
 import { Text } from "@/components/ui/text";
 import { ToggleGroupField } from "@/components/ui/toggle-group";
 import { describeTrailSchedule, formatOccurrence } from "@/lib/trails";
-import { Box, Grid, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { Box, Grid, HStack, LStack, styled } from "@/styled-system/jsx";
+import { capitalise, humanise } from "@/utils/text";
 
+import { TrailRobotActionField } from "./TrailRobotActionField";
+import { TrailScheduleFields } from "./TrailScheduleFields";
 import {
   TrailFormSchema,
   TrailFormValues,
@@ -73,32 +74,6 @@ const cadenceCollection = createListCollection({
   ],
 });
 
-const intervalUnitCollection = createListCollection({
-  items: [
-    { label: "Hours", value: "hours" },
-    { label: "Days", value: "days" },
-  ],
-});
-
-const monthCollection = createListCollection({
-  items: Array.from({ length: 12 }, (_, index) => ({
-    label: new Intl.DateTimeFormat(undefined, { month: "long" }).format(
-      new Date(2000, index, 1),
-    ),
-    value: String(index + 1),
-  })),
-});
-
-const monthDayCollection = createListCollection({
-  items: [
-    { label: "Last day", value: "last" },
-    ...Array.from({ length: 31 }, (_, index) => ({
-      label: String(index + 1),
-      value: String(index + 1),
-    })),
-  ],
-});
-
 const weekdayItems = weekdays.map((day) => ({
   label: day.slice(0, 3),
   value: day,
@@ -109,10 +84,7 @@ export function TrailEditor({ trail, onSaved }: Props) {
   const router = useRouter();
   const { mutate } = useSWRConfig();
   const robots = useRobotsList();
-  const initialValue = useMemo(
-    () => (trail ? mutableTrailValue(trail) : undefined),
-    [trail],
-  );
+  const initialValue = trail ? mutableTrailValue(trail) : undefined;
 
   async function save(payload: TrailMutableProps) {
     const saved = trail
@@ -219,14 +191,7 @@ export function TrailEditorForm({
   }
 
   return (
-    <styled.form
-      display="flex"
-      flexDirection="column"
-      gap="8"
-      maxW="3xl"
-      width="full"
-      onSubmit={save}
-    >
+    <LStack as="form" gap="8" alignItems="stretch" maxW="3xl" onSubmit={save}>
       <LStack gap="4" alignItems="stretch">
         <FormControl>
           <FormLabel>Name</FormLabel>
@@ -308,7 +273,7 @@ export function TrailEditorForm({
           </FormControl>
         )}
 
-        <ScheduleFields form={form} scheduleKind={scheduleKind} />
+        <TrailScheduleFields form={form} scheduleKind={scheduleKind} />
 
         <Box>
           <Button
@@ -351,87 +316,16 @@ export function TrailEditorForm({
         description="Each Robot receives the same trigger and runs independently with a fresh session."
       >
         {actions.fields.map((action, index) => (
-          <CardBox as="section" key={action.id}>
-            <LStack gap="4" alignItems="stretch">
-              <WStack alignItems="center">
-                <Text fontWeight="semibold">Robot action {index + 1}</Text>
-                {actions.fields.length > 1 && (
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => actions.remove(index)}
-                  >
-                    Remove
-                  </Button>
-                )}
-              </WStack>
-
-              <FormControl>
-                <FormLabel>Robot</FormLabel>
-                <ComboboxField
-                  control={form.control}
-                  name={`actions.${index}.robot_ref`}
-                  items={robotItems}
-                  placeholder={
-                    robotsLoading ? "Loading Robots..." : "Search Robots"
-                  }
-                  ariaLabel={`Robot action ${index + 1}`}
-                  disabled={robotsLoading || robots.length === 0}
-                />
-                {robotsError ? (
-                  <FormErrorText>{robotsError}</FormErrorText>
-                ) : robots.length === 0 && !robotsLoading ? (
-                  <FormHelperText>
-                    Create a Robot before adding it to this Trail.
-                  </FormHelperText>
-                ) : (
-                  <FormHelperText>
-                    This Robot runs unattended for every occurrence.
-                  </FormHelperText>
-                )}
-                <FormErrorText>
-                  {form.formState.errors.actions?.[index]?.robot_ref?.message}
-                </FormErrorText>
-              </FormControl>
-
-              <FormControl>
-                <FormLabel>Instruction</FormLabel>
-                <Controller
-                  control={form.control}
-                  name={`actions.${index}.instruction`}
-                  render={({ field }) => (
-                    <styled.textarea
-                      {...field}
-                      aria-label={`Unattended instruction ${index + 1}`}
-                      placeholder="Describe the result the Robot must produce on every run."
-                      rows={6}
-                      width="full"
-                      padding="3"
-                      fontSize="sm"
-                      lineHeight="relaxed"
-                      borderWidth="thin"
-                      borderStyle="solid"
-                      borderColor="border.default"
-                      borderRadius="sm"
-                      backgroundColor="background.control"
-                      resize="vertical"
-                      _focus={{
-                        outline: "none",
-                        borderColor: "accent.solid",
-                      }}
-                    />
-                  )}
-                />
-                <FormHelperText>
-                  This fixed instruction starts a new unattended Robot session.
-                </FormHelperText>
-                <FormErrorText>
-                  {form.formState.errors.actions?.[index]?.instruction?.message}
-                </FormErrorText>
-              </FormControl>
-            </LStack>
-          </CardBox>
+          <TrailRobotActionField
+            key={action.id}
+            actions={actions}
+            form={form}
+            index={index}
+            robotItems={robotItems}
+            robotsAvailable={robots.length > 0}
+            robotsError={robotsError}
+            robotsLoading={robotsLoading ?? false}
+          />
         ))}
 
         <Box>
@@ -466,102 +360,7 @@ export function TrailEditorForm({
           {initialValue ? "Save changes" : "Create Trail"}
         </Button>
       </HStack>
-    </styled.form>
-  );
-}
-
-function ScheduleFields({
-  form,
-  scheduleKind,
-}: {
-  form: ReturnType<typeof useForm<TrailFormValues>>;
-  scheduleKind: TrailFormValues["scheduleKind"];
-}) {
-  return (
-    <Grid
-      gap="4"
-      gridTemplateColumns={{
-        base: "1fr",
-        sm: "repeat(2, minmax(0, 1fr))",
-        lg: "repeat(4, minmax(0, 1fr))",
-      }}
-    >
-      {scheduleKind !== "once" && (
-        <FormControl>
-          <FormLabel>Every</FormLabel>
-          <NumberInputField
-            control={form.control}
-            name="interval"
-            ariaLabel="Interval"
-            min={1}
-          />
-          <FormErrorText>
-            {form.formState.errors.interval?.message}
-          </FormErrorText>
-        </FormControl>
-      )}
-
-      {scheduleKind === "interval" && (
-        <FormControl>
-          <FormLabel>Unit</FormLabel>
-          <SelectField
-            control={form.control}
-            name="intervalUnit"
-            collection={intervalUnitCollection}
-            placeholder="Choose a unit"
-            positioning={{ sameWidth: true }}
-          />
-        </FormControl>
-      )}
-
-      {scheduleKind === "yearly" && (
-        <FormControl>
-          <FormLabel>Month</FormLabel>
-          <SelectField
-            control={form.control}
-            name="month"
-            collection={monthCollection}
-            placeholder="Choose a month"
-            positioning={{ sameWidth: true }}
-          />
-        </FormControl>
-      )}
-
-      {(scheduleKind === "monthly" || scheduleKind === "yearly") && (
-        <FormControl>
-          <FormLabel>Day</FormLabel>
-          <SelectField
-            control={form.control}
-            name="monthDay"
-            collection={monthDayCollection}
-            placeholder="Choose a day"
-            positioning={{ sameWidth: true }}
-          />
-        </FormControl>
-      )}
-
-      <FormControl>
-        <FormLabel>
-          {scheduleKind === "once" ? "Date" : "Starting date"}
-        </FormLabel>
-        <DatePickerField control={form.control} name="startDate" />
-        <FormErrorText>
-          {form.formState.errors.startDate?.message}
-        </FormErrorText>
-      </FormControl>
-
-      <FormControl>
-        <FormLabel>Local time</FormLabel>
-        <Input
-          {...form.register("localTime")}
-          aria-label="Local time"
-          type="time"
-        />
-        <FormErrorText>
-          {form.formState.errors.localTime?.message}
-        </FormErrorText>
-      </FormControl>
-    </Grid>
+    </LStack>
   );
 }
 
@@ -575,15 +374,13 @@ function FormSection({
   children: React.ReactNode;
 }) {
   return (
-    <styled.section display="flex" flexDirection="column" gap="4">
+    <LStack as="section" gap="4" alignItems="stretch">
       <Box maxW="layout.readable">
-        <styled.h2 fontSize="lg" fontWeight="semibold">
-          {title}
-        </styled.h2>
+        <SectionHeading emphasis="strong">{title}</SectionHeading>
         <Text variant="supporting">{description}</Text>
       </Box>
       {children}
-    </styled.section>
+    </LStack>
   );
 }
 
@@ -621,7 +418,7 @@ function getTimezoneItems(current: string) {
   return Array.from(timezones)
     .sort((a, b) => a.localeCompare(b))
     .map((timezone) => ({
-      label: timezone.replaceAll("_", " "),
+      label: humanise(timezone),
       value: timezone,
     }));
 }
@@ -638,10 +435,6 @@ function isScheduleField(name: string): boolean {
     "month",
     "monthDay",
   ].some((field) => name === field || name.startsWith(`${field}.`));
-}
-
-function capitalise(value: string): string {
-  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 function errorMessage(cause: unknown, fallback: string): string {

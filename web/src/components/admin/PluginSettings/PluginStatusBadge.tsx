@@ -1,5 +1,5 @@
 import { Plugin, PluginActiveState } from "@/api/openapi-schema";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 export function PluginStatusBadge({ plugin }: { plugin: Plugin }) {
   const activeState = plugin.status.active_state;
@@ -7,74 +7,44 @@ export function PluginStatusBadge({ plugin }: { plugin: Plugin }) {
   switch (activeState) {
     case PluginActiveState.active:
       return (
-        <Badge
-          size="sm"
-          borderColor="status.success.border"
-          backgroundColor="status.success.surface"
-          color="status.success.content"
-        >
+        <StatusBadge size="sm" tone="success">
           Active
-        </Badge>
+        </StatusBadge>
       );
 
     case PluginActiveState.inactive:
       return (
-        <Badge
-          size="sm"
-          borderColor="border.strong"
-          backgroundColor="background.controlDisabled"
-          color="text.subtle"
-        >
+        <StatusBadge size="sm" tone="neutral">
           Inactive
-        </Badge>
+        </StatusBadge>
       );
 
     case PluginActiveState.starting:
       return (
-        <Badge
-          size="sm"
-          borderColor="status.info.border"
-          backgroundColor="status.info.surface"
-          color="status.info.content"
-        >
+        <StatusBadge size="sm" tone="info">
           Starting
-        </Badge>
+        </StatusBadge>
       );
 
     case PluginActiveState.connecting:
       return (
-        <Badge
-          size="sm"
-          borderColor="status.info.border"
-          backgroundColor="status.info.surface"
-          color="status.info.content"
-        >
+        <StatusBadge size="sm" tone="info">
           Connecting
-        </Badge>
+        </StatusBadge>
       );
 
     case PluginActiveState.restarting:
       return (
-        <Badge
-          size="sm"
-          borderColor="status.warning.border"
-          backgroundColor="status.warning.surface"
-          color="status.warning.content"
-        >
+        <StatusBadge size="sm" tone="warning">
           Restarting
-        </Badge>
+        </StatusBadge>
       );
 
     case PluginActiveState.error:
       return (
-        <Badge
-          size="sm"
-          borderColor="status.danger.border"
-          backgroundColor="status.danger.surface"
-          color="status.danger.content"
-        >
+        <StatusBadge size="sm" tone="danger">
           Error
-        </Badge>
+        </StatusBadge>
       );
   }
 }

@@ -37,3 +37,4 @@ export * from './switch-recipe.mjs';
 export * from './tree-view.mjs';
 export * from './toggle-group.mjs';
 export * from './tooltip.mjs';
+export * from './textarea.mjs';

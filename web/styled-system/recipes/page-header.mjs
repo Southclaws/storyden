@@ -22,6 +22,10 @@ const pageHeaderSlotNames = [
     "page-header__heading"
   ],
   [
+    "back",
+    "page-header__back"
+  ],
+  [
     "titleGroup",
     "page-header__titleGroup"
   ],

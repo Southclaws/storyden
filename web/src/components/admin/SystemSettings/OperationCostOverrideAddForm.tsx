@@ -9,8 +9,7 @@ import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
 import { Text } from "@/components/ui/text";
 import { HStack, LStack, styled } from "@/styled-system/jsx";
-
-import { formatSeconds } from "./useSystemSettings";
+import { formatSeconds } from "@/utils/date";
 
 type OperationCostOverrideAddFormProps = {
   availableOperations: string[];

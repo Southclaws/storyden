@@ -24,6 +24,7 @@ import {
 } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 import { htmlToMarkdown } from "@/utils/markdown";
+import { pluralise, truncateText } from "@/utils/text";
 
 import { Timestamp } from "../../Timestamp";
 
@@ -436,7 +437,7 @@ function RobotThreadReferenceCard({
     thread.assets?.[0]?.path ?? thread.link?.primary_image?.path,
   );
   const replyCount = thread.reply_status.replies;
-  const replyLabel = replyCount === 1 ? "1 reply" : `${replyCount} replies`;
+  const replyLabel = `${replyCount} ${pluralise(replyCount, "reply", "replies")}`;
   const text = resourceSnippet(thread.description, thread.body);
 
   return (
@@ -476,7 +477,7 @@ function resourceSnippet(description?: string, body?: string) {
     return undefined;
   }
 
-  return value.length > 220 ? `${value.slice(0, 220).trim()}…` : value;
+  return truncateText(value, 220);
 }
 
 function RobotFallbackLinkCard({

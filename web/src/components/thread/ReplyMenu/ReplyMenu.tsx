@@ -4,10 +4,7 @@ import { Portal } from "@ark-ui/react";
 import { format } from "date-fns/format";
 
 import { DatagraphItemKind } from "@/api/openapi-schema";
-import {
-  ReportPostMenuItem,
-  truncateBody,
-} from "@/components/report/ReportPostMenuItem";
+import { ReportPostMenuItem } from "@/components/report/ReportPostMenuItem";
 import { MoreAction } from "@/components/site/Action/More";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { EditIcon } from "@/components/ui/icons/Edit";
@@ -66,7 +63,7 @@ export function ReplyMenu(props: Props) {
                 targetId={props.reply.id}
                 author={props.reply.author}
                 headline={`Reply from ${props.reply.author.name}`}
-                body={truncateBody(props.reply.body)}
+                body={props.reply.body}
               />
 
               {isEditingEnabled && (

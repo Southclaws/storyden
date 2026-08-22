@@ -1,4 +1,9 @@
-import { FormatDistanceToNowOptions, formatDistanceToNow } from "date-fns";
+import {
+  FormatDistanceToNowOptions,
+  formatDistanceToNow,
+  formatDuration,
+  intervalToDuration,
+} from "date-fns";
 
 const formatDistanceLocale = {
   lessThanXSeconds: "{{count}}s",
@@ -34,6 +39,13 @@ export const formatDistance = (
 export const formatDistanceDefaults: FormatDistanceToNowOptions = {
   locale: { formatDistance },
 };
+
+export function formatSeconds(seconds: number): string {
+  const duration = intervalToDuration({ start: 0, end: seconds * 1000 });
+  return formatDuration(duration, {
+    format: ["days", "hours", "minutes", "seconds"],
+  });
+}
 
 export function timestamp(date: string | number | Date, short = true) {
   try {

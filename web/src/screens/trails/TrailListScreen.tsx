@@ -1,6 +1,5 @@
 "use client";
 
-import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
@@ -13,8 +12,11 @@ import { CardBox } from "@/components/ui/card-box";
 import { RunningAnimatedIcon } from "@/components/ui/icons/RunningAnimatedIcon";
 import { TrailIcon } from "@/components/ui/icons/Trail";
 import { WarningIcon } from "@/components/ui/icons/Warning";
+import { RelativeTime } from "@/components/ui/relative-time";
+import { Text } from "@/components/ui/text";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { linkOverlay } from "@/styled-system/patterns";
+import { capitalise, pluralise } from "@/utils/text";
 
 export function TrailListScreen() {
   const { data, error } = useTrailList();
@@ -116,7 +118,9 @@ export function TrailCard({
       )}
 
       <WStack alignItems="center" gap="4" minWidth="0">
-        <ActionCount count={trail.actions.length} />
+        <Text as="span" variant="metadata" flexShrink="0" textWrap="nowrap">
+          {trail.actions.length} {pluralise(trail.actions.length, "action")}
+        </Text>
         <LatestActivity
           next={trail.next_occurrence_at}
           latest={latest}
@@ -218,19 +222,6 @@ function StatusLabel({
   );
 }
 
-function ActionCount({ count }: { count: number }) {
-  return (
-    <styled.span
-      color="text.muted"
-      flexShrink="0"
-      fontSize="xs"
-      textWrap="nowrap"
-    >
-      {count} {count === 1 ? "action" : "actions"}
-    </styled.span>
-  );
-}
-
 function LatestActivity({
   latest,
   loading,
@@ -256,63 +247,42 @@ function LatestActivity({
 
   const occurredAt =
     latest.finished_at ?? latest.scheduled_for ?? latest.createdAt;
-  const lastRanLabel = formatDistanceToNow(new Date(occurredAt), {
-    addSuffix: true,
-  });
-  const nextRunLabel = next
-    ? formatDistanceToNow(new Date(next), {
-        addSuffix: true,
-      })
-    : undefined;
-  const nextRunText = nextRunLabel ? `, next ${nextRunLabel}` : "";
-
-  const label = (() => {
+  const prefix = (() => {
     switch (latest.status) {
       case "running":
-        return `Started ${lastRanLabel}`;
+        return "Started";
       case "queued":
-        return `Queued ${lastRanLabel}`;
+        return "Queued";
       case "cancelled":
-        return `Last run cancelled ${lastRanLabel}`;
+        return "Last run cancelled";
       case "skipped":
-        return `Last run skipped ${lastRanLabel}`;
+        return "Last run skipped";
       case "completed":
       case "attention_required":
-        return `Last ran ${lastRanLabel}${nextRunText}`;
+        return "Last ran";
     }
   })();
-
-  return <ActivityLabel dateTime={occurredAt}>{label}</ActivityLabel>;
-}
-
-function ActivityLabel({
-  dateTime,
-  children,
-}: {
-  dateTime?: string;
-  children: React.ReactNode;
-}) {
-  if (dateTime) {
-    return (
-      <styled.time
-        dateTime={dateTime}
-        color="text.muted"
-        fontSize="xs"
-        minWidth="0"
-        overflow="hidden"
-        textAlign="right"
-        textOverflow="ellipsis"
-        textWrap="nowrap"
-      >
-        {children}
-      </styled.time>
-    );
-  }
+  const showNext =
+    next &&
+    (latest.status === "completed" || latest.status === "attention_required");
 
   return (
-    <styled.span
-      color="text.muted"
-      fontSize="xs"
+    <ActivityLabel>
+      {prefix} <RelativeTime value={occurredAt} />
+      {showNext && (
+        <>
+          , next <RelativeTime value={next} />
+        </>
+      )}
+    </ActivityLabel>
+  );
+}
+
+function ActivityLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <Text
+      as="span"
+      variant="metadata"
       minWidth="0"
       overflow="hidden"
       textAlign="right"
@@ -320,10 +290,6 @@ function ActivityLabel({
       textWrap="nowrap"
     >
       {children}
-    </styled.span>
+    </Text>
   );
-}
-
-function capitalise(value: string): string {
-  return value.charAt(0).toUpperCase() + value.slice(1);
 }

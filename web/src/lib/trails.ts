@@ -1,4 +1,15 @@
 import { RecurrenceSchedule } from "@/api/openapi-schema";
+import { capitalise, pluralise } from "@/utils/text";
+
+const occurrenceFormatter = new Intl.DateTimeFormat(undefined, {
+  dateStyle: "medium",
+  timeStyle: "short",
+});
+const monthFormatter = new Intl.DateTimeFormat(undefined, { month: "long" });
+const weekdayFormatter = new Intl.DateTimeFormat("en-US", {
+  weekday: "long",
+  timeZone: "UTC",
+});
 
 export function describeTrailSchedule(schedule: RecurrenceSchedule): string {
   const time = schedule.start.slice(11, 16);
@@ -31,14 +42,13 @@ export function describeTrailSchedule(schedule: RecurrenceSchedule): string {
 
 export function formatOccurrence(value?: string): string {
   if (!value) return "—";
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
+  return occurrenceFormatter.format(new Date(value));
 }
 
 function every(interval: number, singular: string, plural: string): string {
-  return interval === 1 ? `Every ${singular}` : `Every ${interval} ${plural}`;
+  return interval === 1
+    ? `Every ${singular}`
+    : `Every ${interval} ${pluralise(interval, singular, plural)}`;
 }
 
 function describeMonthDays(
@@ -71,20 +81,11 @@ function ordinal(value: number): string {
 }
 
 function monthName(value: number): string {
-  return new Intl.DateTimeFormat(undefined, { month: "long" }).format(
-    new Date(2000, value - 1, 1),
-  );
+  return monthFormatter.format(new Date(2000, value - 1, 1));
 }
 
 function weekdayForStart(value: string): string {
-  return new Intl.DateTimeFormat("en-US", {
-    weekday: "long",
-    timeZone: "UTC",
-  })
+  return weekdayFormatter
     .format(new Date(`${value.slice(0, 10)}T00:00:00Z`))
     .toLowerCase();
-}
-
-function capitalise(value: string): string {
-  return value.charAt(0).toUpperCase() + value.slice(1);
 }

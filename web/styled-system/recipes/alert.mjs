@@ -32,7 +32,9 @@ const alertFn = memo((props = {}) => {
   return Object.fromEntries(alertSlotFns.map(([slotName, slotFn]) => [slotName, slotFn.recipeFn(props)]))
 })
 
-const alertVariantKeys = []
+const alertVariantKeys = [
+  "tone"
+]
 const getVariantProps = (variants) => ({ ...alertDefaultVariants, ...compact(variants) })
 
 export const alert = /* @__PURE__ */ Object.assign(alertFn, {
@@ -41,7 +43,14 @@ export const alert = /* @__PURE__ */ Object.assign(alertFn, {
   raw: (props) => props,
   classNameMap: {},
   variantKeys: alertVariantKeys,
-  variantMap: {},
+  variantMap: {
+  "tone": [
+    "danger",
+    "info",
+    "success",
+    "warning"
+  ]
+},
   splitVariantProps(props) {
     return splitProps(props, alertVariantKeys)
   },

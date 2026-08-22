@@ -6,10 +6,7 @@ import { format } from "date-fns/format";
 import { DatagraphItemKind } from "@/api/openapi-schema";
 import { CategoryMoveMenu } from "@/components/category/CategoryMoveMenu/CategoryMoveMenu";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
-import {
-  ReportPostMenuItem,
-  truncateBody,
-} from "@/components/report/ReportPostMenuItem";
+import { ReportPostMenuItem } from "@/components/report/ReportPostMenuItem";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { MoreAction } from "@/components/site/Action/More";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
@@ -92,7 +89,7 @@ export function ThreadMenu(props: Props) {
                 targetId={thread.id}
                 author={thread.author}
                 headline={thread.title || "Untitled thread"}
-                body={truncateBody(thread.description)}
+                body={thread.description}
               />
 
               {canPinThread && !isThreadPinned && (

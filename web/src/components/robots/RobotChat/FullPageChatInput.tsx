@@ -7,7 +7,9 @@ import { RobotChatLoadingStatus } from "@/components/site/CommandPalette/RobotCh
 import { IconButton } from "@/components/ui/icon-button";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
+import { Textarea } from "@/components/ui/textarea";
 import { HStack, LStack, styled } from "@/styled-system/jsx";
+import { pluralise } from "@/utils/text";
 
 export function FullPageChatInput() {
   const {
@@ -61,12 +63,12 @@ export function FullPageChatInput() {
         <RobotChatLoadingStatus active={isBusy} robotName={activeRobotName} />
         {queuedMessageCount > 0 && (
           <styled.span color="text.muted" fontSize="xs">
-            {queuedMessageCount}{" "}
-            {queuedMessageCount === 1 ? "message" : "messages"} queued
+            {queuedMessageCount} {pluralise(queuedMessageCount, "message")}{" "}
+            queued
           </styled.span>
         )}
         <HStack w="full" gap="2">
-          <styled.textarea
+          <Textarea
             ref={textareaRef}
             aria-label="Message"
             value={input}
@@ -74,20 +76,10 @@ export function FullPageChatInput() {
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
             rows={1}
-            w="full"
             px="3"
             py="2"
             borderRadius="md"
-            borderWidth="thin"
-            borderColor="border.default"
-            bg="background.control"
-            color="text.default"
-            fontSize="sm"
             resize="none"
-            _focus={{
-              borderColor: "accent.solid",
-              outline: "none",
-            }}
           />
           <IconButton
             aria-label="Send message"

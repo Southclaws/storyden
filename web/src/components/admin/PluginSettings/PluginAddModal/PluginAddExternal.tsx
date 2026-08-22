@@ -13,6 +13,7 @@ import * as Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { WarningIcon } from "@/components/ui/icons/Warning";
 import { Text } from "@/components/ui/text";
+import { Textarea } from "@/components/ui/textarea";
 import { WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { deriveError } from "@/utils/error";
@@ -100,21 +101,13 @@ export function PluginAddExternal({ onClose }: UseDisclosureProps) {
         Manifest (YAML or JSON)
       </styled.label>
 
-      <styled.textarea
+      <Textarea
         value={payload}
         onChange={(event) => setPayload(event.currentTarget.value)}
         disabled={isSubmitting}
         minH="72"
-        w="full"
-        resize="vertical"
-        borderWidth="thin"
-        borderColor="border.default"
-        borderRadius="md"
-        p="3"
-        bgColor="background.control"
-        color="text.default"
+        size="sm"
         fontFamily="mono"
-        fontSize="xs"
         lineHeight="tight"
         spellCheck={false}
       />

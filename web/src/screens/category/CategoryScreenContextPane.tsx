@@ -7,6 +7,7 @@ import { SlugIcon } from "@/components/ui/icons/Slug";
 import * as Table from "@/components/ui/table";
 import { css, cva } from "@/styled-system/css";
 import { HStack, LStack } from "@/styled-system/jsx";
+import { pluralise } from "@/utils/text";
 
 import { Props, useCategoryScreen } from "./CategoryScreen";
 
@@ -42,7 +43,7 @@ export function CategoryScreenContextPane(props: Props) {
       style: "numeric" as const,
     },
     {
-      label: category.postCount === 1 ? "thread" : "threads",
+      label: pluralise(category.postCount, "thread"),
       icon: DiscussionIcon,
       value: `${category.postCount}`,
     },

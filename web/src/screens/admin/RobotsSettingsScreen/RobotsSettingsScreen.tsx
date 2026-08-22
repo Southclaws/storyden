@@ -58,6 +58,7 @@ import { Input } from "@/components/ui/input";
 import { PageHeading } from "@/components/ui/page-heading";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { SelectField } from "@/components/ui/select";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Text } from "@/components/ui/text";
 import { useSettingsMutation } from "@/lib/settings/mutation";
 import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
@@ -807,39 +808,24 @@ function RobotProviderItem({ provider }: { provider: RobotProviderStatus }) {
 function ProviderStatusBadge({ provider }: { provider: RobotProviderStatus }) {
   if (provider.settings.enabled) {
     return (
-      <Badge
-        size="sm"
-        borderColor="status.success.border"
-        backgroundColor="status.success.surface"
-        color="status.success.content"
-      >
+      <StatusBadge size="sm" tone="success">
         Enabled
-      </Badge>
+      </StatusBadge>
     );
   }
 
   if (provider.settings.has_api_key) {
     return (
-      <Badge
-        size="sm"
-        borderColor="status.info.border"
-        backgroundColor="status.info.surface"
-        color="status.info.content"
-      >
+      <StatusBadge size="sm" tone="info">
         Configured
-      </Badge>
+      </StatusBadge>
     );
   }
 
   return (
-    <Badge
-      size="sm"
-      borderColor="border.strong"
-      backgroundColor="background.controlDisabled"
-      color="text.subtle"
-    >
+    <StatusBadge size="sm" tone="neutral">
       Disabled
-    </Badge>
+    </StatusBadge>
   );
 }
 

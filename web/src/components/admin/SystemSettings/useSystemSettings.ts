@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { formatDuration, intervalToDuration } from "date-fns";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -17,13 +16,6 @@ export const DEFAULT_RATE_LIMIT_BUCKET = 60;
 export const DEFAULT_RATE_LIMIT_GUEST_COST = 1;
 export const DEFAULT_CLIENT_IP_MODE = "remote_addr";
 export const DEFAULT_CLIENT_IP_HEADER = "X-Real-IP";
-
-export function formatSeconds(seconds: number): string {
-  const duration = intervalToDuration({ start: 0, end: seconds * 1000 });
-  return formatDuration(duration, {
-    format: ["days", "hours", "minutes", "seconds"],
-  });
-}
 
 export const FormSchema = z.object({
   rate_limit: z.number(),

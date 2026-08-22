@@ -1,6 +1,7 @@
 import { PermissionList } from "@/api/openapi-schema";
 import * as Popover from "@/components/ui/popover";
 import { Box, LStack } from "@/styled-system/jsx";
+import { pluralise } from "@/utils/text";
 
 import { Button } from "../ui/button";
 
@@ -13,8 +14,7 @@ type Props = {
 export function PermissionSummary({ permissions }: Props) {
   const permissionCount = permissions.length;
 
-  const permissionCountLabel =
-    permissionCount === 1 ? "permission" : "permissions";
+  const permissionCountLabel = pluralise(permissionCount, "permission");
 
   const permissionLabel = `${permissionCount} ${permissionCountLabel}`;
 

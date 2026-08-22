@@ -1,3 +1,5 @@
+import { capitalise } from "./text";
+
 export type CookieSetOptions = {
   days?: number; // expiration in days
   path?: string;
@@ -42,8 +44,7 @@ export function setCookie(
   }
   if (path) cookie += `; Path=${path}`;
   if (domain) cookie += `; Domain=${domain}`;
-  if (sameSite)
-    cookie += `; SameSite=${sameSite.charAt(0).toUpperCase()}${sameSite.slice(1)}`;
+  if (sameSite) cookie += `; SameSite=${capitalise(sameSite)}`;
   // Ensure Secure when SameSite=None to satisfy browser requirements
   const effectiveSecure = secure || sameSite === "none";
   if (effectiveSecure) cookie += `; Secure`;

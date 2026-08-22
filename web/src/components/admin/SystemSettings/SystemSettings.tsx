@@ -21,6 +21,7 @@ import { SliderField } from "@/components/ui/slider";
 import { Text } from "@/components/ui/text";
 import { API_ADDRESS } from "@/config";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { formatSeconds } from "@/utils/date";
 import { deriveError } from "@/utils/error";
 
 import { OperationCostOverridesField } from "./OperationCostOverrides.field";
@@ -31,7 +32,6 @@ import {
   DEFAULT_RATE_LIMIT_PERIOD,
   Form,
   Props,
-  formatSeconds,
   useSystemSettings,
 } from "./useSystemSettings";
 
@@ -419,8 +419,7 @@ function ClientIPTester({ canRun, initialHeaders }: ClientIPTesterProps) {
 
       if (!ssrResp.ok) {
         const data = (await ssrResp.json().catch(() => undefined)) as
-          | { message?: string }
-          | undefined;
+          { message?: string } | undefined;
         throw new Error(
           data?.message ?? `SSR test request failed with ${ssrResp.status}`,
         );

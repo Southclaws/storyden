@@ -18,6 +18,7 @@ import { MetaGrid, MetaItem } from "@/components/ui/meta-grid";
 import { PageHeading } from "@/components/ui/page-heading";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Text } from "@/components/ui/text";
+import { formatOAuthGrant } from "@/lib/auth/oauth";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { cardBox } from "@/styled-system/recipes";
@@ -117,7 +118,7 @@ function OAuthClientItem({ client }: { client: OAuthClientList[number] }) {
             <time>{formatDate(client.createdAt, "PPpp")}</time>
           </MetaItem>
           <MetaItem label="Grants">
-            {client.allowed_grants.map(formatGrant).join(", ")}
+            {client.allowed_grants.map(formatOAuthGrant).join(", ")}
           </MetaItem>
           <MetaItem label="Redirects">
             {client.redirect_uris?.length || "None"}
@@ -281,15 +282,6 @@ function OAuthRow({ children }: { children: ReactNode }) {
       {children}
     </styled.li>
   );
-}
-
-function formatGrant(grant: string) {
-  if (grant === "client_credentials") return "client credentials";
-  if (grant === "authorization_code") return "authorization code";
-  if (grant === "refresh_token") return "refresh token";
-  if (grant.includes("device_code")) return "device code";
-
-  return grant;
 }
 
 function Empty({ title, body }: { title: string; body: string }) {

@@ -11,10 +11,10 @@ import {
 import { AccountEmailAddress } from "@/api/openapi-schema";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { useConfirmation } from "@/components/site/useConfirmation";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardBox } from "@/components/ui/card-box";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Text } from "@/components/ui/text";
 import { HStack, WStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
@@ -53,22 +53,10 @@ export function EmailCard({ email }: Props) {
             {email.email_address}
           </Text>
           {email.verified ? (
-            <Badge
-              borderColor="status.success.border"
-              backgroundColor="status.success.surface"
-              color="status.success.content"
-            >
-              Verified
-            </Badge>
+            <StatusBadge tone="success">Verified</StatusBadge>
           ) : (
             <Link href="/auth/verify/email?returnURL=/settings">
-              <Badge
-                borderColor="status.danger.border"
-                backgroundColor="status.danger.surface"
-                color="status.danger.content"
-              >
-                Verify this email
-              </Badge>
+              <StatusBadge tone="danger">Verify this email</StatusBadge>
             </Link>
           )}
         </HStack>

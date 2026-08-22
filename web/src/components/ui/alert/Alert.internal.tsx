@@ -3,7 +3,7 @@
 import type { Assign, PolymorphicProps } from "@ark-ui/react";
 import { ark } from "@ark-ui/react/factory";
 
-import { alert } from "@/styled-system/recipes";
+import { type AlertVariantProps, alert } from "@/styled-system/recipes";
 import type { ComponentProps, HTMLStyledProps } from "@/styled-system/types";
 import { createStyleContext } from "@/utils/create-style-context";
 
@@ -12,7 +12,7 @@ const { withProvider, withContext } = createStyleContext(alert);
 export type RootProps = ComponentProps<typeof Root>;
 export const Root = withProvider<
   HTMLDivElement,
-  Assign<HTMLStyledProps<"div">, PolymorphicProps>
+  Assign<Assign<HTMLStyledProps<"div">, PolymorphicProps>, AlertVariantProps>
 >(ark.div, "root");
 
 export const Content = withContext<

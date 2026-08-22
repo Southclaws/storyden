@@ -79,6 +79,27 @@ creating a new component. Search `src/components/ui`, its Storybook stories, and
 representative product call sites before writing route-local UI from raw
 elements and bespoke CSS.
 
+Before editing a product screen:
+
+1. Read `Foundations/Principles/Component Selection` in Storybook, or inspect
+   `src/stories/foundations/ComponentSelection.stories.tsx` when Storybook is
+   not running.
+2. Search components by semantic intent, not by the markup you expect to write.
+   For example, search for status, feedback, member identity, relative time,
+   multiline input, page header, or surface before searching for Badge, Box, or
+   `styled.*`.
+3. Read the closest component stories and at least two representative product
+   call sites. Stories define the supported role and boundary; call sites show
+   how the component participates in real layouts.
+4. State which existing primitives and compositions the screen will reuse. If
+   a semantic role is missing, identify that gap before implementing the
+   feature-local version.
+
+`styled.*`, `Box`, `Stack`, and generated Panda recipes are implementation
+tools, not evidence that the design system lacks a component. Do not rebuild a
+semantic component from these primitives when Storybook already documents that
+role.
+
 Do not create a new visual component, including a feature-local or route-local
 component, without first confirming the decision with the user. Present the
 closest existing components, explain why they cannot satisfy the requirement,
@@ -90,6 +111,22 @@ Feature-specific compositions are allowed without introducing a new primitive
 when they only arrange existing canonical components and do not establish their
 own visual language. Prefer extending an existing recipe or extracting a shared
 composition when multiple features need the same pattern.
+
+Do not extract a component only to shorten JSX or name a small fragment. Keep
+one-off labels, counts, and simple arrangements inline. A feature-local
+component earns its boundary by owning a domain concept, substantial behavior,
+or a coherent section of the screen. Repeated semantic styling or behavior
+across three or more call sites is a signal to stop and extract a shared
+component before adding another local implementation.
+
+When adding or extending a shared component, its Storybook documentation must
+state:
+
+- the semantic role it owns;
+- when to use it;
+- the nearest component or primitive people might confuse it with;
+- when not to use it;
+- realistic variants and edge cases.
 
 Component folders generally follow this shape:
 

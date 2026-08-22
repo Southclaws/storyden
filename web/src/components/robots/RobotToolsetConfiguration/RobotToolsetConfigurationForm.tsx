@@ -13,6 +13,7 @@ import {
   MultiSelectPickerItem,
 } from "@/components/ui/multi-select-picker";
 import { Text } from "@/components/ui/text";
+import { Textarea } from "@/components/ui/textarea";
 import {
   RobotToolsetFormProps,
   useRobotToolsetConfigurationForm,
@@ -102,23 +103,13 @@ export function RobotToolsetConfigurationForm(props: RobotToolsetFormProps) {
 
         <FormControl>
           <FormLabel>Instructions</FormLabel>
-          <styled.textarea
+          <Textarea
             {...form.register("instruction")}
             aria-label="Instructions"
             placeholder="Specialist guidance applied whenever this Toolset is active..."
             rows={10}
-            w="full"
             minH="40"
-            p="3"
-            fontSize="sm"
-            lineHeight="relaxed"
-            borderWidth="thin"
-            borderStyle="solid"
-            borderColor="border.default"
-            borderRadius="sm"
-            resize="vertical"
             disabled={!isEditable}
-            _focus={{ outline: "none", borderColor: "accent.solid" }}
           />
           <Text variant="supporting">
             These instructions augment a Robot&apos;s playbook when the Toolset

@@ -1,6 +1,8 @@
 import { ReportStatus } from "@/api/openapi-schema";
-import { Badge } from "@/components/ui/badge";
-import type { ColorPalette } from "@/styled-system/tokens";
+import {
+  StatusBadge,
+  type StatusBadgeTone,
+} from "@/components/ui/status-badge";
 
 const REPORT_STATUS_LABEL: Record<ReportStatus, string> = {
   [ReportStatus.submitted]: "Submitted",
@@ -8,10 +10,10 @@ const REPORT_STATUS_LABEL: Record<ReportStatus, string> = {
   [ReportStatus.resolved]: "Resolved",
 };
 
-const REPORT_STATUS_COLOR: Record<ReportStatus, ColorPalette> = {
-  [ReportStatus.submitted]: "amber",
-  [ReportStatus.acknowledged]: "blue",
-  [ReportStatus.resolved]: "green",
+const REPORT_STATUS_TONE: Record<ReportStatus, StatusBadgeTone> = {
+  [ReportStatus.submitted]: "warning",
+  [ReportStatus.acknowledged]: "info",
+  [ReportStatus.resolved]: "success",
 };
 
 type Props = {
@@ -20,8 +22,8 @@ type Props = {
 
 export function ReportStatusBadge({ status }: Props) {
   return (
-    <Badge colorPalette={REPORT_STATUS_COLOR[status]} fontWeight="medium">
+    <StatusBadge tone={REPORT_STATUS_TONE[status]} fontWeight="medium">
       {REPORT_STATUS_LABEL[status]}
-    </Badge>
+    </StatusBadge>
   );
 }

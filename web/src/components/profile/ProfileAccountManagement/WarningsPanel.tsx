@@ -24,7 +24,8 @@ import { useConfirmation } from "@/components/site/useConfirmation";
 import { Button } from "@/components/ui/button";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { Text } from "@/components/ui/text";
-import { Box, Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { Textarea } from "@/components/ui/textarea";
+import { Box, Flex, HStack, LStack, WStack } from "@/styled-system/jsx";
 
 type WarningsPanelProps = {
   accountId: string;
@@ -282,16 +283,11 @@ function WarningRecordCard({
       </Flex>
 
       {isEditing && canManageWarnings ? (
-        <styled.textarea
+        <Textarea
           value={reasonDraft}
           onChange={(event) => setReasonDraft(event.target.value)}
           rows={4}
           maxLength={2000}
-          borderWidth="thin"
-          borderRadius="sm"
-          p="2"
-          fontSize="sm"
-          w="full"
         />
       ) : (
         <Text variant="supporting" color="text.default" whiteSpace="pre-wrap">

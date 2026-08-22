@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { handle } from "@/api/client";
 import { getAssetURL } from "@/utils/asset";
 import { htmlToMarkdown, markdownToHTML } from "@/utils/markdown";
+import { pluralise } from "@/utils/text";
 
 import { ContentComposerProps } from "../composer-props";
 import {
@@ -92,9 +93,7 @@ export function useContentComposerMarkdown(props: ContentComposerProps) {
     if (isDragError) {
       return dragErrorMessage;
     }
-    return dragFileCount === 1
-      ? "Drop 1 file to upload"
-      : `Drop ${dragFileCount} files to upload`;
+    return `Drop ${dragFileCount} ${pluralise(dragFileCount, "file")} to upload`;
   }
 
   async function handlePaste(e: React.ClipboardEvent<HTMLTextAreaElement>) {

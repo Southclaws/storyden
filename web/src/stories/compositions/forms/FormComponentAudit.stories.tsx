@@ -37,6 +37,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import * as ToggleGroup from "@/components/ui/toggle-group";
 import { styled } from "@/styled-system/jsx";
+import { capitalise } from "@/utils/text";
 
 const sizes = ["sm", "md", "lg"] as const;
 const buttonVariants = ["subtle", "outline", "ghost", "solid"] as const;
@@ -321,9 +322,7 @@ function ExampleRadioGroup({ size }: { size: ControlSize }) {
       {["public", "members", "private"].map((value) => (
         <RadioGroup.Item key={value} value={value}>
           <RadioGroup.ItemControl />
-          <RadioGroup.ItemText>
-            {value.charAt(0).toUpperCase() + value.slice(1)}
-          </RadioGroup.ItemText>
+          <RadioGroup.ItemText>{capitalise(value)}</RadioGroup.ItemText>
           <RadioGroup.ItemHiddenInput />
         </RadioGroup.Item>
       ))}
