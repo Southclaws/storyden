@@ -68,4 +68,34 @@ test("builds an initial payload without a creator field", () => {
   assert.not.ok("created_by" in payload);
 });
 
+test("preserves and submits an event trigger", () => {
+  const values = initialTrailFormValues(
+    {
+      name: "Respond to new reports",
+      description: "",
+      status: "active",
+      trigger: {
+        type: "event",
+        events: ["EventReportCreated", "EventReportUpdated"],
+      },
+      actions: [
+        {
+          type: "robot_run",
+          robot_ref: "robot_1",
+          instruction: "Review the new report.",
+        },
+      ],
+    },
+    "UTC",
+    "2026-08-24",
+  );
+
+  assert.is(values.triggerType, "event");
+  assert.equal(values.events, ["EventReportCreated", "EventReportUpdated"]);
+  assert.equal(trailFormPayload(values, "active").trigger, {
+    type: "event",
+    events: ["EventReportCreated", "EventReportUpdated"],
+  });
+});
+
 test.run();

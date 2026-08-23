@@ -39,6 +39,24 @@ const editValue = {
   ],
 } satisfies TrailMutableProps;
 
+const editEventValue = {
+  name: "Respond to new reports",
+  description: "Review each report as soon as it enters the moderation queue.",
+  status: "active",
+  trigger: {
+    type: "event",
+    events: ["EventReportCreated", "EventReportUpdated"],
+  },
+  actions: [
+    {
+      type: "robot_run",
+      robot_ref: "robot_moderator",
+      instruction:
+        "Review the new report, gather relevant context, and summarize whether a moderator needs to act.",
+    },
+  ],
+} satisfies TrailMutableProps;
+
 const occurrences = [
   "2026-08-24T08:00:00Z",
   "2026-08-26T08:00:00Z",
@@ -55,7 +73,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "The Trail form is an administrative full-page workflow. The creator is always the signed-in account and is not editable. Name and Description open the form without a redundant section heading. Cadence uses Select; timezone and Robot choices use searchable Comboboxes; intervals use Number Input; dates use Date Picker; local time uses a time Input; weekdays use a content-sized Toggle Group. Timezone choices come from the browser's IANA list and the backend remains authoritative. The sole Create or Save action is right-aligned; page-level back navigation replaces a duplicate Cancel action.",
+          "The Trail form is an administrative full-page workflow. The creator is always the signed-in account and is not editable. Name and Description open the form without a redundant section heading. Trigger type uses Tabs, with each tab owning only its specific fields. Schedule cadence uses Select; timezone and Robot choices use searchable Comboboxes; events use a Multi Select Picker; intervals use Number Input; dates use Date Picker; local time uses a time Input; weekdays use a content-sized Toggle Group. Event names and descriptions come from the generated event catalogue. Timezone choices come from the browser's IANA list and the backend remains authoritative. The sole Create or Save action is right-aligned; page-level back navigation replaces a duplicate Cancel action.",
       },
     },
   },
@@ -102,6 +120,12 @@ export const FullPageCreate: Story = {
 export const EditPausedTrail: Story = {
   args: {
     initialValue: editValue,
+  },
+};
+
+export const EditEventTrail: Story = {
+  args: {
+    initialValue: editEventValue,
   },
 };
 

@@ -77,14 +77,14 @@ func TestTrailRobotRuntime(t *testing.T) {
 						openapi.TrailMutableStatusActive,
 						trailRobotAction(t, string(robot.JSON200.Id), "Respond to the published thread"),
 					)
-					props.Trigger = trailEventTrigger(t, "EventThreadPublished")
+					props.Trigger = trailEventTrigger(t, "EventThreadPublished", "EventThreadUpdated")
 					eventTrail := createTrail(t, root, cl, adminSession, props)
 					a.Nil(eventTrail.NextOccurrenceAt)
 
 					threadID := post.ID(xid.New())
 					var runID openapi.Identifier
 					r.Eventually(func() bool {
-						bus.Publish(root, &rpc.EventThreadPublished{ID: threadID})
+						bus.Publish(root, &rpc.EventThreadUpdated{ID: threadID})
 						history, err := cl.TrailRunListWithResponse(root, eventTrail.Id, adminSession)
 						if err != nil || history == nil || history.JSON200 == nil || len(history.JSON200.Runs) == 0 {
 							return false
@@ -98,7 +98,7 @@ func TestTrailRobotRuntime(t *testing.T) {
 					a.Equal(openapi.TrailRunKindEvent, run.Trigger.Kind)
 					a.Nil(run.ScheduledFor)
 					trigger := requireEventTrigger(t, run.Trigger.Trigger)
-					a.Equal("EventThreadPublished", trigger.Event)
+					a.Equal([]string{"EventThreadPublished", "EventThreadUpdated"}, trigger.Events)
 					r.NotNil(run.Trigger.Payload)
 
 					payload, err := json.Marshal(*run.Trigger.Payload)

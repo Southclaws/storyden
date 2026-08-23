@@ -1,9 +1,8 @@
 "use client";
 
-import { createListCollection } from "@ark-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
 
@@ -20,29 +19,22 @@ import {
   TrailMutableProps,
 } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";
-import { ComboboxField } from "@/components/ui/combobox";
 import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
 import { Input } from "@/components/ui/input";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { SelectField } from "@/components/ui/select";
 import { Text } from "@/components/ui/text";
-import { ToggleGroupField } from "@/components/ui/toggle-group";
-import { describeTrailSchedule, formatOccurrence } from "@/lib/trails";
-import { Box, Grid, HStack, LStack, styled } from "@/styled-system/jsx";
-import { capitalise, humanise } from "@/utils/text";
+import { Box, HStack, LStack } from "@/styled-system/jsx";
 
 import { TrailRobotActionField } from "./TrailRobotActionField";
-import { TrailScheduleFields } from "./TrailScheduleFields";
+import { TrailTriggerFields } from "./TrailTriggerFields";
 import {
   TrailFormSchema,
   TrailFormValues,
   initialTrailFormValues,
   trailFormPayload,
-  trailFormSchedule,
-  weekdays,
 } from "./trailForm";
 
 type Props = {
@@ -63,22 +55,6 @@ export type TrailEditorFormProps = {
   onPreview: (schedule: RecurrenceSchedule) => Promise<string[]>;
   onSubmit: (payload: TrailMutableProps) => Promise<void>;
 };
-
-const cadenceCollection = createListCollection({
-  items: [
-    { label: "One time", value: "once" },
-    { label: "Every few hours or days", value: "interval" },
-    { label: "Selected weekdays", value: "weekly" },
-    { label: "Monthly", value: "monthly" },
-    { label: "Yearly", value: "yearly" },
-  ],
-});
-
-const weekdayItems = weekdays.map((day) => ({
-  label: day.slice(0, 3),
-  value: day,
-  description: capitalise(day),
-}));
 
 export function TrailEditor({ trail, onSaved }: Props) {
   const router = useRouter();
@@ -127,8 +103,8 @@ export function TrailEditorForm({
   onPreview,
   onSubmit,
 }: TrailEditorFormProps) {
-  const browserTimezone = useMemo(getBrowserTimezone, []);
-  const defaultStartDate = useMemo(getTomorrow, []);
+  const [browserTimezone] = useState(getBrowserTimezone);
+  const [defaultStartDate] = useState(getTomorrow);
   const form = useForm<TrailFormValues>({
     defaultValues: initialTrailFormValues(
       initialValue,
@@ -138,30 +114,12 @@ export function TrailEditorForm({
     resolver: zodResolver(TrailFormSchema),
   });
   const actions = useFieldArray({ control: form.control, name: "actions" });
-  const scheduleKind = form.watch("scheduleKind");
-  const [preview, setPreview] = useState<{
-    schedule: RecurrenceSchedule;
-    occurrences: string[];
-  }>();
-  const [previewing, setPreviewing] = useState(false);
   const [requestError, setRequestError] = useState<string>();
 
-  const timezoneItems = useMemo(
-    () => getTimezoneItems(form.getValues("timezone")),
-    [form],
-  );
-  const robotItems = useMemo(
-    () => robots.map((robot) => ({ label: robot.name, value: robot.id })),
-    [robots],
-  );
-
-  useEffect(() => {
-    const subscription = form.watch((_, { name }) => {
-      if (name && isScheduleField(name)) setPreview(undefined);
-    });
-
-    return () => subscription.unsubscribe();
-  }, [form]);
+  const robotItems = robots.map((robot) => ({
+    label: robot.name,
+    value: robot.id,
+  }));
 
   const save = form.handleSubmit(async (values) => {
     setRequestError(undefined);
@@ -174,21 +132,6 @@ export function TrailEditorForm({
       setRequestError(errorMessage(cause, "Could not save this Trail."));
     }
   });
-
-  async function previewSchedule() {
-    setPreviewing(true);
-    setRequestError(undefined);
-
-    try {
-      const schedule = trailFormSchedule(form.getValues());
-      const occurrences = await onPreview(schedule);
-      setPreview({ schedule, occurrences });
-    } catch (cause) {
-      setRequestError(errorMessage(cause, "Could not preview this schedule."));
-    } finally {
-      setPreviewing(false);
-    }
-  }
 
   return (
     <LStack as="form" gap="8" alignItems="stretch" maxW="3xl" onSubmit={save}>
@@ -219,96 +162,8 @@ export function TrailEditorForm({
         </FormControl>
       </LStack>
 
-      <FormSection
-        title="Schedule"
-        description="Choose when the Trail emits its trigger. Times use the selected timezone."
-      >
-        <Grid
-          gap="4"
-          gridTemplateColumns={{
-            base: "1fr",
-            md: "minmax(0, 1fr) minmax(0, 1fr)",
-          }}
-        >
-          <FormControl>
-            <FormLabel>Cadence</FormLabel>
-            <SelectField
-              control={form.control}
-              name="scheduleKind"
-              collection={cadenceCollection}
-              placeholder="Choose a cadence"
-              positioning={{ sameWidth: true }}
-            />
-          </FormControl>
-
-          <FormControl>
-            <FormLabel>Timezone</FormLabel>
-            <ComboboxField
-              control={form.control}
-              name="timezone"
-              items={timezoneItems}
-              placeholder="Search timezones"
-              ariaLabel="Timezone"
-            />
-            <FormHelperText>
-              Daylight saving gaps are skipped. Overlaps run once.
-            </FormHelperText>
-            <FormErrorText>
-              {form.formState.errors.timezone?.message}
-            </FormErrorText>
-          </FormControl>
-        </Grid>
-
-        {scheduleKind === "weekly" && (
-          <FormControl>
-            <FormLabel>Weekdays</FormLabel>
-            <ToggleGroupField
-              control={form.control}
-              name="selectedDays"
-              items={weekdayItems}
-            />
-            <FormErrorText>
-              {form.formState.errors.selectedDays?.message}
-            </FormErrorText>
-          </FormControl>
-        )}
-
-        <TrailScheduleFields form={form} scheduleKind={scheduleKind} />
-
-        <Box>
-          <Button
-            type="button"
-            variant="outline"
-            loading={previewing}
-            loadingText="Checking schedule..."
-            onClick={previewSchedule}
-          >
-            Preview next five
-          </Button>
-        </Box>
-
-        {preview && (
-          <Box backgroundColor="background.inset" borderRadius="md" padding="4">
-            <Text fontWeight="medium">
-              {describeTrailSchedule(preview.schedule)}
-            </Text>
-            <styled.ol
-              display="grid"
-              gap="1"
-              listStyle="decimal"
-              marginTop="2"
-              paddingLeft="5"
-            >
-              {preview.occurrences.map((value) => (
-                <styled.li key={value} color="text.muted" fontSize="sm">
-                  <styled.time dateTime={value}>
-                    {formatOccurrence(value)}
-                  </styled.time>
-                </styled.li>
-              ))}
-            </styled.ol>
-          </Box>
-        )}
+      <FormSection title="Trigger" description="Choose what starts this Trail.">
+        <TrailTriggerFields form={form} onPreview={onPreview} />
       </FormSection>
 
       <FormSection
@@ -406,35 +261,6 @@ function getBrowserTimezone(): string {
 function getTomorrow(): string {
   const date = new Date(Date.now() + 86_400_000);
   return date.toISOString().slice(0, 10);
-}
-
-function getTimezoneItems(current: string) {
-  const supported =
-    typeof Intl.supportedValuesOf === "function"
-      ? Intl.supportedValuesOf("timeZone")
-      : [];
-  const timezones = new Set([current, "UTC", ...supported]);
-
-  return Array.from(timezones)
-    .sort((a, b) => a.localeCompare(b))
-    .map((timezone) => ({
-      label: humanise(timezone),
-      value: timezone,
-    }));
-}
-
-function isScheduleField(name: string): boolean {
-  return [
-    "scheduleKind",
-    "timezone",
-    "startDate",
-    "localTime",
-    "interval",
-    "intervalUnit",
-    "selectedDays",
-    "month",
-    "monthDay",
-  ].some((field) => name === field || name.startsWith(`${field}.`));
 }
 
 function errorMessage(cause: unknown, fallback: string): string {

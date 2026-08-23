@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -16,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_repo"
 	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/resources/recurrence"
 	robotresource "github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
 	"github.com/Southclaws/storyden/app/resources/trail"
@@ -137,16 +139,52 @@ func trailInvocationContext(run *trail.ActionRun) robotservice.InvocationContext
 		robotservice.InvocationContextKeyTrailActionRunID: run.ID.String(),
 	}
 
-	if run.Run != nil && len(run.Run.TriggerPayload) > 0 {
-		invocation[robotservice.InvocationContextKeyTrailTrigger] = json.RawMessage(run.Run.TriggerPayload)
-
-		var event trail.TriggerEvent
-		if json.Unmarshal(run.Run.TriggerPayload, &event) == nil {
-			invocation[robotservice.InvocationContextKeyTrailTriggerKind] = event.Kind.String()
-		}
+	if run.Run != nil {
+		invocation[robotservice.InvocationContextKeyTrailTrigger] = materialiseTrailTriggerContext(run.Run.Trigger)
+		invocation[robotservice.InvocationContextKeyTrailTriggerKind] = run.Run.Trigger.Kind.String()
 	}
 
 	return invocation
+}
+
+type trailTriggerContext struct {
+	TrailID      string                        `json:"trail_id"`
+	TrailRunID   string                        `json:"trail_run_id"`
+	Kind         trail.RunKind                 `json:"kind"`
+	Trigger      trailTriggerDefinitionContext `json:"trigger"`
+	Payload      json.RawMessage               `json:"payload,omitempty"`
+	ScheduledFor *time.Time                    `json:"scheduled_for,omitempty"`
+	ObservedAt   time.Time                     `json:"observed_at"`
+	InitiatedBy  string                        `json:"initiated_by,omitempty"`
+}
+
+type trailTriggerDefinitionContext struct {
+	Type     trail.TriggerType    `json:"type"`
+	Schedule *recurrence.Schedule `json:"schedule,omitempty"`
+	Events   []string             `json:"events,omitempty"`
+}
+
+func materialiseTrailTriggerContext(event trail.TriggerEvent) trailTriggerContext {
+	trigger := trailTriggerDefinitionContext{Type: event.Trigger.Type()}
+	switch event.Trigger.Type() {
+	case trail.TriggerTypeSchedule:
+		trigger.Schedule = event.Trigger.Schedule()
+	case trail.TriggerTypeEvent:
+		if definition := event.Trigger.Event(); definition != nil {
+			trigger.Events = definition.Events
+		}
+	}
+
+	return trailTriggerContext{
+		TrailID:      event.TrailID,
+		TrailRunID:   event.TrailRunID,
+		Kind:         event.Kind,
+		Trigger:      trigger,
+		Payload:      event.Payload,
+		ScheduledFor: event.ScheduledFor,
+		ObservedAt:   event.ObservedAt,
+		InitiatedBy:  event.InitiatedBy,
+	}
 }
 
 func trailRobotSessionName(trailName string, runNumber int) string {

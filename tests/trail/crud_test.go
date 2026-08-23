@@ -72,14 +72,14 @@ func TestTrailCRUD(t *testing.T) {
 				a := assert.New(t)
 
 				props := trailProps(t, "Published thread responder", openapi.TrailMutableStatusPaused, firstAction)
-				props.Trigger = trailEventTrigger(t, "EventThreadPublished")
+				props.Trigger = trailEventTrigger(t, "EventThreadPublished", "EventThreadUpdated")
 				created := createTrail(t, root, cl, adminSession, props)
 
 				a.Equal(openapi.TrailStatusPaused, created.Status)
 				a.Nil(created.NextOccurrenceAt)
 				trigger := requireEventTrigger(t, created.Trigger)
 				a.Equal(openapi.TrailTriggerTypeEvent, trigger.Type)
-				a.Equal("EventThreadPublished", trigger.Event)
+				a.Equal([]string{"EventThreadPublished", "EventThreadUpdated"}, trigger.Events)
 				r.Len(created.Actions, 1)
 			})
 
@@ -176,7 +176,7 @@ func TestTrailCRUD(t *testing.T) {
 
 				a.Equal(openapi.TrailStatusActive, response.JSON200.Status)
 				a.Nil(response.JSON200.NextOccurrenceAt)
-				a.Equal("EventThreadPublished", requireEventTrigger(t, response.JSON200.Trigger).Event)
+				a.Equal([]string{"EventThreadPublished"}, requireEventTrigger(t, response.JSON200.Trigger).Events)
 
 				created = openapi.Trail(*response.JSON200)
 			})
@@ -264,6 +264,14 @@ func TestTrailValidation(t *testing.T) {
 			invalidEvent.Trigger = trailEventTrigger(t, "EventNotReal")
 			tests["invalid_event"] = invalidEvent
 
+			emptyEvents := trailProps(t, "Empty events", openapi.TrailMutableStatusPaused, validAction)
+			emptyEvents.Trigger = trailEventTrigger(t)
+			tests["empty_events"] = emptyEvents
+
+			duplicateEvents := trailProps(t, "Duplicate events", openapi.TrailMutableStatusPaused, validAction)
+			duplicateEvents.Trigger = trailEventTrigger(t, "EventThreadPublished", "EventThreadPublished")
+			tests["duplicate_events"] = duplicateEvents
+
 			for name, props := range tests {
 				t.Run(name, func(t *testing.T) {
 					response, err := cl.TrailCreateWithResponse(root, props, adminSession)
@@ -325,7 +333,10 @@ func TestTrailPermissions(t *testing.T) {
 				},
 				"update": func(t *testing.T, session openapi.RequestEditorFn) int {
 					response, err := cl.TrailUpdateWithResponse(root, created.Id, openapi.TrailMutableProps{
-						Name: created.Name, Status: openapi.TrailMutableStatusPaused, Trigger: created.Trigger, Actions: []openapi.TrailAction{action},
+						Name:    created.Name,
+						Status:  openapi.TrailMutableStatusPaused,
+						Trigger: created.Trigger,
+						Actions: []openapi.TrailAction{action},
 					}, session)
 					require.NoError(t, err)
 					return response.StatusCode()

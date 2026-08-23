@@ -51,7 +51,7 @@ func (h *Trails) TrailCreate(ctx context.Context, request openapi.TrailCreateReq
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	triggerType, triggerConfig, err := deserialiseTrailTrigger(request.Body.Trigger)
+	trigger, err := deserialiseTrailTrigger(request.Body.Trigger)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
@@ -74,8 +74,7 @@ func (h *Trails) TrailCreate(ctx context.Context, request openapi.TrailCreateReq
 		request.Body.Name,
 		description,
 		status,
-		triggerType,
-		triggerConfig,
+		trigger,
 		actions,
 	)
 	if err != nil {
@@ -97,10 +96,9 @@ func (h *Trails) TrailSchedulePreview(ctx context.Context, request openapi.Trail
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
-
-	raw, err := json.Marshal(schedule)
+	schedule, err = recurrence.Compile(*schedule)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
 	after := time.Now().UTC()
@@ -108,10 +106,7 @@ func (h *Trails) TrailSchedulePreview(ctx context.Context, request openapi.Trail
 		after = request.Body.After.UTC()
 	}
 
-	occurrences, err := h.manager.Preview(ctx, raw, after)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
+	occurrences := h.manager.Preview(schedule, after)
 
 	return openapi.TrailSchedulePreview200JSONResponse{
 		TrailSchedulePreviewOKJSONResponse: openapi.TrailSchedulePreviewOKJSONResponse{
@@ -142,7 +137,7 @@ func (h *Trails) TrailUpdate(ctx context.Context, request openapi.TrailUpdateReq
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	triggerType, triggerConfig, err := deserialiseTrailTrigger(request.Body.Trigger)
+	trigger, err := deserialiseTrailTrigger(request.Body.Trigger)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
@@ -160,8 +155,7 @@ func (h *Trails) TrailUpdate(ctx context.Context, request openapi.TrailUpdateReq
 		request.Body.Name,
 		description,
 		status,
-		triggerType,
-		triggerConfig,
+		trigger,
 		actions,
 	)
 	if err != nil {
@@ -250,53 +244,33 @@ func (h *Trails) TrailActionRunCancel(ctx context.Context, request openapi.Trail
 	return openapi.TrailActionRunCancel200Response{}, nil
 }
 
-func deserialiseTrailTrigger(input openapi.TrailTrigger) (trail.TriggerType, json.RawMessage, error) {
+func deserialiseTrailTrigger(input openapi.TrailTrigger) (trail.Trigger, error) {
 	value, err := input.ValueByDiscriminator()
 	if err != nil {
-		return trail.TriggerType{}, nil, err
+		return trail.Trigger{}, err
 	}
 
 	switch trigger := value.(type) {
 	case openapi.TrailTriggerSchedule:
-		kind, err := trail.NewTriggerType(string(trigger.Type))
-		if err != nil {
-			return trail.TriggerType{}, nil, err
-		}
-
 		schedule, err := deserialiseRecurrenceSchedule(trigger.Schedule)
 		if err != nil {
-			return trail.TriggerType{}, nil, err
+			return trail.Trigger{}, err
 		}
 
-		config, err := json.Marshal(schedule)
-		if err != nil {
-			return trail.TriggerType{}, nil, err
-		}
-
-		return kind, config, nil
+		return trail.NewScheduleTrigger(*schedule)
 
 	case openapi.TrailTriggerEvent:
-		kind, err := trail.NewTriggerType(string(trigger.Type))
-		if err != nil {
-			return trail.TriggerType{}, nil, err
-		}
-
-		config, err := json.Marshal(trail.EventTriggerConfig{Event: trigger.Event})
-		if err != nil {
-			return trail.TriggerType{}, nil, err
-		}
-
-		return kind, config, nil
+		return trail.NewEventTrigger(trigger.Events)
 
 	default:
-		return trail.TriggerType{}, nil, fault.Newf("invalid Trail trigger type %T", value)
+		return trail.Trigger{}, fault.Newf("invalid Trail trigger type %T", value)
 	}
 }
 
-func deserialiseRecurrenceSchedule(input openapi.RecurrenceSchedule) (recurrence.Schedule, error) {
+func deserialiseRecurrenceSchedule(input openapi.RecurrenceSchedule) (*recurrence.Schedule, error) {
 	frequency, err := recurrence.NewFrequency(string(input.Rule.Frequency))
 	if err != nil {
-		return recurrence.Schedule{}, err
+		return nil, err
 	}
 
 	weekdays := []recurrence.Weekday{}
@@ -305,7 +279,7 @@ func deserialiseRecurrenceSchedule(input openapi.RecurrenceSchedule) (recurrence
 			return recurrence.NewWeekday(string(value))
 		})
 		if err != nil {
-			return recurrence.Schedule{}, err
+			return nil, err
 		}
 	}
 
@@ -319,7 +293,7 @@ func deserialiseRecurrenceSchedule(input openapi.RecurrenceSchedule) (recurrence
 		byMonthDay = *input.Rule.ByMonthDay
 	}
 
-	return recurrence.Schedule{
+	schedule := recurrence.Schedule{
 		Start:    input.Start,
 		Timezone: input.Timezone,
 		Rule: recurrence.Rule{
@@ -330,7 +304,9 @@ func deserialiseRecurrenceSchedule(input openapi.RecurrenceSchedule) (recurrence
 			ByMonthDay: byMonthDay,
 			Count:      input.Rule.Count,
 		},
-	}, nil
+	}
+
+	return &schedule, nil
 }
 
 func deserialiseTrailActionList(input []openapi.TrailAction) ([]trail.ActionSpec, error) {
@@ -371,7 +347,7 @@ func serialiseTrailList(input []*trail.Trail) (openapi.TrailList, error) {
 }
 
 func serialiseTrail(input *trail.Trail) (openapi.Trail, error) {
-	trigger, err := serialiseTrailTrigger(input.TriggerType, input.TriggerConfig)
+	trigger, err := serialiseTrailTrigger(input.Trigger)
 	if err != nil {
 		return openapi.Trail{}, err
 	}
@@ -396,31 +372,31 @@ func serialiseTrail(input *trail.Trail) (openapi.Trail, error) {
 	}, nil
 }
 
-func serialiseTrailTrigger(kind trail.TriggerType, data json.RawMessage) (openapi.TrailTrigger, error) {
+func serialiseTrailTrigger(input trail.Trigger) (openapi.TrailTrigger, error) {
 	trigger := openapi.TrailTrigger{}
-	switch kind {
+	switch input.Type() {
 	case trail.TriggerTypeSchedule:
-		schedule, err := recurrence.Parse(data)
-		if err != nil {
-			return openapi.TrailTrigger{}, err
+		schedule := input.Schedule()
+		if schedule == nil {
+			return openapi.TrailTrigger{}, trail.ErrInvalidScheduleTrigger
 		}
 
 		if err := trigger.FromTrailTriggerSchedule(openapi.TrailTriggerSchedule{
-			Type:     openapi.TrailTriggerType(kind.String()),
+			Type:     openapi.TrailTriggerType(input.Type().String()),
 			Schedule: serialiseRecurrenceSchedule(schedule),
 		}); err != nil {
 			return openapi.TrailTrigger{}, err
 		}
 
 	case trail.TriggerTypeEvent:
-		var config trail.EventTriggerConfig
-		if err := json.Unmarshal(data, &config); err != nil {
-			return openapi.TrailTrigger{}, err
+		event := input.Event()
+		if event == nil {
+			return openapi.TrailTrigger{}, trail.ErrInvalidEventTrigger
 		}
 
 		if err := trigger.FromTrailTriggerEvent(openapi.TrailTriggerEvent{
-			Type:  openapi.TrailTriggerType(kind.String()),
-			Event: config.Event,
+			Type:   openapi.TrailTriggerType(input.Type().String()),
+			Events: event.Events,
 		}); err != nil {
 			return openapi.TrailTrigger{}, err
 		}
@@ -496,7 +472,7 @@ func serialiseTrailRunList(input []*trail.Run) (openapi.TrailRunList, error) {
 }
 
 func serialiseTrailRun(input *trail.Run) (openapi.TrailRun, error) {
-	trigger, err := serialiseTrailTriggerSnapshot(input.TriggerPayload)
+	trigger, err := serialiseTrailTriggerSnapshot(input.Trigger)
 	if err != nil {
 		return openapi.TrailRun{}, err
 	}
@@ -519,13 +495,8 @@ func serialiseTrailRun(input *trail.Run) (openapi.TrailRun, error) {
 	}, nil
 }
 
-func serialiseTrailTriggerSnapshot(input json.RawMessage) (openapi.TrailTriggerSnapshot, error) {
-	var event trail.TriggerEvent
-	if err := json.Unmarshal(input, &event); err != nil {
-		return openapi.TrailTriggerSnapshot{}, err
-	}
-
-	trigger, err := serialiseTrailTriggerFromSnapshot(event.Trigger)
+func serialiseTrailTriggerSnapshot(event trail.TriggerEvent) (openapi.TrailTriggerSnapshot, error) {
+	trigger, err := serialiseTrailTrigger(event.Trigger)
 	if err != nil {
 		return openapi.TrailTriggerSnapshot{}, err
 	}
@@ -554,30 +525,6 @@ func serialiseTrailTriggerSnapshot(input json.RawMessage) (openapi.TrailTriggerS
 		InitiatedBy:  initiatedBy.Ptr(),
 		Payload:      payload,
 	}, nil
-}
-
-func serialiseTrailTriggerFromSnapshot(input json.RawMessage) (openapi.TrailTrigger, error) {
-	var trigger struct {
-		Type     trail.TriggerType `json:"type"`
-		Schedule json.RawMessage   `json:"schedule"`
-		Event    string            `json:"event"`
-	}
-	if err := json.Unmarshal(input, &trigger); err != nil {
-		return openapi.TrailTrigger{}, err
-	}
-
-	switch trigger.Type {
-	case trail.TriggerTypeSchedule:
-		return serialiseTrailTrigger(trigger.Type, trigger.Schedule)
-	case trail.TriggerTypeEvent:
-		config, err := json.Marshal(trail.EventTriggerConfig{Event: trigger.Event})
-		if err != nil {
-			return openapi.TrailTrigger{}, err
-		}
-		return serialiseTrailTrigger(trigger.Type, config)
-	default:
-		return openapi.TrailTrigger{}, trail.ErrUnsupportedTrigger
-	}
 }
 
 func serialiseTrailActionRunList(input []*trail.ActionRun) (openapi.TrailActionRunList, error) {

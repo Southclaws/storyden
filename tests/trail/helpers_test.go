@@ -2,15 +2,34 @@ package trail_test
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"testing"
 
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/require"
 
+	"github.com/Southclaws/storyden/app/resources/recurrence"
+	"github.com/Southclaws/storyden/app/resources/trail"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/tests"
 )
+
+func domainScheduleTrigger(t *testing.T, raw json.RawMessage) trail.Trigger {
+	t.Helper()
+	schedule, err := recurrence.Parse(raw)
+	require.NoError(t, err)
+	trigger, err := trail.NewScheduleTrigger(*schedule)
+	require.NoError(t, err)
+	return trigger
+}
+
+func domainEventTrigger(t *testing.T, events ...string) trail.Trigger {
+	t.Helper()
+	trigger, err := trail.NewEventTrigger(events)
+	require.NoError(t, err)
+	return trigger
+}
 
 func trailSchedule(start, timezone string, frequency openapi.RecurrenceFrequency) openapi.RecurrenceSchedule {
 	return openapi.RecurrenceSchedule{
@@ -35,13 +54,13 @@ func trailTrigger(t *testing.T, schedule openapi.RecurrenceSchedule) openapi.Tra
 	return trigger
 }
 
-func trailEventTrigger(t *testing.T, event string) openapi.TrailTrigger {
+func trailEventTrigger(t *testing.T, events ...string) openapi.TrailTrigger {
 	t.Helper()
 
 	trigger := openapi.TrailTrigger{}
 	require.NoError(t, trigger.FromTrailTriggerEvent(openapi.TrailTriggerEvent{
-		Type:  openapi.TrailTriggerTypeEvent,
-		Event: event,
+		Type:   openapi.TrailTriggerTypeEvent,
+		Events: events,
 	}))
 
 	return trigger

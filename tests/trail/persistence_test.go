@@ -94,8 +94,7 @@ func TestTrailScheduledOccurrenceMaterialisation(t *testing.T) {
 				"Weekly prompt",
 				"",
 				trail.StatusActive,
-				trail.TriggerTypeSchedule,
-				json.RawMessage(`{"start":"2040-01-04T09:00:00","timezone":"Europe/London","rule":{"frequency":"weekly","interval":1,"by_weekday":["wednesday"]}}`),
+				domainScheduleTrigger(t, json.RawMessage(`{"start":"2040-01-04T09:00:00","timezone":"Europe/London","rule":{"frequency":"weekly","interval":1,"by_weekday":["wednesday"]}}`)),
 				[]trail.ActionSpec{{Kind: trail.ActionKindRobotRun, Config: config}},
 				opt.New(firstOccurrence),
 			)
@@ -125,8 +124,7 @@ func TestTrailScheduledOccurrenceMaterialisation(t *testing.T) {
 				a.WithinDuration(firstOccurrence, *run.ScheduledFor, 0)
 				a.JSONEq(string(config), string(run.ActionRuns[0].Config))
 
-				var event trail.TriggerEvent
-				r.NoError(json.Unmarshal(run.TriggerPayload, &event))
+				event := run.Trigger
 				a.Equal(definition.ID.String(), event.TrailID)
 				a.Equal(run.ID.String(), event.TrailRunID)
 				a.Equal(trail.RunKindScheduled, event.Kind)
@@ -183,8 +181,7 @@ func TestTrailEventOccurrenceMaterialisation(t *testing.T) {
 				"Published thread responder",
 				"",
 				trail.StatusActive,
-				trail.TriggerTypeEvent,
-				json.RawMessage(`{"event":"EventThreadPublished"}`),
+				domainEventTrigger(t, "EventThreadPublished", "EventThreadUpdated"),
 				[]trail.ActionSpec{{Kind: trail.ActionKindRobotRun, Config: actionConfig}},
 				opt.NewEmpty[time.Time](),
 			)
@@ -195,7 +192,7 @@ func TestTrailEventOccurrenceMaterialisation(t *testing.T) {
 			runID, created, err := repository.MaterialiseEvent(
 				root,
 				definition.ID,
-				"EventThreadPublished",
+				"EventThreadUpdated",
 				sourcePayload,
 				observedAt,
 			)
@@ -209,12 +206,11 @@ func TestTrailEventOccurrenceMaterialisation(t *testing.T) {
 			a.Nil(run.ScheduledFor)
 			a.JSONEq(string(actionConfig), string(run.ActionRuns[0].Config))
 
-			var event trail.TriggerEvent
-			r.NoError(json.Unmarshal(run.TriggerPayload, &event))
+			event := run.Trigger
 			a.Equal(trail.RunKindEvent, event.Kind)
 			a.Equal(observedAt, event.ObservedAt)
 			a.JSONEq(string(sourcePayload), string(event.Payload))
-			a.JSONEq(`{"type":"event","event":"EventThreadPublished"}`, string(event.Trigger))
+			a.Equal([]string{"EventThreadPublished", "EventThreadUpdated"}, event.Trigger.Event().Events)
 
 			stored, err := repository.Get(root, definition.ID)
 			r.NoError(err)
@@ -260,8 +256,7 @@ func TestTrailActionFanoutAndRecovery(t *testing.T) {
 				"Independent consumers",
 				"",
 				trail.StatusPaused,
-				trail.TriggerTypeSchedule,
-				json.RawMessage(`{"start":"2040-01-10T09:00:00","timezone":"UTC","rule":{"frequency":"daily","interval":1}}`),
+				domainScheduleTrigger(t, json.RawMessage(`{"start":"2040-01-10T09:00:00","timezone":"UTC","rule":{"frequency":"daily","interval":1}}`)),
 				[]trail.ActionSpec{
 					{Kind: trail.ActionKindRobotRun, Config: firstConfig},
 					{Kind: trail.ActionKindRobotRun, Config: secondConfig},
@@ -281,8 +276,7 @@ func TestTrailActionFanoutAndRecovery(t *testing.T) {
 				a.Equal(trail.RunKindManual, manual.Kind)
 				a.Nil(manual.ScheduledFor)
 
-				var event trail.TriggerEvent
-				r.NoError(json.Unmarshal(manual.TriggerPayload, &event))
+				event := manual.Trigger
 				a.Equal(manual.ID.String(), event.TrailRunID)
 				a.Equal(creatorID.String(), event.InitiatedBy)
 				a.Equal(trail.RunKindManual, event.Kind)
@@ -299,8 +293,7 @@ func TestTrailActionFanoutAndRecovery(t *testing.T) {
 					definition.Name,
 					definition.Description,
 					trail.StatusPaused,
-					definition.TriggerType,
-					definition.TriggerConfig,
+					definition.Trigger,
 					[]trail.ActionSpec{{Kind: trail.ActionKindRobotRun, Config: updatedConfig}},
 					opt.New(nextOccurrence),
 				)
@@ -461,8 +454,7 @@ func TestTrailMissedOneTimeOccurrence(t *testing.T) {
 				"One time announcement",
 				"",
 				trail.StatusActive,
-				trail.TriggerTypeSchedule,
-				json.RawMessage(`{"start":"2020-03-31T01:30:00","timezone":"Europe/London","rule":{"frequency":"daily","interval":1,"count":1}}`),
+				domainScheduleTrigger(t, json.RawMessage(`{"start":"2020-03-31T01:30:00","timezone":"Europe/London","rule":{"frequency":"daily","interval":1,"count":1}}`)),
 				[]trail.ActionSpec{{
 					Kind:   trail.ActionKindRobotRun,
 					Config: json.RawMessage(`{"type":"robot_run","robot_ref":"robot-one","instruction":"Post once"}`),

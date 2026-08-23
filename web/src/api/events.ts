@@ -46,3 +46,236 @@ export const pluginEventNames = [
 ] as const;
 
 export type PluginEventName = (typeof pluginEventNames)[number];
+
+export const events = [
+  {
+    name: "EventThreadPublished",
+    label: "Thread published",
+    description:
+      "Emitted when a thread is visible as published, either on create or after a visibility change.",
+  },
+  {
+    name: "EventThreadUnpublished",
+    label: "Thread unpublished",
+    description:
+      "Emitted when a previously published thread transitions to a non-published visibility.",
+  },
+  {
+    name: "EventThreadUpdated",
+    label: "Thread updated",
+    description:
+      "Emitted after a thread update succeeds, regardless of which fields changed.",
+  },
+  {
+    name: "EventThreadDeleted",
+    label: "Thread deleted",
+    description: "Emitted after a thread is deleted.",
+  },
+  {
+    name: "EventThreadReplyCreated",
+    label: "Thread reply created",
+    description:
+      "Emitted when a new reply is created and remains published (not moved to review by moderation).",
+  },
+  {
+    name: "EventThreadReplyDeleted",
+    label: "Thread reply deleted",
+    description: "Emitted after a reply is deleted from a thread.",
+  },
+  {
+    name: "EventThreadReplyUpdated",
+    label: "Thread reply updated",
+    description: "Emitted after a reply update succeeds.",
+  },
+  {
+    name: "EventThreadReplyPublished",
+    label: "Thread reply published",
+    description: "Emitted when a reply visibility transitions to published.",
+  },
+  {
+    name: "EventThreadReplyUnpublished",
+    label: "Thread reply unpublished",
+    description:
+      "Emitted when a previously published reply transitions to a non-published visibility.",
+  },
+  {
+    name: "EventPostLiked",
+    label: "Post liked",
+    description: "Emitted when a member adds a like to a post.",
+  },
+  {
+    name: "EventPostUnliked",
+    label: "Post unliked",
+    description: "Emitted when a member removes a like from a post.",
+  },
+  {
+    name: "EventPostReacted",
+    label: "Post reacted",
+    description: "Emitted when a member adds an emoji reaction to a post.",
+  },
+  {
+    name: "EventPostUnreacted",
+    label: "Post unreacted",
+    description: "Emitted when a member removes an emoji reaction from a post.",
+  },
+  {
+    name: "EventCategoryUpdated",
+    label: "Category updated",
+    description: "Emitted when a category is created, updated, or moved.",
+  },
+  {
+    name: "EventCategoryDeleted",
+    label: "Category deleted",
+    description: "Emitted after a category is deleted.",
+  },
+  {
+    name: "EventMemberMentioned",
+    label: "Member mentioned",
+    description:
+      "Emitted once per mention target when a member mention is detected (self-mentions are skipped).",
+  },
+  {
+    name: "EventNodeCreated",
+    label: "Node created",
+    description: "Emitted after a library node is created.",
+  },
+  {
+    name: "EventNodeUpdated",
+    label: "Node updated",
+    description:
+      "Emitted after a library node is updated, moved, re-ordered, or affected by property schema changes.",
+  },
+  {
+    name: "EventNodeDeleted",
+    label: "Node deleted",
+    description: "Emitted after a library node is deleted.",
+  },
+  {
+    name: "EventNodePublished",
+    label: "Node published",
+    description:
+      "Emitted when a library node becomes published, either on create or after a visibility change.",
+  },
+  {
+    name: "EventNodeSubmittedForReview",
+    label: "Node submitted for review",
+    description:
+      "Emitted when a library node transitions to review visibility.",
+  },
+  {
+    name: "EventNodeUnpublished",
+    label: "Node unpublished",
+    description:
+      "Emitted when a previously published library node transitions to draft, unlisted, or review.",
+  },
+  {
+    name: "EventNodeVersionDraftCreated",
+    label: "Node version draft created",
+    description: "Emitted when a draft version is created for a library node.",
+  },
+  {
+    name: "EventNodeVersionDraftUpdated",
+    label: "Node version draft updated",
+    description: "Emitted when a draft version is updated.",
+  },
+  {
+    name: "EventNodeVersionDraftDeleted",
+    label: "Node version draft deleted",
+    description: "Emitted when a draft version is discarded.",
+  },
+  {
+    name: "EventNodeVersionDraftApplied",
+    label: "Node version draft applied",
+    description: "Emitted when a draft version is applied to a library node.",
+  },
+  {
+    name: "EventAccountCreated",
+    label: "Account created",
+    description: "Emitted after a new account is created.",
+  },
+  {
+    name: "EventAccountUpdated",
+    label: "Account updated",
+    description:
+      "Emitted after account profile, email, or role assignment changes.",
+  },
+  {
+    name: "EventAccountSuspended",
+    label: "Account suspended",
+    description: "Emitted when an account is suspended.",
+  },
+  {
+    name: "EventAccountUnsuspended",
+    label: "Account unsuspended",
+    description: "Emitted when a suspended account is reinstated.",
+  },
+  {
+    name: "EventModerationNoteCreated",
+    label: "Moderation note created",
+    description:
+      "Emitted when a moderator creates an internal account moderation note.",
+  },
+  {
+    name: "EventModerationNoteDeleted",
+    label: "Moderation note deleted",
+    description:
+      "Emitted when a moderator deletes an internal account moderation note.",
+  },
+  {
+    name: "EventAccountWarned",
+    label: "Account warned",
+    description: "Emitted when a moderation warning is issued to an account.",
+  },
+  {
+    name: "EventAccountWarningUpdated",
+    label: "Account warning updated",
+    description: "Emitted when a moderation warning is edited.",
+  },
+  {
+    name: "EventAccountWarningDeleted",
+    label: "Account warning deleted",
+    description: "Emitted when a moderation warning is permanently deleted.",
+  },
+  {
+    name: "EventReportCreated",
+    label: "Report created",
+    description: "Emitted when a new member or system report is created.",
+  },
+  {
+    name: "EventReportUpdated",
+    label: "Report updated",
+    description:
+      "Emitted when a report is updated, including status and handler changes.",
+  },
+  {
+    name: "EventActivityCreated",
+    label: "Activity created",
+    description: "Emitted after an activity event is created.",
+  },
+  {
+    name: "EventActivityUpdated",
+    label: "Activity updated",
+    description: "Emitted after an activity event is updated.",
+  },
+  {
+    name: "EventActivityDeleted",
+    label: "Activity deleted",
+    description: "Emitted after an activity event is deleted.",
+  },
+  {
+    name: "EventActivityPublished",
+    label: "Activity published",
+    description:
+      "Emitted when an activity event becomes published, either on create or after a visibility change.",
+  },
+  {
+    name: "EventSettingsUpdated",
+    label: "Settings updated",
+    description:
+      "Emitted when site settings are updated via the admin settings manager.",
+  },
+] as const satisfies readonly {
+  name: PluginEventName;
+  label: string;
+  description: string;
+}[];

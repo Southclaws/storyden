@@ -1,3 +1,4 @@
+import { events as eventDefinitions } from "@/api/events";
 import { Trail } from "@/api/openapi-schema";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { CalendarIcon } from "@/components/ui/icons/Calendar";
@@ -12,8 +13,12 @@ import { TrailStatusBadge } from "./TrailStatusBadge";
 export function TrailOverview({ trail }: { trail: Trail }) {
   const schedule =
     trail.trigger.type === "schedule" ? trail.trigger.schedule : undefined;
-  const event =
-    trail.trigger.type === "event" ? trail.trigger.event : undefined;
+  const eventNames =
+    trail.trigger.type === "event" ? trail.trigger.events : undefined;
+  const eventLabels = eventNames?.map(
+    (name) =>
+      eventDefinitions.find((event) => event.name === name)?.label ?? name,
+  );
 
   return (
     <styled.section aria-label="Trail details">
@@ -87,10 +92,14 @@ export function TrailOverview({ trail }: { trail: Trail }) {
             overflowWrap="anywhere"
             display="block"
           >
-            {schedule ? describeTrailSchedule(schedule) : event}
+            {schedule
+              ? describeTrailSchedule(schedule)
+              : eventLabels?.join(", ")}
           </Text>
           <Text as="span" variant="metadata" display="block">
-            {schedule ? schedule.timezone : "Runs when this event occurs"}
+            {schedule
+              ? schedule.timezone
+              : "Runs when any selected event occurs"}
           </Text>
         </Box>
 

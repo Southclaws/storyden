@@ -3,7 +3,7 @@ package trail
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"slices"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -44,16 +44,19 @@ func (r *Repository) Create(
 	name string,
 	description string,
 	status Status,
-	triggerType TriggerType,
-	triggerConfig json.RawMessage,
+	trigger Trigger,
 	actions []ActionSpec,
 	nextOccurrenceAt opt.Optional[time.Time],
 ) (*Trail, error) {
 	if len(actions) == 0 {
 		return nil, ErrNoActions
 	}
+	triggerType, triggerConfig, err := encodeTrigger(trigger)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 	id := xid.New()
-	err := ent.WithTx(ctx, r.db, func(tx *ent.Tx) error {
+	err = ent.WithTx(ctx, r.db, func(tx *ent.Tx) error {
 		create := tx.Trail.Create().
 			SetID(id).
 			SetAccountID(creatorID).
@@ -90,16 +93,19 @@ func (r *Repository) Update(
 	name string,
 	description string,
 	status Status,
-	triggerType TriggerType,
-	triggerConfig json.RawMessage,
+	trigger Trigger,
 	actions []ActionSpec,
 	nextOccurrenceAt opt.Optional[time.Time],
 ) (*Trail, error) {
 	if len(actions) == 0 {
 		return nil, ErrNoActions
 	}
+	triggerType, triggerConfig, err := encodeTrigger(trigger)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 	now := time.Now().UTC()
-	err := ent.WithTx(ctx, r.db, func(tx *ent.Tx) error {
+	err = ent.WithTx(ctx, r.db, func(tx *ent.Tx) error {
 		update := tx.Trail.Update().
 			Where(enttrail.IDEQ(xid.ID(id))).
 			SetName(name).
@@ -189,7 +195,7 @@ func (r *Repository) List(ctx context.Context) ([]*Trail, error) {
 
 type EventTriggerDefinition struct {
 	ID     ID
-	Config json.RawMessage
+	Events []string
 }
 
 func (r *Repository) ActiveEventTriggers(ctx context.Context) ([]EventTriggerDefinition, error) {
@@ -198,7 +204,7 @@ func (r *Repository) ActiveEventTriggers(ctx context.Context) ([]EventTriggerDef
 			enttrail.StatusEQ(enttrail.StatusActive),
 			enttrail.TriggerTypeEQ(TriggerTypeEvent.String()),
 		).
-		Select(enttrail.FieldID, enttrail.FieldTriggerConfig).
+		Select(enttrail.FieldID, enttrail.FieldTriggerType, enttrail.FieldTriggerConfig).
 		All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -206,7 +212,15 @@ func (r *Repository) ActiveEventTriggers(ctx context.Context) ([]EventTriggerDef
 
 	result := make([]EventTriggerDefinition, len(rows))
 	for i, row := range rows {
-		result[i] = EventTriggerDefinition{ID: ID(row.ID), Config: row.TriggerConfig}
+		trigger, err := decodeTrigger(row.TriggerType, row.TriggerConfig)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+		event := trigger.Event()
+		if event == nil {
+			return nil, fault.Wrap(ErrInvalidEventTrigger, fctx.With(ctx))
+		}
+		result[i] = EventTriggerDefinition{ID: ID(row.ID), Events: event.Events}
 	}
 
 	return result, nil
@@ -257,16 +271,19 @@ func (r *Repository) MaterialiseScheduled(ctx context.Context, id ID, expectedCu
 			return err
 		}
 		runID = xid.New()
-		trigger, err := serialiseTrigger(trailRow.TriggerType, trailRow.TriggerConfig)
+		definition, err := decodeTrigger(trailRow.TriggerType, trailRow.TriggerConfig)
 		if err != nil {
 			return err
 		}
 		event := TriggerEvent{
-			TrailID: id.String(), TrailRunID: runID.String(), Kind: RunKindScheduled,
-			Trigger:      trigger,
-			ScheduledFor: ptrTime(recordedFor.UTC()), ObservedAt: time.Now().UTC(),
+			TrailID:      id.String(),
+			TrailRunID:   runID.String(),
+			Kind:         RunKindScheduled,
+			Trigger:      definition,
+			ScheduledFor: ptrTime(recordedFor.UTC()),
+			ObservedAt:   time.Now().UTC(),
 		}
-		payload, err := json.Marshal(event)
+		payload, err := encodeTriggerEvent(event)
 		if err != nil {
 			return err
 		}
@@ -344,24 +361,25 @@ func (r *Repository) MaterialiseEvent(ctx context.Context, id ID, eventName stri
 			return err
 		}
 
-		var config EventTriggerConfig
-		if err := json.Unmarshal(trailRow.TriggerConfig, &config); err != nil {
+		definition, err := decodeTrigger(trailRow.TriggerType, trailRow.TriggerConfig)
+		if err != nil {
 			return err
 		}
-		if config.Event != eventName {
+		eventTrigger := definition.Event()
+		if eventTrigger == nil || !slices.Contains(eventTrigger.Events, eventName) {
 			return nil
 		}
 
 		runID = xid.New()
-		trigger, err := serialiseTrigger(trailRow.TriggerType, trailRow.TriggerConfig)
-		if err != nil {
-			return err
-		}
 		event := TriggerEvent{
-			TrailID: id.String(), TrailRunID: runID.String(), Kind: RunKindEvent,
-			Trigger: trigger, Payload: sourcePayload, ObservedAt: observedAt.UTC(),
+			TrailID:    id.String(),
+			TrailRunID: runID.String(),
+			Kind:       RunKindEvent,
+			Trigger:    definition,
+			Payload:    sourcePayload,
+			ObservedAt: observedAt.UTC(),
 		}
-		payload, err := json.Marshal(event)
+		payload, err := encodeTriggerEvent(event)
 		if err != nil {
 			return err
 		}
@@ -418,16 +436,19 @@ func (r *Repository) MaterialiseManual(ctx context.Context, id ID, initiatedBy x
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 	runID := xid.New()
-	trigger, err := serialiseTrigger(trailRow.TriggerType, trailRow.TriggerConfig)
+	definition, err := decodeTrigger(trailRow.TriggerType, trailRow.TriggerConfig)
 	if err != nil {
 		return nil, err
 	}
 	event := TriggerEvent{
-		TrailID: id.String(), TrailRunID: runID.String(), Kind: RunKindManual,
-		Trigger:    trigger,
-		ObservedAt: time.Now().UTC(), InitiatedBy: initiatedBy.String(),
+		TrailID:     id.String(),
+		TrailRunID:  runID.String(),
+		Kind:        RunKindManual,
+		Trigger:     definition,
+		ObservedAt:  time.Now().UTC(),
+		InitiatedBy: initiatedBy.String(),
 	}
-	payload, err := json.Marshal(event)
+	payload, err := encodeTriggerEvent(event)
 	if err != nil {
 		return nil, err
 	}
@@ -850,15 +871,21 @@ func mapTrail(row *ent.Trail) (*Trail, error) {
 	if err != nil {
 		return nil, err
 	}
-	triggerType, err := NewTriggerType(row.TriggerType)
+	trigger, err := decodeTrigger(row.TriggerType, row.TriggerConfig)
 	if err != nil {
 		return nil, err
 	}
 	result := &Trail{
-		ID: ID(row.ID), Creator: *creator, Name: row.Name, Description: row.Description,
-		Status: status, TriggerType: triggerType, TriggerConfig: row.TriggerConfig,
-		NextOccurrenceAt: row.NextOccurrenceAt, LastOccurrenceAt: row.LastOccurrenceAt,
-		CreatedAt: row.CreatedAt, UpdatedAt: row.UpdatedAt,
+		ID:               ID(row.ID),
+		Creator:          *creator,
+		Name:             row.Name,
+		Description:      row.Description,
+		Status:           status,
+		Trigger:          trigger,
+		NextOccurrenceAt: row.NextOccurrenceAt,
+		LastOccurrenceAt: row.LastOccurrenceAt,
+		CreatedAt:        row.CreatedAt,
+		UpdatedAt:        row.UpdatedAt,
 	}
 	for _, action := range row.Edges.Actions {
 		mapped, err := mapAction(action)
@@ -876,8 +903,14 @@ func mapAction(row *ent.TrailAction) (*Action, error) {
 		return nil, err
 	}
 	return &Action{
-		ID: ActionID(row.ID), TrailID: ID(row.TrailID), Kind: kind, Position: row.Position,
-		Config: row.Config, ArchivedAt: row.ArchivedAt, CreatedAt: row.CreatedAt, UpdatedAt: row.UpdatedAt,
+		ID:         ActionID(row.ID),
+		TrailID:    ID(row.TrailID),
+		Kind:       kind,
+		Position:   row.Position,
+		Config:     row.Config,
+		ArchivedAt: row.ArchivedAt,
+		CreatedAt:  row.CreatedAt,
+		UpdatedAt:  row.UpdatedAt,
 	}, nil
 }
 
@@ -890,10 +923,21 @@ func mapRun(row *ent.TrailRun) (*Run, error) {
 	if err != nil {
 		return nil, err
 	}
+	trigger, err := decodeTriggerEvent(row.TriggerPayload)
+	if err != nil {
+		return nil, err
+	}
 	result := &Run{
-		ID: RunID(row.ID), TrailID: ID(row.TrailID), InitiatedBy: row.InitiatedByID,
-		Kind: kind, TriggerPayload: row.TriggerPayload, ScheduledFor: row.ScheduledFor,
-		Status: status, FinishedAt: row.FinishedAt, CreatedAt: row.CreatedAt, UpdatedAt: row.UpdatedAt,
+		ID:           RunID(row.ID),
+		TrailID:      ID(row.TrailID),
+		InitiatedBy:  row.InitiatedByID,
+		Kind:         kind,
+		Trigger:      trigger,
+		ScheduledFor: row.ScheduledFor,
+		Status:       status,
+		FinishedAt:   row.FinishedAt,
+		CreatedAt:    row.CreatedAt,
+		UpdatedAt:    row.UpdatedAt,
 	}
 	for _, action := range row.Edges.ActionRuns {
 		mapped, err := mapActionRun(action)
@@ -915,11 +959,22 @@ func mapActionRun(row *ent.TrailActionRun) (*ActionRun, error) {
 		return nil, err
 	}
 	result := &ActionRun{
-		ID: ActionRunID(row.ID), RunID: RunID(row.RunID), ActionID: ActionID(row.ActionID), Kind: kind,
-		Config: row.Config, Status: status, LeaseToken: row.LeaseToken,
+		ID:             ActionRunID(row.ID),
+		RunID:          RunID(row.RunID),
+		ActionID:       ActionID(row.ActionID),
+		Kind:           kind,
+		Config:         row.Config,
+		Status:         status,
+		LeaseToken:     row.LeaseToken,
 		LeaseExpiresAt: row.LeaseExpiresAt,
-		Output:         row.Output, Target: row.Target, ErrorText: row.ErrorText, StartedAt: row.StartedAt, FinishedAt: row.FinishedAt,
-		NotifiedAt: row.NotifiedAt, CreatedAt: row.CreatedAt, UpdatedAt: row.UpdatedAt,
+		Output:         row.Output,
+		Target:         row.Target,
+		ErrorText:      row.ErrorText,
+		StartedAt:      row.StartedAt,
+		FinishedAt:     row.FinishedAt,
+		NotifiedAt:     row.NotifiedAt,
+		CreatedAt:      row.CreatedAt,
+		UpdatedAt:      row.UpdatedAt,
 	}
 	if row.Edges.Action != nil {
 		result.Action, err = mapAction(row.Edges.Action)
@@ -931,31 +986,3 @@ func mapActionRun(row *ent.TrailActionRun) (*ActionRun, error) {
 }
 
 func ptrTime(value time.Time) *time.Time { return &value }
-
-func serialiseTrigger(triggerType string, config json.RawMessage) (json.RawMessage, error) {
-	kind, err := NewTriggerType(triggerType)
-	if err != nil {
-		return nil, err
-	}
-
-	switch kind {
-	case TriggerTypeSchedule:
-		return json.Marshal(struct {
-			Type     string          `json:"type"`
-			Schedule json.RawMessage `json:"schedule"`
-		}{Type: triggerType, Schedule: config})
-
-	case TriggerTypeEvent:
-		var event EventTriggerConfig
-		if err := json.Unmarshal(config, &event); err != nil {
-			return nil, err
-		}
-		return json.Marshal(struct {
-			Type  string `json:"type"`
-			Event string `json:"event"`
-		}{Type: triggerType, Event: event.Event})
-
-	default:
-		return nil, fmt.Errorf("%w: %q", ErrUnsupportedTrigger, triggerType)
-	}
-}

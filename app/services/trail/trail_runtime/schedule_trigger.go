@@ -79,11 +79,7 @@ func (r *Runtime) skipOfflineGap(ctx context.Context, now time.Time) error {
 		}
 
 		for _, definition := range due {
-			schedule, err := recurrence.Parse(definition.TriggerConfig)
-			if err != nil {
-				r.logger.Error("invalid persisted Trail schedule", slog.String("trail_id", definition.ID.String()), slog.String("error", err.Error()))
-				continue
-			}
+			schedule := definition.Trigger.Schedule()
 
 			first := *definition.NextOccurrenceAt
 			latest, following, ok := recurrence.AdvancePast(schedule, first, now)
@@ -110,11 +106,7 @@ func (r *Runtime) materialiseDue(ctx context.Context, now time.Time) error {
 		return err
 	}
 	for _, definition := range due {
-		schedule, err := recurrence.Parse(definition.TriggerConfig)
-		if err != nil {
-			r.logger.Error("invalid persisted Trail schedule", slog.String("trail_id", definition.ID.String()), slog.String("error", err.Error()))
-			continue
-		}
+		schedule := definition.Trigger.Schedule()
 
 		current := *definition.NextOccurrenceAt
 		following, hasNext := schedule.NextAfter(current)

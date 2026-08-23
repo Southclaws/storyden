@@ -116,8 +116,12 @@ func TestTrailSchedulePreview(t *testing.T) {
 				ts := map[string]openapi.RecurrenceSchedule{
 					"timezone": trailSchedule("2090-01-10T09:00:00", "Not/AZone", openapi.Daily),
 					"interval": {
-						Start: "2090-01-10T09:00:00", Timezone: "UTC",
-						Rule: openapi.RecurrenceRule{Frequency: openapi.Daily, Interval: 0},
+						Start:    "2090-01-10T09:00:00",
+						Timezone: "UTC",
+						Rule: openapi.RecurrenceRule{
+							Frequency: openapi.Daily,
+							Interval:  0,
+						},
 					},
 					"offset_start": trailSchedule("2090-01-10T09:00:00Z", "UTC", openapi.Daily),
 				}

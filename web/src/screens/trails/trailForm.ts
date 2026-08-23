@@ -14,6 +14,8 @@ export const scheduleKinds = [
   "yearly",
 ] as const;
 
+export const triggerTypes = ["schedule", "event"] as const;
+
 export const weekdays = [
   "monday",
   "tuesday",
@@ -28,6 +30,8 @@ export const TrailFormSchema = z
   .object({
     name: z.string().trim().min(1, "Name is required").max(120),
     description: z.string(),
+    triggerType: z.enum(triggerTypes),
+    events: z.array(z.string()),
     scheduleKind: z.enum(scheduleKinds),
     timezone: z.string().trim().min(1, "Timezone is required"),
     startDate: z.string().min(1, "Starting date is required"),
@@ -48,7 +52,19 @@ export const TrailFormSchema = z
       .min(1, "Add at least one Robot action"),
   })
   .superRefine((values, context) => {
-    if (values.scheduleKind === "weekly" && values.selectedDays.length === 0) {
+    if (values.triggerType === "event" && values.events.length === 0) {
+      context.addIssue({
+        code: "custom",
+        message: "Choose at least one event",
+        path: ["events"],
+      });
+    }
+
+    if (
+      values.triggerType === "schedule" &&
+      values.scheduleKind === "weekly" &&
+      values.selectedDays.length === 0
+    ) {
       context.addIssue({
         code: "custom",
         message: "Choose at least one weekday",
@@ -73,6 +89,9 @@ export function initialTrailFormValues(
   return {
     name: initialValue?.name ?? "",
     description: initialValue?.description ?? "",
+    triggerType: initialValue?.trigger.type ?? "schedule",
+    events:
+      initialValue?.trigger.type === "event" ? initialValue.trigger.events : [],
     scheduleKind: scheduleKind(schedule),
     timezone: schedule?.timezone ?? timezone,
     startDate: schedule?.start.slice(0, 10) ?? startDate,
@@ -161,10 +180,10 @@ export function trailFormPayload(
     name: values.name,
     description: values.description,
     status,
-    trigger: {
-      type: "schedule",
-      schedule: trailFormSchedule(values),
-    },
+    trigger:
+      values.triggerType === "event"
+        ? { type: "event", events: values.events }
+        : { type: "schedule", schedule: trailFormSchedule(values) },
     actions: values.actions,
   };
 }

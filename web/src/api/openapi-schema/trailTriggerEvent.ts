@@ -12,8 +12,9 @@ import type { TrailTriggerEventType } from "./trailTriggerEventType";
 export interface TrailTriggerEvent {
   type: TrailTriggerEventType;
   /**
-   * A Storyden event name from the canonical event catalogue.
-   * @minLength 1
+   * Event names from the canonical event catalogue.
+   * @minItems 1
+   * @items.minLength 1
    */
-  event: string;
+  events: string[];
 }

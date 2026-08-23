@@ -86,8 +86,7 @@ type Trail struct {
 	Name             string
 	Description      string
 	Status           Status
-	TriggerType      TriggerType
-	TriggerConfig    json.RawMessage
+	Trigger          Trigger
 	NextOccurrenceAt *time.Time
 	LastOccurrenceAt *time.Time
 	CreatedAt        time.Time
@@ -107,32 +106,28 @@ type Action struct {
 }
 
 type TriggerEvent struct {
-	TrailID      string          `json:"trail_id"`
-	TrailRunID   string          `json:"trail_run_id"`
-	Kind         RunKind         `json:"kind"`
-	Trigger      json.RawMessage `json:"trigger"`
-	Payload      json.RawMessage `json:"payload,omitempty"`
-	ScheduledFor *time.Time      `json:"scheduled_for,omitempty"`
-	ObservedAt   time.Time       `json:"observed_at"`
-	InitiatedBy  string          `json:"initiated_by,omitempty"`
-}
-
-type EventTriggerConfig struct {
-	Event string `json:"event"`
+	TrailID      string
+	TrailRunID   string
+	Kind         RunKind
+	Trigger      Trigger
+	Payload      json.RawMessage
+	ScheduledFor *time.Time
+	ObservedAt   time.Time
+	InitiatedBy  string
 }
 
 type Run struct {
-	ID             RunID
-	TrailID        ID
-	InitiatedBy    *xid.ID
-	Kind           RunKind
-	TriggerPayload json.RawMessage
-	ScheduledFor   *time.Time
-	Status         RunStatus
-	FinishedAt     *time.Time
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	ActionRuns     []*ActionRun
+	ID           RunID
+	TrailID      ID
+	InitiatedBy  *xid.ID
+	Kind         RunKind
+	Trigger      TriggerEvent
+	ScheduledFor *time.Time
+	Status       RunStatus
+	FinishedAt   *time.Time
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	ActionRuns   []*ActionRun
 }
 
 type ActionRun struct {
