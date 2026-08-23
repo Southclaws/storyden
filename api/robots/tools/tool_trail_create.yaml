@@ -1,9 +1,8 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolTrailCreate
-x-storyden:
+x-storyden-tool:
   toolsets:
     - system.trails
-x-storyden-tool:
   title: Create Trail
   role: MANAGE_TRAILS
   annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false }

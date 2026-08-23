@@ -1,9 +1,8 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolWebOpen
-x-storyden:
+x-storyden-tool:
   internal: true
   toolsets: []
-x-storyden-tool:
   title: Open Web Page
   annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true }
 title: web_open

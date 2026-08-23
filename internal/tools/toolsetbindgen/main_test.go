@@ -14,18 +14,15 @@ func TestParseToolsetBindingsGroupsAndSortsToolNames(t *testing.T) {
   "definitions": {
     "ToolThreadList": {
       "title": "thread_list",
-	  "x-storyden-tool": {"title": "List discussions"},
-      "x-storyden": {"toolsets": ["system.discussions"]}
+	  "x-storyden-tool": {"title": "List discussions", "toolsets": ["system.discussions"]}
     },
     "ToolLibrarySearchPages": {
       "title": "library_search_pages",
-	  "x-storyden-tool": {"title": "Search library pages"},
-      "x-storyden": {"toolsets": ["system.library", "system.content_search"]}
+	  "x-storyden-tool": {"title": "Search library pages", "toolsets": ["system.library", "system.content_search"]}
     },
     "ToolThreadGet": {
       "title": "thread_get",
-	  "x-storyden-tool": {"title": "Get discussion"},
-      "x-storyden": {"toolsets": ["system.discussions", "system.discussions"]}
+	  "x-storyden-tool": {"title": "Get discussion", "toolsets": ["system.discussions", "system.discussions"]}
     },
     "ToolThreadGetInput": {"type": "object"}
   }
@@ -47,8 +44,7 @@ func TestParseToolsetBindingsRejectsInvalidMembership(t *testing.T) {
   "definitions": {
     "ToolThreadGet": {
       "title": "thread_get",
-	  "x-storyden-tool": {"title": "Get discussion"},
-      "x-storyden": {"toolsets": ["custom.user_tools"]}
+	  "x-storyden-tool": {"title": "Get discussion", "toolsets": ["custom.user_tools"]}
     }
   }
 }`))
@@ -66,7 +62,7 @@ func TestParseToolsetBindingsRequiresExplicitMembershipArray(t *testing.T) {
   }
 }`))
 	require.Error(t, err)
-	assert.EqualError(t, err, "ToolLinkCreate must declare x-storyden.toolsets")
+	assert.EqualError(t, err, "ToolLinkCreate must declare x-storyden-tool.toolsets")
 }
 
 func TestParseToolsetBindingsValidatesToolsetOnlyMetadata(t *testing.T) {
@@ -74,25 +70,23 @@ func TestParseToolsetBindingsValidatesToolsetOnlyMetadata(t *testing.T) {
   "definitions": {
     "ToolDocumentGet": {
       "title": "document_get",
-      "x-storyden-tool": {"title": "Inspect document"},
-      "x-storyden": {"toolsets": [], "toolset_only": true}
+      "x-storyden-tool": {"title": "Inspect document", "toolsets": [], "toolset_only": true}
     }
   }
 }`))
 	require.Error(t, err)
-	assert.EqualError(t, err, "ToolDocumentGet x-storyden.toolset_only requires at least one x-storyden.toolsets entry")
+	assert.EqualError(t, err, "ToolDocumentGet x-storyden-tool.toolset_only requires at least one x-storyden-tool.toolsets entry")
 
 	_, err = parseToolsetBindings([]byte(`{
   "definitions": {
     "ToolDocumentGet": {
       "title": "document_get",
-      "x-storyden-tool": {"title": "Inspect document"},
-      "x-storyden": {"toolsets": ["system.documents"], "toolset_only": "yes"}
+      "x-storyden-tool": {"title": "Inspect document", "toolsets": ["system.documents"], "toolset_only": "yes"}
     }
   }
 }`))
 	require.Error(t, err)
-	assert.EqualError(t, err, "ToolDocumentGet x-storyden.toolset_only must be a boolean")
+	assert.EqualError(t, err, "ToolDocumentGet x-storyden-tool.toolset_only must be a boolean")
 }
 
 func TestWriteBindingsTargetsDefinitionPackages(t *testing.T) {

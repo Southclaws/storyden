@@ -1,9 +1,8 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolTrailActionRunCancel
-x-storyden:
+x-storyden-tool:
   toolsets:
     - system.trails
-x-storyden-tool:
   title: Cancel Trail Action Run
   role: MANAGE_TRAILS
   requires_confirmation: true

@@ -1,9 +1,8 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolTrailList
-x-storyden:
+x-storyden-tool:
   toolsets:
     - system.trails
-x-storyden-tool:
   title: List Trails
   role: MANAGE_TRAILS
   annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }

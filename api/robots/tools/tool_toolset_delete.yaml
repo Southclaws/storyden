@@ -1,9 +1,8 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolToolsetDelete
-x-storyden:
+x-storyden-tool:
   toolsets:
     - system.robot_studio
-x-storyden-tool:
   title: Delete Toolset
   role: USE_ROBOTS
   annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: false }

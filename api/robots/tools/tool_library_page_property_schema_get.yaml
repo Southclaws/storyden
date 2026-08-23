@@ -1,9 +1,8 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolLibraryPagePropertySchemaGet
-x-storyden:
+x-storyden-tool:
   toolsets:
     - system.library
-x-storyden-tool:
   title: Get Property Schema
   role: READ_PUBLISHED_LIBRARY
   annotations:

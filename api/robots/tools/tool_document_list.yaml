@@ -1,11 +1,10 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolDocumentList
-x-storyden:
+x-storyden-tool:
   internal: true
   toolset_only: true
   toolsets:
     - system.documents
-x-storyden-tool:
   title: List Open Documents
   annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
 title: document_list

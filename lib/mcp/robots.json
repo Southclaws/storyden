@@ -646,11 +646,6 @@
       ],
       "title": "category_list",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.discussions"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -658,7 +653,10 @@
           "openWorldHint": false,
           "readOnlyHint": true
         },
-        "title": "List Categories"
+        "title": "List Categories",
+        "toolsets": [
+          "system.discussions"
+        ]
       }
     },
     "ToolCategoryListInput": {
@@ -698,11 +696,6 @@
       ],
       "title": "content_search",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.content_search"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -710,7 +703,10 @@
           "openWorldHint": false,
           "readOnlyHint": true
         },
-        "title": "Content Search"
+        "title": "Content Search",
+        "toolsets": [
+          "system.content_search"
+        ]
       }
     },
     "ToolContentSearchInput": {
@@ -809,13 +805,6 @@
       ],
       "title": "document_close",
       "type": "object",
-      "x-storyden": {
-        "internal": true,
-        "toolset_only": true,
-        "toolsets": [
-          "system.documents"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -823,7 +812,12 @@
           "openWorldHint": false,
           "readOnlyHint": false
         },
-        "title": "Close Document"
+        "internal": true,
+        "title": "Close Document",
+        "toolset_only": true,
+        "toolsets": [
+          "system.documents"
+        ]
       }
     },
     "ToolDocumentCloseInput": {
@@ -880,13 +874,6 @@
       ],
       "title": "document_get",
       "type": "object",
-      "x-storyden": {
-        "internal": true,
-        "toolset_only": true,
-        "toolsets": [
-          "system.documents"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -894,7 +881,12 @@
           "openWorldHint": false,
           "readOnlyHint": false
         },
-        "title": "Inspect Document"
+        "internal": true,
+        "title": "Inspect Document",
+        "toolset_only": true,
+        "toolsets": [
+          "system.documents"
+        ]
       }
     },
     "ToolDocumentGetInput": {
@@ -1024,13 +1016,6 @@
       ],
       "title": "document_list",
       "type": "object",
-      "x-storyden": {
-        "internal": true,
-        "toolset_only": true,
-        "toolsets": [
-          "system.documents"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1038,7 +1023,12 @@
           "openWorldHint": false,
           "readOnlyHint": true
         },
-        "title": "List Open Documents"
+        "internal": true,
+        "title": "List Open Documents",
+        "toolset_only": true,
+        "toolsets": [
+          "system.documents"
+        ]
       }
     },
     "ToolDocumentListInput": {
@@ -1083,13 +1073,6 @@
       ],
       "title": "document_search",
       "type": "object",
-      "x-storyden": {
-        "internal": true,
-        "toolset_only": true,
-        "toolsets": [
-          "system.documents"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1097,7 +1080,12 @@
           "openWorldHint": false,
           "readOnlyHint": true
         },
-        "title": "Search Document"
+        "internal": true,
+        "title": "Search Document",
+        "toolset_only": true,
+        "toolsets": [
+          "system.documents"
+        ]
       }
     },
     "ToolDocumentSearchInput": {
@@ -1185,11 +1173,6 @@
       ],
       "title": "create_library_page",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.library"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1198,7 +1181,10 @@
           "readOnlyHint": false
         },
         "role": "MANAGE_LIBRARY",
-        "title": "Create Library Page"
+        "title": "Create Library Page",
+        "toolsets": [
+          "system.library"
+        ]
       }
     },
     "ToolLibraryPageCreateInput": {
@@ -1292,11 +1278,6 @@
       ],
       "title": "library_page_get",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.library"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1305,7 +1286,10 @@
           "readOnlyHint": true
         },
         "role": "READ_PUBLISHED_LIBRARY",
-        "title": "Get Library Page"
+        "title": "Get Library Page",
+        "toolsets": [
+          "system.library"
+        ]
       }
     },
     "ToolLibraryPageGetInput": {
@@ -1405,12 +1389,6 @@
       ],
       "title": "library_page_open",
       "type": "object",
-      "x-storyden": {
-        "internal": true,
-        "toolsets": [
-          "system.library"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1418,8 +1396,12 @@
           "openWorldHint": false,
           "readOnlyHint": false
         },
+        "internal": true,
         "role": "READ_PUBLISHED_LIBRARY",
-        "title": "Open Library Page"
+        "title": "Open Library Page",
+        "toolsets": [
+          "system.library"
+        ]
       }
     },
     "ToolLibraryPageOpenInput": {
@@ -1544,11 +1526,6 @@
       ],
       "title": "library_page_properties_update",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.library"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1556,7 +1533,10 @@
           "openWorldHint": false,
           "readOnlyHint": false
         },
-        "title": "Update Page Properties"
+        "title": "Update Page Properties",
+        "toolsets": [
+          "system.library"
+        ]
       }
     },
     "ToolLibraryPagePropertiesUpdateInput": {
@@ -1614,11 +1594,6 @@
       ],
       "title": "library_page_property_schema_get",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.library"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1627,7 +1602,10 @@
           "readOnlyHint": true
         },
         "role": "READ_PUBLISHED_LIBRARY",
-        "title": "Get Property Schema"
+        "title": "Get Property Schema",
+        "toolsets": [
+          "system.library"
+        ]
       }
     },
     "ToolLibraryPagePropertySchemaGetInput": {
@@ -1681,11 +1659,6 @@
       ],
       "title": "library_page_property_schema_update",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.library"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": true,
@@ -1694,7 +1667,10 @@
           "readOnlyHint": false
         },
         "role": "MANAGE_LIBRARY",
-        "title": "Update Property Schema"
+        "title": "Update Property Schema",
+        "toolsets": [
+          "system.library"
+        ]
       }
     },
     "ToolLibraryPagePropertySchemaUpdateInput": {
@@ -1752,11 +1728,6 @@
       ],
       "title": "library_page_list",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.library"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1765,7 +1736,10 @@
           "readOnlyHint": true
         },
         "role": "READ_PUBLISHED_LIBRARY",
-        "title": "List Library Pages"
+        "title": "List Library Pages",
+        "toolsets": [
+          "system.library"
+        ]
       }
     },
     "ToolLibraryPageTreeInput": {
@@ -1826,11 +1800,6 @@
       ],
       "title": "update_library_page",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.library"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1838,7 +1807,10 @@
           "openWorldHint": false,
           "readOnlyHint": false
         },
-        "title": "Update Library Page"
+        "title": "Update Library Page",
+        "toolsets": [
+          "system.library"
+        ]
       }
     },
     "ToolLibraryPageUpdateInput": {
@@ -1938,12 +1910,6 @@
       ],
       "title": "library_request_page",
       "type": "object",
-      "x-storyden": {
-        "internal": true,
-        "toolsets": [
-          "system.library"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1951,8 +1917,12 @@
           "openWorldHint": false,
           "readOnlyHint": true
         },
+        "internal": true,
         "role": "READ_PUBLISHED_LIBRARY",
-        "title": "Request Library Page"
+        "title": "Request Library Page",
+        "toolsets": [
+          "system.library"
+        ]
       }
     },
     "ToolLibraryRequestPageInput": {
@@ -2008,12 +1978,6 @@
       ],
       "title": "library_search_pages",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.library",
-          "system.content_search"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2022,7 +1986,11 @@
           "readOnlyHint": true
         },
         "role": "READ_PUBLISHED_LIBRARY",
-        "title": "Search Library Pages"
+        "title": "Search Library Pages",
+        "toolsets": [
+          "system.library",
+          "system.content_search"
+        ]
       }
     },
     "ToolLibrarySearchPagesInput": {
@@ -2077,9 +2045,6 @@
       ],
       "title": "link_create",
       "type": "object",
-      "x-storyden": {
-        "toolsets": []
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2088,7 +2053,8 @@
           "readOnlyHint": false
         },
         "role": "CREATE_POST",
-        "title": "Create Link"
+        "title": "Create Link",
+        "toolsets": []
       }
     },
     "ToolLinkCreateInput": {
@@ -2152,11 +2118,6 @@
       ],
       "title": "member_search",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.content_search"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2164,7 +2125,10 @@
           "openWorldHint": false,
           "readOnlyHint": true
         },
-        "title": "Member Search"
+        "title": "Member Search",
+        "toolsets": [
+          "system.content_search"
+        ]
       }
     },
     "ToolMemberSearchInput": {
@@ -2225,12 +2189,6 @@
       ],
       "title": "post_search",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.content_search",
-          "system.discussions"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2238,7 +2196,11 @@
           "openWorldHint": false,
           "readOnlyHint": true
         },
-        "title": "Post Search"
+        "title": "Post Search",
+        "toolsets": [
+          "system.content_search",
+          "system.discussions"
+        ]
       }
     },
     "ToolPostSearchInput": {
@@ -2321,12 +2283,6 @@
       ],
       "title": "reply_search",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.content_search",
-          "system.discussions"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2334,7 +2290,11 @@
           "openWorldHint": false,
           "readOnlyHint": true
         },
-        "title": "Reply Search"
+        "title": "Reply Search",
+        "toolsets": [
+          "system.content_search",
+          "system.discussions"
+        ]
       }
     },
     "ToolReplySearchInput": {
@@ -2410,11 +2370,6 @@
       ],
       "title": "robot_create",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.robot_studio"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2423,7 +2378,10 @@
           "readOnlyHint": false
         },
         "role": "MANAGE_ROBOTS",
-        "title": "Create Robot"
+        "title": "Create Robot",
+        "toolsets": [
+          "system.robot_studio"
+        ]
       }
     },
     "ToolRobotCreateInput": {
@@ -2505,11 +2463,6 @@
       ],
       "title": "robot_delete",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.robot_studio"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": true,
@@ -2519,7 +2472,10 @@
         },
         "requires_confirmation": true,
         "role": "MANAGE_ROBOTS",
-        "title": "Delete Robot"
+        "title": "Delete Robot",
+        "toolsets": [
+          "system.robot_studio"
+        ]
       }
     },
     "ToolRobotDeleteInput": {
@@ -2571,11 +2527,6 @@
       ],
       "title": "robot_get",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.robot_studio"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2584,7 +2535,10 @@
           "readOnlyHint": true
         },
         "role": "USE_ROBOTS",
-        "title": "Get Robot"
+        "title": "Get Robot",
+        "toolsets": [
+          "system.robot_studio"
+        ]
       }
     },
     "ToolRobotGetInput": {
@@ -2666,11 +2620,6 @@
       ],
       "title": "robot_list",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.robot_studio"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2679,7 +2628,10 @@
           "readOnlyHint": true
         },
         "role": "USE_ROBOTS",
-        "title": "List Robots"
+        "title": "List Robots",
+        "toolsets": [
+          "system.robot_studio"
+        ]
       }
     },
     "ToolRobotListInput": {
@@ -2730,11 +2682,6 @@
       ],
       "title": "robot_search",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.robot_studio"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2743,7 +2690,10 @@
           "readOnlyHint": true
         },
         "role": "USE_ROBOTS",
-        "title": "Search Robots"
+        "title": "Search Robots",
+        "toolsets": [
+          "system.robot_studio"
+        ]
       }
     },
     "ToolRobotSearchInput": {
@@ -2801,11 +2751,6 @@
       ],
       "title": "robot_update",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.robot_studio"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2814,7 +2759,10 @@
           "readOnlyHint": false
         },
         "role": "MANAGE_ROBOTS",
-        "title": "Update Robot"
+        "title": "Update Robot",
+        "toolsets": [
+          "system.robot_studio"
+        ]
       }
     },
     "ToolRobotUpdateInput": {
@@ -2899,11 +2847,6 @@
       ],
       "title": "tag_list",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.discussions"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2912,7 +2855,10 @@
           "readOnlyHint": true
         },
         "role": "READ_PUBLISHED_THREADS",
-        "title": "List Tags"
+        "title": "List Tags",
+        "toolsets": [
+          "system.discussions"
+        ]
       }
     },
     "ToolTagListInput": {
@@ -2958,11 +2904,6 @@
       ],
       "title": "thread_create",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.discussions"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2971,7 +2912,10 @@
           "readOnlyHint": false
         },
         "role": "CREATE_POST",
-        "title": "Create Thread"
+        "title": "Create Thread",
+        "toolsets": [
+          "system.discussions"
+        ]
       }
     },
     "ToolThreadCreateInput": {
@@ -3094,11 +3038,6 @@
       ],
       "title": "thread_get",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.discussions"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -3107,7 +3046,10 @@
           "readOnlyHint": true
         },
         "role": "READ_PUBLISHED_THREADS",
-        "title": "Get Thread"
+        "title": "Get Thread",
+        "toolsets": [
+          "system.discussions"
+        ]
       }
     },
     "ToolThreadGetInput": {
@@ -3210,11 +3152,6 @@
       ],
       "title": "thread_list",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.discussions"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -3223,7 +3160,10 @@
           "readOnlyHint": true
         },
         "role": "READ_PUBLISHED_THREADS",
-        "title": "List Threads"
+        "title": "List Threads",
+        "toolsets": [
+          "system.discussions"
+        ]
       }
     },
     "ToolThreadListInput": {
@@ -3297,12 +3237,6 @@
       ],
       "title": "thread_open",
       "type": "object",
-      "x-storyden": {
-        "internal": true,
-        "toolsets": [
-          "system.discussions"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -3310,8 +3244,12 @@
           "openWorldHint": false,
           "readOnlyHint": false
         },
+        "internal": true,
         "role": "READ_PUBLISHED_THREADS",
-        "title": "Open Thread"
+        "title": "Open Thread",
+        "toolsets": [
+          "system.discussions"
+        ]
       }
     },
     "ToolThreadOpenInput": {
@@ -3436,11 +3374,6 @@
       ],
       "title": "thread_reply",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.discussions"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -3449,7 +3382,10 @@
           "readOnlyHint": false
         },
         "role": "CREATE_POST",
-        "title": "Reply to Thread"
+        "title": "Reply to Thread",
+        "toolsets": [
+          "system.discussions"
+        ]
       }
     },
     "ToolThreadReplyInput": {
@@ -3527,12 +3463,6 @@
       ],
       "title": "thread_search",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.content_search",
-          "system.discussions"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -3540,7 +3470,11 @@
           "openWorldHint": false,
           "readOnlyHint": true
         },
-        "title": "Thread Search"
+        "title": "Thread Search",
+        "toolsets": [
+          "system.content_search",
+          "system.discussions"
+        ]
       }
     },
     "ToolThreadSearchInput": {
@@ -3623,11 +3557,6 @@
       ],
       "title": "thread_update",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.discussions"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -3635,7 +3564,10 @@
           "openWorldHint": false,
           "readOnlyHint": false
         },
-        "title": "Update Thread"
+        "title": "Update Thread",
+        "toolsets": [
+          "system.discussions"
+        ]
       }
     },
     "ToolThreadUpdateInput": {
@@ -3751,11 +3683,6 @@
       ],
       "title": "tool_get",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.robot_studio"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -3764,7 +3691,10 @@
           "readOnlyHint": true
         },
         "role": "USE_ROBOTS",
-        "title": "Get Tool"
+        "title": "Get Tool",
+        "toolsets": [
+          "system.robot_studio"
+        ]
       }
     },
     "ToolToolGetInput": {
@@ -3854,10 +3784,6 @@
       ],
       "title": "tool_load",
       "type": "object",
-      "x-storyden": {
-        "internal": true,
-        "toolsets": []
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -3865,7 +3791,9 @@
           "openWorldHint": false,
           "readOnlyHint": false
         },
-        "title": "Load Tools"
+        "internal": true,
+        "title": "Load Tools",
+        "toolsets": []
       }
     },
     "ToolToolLoadInput": {
@@ -3944,11 +3872,6 @@
       ],
       "title": "tool_search",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.robot_studio"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -3957,7 +3880,10 @@
           "readOnlyHint": true
         },
         "role": "USE_ROBOTS",
-        "title": "Search Tools"
+        "title": "Search Tools",
+        "toolsets": [
+          "system.robot_studio"
+        ]
       }
     },
     "ToolToolSearchInput": {
@@ -4039,11 +3965,6 @@
       ],
       "title": "toolset_create",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.robot_studio"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -4052,7 +3973,10 @@
           "readOnlyHint": false
         },
         "role": "USE_ROBOTS",
-        "title": "Create Toolset"
+        "title": "Create Toolset",
+        "toolsets": [
+          "system.robot_studio"
+        ]
       }
     },
     "ToolToolsetCreateInput": {
@@ -4115,11 +4039,6 @@
       ],
       "title": "toolset_delete",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.robot_studio"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": true,
@@ -4128,7 +4047,10 @@
           "readOnlyHint": false
         },
         "role": "USE_ROBOTS",
-        "title": "Delete Toolset"
+        "title": "Delete Toolset",
+        "toolsets": [
+          "system.robot_studio"
+        ]
       }
     },
     "ToolToolsetDeleteInput": {
@@ -4177,11 +4099,6 @@
       ],
       "title": "toolset_get",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.robot_studio"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -4190,7 +4107,10 @@
           "readOnlyHint": true
         },
         "role": "USE_ROBOTS",
-        "title": "Get Toolset"
+        "title": "Get Toolset",
+        "toolsets": [
+          "system.robot_studio"
+        ]
       }
     },
     "ToolToolsetGetInput": {
@@ -4269,11 +4189,6 @@
       ],
       "title": "toolset_list",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.robot_studio"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -4282,7 +4197,10 @@
           "readOnlyHint": true
         },
         "role": "USE_ROBOTS",
-        "title": "List Toolsets"
+        "title": "List Toolsets",
+        "toolsets": [
+          "system.robot_studio"
+        ]
       }
     },
     "ToolToolsetListInput": {
@@ -4342,10 +4260,6 @@
       ],
       "title": "toolset_load",
       "type": "object",
-      "x-storyden": {
-        "internal": true,
-        "toolsets": []
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -4353,7 +4267,9 @@
           "openWorldHint": false,
           "readOnlyHint": false
         },
-        "title": "Load Toolsets"
+        "internal": true,
+        "title": "Load Toolsets",
+        "toolsets": []
       }
     },
     "ToolToolsetLoadInput": {
@@ -4432,11 +4348,6 @@
       ],
       "title": "toolset_search",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.robot_studio"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -4445,7 +4356,10 @@
           "readOnlyHint": true
         },
         "role": "USE_ROBOTS",
-        "title": "Search Toolsets"
+        "title": "Search Toolsets",
+        "toolsets": [
+          "system.robot_studio"
+        ]
       }
     },
     "ToolToolsetSearchInput": {
@@ -4527,11 +4441,6 @@
       ],
       "title": "toolset_update",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.robot_studio"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -4540,7 +4449,10 @@
           "readOnlyHint": false
         },
         "role": "USE_ROBOTS",
-        "title": "Update Toolset"
+        "title": "Update Toolset",
+        "toolsets": [
+          "system.robot_studio"
+        ]
       }
     },
     "ToolToolsetUpdateInput": {
@@ -4605,11 +4517,6 @@
       ],
       "title": "trail_action_run_cancel",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.trails"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": true,
@@ -4619,7 +4526,10 @@
         },
         "requires_confirmation": true,
         "role": "MANAGE_TRAILS",
-        "title": "Cancel Trail Action Run"
+        "title": "Cancel Trail Action Run",
+        "toolsets": [
+          "system.trails"
+        ]
       }
     },
     "ToolTrailActionRunCancelInput": {
@@ -5113,11 +5023,6 @@
       ],
       "title": "trail_create",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.trails"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -5126,7 +5031,10 @@
           "readOnlyHint": false
         },
         "role": "MANAGE_TRAILS",
-        "title": "Create Trail"
+        "title": "Create Trail",
+        "toolsets": [
+          "system.trails"
+        ]
       }
     },
     "ToolTrailCreateInput": {
@@ -5563,11 +5471,6 @@
       ],
       "title": "trail_get",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.trails"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -5576,7 +5479,10 @@
           "readOnlyHint": true
         },
         "role": "MANAGE_TRAILS",
-        "title": "Get Trail"
+        "title": "Get Trail",
+        "toolsets": [
+          "system.trails"
+        ]
       }
     },
     "ToolTrailGetInput": {
@@ -5832,11 +5738,6 @@
       ],
       "title": "trail_list",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.trails"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -5845,7 +5746,10 @@
           "readOnlyHint": true
         },
         "role": "MANAGE_TRAILS",
-        "title": "List Trails"
+        "title": "List Trails",
+        "toolsets": [
+          "system.trails"
+        ]
       }
     },
     "ToolTrailListInput": {
@@ -6102,11 +6006,6 @@
       ],
       "title": "trail_run_create",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.trails"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -6116,7 +6015,10 @@
         },
         "requires_confirmation": true,
         "role": "MANAGE_TRAILS",
-        "title": "Create Trail Run"
+        "title": "Create Trail Run",
+        "toolsets": [
+          "system.trails"
+        ]
       }
     },
     "ToolTrailRunCreateInput": {
@@ -6598,11 +6500,6 @@
       ],
       "title": "trail_run_get",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.trails"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -6611,7 +6508,10 @@
           "readOnlyHint": true
         },
         "role": "MANAGE_TRAILS",
-        "title": "Get Trail Run"
+        "title": "Get Trail Run",
+        "toolsets": [
+          "system.trails"
+        ]
       }
     },
     "ToolTrailRunGetInput": {
@@ -7099,11 +6999,6 @@
       ],
       "title": "trail_run_list",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.trails"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -7112,7 +7007,10 @@
           "readOnlyHint": true
         },
         "role": "MANAGE_TRAILS",
-        "title": "List Trail Runs"
+        "title": "List Trail Runs",
+        "toolsets": [
+          "system.trails"
+        ]
       }
     },
     "ToolTrailRunListInput": {
@@ -7293,11 +7191,6 @@
       ],
       "title": "trail_schedule_preview",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.trails"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -7306,7 +7199,10 @@
           "readOnlyHint": true
         },
         "role": "MANAGE_TRAILS",
-        "title": "Preview Trail Schedule"
+        "title": "Preview Trail Schedule",
+        "toolsets": [
+          "system.trails"
+        ]
       }
     },
     "ToolTrailSchedulePreviewInput": {
@@ -7452,11 +7348,6 @@
       ],
       "title": "trail_update",
       "type": "object",
-      "x-storyden": {
-        "toolsets": [
-          "system.trails"
-        ]
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -7465,7 +7356,10 @@
           "readOnlyHint": false
         },
         "role": "MANAGE_TRAILS",
-        "title": "Update Trail"
+        "title": "Update Trail",
+        "toolsets": [
+          "system.trails"
+        ]
       }
     },
     "ToolTrailUpdateInput": {
@@ -7908,9 +7802,6 @@
       ],
       "title": "web_fetch",
       "type": "object",
-      "x-storyden": {
-        "toolsets": []
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -7918,7 +7809,8 @@
           "openWorldHint": true,
           "readOnlyHint": true
         },
-        "title": "Fetch Web Page"
+        "title": "Fetch Web Page",
+        "toolsets": []
       }
     },
     "ToolWebFetchInput": {
@@ -7992,10 +7884,6 @@
       ],
       "title": "web_open",
       "type": "object",
-      "x-storyden": {
-        "internal": true,
-        "toolsets": []
-      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -8003,7 +7891,9 @@
           "openWorldHint": true,
           "readOnlyHint": false
         },
-        "title": "Open Web Page"
+        "internal": true,
+        "title": "Open Web Page",
+        "toolsets": []
       }
     },
     "ToolWebOpenInput": {

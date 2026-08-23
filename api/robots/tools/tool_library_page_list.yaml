@@ -1,9 +1,8 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolLibraryPageTree
-x-storyden:
+x-storyden-tool:
   toolsets:
     - system.library
-x-storyden-tool:
   title: List Library Pages
   role: READ_PUBLISHED_LIBRARY
   annotations:

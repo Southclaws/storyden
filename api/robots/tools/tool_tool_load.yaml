@@ -1,9 +1,8 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolToolLoad
-x-storyden:
+x-storyden-tool:
   internal: true
   toolsets: []
-x-storyden-tool:
   title: Load Tools
   annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false }
 title: tool_load

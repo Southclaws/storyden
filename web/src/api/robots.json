@@ -4,12 +4,10 @@
     "ToolContentSearch": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolContentSearch",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.content_search"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Content Search",
         "annotations": {
           "readOnlyHint": true,
@@ -298,14 +296,12 @@
     "ToolDocumentGet": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolDocumentGet",
-      "x-storyden": {
+      "x-storyden-tool": {
         "internal": true,
         "toolset_only": true,
         "toolsets": [
           "system.documents"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Inspect Document",
         "annotations": {
           "readOnlyHint": false,
@@ -551,14 +547,12 @@
     "ToolDocumentSearch": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolDocumentSearch",
-      "x-storyden": {
+      "x-storyden-tool": {
         "internal": true,
         "toolset_only": true,
         "toolsets": [
           "system.documents"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Search Document",
         "annotations": {
           "readOnlyHint": true,
@@ -796,14 +790,12 @@
     "ToolDocumentList": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolDocumentList",
-      "x-storyden": {
+      "x-storyden-tool": {
         "internal": true,
         "toolset_only": true,
         "toolsets": [
           "system.documents"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "List Open Documents",
         "annotations": {
           "readOnlyHint": true,
@@ -1081,14 +1073,12 @@
     "ToolDocumentClose": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolDocumentClose",
-      "x-storyden": {
+      "x-storyden-tool": {
         "internal": true,
         "toolset_only": true,
         "toolsets": [
           "system.documents"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Close Document",
         "annotations": {
           "readOnlyHint": false,
@@ -1186,12 +1176,10 @@
     "ToolToolSearch": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolToolSearch",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.robot_studio"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Search Tools",
         "role": "USE_ROBOTS",
         "annotations": {
@@ -1342,12 +1330,10 @@
     "ToolToolGet": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolToolGet",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.robot_studio"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Get Tool",
         "role": "USE_ROBOTS",
         "annotations": {
@@ -1512,11 +1498,9 @@
     "ToolToolLoad": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolToolLoad",
-      "x-storyden": {
-        "internal": true,
-        "toolsets": []
-      },
       "x-storyden-tool": {
+        "internal": true,
+        "toolsets": [],
         "title": "Load Tools",
         "annotations": {
           "readOnlyHint": false,
@@ -1660,12 +1644,10 @@
     "ToolRobotCreate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolRobotCreate",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.robot_studio"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Create Robot",
         "role": "MANAGE_ROBOTS",
         "annotations": {
@@ -1814,12 +1796,10 @@
     "ToolRobotList": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolRobotList",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.robot_studio"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "List Robots",
         "role": "USE_ROBOTS",
         "annotations": {
@@ -1966,12 +1946,10 @@
     "ToolRobotGet": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolRobotGet",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.robot_studio"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Get Robot",
         "role": "USE_ROBOTS",
         "annotations": {
@@ -2120,12 +2098,10 @@
     "ToolRobotUpdate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolRobotUpdate",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.robot_studio"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Update Robot",
         "role": "MANAGE_ROBOTS",
         "annotations": {
@@ -2280,12 +2256,10 @@
     "ToolRobotDelete": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolRobotDelete",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.robot_studio"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Delete Robot",
         "role": "MANAGE_ROBOTS",
         "requires_confirmation": true,
@@ -2375,12 +2349,10 @@
     "ToolRobotSearch": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolRobotSearch",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.robot_studio"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Search Robots",
         "role": "USE_ROBOTS",
         "annotations": {
@@ -2550,12 +2522,10 @@
     "ToolTrailCreate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolTrailCreate",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.trails"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Create Trail",
         "role": "MANAGE_TRAILS",
         "annotations": {
@@ -3432,12 +3402,10 @@
     "ToolTrailList": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolTrailList",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.trails"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "List Trails",
         "role": "MANAGE_TRAILS",
         "annotations": {
@@ -3946,12 +3914,10 @@
     "ToolTrailGet": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolTrailGet",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.trails"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Get Trail",
         "role": "MANAGE_TRAILS",
         "annotations": {
@@ -4458,12 +4424,10 @@
     "ToolTrailUpdate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolTrailUpdate",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.trails"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Update Trail",
         "role": "MANAGE_TRAILS",
         "annotations": {
@@ -5352,12 +5316,10 @@
     "ToolTrailSchedulePreview": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolTrailSchedulePreview",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.trails"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Preview Trail Schedule",
         "role": "MANAGE_TRAILS",
         "annotations": {
@@ -5638,12 +5600,10 @@
     "ToolTrailRunList": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolTrailRunList",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.trails"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "List Trail Runs",
         "role": "MANAGE_TRAILS",
         "annotations": {
@@ -5994,12 +5954,10 @@
     "ToolTrailRunGet": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolTrailRunGet",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.trails"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Get Trail Run",
         "role": "MANAGE_TRAILS",
         "annotations": {
@@ -6982,12 +6940,10 @@
     "ToolTrailRunCreate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolTrailRunCreate",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.trails"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Create Trail Run",
         "role": "MANAGE_TRAILS",
         "requires_confirmation": true,
@@ -7959,12 +7915,10 @@
     "ToolTrailActionRunCancel": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolTrailActionRunCancel",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.trails"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Cancel Trail Action Run",
         "role": "MANAGE_TRAILS",
         "requires_confirmation": true,
@@ -8960,12 +8914,10 @@
     "ToolToolsetSearch": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolToolsetSearch",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.robot_studio"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Search Toolsets",
         "role": "USE_ROBOTS",
         "annotations": {
@@ -9116,11 +9068,9 @@
     "ToolToolsetLoad": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolToolsetLoad",
-      "x-storyden": {
-        "internal": true,
-        "toolsets": []
-      },
       "x-storyden-tool": {
+        "internal": true,
+        "toolsets": [],
         "title": "Load Toolsets",
         "annotations": {
           "readOnlyHint": false,
@@ -9264,12 +9214,10 @@
     "ToolToolsetCreate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolToolsetCreate",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.robot_studio"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Create Toolset",
         "role": "USE_ROBOTS",
         "annotations": {
@@ -9380,12 +9328,10 @@
     "ToolToolsetList": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolToolsetList",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.robot_studio"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "List Toolsets",
         "role": "USE_ROBOTS",
         "annotations": {
@@ -9492,12 +9438,10 @@
     "ToolToolsetGet": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolToolsetGet",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.robot_studio"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Get Toolset",
         "role": "USE_ROBOTS",
         "annotations": {
@@ -9640,12 +9584,10 @@
     "ToolToolsetUpdate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolToolsetUpdate",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.robot_studio"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Update Toolset",
         "role": "USE_ROBOTS",
         "annotations": {
@@ -9760,12 +9702,10 @@
     "ToolToolsetDelete": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolToolsetDelete",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.robot_studio"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Delete Toolset",
         "role": "USE_ROBOTS",
         "annotations": {
@@ -9848,12 +9788,10 @@
     "ToolLibraryPageTree": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibraryPageTree",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.library"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "List Library Pages",
         "role": "READ_PUBLISHED_LIBRARY",
         "annotations": {
@@ -10116,13 +10054,11 @@
     "ToolLibraryRequestPage": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibraryRequestPage",
-      "x-storyden": {
+      "x-storyden-tool": {
         "internal": true,
         "toolsets": [
           "system.library"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Request Library Page",
         "role": "READ_PUBLISHED_LIBRARY",
         "annotations": {
@@ -10219,12 +10155,10 @@
     "ToolLibraryPageGet": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibraryPageGet",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.library"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Get Library Page",
         "role": "READ_PUBLISHED_LIBRARY",
         "annotations": {
@@ -10409,13 +10343,11 @@
     "ToolLibraryPageOpen": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibraryPageOpen",
-      "x-storyden": {
+      "x-storyden-tool": {
         "internal": true,
         "toolsets": [
           "system.library"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Open Library Page",
         "role": "READ_PUBLISHED_LIBRARY",
         "annotations": {
@@ -10652,12 +10584,10 @@
     "ToolLibraryPageCreate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibraryPageCreate",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.library"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Create Library Page",
         "role": "MANAGE_LIBRARY",
         "annotations": {
@@ -10830,12 +10760,10 @@
     "ToolLibraryPageUpdate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibraryPageUpdate",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.library"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Update Library Page",
         "annotations": {
           "readOnlyHint": false,
@@ -11019,13 +10947,11 @@
     "ToolLibrarySearchPages": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibrarySearchPages",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.library",
           "system.content_search"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Search Library Pages",
         "role": "READ_PUBLISHED_LIBRARY",
         "annotations": {
@@ -11222,12 +11148,10 @@
     "ToolLibraryPagePropertySchemaGet": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibraryPagePropertySchemaGet",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.library"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Get Property Schema",
         "role": "READ_PUBLISHED_LIBRARY",
         "annotations": {
@@ -11413,12 +11337,10 @@
     "ToolLibraryPagePropertySchemaUpdate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibraryPagePropertySchemaUpdate",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.library"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Update Property Schema",
         "role": "MANAGE_LIBRARY",
         "annotations": {
@@ -11681,12 +11603,10 @@
     "ToolLibraryPagePropertiesUpdate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibraryPagePropertiesUpdate",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.library"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Update Page Properties",
         "annotations": {
           "readOnlyHint": false,
@@ -11927,12 +11847,10 @@
     "ToolTagList": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolTagList",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.discussions"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "List Tags",
         "role": "READ_PUBLISHED_THREADS",
         "annotations": {
@@ -12057,10 +11975,8 @@
     "ToolLinkCreate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLinkCreate",
-      "x-storyden": {
-        "toolsets": []
-      },
       "x-storyden-tool": {
+        "toolsets": [],
         "title": "Create Link",
         "role": "CREATE_POST",
         "annotations": {
@@ -12173,10 +12089,8 @@
     "ToolWebFetch": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolWebFetch",
-      "x-storyden": {
-        "toolsets": []
-      },
       "x-storyden-tool": {
+        "toolsets": [],
         "title": "Fetch Web Page",
         "annotations": {
           "readOnlyHint": true,
@@ -12308,11 +12222,9 @@
     "ToolWebOpen": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolWebOpen",
-      "x-storyden": {
-        "internal": true,
-        "toolsets": []
-      },
       "x-storyden-tool": {
+        "internal": true,
+        "toolsets": [],
         "title": "Open Web Page",
         "annotations": {
           "readOnlyHint": false,
@@ -12548,12 +12460,10 @@
     "ToolThreadCreate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolThreadCreate",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.discussions"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Create Thread",
         "role": "CREATE_POST",
         "annotations": {
@@ -12784,12 +12694,10 @@
     "ToolThreadList": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolThreadList",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.discussions"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "List Threads",
         "role": "READ_PUBLISHED_THREADS",
         "annotations": {
@@ -13039,12 +12947,10 @@
     "ToolThreadGet": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolThreadGet",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.discussions"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Get Thread",
         "role": "READ_PUBLISHED_THREADS",
         "annotations": {
@@ -13235,13 +13141,11 @@
     "ToolThreadOpen": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolThreadOpen",
-      "x-storyden": {
+      "x-storyden-tool": {
         "internal": true,
         "toolsets": [
           "system.discussions"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Open Thread",
         "role": "READ_PUBLISHED_THREADS",
         "annotations": {
@@ -13478,12 +13382,10 @@
     "ToolThreadUpdate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolThreadUpdate",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.discussions"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Update Thread",
         "annotations": {
           "readOnlyHint": false,
@@ -13699,12 +13601,10 @@
     "ToolThreadReply": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolThreadReply",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.discussions"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Reply to Thread",
         "role": "CREATE_POST",
         "annotations": {
@@ -13845,12 +13745,10 @@
     "ToolCategoryList": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolCategoryList",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.discussions"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "List Categories",
         "annotations": {
           "readOnlyHint": true,
@@ -13974,13 +13872,11 @@
     "ToolThreadSearch": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolThreadSearch",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.content_search",
           "system.discussions"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Thread Search",
         "annotations": {
           "readOnlyHint": true,
@@ -14220,13 +14116,11 @@
     "ToolReplySearch": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolReplySearch",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.content_search",
           "system.discussions"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Reply Search",
         "annotations": {
           "readOnlyHint": true,
@@ -14452,13 +14346,11 @@
     "ToolPostSearch": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolPostSearch",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.content_search",
           "system.discussions"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Post Search",
         "annotations": {
           "readOnlyHint": true,
@@ -14713,12 +14605,10 @@
     "ToolMemberSearch": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolMemberSearch",
-      "x-storyden": {
+      "x-storyden-tool": {
         "toolsets": [
           "system.content_search"
-        ]
-      },
-      "x-storyden-tool": {
+        ],
         "title": "Member Search",
         "annotations": {
           "readOnlyHint": true,

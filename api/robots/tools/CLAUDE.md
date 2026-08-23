@@ -9,11 +9,11 @@ These rules apply to **all new tools** and **any modifications to existing tools
 
 ## Built-in Toolset membership
 
-Use the `x-storyden.toolsets` string array to assign a tool to one or more
+Use the `x-storyden-tool.toolsets` string array to assign a tool to one or more
 built-in Toolsets:
 
 ```yaml
-x-storyden:
+x-storyden-tool:
   toolsets:
     - system.library
     - system.content_search
@@ -40,11 +40,11 @@ its runtime builder while its public identity lives in the Toolsets package.
 
 ## Internal tools
 
-Set `x-storyden.internal: true` for tools that are available only inside
+Set `x-storyden-tool.internal: true` for tools that are available only inside
 Storyden Robot conversations and must not be exported by Storyden's MCP server:
 
 ```yaml
-x-storyden:
+x-storyden-tool:
   internal: true
   toolsets: []
 ```
@@ -53,12 +53,12 @@ Omit `internal` for tools that external MCP clients may discover and call.
 
 ## Toolset-only tools
 
-Set `x-storyden.toolset_only: true` when a tool depends on the complete Toolset
+Set `x-storyden-tool.toolset_only: true` when a tool depends on the complete Toolset
 that owns it and must not be assigned to a Robot or loaded into a conversation
 as an individual tool:
 
 ```yaml
-x-storyden:
+x-storyden-tool:
   internal: true
   toolset_only: true
   toolsets:
@@ -66,7 +66,7 @@ x-storyden:
 ```
 
 Toolset-only tools may only be provided by the built-in Toolsets declared in
-`x-storyden.toolsets`. Individual-tool discovery, custom Toolset authoring, and
+`x-storyden-tool.toolsets`. Individual-tool discovery, custom Toolset authoring, and
 Robot configuration surfaces must direct callers to an owning Toolset instead.
 
 ---
@@ -661,6 +661,9 @@ Tools specify metadata via the `x-storyden-tool` extension object at the top of 
 ```yaml
 x-storyden-tool:
   title: "Human-Readable Tool Name"
+  toolsets: [system.robots]
+  internal: false # optional — omit for externally exported tools
+  toolset_only: false # optional — omit for individually loadable tools
   role: MANAGE_ROBOTS # optional — omit when the service layer handles auth
   requires_confirmation: true # optional — require HITL approval before execution
   requires_workspace: true # optional — hide unless the session has an active workspace
@@ -674,6 +677,9 @@ x-storyden-tool:
 Fields:
 
 - **`title`** (required): Human-readable display name passed to MCP clients.
+- **`toolsets`** (required): Built-in `system.*` Toolset memberships. Use an empty array when none apply.
+- **`internal`** (optional): If true, exclude the tool from the external Storyden MCP export.
+- **`toolset_only`** (optional): If true, expose the tool only through one of its owning built-in Toolsets.
 - **`role`** (optional): RBAC permission gate applied before tool execution. Omit for tools where the service layer already enforces ownership-based auth (e.g. `library_page_update`). Must be a valid value from `app/resources/rbac/permission.go`.
 - **`requires_confirmation`** (optional): If true, the robot runtime pauses before executing the tool and waits for an approve/deny result from the client.
 - **`requires_workspace`** (optional): If true, the runtime derives workspace availability from the session's `robot_workspace` mount state and excludes the tool when no workspace is active. `tool_get` still discloses this precondition, while `tool_load` rejects activation without changing session state.

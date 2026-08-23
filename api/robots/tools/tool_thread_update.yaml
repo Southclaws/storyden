@@ -1,9 +1,8 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolThreadUpdate
-x-storyden:
+x-storyden-tool:
   toolsets:
     - system.discussions
-x-storyden-tool:
   title: Update Thread
   annotations:
     readOnlyHint: false

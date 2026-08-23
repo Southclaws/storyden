@@ -87,35 +87,35 @@ func parseToolsetBindings(data []byte) ([]toolsetBinding, error) {
 		if !ok || strings.TrimSpace(toolName) == "" {
 			return nil, fmt.Errorf("%s has no tool title", definitionName)
 		}
-		extensionRaw, exists := definition["x-storyden"]
+		extensionRaw, exists := definition["x-storyden-tool"]
 		if !exists {
-			return nil, fmt.Errorf("%s must declare x-storyden.toolsets", definitionName)
+			return nil, fmt.Errorf("%s must declare x-storyden-tool.toolsets", definitionName)
 		}
 		extension, ok := extensionRaw.(map[string]any)
 		if !ok {
-			return nil, fmt.Errorf("%s x-storyden must be an object", definitionName)
+			return nil, fmt.Errorf("%s x-storyden-tool must be an object", definitionName)
 		}
 		toolsetsRaw, exists := extension["toolsets"]
 		if !exists {
-			return nil, fmt.Errorf("%s must declare x-storyden.toolsets", definitionName)
+			return nil, fmt.Errorf("%s must declare x-storyden-tool.toolsets", definitionName)
 		}
 		toolsets, ok := toolsetsRaw.([]any)
 		if !ok {
-			return nil, fmt.Errorf("%s x-storyden.toolsets must be a string array", definitionName)
+			return nil, fmt.Errorf("%s x-storyden-tool.toolsets must be a string array", definitionName)
 		}
 		if toolsetOnlyRaw, exists := extension["toolset_only"]; exists {
 			toolsetOnly, ok := toolsetOnlyRaw.(bool)
 			if !ok {
-				return nil, fmt.Errorf("%s x-storyden.toolset_only must be a boolean", definitionName)
+				return nil, fmt.Errorf("%s x-storyden-tool.toolset_only must be a boolean", definitionName)
 			}
 			if toolsetOnly && len(toolsets) == 0 {
-				return nil, fmt.Errorf("%s x-storyden.toolset_only requires at least one x-storyden.toolsets entry", definitionName)
+				return nil, fmt.Errorf("%s x-storyden-tool.toolset_only requires at least one x-storyden-tool.toolsets entry", definitionName)
 			}
 		}
 		for _, raw := range toolsets {
 			id, ok := raw.(string)
 			if !ok {
-				return nil, fmt.Errorf("%s x-storyden.toolsets must contain only strings", definitionName)
+				return nil, fmt.Errorf("%s x-storyden-tool.toolsets must contain only strings", definitionName)
 			}
 			if !systemToolsetIDPattern.MatchString(id) {
 				return nil, fmt.Errorf("%s has invalid system Toolset ID %q", definitionName, id)

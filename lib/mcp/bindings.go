@@ -199,7 +199,7 @@ func initTool(name string) *ToolDefinition {
 	var annotations ToolAnnotations
 
 	if toolDef.Extra != nil {
-		if ext, ok := toolDef.Extra["x-storyden"].(map[string]any); ok {
+		if ext, ok := toolDef.Extra["x-storyden-tool"].(map[string]any); ok {
 			internal, _ = ext["internal"].(bool)
 			toolsetOnly, _ = ext["toolset_only"].(bool)
 			if values, ok := ext["toolsets"].([]any); ok {
@@ -209,8 +209,6 @@ func initTool(name string) *ToolDefinition {
 					}
 				}
 			}
-		}
-		if ext, ok := toolDef.Extra["x-storyden-tool"].(map[string]any); ok {
 			if roleStr, ok := ext["role"].(string); ok {
 				r, err := rbac.NewPermission(roleStr)
 				if err != nil {

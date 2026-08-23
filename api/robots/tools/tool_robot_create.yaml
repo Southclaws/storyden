@@ -1,9 +1,8 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolRobotCreate
-x-storyden:
+x-storyden-tool:
   toolsets:
     - system.robot_studio
-x-storyden-tool:
   title: Create Robot
   role: MANAGE_ROBOTS
   annotations:

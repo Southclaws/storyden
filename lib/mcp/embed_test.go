@@ -105,7 +105,7 @@ func TestAllToolSchemasResolve(t *testing.T) {
 	}
 }
 
-func TestEveryToolHasDisplayTitle(t *testing.T) {
+func TestEveryToolHasUnifiedStorydenMetadata(t *testing.T) {
 	for definitionName, schema := range Schema.Definitions {
 		if !strings.HasPrefix(definitionName, "Tool") {
 			continue
@@ -117,11 +117,16 @@ func TestEveryToolHasDisplayTitle(t *testing.T) {
 			continue
 		}
 
+		_, hasLegacyExtension := schema.Extra["x-storyden"]
+		assert.False(t, hasLegacyExtension, "%s must not define legacy x-storyden metadata", definitionName)
+
 		extension, ok := schema.Extra["x-storyden-tool"].(map[string]any)
 		require.True(t, ok, "%s must define x-storyden-tool", definitionName)
 		title, ok := extension["title"].(string)
 		require.True(t, ok, "%s must define x-storyden-tool.title", definitionName)
 		assert.NotEmpty(t, strings.TrimSpace(title), "%s must define a non-empty x-storyden-tool.title", definitionName)
+		_, ok = extension["toolsets"].([]any)
+		require.True(t, ok, "%s must define x-storyden-tool.toolsets", definitionName)
 	}
 }
 

@@ -1,9 +1,8 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolToolsetCreate
-x-storyden:
+x-storyden-tool:
   toolsets:
     - system.robot_studio
-x-storyden-tool:
   title: Create Toolset
   role: USE_ROBOTS
   annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false }
