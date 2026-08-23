@@ -1,0 +1,14 @@
+steps:
+  - match:
+      any: true
+    respond:
+      tool_calls:
+        - id: call_finish_1
+          name: robot_run_finish
+          args:
+            status: blocked
+            summary: A moderator decision is required.
+            attention:
+              reason: missing_input
+              message: Select a moderation outcome.
+      finish: stop

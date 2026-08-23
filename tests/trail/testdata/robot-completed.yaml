@@ -1,0 +1,11 @@
+steps:
+  - match:
+      any: true
+    respond:
+      tool_calls:
+        - id: call_finish_1
+          name: robot_run_finish
+          args:
+            status: completed
+            summary: Scheduled work complete.
+      finish: stop

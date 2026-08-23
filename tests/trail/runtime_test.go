@@ -30,7 +30,7 @@ func TestTrailRobotRuntime(t *testing.T) {
 		t,
 		&config.Config{LanguageModelProvider: "mock"},
 		e2e.Setup(),
-		testrobot.WithRobotSettings("mock/data/robot-completed.yaml"),
+		testrobot.WithRobotSettings("mock/testdata/robot-completed.yaml"),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,
@@ -45,7 +45,7 @@ func TestTrailRobotRuntime(t *testing.T) {
 				adminCtx, admin := e2e.WithAccount(root, accounts, seed.Account_001_Odin)
 				adminSession := sh.WithSession(adminCtx)
 
-				model := openapi.RobotModelRef("mock/data/robot-completed.yaml")
+				model := openapi.RobotModelRef("mock/testdata/robot-completed.yaml")
 				robot := tests.AssertRequest(cl.RobotCreateWithResponse(root, openapi.RobotCreateJSONRequestBody{
 					Name:        "Trail runtime Robot " + xid.New().String(),
 					Description: "Completes Trail runtime fixtures",
@@ -139,7 +139,7 @@ func TestTrailRobotRuntime(t *testing.T) {
 					r := require.New(t)
 					a := assert.New(t)
 
-					blockedModel := openapi.RobotModelRef("mock/data/robot-blocked.yaml")
+					blockedModel := openapi.RobotModelRef("mock/testdata/robot-blocked.yaml")
 					blockedRobot := tests.AssertRequest(cl.RobotCreateWithResponse(root, openapi.RobotCreateJSONRequestBody{
 						Name:        "Blocked Trail Robot " + xid.New().String(),
 						Description: "Returns structured attention",
@@ -190,7 +190,7 @@ func TestTrailRobotRuntime(t *testing.T) {
 					r := require.New(t)
 					a := assert.New(t)
 
-					malformedModel := openapi.RobotModelRef("mock/data/robot-malformed.yaml")
+					malformedModel := openapi.RobotModelRef("mock/testdata/robot-malformed.yaml")
 					malformedRobot := tests.AssertRequest(cl.RobotCreateWithResponse(root, openapi.RobotCreateJSONRequestBody{
 						Name:        "Malformed Trail Robot " + xid.New().String(),
 						Description: "Omits the structured finish",
@@ -251,7 +251,7 @@ func TestTrailRobotPermissionLoss(t *testing.T) {
 		t,
 		&config.Config{LanguageModelProvider: "mock"},
 		e2e.Setup(),
-		testrobot.WithRobotSettings("mock/data/robot-completed.yaml"),
+		testrobot.WithRobotSettings("mock/testdata/robot-completed.yaml"),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,
@@ -281,7 +281,7 @@ func TestTrailRobotPermissionLoss(t *testing.T) {
 
 				tests.AssertRequest(cl.AccountAddRoleWithResponse(root, member.Handle, role.JSON200.Id, adminSession))(t, http.StatusOK)
 
-				model := openapi.RobotModelRef("mock/data/robot-completed.yaml")
+				model := openapi.RobotModelRef("mock/testdata/robot-completed.yaml")
 				robot := tests.AssertRequest(cl.RobotCreateWithResponse(root, openapi.RobotCreateJSONRequestBody{
 					Name:        "Permission loss Robot " + xid.New().String(),
 					Description: "Must not run without current permission",
