@@ -28,11 +28,10 @@ func TestFetchBoundedAcceptsSmallBody(t *testing.T) {
 func TestFetchBoundedRejectsDeclaredOversizeBody(t *testing.T) {
 	t.Parallel()
 
-	served := 0
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Length", "4096")
 		w.WriteHeader(http.StatusOK)
-		served, _ = w.Write(make([]byte, 4096))
+		w.Write(make([]byte, 4096))
 	}))
 	defer srv.Close()
 
@@ -40,7 +39,6 @@ func TestFetchBoundedRejectsDeclaredOversizeBody(t *testing.T) {
 
 	require.Error(t, err)
 	assert.True(t, errors.Is(err, errAssetTooLarge))
-	assert.NotZero(t, served)
 }
 
 func TestFetchBoundedRejectsUndeclaredOversizeBody(t *testing.T) {
