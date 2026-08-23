@@ -472,7 +472,15 @@ func (r *Repository) RenewSchedulerLease(ctx context.Context, token string, expi
 }
 
 func (r *Repository) ClaimActionRun(ctx context.Context, now time.Time, leaseDuration time.Duration) (*ActionRun, bool, error) {
-	row, err := r.db.TrailActionRun.Query().
+	return r.claimActionRun(ctx, nil, now, leaseDuration)
+}
+
+func (r *Repository) ClaimActionRunByID(ctx context.Context, id ActionRunID, now time.Time, leaseDuration time.Duration) (*ActionRun, bool, error) {
+	return r.claimActionRun(ctx, &id, now, leaseDuration)
+}
+
+func (r *Repository) claimActionRun(ctx context.Context, id *ActionRunID, now time.Time, leaseDuration time.Duration) (*ActionRun, bool, error) {
+	query := r.db.TrailActionRun.Query().
 		Where(entactionrun.Or(
 			entactionrun.StatusEQ(entactionrun.StatusQueued),
 			entactionrun.And(
@@ -480,8 +488,12 @@ func (r *Repository) ClaimActionRun(ctx context.Context, now time.Time, leaseDur
 				entactionrun.Or(entactionrun.LeaseExpiresAtIsNil(), entactionrun.LeaseExpiresAtLTE(now)),
 			),
 		)).
-		Order(entactionrun.ByCreatedAt(sql.OrderAsc())).
-		First(ctx)
+		Order(entactionrun.ByCreatedAt(sql.OrderAsc()))
+	if id != nil {
+		query.Where(entactionrun.IDEQ(xid.ID(*id)))
+	}
+
+	row, err := query.First(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, false, nil

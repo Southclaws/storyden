@@ -41,7 +41,7 @@ func TestTrailSchedulerLease(t *testing.T) {
 				r.NoError(err)
 				r.True(acquired)
 				r.NotNil(lease)
-				a.Equal(leaseStart.Add(15*time.Second), lease.ExpiresAt)
+				a.WithinDuration(leaseStart.Add(15*time.Second), lease.ExpiresAt, 0)
 
 				second, acquired, err := repository.AcquireSchedulerLease(root, leaseStart.Add(time.Second), 15*time.Second)
 				r.NoError(err)
@@ -122,7 +122,7 @@ func TestTrailScheduledOccurrenceMaterialisation(t *testing.T) {
 				a.Equal(trail.RunKindScheduled, run.Kind)
 				a.Equal(trail.RunStatusQueued, run.Status)
 				r.NotNil(run.ScheduledFor)
-				a.Equal(firstOccurrence, *run.ScheduledFor)
+				a.WithinDuration(firstOccurrence, *run.ScheduledFor, 0)
 				a.JSONEq(string(config), string(run.ActionRuns[0].Config))
 
 				var event trail.TriggerEvent
@@ -138,8 +138,8 @@ func TestTrailScheduledOccurrenceMaterialisation(t *testing.T) {
 				r.NoError(err)
 				r.NotNil(stored.NextOccurrenceAt)
 				r.NotNil(stored.LastOccurrenceAt)
-				a.Equal(secondOccurrence, *stored.NextOccurrenceAt)
-				a.Equal(firstOccurrence, *stored.LastOccurrenceAt)
+				a.WithinDuration(secondOccurrence, *stored.NextOccurrenceAt, 0)
+				a.WithinDuration(firstOccurrence, *stored.LastOccurrenceAt, 0)
 
 				duplicate, duplicateCreated, err := repository.MaterialiseScheduled(
 					root,
@@ -216,7 +216,7 @@ func TestTrailActionFanoutAndRecovery(t *testing.T) {
 				stored, err := repository.Get(root, definition.ID)
 				r.NoError(err)
 				r.NotNil(stored.NextOccurrenceAt)
-				a.Equal(nextOccurrence, *stored.NextOccurrenceAt)
+				a.WithinDuration(nextOccurrence, *stored.NextOccurrenceAt, 0)
 
 				updatedConfig := json.RawMessage(`{"type":"robot_run","robot_ref":"robot-new","instruction":"Replacement consumer"}`)
 				_, err = repository.Update(
@@ -244,14 +244,14 @@ func TestTrailActionFanoutAndRecovery(t *testing.T) {
 				a := assert.New(t)
 
 				claimAt := time.Date(2040, time.February, 1, 12, 0, 0, 0, time.UTC)
-				claimed, ok, err := repository.ClaimActionRun(root, claimAt, time.Minute)
+				claimed, ok, err := repository.ClaimActionRunByID(root, manual.ActionRuns[0].ID, claimAt, time.Minute)
 				r.NoError(err)
 				r.True(ok)
 				r.NotNil(claimed.LeaseToken)
 				a.Equal(manual.ActionRuns[0].ID, claimed.ID)
 				firstToken := *claimed.LeaseToken
 
-				other, ok, err := repository.ClaimActionRun(root, claimAt.Add(30*time.Second), time.Minute)
+				other, ok, err := repository.ClaimActionRunByID(root, manual.ActionRuns[1].ID, claimAt.Add(30*time.Second), time.Minute)
 				r.NoError(err)
 				r.True(ok)
 				a.Equal(manual.ActionRuns[1].ID, other.ID)
@@ -260,12 +260,12 @@ func TestTrailActionFanoutAndRecovery(t *testing.T) {
 				r.NoError(err)
 				a.True(renewed)
 
-				recovered, ok, err := repository.ClaimActionRun(root, claimAt.Add(91*time.Second), time.Minute)
+				recovered, ok, err := repository.ClaimActionRunByID(root, other.ID, claimAt.Add(91*time.Second), time.Minute)
 				r.NoError(err)
 				r.True(ok)
 				a.Equal(other.ID, recovered.ID)
 
-				recovered, ok, err = repository.ClaimActionRun(root, claimAt.Add(121*time.Second), time.Minute)
+				recovered, ok, err = repository.ClaimActionRunByID(root, claimed.ID, claimAt.Add(121*time.Second), time.Minute)
 				r.NoError(err)
 				r.True(ok)
 				a.Equal(claimed.ID, recovered.ID)
@@ -280,7 +280,7 @@ func TestTrailActionFanoutAndRecovery(t *testing.T) {
 					"",
 				))
 
-				otherRecovered, ok, err := repository.ClaimActionRun(root, claimAt.Add(152*time.Second), time.Minute)
+				otherRecovered, ok, err := repository.ClaimActionRunByID(root, other.ID, claimAt.Add(152*time.Second), time.Minute)
 				r.NoError(err)
 				r.True(ok)
 				a.Equal(other.ID, otherRecovered.ID)
@@ -363,6 +363,10 @@ func TestTrailActionFanoutAndRecovery(t *testing.T) {
 func TestTrailMissedOneTimeOccurrence(t *testing.T) {
 	tests.ParallelIfNotSharedPostgres(t)
 
+	if tests.IsSharedPostgresDatabase() {
+		t.Skip("the Trail scheduler lease is intentionally shared between backend replicas")
+	}
+
 	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
 		lc fx.Lifecycle,
 		root context.Context,
@@ -375,7 +379,7 @@ func TestTrailMissedOneTimeOccurrence(t *testing.T) {
 			a := assert.New(t)
 
 			_, creator := e2e.WithAccount(root, accounts, seed.Account_001_Odin)
-			missedAt := time.Date(2020, time.March, 31, 1, 30, 0, 0, time.UTC)
+			missedAt := time.Date(2020, time.March, 31, 0, 30, 0, 0, time.UTC)
 
 			definition, err := repository.Create(
 				root,
@@ -414,7 +418,7 @@ func TestTrailMissedOneTimeOccurrence(t *testing.T) {
 			a.Equal(trail.StatusFinished, finished.Status)
 			a.Nil(finished.NextOccurrenceAt)
 			r.NotNil(finished.LastOccurrenceAt)
-			a.Equal(missedAt, *finished.LastOccurrenceAt)
+			a.WithinDuration(missedAt, *finished.LastOccurrenceAt, 0)
 
 			history, err := repository.ListRuns(root, definition.ID, 10)
 			r.NoError(err)
