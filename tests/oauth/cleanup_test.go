@@ -30,6 +30,10 @@ import (
 )
 
 func TestOAuthCleanup(t *testing.T) {
+	if tests.IsSharedPostgresDatabase() {
+		t.Skip("OAuth cleanup is intentionally global")
+	}
+
 	t.Parallel()
 
 	integration.Test(t, oauthConfig(t), e2e.Setup(), fx.Invoke(func(
