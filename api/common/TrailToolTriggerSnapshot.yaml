@@ -1,0 +1,30 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+description: Immutable trigger context that materialized a Trail run.
+required: [kind, trigger, observed_at]
+additionalProperties: false
+properties:
+  kind:
+    type: string
+    enum: [scheduled, event, manual]
+    description: Cause that materialized the run.
+  trigger:
+    $ref: "./TrailToolTrigger.yaml"
+  event_name:
+    type: string
+    description: Canonical event name that matched an event trigger.
+  event_payload_json:
+    type: string
+    description: Complete triggering event payload encoded as JSON data.
+  scheduled_for:
+    type: string
+    format: date-time
+    description: Scheduled occurrence time in UTC.
+  observed_at:
+    type: string
+    format: date-time
+    description: Time the trigger was observed in UTC.
+  initiated_by:
+    type: string
+    pattern: '^[0-9a-v]{20}$'
+    description: Account that requested a manual run.

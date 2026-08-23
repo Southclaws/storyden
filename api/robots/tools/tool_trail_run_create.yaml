@@ -1,0 +1,40 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolTrailRunCreate
+x-storyden:
+  toolsets:
+    - system.trails
+x-storyden-tool:
+  title: Create Trail Run
+  role: MANAGE_TRAILS
+  requires_confirmation: true
+  annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false }
+title: trail_run_create
+description: Create a manual Trail run without moving its schedule.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolTrailRunCreateInput" }
+  output: { $ref: "#/definitions/ToolTrailRunCreateOutput" }
+definitions:
+  ToolTrailRunCreateInput:
+    type: object
+    required: [trail_id]
+    additionalProperties: false
+    properties:
+      trail_id:
+        type: string
+        pattern: '^[0-9a-v]{20}$'
+        description: Trail identifier to execute immediately.
+  ToolTrailRunCreateOutput:
+    type: object
+    required: [run, message, next_action]
+    additionalProperties: false
+    properties:
+      run:
+        $ref: "../../common/TrailToolRun.yaml"
+      message:
+        type: string
+        description: Human-readable confirmation of the manual run.
+      next_action:
+        type: string
+        description: Recommended follow-up for observing the run.

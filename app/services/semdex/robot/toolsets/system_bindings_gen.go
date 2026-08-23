@@ -8,6 +8,7 @@ import (
 	system_documents "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_documents"
 	system_library "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_library"
 	system_robot_studio "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_robot_studio"
+	system_trails "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_trails"
 )
 
 func systemDefinitions() []Definition {
@@ -50,6 +51,14 @@ func systemDefinitions() []Definition {
 			Description: system_robot_studio.Description,
 			Instruction: system_robot_studio.Instruction,
 			ToolNames:   append([]string(nil), system_robot_studio.ToolNames...),
+			Source:      SourceSystem,
+		},
+		{
+			ID:          system_trails.ID,
+			Name:        system_trails.Name,
+			Description: system_trails.Description,
+			Instruction: system_trails.Instruction,
+			ToolNames:   append([]string(nil), system_trails.ToolNames...),
 			Source:      SourceSystem,
 		},
 	}

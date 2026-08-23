@@ -9,6 +9,7 @@ import (
 
 type RunContext struct {
 	RobotID   opt.Optional[xid.ID]
+	RobotRef  string
 	AccountID string
 	SessionID string
 }

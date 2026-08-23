@@ -1,0 +1,51 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolTrailRunList
+x-storyden:
+  toolsets:
+    - system.trails
+x-storyden-tool:
+  title: List Trail Runs
+  role: MANAGE_TRAILS
+  annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
+title: trail_run_list
+description: List recent runs for a Trail.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolTrailRunListInput" }
+  output: { $ref: "#/definitions/ToolTrailRunListOutput" }
+definitions:
+  ToolTrailRunListInput:
+    type: object
+    required: [trail_id]
+    additionalProperties: false
+    properties:
+      trail_id:
+        type: string
+        pattern: '^[0-9a-v]{20}$'
+        description: Trail identifier returned by trail_list or trail_create.
+      limit:
+        type: integer
+        minimum: 1
+        maximum: 100
+        description: Maximum number of recent runs to return; omit to use the default.
+  ToolTrailRunListOutput:
+    type: object
+    required: [runs, returned, has_more, next_action]
+    additionalProperties: false
+    properties:
+      runs:
+        type: array
+        description: Recent Trail runs ordered newest first.
+        items:
+          $ref: "../../common/TrailToolRunSummary.yaml"
+      returned:
+        type: integer
+        minimum: 0
+        description: Number of run summaries returned.
+      has_more:
+        type: boolean
+        description: Whether older runs exist beyond this response.
+      next_action:
+        type: string
+        description: Recommended follow-up for inspecting a selected run.

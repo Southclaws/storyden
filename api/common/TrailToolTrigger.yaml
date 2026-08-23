@@ -1,0 +1,20 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+description: A schedule or Storyden event trigger for a Trail.
+required: [type]
+additionalProperties: false
+properties:
+  type:
+    type: string
+    enum: [schedule, event]
+    description: Trigger kind that determines which trigger details are used.
+  schedule:
+    $ref: "./TrailToolSchedule.yaml"
+  event:
+    type: array
+    minItems: 1
+    uniqueItems: true
+    description: Canonical Storyden event names observed by an event trigger.
+    items:
+      type: string
+      minLength: 1

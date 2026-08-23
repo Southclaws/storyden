@@ -30,6 +30,7 @@ import {
   useRobotWorkspacesList,
 } from "@/api/openapi-client/robots";
 import { getThreadListKey } from "@/api/openapi-client/threads";
+import { getTrailListKey } from "@/api/openapi-client/trails";
 import {
   RobotSessionList,
   RobotSessionStreamEvent,
@@ -62,6 +63,13 @@ const MUTATIVE_THREAD_TOOLS: ToolName[] = [
   "thread_create",
   "thread_update",
   "thread_reply",
+];
+
+const MUTATIVE_TRAIL_TOOLS: ToolName[] = [
+  "trail_create",
+  "trail_update",
+  "trail_run_create",
+  "trail_action_run_cancel",
 ];
 
 export const DENBOT_NAME = "Denbot";
@@ -303,6 +311,10 @@ export function RobotChatContext({
       // (create, update, reply), we need to tell SWR to re-validate the feed.
       if (MUTATIVE_THREAD_TOOLS.includes(toolName)) {
         await mutate(threadListKeyFilterFn);
+      }
+
+      if (MUTATIVE_TRAIL_TOOLS.includes(toolName)) {
+        await mutate(getTrailListKey());
       }
     },
     [mutate],
@@ -717,6 +729,10 @@ export function RobotChatContext({
 
       if (MUTATIVE_THREAD_TOOLS.includes(input.toolName)) {
         await mutate(threadListKeyFilterFn);
+      }
+
+      if (MUTATIVE_TRAIL_TOOLS.includes(input.toolName)) {
+        await mutate(getTrailListKey());
       }
     },
     [chat, mutate],

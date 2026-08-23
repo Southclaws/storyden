@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/trail/trail_action_registry"
 	"github.com/Southclaws/storyden/app/services/trail/trail_manager"
 	"github.com/Southclaws/storyden/app/services/trail/trail_runtime"
+	"github.com/Southclaws/storyden/app/services/trail/trail_tools"
 )
 
 func Build() fx.Option {
@@ -16,6 +17,9 @@ func Build() fx.Option {
 			trail_manager.New,
 			trail_runtime.New,
 		),
-		fx.Invoke(func(*trail_runtime.Runtime) {}),
+		fx.Invoke(
+			func(*trail_runtime.Runtime) {},
+			trail_tools.New,
+		),
 	)
 }

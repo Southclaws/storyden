@@ -1,0 +1,43 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolTrailRunGet
+x-storyden:
+  toolsets:
+    - system.trails
+x-storyden-tool:
+  title: Get Trail Run
+  role: MANAGE_TRAILS
+  annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
+title: trail_run_get
+description: Retrieve one Trail run with its trigger context and action results.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolTrailRunGetInput" }
+  output: { $ref: "#/definitions/ToolTrailRunGetOutput" }
+definitions:
+  ToolTrailRunGetInput:
+    type: object
+    required: [trail_id, run_id]
+    additionalProperties: false
+    properties:
+      trail_id:
+        type: string
+        pattern: '^[0-9a-v]{20}$'
+        description: Trail identifier that owns the run.
+      run_id:
+        type: string
+        pattern: '^[0-9a-v]{20}$'
+        description: Run identifier returned by trail_run_list or trail_run_create.
+  ToolTrailRunGetOutput:
+    type: object
+    required: [run, message, next_action]
+    additionalProperties: false
+    properties:
+      run:
+        $ref: "../../common/TrailToolRun.yaml"
+      message:
+        type: string
+        description: Human-readable summary of the run's current outcome.
+      next_action:
+        type: string
+        description: Recommended follow-up based on the run and action states.

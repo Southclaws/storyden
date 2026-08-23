@@ -1,0 +1,15 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+description: A Trail run with its immutable trigger context and independent action results.
+required: [summary, action]
+additionalProperties: false
+properties:
+  summary:
+    $ref: "./TrailToolRunSummary.yaml"
+  trigger:
+    $ref: "./TrailToolTriggerSnapshot.yaml"
+  action:
+    type: array
+    description: Independent action results in Trail binding order.
+    items:
+      $ref: "./TrailToolActionRun.yaml"

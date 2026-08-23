@@ -1,0 +1,15 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+description: Structured result reported by a Robot action.
+required: [status, summary]
+additionalProperties: false
+properties:
+  status:
+    type: string
+    enum: [completed, blocked, failed]
+    description: Robot-reported outcome of the unattended task.
+  summary:
+    type: string
+    description: Concise account of the work performed or why it did not finish.
+  attention:
+    $ref: "./TrailToolRobotAttention.yaml"

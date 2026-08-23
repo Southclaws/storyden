@@ -4588,6 +4588,3309 @@
       ],
       "type": "object"
     },
+    "ToolTrailActionRunCancel": {
+      "$id": "ToolTrailActionRunCancel",
+      "description": "Cancel one queued or running action in a Trail run.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolTrailActionRunCancelInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolTrailActionRunCancelOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "trail_action_run_cancel",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.trails"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": true,
+          "idempotentHint": false,
+          "openWorldHint": false,
+          "readOnlyHint": false
+        },
+        "requires_confirmation": true,
+        "role": "MANAGE_TRAILS",
+        "title": "Cancel Trail Action Run"
+      }
+    },
+    "ToolTrailActionRunCancelInput": {
+      "additionalProperties": false,
+      "properties": {
+        "action_run_id": {
+          "description": "Queued or running action identifier returned by trail_run_get.",
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        },
+        "run_id": {
+          "description": "Run identifier that owns the action run.",
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        },
+        "trail_id": {
+          "description": "Trail identifier that owns the run.",
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "trail_id",
+        "run_id",
+        "action_run_id"
+      ],
+      "type": "object"
+    },
+    "ToolTrailActionRunCancelOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "description": "Human-readable confirmation of the cancelled action.",
+          "type": "string"
+        },
+        "next_action": {
+          "description": "Recommended follow-up for inspecting the updated run.",
+          "type": "string"
+        },
+        "run": {
+          "additionalProperties": false,
+          "description": "A Trail run with its immutable trigger context and independent action results.",
+          "properties": {
+            "action": {
+              "description": "Independent action results in Trail binding order.",
+              "items": {
+                "additionalProperties": false,
+                "description": "The immutable action configuration and execution result for one Trail run.",
+                "properties": {
+                  "action": {
+                    "additionalProperties": false,
+                    "description": "A Robot invocation performed for each Trail occurrence.",
+                    "properties": {
+                      "instruction": {
+                        "description": "Task given to the Robot when the Trail runs.",
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "robot_ref": {
+                        "description": "Robot ID to invoke; omit to invoke the current Robot when called from a Robot conversation.",
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "type": {
+                        "const": "robot_run",
+                        "description": "Trail action kind.",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "instruction"
+                    ],
+                    "type": "object"
+                  },
+                  "action_id": {
+                    "description": "Trail action binding captured by this run.",
+                    "pattern": "^[0-9a-v]{20}$",
+                    "type": "string"
+                  },
+                  "created_at": {
+                    "description": "Action-run creation time in UTC.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "error": {
+                    "description": "Execution error recorded when the action failed outside its structured Robot result.",
+                    "type": "string"
+                  },
+                  "finished_at": {
+                    "description": "Action completion time in UTC.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "id": {
+                    "description": "Stable action-run identifier accepted by trail_action_run_cancel.",
+                    "pattern": "^[0-9a-v]{20}$",
+                    "type": "string"
+                  },
+                  "output": {
+                    "additionalProperties": false,
+                    "description": "Structured result reported by a Robot action.",
+                    "properties": {
+                      "attention": {
+                        "additionalProperties": false,
+                        "description": "A user decision or missing input that blocked a Robot action.",
+                        "properties": {
+                          "message": {
+                            "description": "Explanation of what the Robot needs from the user.",
+                            "type": "string"
+                          },
+                          "reason": {
+                            "description": "Short category for the required attention.",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "reason",
+                          "message"
+                        ],
+                        "type": "object"
+                      },
+                      "status": {
+                        "description": "Robot-reported outcome of the unattended task.",
+                        "enum": [
+                          "completed",
+                          "blocked",
+                          "failed"
+                        ],
+                        "type": "string"
+                      },
+                      "summary": {
+                        "description": "Concise account of the work performed or why it did not finish.",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "status",
+                      "summary"
+                    ],
+                    "type": "object"
+                  },
+                  "robot_session_id": {
+                    "description": "Robot session created for this action run.",
+                    "pattern": "^[0-9a-v]{20}$",
+                    "type": "string"
+                  },
+                  "started_at": {
+                    "description": "Action start time in UTC.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "status": {
+                    "description": "Lifecycle state of this independent action run.",
+                    "enum": [
+                      "queued",
+                      "running",
+                      "completed",
+                      "blocked",
+                      "failed",
+                      "cancelled"
+                    ],
+                    "type": "string"
+                  },
+                  "updated_at": {
+                    "description": "Action-run update time in UTC.",
+                    "format": "date-time",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "action_id",
+                  "action",
+                  "status",
+                  "created_at",
+                  "updated_at"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "summary": {
+              "additionalProperties": false,
+              "description": "A concise Trail run record for choosing a run to inspect.",
+              "properties": {
+                "action_status": {
+                  "additionalProperties": false,
+                  "description": "Counts of action runs in each lifecycle state for one Trail run.",
+                  "properties": {
+                    "blocked": {
+                      "description": "Number of actions that require user attention.",
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "cancelled": {
+                      "description": "Number of actions that were cancelled.",
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "completed": {
+                      "description": "Number of actions that completed successfully.",
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "failed": {
+                      "description": "Number of actions that failed.",
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "queued": {
+                      "description": "Number of actions waiting to start.",
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "running": {
+                      "description": "Number of actions currently executing.",
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "queued",
+                    "running",
+                    "completed",
+                    "blocked",
+                    "failed",
+                    "cancelled"
+                  ],
+                  "type": "object"
+                },
+                "created_at": {
+                  "description": "Run creation time in UTC.",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "finished_at": {
+                  "description": "Run completion time in UTC.",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "Stable run identifier accepted by Trail run tools.",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "type": "string"
+                },
+                "kind": {
+                  "description": "Cause that materialized the run.",
+                  "enum": [
+                    "scheduled",
+                    "event",
+                    "manual"
+                  ],
+                  "type": "string"
+                },
+                "scheduled_for": {
+                  "description": "Scheduled occurrence time in UTC.",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "status": {
+                  "description": "Aggregate lifecycle state across the run's independent actions.",
+                  "enum": [
+                    "queued",
+                    "running",
+                    "completed",
+                    "attention_required",
+                    "cancelled",
+                    "skipped"
+                  ],
+                  "type": "string"
+                },
+                "trail_id": {
+                  "description": "Trail definition that produced this run.",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "type": "string"
+                },
+                "updated_at": {
+                  "description": "Run update time in UTC.",
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "trail_id",
+                "kind",
+                "status",
+                "action_status",
+                "created_at",
+                "updated_at"
+              ],
+              "type": "object"
+            },
+            "trigger": {
+              "additionalProperties": false,
+              "description": "Immutable trigger context that materialized a Trail run.",
+              "properties": {
+                "event_name": {
+                  "description": "Canonical event name that matched an event trigger.",
+                  "type": "string"
+                },
+                "event_payload_json": {
+                  "description": "Complete triggering event payload encoded as JSON data.",
+                  "type": "string"
+                },
+                "initiated_by": {
+                  "description": "Account that requested a manual run.",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "type": "string"
+                },
+                "kind": {
+                  "description": "Cause that materialized the run.",
+                  "enum": [
+                    "scheduled",
+                    "event",
+                    "manual"
+                  ],
+                  "type": "string"
+                },
+                "observed_at": {
+                  "description": "Time the trigger was observed in UTC.",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "scheduled_for": {
+                  "description": "Scheduled occurrence time in UTC.",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "trigger": {
+                  "additionalProperties": false,
+                  "description": "A schedule or Storyden event trigger for a Trail.",
+                  "properties": {
+                    "event": {
+                      "description": "Canonical Storyden event names observed by an event trigger.",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "minItems": 1,
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "schedule": {
+                      "additionalProperties": false,
+                      "description": "A Trail schedule expressed as a local start time, timezone, and typed recurrence rule.",
+                      "properties": {
+                        "rule": {
+                          "additionalProperties": false,
+                          "description": "A human-readable recurrence rule for a Trail schedule.",
+                          "properties": {
+                            "count": {
+                              "description": "Maximum number of occurrences from the schedule start; use 1 for a one-shot wake-up.",
+                              "maximum": 100000,
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "frequency": {
+                              "description": "Recurrence frequency for the schedule.",
+                              "enum": [
+                                "hourly",
+                                "daily",
+                                "weekly",
+                                "monthly",
+                                "yearly"
+                              ],
+                              "type": "string"
+                            },
+                            "interval": {
+                              "description": "Number of frequency units between occurrences.",
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "month": {
+                              "description": "Months selected by a monthly or yearly schedule.",
+                              "items": {
+                                "maximum": 12,
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "type": "array",
+                              "uniqueItems": true
+                            },
+                            "month_day": {
+                              "description": "Calendar days selected by a monthly or yearly schedule, with negative values counted from the end of the month.",
+                              "items": {
+                                "maximum": 31,
+                                "minimum": -31,
+                                "not": {
+                                  "const": 0
+                                },
+                                "type": "integer"
+                              },
+                              "type": "array",
+                              "uniqueItems": true
+                            },
+                            "weekday": {
+                              "description": "Weekdays selected by a weekly schedule.",
+                              "items": {
+                                "enum": [
+                                  "monday",
+                                  "tuesday",
+                                  "wednesday",
+                                  "thursday",
+                                  "friday",
+                                  "saturday",
+                                  "sunday"
+                                ],
+                                "type": "string"
+                              },
+                              "type": "array",
+                              "uniqueItems": true
+                            }
+                          },
+                          "required": [
+                            "frequency",
+                            "interval"
+                          ],
+                          "type": "object"
+                        },
+                        "start": {
+                          "description": "Local start date and time without a UTC offset.",
+                          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
+                          "type": "string"
+                        },
+                        "timezone": {
+                          "description": "IANA timezone used to interpret the local start time.",
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "start",
+                        "timezone",
+                        "rule"
+                      ],
+                      "type": "object"
+                    },
+                    "type": {
+                      "description": "Trigger kind that determines which trigger details are used.",
+                      "enum": [
+                        "schedule",
+                        "event"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "kind",
+                "trigger",
+                "observed_at"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "summary",
+            "action"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "run",
+        "message",
+        "next_action"
+      ],
+      "type": "object"
+    },
+    "ToolTrailCreate": {
+      "$id": "ToolTrailCreate",
+      "description": "Create a scheduled or event-driven Trail.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolTrailCreateInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolTrailCreateOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "trail_create",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.trails"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false,
+          "readOnlyHint": false
+        },
+        "role": "MANAGE_TRAILS",
+        "title": "Create Trail"
+      }
+    },
+    "ToolTrailCreateInput": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "description": "Robot tasks performed independently for each occurrence.",
+          "items": {
+            "additionalProperties": false,
+            "description": "A Robot invocation performed for each Trail occurrence.",
+            "properties": {
+              "instruction": {
+                "description": "Task given to the Robot when the Trail runs.",
+                "minLength": 1,
+                "type": "string"
+              },
+              "robot_ref": {
+                "description": "Robot ID to invoke; omit to invoke the current Robot when called from a Robot conversation.",
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": {
+                "const": "robot_run",
+                "description": "Trail action kind.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "instruction"
+            ],
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "description": {
+          "description": "Optional explanation of the Trail's purpose.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Human-readable name for the scheduled or event-driven job.",
+          "maxLength": 120,
+          "minLength": 1,
+          "type": "string"
+        },
+        "status": {
+          "description": "Initial lifecycle state for the Trail.",
+          "enum": [
+            "active",
+            "paused",
+            "archived"
+          ],
+          "type": "string"
+        },
+        "trigger": {
+          "additionalProperties": false,
+          "description": "A schedule or Storyden event trigger for a Trail.",
+          "properties": {
+            "event": {
+              "description": "Canonical Storyden event names observed by an event trigger.",
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "minItems": 1,
+              "type": "array",
+              "uniqueItems": true
+            },
+            "schedule": {
+              "additionalProperties": false,
+              "description": "A Trail schedule expressed as a local start time, timezone, and typed recurrence rule.",
+              "properties": {
+                "rule": {
+                  "additionalProperties": false,
+                  "description": "A human-readable recurrence rule for a Trail schedule.",
+                  "properties": {
+                    "count": {
+                      "description": "Maximum number of occurrences from the schedule start; use 1 for a one-shot wake-up.",
+                      "maximum": 100000,
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "frequency": {
+                      "description": "Recurrence frequency for the schedule.",
+                      "enum": [
+                        "hourly",
+                        "daily",
+                        "weekly",
+                        "monthly",
+                        "yearly"
+                      ],
+                      "type": "string"
+                    },
+                    "interval": {
+                      "description": "Number of frequency units between occurrences.",
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "month": {
+                      "description": "Months selected by a monthly or yearly schedule.",
+                      "items": {
+                        "maximum": 12,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "month_day": {
+                      "description": "Calendar days selected by a monthly or yearly schedule, with negative values counted from the end of the month.",
+                      "items": {
+                        "maximum": 31,
+                        "minimum": -31,
+                        "not": {
+                          "const": 0
+                        },
+                        "type": "integer"
+                      },
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "weekday": {
+                      "description": "Weekdays selected by a weekly schedule.",
+                      "items": {
+                        "enum": [
+                          "monday",
+                          "tuesday",
+                          "wednesday",
+                          "thursday",
+                          "friday",
+                          "saturday",
+                          "sunday"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array",
+                      "uniqueItems": true
+                    }
+                  },
+                  "required": [
+                    "frequency",
+                    "interval"
+                  ],
+                  "type": "object"
+                },
+                "start": {
+                  "description": "Local start date and time without a UTC offset.",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
+                  "type": "string"
+                },
+                "timezone": {
+                  "description": "IANA timezone used to interpret the local start time.",
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "start",
+                "timezone",
+                "rule"
+              ],
+              "type": "object"
+            },
+            "type": {
+              "description": "Trigger kind that determines which trigger details are used.",
+              "enum": [
+                "schedule",
+                "event"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "name",
+        "status",
+        "trigger",
+        "action"
+      ],
+      "type": "object"
+    },
+    "ToolTrailCreateOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "description": "Human-readable confirmation of the created Trail and its next occurrence.",
+          "type": "string"
+        },
+        "next_action": {
+          "description": "Recommended follow-up for inspecting or changing the Trail.",
+          "type": "string"
+        },
+        "trail": {
+          "additionalProperties": false,
+          "description": "A Trail definition with its trigger, Robot actions, lifecycle state, and occurrence times.",
+          "properties": {
+            "action": {
+              "description": "Robot invocations performed independently for each occurrence.",
+              "items": {
+                "additionalProperties": false,
+                "description": "A Robot invocation performed for each Trail occurrence.",
+                "properties": {
+                  "instruction": {
+                    "description": "Task given to the Robot when the Trail runs.",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "robot_ref": {
+                    "description": "Robot ID to invoke; omit to invoke the current Robot when called from a Robot conversation.",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "robot_run",
+                    "description": "Trail action kind.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "instruction"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "created_at": {
+              "description": "Trail creation time in UTC.",
+              "format": "date-time",
+              "type": "string"
+            },
+            "description": {
+              "description": "Human-readable purpose of the Trail.",
+              "type": "string"
+            },
+            "id": {
+              "description": "Stable Trail identifier accepted by Trail management tools.",
+              "pattern": "^[0-9a-v]{20}$",
+              "type": "string"
+            },
+            "last_occurrence_at": {
+              "description": "Most recent materialized occurrence in UTC.",
+              "format": "date-time",
+              "type": "string"
+            },
+            "name": {
+              "description": "Human-readable Trail name.",
+              "type": "string"
+            },
+            "next_occurrence_at": {
+              "description": "Next scheduled occurrence in UTC when one remains.",
+              "format": "date-time",
+              "type": "string"
+            },
+            "status": {
+              "description": "Current Trail lifecycle state.",
+              "enum": [
+                "active",
+                "paused",
+                "finished",
+                "archived"
+              ],
+              "type": "string"
+            },
+            "trigger": {
+              "additionalProperties": false,
+              "description": "A schedule or Storyden event trigger for a Trail.",
+              "properties": {
+                "event": {
+                  "description": "Canonical Storyden event names observed by an event trigger.",
+                  "items": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "minItems": 1,
+                  "type": "array",
+                  "uniqueItems": true
+                },
+                "schedule": {
+                  "additionalProperties": false,
+                  "description": "A Trail schedule expressed as a local start time, timezone, and typed recurrence rule.",
+                  "properties": {
+                    "rule": {
+                      "additionalProperties": false,
+                      "description": "A human-readable recurrence rule for a Trail schedule.",
+                      "properties": {
+                        "count": {
+                          "description": "Maximum number of occurrences from the schedule start; use 1 for a one-shot wake-up.",
+                          "maximum": 100000,
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "frequency": {
+                          "description": "Recurrence frequency for the schedule.",
+                          "enum": [
+                            "hourly",
+                            "daily",
+                            "weekly",
+                            "monthly",
+                            "yearly"
+                          ],
+                          "type": "string"
+                        },
+                        "interval": {
+                          "description": "Number of frequency units between occurrences.",
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "month": {
+                          "description": "Months selected by a monthly or yearly schedule.",
+                          "items": {
+                            "maximum": 12,
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "type": "array",
+                          "uniqueItems": true
+                        },
+                        "month_day": {
+                          "description": "Calendar days selected by a monthly or yearly schedule, with negative values counted from the end of the month.",
+                          "items": {
+                            "maximum": 31,
+                            "minimum": -31,
+                            "not": {
+                              "const": 0
+                            },
+                            "type": "integer"
+                          },
+                          "type": "array",
+                          "uniqueItems": true
+                        },
+                        "weekday": {
+                          "description": "Weekdays selected by a weekly schedule.",
+                          "items": {
+                            "enum": [
+                              "monday",
+                              "tuesday",
+                              "wednesday",
+                              "thursday",
+                              "friday",
+                              "saturday",
+                              "sunday"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array",
+                          "uniqueItems": true
+                        }
+                      },
+                      "required": [
+                        "frequency",
+                        "interval"
+                      ],
+                      "type": "object"
+                    },
+                    "start": {
+                      "description": "Local start date and time without a UTC offset.",
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
+                      "type": "string"
+                    },
+                    "timezone": {
+                      "description": "IANA timezone used to interpret the local start time.",
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "start",
+                    "timezone",
+                    "rule"
+                  ],
+                  "type": "object"
+                },
+                "type": {
+                  "description": "Trigger kind that determines which trigger details are used.",
+                  "enum": [
+                    "schedule",
+                    "event"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type"
+              ],
+              "type": "object"
+            },
+            "updated_at": {
+              "description": "Trail update time in UTC.",
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "description",
+            "status",
+            "trigger",
+            "action",
+            "created_at",
+            "updated_at"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "trail",
+        "message",
+        "next_action"
+      ],
+      "type": "object"
+    },
+    "ToolTrailGet": {
+      "$id": "ToolTrailGet",
+      "description": "Retrieve a Trail by its ID.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolTrailGetInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolTrailGetOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "trail_get",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.trails"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        },
+        "role": "MANAGE_TRAILS",
+        "title": "Get Trail"
+      }
+    },
+    "ToolTrailGetInput": {
+      "additionalProperties": false,
+      "properties": {
+        "trail_id": {
+          "description": "Trail identifier returned by trail_list or trail_create.",
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "trail_id"
+      ],
+      "type": "object"
+    },
+    "ToolTrailGetOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "trail": {
+          "additionalProperties": false,
+          "description": "A Trail definition with its trigger, Robot actions, lifecycle state, and occurrence times.",
+          "properties": {
+            "action": {
+              "description": "Robot invocations performed independently for each occurrence.",
+              "items": {
+                "additionalProperties": false,
+                "description": "A Robot invocation performed for each Trail occurrence.",
+                "properties": {
+                  "instruction": {
+                    "description": "Task given to the Robot when the Trail runs.",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "robot_ref": {
+                    "description": "Robot ID to invoke; omit to invoke the current Robot when called from a Robot conversation.",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "robot_run",
+                    "description": "Trail action kind.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "instruction"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "created_at": {
+              "description": "Trail creation time in UTC.",
+              "format": "date-time",
+              "type": "string"
+            },
+            "description": {
+              "description": "Human-readable purpose of the Trail.",
+              "type": "string"
+            },
+            "id": {
+              "description": "Stable Trail identifier accepted by Trail management tools.",
+              "pattern": "^[0-9a-v]{20}$",
+              "type": "string"
+            },
+            "last_occurrence_at": {
+              "description": "Most recent materialized occurrence in UTC.",
+              "format": "date-time",
+              "type": "string"
+            },
+            "name": {
+              "description": "Human-readable Trail name.",
+              "type": "string"
+            },
+            "next_occurrence_at": {
+              "description": "Next scheduled occurrence in UTC when one remains.",
+              "format": "date-time",
+              "type": "string"
+            },
+            "status": {
+              "description": "Current Trail lifecycle state.",
+              "enum": [
+                "active",
+                "paused",
+                "finished",
+                "archived"
+              ],
+              "type": "string"
+            },
+            "trigger": {
+              "additionalProperties": false,
+              "description": "A schedule or Storyden event trigger for a Trail.",
+              "properties": {
+                "event": {
+                  "description": "Canonical Storyden event names observed by an event trigger.",
+                  "items": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "minItems": 1,
+                  "type": "array",
+                  "uniqueItems": true
+                },
+                "schedule": {
+                  "additionalProperties": false,
+                  "description": "A Trail schedule expressed as a local start time, timezone, and typed recurrence rule.",
+                  "properties": {
+                    "rule": {
+                      "additionalProperties": false,
+                      "description": "A human-readable recurrence rule for a Trail schedule.",
+                      "properties": {
+                        "count": {
+                          "description": "Maximum number of occurrences from the schedule start; use 1 for a one-shot wake-up.",
+                          "maximum": 100000,
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "frequency": {
+                          "description": "Recurrence frequency for the schedule.",
+                          "enum": [
+                            "hourly",
+                            "daily",
+                            "weekly",
+                            "monthly",
+                            "yearly"
+                          ],
+                          "type": "string"
+                        },
+                        "interval": {
+                          "description": "Number of frequency units between occurrences.",
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "month": {
+                          "description": "Months selected by a monthly or yearly schedule.",
+                          "items": {
+                            "maximum": 12,
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "type": "array",
+                          "uniqueItems": true
+                        },
+                        "month_day": {
+                          "description": "Calendar days selected by a monthly or yearly schedule, with negative values counted from the end of the month.",
+                          "items": {
+                            "maximum": 31,
+                            "minimum": -31,
+                            "not": {
+                              "const": 0
+                            },
+                            "type": "integer"
+                          },
+                          "type": "array",
+                          "uniqueItems": true
+                        },
+                        "weekday": {
+                          "description": "Weekdays selected by a weekly schedule.",
+                          "items": {
+                            "enum": [
+                              "monday",
+                              "tuesday",
+                              "wednesday",
+                              "thursday",
+                              "friday",
+                              "saturday",
+                              "sunday"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array",
+                          "uniqueItems": true
+                        }
+                      },
+                      "required": [
+                        "frequency",
+                        "interval"
+                      ],
+                      "type": "object"
+                    },
+                    "start": {
+                      "description": "Local start date and time without a UTC offset.",
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
+                      "type": "string"
+                    },
+                    "timezone": {
+                      "description": "IANA timezone used to interpret the local start time.",
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "start",
+                    "timezone",
+                    "rule"
+                  ],
+                  "type": "object"
+                },
+                "type": {
+                  "description": "Trigger kind that determines which trigger details are used.",
+                  "enum": [
+                    "schedule",
+                    "event"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type"
+              ],
+              "type": "object"
+            },
+            "updated_at": {
+              "description": "Trail update time in UTC.",
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "description",
+            "status",
+            "trigger",
+            "action",
+            "created_at",
+            "updated_at"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "trail"
+      ],
+      "type": "object"
+    },
+    "ToolTrailList": {
+      "$id": "ToolTrailList",
+      "description": "List Trails available to the current account.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolTrailListInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolTrailListOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "trail_list",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.trails"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        },
+        "role": "MANAGE_TRAILS",
+        "title": "List Trails"
+      }
+    },
+    "ToolTrailListInput": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "ToolTrailListOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "total": {
+          "description": "Number of Trails returned.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "trails": {
+          "description": "Trail definitions ordered by most recent update.",
+          "items": {
+            "additionalProperties": false,
+            "description": "A Trail definition with its trigger, Robot actions, lifecycle state, and occurrence times.",
+            "properties": {
+              "action": {
+                "description": "Robot invocations performed independently for each occurrence.",
+                "items": {
+                  "additionalProperties": false,
+                  "description": "A Robot invocation performed for each Trail occurrence.",
+                  "properties": {
+                    "instruction": {
+                      "description": "Task given to the Robot when the Trail runs.",
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "robot_ref": {
+                      "description": "Robot ID to invoke; omit to invoke the current Robot when called from a Robot conversation.",
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "type": {
+                      "const": "robot_run",
+                      "description": "Trail action kind.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "instruction"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "created_at": {
+                "description": "Trail creation time in UTC.",
+                "format": "date-time",
+                "type": "string"
+              },
+              "description": {
+                "description": "Human-readable purpose of the Trail.",
+                "type": "string"
+              },
+              "id": {
+                "description": "Stable Trail identifier accepted by Trail management tools.",
+                "pattern": "^[0-9a-v]{20}$",
+                "type": "string"
+              },
+              "last_occurrence_at": {
+                "description": "Most recent materialized occurrence in UTC.",
+                "format": "date-time",
+                "type": "string"
+              },
+              "name": {
+                "description": "Human-readable Trail name.",
+                "type": "string"
+              },
+              "next_occurrence_at": {
+                "description": "Next scheduled occurrence in UTC when one remains.",
+                "format": "date-time",
+                "type": "string"
+              },
+              "status": {
+                "description": "Current Trail lifecycle state.",
+                "enum": [
+                  "active",
+                  "paused",
+                  "finished",
+                  "archived"
+                ],
+                "type": "string"
+              },
+              "trigger": {
+                "additionalProperties": false,
+                "description": "A schedule or Storyden event trigger for a Trail.",
+                "properties": {
+                  "event": {
+                    "description": "Canonical Storyden event names observed by an event trigger.",
+                    "items": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array",
+                    "uniqueItems": true
+                  },
+                  "schedule": {
+                    "additionalProperties": false,
+                    "description": "A Trail schedule expressed as a local start time, timezone, and typed recurrence rule.",
+                    "properties": {
+                      "rule": {
+                        "additionalProperties": false,
+                        "description": "A human-readable recurrence rule for a Trail schedule.",
+                        "properties": {
+                          "count": {
+                            "description": "Maximum number of occurrences from the schedule start; use 1 for a one-shot wake-up.",
+                            "maximum": 100000,
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "frequency": {
+                            "description": "Recurrence frequency for the schedule.",
+                            "enum": [
+                              "hourly",
+                              "daily",
+                              "weekly",
+                              "monthly",
+                              "yearly"
+                            ],
+                            "type": "string"
+                          },
+                          "interval": {
+                            "description": "Number of frequency units between occurrences.",
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "month": {
+                            "description": "Months selected by a monthly or yearly schedule.",
+                            "items": {
+                              "maximum": 12,
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "type": "array",
+                            "uniqueItems": true
+                          },
+                          "month_day": {
+                            "description": "Calendar days selected by a monthly or yearly schedule, with negative values counted from the end of the month.",
+                            "items": {
+                              "maximum": 31,
+                              "minimum": -31,
+                              "not": {
+                                "const": 0
+                              },
+                              "type": "integer"
+                            },
+                            "type": "array",
+                            "uniqueItems": true
+                          },
+                          "weekday": {
+                            "description": "Weekdays selected by a weekly schedule.",
+                            "items": {
+                              "enum": [
+                                "monday",
+                                "tuesday",
+                                "wednesday",
+                                "thursday",
+                                "friday",
+                                "saturday",
+                                "sunday"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array",
+                            "uniqueItems": true
+                          }
+                        },
+                        "required": [
+                          "frequency",
+                          "interval"
+                        ],
+                        "type": "object"
+                      },
+                      "start": {
+                        "description": "Local start date and time without a UTC offset.",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
+                        "type": "string"
+                      },
+                      "timezone": {
+                        "description": "IANA timezone used to interpret the local start time.",
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "start",
+                      "timezone",
+                      "rule"
+                    ],
+                    "type": "object"
+                  },
+                  "type": {
+                    "description": "Trigger kind that determines which trigger details are used.",
+                    "enum": [
+                      "schedule",
+                      "event"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type"
+                ],
+                "type": "object"
+              },
+              "updated_at": {
+                "description": "Trail update time in UTC.",
+                "format": "date-time",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "description",
+              "status",
+              "trigger",
+              "action",
+              "created_at",
+              "updated_at"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "trails",
+        "total"
+      ],
+      "type": "object"
+    },
+    "ToolTrailRunCreate": {
+      "$id": "ToolTrailRunCreate",
+      "description": "Create a manual Trail run without moving its schedule.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolTrailRunCreateInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolTrailRunCreateOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "trail_run_create",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.trails"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false,
+          "readOnlyHint": false
+        },
+        "requires_confirmation": true,
+        "role": "MANAGE_TRAILS",
+        "title": "Create Trail Run"
+      }
+    },
+    "ToolTrailRunCreateInput": {
+      "additionalProperties": false,
+      "properties": {
+        "trail_id": {
+          "description": "Trail identifier to execute immediately.",
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "trail_id"
+      ],
+      "type": "object"
+    },
+    "ToolTrailRunCreateOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "description": "Human-readable confirmation of the manual run.",
+          "type": "string"
+        },
+        "next_action": {
+          "description": "Recommended follow-up for observing the run.",
+          "type": "string"
+        },
+        "run": {
+          "additionalProperties": false,
+          "description": "A Trail run with its immutable trigger context and independent action results.",
+          "properties": {
+            "action": {
+              "description": "Independent action results in Trail binding order.",
+              "items": {
+                "additionalProperties": false,
+                "description": "The immutable action configuration and execution result for one Trail run.",
+                "properties": {
+                  "action": {
+                    "additionalProperties": false,
+                    "description": "A Robot invocation performed for each Trail occurrence.",
+                    "properties": {
+                      "instruction": {
+                        "description": "Task given to the Robot when the Trail runs.",
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "robot_ref": {
+                        "description": "Robot ID to invoke; omit to invoke the current Robot when called from a Robot conversation.",
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "type": {
+                        "const": "robot_run",
+                        "description": "Trail action kind.",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "instruction"
+                    ],
+                    "type": "object"
+                  },
+                  "action_id": {
+                    "description": "Trail action binding captured by this run.",
+                    "pattern": "^[0-9a-v]{20}$",
+                    "type": "string"
+                  },
+                  "created_at": {
+                    "description": "Action-run creation time in UTC.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "error": {
+                    "description": "Execution error recorded when the action failed outside its structured Robot result.",
+                    "type": "string"
+                  },
+                  "finished_at": {
+                    "description": "Action completion time in UTC.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "id": {
+                    "description": "Stable action-run identifier accepted by trail_action_run_cancel.",
+                    "pattern": "^[0-9a-v]{20}$",
+                    "type": "string"
+                  },
+                  "output": {
+                    "additionalProperties": false,
+                    "description": "Structured result reported by a Robot action.",
+                    "properties": {
+                      "attention": {
+                        "additionalProperties": false,
+                        "description": "A user decision or missing input that blocked a Robot action.",
+                        "properties": {
+                          "message": {
+                            "description": "Explanation of what the Robot needs from the user.",
+                            "type": "string"
+                          },
+                          "reason": {
+                            "description": "Short category for the required attention.",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "reason",
+                          "message"
+                        ],
+                        "type": "object"
+                      },
+                      "status": {
+                        "description": "Robot-reported outcome of the unattended task.",
+                        "enum": [
+                          "completed",
+                          "blocked",
+                          "failed"
+                        ],
+                        "type": "string"
+                      },
+                      "summary": {
+                        "description": "Concise account of the work performed or why it did not finish.",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "status",
+                      "summary"
+                    ],
+                    "type": "object"
+                  },
+                  "robot_session_id": {
+                    "description": "Robot session created for this action run.",
+                    "pattern": "^[0-9a-v]{20}$",
+                    "type": "string"
+                  },
+                  "started_at": {
+                    "description": "Action start time in UTC.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "status": {
+                    "description": "Lifecycle state of this independent action run.",
+                    "enum": [
+                      "queued",
+                      "running",
+                      "completed",
+                      "blocked",
+                      "failed",
+                      "cancelled"
+                    ],
+                    "type": "string"
+                  },
+                  "updated_at": {
+                    "description": "Action-run update time in UTC.",
+                    "format": "date-time",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "action_id",
+                  "action",
+                  "status",
+                  "created_at",
+                  "updated_at"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "summary": {
+              "additionalProperties": false,
+              "description": "A concise Trail run record for choosing a run to inspect.",
+              "properties": {
+                "action_status": {
+                  "additionalProperties": false,
+                  "description": "Counts of action runs in each lifecycle state for one Trail run.",
+                  "properties": {
+                    "blocked": {
+                      "description": "Number of actions that require user attention.",
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "cancelled": {
+                      "description": "Number of actions that were cancelled.",
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "completed": {
+                      "description": "Number of actions that completed successfully.",
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "failed": {
+                      "description": "Number of actions that failed.",
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "queued": {
+                      "description": "Number of actions waiting to start.",
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "running": {
+                      "description": "Number of actions currently executing.",
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "queued",
+                    "running",
+                    "completed",
+                    "blocked",
+                    "failed",
+                    "cancelled"
+                  ],
+                  "type": "object"
+                },
+                "created_at": {
+                  "description": "Run creation time in UTC.",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "finished_at": {
+                  "description": "Run completion time in UTC.",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "Stable run identifier accepted by Trail run tools.",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "type": "string"
+                },
+                "kind": {
+                  "description": "Cause that materialized the run.",
+                  "enum": [
+                    "scheduled",
+                    "event",
+                    "manual"
+                  ],
+                  "type": "string"
+                },
+                "scheduled_for": {
+                  "description": "Scheduled occurrence time in UTC.",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "status": {
+                  "description": "Aggregate lifecycle state across the run's independent actions.",
+                  "enum": [
+                    "queued",
+                    "running",
+                    "completed",
+                    "attention_required",
+                    "cancelled",
+                    "skipped"
+                  ],
+                  "type": "string"
+                },
+                "trail_id": {
+                  "description": "Trail definition that produced this run.",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "type": "string"
+                },
+                "updated_at": {
+                  "description": "Run update time in UTC.",
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "trail_id",
+                "kind",
+                "status",
+                "action_status",
+                "created_at",
+                "updated_at"
+              ],
+              "type": "object"
+            },
+            "trigger": {
+              "additionalProperties": false,
+              "description": "Immutable trigger context that materialized a Trail run.",
+              "properties": {
+                "event_name": {
+                  "description": "Canonical event name that matched an event trigger.",
+                  "type": "string"
+                },
+                "event_payload_json": {
+                  "description": "Complete triggering event payload encoded as JSON data.",
+                  "type": "string"
+                },
+                "initiated_by": {
+                  "description": "Account that requested a manual run.",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "type": "string"
+                },
+                "kind": {
+                  "description": "Cause that materialized the run.",
+                  "enum": [
+                    "scheduled",
+                    "event",
+                    "manual"
+                  ],
+                  "type": "string"
+                },
+                "observed_at": {
+                  "description": "Time the trigger was observed in UTC.",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "scheduled_for": {
+                  "description": "Scheduled occurrence time in UTC.",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "trigger": {
+                  "additionalProperties": false,
+                  "description": "A schedule or Storyden event trigger for a Trail.",
+                  "properties": {
+                    "event": {
+                      "description": "Canonical Storyden event names observed by an event trigger.",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "minItems": 1,
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "schedule": {
+                      "additionalProperties": false,
+                      "description": "A Trail schedule expressed as a local start time, timezone, and typed recurrence rule.",
+                      "properties": {
+                        "rule": {
+                          "additionalProperties": false,
+                          "description": "A human-readable recurrence rule for a Trail schedule.",
+                          "properties": {
+                            "count": {
+                              "description": "Maximum number of occurrences from the schedule start; use 1 for a one-shot wake-up.",
+                              "maximum": 100000,
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "frequency": {
+                              "description": "Recurrence frequency for the schedule.",
+                              "enum": [
+                                "hourly",
+                                "daily",
+                                "weekly",
+                                "monthly",
+                                "yearly"
+                              ],
+                              "type": "string"
+                            },
+                            "interval": {
+                              "description": "Number of frequency units between occurrences.",
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "month": {
+                              "description": "Months selected by a monthly or yearly schedule.",
+                              "items": {
+                                "maximum": 12,
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "type": "array",
+                              "uniqueItems": true
+                            },
+                            "month_day": {
+                              "description": "Calendar days selected by a monthly or yearly schedule, with negative values counted from the end of the month.",
+                              "items": {
+                                "maximum": 31,
+                                "minimum": -31,
+                                "not": {
+                                  "const": 0
+                                },
+                                "type": "integer"
+                              },
+                              "type": "array",
+                              "uniqueItems": true
+                            },
+                            "weekday": {
+                              "description": "Weekdays selected by a weekly schedule.",
+                              "items": {
+                                "enum": [
+                                  "monday",
+                                  "tuesday",
+                                  "wednesday",
+                                  "thursday",
+                                  "friday",
+                                  "saturday",
+                                  "sunday"
+                                ],
+                                "type": "string"
+                              },
+                              "type": "array",
+                              "uniqueItems": true
+                            }
+                          },
+                          "required": [
+                            "frequency",
+                            "interval"
+                          ],
+                          "type": "object"
+                        },
+                        "start": {
+                          "description": "Local start date and time without a UTC offset.",
+                          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
+                          "type": "string"
+                        },
+                        "timezone": {
+                          "description": "IANA timezone used to interpret the local start time.",
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "start",
+                        "timezone",
+                        "rule"
+                      ],
+                      "type": "object"
+                    },
+                    "type": {
+                      "description": "Trigger kind that determines which trigger details are used.",
+                      "enum": [
+                        "schedule",
+                        "event"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "kind",
+                "trigger",
+                "observed_at"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "summary",
+            "action"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "run",
+        "message",
+        "next_action"
+      ],
+      "type": "object"
+    },
+    "ToolTrailRunGet": {
+      "$id": "ToolTrailRunGet",
+      "description": "Retrieve one Trail run with its trigger context and action results.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolTrailRunGetInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolTrailRunGetOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "trail_run_get",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.trails"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        },
+        "role": "MANAGE_TRAILS",
+        "title": "Get Trail Run"
+      }
+    },
+    "ToolTrailRunGetInput": {
+      "additionalProperties": false,
+      "properties": {
+        "run_id": {
+          "description": "Run identifier returned by trail_run_list or trail_run_create.",
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        },
+        "trail_id": {
+          "description": "Trail identifier that owns the run.",
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "trail_id",
+        "run_id"
+      ],
+      "type": "object"
+    },
+    "ToolTrailRunGetOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "description": "Human-readable summary of the run's current outcome.",
+          "type": "string"
+        },
+        "next_action": {
+          "description": "Recommended follow-up based on the run and action states.",
+          "type": "string"
+        },
+        "run": {
+          "additionalProperties": false,
+          "description": "A Trail run with its immutable trigger context and independent action results.",
+          "properties": {
+            "action": {
+              "description": "Independent action results in Trail binding order.",
+              "items": {
+                "additionalProperties": false,
+                "description": "The immutable action configuration and execution result for one Trail run.",
+                "properties": {
+                  "action": {
+                    "additionalProperties": false,
+                    "description": "A Robot invocation performed for each Trail occurrence.",
+                    "properties": {
+                      "instruction": {
+                        "description": "Task given to the Robot when the Trail runs.",
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "robot_ref": {
+                        "description": "Robot ID to invoke; omit to invoke the current Robot when called from a Robot conversation.",
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "type": {
+                        "const": "robot_run",
+                        "description": "Trail action kind.",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "instruction"
+                    ],
+                    "type": "object"
+                  },
+                  "action_id": {
+                    "description": "Trail action binding captured by this run.",
+                    "pattern": "^[0-9a-v]{20}$",
+                    "type": "string"
+                  },
+                  "created_at": {
+                    "description": "Action-run creation time in UTC.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "error": {
+                    "description": "Execution error recorded when the action failed outside its structured Robot result.",
+                    "type": "string"
+                  },
+                  "finished_at": {
+                    "description": "Action completion time in UTC.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "id": {
+                    "description": "Stable action-run identifier accepted by trail_action_run_cancel.",
+                    "pattern": "^[0-9a-v]{20}$",
+                    "type": "string"
+                  },
+                  "output": {
+                    "additionalProperties": false,
+                    "description": "Structured result reported by a Robot action.",
+                    "properties": {
+                      "attention": {
+                        "additionalProperties": false,
+                        "description": "A user decision or missing input that blocked a Robot action.",
+                        "properties": {
+                          "message": {
+                            "description": "Explanation of what the Robot needs from the user.",
+                            "type": "string"
+                          },
+                          "reason": {
+                            "description": "Short category for the required attention.",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "reason",
+                          "message"
+                        ],
+                        "type": "object"
+                      },
+                      "status": {
+                        "description": "Robot-reported outcome of the unattended task.",
+                        "enum": [
+                          "completed",
+                          "blocked",
+                          "failed"
+                        ],
+                        "type": "string"
+                      },
+                      "summary": {
+                        "description": "Concise account of the work performed or why it did not finish.",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "status",
+                      "summary"
+                    ],
+                    "type": "object"
+                  },
+                  "robot_session_id": {
+                    "description": "Robot session created for this action run.",
+                    "pattern": "^[0-9a-v]{20}$",
+                    "type": "string"
+                  },
+                  "started_at": {
+                    "description": "Action start time in UTC.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "status": {
+                    "description": "Lifecycle state of this independent action run.",
+                    "enum": [
+                      "queued",
+                      "running",
+                      "completed",
+                      "blocked",
+                      "failed",
+                      "cancelled"
+                    ],
+                    "type": "string"
+                  },
+                  "updated_at": {
+                    "description": "Action-run update time in UTC.",
+                    "format": "date-time",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "action_id",
+                  "action",
+                  "status",
+                  "created_at",
+                  "updated_at"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "summary": {
+              "additionalProperties": false,
+              "description": "A concise Trail run record for choosing a run to inspect.",
+              "properties": {
+                "action_status": {
+                  "additionalProperties": false,
+                  "description": "Counts of action runs in each lifecycle state for one Trail run.",
+                  "properties": {
+                    "blocked": {
+                      "description": "Number of actions that require user attention.",
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "cancelled": {
+                      "description": "Number of actions that were cancelled.",
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "completed": {
+                      "description": "Number of actions that completed successfully.",
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "failed": {
+                      "description": "Number of actions that failed.",
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "queued": {
+                      "description": "Number of actions waiting to start.",
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "running": {
+                      "description": "Number of actions currently executing.",
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "queued",
+                    "running",
+                    "completed",
+                    "blocked",
+                    "failed",
+                    "cancelled"
+                  ],
+                  "type": "object"
+                },
+                "created_at": {
+                  "description": "Run creation time in UTC.",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "finished_at": {
+                  "description": "Run completion time in UTC.",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "Stable run identifier accepted by Trail run tools.",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "type": "string"
+                },
+                "kind": {
+                  "description": "Cause that materialized the run.",
+                  "enum": [
+                    "scheduled",
+                    "event",
+                    "manual"
+                  ],
+                  "type": "string"
+                },
+                "scheduled_for": {
+                  "description": "Scheduled occurrence time in UTC.",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "status": {
+                  "description": "Aggregate lifecycle state across the run's independent actions.",
+                  "enum": [
+                    "queued",
+                    "running",
+                    "completed",
+                    "attention_required",
+                    "cancelled",
+                    "skipped"
+                  ],
+                  "type": "string"
+                },
+                "trail_id": {
+                  "description": "Trail definition that produced this run.",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "type": "string"
+                },
+                "updated_at": {
+                  "description": "Run update time in UTC.",
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "trail_id",
+                "kind",
+                "status",
+                "action_status",
+                "created_at",
+                "updated_at"
+              ],
+              "type": "object"
+            },
+            "trigger": {
+              "additionalProperties": false,
+              "description": "Immutable trigger context that materialized a Trail run.",
+              "properties": {
+                "event_name": {
+                  "description": "Canonical event name that matched an event trigger.",
+                  "type": "string"
+                },
+                "event_payload_json": {
+                  "description": "Complete triggering event payload encoded as JSON data.",
+                  "type": "string"
+                },
+                "initiated_by": {
+                  "description": "Account that requested a manual run.",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "type": "string"
+                },
+                "kind": {
+                  "description": "Cause that materialized the run.",
+                  "enum": [
+                    "scheduled",
+                    "event",
+                    "manual"
+                  ],
+                  "type": "string"
+                },
+                "observed_at": {
+                  "description": "Time the trigger was observed in UTC.",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "scheduled_for": {
+                  "description": "Scheduled occurrence time in UTC.",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "trigger": {
+                  "additionalProperties": false,
+                  "description": "A schedule or Storyden event trigger for a Trail.",
+                  "properties": {
+                    "event": {
+                      "description": "Canonical Storyden event names observed by an event trigger.",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "minItems": 1,
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "schedule": {
+                      "additionalProperties": false,
+                      "description": "A Trail schedule expressed as a local start time, timezone, and typed recurrence rule.",
+                      "properties": {
+                        "rule": {
+                          "additionalProperties": false,
+                          "description": "A human-readable recurrence rule for a Trail schedule.",
+                          "properties": {
+                            "count": {
+                              "description": "Maximum number of occurrences from the schedule start; use 1 for a one-shot wake-up.",
+                              "maximum": 100000,
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "frequency": {
+                              "description": "Recurrence frequency for the schedule.",
+                              "enum": [
+                                "hourly",
+                                "daily",
+                                "weekly",
+                                "monthly",
+                                "yearly"
+                              ],
+                              "type": "string"
+                            },
+                            "interval": {
+                              "description": "Number of frequency units between occurrences.",
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "month": {
+                              "description": "Months selected by a monthly or yearly schedule.",
+                              "items": {
+                                "maximum": 12,
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "type": "array",
+                              "uniqueItems": true
+                            },
+                            "month_day": {
+                              "description": "Calendar days selected by a monthly or yearly schedule, with negative values counted from the end of the month.",
+                              "items": {
+                                "maximum": 31,
+                                "minimum": -31,
+                                "not": {
+                                  "const": 0
+                                },
+                                "type": "integer"
+                              },
+                              "type": "array",
+                              "uniqueItems": true
+                            },
+                            "weekday": {
+                              "description": "Weekdays selected by a weekly schedule.",
+                              "items": {
+                                "enum": [
+                                  "monday",
+                                  "tuesday",
+                                  "wednesday",
+                                  "thursday",
+                                  "friday",
+                                  "saturday",
+                                  "sunday"
+                                ],
+                                "type": "string"
+                              },
+                              "type": "array",
+                              "uniqueItems": true
+                            }
+                          },
+                          "required": [
+                            "frequency",
+                            "interval"
+                          ],
+                          "type": "object"
+                        },
+                        "start": {
+                          "description": "Local start date and time without a UTC offset.",
+                          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
+                          "type": "string"
+                        },
+                        "timezone": {
+                          "description": "IANA timezone used to interpret the local start time.",
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "start",
+                        "timezone",
+                        "rule"
+                      ],
+                      "type": "object"
+                    },
+                    "type": {
+                      "description": "Trigger kind that determines which trigger details are used.",
+                      "enum": [
+                        "schedule",
+                        "event"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "kind",
+                "trigger",
+                "observed_at"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "summary",
+            "action"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "run",
+        "message",
+        "next_action"
+      ],
+      "type": "object"
+    },
+    "ToolTrailRunList": {
+      "$id": "ToolTrailRunList",
+      "description": "List recent runs for a Trail.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolTrailRunListInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolTrailRunListOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "trail_run_list",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.trails"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        },
+        "role": "MANAGE_TRAILS",
+        "title": "List Trail Runs"
+      }
+    },
+    "ToolTrailRunListInput": {
+      "additionalProperties": false,
+      "properties": {
+        "limit": {
+          "description": "Maximum number of recent runs to return; omit to use the default.",
+          "maximum": 100,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "trail_id": {
+          "description": "Trail identifier returned by trail_list or trail_create.",
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "trail_id"
+      ],
+      "type": "object"
+    },
+    "ToolTrailRunListOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "has_more": {
+          "description": "Whether older runs exist beyond this response.",
+          "type": "boolean"
+        },
+        "next_action": {
+          "description": "Recommended follow-up for inspecting a selected run.",
+          "type": "string"
+        },
+        "returned": {
+          "description": "Number of run summaries returned.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "runs": {
+          "description": "Recent Trail runs ordered newest first.",
+          "items": {
+            "additionalProperties": false,
+            "description": "A concise Trail run record for choosing a run to inspect.",
+            "properties": {
+              "action_status": {
+                "additionalProperties": false,
+                "description": "Counts of action runs in each lifecycle state for one Trail run.",
+                "properties": {
+                  "blocked": {
+                    "description": "Number of actions that require user attention.",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "cancelled": {
+                    "description": "Number of actions that were cancelled.",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "completed": {
+                    "description": "Number of actions that completed successfully.",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "failed": {
+                    "description": "Number of actions that failed.",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "queued": {
+                    "description": "Number of actions waiting to start.",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "running": {
+                    "description": "Number of actions currently executing.",
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "queued",
+                  "running",
+                  "completed",
+                  "blocked",
+                  "failed",
+                  "cancelled"
+                ],
+                "type": "object"
+              },
+              "created_at": {
+                "description": "Run creation time in UTC.",
+                "format": "date-time",
+                "type": "string"
+              },
+              "finished_at": {
+                "description": "Run completion time in UTC.",
+                "format": "date-time",
+                "type": "string"
+              },
+              "id": {
+                "description": "Stable run identifier accepted by Trail run tools.",
+                "pattern": "^[0-9a-v]{20}$",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Cause that materialized the run.",
+                "enum": [
+                  "scheduled",
+                  "event",
+                  "manual"
+                ],
+                "type": "string"
+              },
+              "scheduled_for": {
+                "description": "Scheduled occurrence time in UTC.",
+                "format": "date-time",
+                "type": "string"
+              },
+              "status": {
+                "description": "Aggregate lifecycle state across the run's independent actions.",
+                "enum": [
+                  "queued",
+                  "running",
+                  "completed",
+                  "attention_required",
+                  "cancelled",
+                  "skipped"
+                ],
+                "type": "string"
+              },
+              "trail_id": {
+                "description": "Trail definition that produced this run.",
+                "pattern": "^[0-9a-v]{20}$",
+                "type": "string"
+              },
+              "updated_at": {
+                "description": "Run update time in UTC.",
+                "format": "date-time",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "trail_id",
+              "kind",
+              "status",
+              "action_status",
+              "created_at",
+              "updated_at"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "runs",
+        "returned",
+        "has_more",
+        "next_action"
+      ],
+      "type": "object"
+    },
+    "ToolTrailSchedulePreview": {
+      "$id": "ToolTrailSchedulePreview",
+      "description": "Preview the next occurrences of a Trail schedule.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolTrailSchedulePreviewInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolTrailSchedulePreviewOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "trail_schedule_preview",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.trails"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        },
+        "role": "MANAGE_TRAILS",
+        "title": "Preview Trail Schedule"
+      }
+    },
+    "ToolTrailSchedulePreviewInput": {
+      "additionalProperties": false,
+      "properties": {
+        "after": {
+          "description": "UTC instant after which occurrences are calculated; omit to use the current time.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "schedule": {
+          "additionalProperties": false,
+          "description": "A Trail schedule expressed as a local start time, timezone, and typed recurrence rule.",
+          "properties": {
+            "rule": {
+              "additionalProperties": false,
+              "description": "A human-readable recurrence rule for a Trail schedule.",
+              "properties": {
+                "count": {
+                  "description": "Maximum number of occurrences from the schedule start; use 1 for a one-shot wake-up.",
+                  "maximum": 100000,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "frequency": {
+                  "description": "Recurrence frequency for the schedule.",
+                  "enum": [
+                    "hourly",
+                    "daily",
+                    "weekly",
+                    "monthly",
+                    "yearly"
+                  ],
+                  "type": "string"
+                },
+                "interval": {
+                  "description": "Number of frequency units between occurrences.",
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "month": {
+                  "description": "Months selected by a monthly or yearly schedule.",
+                  "items": {
+                    "maximum": 12,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "type": "array",
+                  "uniqueItems": true
+                },
+                "month_day": {
+                  "description": "Calendar days selected by a monthly or yearly schedule, with negative values counted from the end of the month.",
+                  "items": {
+                    "maximum": 31,
+                    "minimum": -31,
+                    "not": {
+                      "const": 0
+                    },
+                    "type": "integer"
+                  },
+                  "type": "array",
+                  "uniqueItems": true
+                },
+                "weekday": {
+                  "description": "Weekdays selected by a weekly schedule.",
+                  "items": {
+                    "enum": [
+                      "monday",
+                      "tuesday",
+                      "wednesday",
+                      "thursday",
+                      "friday",
+                      "saturday",
+                      "sunday"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array",
+                  "uniqueItems": true
+                }
+              },
+              "required": [
+                "frequency",
+                "interval"
+              ],
+              "type": "object"
+            },
+            "start": {
+              "description": "Local start date and time without a UTC offset.",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
+              "type": "string"
+            },
+            "timezone": {
+              "description": "IANA timezone used to interpret the local start time.",
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "start",
+            "timezone",
+            "rule"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "schedule"
+      ],
+      "type": "object"
+    },
+    "ToolTrailSchedulePreviewOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "occurrences": {
+          "description": "Next schedule occurrences in UTC.",
+          "items": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "occurrences"
+      ],
+      "type": "object"
+    },
+    "ToolTrailUpdate": {
+      "$id": "ToolTrailUpdate",
+      "description": "Replace an existing Trail definition.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolTrailUpdateInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolTrailUpdateOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "trail_update",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.trails"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": false
+        },
+        "role": "MANAGE_TRAILS",
+        "title": "Update Trail"
+      }
+    },
+    "ToolTrailUpdateInput": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "description": "Replacement Robot tasks performed independently for each occurrence.",
+          "items": {
+            "additionalProperties": false,
+            "description": "A Robot invocation performed for each Trail occurrence.",
+            "properties": {
+              "instruction": {
+                "description": "Task given to the Robot when the Trail runs.",
+                "minLength": 1,
+                "type": "string"
+              },
+              "robot_ref": {
+                "description": "Robot ID to invoke; omit to invoke the current Robot when called from a Robot conversation.",
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": {
+                "const": "robot_run",
+                "description": "Trail action kind.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "instruction"
+            ],
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "description": {
+          "description": "Replacement explanation of the Trail's purpose.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Replacement human-readable Trail name.",
+          "maxLength": 120,
+          "minLength": 1,
+          "type": "string"
+        },
+        "status": {
+          "description": "Replacement lifecycle state for the Trail.",
+          "enum": [
+            "active",
+            "paused",
+            "archived"
+          ],
+          "type": "string"
+        },
+        "trail_id": {
+          "description": "Trail identifier returned by trail_list or trail_create.",
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        },
+        "trigger": {
+          "additionalProperties": false,
+          "description": "A schedule or Storyden event trigger for a Trail.",
+          "properties": {
+            "event": {
+              "description": "Canonical Storyden event names observed by an event trigger.",
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "minItems": 1,
+              "type": "array",
+              "uniqueItems": true
+            },
+            "schedule": {
+              "additionalProperties": false,
+              "description": "A Trail schedule expressed as a local start time, timezone, and typed recurrence rule.",
+              "properties": {
+                "rule": {
+                  "additionalProperties": false,
+                  "description": "A human-readable recurrence rule for a Trail schedule.",
+                  "properties": {
+                    "count": {
+                      "description": "Maximum number of occurrences from the schedule start; use 1 for a one-shot wake-up.",
+                      "maximum": 100000,
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "frequency": {
+                      "description": "Recurrence frequency for the schedule.",
+                      "enum": [
+                        "hourly",
+                        "daily",
+                        "weekly",
+                        "monthly",
+                        "yearly"
+                      ],
+                      "type": "string"
+                    },
+                    "interval": {
+                      "description": "Number of frequency units between occurrences.",
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "month": {
+                      "description": "Months selected by a monthly or yearly schedule.",
+                      "items": {
+                        "maximum": 12,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "month_day": {
+                      "description": "Calendar days selected by a monthly or yearly schedule, with negative values counted from the end of the month.",
+                      "items": {
+                        "maximum": 31,
+                        "minimum": -31,
+                        "not": {
+                          "const": 0
+                        },
+                        "type": "integer"
+                      },
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "weekday": {
+                      "description": "Weekdays selected by a weekly schedule.",
+                      "items": {
+                        "enum": [
+                          "monday",
+                          "tuesday",
+                          "wednesday",
+                          "thursday",
+                          "friday",
+                          "saturday",
+                          "sunday"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array",
+                      "uniqueItems": true
+                    }
+                  },
+                  "required": [
+                    "frequency",
+                    "interval"
+                  ],
+                  "type": "object"
+                },
+                "start": {
+                  "description": "Local start date and time without a UTC offset.",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
+                  "type": "string"
+                },
+                "timezone": {
+                  "description": "IANA timezone used to interpret the local start time.",
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "start",
+                "timezone",
+                "rule"
+              ],
+              "type": "object"
+            },
+            "type": {
+              "description": "Trigger kind that determines which trigger details are used.",
+              "enum": [
+                "schedule",
+                "event"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "trail_id",
+        "name",
+        "status",
+        "trigger",
+        "action"
+      ],
+      "type": "object"
+    },
+    "ToolTrailUpdateOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "description": "Human-readable confirmation of the updated Trail and its next occurrence.",
+          "type": "string"
+        },
+        "next_action": {
+          "description": "Recommended follow-up for inspecting or changing the Trail.",
+          "type": "string"
+        },
+        "trail": {
+          "additionalProperties": false,
+          "description": "A Trail definition with its trigger, Robot actions, lifecycle state, and occurrence times.",
+          "properties": {
+            "action": {
+              "description": "Robot invocations performed independently for each occurrence.",
+              "items": {
+                "additionalProperties": false,
+                "description": "A Robot invocation performed for each Trail occurrence.",
+                "properties": {
+                  "instruction": {
+                    "description": "Task given to the Robot when the Trail runs.",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "robot_ref": {
+                    "description": "Robot ID to invoke; omit to invoke the current Robot when called from a Robot conversation.",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "robot_run",
+                    "description": "Trail action kind.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "instruction"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "created_at": {
+              "description": "Trail creation time in UTC.",
+              "format": "date-time",
+              "type": "string"
+            },
+            "description": {
+              "description": "Human-readable purpose of the Trail.",
+              "type": "string"
+            },
+            "id": {
+              "description": "Stable Trail identifier accepted by Trail management tools.",
+              "pattern": "^[0-9a-v]{20}$",
+              "type": "string"
+            },
+            "last_occurrence_at": {
+              "description": "Most recent materialized occurrence in UTC.",
+              "format": "date-time",
+              "type": "string"
+            },
+            "name": {
+              "description": "Human-readable Trail name.",
+              "type": "string"
+            },
+            "next_occurrence_at": {
+              "description": "Next scheduled occurrence in UTC when one remains.",
+              "format": "date-time",
+              "type": "string"
+            },
+            "status": {
+              "description": "Current Trail lifecycle state.",
+              "enum": [
+                "active",
+                "paused",
+                "finished",
+                "archived"
+              ],
+              "type": "string"
+            },
+            "trigger": {
+              "additionalProperties": false,
+              "description": "A schedule or Storyden event trigger for a Trail.",
+              "properties": {
+                "event": {
+                  "description": "Canonical Storyden event names observed by an event trigger.",
+                  "items": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "minItems": 1,
+                  "type": "array",
+                  "uniqueItems": true
+                },
+                "schedule": {
+                  "additionalProperties": false,
+                  "description": "A Trail schedule expressed as a local start time, timezone, and typed recurrence rule.",
+                  "properties": {
+                    "rule": {
+                      "additionalProperties": false,
+                      "description": "A human-readable recurrence rule for a Trail schedule.",
+                      "properties": {
+                        "count": {
+                          "description": "Maximum number of occurrences from the schedule start; use 1 for a one-shot wake-up.",
+                          "maximum": 100000,
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "frequency": {
+                          "description": "Recurrence frequency for the schedule.",
+                          "enum": [
+                            "hourly",
+                            "daily",
+                            "weekly",
+                            "monthly",
+                            "yearly"
+                          ],
+                          "type": "string"
+                        },
+                        "interval": {
+                          "description": "Number of frequency units between occurrences.",
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "month": {
+                          "description": "Months selected by a monthly or yearly schedule.",
+                          "items": {
+                            "maximum": 12,
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "type": "array",
+                          "uniqueItems": true
+                        },
+                        "month_day": {
+                          "description": "Calendar days selected by a monthly or yearly schedule, with negative values counted from the end of the month.",
+                          "items": {
+                            "maximum": 31,
+                            "minimum": -31,
+                            "not": {
+                              "const": 0
+                            },
+                            "type": "integer"
+                          },
+                          "type": "array",
+                          "uniqueItems": true
+                        },
+                        "weekday": {
+                          "description": "Weekdays selected by a weekly schedule.",
+                          "items": {
+                            "enum": [
+                              "monday",
+                              "tuesday",
+                              "wednesday",
+                              "thursday",
+                              "friday",
+                              "saturday",
+                              "sunday"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array",
+                          "uniqueItems": true
+                        }
+                      },
+                      "required": [
+                        "frequency",
+                        "interval"
+                      ],
+                      "type": "object"
+                    },
+                    "start": {
+                      "description": "Local start date and time without a UTC offset.",
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
+                      "type": "string"
+                    },
+                    "timezone": {
+                      "description": "IANA timezone used to interpret the local start time.",
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "start",
+                    "timezone",
+                    "rule"
+                  ],
+                  "type": "object"
+                },
+                "type": {
+                  "description": "Trigger kind that determines which trigger details are used.",
+                  "enum": [
+                    "schedule",
+                    "event"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type"
+              ],
+              "type": "object"
+            },
+            "updated_at": {
+              "description": "Trail update time in UTC.",
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "description",
+            "status",
+            "trigger",
+            "action",
+            "created_at",
+            "updated_at"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "trail",
+        "message",
+        "next_action"
+      ],
+      "type": "object"
+    },
     "ToolWebFetch": {
       "$id": "ToolWebFetch",
       "description": "Fetch a web page for metadata without adding it to Storyden or opening a navigable document snapshot.",

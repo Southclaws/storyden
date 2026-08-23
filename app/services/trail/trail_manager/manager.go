@@ -182,6 +182,10 @@ func (m *Manager) Get(ctx context.Context, id trail.ID) (*trail.Trail, error) {
 }
 
 func (m *Manager) ListRuns(ctx context.Context, id trail.ID) ([]*trail.Run, error) {
+	return m.ListRunsLimited(ctx, id, 100)
+}
+
+func (m *Manager) ListRunsLimited(ctx context.Context, id trail.ID, limit int) ([]*trail.Run, error) {
 	_, err := m.repository.Get(ctx, id)
 	if err != nil {
 		return nil, err
@@ -191,7 +195,7 @@ func (m *Manager) ListRuns(ctx context.Context, id trail.ID) ([]*trail.Run, erro
 		return nil, err
 	}
 
-	return m.repository.ListRuns(ctx, id, 100)
+	return m.repository.ListRuns(ctx, id, limit)
 }
 
 func (m *Manager) GetRun(ctx context.Context, trailID trail.ID, runID trail.RunID) (*trail.Run, error) {

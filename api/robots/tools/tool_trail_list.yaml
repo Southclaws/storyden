@@ -1,0 +1,35 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolTrailList
+x-storyden:
+  toolsets:
+    - system.trails
+x-storyden-tool:
+  title: List Trails
+  role: MANAGE_TRAILS
+  annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
+title: trail_list
+description: List Trails available to the current account.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolTrailListInput" }
+  output: { $ref: "#/definitions/ToolTrailListOutput" }
+definitions:
+  ToolTrailListInput:
+    type: object
+    properties: {}
+    additionalProperties: false
+  ToolTrailListOutput:
+    type: object
+    required: [trails, total]
+    additionalProperties: false
+    properties:
+      trails:
+        type: array
+        description: Trail definitions ordered by most recent update.
+        items:
+          $ref: "../../common/TrailToolItem.yaml"
+      total:
+        type: integer
+        minimum: 0
+        description: Number of Trails returned.

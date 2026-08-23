@@ -19,6 +19,15 @@ export interface MCPTools {
   ToolRobotUpdate?: RobotUpdate;
   ToolRobotDelete?: RobotDelete;
   ToolRobotSearch?: RobotSearch;
+  ToolTrailCreate?: TrailCreate;
+  ToolTrailList?: TrailList;
+  ToolTrailGet?: TrailGet;
+  ToolTrailUpdate?: TrailUpdate;
+  ToolTrailSchedulePreview?: TrailSchedulePreview;
+  ToolTrailRunList?: TrailRunList;
+  ToolTrailRunGet?: TrailRunGet;
+  ToolTrailRunCreate?: TrailRunCreate;
+  ToolTrailActionRunCancel?: TrailActionRunCancel;
   ToolToolsetSearch?: ToolsetSearch;
   ToolToolsetLoad?: ToolsetLoad;
   ToolToolsetCreate?: ToolsetCreate;
@@ -727,6 +736,566 @@ export interface RobotSearchResult {
   delegate_to: string;
   name: string;
   description: string;
+}
+/**
+ * Create a scheduled or event-driven Trail.
+ */
+export interface TrailCreate {
+  input: ToolTrailCreateInput;
+  output: ToolTrailCreateOutput;
+  [k: string]: unknown;
+}
+export interface ToolTrailCreateInput {
+  /**
+   * Human-readable name for the scheduled or event-driven job.
+   */
+  name: string;
+  /**
+   * Optional explanation of the Trail's purpose.
+   */
+  description?: string;
+  /**
+   * Initial lifecycle state for the Trail.
+   */
+  status: "active" | "paused" | "archived";
+  trigger: TrailToolTrigger;
+  /**
+   * Robot tasks performed independently for each occurrence.
+   *
+   * @minItems 1
+   */
+  action: [TrailToolAction, ...TrailToolAction[]];
+}
+/**
+ * A schedule or Storyden event trigger for a Trail.
+ */
+export interface TrailToolTrigger {
+  /**
+   * Trigger kind that determines which trigger details are used.
+   */
+  type: "schedule" | "event";
+  schedule?: TrailToolSchedule;
+  /**
+   * Canonical Storyden event names observed by an event trigger.
+   *
+   * @minItems 1
+   */
+  event?: [string, ...string[]];
+}
+/**
+ * A Trail schedule expressed as a local start time, timezone, and typed recurrence rule.
+ */
+export interface TrailToolSchedule {
+  /**
+   * Local start date and time without a UTC offset.
+   */
+  start: string;
+  /**
+   * IANA timezone used to interpret the local start time.
+   */
+  timezone: string;
+  rule: TrailToolRecurrenceRule;
+}
+/**
+ * A human-readable recurrence rule for a Trail schedule.
+ */
+export interface TrailToolRecurrenceRule {
+  /**
+   * Recurrence frequency for the schedule.
+   */
+  frequency: "hourly" | "daily" | "weekly" | "monthly" | "yearly";
+  /**
+   * Number of frequency units between occurrences.
+   */
+  interval: number;
+  /**
+   * Weekdays selected by a weekly schedule.
+   */
+  weekday?: ("monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday")[];
+  /**
+   * Months selected by a monthly or yearly schedule.
+   */
+  month?: number[];
+  /**
+   * Calendar days selected by a monthly or yearly schedule, with negative values counted from the end of the month.
+   */
+  month_day?: number[];
+  /**
+   * Maximum number of occurrences from the schedule start; use 1 for a one-shot wake-up.
+   */
+  count?: number;
+}
+/**
+ * A Robot invocation performed for each Trail occurrence.
+ */
+export interface TrailToolAction {
+  /**
+   * Trail action kind.
+   */
+  type: "robot_run";
+  /**
+   * Robot ID to invoke; omit to invoke the current Robot when called from a Robot conversation.
+   */
+  robot_ref?: string;
+  /**
+   * Task given to the Robot when the Trail runs.
+   */
+  instruction: string;
+}
+export interface ToolTrailCreateOutput {
+  trail: TrailToolItem;
+  /**
+   * Human-readable confirmation of the created Trail and its next occurrence.
+   */
+  message: string;
+  /**
+   * Recommended follow-up for inspecting or changing the Trail.
+   */
+  next_action: string;
+}
+/**
+ * A Trail definition with its trigger, Robot actions, lifecycle state, and occurrence times.
+ */
+export interface TrailToolItem {
+  /**
+   * Stable Trail identifier accepted by Trail management tools.
+   */
+  id: string;
+  /**
+   * Human-readable Trail name.
+   */
+  name: string;
+  /**
+   * Human-readable purpose of the Trail.
+   */
+  description: string;
+  /**
+   * Current Trail lifecycle state.
+   */
+  status: "active" | "paused" | "finished" | "archived";
+  trigger: TrailToolTrigger;
+  /**
+   * Robot invocations performed independently for each occurrence.
+   */
+  action: TrailToolAction[];
+  /**
+   * Next scheduled occurrence in UTC when one remains.
+   */
+  next_occurrence_at?: string;
+  /**
+   * Most recent materialized occurrence in UTC.
+   */
+  last_occurrence_at?: string;
+  /**
+   * Trail creation time in UTC.
+   */
+  created_at: string;
+  /**
+   * Trail update time in UTC.
+   */
+  updated_at: string;
+}
+/**
+ * List Trails available to the current account.
+ */
+export interface TrailList {
+  input: ToolTrailListInput;
+  output: ToolTrailListOutput;
+  [k: string]: unknown;
+}
+export interface ToolTrailListInput {}
+export interface ToolTrailListOutput {
+  /**
+   * Trail definitions ordered by most recent update.
+   */
+  trails: TrailToolItem[];
+  /**
+   * Number of Trails returned.
+   */
+  total: number;
+}
+/**
+ * Retrieve a Trail by its ID.
+ */
+export interface TrailGet {
+  input: ToolTrailGetInput;
+  output: ToolTrailGetOutput;
+  [k: string]: unknown;
+}
+export interface ToolTrailGetInput {
+  /**
+   * Trail identifier returned by trail_list or trail_create.
+   */
+  trail_id: string;
+}
+export interface ToolTrailGetOutput {
+  trail: TrailToolItem;
+}
+/**
+ * Replace an existing Trail definition.
+ */
+export interface TrailUpdate {
+  input: ToolTrailUpdateInput;
+  output: ToolTrailUpdateOutput;
+  [k: string]: unknown;
+}
+export interface ToolTrailUpdateInput {
+  /**
+   * Trail identifier returned by trail_list or trail_create.
+   */
+  trail_id: string;
+  /**
+   * Replacement human-readable Trail name.
+   */
+  name: string;
+  /**
+   * Replacement explanation of the Trail's purpose.
+   */
+  description?: string;
+  /**
+   * Replacement lifecycle state for the Trail.
+   */
+  status: "active" | "paused" | "archived";
+  trigger: TrailToolTrigger;
+  /**
+   * Replacement Robot tasks performed independently for each occurrence.
+   *
+   * @minItems 1
+   */
+  action: [TrailToolAction, ...TrailToolAction[]];
+}
+export interface ToolTrailUpdateOutput {
+  trail: TrailToolItem;
+  /**
+   * Human-readable confirmation of the updated Trail and its next occurrence.
+   */
+  message: string;
+  /**
+   * Recommended follow-up for inspecting or changing the Trail.
+   */
+  next_action: string;
+}
+/**
+ * Preview the next occurrences of a Trail schedule.
+ */
+export interface TrailSchedulePreview {
+  input: ToolTrailSchedulePreviewInput;
+  output: ToolTrailSchedulePreviewOutput;
+  [k: string]: unknown;
+}
+export interface ToolTrailSchedulePreviewInput {
+  schedule: TrailToolSchedule;
+  /**
+   * UTC instant after which occurrences are calculated; omit to use the current time.
+   */
+  after?: string;
+}
+export interface ToolTrailSchedulePreviewOutput {
+  /**
+   * Next schedule occurrences in UTC.
+   */
+  occurrences: string[];
+}
+/**
+ * List recent runs for a Trail.
+ */
+export interface TrailRunList {
+  input: ToolTrailRunListInput;
+  output: ToolTrailRunListOutput;
+  [k: string]: unknown;
+}
+export interface ToolTrailRunListInput {
+  /**
+   * Trail identifier returned by trail_list or trail_create.
+   */
+  trail_id: string;
+  /**
+   * Maximum number of recent runs to return; omit to use the default.
+   */
+  limit?: number;
+}
+export interface ToolTrailRunListOutput {
+  /**
+   * Recent Trail runs ordered newest first.
+   */
+  runs: TrailToolRunSummary[];
+  /**
+   * Number of run summaries returned.
+   */
+  returned: number;
+  /**
+   * Whether older runs exist beyond this response.
+   */
+  has_more: boolean;
+  /**
+   * Recommended follow-up for inspecting a selected run.
+   */
+  next_action: string;
+}
+/**
+ * A concise Trail run record for choosing a run to inspect.
+ */
+export interface TrailToolRunSummary {
+  /**
+   * Stable run identifier accepted by Trail run tools.
+   */
+  id: string;
+  /**
+   * Trail definition that produced this run.
+   */
+  trail_id: string;
+  /**
+   * Cause that materialized the run.
+   */
+  kind: "scheduled" | "event" | "manual";
+  /**
+   * Aggregate lifecycle state across the run's independent actions.
+   */
+  status: "queued" | "running" | "completed" | "attention_required" | "cancelled" | "skipped";
+  action_status: TrailToolActionRunCounts;
+  /**
+   * Scheduled occurrence time in UTC.
+   */
+  scheduled_for?: string;
+  /**
+   * Run completion time in UTC.
+   */
+  finished_at?: string;
+  /**
+   * Run creation time in UTC.
+   */
+  created_at: string;
+  /**
+   * Run update time in UTC.
+   */
+  updated_at: string;
+}
+/**
+ * Counts of action runs in each lifecycle state for one Trail run.
+ */
+export interface TrailToolActionRunCounts {
+  /**
+   * Number of actions waiting to start.
+   */
+  queued: number;
+  /**
+   * Number of actions currently executing.
+   */
+  running: number;
+  /**
+   * Number of actions that completed successfully.
+   */
+  completed: number;
+  /**
+   * Number of actions that require user attention.
+   */
+  blocked: number;
+  /**
+   * Number of actions that failed.
+   */
+  failed: number;
+  /**
+   * Number of actions that were cancelled.
+   */
+  cancelled: number;
+}
+/**
+ * Retrieve one Trail run with its trigger context and action results.
+ */
+export interface TrailRunGet {
+  input: ToolTrailRunGetInput;
+  output: ToolTrailRunGetOutput;
+  [k: string]: unknown;
+}
+export interface ToolTrailRunGetInput {
+  /**
+   * Trail identifier that owns the run.
+   */
+  trail_id: string;
+  /**
+   * Run identifier returned by trail_run_list or trail_run_create.
+   */
+  run_id: string;
+}
+export interface ToolTrailRunGetOutput {
+  run: TrailToolRun;
+  /**
+   * Human-readable summary of the run's current outcome.
+   */
+  message: string;
+  /**
+   * Recommended follow-up based on the run and action states.
+   */
+  next_action: string;
+}
+/**
+ * A Trail run with its immutable trigger context and independent action results.
+ */
+export interface TrailToolRun {
+  summary: TrailToolRunSummary;
+  trigger?: TrailToolTriggerSnapshot;
+  /**
+   * Independent action results in Trail binding order.
+   */
+  action: TrailToolActionRun[];
+}
+/**
+ * Immutable trigger context that materialized a Trail run.
+ */
+export interface TrailToolTriggerSnapshot {
+  /**
+   * Cause that materialized the run.
+   */
+  kind: "scheduled" | "event" | "manual";
+  trigger: TrailToolTrigger;
+  /**
+   * Canonical event name that matched an event trigger.
+   */
+  event_name?: string;
+  /**
+   * Complete triggering event payload encoded as JSON data.
+   */
+  event_payload_json?: string;
+  /**
+   * Scheduled occurrence time in UTC.
+   */
+  scheduled_for?: string;
+  /**
+   * Time the trigger was observed in UTC.
+   */
+  observed_at: string;
+  /**
+   * Account that requested a manual run.
+   */
+  initiated_by?: string;
+}
+/**
+ * The immutable action configuration and execution result for one Trail run.
+ */
+export interface TrailToolActionRun {
+  /**
+   * Stable action-run identifier accepted by trail_action_run_cancel.
+   */
+  id: string;
+  /**
+   * Trail action binding captured by this run.
+   */
+  action_id: string;
+  action: TrailToolAction;
+  /**
+   * Lifecycle state of this independent action run.
+   */
+  status: "queued" | "running" | "completed" | "blocked" | "failed" | "cancelled";
+  /**
+   * Robot session created for this action run.
+   */
+  robot_session_id?: string;
+  output?: TrailToolRobotOutput;
+  /**
+   * Execution error recorded when the action failed outside its structured Robot result.
+   */
+  error?: string;
+  /**
+   * Action start time in UTC.
+   */
+  started_at?: string;
+  /**
+   * Action completion time in UTC.
+   */
+  finished_at?: string;
+  /**
+   * Action-run creation time in UTC.
+   */
+  created_at: string;
+  /**
+   * Action-run update time in UTC.
+   */
+  updated_at: string;
+}
+/**
+ * Structured result reported by a Robot action.
+ */
+export interface TrailToolRobotOutput {
+  /**
+   * Robot-reported outcome of the unattended task.
+   */
+  status: "completed" | "blocked" | "failed";
+  /**
+   * Concise account of the work performed or why it did not finish.
+   */
+  summary: string;
+  attention?: TrailToolRobotAttention;
+}
+/**
+ * A user decision or missing input that blocked a Robot action.
+ */
+export interface TrailToolRobotAttention {
+  /**
+   * Short category for the required attention.
+   */
+  reason: string;
+  /**
+   * Explanation of what the Robot needs from the user.
+   */
+  message: string;
+}
+/**
+ * Create a manual Trail run without moving its schedule.
+ */
+export interface TrailRunCreate {
+  input: ToolTrailRunCreateInput;
+  output: ToolTrailRunCreateOutput;
+  [k: string]: unknown;
+}
+export interface ToolTrailRunCreateInput {
+  /**
+   * Trail identifier to execute immediately.
+   */
+  trail_id: string;
+}
+export interface ToolTrailRunCreateOutput {
+  run: TrailToolRun;
+  /**
+   * Human-readable confirmation of the manual run.
+   */
+  message: string;
+  /**
+   * Recommended follow-up for observing the run.
+   */
+  next_action: string;
+}
+/**
+ * Cancel one queued or running action in a Trail run.
+ */
+export interface TrailActionRunCancel {
+  input: ToolTrailActionRunCancelInput;
+  output: ToolTrailActionRunCancelOutput;
+  [k: string]: unknown;
+}
+export interface ToolTrailActionRunCancelInput {
+  /**
+   * Trail identifier that owns the run.
+   */
+  trail_id: string;
+  /**
+   * Run identifier that owns the action run.
+   */
+  run_id: string;
+  /**
+   * Queued or running action identifier returned by trail_run_get.
+   */
+  action_run_id: string;
+}
+export interface ToolTrailActionRunCancelOutput {
+  run: TrailToolRun;
+  /**
+   * Human-readable confirmation of the cancelled action.
+   */
+  message: string;
+  /**
+   * Recommended follow-up for inspecting the updated run.
+   */
+  next_action: string;
 }
 /**
  * Search reusable Toolsets for a coherent bundle of capabilities and specialist guidance. Use toolset_get to inspect a candidate before loading it or assigning it to a Robot.
@@ -2089,9 +2658,9 @@ export interface MemberSearchItem {
   bio?: string;
 }
 
-export type ToolName = "content_search" | "document_get" | "document_search" | "document_list" | "document_close" | "tool_search" | "tool_get" | "tool_load" | "robot_create" | "robot_list" | "robot_get" | "robot_update" | "robot_delete" | "robot_search" | "toolset_search" | "toolset_load" | "toolset_create" | "toolset_list" | "toolset_get" | "toolset_update" | "toolset_delete" | "library_page_list" | "library_request_page" | "library_page_get" | "library_page_open" | "create_library_page" | "update_library_page" | "library_search_pages" | "library_page_property_schema_get" | "library_page_property_schema_update" | "library_page_properties_update" | "tag_list" | "link_create" | "web_fetch" | "web_open" | "thread_create" | "thread_list" | "thread_get" | "thread_open" | "thread_update" | "thread_reply" | "category_list" | "thread_search" | "reply_search" | "post_search" | "member_search";
+export type ToolName = "content_search" | "document_get" | "document_search" | "document_list" | "document_close" | "tool_search" | "tool_get" | "tool_load" | "robot_create" | "robot_list" | "robot_get" | "robot_update" | "robot_delete" | "robot_search" | "trail_create" | "trail_list" | "trail_get" | "trail_update" | "trail_schedule_preview" | "trail_run_list" | "trail_run_get" | "trail_run_create" | "trail_action_run_cancel" | "toolset_search" | "toolset_load" | "toolset_create" | "toolset_list" | "toolset_get" | "toolset_update" | "toolset_delete" | "library_page_list" | "library_request_page" | "library_page_get" | "library_page_open" | "create_library_page" | "update_library_page" | "library_search_pages" | "library_page_property_schema_get" | "library_page_property_schema_update" | "library_page_properties_update" | "tag_list" | "link_create" | "web_fetch" | "web_open" | "thread_create" | "thread_list" | "thread_get" | "thread_open" | "thread_update" | "thread_reply" | "category_list" | "thread_search" | "reply_search" | "post_search" | "member_search";
 
-export const TOOL_NAMES = ["content_search", "document_get", "document_search", "document_list", "document_close", "tool_search", "tool_get", "tool_load", "robot_create", "robot_list", "robot_get", "robot_update", "robot_delete", "robot_search", "toolset_search", "toolset_load", "toolset_create", "toolset_list", "toolset_get", "toolset_update", "toolset_delete", "library_page_list", "library_request_page", "library_page_get", "library_page_open", "create_library_page", "update_library_page", "library_search_pages", "library_page_property_schema_get", "library_page_property_schema_update", "library_page_properties_update", "tag_list", "link_create", "web_fetch", "web_open", "thread_create", "thread_list", "thread_get", "thread_open", "thread_update", "thread_reply", "category_list", "thread_search", "reply_search", "post_search", "member_search"] as const;
+export const TOOL_NAMES = ["content_search", "document_get", "document_search", "document_list", "document_close", "tool_search", "tool_get", "tool_load", "robot_create", "robot_list", "robot_get", "robot_update", "robot_delete", "robot_search", "trail_create", "trail_list", "trail_get", "trail_update", "trail_schedule_preview", "trail_run_list", "trail_run_get", "trail_run_create", "trail_action_run_cancel", "toolset_search", "toolset_load", "toolset_create", "toolset_list", "toolset_get", "toolset_update", "toolset_delete", "library_page_list", "library_request_page", "library_page_get", "library_page_open", "create_library_page", "update_library_page", "library_search_pages", "library_page_property_schema_get", "library_page_property_schema_update", "library_page_properties_update", "tag_list", "link_create", "web_fetch", "web_open", "thread_create", "thread_list", "thread_get", "thread_open", "thread_update", "thread_reply", "category_list", "thread_search", "reply_search", "post_search", "member_search"] as const;
 
 export type ToolInputMap = {
   "content_search": ToolContentSearchInput;
@@ -2108,6 +2677,15 @@ export type ToolInputMap = {
   "robot_update": ToolRobotUpdateInput;
   "robot_delete": ToolRobotDeleteInput;
   "robot_search": ToolRobotSearchInput;
+  "trail_create": ToolTrailCreateInput;
+  "trail_list": ToolTrailListInput;
+  "trail_get": ToolTrailGetInput;
+  "trail_update": ToolTrailUpdateInput;
+  "trail_schedule_preview": ToolTrailSchedulePreviewInput;
+  "trail_run_list": ToolTrailRunListInput;
+  "trail_run_get": ToolTrailRunGetInput;
+  "trail_run_create": ToolTrailRunCreateInput;
+  "trail_action_run_cancel": ToolTrailActionRunCancelInput;
   "toolset_search": ToolToolsetSearchInput;
   "toolset_load": ToolToolsetLoadInput;
   "toolset_create": ToolToolsetCreateInput;
@@ -2157,6 +2735,15 @@ export type ToolOutputMap = {
   "robot_update": ToolRobotUpdateOutput;
   "robot_delete": ToolRobotDeleteOutput;
   "robot_search": ToolRobotSearchOutput;
+  "trail_create": ToolTrailCreateOutput;
+  "trail_list": ToolTrailListOutput;
+  "trail_get": ToolTrailGetOutput;
+  "trail_update": ToolTrailUpdateOutput;
+  "trail_schedule_preview": ToolTrailSchedulePreviewOutput;
+  "trail_run_list": ToolTrailRunListOutput;
+  "trail_run_get": ToolTrailRunGetOutput;
+  "trail_run_create": ToolTrailRunCreateOutput;
+  "trail_action_run_cancel": ToolTrailActionRunCancelOutput;
   "toolset_search": ToolToolsetSearchOutput;
   "toolset_load": ToolToolsetLoadOutput;
   "toolset_create": ToolToolsetCreateOutput;
@@ -2246,6 +2833,42 @@ export type StorydenTools = {
   "robot_search": {
     input: ToolRobotSearchInput;
     output: ToolRobotSearchOutput;
+  };
+  "trail_create": {
+    input: ToolTrailCreateInput;
+    output: ToolTrailCreateOutput;
+  };
+  "trail_list": {
+    input: ToolTrailListInput;
+    output: ToolTrailListOutput;
+  };
+  "trail_get": {
+    input: ToolTrailGetInput;
+    output: ToolTrailGetOutput;
+  };
+  "trail_update": {
+    input: ToolTrailUpdateInput;
+    output: ToolTrailUpdateOutput;
+  };
+  "trail_schedule_preview": {
+    input: ToolTrailSchedulePreviewInput;
+    output: ToolTrailSchedulePreviewOutput;
+  };
+  "trail_run_list": {
+    input: ToolTrailRunListInput;
+    output: ToolTrailRunListOutput;
+  };
+  "trail_run_get": {
+    input: ToolTrailRunGetInput;
+    output: ToolTrailRunGetOutput;
+  };
+  "trail_run_create": {
+    input: ToolTrailRunCreateInput;
+    output: ToolTrailRunCreateOutput;
+  };
+  "trail_action_run_cancel": {
+    input: ToolTrailActionRunCancelInput;
+    output: ToolTrailActionRunCancelOutput;
   };
   "toolset_search": {
     input: ToolToolsetSearchInput;

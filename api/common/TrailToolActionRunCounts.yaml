@@ -1,0 +1,12 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+description: Counts of action runs in each lifecycle state for one Trail run.
+required: [queued, running, completed, blocked, failed, cancelled]
+additionalProperties: false
+properties:
+  queued: { type: integer, minimum: 0, description: Number of actions waiting to start. }
+  running: { type: integer, minimum: 0, description: Number of actions currently executing. }
+  completed: { type: integer, minimum: 0, description: Number of actions that completed successfully. }
+  blocked: { type: integer, minimum: 0, description: Number of actions that require user attention. }
+  failed: { type: integer, minimum: 0, description: Number of actions that failed. }
+  cancelled: { type: integer, minimum: 0, description: Number of actions that were cancelled. }

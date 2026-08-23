@@ -1,0 +1,16 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+description: A Trail schedule expressed as a local start time, timezone, and typed recurrence rule.
+required: [start, timezone, rule]
+additionalProperties: false
+properties:
+  start:
+    type: string
+    pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$'
+    description: Local start date and time without a UTC offset.
+  timezone:
+    type: string
+    minLength: 1
+    description: IANA timezone used to interpret the local start time.
+  rule:
+    $ref: "./TrailToolRecurrenceRule.yaml"

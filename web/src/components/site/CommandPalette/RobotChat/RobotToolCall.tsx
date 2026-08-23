@@ -186,6 +186,37 @@ function RobotToolCallContent({ part }: Props) {
       }
       return <p>Deleted robot</p>;
 
+    case "tool-trail_create":
+    case "tool-trail_update":
+      return <p>{part.output.message}</p>;
+
+    case "tool-trail_list":
+      return <p>{part.output.total} Trails</p>;
+
+    case "tool-trail_get":
+      return null;
+
+    case "tool-trail_schedule_preview":
+      return <p>{part.output.occurrences.length} occurrences</p>;
+
+    case "tool-trail_run_list":
+      return <p>{part.output.returned} runs</p>;
+
+    case "tool-trail_run_get":
+      return <p>{part.output.message}</p>;
+
+    case "tool-trail_run_create":
+      if (isConfirmationDenied(part.output)) {
+        return <p>Manual run cancelled</p>;
+      }
+      return <p>{part.output.message}</p>;
+
+    case "tool-trail_action_run_cancel":
+      if (isConfirmationDenied(part.output)) {
+        return <p>Action cancellation cancelled</p>;
+      }
+      return <p>{part.output.message}</p>;
+
     case "tool-toolset_search":
     case "tool-toolset_list":
       return <p>{part.output.toolsets.length} Toolsets found</p>;

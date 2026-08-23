@@ -1,0 +1,18 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+description: A Robot invocation performed for each Trail occurrence.
+required: [type, instruction]
+additionalProperties: false
+properties:
+  type:
+    type: string
+    const: robot_run
+    description: Trail action kind.
+  robot_ref:
+    type: string
+    minLength: 1
+    description: Robot ID to invoke; omit to invoke the current Robot when called from a Robot conversation.
+  instruction:
+    type: string
+    minLength: 1
+    description: Task given to the Robot when the Trail runs.

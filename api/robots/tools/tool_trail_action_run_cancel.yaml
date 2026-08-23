@@ -1,0 +1,48 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolTrailActionRunCancel
+x-storyden:
+  toolsets:
+    - system.trails
+x-storyden-tool:
+  title: Cancel Trail Action Run
+  role: MANAGE_TRAILS
+  requires_confirmation: true
+  annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: false }
+title: trail_action_run_cancel
+description: Cancel one queued or running action in a Trail run.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolTrailActionRunCancelInput" }
+  output: { $ref: "#/definitions/ToolTrailActionRunCancelOutput" }
+definitions:
+  ToolTrailActionRunCancelInput:
+    type: object
+    required: [trail_id, run_id, action_run_id]
+    additionalProperties: false
+    properties:
+      trail_id:
+        type: string
+        pattern: '^[0-9a-v]{20}$'
+        description: Trail identifier that owns the run.
+      run_id:
+        type: string
+        pattern: '^[0-9a-v]{20}$'
+        description: Run identifier that owns the action run.
+      action_run_id:
+        type: string
+        pattern: '^[0-9a-v]{20}$'
+        description: Queued or running action identifier returned by trail_run_get.
+  ToolTrailActionRunCancelOutput:
+    type: object
+    required: [run, message, next_action]
+    additionalProperties: false
+    properties:
+      run:
+        $ref: "../../common/TrailToolRun.yaml"
+      message:
+        type: string
+        description: Human-readable confirmation of the cancelled action.
+      next_action:
+        type: string
+        description: Recommended follow-up for inspecting the updated run.

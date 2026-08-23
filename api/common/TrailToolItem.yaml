@@ -1,0 +1,43 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+description: A Trail definition with its trigger, Robot actions, lifecycle state, and occurrence times.
+required: [id, name, description, status, trigger, action, created_at, updated_at]
+additionalProperties: false
+properties:
+  id:
+    type: string
+    pattern: '^[0-9a-v]{20}$'
+    description: Stable Trail identifier accepted by Trail management tools.
+  name:
+    type: string
+    description: Human-readable Trail name.
+  description:
+    type: string
+    description: Human-readable purpose of the Trail.
+  status:
+    type: string
+    enum: [active, paused, finished, archived]
+    description: Current Trail lifecycle state.
+  trigger:
+    $ref: "./TrailToolTrigger.yaml"
+  action:
+    type: array
+    description: Robot invocations performed independently for each occurrence.
+    items:
+      $ref: "./TrailToolAction.yaml"
+  next_occurrence_at:
+    type: string
+    format: date-time
+    description: Next scheduled occurrence in UTC when one remains.
+  last_occurrence_at:
+    type: string
+    format: date-time
+    description: Most recent materialized occurrence in UTC.
+  created_at:
+    type: string
+    format: date-time
+    description: Trail creation time in UTC.
+  updated_at:
+    type: string
+    format: date-time
+    description: Trail update time in UTC.

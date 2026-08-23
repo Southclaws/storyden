@@ -1,0 +1,55 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolTrailCreate
+x-storyden:
+  toolsets:
+    - system.trails
+x-storyden-tool:
+  title: Create Trail
+  role: MANAGE_TRAILS
+  annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false }
+title: trail_create
+description: Create a scheduled or event-driven Trail.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolTrailCreateInput" }
+  output: { $ref: "#/definitions/ToolTrailCreateOutput" }
+definitions:
+  ToolTrailCreateInput:
+    type: object
+    required: [name, status, trigger, action]
+    additionalProperties: false
+    properties:
+      name:
+        type: string
+        minLength: 1
+        maxLength: 120
+        description: Human-readable name for the scheduled or event-driven job.
+      description:
+        type: string
+        description: Optional explanation of the Trail's purpose.
+      status:
+        type: string
+        enum: [active, paused, archived]
+        description: Initial lifecycle state for the Trail.
+      trigger:
+        $ref: "../../common/TrailToolTrigger.yaml"
+      action:
+        type: array
+        minItems: 1
+        description: Robot tasks performed independently for each occurrence.
+        items:
+          $ref: "../../common/TrailToolAction.yaml"
+  ToolTrailCreateOutput:
+    type: object
+    required: [trail, message, next_action]
+    additionalProperties: false
+    properties:
+      trail:
+        $ref: "../../common/TrailToolItem.yaml"
+      message:
+        type: string
+        description: Human-readable confirmation of the created Trail and its next occurrence.
+      next_action:
+        type: string
+        description: Recommended follow-up for inspecting or changing the Trail.

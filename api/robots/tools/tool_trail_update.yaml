@@ -1,0 +1,59 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolTrailUpdate
+x-storyden:
+  toolsets:
+    - system.trails
+x-storyden-tool:
+  title: Update Trail
+  role: MANAGE_TRAILS
+  annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false }
+title: trail_update
+description: Replace an existing Trail definition.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolTrailUpdateInput" }
+  output: { $ref: "#/definitions/ToolTrailUpdateOutput" }
+definitions:
+  ToolTrailUpdateInput:
+    type: object
+    required: [trail_id, name, status, trigger, action]
+    additionalProperties: false
+    properties:
+      trail_id:
+        type: string
+        pattern: '^[0-9a-v]{20}$'
+        description: Trail identifier returned by trail_list or trail_create.
+      name:
+        type: string
+        minLength: 1
+        maxLength: 120
+        description: Replacement human-readable Trail name.
+      description:
+        type: string
+        description: Replacement explanation of the Trail's purpose.
+      status:
+        type: string
+        enum: [active, paused, archived]
+        description: Replacement lifecycle state for the Trail.
+      trigger:
+        $ref: "../../common/TrailToolTrigger.yaml"
+      action:
+        type: array
+        minItems: 1
+        description: Replacement Robot tasks performed independently for each occurrence.
+        items:
+          $ref: "../../common/TrailToolAction.yaml"
+  ToolTrailUpdateOutput:
+    type: object
+    required: [trail, message, next_action]
+    additionalProperties: false
+    properties:
+      trail:
+        $ref: "../../common/TrailToolItem.yaml"
+      message:
+        type: string
+        description: Human-readable confirmation of the updated Trail and its next occurrence.
+      next_action:
+        type: string
+        description: Recommended follow-up for inspecting or changing the Trail.

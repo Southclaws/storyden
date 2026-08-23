@@ -1,0 +1,45 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+description: The immutable action configuration and execution result for one Trail run.
+required: [id, action_id, action, status, created_at, updated_at]
+additionalProperties: false
+properties:
+  id:
+    type: string
+    pattern: '^[0-9a-v]{20}$'
+    description: Stable action-run identifier accepted by trail_action_run_cancel.
+  action_id:
+    type: string
+    pattern: '^[0-9a-v]{20}$'
+    description: Trail action binding captured by this run.
+  action:
+    $ref: "./TrailToolAction.yaml"
+  status:
+    type: string
+    enum: [queued, running, completed, blocked, failed, cancelled]
+    description: Lifecycle state of this independent action run.
+  robot_session_id:
+    type: string
+    pattern: '^[0-9a-v]{20}$'
+    description: Robot session created for this action run.
+  output:
+    $ref: "./TrailToolRobotOutput.yaml"
+  error:
+    type: string
+    description: Execution error recorded when the action failed outside its structured Robot result.
+  started_at:
+    type: string
+    format: date-time
+    description: Action start time in UTC.
+  finished_at:
+    type: string
+    format: date-time
+    description: Action completion time in UTC.
+  created_at:
+    type: string
+    format: date-time
+    description: Action-run creation time in UTC.
+  updated_at:
+    type: string
+    format: date-time
+    description: Action-run update time in UTC.

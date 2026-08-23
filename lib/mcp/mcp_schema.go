@@ -6,6 +6,7 @@ import "encoding/json"
 import "fmt"
 import "reflect"
 import "regexp"
+import "time"
 
 type CategoryItem struct {
 	// Category description
@@ -5757,6 +5758,945 @@ func (j *ToolToolsetUpdateYaml) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
+type ToolTrailActionRunCancelInput struct {
+	// Queued or running action identifier returned by trail_run_get.
+	ActionRunId string `json:"action_run_id" yaml:"action_run_id" mapstructure:"action_run_id"`
+
+	// Run identifier that owns the action run.
+	RunId string `json:"run_id" yaml:"run_id" mapstructure:"run_id"`
+
+	// Trail identifier that owns the run.
+	TrailId string `json:"trail_id" yaml:"trail_id" mapstructure:"trail_id"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailActionRunCancelInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["action_run_id"]; raw != nil && !ok {
+		return fmt.Errorf("field action_run_id in ToolTrailActionRunCancelInput: required")
+	}
+	if _, ok := raw["run_id"]; raw != nil && !ok {
+		return fmt.Errorf("field run_id in ToolTrailActionRunCancelInput: required")
+	}
+	if _, ok := raw["trail_id"]; raw != nil && !ok {
+		return fmt.Errorf("field trail_id in ToolTrailActionRunCancelInput: required")
+	}
+	type Plain ToolTrailActionRunCancelInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.ActionRunId)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "ActionRunId", `^[0-9a-v]{20}$`)
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.RunId)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "RunId", `^[0-9a-v]{20}$`)
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.TrailId)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "TrailId", `^[0-9a-v]{20}$`)
+	}
+	*j = ToolTrailActionRunCancelInput(plain)
+	return nil
+}
+
+type ToolTrailActionRunCancelOutput struct {
+	// Human-readable confirmation of the cancelled action.
+	Message string `json:"message" yaml:"message" mapstructure:"message"`
+
+	// Recommended follow-up for inspecting the updated run.
+	NextAction string `json:"next_action" yaml:"next_action" mapstructure:"next_action"`
+
+	// Run corresponds to the JSON schema field "run".
+	Run TrailToolRunYaml `json:"run" yaml:"run" mapstructure:"run"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailActionRunCancelOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["message"]; raw != nil && !ok {
+		return fmt.Errorf("field message in ToolTrailActionRunCancelOutput: required")
+	}
+	if _, ok := raw["next_action"]; raw != nil && !ok {
+		return fmt.Errorf("field next_action in ToolTrailActionRunCancelOutput: required")
+	}
+	if _, ok := raw["run"]; raw != nil && !ok {
+		return fmt.Errorf("field run in ToolTrailActionRunCancelOutput: required")
+	}
+	type Plain ToolTrailActionRunCancelOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolTrailActionRunCancelOutput(plain)
+	return nil
+}
+
+// Cancel one queued or running action in a Trail run.
+type ToolTrailActionRunCancelYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolTrailActionRunCancelInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolTrailActionRunCancelOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailActionRunCancelYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolTrailActionRunCancelYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolTrailActionRunCancelYaml: required")
+	}
+	type Plain ToolTrailActionRunCancelYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolTrailActionRunCancelYaml(plain)
+	return nil
+}
+
+type ToolTrailCreateInput struct {
+	// Robot tasks performed independently for each occurrence.
+	Action []TrailToolActionYaml `json:"action" yaml:"action" mapstructure:"action"`
+
+	// Optional explanation of the Trail's purpose.
+	Description *string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
+
+	// Human-readable name for the scheduled or event-driven job.
+	Name string `json:"name" yaml:"name" mapstructure:"name"`
+
+	// Initial lifecycle state for the Trail.
+	Status ToolTrailCreateInputStatus `json:"status" yaml:"status" mapstructure:"status"`
+
+	// Trigger corresponds to the JSON schema field "trigger".
+	Trigger TrailToolTriggerYaml `json:"trigger" yaml:"trigger" mapstructure:"trigger"`
+}
+
+type ToolTrailCreateInputStatus string
+
+const ToolTrailCreateInputStatusActive ToolTrailCreateInputStatus = "active"
+const ToolTrailCreateInputStatusArchived ToolTrailCreateInputStatus = "archived"
+const ToolTrailCreateInputStatusPaused ToolTrailCreateInputStatus = "paused"
+
+var enumValues_ToolTrailCreateInputStatus = []interface{}{
+	"active",
+	"paused",
+	"archived",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailCreateInputStatus) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_ToolTrailCreateInputStatus {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_ToolTrailCreateInputStatus, v)
+	}
+	*j = ToolTrailCreateInputStatus(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailCreateInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["action"]; raw != nil && !ok {
+		return fmt.Errorf("field action in ToolTrailCreateInput: required")
+	}
+	if _, ok := raw["name"]; raw != nil && !ok {
+		return fmt.Errorf("field name in ToolTrailCreateInput: required")
+	}
+	if _, ok := raw["status"]; raw != nil && !ok {
+		return fmt.Errorf("field status in ToolTrailCreateInput: required")
+	}
+	if _, ok := raw["trigger"]; raw != nil && !ok {
+		return fmt.Errorf("field trigger in ToolTrailCreateInput: required")
+	}
+	type Plain ToolTrailCreateInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if plain.Action != nil && len(plain.Action) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "action", 1)
+	}
+	if len(plain.Name) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "name", 1)
+	}
+	if len(plain.Name) > 120 {
+		return fmt.Errorf("field %s length: must be <= %d", "name", 120)
+	}
+	*j = ToolTrailCreateInput(plain)
+	return nil
+}
+
+type ToolTrailCreateOutput struct {
+	// Human-readable confirmation of the created Trail and its next occurrence.
+	Message string `json:"message" yaml:"message" mapstructure:"message"`
+
+	// Recommended follow-up for inspecting or changing the Trail.
+	NextAction string `json:"next_action" yaml:"next_action" mapstructure:"next_action"`
+
+	// Trail corresponds to the JSON schema field "trail".
+	Trail TrailToolItemYaml `json:"trail" yaml:"trail" mapstructure:"trail"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailCreateOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["message"]; raw != nil && !ok {
+		return fmt.Errorf("field message in ToolTrailCreateOutput: required")
+	}
+	if _, ok := raw["next_action"]; raw != nil && !ok {
+		return fmt.Errorf("field next_action in ToolTrailCreateOutput: required")
+	}
+	if _, ok := raw["trail"]; raw != nil && !ok {
+		return fmt.Errorf("field trail in ToolTrailCreateOutput: required")
+	}
+	type Plain ToolTrailCreateOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolTrailCreateOutput(plain)
+	return nil
+}
+
+// Create a scheduled or event-driven Trail.
+type ToolTrailCreateYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolTrailCreateInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolTrailCreateOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailCreateYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolTrailCreateYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolTrailCreateYaml: required")
+	}
+	type Plain ToolTrailCreateYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolTrailCreateYaml(plain)
+	return nil
+}
+
+type ToolTrailGetInput struct {
+	// Trail identifier returned by trail_list or trail_create.
+	TrailId string `json:"trail_id" yaml:"trail_id" mapstructure:"trail_id"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailGetInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["trail_id"]; raw != nil && !ok {
+		return fmt.Errorf("field trail_id in ToolTrailGetInput: required")
+	}
+	type Plain ToolTrailGetInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.TrailId)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "TrailId", `^[0-9a-v]{20}$`)
+	}
+	*j = ToolTrailGetInput(plain)
+	return nil
+}
+
+type ToolTrailGetOutput struct {
+	// Trail corresponds to the JSON schema field "trail".
+	Trail TrailToolItemYaml `json:"trail" yaml:"trail" mapstructure:"trail"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailGetOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["trail"]; raw != nil && !ok {
+		return fmt.Errorf("field trail in ToolTrailGetOutput: required")
+	}
+	type Plain ToolTrailGetOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolTrailGetOutput(plain)
+	return nil
+}
+
+// Retrieve a Trail by its ID.
+type ToolTrailGetYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolTrailGetInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolTrailGetOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailGetYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolTrailGetYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolTrailGetYaml: required")
+	}
+	type Plain ToolTrailGetYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolTrailGetYaml(plain)
+	return nil
+}
+
+type ToolTrailListOutput struct {
+	// Number of Trails returned.
+	Total int `json:"total" yaml:"total" mapstructure:"total"`
+
+	// Trail definitions ordered by most recent update.
+	Trails []TrailToolItemYaml `json:"trails" yaml:"trails" mapstructure:"trails"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailListOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["total"]; raw != nil && !ok {
+		return fmt.Errorf("field total in ToolTrailListOutput: required")
+	}
+	if _, ok := raw["trails"]; raw != nil && !ok {
+		return fmt.Errorf("field trails in ToolTrailListOutput: required")
+	}
+	type Plain ToolTrailListOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if 0 > plain.Total {
+		return fmt.Errorf("field %s: must be >= %v", "total", 0)
+	}
+	*j = ToolTrailListOutput(plain)
+	return nil
+}
+
+// List Trails available to the current account.
+type ToolTrailListYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input map[string]interface{} `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolTrailListOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailListYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolTrailListYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolTrailListYaml: required")
+	}
+	type Plain ToolTrailListYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolTrailListYaml(plain)
+	return nil
+}
+
+type ToolTrailRunCreateInput struct {
+	// Trail identifier to execute immediately.
+	TrailId string `json:"trail_id" yaml:"trail_id" mapstructure:"trail_id"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailRunCreateInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["trail_id"]; raw != nil && !ok {
+		return fmt.Errorf("field trail_id in ToolTrailRunCreateInput: required")
+	}
+	type Plain ToolTrailRunCreateInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.TrailId)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "TrailId", `^[0-9a-v]{20}$`)
+	}
+	*j = ToolTrailRunCreateInput(plain)
+	return nil
+}
+
+type ToolTrailRunCreateOutput struct {
+	// Human-readable confirmation of the manual run.
+	Message string `json:"message" yaml:"message" mapstructure:"message"`
+
+	// Recommended follow-up for observing the run.
+	NextAction string `json:"next_action" yaml:"next_action" mapstructure:"next_action"`
+
+	// Run corresponds to the JSON schema field "run".
+	Run TrailToolRunYaml `json:"run" yaml:"run" mapstructure:"run"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailRunCreateOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["message"]; raw != nil && !ok {
+		return fmt.Errorf("field message in ToolTrailRunCreateOutput: required")
+	}
+	if _, ok := raw["next_action"]; raw != nil && !ok {
+		return fmt.Errorf("field next_action in ToolTrailRunCreateOutput: required")
+	}
+	if _, ok := raw["run"]; raw != nil && !ok {
+		return fmt.Errorf("field run in ToolTrailRunCreateOutput: required")
+	}
+	type Plain ToolTrailRunCreateOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolTrailRunCreateOutput(plain)
+	return nil
+}
+
+// Create a manual Trail run without moving its schedule.
+type ToolTrailRunCreateYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolTrailRunCreateInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolTrailRunCreateOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailRunCreateYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolTrailRunCreateYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolTrailRunCreateYaml: required")
+	}
+	type Plain ToolTrailRunCreateYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolTrailRunCreateYaml(plain)
+	return nil
+}
+
+type ToolTrailRunGetInput struct {
+	// Run identifier returned by trail_run_list or trail_run_create.
+	RunId string `json:"run_id" yaml:"run_id" mapstructure:"run_id"`
+
+	// Trail identifier that owns the run.
+	TrailId string `json:"trail_id" yaml:"trail_id" mapstructure:"trail_id"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailRunGetInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["run_id"]; raw != nil && !ok {
+		return fmt.Errorf("field run_id in ToolTrailRunGetInput: required")
+	}
+	if _, ok := raw["trail_id"]; raw != nil && !ok {
+		return fmt.Errorf("field trail_id in ToolTrailRunGetInput: required")
+	}
+	type Plain ToolTrailRunGetInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.RunId)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "RunId", `^[0-9a-v]{20}$`)
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.TrailId)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "TrailId", `^[0-9a-v]{20}$`)
+	}
+	*j = ToolTrailRunGetInput(plain)
+	return nil
+}
+
+type ToolTrailRunGetOutput struct {
+	// Human-readable summary of the run's current outcome.
+	Message string `json:"message" yaml:"message" mapstructure:"message"`
+
+	// Recommended follow-up based on the run and action states.
+	NextAction string `json:"next_action" yaml:"next_action" mapstructure:"next_action"`
+
+	// Run corresponds to the JSON schema field "run".
+	Run TrailToolRunYaml `json:"run" yaml:"run" mapstructure:"run"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailRunGetOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["message"]; raw != nil && !ok {
+		return fmt.Errorf("field message in ToolTrailRunGetOutput: required")
+	}
+	if _, ok := raw["next_action"]; raw != nil && !ok {
+		return fmt.Errorf("field next_action in ToolTrailRunGetOutput: required")
+	}
+	if _, ok := raw["run"]; raw != nil && !ok {
+		return fmt.Errorf("field run in ToolTrailRunGetOutput: required")
+	}
+	type Plain ToolTrailRunGetOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolTrailRunGetOutput(plain)
+	return nil
+}
+
+// Retrieve one Trail run with its trigger context and action results.
+type ToolTrailRunGetYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolTrailRunGetInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolTrailRunGetOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailRunGetYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolTrailRunGetYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolTrailRunGetYaml: required")
+	}
+	type Plain ToolTrailRunGetYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolTrailRunGetYaml(plain)
+	return nil
+}
+
+type ToolTrailRunListInput struct {
+	// Maximum number of recent runs to return; omit to use the default.
+	Limit *int `json:"limit,omitempty" yaml:"limit,omitempty" mapstructure:"limit,omitempty"`
+
+	// Trail identifier returned by trail_list or trail_create.
+	TrailId string `json:"trail_id" yaml:"trail_id" mapstructure:"trail_id"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailRunListInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["trail_id"]; raw != nil && !ok {
+		return fmt.Errorf("field trail_id in ToolTrailRunListInput: required")
+	}
+	type Plain ToolTrailRunListInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if plain.Limit != nil && 100 < *plain.Limit {
+		return fmt.Errorf("field %s: must be <= %v", "limit", 100)
+	}
+	if plain.Limit != nil && 1 > *plain.Limit {
+		return fmt.Errorf("field %s: must be >= %v", "limit", 1)
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.TrailId)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "TrailId", `^[0-9a-v]{20}$`)
+	}
+	*j = ToolTrailRunListInput(plain)
+	return nil
+}
+
+type ToolTrailRunListOutput struct {
+	// Whether older runs exist beyond this response.
+	HasMore bool `json:"has_more" yaml:"has_more" mapstructure:"has_more"`
+
+	// Recommended follow-up for inspecting a selected run.
+	NextAction string `json:"next_action" yaml:"next_action" mapstructure:"next_action"`
+
+	// Number of run summaries returned.
+	Returned int `json:"returned" yaml:"returned" mapstructure:"returned"`
+
+	// Recent Trail runs ordered newest first.
+	Runs []TrailToolRunSummaryYaml `json:"runs" yaml:"runs" mapstructure:"runs"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailRunListOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["has_more"]; raw != nil && !ok {
+		return fmt.Errorf("field has_more in ToolTrailRunListOutput: required")
+	}
+	if _, ok := raw["next_action"]; raw != nil && !ok {
+		return fmt.Errorf("field next_action in ToolTrailRunListOutput: required")
+	}
+	if _, ok := raw["returned"]; raw != nil && !ok {
+		return fmt.Errorf("field returned in ToolTrailRunListOutput: required")
+	}
+	if _, ok := raw["runs"]; raw != nil && !ok {
+		return fmt.Errorf("field runs in ToolTrailRunListOutput: required")
+	}
+	type Plain ToolTrailRunListOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if 0 > plain.Returned {
+		return fmt.Errorf("field %s: must be >= %v", "returned", 0)
+	}
+	*j = ToolTrailRunListOutput(plain)
+	return nil
+}
+
+// List recent runs for a Trail.
+type ToolTrailRunListYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolTrailRunListInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolTrailRunListOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailRunListYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolTrailRunListYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolTrailRunListYaml: required")
+	}
+	type Plain ToolTrailRunListYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolTrailRunListYaml(plain)
+	return nil
+}
+
+type ToolTrailSchedulePreviewInput struct {
+	// UTC instant after which occurrences are calculated; omit to use the current
+	// time.
+	After *time.Time `json:"after,omitempty" yaml:"after,omitempty" mapstructure:"after,omitempty"`
+
+	// Schedule corresponds to the JSON schema field "schedule".
+	Schedule TrailToolScheduleYaml `json:"schedule" yaml:"schedule" mapstructure:"schedule"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailSchedulePreviewInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["schedule"]; raw != nil && !ok {
+		return fmt.Errorf("field schedule in ToolTrailSchedulePreviewInput: required")
+	}
+	type Plain ToolTrailSchedulePreviewInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolTrailSchedulePreviewInput(plain)
+	return nil
+}
+
+type ToolTrailSchedulePreviewOutput struct {
+	// Next schedule occurrences in UTC.
+	Occurrences []time.Time `json:"occurrences" yaml:"occurrences" mapstructure:"occurrences"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailSchedulePreviewOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["occurrences"]; raw != nil && !ok {
+		return fmt.Errorf("field occurrences in ToolTrailSchedulePreviewOutput: required")
+	}
+	type Plain ToolTrailSchedulePreviewOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolTrailSchedulePreviewOutput(plain)
+	return nil
+}
+
+// Preview the next occurrences of a Trail schedule.
+type ToolTrailSchedulePreviewYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolTrailSchedulePreviewInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolTrailSchedulePreviewOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailSchedulePreviewYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolTrailSchedulePreviewYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolTrailSchedulePreviewYaml: required")
+	}
+	type Plain ToolTrailSchedulePreviewYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolTrailSchedulePreviewYaml(plain)
+	return nil
+}
+
+type ToolTrailUpdateInput struct {
+	// Replacement Robot tasks performed independently for each occurrence.
+	Action []TrailToolActionYaml `json:"action" yaml:"action" mapstructure:"action"`
+
+	// Replacement explanation of the Trail's purpose.
+	Description *string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
+
+	// Replacement human-readable Trail name.
+	Name string `json:"name" yaml:"name" mapstructure:"name"`
+
+	// Replacement lifecycle state for the Trail.
+	Status ToolTrailUpdateInputStatus `json:"status" yaml:"status" mapstructure:"status"`
+
+	// Trail identifier returned by trail_list or trail_create.
+	TrailId string `json:"trail_id" yaml:"trail_id" mapstructure:"trail_id"`
+
+	// Trigger corresponds to the JSON schema field "trigger".
+	Trigger TrailToolTriggerYaml `json:"trigger" yaml:"trigger" mapstructure:"trigger"`
+}
+
+type ToolTrailUpdateInputStatus string
+
+const ToolTrailUpdateInputStatusActive ToolTrailUpdateInputStatus = "active"
+const ToolTrailUpdateInputStatusArchived ToolTrailUpdateInputStatus = "archived"
+const ToolTrailUpdateInputStatusPaused ToolTrailUpdateInputStatus = "paused"
+
+var enumValues_ToolTrailUpdateInputStatus = []interface{}{
+	"active",
+	"paused",
+	"archived",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailUpdateInputStatus) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_ToolTrailUpdateInputStatus {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_ToolTrailUpdateInputStatus, v)
+	}
+	*j = ToolTrailUpdateInputStatus(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailUpdateInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["action"]; raw != nil && !ok {
+		return fmt.Errorf("field action in ToolTrailUpdateInput: required")
+	}
+	if _, ok := raw["name"]; raw != nil && !ok {
+		return fmt.Errorf("field name in ToolTrailUpdateInput: required")
+	}
+	if _, ok := raw["status"]; raw != nil && !ok {
+		return fmt.Errorf("field status in ToolTrailUpdateInput: required")
+	}
+	if _, ok := raw["trail_id"]; raw != nil && !ok {
+		return fmt.Errorf("field trail_id in ToolTrailUpdateInput: required")
+	}
+	if _, ok := raw["trigger"]; raw != nil && !ok {
+		return fmt.Errorf("field trigger in ToolTrailUpdateInput: required")
+	}
+	type Plain ToolTrailUpdateInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if plain.Action != nil && len(plain.Action) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "action", 1)
+	}
+	if len(plain.Name) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "name", 1)
+	}
+	if len(plain.Name) > 120 {
+		return fmt.Errorf("field %s length: must be <= %d", "name", 120)
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.TrailId)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "TrailId", `^[0-9a-v]{20}$`)
+	}
+	*j = ToolTrailUpdateInput(plain)
+	return nil
+}
+
+type ToolTrailUpdateOutput struct {
+	// Human-readable confirmation of the updated Trail and its next occurrence.
+	Message string `json:"message" yaml:"message" mapstructure:"message"`
+
+	// Recommended follow-up for inspecting or changing the Trail.
+	NextAction string `json:"next_action" yaml:"next_action" mapstructure:"next_action"`
+
+	// Trail corresponds to the JSON schema field "trail".
+	Trail TrailToolItemYaml `json:"trail" yaml:"trail" mapstructure:"trail"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailUpdateOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["message"]; raw != nil && !ok {
+		return fmt.Errorf("field message in ToolTrailUpdateOutput: required")
+	}
+	if _, ok := raw["next_action"]; raw != nil && !ok {
+		return fmt.Errorf("field next_action in ToolTrailUpdateOutput: required")
+	}
+	if _, ok := raw["trail"]; raw != nil && !ok {
+		return fmt.Errorf("field trail in ToolTrailUpdateOutput: required")
+	}
+	type Plain ToolTrailUpdateOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolTrailUpdateOutput(plain)
+	return nil
+}
+
+// Replace an existing Trail definition.
+type ToolTrailUpdateYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolTrailUpdateInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolTrailUpdateOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolTrailUpdateYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolTrailUpdateYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolTrailUpdateYaml: required")
+	}
+	type Plain ToolTrailUpdateYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolTrailUpdateYaml(plain)
+	return nil
+}
+
 type ToolWebFetchInput struct {
 	// HTTP or HTTPS page URL to fetch.
 	Url string `json:"url" yaml:"url" mapstructure:"url"`
@@ -5905,5 +6845,936 @@ func (j *ToolWebOpenYaml) UnmarshalJSON(value []byte) error {
 		return err
 	}
 	*j = ToolWebOpenYaml(plain)
+	return nil
+}
+
+// Counts of action runs in each lifecycle state for one Trail run.
+type TrailToolActionRunCountsYaml struct {
+	// Number of actions that require user attention.
+	Blocked int `json:"blocked" yaml:"blocked" mapstructure:"blocked"`
+
+	// Number of actions that were cancelled.
+	Cancelled int `json:"cancelled" yaml:"cancelled" mapstructure:"cancelled"`
+
+	// Number of actions that completed successfully.
+	Completed int `json:"completed" yaml:"completed" mapstructure:"completed"`
+
+	// Number of actions that failed.
+	Failed int `json:"failed" yaml:"failed" mapstructure:"failed"`
+
+	// Number of actions waiting to start.
+	Queued int `json:"queued" yaml:"queued" mapstructure:"queued"`
+
+	// Number of actions currently executing.
+	Running int `json:"running" yaml:"running" mapstructure:"running"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolActionRunCountsYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["blocked"]; raw != nil && !ok {
+		return fmt.Errorf("field blocked in TrailToolActionRunCountsYaml: required")
+	}
+	if _, ok := raw["cancelled"]; raw != nil && !ok {
+		return fmt.Errorf("field cancelled in TrailToolActionRunCountsYaml: required")
+	}
+	if _, ok := raw["completed"]; raw != nil && !ok {
+		return fmt.Errorf("field completed in TrailToolActionRunCountsYaml: required")
+	}
+	if _, ok := raw["failed"]; raw != nil && !ok {
+		return fmt.Errorf("field failed in TrailToolActionRunCountsYaml: required")
+	}
+	if _, ok := raw["queued"]; raw != nil && !ok {
+		return fmt.Errorf("field queued in TrailToolActionRunCountsYaml: required")
+	}
+	if _, ok := raw["running"]; raw != nil && !ok {
+		return fmt.Errorf("field running in TrailToolActionRunCountsYaml: required")
+	}
+	type Plain TrailToolActionRunCountsYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if 0 > plain.Blocked {
+		return fmt.Errorf("field %s: must be >= %v", "blocked", 0)
+	}
+	if 0 > plain.Cancelled {
+		return fmt.Errorf("field %s: must be >= %v", "cancelled", 0)
+	}
+	if 0 > plain.Completed {
+		return fmt.Errorf("field %s: must be >= %v", "completed", 0)
+	}
+	if 0 > plain.Failed {
+		return fmt.Errorf("field %s: must be >= %v", "failed", 0)
+	}
+	if 0 > plain.Queued {
+		return fmt.Errorf("field %s: must be >= %v", "queued", 0)
+	}
+	if 0 > plain.Running {
+		return fmt.Errorf("field %s: must be >= %v", "running", 0)
+	}
+	*j = TrailToolActionRunCountsYaml(plain)
+	return nil
+}
+
+// The immutable action configuration and execution result for one Trail run.
+type TrailToolActionRunYaml struct {
+	// Action corresponds to the JSON schema field "action".
+	Action TrailToolActionYaml `json:"action" yaml:"action" mapstructure:"action"`
+
+	// Trail action binding captured by this run.
+	ActionId string `json:"action_id" yaml:"action_id" mapstructure:"action_id"`
+
+	// Action-run creation time in UTC.
+	CreatedAt time.Time `json:"created_at" yaml:"created_at" mapstructure:"created_at"`
+
+	// Execution error recorded when the action failed outside its structured Robot
+	// result.
+	Error *string `json:"error,omitempty" yaml:"error,omitempty" mapstructure:"error,omitempty"`
+
+	// Action completion time in UTC.
+	FinishedAt *time.Time `json:"finished_at,omitempty" yaml:"finished_at,omitempty" mapstructure:"finished_at,omitempty"`
+
+	// Stable action-run identifier accepted by trail_action_run_cancel.
+	Id string `json:"id" yaml:"id" mapstructure:"id"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output *TrailToolRobotOutputYaml `json:"output,omitempty" yaml:"output,omitempty" mapstructure:"output,omitempty"`
+
+	// Robot session created for this action run.
+	RobotSessionId *string `json:"robot_session_id,omitempty" yaml:"robot_session_id,omitempty" mapstructure:"robot_session_id,omitempty"`
+
+	// Action start time in UTC.
+	StartedAt *time.Time `json:"started_at,omitempty" yaml:"started_at,omitempty" mapstructure:"started_at,omitempty"`
+
+	// Lifecycle state of this independent action run.
+	Status TrailToolActionRunYamlStatus `json:"status" yaml:"status" mapstructure:"status"`
+
+	// Action-run update time in UTC.
+	UpdatedAt time.Time `json:"updated_at" yaml:"updated_at" mapstructure:"updated_at"`
+}
+
+type TrailToolActionRunYamlStatus string
+
+const TrailToolActionRunYamlStatusBlocked TrailToolActionRunYamlStatus = "blocked"
+const TrailToolActionRunYamlStatusCancelled TrailToolActionRunYamlStatus = "cancelled"
+const TrailToolActionRunYamlStatusCompleted TrailToolActionRunYamlStatus = "completed"
+const TrailToolActionRunYamlStatusFailed TrailToolActionRunYamlStatus = "failed"
+const TrailToolActionRunYamlStatusQueued TrailToolActionRunYamlStatus = "queued"
+const TrailToolActionRunYamlStatusRunning TrailToolActionRunYamlStatus = "running"
+
+var enumValues_TrailToolActionRunYamlStatus = []interface{}{
+	"queued",
+	"running",
+	"completed",
+	"blocked",
+	"failed",
+	"cancelled",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolActionRunYamlStatus) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_TrailToolActionRunYamlStatus {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_TrailToolActionRunYamlStatus, v)
+	}
+	*j = TrailToolActionRunYamlStatus(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolActionRunYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["action"]; raw != nil && !ok {
+		return fmt.Errorf("field action in TrailToolActionRunYaml: required")
+	}
+	if _, ok := raw["action_id"]; raw != nil && !ok {
+		return fmt.Errorf("field action_id in TrailToolActionRunYaml: required")
+	}
+	if _, ok := raw["created_at"]; raw != nil && !ok {
+		return fmt.Errorf("field created_at in TrailToolActionRunYaml: required")
+	}
+	if _, ok := raw["id"]; raw != nil && !ok {
+		return fmt.Errorf("field id in TrailToolActionRunYaml: required")
+	}
+	if _, ok := raw["status"]; raw != nil && !ok {
+		return fmt.Errorf("field status in TrailToolActionRunYaml: required")
+	}
+	if _, ok := raw["updated_at"]; raw != nil && !ok {
+		return fmt.Errorf("field updated_at in TrailToolActionRunYaml: required")
+	}
+	type Plain TrailToolActionRunYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.ActionId)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "ActionId", `^[0-9a-v]{20}$`)
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.Id)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "Id", `^[0-9a-v]{20}$`)
+	}
+	if plain.RobotSessionId != nil {
+		if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(*plain.RobotSessionId)); !matched {
+			return fmt.Errorf("field %s pattern match: must match %s", "RobotSessionId", `^[0-9a-v]{20}$`)
+		}
+	}
+	*j = TrailToolActionRunYaml(plain)
+	return nil
+}
+
+// A Robot invocation performed for each Trail occurrence.
+type TrailToolActionYaml struct {
+	// Task given to the Robot when the Trail runs.
+	Instruction string `json:"instruction" yaml:"instruction" mapstructure:"instruction"`
+
+	// Robot ID to invoke; omit to invoke the current Robot when called from a Robot
+	// conversation.
+	RobotRef *string `json:"robot_ref,omitempty" yaml:"robot_ref,omitempty" mapstructure:"robot_ref,omitempty"`
+
+	// Trail action kind.
+	Type string `json:"type" yaml:"type" mapstructure:"type"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolActionYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["instruction"]; raw != nil && !ok {
+		return fmt.Errorf("field instruction in TrailToolActionYaml: required")
+	}
+	if _, ok := raw["type"]; raw != nil && !ok {
+		return fmt.Errorf("field type in TrailToolActionYaml: required")
+	}
+	type Plain TrailToolActionYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if len(plain.Instruction) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "instruction", 1)
+	}
+	if plain.RobotRef != nil && len(*plain.RobotRef) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "robot_ref", 1)
+	}
+	*j = TrailToolActionYaml(plain)
+	return nil
+}
+
+// A Trail definition with its trigger, Robot actions, lifecycle state, and
+// occurrence times.
+type TrailToolItemYaml struct {
+	// Robot invocations performed independently for each occurrence.
+	Action []TrailToolActionYaml `json:"action" yaml:"action" mapstructure:"action"`
+
+	// Trail creation time in UTC.
+	CreatedAt time.Time `json:"created_at" yaml:"created_at" mapstructure:"created_at"`
+
+	// Human-readable purpose of the Trail.
+	Description string `json:"description" yaml:"description" mapstructure:"description"`
+
+	// Stable Trail identifier accepted by Trail management tools.
+	Id string `json:"id" yaml:"id" mapstructure:"id"`
+
+	// Most recent materialized occurrence in UTC.
+	LastOccurrenceAt *time.Time `json:"last_occurrence_at,omitempty" yaml:"last_occurrence_at,omitempty" mapstructure:"last_occurrence_at,omitempty"`
+
+	// Human-readable Trail name.
+	Name string `json:"name" yaml:"name" mapstructure:"name"`
+
+	// Next scheduled occurrence in UTC when one remains.
+	NextOccurrenceAt *time.Time `json:"next_occurrence_at,omitempty" yaml:"next_occurrence_at,omitempty" mapstructure:"next_occurrence_at,omitempty"`
+
+	// Current Trail lifecycle state.
+	Status TrailToolItemYamlStatus `json:"status" yaml:"status" mapstructure:"status"`
+
+	// Trigger corresponds to the JSON schema field "trigger".
+	Trigger TrailToolTriggerYaml `json:"trigger" yaml:"trigger" mapstructure:"trigger"`
+
+	// Trail update time in UTC.
+	UpdatedAt time.Time `json:"updated_at" yaml:"updated_at" mapstructure:"updated_at"`
+}
+
+type TrailToolItemYamlStatus string
+
+const TrailToolItemYamlStatusActive TrailToolItemYamlStatus = "active"
+const TrailToolItemYamlStatusArchived TrailToolItemYamlStatus = "archived"
+const TrailToolItemYamlStatusFinished TrailToolItemYamlStatus = "finished"
+const TrailToolItemYamlStatusPaused TrailToolItemYamlStatus = "paused"
+
+var enumValues_TrailToolItemYamlStatus = []interface{}{
+	"active",
+	"paused",
+	"finished",
+	"archived",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolItemYamlStatus) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_TrailToolItemYamlStatus {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_TrailToolItemYamlStatus, v)
+	}
+	*j = TrailToolItemYamlStatus(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolItemYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["action"]; raw != nil && !ok {
+		return fmt.Errorf("field action in TrailToolItemYaml: required")
+	}
+	if _, ok := raw["created_at"]; raw != nil && !ok {
+		return fmt.Errorf("field created_at in TrailToolItemYaml: required")
+	}
+	if _, ok := raw["description"]; raw != nil && !ok {
+		return fmt.Errorf("field description in TrailToolItemYaml: required")
+	}
+	if _, ok := raw["id"]; raw != nil && !ok {
+		return fmt.Errorf("field id in TrailToolItemYaml: required")
+	}
+	if _, ok := raw["name"]; raw != nil && !ok {
+		return fmt.Errorf("field name in TrailToolItemYaml: required")
+	}
+	if _, ok := raw["status"]; raw != nil && !ok {
+		return fmt.Errorf("field status in TrailToolItemYaml: required")
+	}
+	if _, ok := raw["trigger"]; raw != nil && !ok {
+		return fmt.Errorf("field trigger in TrailToolItemYaml: required")
+	}
+	if _, ok := raw["updated_at"]; raw != nil && !ok {
+		return fmt.Errorf("field updated_at in TrailToolItemYaml: required")
+	}
+	type Plain TrailToolItemYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.Id)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "Id", `^[0-9a-v]{20}$`)
+	}
+	*j = TrailToolItemYaml(plain)
+	return nil
+}
+
+// A human-readable recurrence rule for a Trail schedule.
+type TrailToolRecurrenceRuleYaml struct {
+	// Maximum number of occurrences from the schedule start; use 1 for a one-shot
+	// wake-up.
+	Count *int `json:"count,omitempty" yaml:"count,omitempty" mapstructure:"count,omitempty"`
+
+	// Recurrence frequency for the schedule.
+	Frequency TrailToolRecurrenceRuleYamlFrequency `json:"frequency" yaml:"frequency" mapstructure:"frequency"`
+
+	// Number of frequency units between occurrences.
+	Interval int `json:"interval" yaml:"interval" mapstructure:"interval"`
+
+	// Months selected by a monthly or yearly schedule.
+	Month []int `json:"month,omitempty" yaml:"month,omitempty" mapstructure:"month,omitempty"`
+
+	// Calendar days selected by a monthly or yearly schedule, with negative values
+	// counted from the end of the month.
+	MonthDay []int `json:"month_day,omitempty" yaml:"month_day,omitempty" mapstructure:"month_day,omitempty"`
+
+	// Weekdays selected by a weekly schedule.
+	Weekday []TrailToolRecurrenceRuleYamlWeekdayElem `json:"weekday,omitempty" yaml:"weekday,omitempty" mapstructure:"weekday,omitempty"`
+}
+
+type TrailToolRecurrenceRuleYamlFrequency string
+
+const TrailToolRecurrenceRuleYamlFrequencyDaily TrailToolRecurrenceRuleYamlFrequency = "daily"
+const TrailToolRecurrenceRuleYamlFrequencyHourly TrailToolRecurrenceRuleYamlFrequency = "hourly"
+const TrailToolRecurrenceRuleYamlFrequencyMonthly TrailToolRecurrenceRuleYamlFrequency = "monthly"
+const TrailToolRecurrenceRuleYamlFrequencyWeekly TrailToolRecurrenceRuleYamlFrequency = "weekly"
+const TrailToolRecurrenceRuleYamlFrequencyYearly TrailToolRecurrenceRuleYamlFrequency = "yearly"
+
+var enumValues_TrailToolRecurrenceRuleYamlFrequency = []interface{}{
+	"hourly",
+	"daily",
+	"weekly",
+	"monthly",
+	"yearly",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolRecurrenceRuleYamlFrequency) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_TrailToolRecurrenceRuleYamlFrequency {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_TrailToolRecurrenceRuleYamlFrequency, v)
+	}
+	*j = TrailToolRecurrenceRuleYamlFrequency(v)
+	return nil
+}
+
+type TrailToolRecurrenceRuleYamlWeekdayElem string
+
+const TrailToolRecurrenceRuleYamlWeekdayElemFriday TrailToolRecurrenceRuleYamlWeekdayElem = "friday"
+const TrailToolRecurrenceRuleYamlWeekdayElemMonday TrailToolRecurrenceRuleYamlWeekdayElem = "monday"
+const TrailToolRecurrenceRuleYamlWeekdayElemSaturday TrailToolRecurrenceRuleYamlWeekdayElem = "saturday"
+const TrailToolRecurrenceRuleYamlWeekdayElemSunday TrailToolRecurrenceRuleYamlWeekdayElem = "sunday"
+const TrailToolRecurrenceRuleYamlWeekdayElemThursday TrailToolRecurrenceRuleYamlWeekdayElem = "thursday"
+const TrailToolRecurrenceRuleYamlWeekdayElemTuesday TrailToolRecurrenceRuleYamlWeekdayElem = "tuesday"
+const TrailToolRecurrenceRuleYamlWeekdayElemWednesday TrailToolRecurrenceRuleYamlWeekdayElem = "wednesday"
+
+var enumValues_TrailToolRecurrenceRuleYamlWeekdayElem = []interface{}{
+	"monday",
+	"tuesday",
+	"wednesday",
+	"thursday",
+	"friday",
+	"saturday",
+	"sunday",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolRecurrenceRuleYamlWeekdayElem) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_TrailToolRecurrenceRuleYamlWeekdayElem {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_TrailToolRecurrenceRuleYamlWeekdayElem, v)
+	}
+	*j = TrailToolRecurrenceRuleYamlWeekdayElem(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolRecurrenceRuleYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["frequency"]; raw != nil && !ok {
+		return fmt.Errorf("field frequency in TrailToolRecurrenceRuleYaml: required")
+	}
+	if _, ok := raw["interval"]; raw != nil && !ok {
+		return fmt.Errorf("field interval in TrailToolRecurrenceRuleYaml: required")
+	}
+	type Plain TrailToolRecurrenceRuleYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if plain.Count != nil && 100000 < *plain.Count {
+		return fmt.Errorf("field %s: must be <= %v", "count", 100000)
+	}
+	if plain.Count != nil && 1 > *plain.Count {
+		return fmt.Errorf("field %s: must be >= %v", "count", 1)
+	}
+	if 1 > plain.Interval {
+		return fmt.Errorf("field %s: must be >= %v", "interval", 1)
+	}
+	*j = TrailToolRecurrenceRuleYaml(plain)
+	return nil
+}
+
+// A user decision or missing input that blocked a Robot action.
+type TrailToolRobotAttentionYaml struct {
+	// Explanation of what the Robot needs from the user.
+	Message string `json:"message" yaml:"message" mapstructure:"message"`
+
+	// Short category for the required attention.
+	Reason string `json:"reason" yaml:"reason" mapstructure:"reason"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolRobotAttentionYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["message"]; raw != nil && !ok {
+		return fmt.Errorf("field message in TrailToolRobotAttentionYaml: required")
+	}
+	if _, ok := raw["reason"]; raw != nil && !ok {
+		return fmt.Errorf("field reason in TrailToolRobotAttentionYaml: required")
+	}
+	type Plain TrailToolRobotAttentionYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = TrailToolRobotAttentionYaml(plain)
+	return nil
+}
+
+// Structured result reported by a Robot action.
+type TrailToolRobotOutputYaml struct {
+	// Attention corresponds to the JSON schema field "attention".
+	Attention *TrailToolRobotAttentionYaml `json:"attention,omitempty" yaml:"attention,omitempty" mapstructure:"attention,omitempty"`
+
+	// Robot-reported outcome of the unattended task.
+	Status TrailToolRobotOutputYamlStatus `json:"status" yaml:"status" mapstructure:"status"`
+
+	// Concise account of the work performed or why it did not finish.
+	Summary string `json:"summary" yaml:"summary" mapstructure:"summary"`
+}
+
+type TrailToolRobotOutputYamlStatus string
+
+const TrailToolRobotOutputYamlStatusBlocked TrailToolRobotOutputYamlStatus = "blocked"
+const TrailToolRobotOutputYamlStatusCompleted TrailToolRobotOutputYamlStatus = "completed"
+const TrailToolRobotOutputYamlStatusFailed TrailToolRobotOutputYamlStatus = "failed"
+
+var enumValues_TrailToolRobotOutputYamlStatus = []interface{}{
+	"completed",
+	"blocked",
+	"failed",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolRobotOutputYamlStatus) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_TrailToolRobotOutputYamlStatus {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_TrailToolRobotOutputYamlStatus, v)
+	}
+	*j = TrailToolRobotOutputYamlStatus(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolRobotOutputYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["status"]; raw != nil && !ok {
+		return fmt.Errorf("field status in TrailToolRobotOutputYaml: required")
+	}
+	if _, ok := raw["summary"]; raw != nil && !ok {
+		return fmt.Errorf("field summary in TrailToolRobotOutputYaml: required")
+	}
+	type Plain TrailToolRobotOutputYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = TrailToolRobotOutputYaml(plain)
+	return nil
+}
+
+// A concise Trail run record for choosing a run to inspect.
+type TrailToolRunSummaryYaml struct {
+	// ActionStatus corresponds to the JSON schema field "action_status".
+	ActionStatus TrailToolActionRunCountsYaml `json:"action_status" yaml:"action_status" mapstructure:"action_status"`
+
+	// Run creation time in UTC.
+	CreatedAt time.Time `json:"created_at" yaml:"created_at" mapstructure:"created_at"`
+
+	// Run completion time in UTC.
+	FinishedAt *time.Time `json:"finished_at,omitempty" yaml:"finished_at,omitempty" mapstructure:"finished_at,omitempty"`
+
+	// Stable run identifier accepted by Trail run tools.
+	Id string `json:"id" yaml:"id" mapstructure:"id"`
+
+	// Cause that materialized the run.
+	Kind TrailToolRunSummaryYamlKind `json:"kind" yaml:"kind" mapstructure:"kind"`
+
+	// Scheduled occurrence time in UTC.
+	ScheduledFor *time.Time `json:"scheduled_for,omitempty" yaml:"scheduled_for,omitempty" mapstructure:"scheduled_for,omitempty"`
+
+	// Aggregate lifecycle state across the run's independent actions.
+	Status TrailToolRunSummaryYamlStatus `json:"status" yaml:"status" mapstructure:"status"`
+
+	// Trail definition that produced this run.
+	TrailId string `json:"trail_id" yaml:"trail_id" mapstructure:"trail_id"`
+
+	// Run update time in UTC.
+	UpdatedAt time.Time `json:"updated_at" yaml:"updated_at" mapstructure:"updated_at"`
+}
+
+type TrailToolRunSummaryYamlKind string
+
+const TrailToolRunSummaryYamlKindEvent TrailToolRunSummaryYamlKind = "event"
+const TrailToolRunSummaryYamlKindManual TrailToolRunSummaryYamlKind = "manual"
+const TrailToolRunSummaryYamlKindScheduled TrailToolRunSummaryYamlKind = "scheduled"
+
+var enumValues_TrailToolRunSummaryYamlKind = []interface{}{
+	"scheduled",
+	"event",
+	"manual",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolRunSummaryYamlKind) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_TrailToolRunSummaryYamlKind {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_TrailToolRunSummaryYamlKind, v)
+	}
+	*j = TrailToolRunSummaryYamlKind(v)
+	return nil
+}
+
+type TrailToolRunSummaryYamlStatus string
+
+const TrailToolRunSummaryYamlStatusAttentionRequired TrailToolRunSummaryYamlStatus = "attention_required"
+const TrailToolRunSummaryYamlStatusCancelled TrailToolRunSummaryYamlStatus = "cancelled"
+const TrailToolRunSummaryYamlStatusCompleted TrailToolRunSummaryYamlStatus = "completed"
+const TrailToolRunSummaryYamlStatusQueued TrailToolRunSummaryYamlStatus = "queued"
+const TrailToolRunSummaryYamlStatusRunning TrailToolRunSummaryYamlStatus = "running"
+const TrailToolRunSummaryYamlStatusSkipped TrailToolRunSummaryYamlStatus = "skipped"
+
+var enumValues_TrailToolRunSummaryYamlStatus = []interface{}{
+	"queued",
+	"running",
+	"completed",
+	"attention_required",
+	"cancelled",
+	"skipped",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolRunSummaryYamlStatus) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_TrailToolRunSummaryYamlStatus {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_TrailToolRunSummaryYamlStatus, v)
+	}
+	*j = TrailToolRunSummaryYamlStatus(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolRunSummaryYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["action_status"]; raw != nil && !ok {
+		return fmt.Errorf("field action_status in TrailToolRunSummaryYaml: required")
+	}
+	if _, ok := raw["created_at"]; raw != nil && !ok {
+		return fmt.Errorf("field created_at in TrailToolRunSummaryYaml: required")
+	}
+	if _, ok := raw["id"]; raw != nil && !ok {
+		return fmt.Errorf("field id in TrailToolRunSummaryYaml: required")
+	}
+	if _, ok := raw["kind"]; raw != nil && !ok {
+		return fmt.Errorf("field kind in TrailToolRunSummaryYaml: required")
+	}
+	if _, ok := raw["status"]; raw != nil && !ok {
+		return fmt.Errorf("field status in TrailToolRunSummaryYaml: required")
+	}
+	if _, ok := raw["trail_id"]; raw != nil && !ok {
+		return fmt.Errorf("field trail_id in TrailToolRunSummaryYaml: required")
+	}
+	if _, ok := raw["updated_at"]; raw != nil && !ok {
+		return fmt.Errorf("field updated_at in TrailToolRunSummaryYaml: required")
+	}
+	type Plain TrailToolRunSummaryYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.Id)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "Id", `^[0-9a-v]{20}$`)
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.TrailId)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "TrailId", `^[0-9a-v]{20}$`)
+	}
+	*j = TrailToolRunSummaryYaml(plain)
+	return nil
+}
+
+// A Trail run with its immutable trigger context and independent action results.
+type TrailToolRunYaml struct {
+	// Independent action results in Trail binding order.
+	Action []TrailToolActionRunYaml `json:"action" yaml:"action" mapstructure:"action"`
+
+	// Summary corresponds to the JSON schema field "summary".
+	Summary TrailToolRunSummaryYaml `json:"summary" yaml:"summary" mapstructure:"summary"`
+
+	// Trigger corresponds to the JSON schema field "trigger".
+	Trigger *TrailToolTriggerSnapshotYaml `json:"trigger,omitempty" yaml:"trigger,omitempty" mapstructure:"trigger,omitempty"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolRunYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["action"]; raw != nil && !ok {
+		return fmt.Errorf("field action in TrailToolRunYaml: required")
+	}
+	if _, ok := raw["summary"]; raw != nil && !ok {
+		return fmt.Errorf("field summary in TrailToolRunYaml: required")
+	}
+	type Plain TrailToolRunYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = TrailToolRunYaml(plain)
+	return nil
+}
+
+// A Trail schedule expressed as a local start time, timezone, and typed recurrence
+// rule.
+type TrailToolScheduleYaml struct {
+	// Rule corresponds to the JSON schema field "rule".
+	Rule TrailToolRecurrenceRuleYaml `json:"rule" yaml:"rule" mapstructure:"rule"`
+
+	// Local start date and time without a UTC offset.
+	Start string `json:"start" yaml:"start" mapstructure:"start"`
+
+	// IANA timezone used to interpret the local start time.
+	Timezone string `json:"timezone" yaml:"timezone" mapstructure:"timezone"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolScheduleYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["rule"]; raw != nil && !ok {
+		return fmt.Errorf("field rule in TrailToolScheduleYaml: required")
+	}
+	if _, ok := raw["start"]; raw != nil && !ok {
+		return fmt.Errorf("field start in TrailToolScheduleYaml: required")
+	}
+	if _, ok := raw["timezone"]; raw != nil && !ok {
+		return fmt.Errorf("field timezone in TrailToolScheduleYaml: required")
+	}
+	type Plain TrailToolScheduleYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if matched, _ := regexp.MatchString(`^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$`, string(plain.Start)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "Start", `^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$`)
+	}
+	if len(plain.Timezone) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "timezone", 1)
+	}
+	*j = TrailToolScheduleYaml(plain)
+	return nil
+}
+
+// Immutable trigger context that materialized a Trail run.
+type TrailToolTriggerSnapshotYaml struct {
+	// Canonical event name that matched an event trigger.
+	EventName *string `json:"event_name,omitempty" yaml:"event_name,omitempty" mapstructure:"event_name,omitempty"`
+
+	// Complete triggering event payload encoded as JSON data.
+	EventPayloadJson *string `json:"event_payload_json,omitempty" yaml:"event_payload_json,omitempty" mapstructure:"event_payload_json,omitempty"`
+
+	// Account that requested a manual run.
+	InitiatedBy *string `json:"initiated_by,omitempty" yaml:"initiated_by,omitempty" mapstructure:"initiated_by,omitempty"`
+
+	// Cause that materialized the run.
+	Kind TrailToolTriggerSnapshotYamlKind `json:"kind" yaml:"kind" mapstructure:"kind"`
+
+	// Time the trigger was observed in UTC.
+	ObservedAt time.Time `json:"observed_at" yaml:"observed_at" mapstructure:"observed_at"`
+
+	// Scheduled occurrence time in UTC.
+	ScheduledFor *time.Time `json:"scheduled_for,omitempty" yaml:"scheduled_for,omitempty" mapstructure:"scheduled_for,omitempty"`
+
+	// Trigger corresponds to the JSON schema field "trigger".
+	Trigger TrailToolTriggerYaml `json:"trigger" yaml:"trigger" mapstructure:"trigger"`
+}
+
+type TrailToolTriggerSnapshotYamlKind string
+
+const TrailToolTriggerSnapshotYamlKindEvent TrailToolTriggerSnapshotYamlKind = "event"
+const TrailToolTriggerSnapshotYamlKindManual TrailToolTriggerSnapshotYamlKind = "manual"
+const TrailToolTriggerSnapshotYamlKindScheduled TrailToolTriggerSnapshotYamlKind = "scheduled"
+
+var enumValues_TrailToolTriggerSnapshotYamlKind = []interface{}{
+	"scheduled",
+	"event",
+	"manual",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolTriggerSnapshotYamlKind) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_TrailToolTriggerSnapshotYamlKind {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_TrailToolTriggerSnapshotYamlKind, v)
+	}
+	*j = TrailToolTriggerSnapshotYamlKind(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolTriggerSnapshotYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["kind"]; raw != nil && !ok {
+		return fmt.Errorf("field kind in TrailToolTriggerSnapshotYaml: required")
+	}
+	if _, ok := raw["observed_at"]; raw != nil && !ok {
+		return fmt.Errorf("field observed_at in TrailToolTriggerSnapshotYaml: required")
+	}
+	if _, ok := raw["trigger"]; raw != nil && !ok {
+		return fmt.Errorf("field trigger in TrailToolTriggerSnapshotYaml: required")
+	}
+	type Plain TrailToolTriggerSnapshotYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if plain.InitiatedBy != nil {
+		if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(*plain.InitiatedBy)); !matched {
+			return fmt.Errorf("field %s pattern match: must match %s", "InitiatedBy", `^[0-9a-v]{20}$`)
+		}
+	}
+	*j = TrailToolTriggerSnapshotYaml(plain)
+	return nil
+}
+
+// A schedule or Storyden event trigger for a Trail.
+type TrailToolTriggerYaml struct {
+	// Canonical Storyden event names observed by an event trigger.
+	Event []string `json:"event,omitempty" yaml:"event,omitempty" mapstructure:"event,omitempty"`
+
+	// Schedule corresponds to the JSON schema field "schedule".
+	Schedule *TrailToolScheduleYaml `json:"schedule,omitempty" yaml:"schedule,omitempty" mapstructure:"schedule,omitempty"`
+
+	// Trigger kind that determines which trigger details are used.
+	Type TrailToolTriggerYamlType `json:"type" yaml:"type" mapstructure:"type"`
+}
+
+type TrailToolTriggerYamlType string
+
+const TrailToolTriggerYamlTypeEvent TrailToolTriggerYamlType = "event"
+const TrailToolTriggerYamlTypeSchedule TrailToolTriggerYamlType = "schedule"
+
+var enumValues_TrailToolTriggerYamlType = []interface{}{
+	"schedule",
+	"event",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolTriggerYamlType) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_TrailToolTriggerYamlType {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_TrailToolTriggerYamlType, v)
+	}
+	*j = TrailToolTriggerYamlType(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *TrailToolTriggerYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["type"]; raw != nil && !ok {
+		return fmt.Errorf("field type in TrailToolTriggerYaml: required")
+	}
+	type Plain TrailToolTriggerYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if plain.Event != nil && len(plain.Event) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "event", 1)
+	}
+	*j = TrailToolTriggerYaml(plain)
 	return nil
 }

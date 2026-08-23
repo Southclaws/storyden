@@ -42,6 +42,33 @@ definitions:
   ToolRobotSearch:
     $ref: "./robots/tools/tool_robot_search.yaml"
 
+  ToolTrailCreate:
+    $ref: "./robots/tools/tool_trail_create.yaml"
+
+  ToolTrailList:
+    $ref: "./robots/tools/tool_trail_list.yaml"
+
+  ToolTrailGet:
+    $ref: "./robots/tools/tool_trail_get.yaml"
+
+  ToolTrailUpdate:
+    $ref: "./robots/tools/tool_trail_update.yaml"
+
+  ToolTrailSchedulePreview:
+    $ref: "./robots/tools/tool_trail_schedule_preview.yaml"
+
+  ToolTrailRunList:
+    $ref: "./robots/tools/tool_trail_run_list.yaml"
+
+  ToolTrailRunGet:
+    $ref: "./robots/tools/tool_trail_run_get.yaml"
+
+  ToolTrailRunCreate:
+    $ref: "./robots/tools/tool_trail_run_create.yaml"
+
+  ToolTrailActionRunCancel:
+    $ref: "./robots/tools/tool_trail_action_run_cancel.yaml"
+
   ToolToolsetSearch:
     $ref: "./robots/tools/tool_toolset_search.yaml"
 

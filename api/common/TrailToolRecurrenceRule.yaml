@@ -1,0 +1,43 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+description: A human-readable recurrence rule for a Trail schedule.
+required: [frequency, interval]
+additionalProperties: false
+properties:
+  frequency:
+    type: string
+    enum: [hourly, daily, weekly, monthly, yearly]
+    description: Recurrence frequency for the schedule.
+  interval:
+    type: integer
+    minimum: 1
+    description: Number of frequency units between occurrences.
+  weekday:
+    type: array
+    uniqueItems: true
+    description: Weekdays selected by a weekly schedule.
+    items:
+      type: string
+      enum: [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
+  month:
+    type: array
+    uniqueItems: true
+    description: Months selected by a monthly or yearly schedule.
+    items:
+      type: integer
+      minimum: 1
+      maximum: 12
+  month_day:
+    type: array
+    uniqueItems: true
+    description: Calendar days selected by a monthly or yearly schedule, with negative values counted from the end of the month.
+    items:
+      type: integer
+      minimum: -31
+      maximum: 31
+      not: { const: 0 }
+  count:
+    type: integer
+    minimum: 1
+    maximum: 100000
+    description: Maximum number of occurrences from the schedule start; use 1 for a one-shot wake-up.

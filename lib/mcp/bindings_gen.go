@@ -47,6 +47,15 @@ var (
 	toolToolsetLoad                     *ToolDefinition
 	toolToolsetSearch                   *ToolDefinition
 	toolToolsetUpdate                   *ToolDefinition
+	toolTrailActionRunCancel            *ToolDefinition
+	toolTrailCreate                     *ToolDefinition
+	toolTrailGet                        *ToolDefinition
+	toolTrailList                       *ToolDefinition
+	toolTrailRunCreate                  *ToolDefinition
+	toolTrailRunGet                     *ToolDefinition
+	toolTrailRunList                    *ToolDefinition
+	toolTrailSchedulePreview            *ToolDefinition
+	toolTrailUpdate                     *ToolDefinition
 	toolWebFetch                        *ToolDefinition
 	toolWebOpen                         *ToolDefinition
 	toolNamesEnum                       []any
@@ -97,6 +106,15 @@ func initAllTools() {
 	toolToolsetLoad = initTool("ToolsetLoad")
 	toolToolsetSearch = initTool("ToolsetSearch")
 	toolToolsetUpdate = initTool("ToolsetUpdate")
+	toolTrailActionRunCancel = initTool("TrailActionRunCancel")
+	toolTrailCreate = initTool("TrailCreate")
+	toolTrailGet = initTool("TrailGet")
+	toolTrailList = initTool("TrailList")
+	toolTrailRunCreate = initTool("TrailRunCreate")
+	toolTrailRunGet = initTool("TrailRunGet")
+	toolTrailRunList = initTool("TrailRunList")
+	toolTrailSchedulePreview = initTool("TrailSchedulePreview")
+	toolTrailUpdate = initTool("TrailUpdate")
 	toolWebFetch = initTool("WebFetch")
 	toolWebOpen = initTool("WebOpen")
 
@@ -154,6 +172,15 @@ func AllToolNames() []string {
 		toolToolsetLoad.Name,
 		toolToolsetSearch.Name,
 		toolToolsetUpdate.Name,
+		toolTrailActionRunCancel.Name,
+		toolTrailCreate.Name,
+		toolTrailGet.Name,
+		toolTrailList.Name,
+		toolTrailRunCreate.Name,
+		toolTrailRunGet.Name,
+		toolTrailRunList.Name,
+		toolTrailSchedulePreview.Name,
+		toolTrailUpdate.Name,
 		toolWebFetch.Name,
 		toolWebOpen.Name,
 	}
@@ -333,6 +360,42 @@ func GetToolsetSearchTool() *ToolDefinition {
 
 func GetToolsetUpdateTool() *ToolDefinition {
 	return toolToolsetUpdate
+}
+
+func GetTrailActionRunCancelTool() *ToolDefinition {
+	return toolTrailActionRunCancel
+}
+
+func GetTrailCreateTool() *ToolDefinition {
+	return toolTrailCreate
+}
+
+func GetTrailGetTool() *ToolDefinition {
+	return toolTrailGet
+}
+
+func GetTrailListTool() *ToolDefinition {
+	return toolTrailList
+}
+
+func GetTrailRunCreateTool() *ToolDefinition {
+	return toolTrailRunCreate
+}
+
+func GetTrailRunGetTool() *ToolDefinition {
+	return toolTrailRunGet
+}
+
+func GetTrailRunListTool() *ToolDefinition {
+	return toolTrailRunList
+}
+
+func GetTrailSchedulePreviewTool() *ToolDefinition {
+	return toolTrailSchedulePreview
+}
+
+func GetTrailUpdateTool() *ToolDefinition {
+	return toolTrailUpdate
 }
 
 func GetWebFetchTool() *ToolDefinition {

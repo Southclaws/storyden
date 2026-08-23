@@ -1,0 +1,40 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+description: A concise Trail run record for choosing a run to inspect.
+required: [id, trail_id, kind, status, action_status, created_at, updated_at]
+additionalProperties: false
+properties:
+  id:
+    type: string
+    pattern: '^[0-9a-v]{20}$'
+    description: Stable run identifier accepted by Trail run tools.
+  trail_id:
+    type: string
+    pattern: '^[0-9a-v]{20}$'
+    description: Trail definition that produced this run.
+  kind:
+    type: string
+    enum: [scheduled, event, manual]
+    description: Cause that materialized the run.
+  status:
+    type: string
+    enum: [queued, running, completed, attention_required, cancelled, skipped]
+    description: Aggregate lifecycle state across the run's independent actions.
+  action_status:
+    $ref: "./TrailToolActionRunCounts.yaml"
+  scheduled_for:
+    type: string
+    format: date-time
+    description: Scheduled occurrence time in UTC.
+  finished_at:
+    type: string
+    format: date-time
+    description: Run completion time in UTC.
+  created_at:
+    type: string
+    format: date-time
+    description: Run creation time in UTC.
+  updated_at:
+    type: string
+    format: date-time
+    description: Run update time in UTC.
