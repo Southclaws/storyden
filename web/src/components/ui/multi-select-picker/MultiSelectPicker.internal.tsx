@@ -1,22 +1,33 @@
-import { Portal } from "@ark-ui/react";
-import { useEffect, useRef, useState } from "react";
+"use client";
+
+import { createListCollection } from "@ark-ui/react";
+import {
+  FloatingPortal,
+  autoUpdate,
+  flip,
+  size as floatingSize,
+  offset,
+  shift,
+  useFloating,
+} from "@floating-ui/react";
+import { type CSSProperties, type Ref, useRef, useState } from "react";
 import { cx } from "styled-system/css";
 
-import * as Menu from "@/components/ui/menu";
-import { Box, HStack, WStack } from "@/styled-system/jsx";
+import { Unready } from "@/components/site/Unready";
+import * as Combobox from "@/components/ui/combobox";
+import { styled } from "@/styled-system/jsx";
 import {
-  InputVariantProps,
-  MenuVariantProps,
+  type InputVariantProps,
   input,
   multiSelectPicker,
 } from "@/styled-system/recipes";
 import { deriveColour } from "@/utils/colour";
 
-import { CancelAction } from "../../site/Action/Cancel";
-import { Unready } from "../../site/Unready";
 import { Badge, badgeColourPalette, badgeColours } from "../badge";
-import { ButtonProps } from "../button";
-import { Input } from "../input";
+import { IconButton } from "../icon-button";
+import { AddIcon } from "../icons/Add";
+import { CheckIcon } from "../icons/Check";
+import { SelectIcon } from "../icons/Select";
 import { Text } from "../text";
 
 type ControlSize = "sm" | "md" | "lg";
@@ -27,28 +38,63 @@ export type MultiSelectPickerItem = {
   colour?: string;
 };
 
-type Props = {
+type RootProps = Omit<
+  Combobox.RootProps,
+  | "children"
+  | "collection"
+  | "defaultInputValue"
+  | "defaultValue"
+  | "inputValue"
+  | "multiple"
+  | "onChange"
+  | "onInputValueChange"
+  | "onValueChange"
+  | "open"
+  | "value"
+>;
+
+export type MultiSelectPickerProps = RootProps & {
   value: MultiSelectPickerItem[];
-  initialValue?: MultiSelectPickerItem[];
-  onChange: (item: MultiSelectPickerItem[]) => Promise<void>;
+  onChange: (items: MultiSelectPickerItem[]) => Promise<void>;
   onQuery: (query: string) => void;
   queryResults?: MultiSelectPickerItem[];
   allowNewValues?: boolean;
   inputPlaceholder?: string;
+  ariaLabel?: string;
   autoColour?: boolean;
   queryError?: string | null;
-
-  // styling
   size?: ControlSize;
-  triggerProps?: ButtonProps;
-  menuVariantProps?: MenuVariantProps;
-  inputVariantProps?: InputVariantProps;
+  inputVariant?: InputVariantProps["variant"];
 };
 
-function selectedBadgeSize(size: Props["size"]) {
+type PickerCollectionItem = MultiSelectPickerItem & {
+  kind?: "create";
+};
+
+const CREATE_VALUE_PREFIX = "multi-select-picker:create:";
+
+function selectedBadgeSize(size: ControlSize | undefined) {
   if (size === "lg") return "lg";
   if (size === "md") return "md";
   return "sm";
+}
+
+function itemColourStyles(item: MultiSelectPickerItem) {
+  const colour = badgeColours(
+    item.colour ? item.colour : deriveColour(item.value),
+  );
+
+  return colour ? badgeColourPalette(colour) : undefined;
+}
+
+function uniqueItems(items: PickerCollectionItem[]) {
+  const seen = new Set<string>();
+
+  return items.filter((item) => {
+    if (seen.has(item.value)) return false;
+    seen.add(item.value);
+    return true;
+  });
 }
 
 export function MultiSelectPicker({
@@ -56,314 +102,340 @@ export function MultiSelectPicker({
   onChange,
   onQuery,
   queryResults,
-  allowNewValues,
-  inputPlaceholder,
-  autoColour,
+  allowNewValues = false,
+  inputPlaceholder = "Select items...",
+  ariaLabel,
+  autoColour = false,
   queryError,
-
-  size,
-  triggerProps,
-  menuVariantProps,
-  inputVariantProps,
-}: Props) {
-  const { value: _value, ...menuTriggerProps } = triggerProps ?? {};
+  size = "sm",
+  inputVariant = "ghost",
+  positioning,
+  onOpenChange,
+  defaultOpen = false,
+  ...rootProps
+}: MultiSelectPickerProps) {
   const [queryInput, setQueryInput] = useState("");
-  const [hiddenCount, setHiddenCount] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const badgeRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const {
+    refs: { setFloating, setReference },
+    floatingStyles,
+  } = useFloating({
+    open: isOpen,
+    placement: positioning?.placement ?? "bottom-start",
+    strategy: "fixed",
+    whileElementsMounted: autoUpdate,
+    middleware: [
+      offset(positioning?.gutter ?? 4),
+      flip({ padding: positioning?.overflowPadding ?? 8 }),
+      shift({ padding: positioning?.overflowPadding ?? 8 }),
+      floatingSize({
+        padding: positioning?.overflowPadding ?? 8,
+        apply({ availableHeight, availableWidth, elements, rects }) {
+          const width = Math.min(
+            rects.reference.width,
+            512,
+            Math.max(0, availableWidth),
+          );
 
-  useEffect(() => {
-    const calculateHiddenItems = () => {
-      if (!containerRef.current || value.length === 0) {
-        setHiddenCount(0);
-        return;
+          Object.assign(elements.floating.style, {
+            boxSizing: "border-box",
+            maxHeight: `${Math.min(384, Math.max(0, availableHeight))}px`,
+            maxWidth: `${Math.max(0, availableWidth)}px`,
+            width: `${width}px`,
+          });
+        },
+      }),
+    ],
+  });
+  const trimmedQuery = queryInput.trim();
+  const selectedValues = new Set(value.map((item) => item.value));
+  const filteredQueryResults =
+    queryResults?.filter((result) => !selectedValues.has(result.value)) ?? [];
+  const showCreateNew =
+    allowNewValues &&
+    trimmedQuery.length > 0 &&
+    !selectedValues.has(trimmedQuery) &&
+    !filteredQueryResults.some((result) => result.value === trimmedQuery);
+  const createItem: PickerCollectionItem | undefined = showCreateNew
+    ? {
+        kind: "create",
+        label: `Create “${trimmedQuery}”`,
+        value: `${CREATE_VALUE_PREFIX}${encodeURIComponent(trimmedQuery)}`,
       }
+    : undefined;
+  const collectionItems = uniqueItems([
+    ...value,
+    ...filteredQueryResults,
+    ...(createItem ? [createItem] : []),
+  ]);
+  const collection = createListCollection({ items: collectionItems });
+  const itemsByValue = new Map(
+    collectionItems.map((item) => [item.value, item]),
+  );
+  const badgeSize = selectedBadgeSize(size);
+  const inputLabel = ariaLabel ?? "Search for items";
+  const triggerLabel = ariaLabel ?? "Select items";
 
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const containerRight = containerRect.right;
-      let hidden = 0;
-
-      badgeRefs.current.forEach((badge) => {
-        if (!badge) return;
-
-        const badgeRect = badge.getBoundingClientRect();
-        const badgeRight = badgeRect.right;
-        const badgeLeft = badgeRect.left;
-        const badgeWidth = badgeRect.width;
-
-        if (badgeLeft >= containerRight) {
-          hidden++;
-        } else if (badgeRight > containerRight) {
-          const visibleWidth = containerRight - badgeLeft;
-          const visiblePercentage = (visibleWidth / badgeWidth) * 100;
-
-          if (visiblePercentage < 50) {
-            hidden++;
-          }
-        }
-      });
-
-      setHiddenCount(hidden);
-    };
-
-    calculateHiddenItems();
-
-    const resizeObserver = new ResizeObserver(calculateHiddenItems);
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current);
-    }
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, [value]);
-
-  function handleQuery(event: React.ChangeEvent<HTMLInputElement>) {
-    const queryValue = event.target.value;
-    setQueryInput(queryValue);
-    onQuery(queryValue);
+  function resetQuery() {
+    setQueryInput("");
+    onQuery("");
   }
 
-  const handleRemoveItem =
-    (item: MultiSelectPickerItem) => async (e: React.MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const newValue = value.filter((v) => v.value !== item.value);
-      await onChange(newValue);
-    };
+  function addColour(item: MultiSelectPickerItem) {
+    return autoColour && !item.colour
+      ? { ...item, colour: deriveColour(item.value) }
+      : item;
+  }
 
-  const handleAddResult = (item: MultiSelectPickerItem) => async () => {
-    if (value.some((v) => v.value === item.value)) {
+  async function createNewValue() {
+    if (!showCreateNew) return;
+
+    await onChange([
+      ...value,
+      {
+        label: trimmedQuery,
+        value: trimmedQuery,
+        colour: autoColour ? deriveColour(trimmedQuery) : undefined,
+      },
+    ]);
+    resetQuery();
+  }
+
+  function handleValueChange(nextValues: string[]) {
+    if (createItem && nextValues.includes(createItem.value)) {
+      void createNewValue();
       return;
     }
 
-    const itemWithColour =
-      autoColour && !item.colour
-        ? { ...item, colour: deriveColour(item.value) }
-        : item;
+    const nextItems = nextValues.flatMap((itemValue) => {
+      const item = itemsByValue.get(itemValue);
+      if (!item || item.kind === "create") return [];
 
-    await onChange([...value, itemWithColour]);
-  };
+      return [selectedValues.has(itemValue) ? item : addColour(item)];
+    });
 
-  const handleAddNewValue = async () => {
-    if (!allowNewValues || !queryInput.trim()) return;
-
-    const newItem: MultiSelectPickerItem = {
-      label: queryInput,
-      value: queryInput,
-      colour: autoColour ? deriveColour(queryInput) : undefined,
-    };
-
-    await onChange([...value, newItem]);
-    setQueryInput("");
-  };
-
-  const handleKeyDown = async (
-    event: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
-    if (event.key === "Enter" && allowNewValues && queryInput.trim()) {
-      event.preventDefault();
-      await handleAddNewValue();
-    }
-  };
-
-  const filteredQueryResults = queryResults?.filter(
-    (result) => !value.some((v) => v.value === result.value),
-  );
-  const badgeSize = selectedBadgeSize(size);
-
-  const showCreateNew =
-    allowNewValues &&
-    queryInput.trim() &&
-    !value.some((v) => v.value === queryInput) &&
-    (!filteredQueryResults ||
-      !filteredQueryResults.some((r) => r.value === queryInput));
+    void onChange(nextItems);
+    resetQuery();
+  }
 
   return (
-    <Menu.Root
+    <Combobox.Root
+      {...rootProps}
+      collection={collection}
+      closeOnSelect={false}
+      inputBehavior="autohighlight"
+      inputValue={queryInput}
+      multiple
+      open={isOpen}
+      openOnClick
+      positioning={{ placement: "bottom-start", ...positioning }}
       size={size}
-      lazyMount
-      positioning={{
-        placement: "bottom-end",
-        strategy: "fixed",
+      value={value.map((item) => item.value)}
+      onOpenChange={(details) => {
+        setIsOpen(details.open);
+        if (!details.open && queryInput) resetQuery();
+        onOpenChange?.(details);
       }}
-      {...menuVariantProps}
+      onValueChange={({ value: nextValues }) => handleValueChange(nextValues)}
     >
-      <Menu.Trigger
-        w="full"
-        flexShrink="1"
-        justifyContent="space-between"
-        cursor="pointer"
-        aria-label={`Select items${value.length > 0 ? `, ${value.length} selected` : ""}`}
-        {...menuTriggerProps}
+      <Combobox.Label srOnly>{inputLabel}</Combobox.Label>
+      <Combobox.Control
+        ref={setReference}
+        className={multiSelectPicker({ size })}
+        onClick={(event) => {
+          if (!(event.target as HTMLElement).closest("button")) {
+            inputRef.current?.focus();
+          }
+        }}
       >
-        <HStack
-          ref={containerRef}
+        <styled.div
+          alignItems="center"
+          display="flex"
+          flex="1"
+          flexWrap="wrap"
           gap="1"
-          w="full"
-          className={cx(input({ size }), multiSelectPicker({ size }))}
-          overflowX="clip"
-          overflowY="hidden"
-          position="relative"
+          minW="0"
         >
-          {value.length > 0 ? (
-            <>
-              {value.map((item, index) => {
-                const colour = badgeColours(
-                  item.colour ? item.colour : deriveColour(item.value),
-                );
+          {value.map((item) => (
+            <Badge
+              key={item.value}
+              aria-hidden="true"
+              flexShrink="0"
+              size={badgeSize}
+              style={itemColourStyles(item)}
+            >
+              {item.label}
+            </Badge>
+          ))}
 
-                const colourStyles = colour
-                  ? badgeColourPalette(colour)
-                  : undefined;
+          <Combobox.Input
+            ref={inputRef}
+            aria-label={inputLabel}
+            autoComplete="off"
+            className={cx(input({ size, variant: inputVariant }))}
+            flex="1"
+            h="auto!"
+            minW={value.length > 0 ? "24" : "32"}
+            placeholder={inputPlaceholder}
+            pr="0!"
+            width="auto"
+            onChange={(event) => {
+              const nextQuery = event.currentTarget.value;
+              setQueryInput(nextQuery);
+              onQuery(nextQuery);
+            }}
+            onKeyDown={(event) => {
+              if (
+                event.key === "Backspace" &&
+                event.currentTarget.value === "" &&
+                value.length > 0
+              ) {
+                event.preventDefault();
+                void onChange(value.slice(0, -1));
+                return;
+              }
 
-                return (
-                  <Badge
-                    key={item.value}
-                    ref={(el) => {
-                      badgeRefs.current[index] = el;
-                    }}
-                    size={badgeSize}
-                    style={colourStyles}
-                  >
-                    {item.label}
-                  </Badge>
-                );
-              })}
-              {hiddenCount > 0 && (
-                <>
-                  <HStack
-                    position="absolute"
-                    right="-0.5"
-                    bg="background.control"
-                    color="text.default"
-                    backdropBlur="frosted"
-                    backdropFilter="auto"
-                    mask="linear-gradient(to right, rgb(from {colors.background.control} r g b / 0) 0%, rgb(from {colors.background.control} r g b / 0.8) 100%)"
-                    fontWeight="semibold"
-                    pointerEvents="none"
-                    height="full"
-                    alignItems="center"
-                    px="2"
-                  >
-                    <Box>+{hiddenCount}</Box>
-                  </HStack>
-                  <HStack
-                    position="absolute"
-                    right="-0.5"
-                    color="text.default"
-                    bg="overflow-fade"
-                    fontWeight="semibold"
-                    pointerEvents="none"
-                    height="full"
-                    alignItems="center"
-                    px="2"
-                  >
-                    <Box>+{hiddenCount}</Box>
-                  </HStack>
-                </>
-              )}
-            </>
-          ) : (
-            <Text variant="supporting" color="text.subtle">
-              {inputPlaceholder || "Select items..."}
-            </Text>
+              if (event.key === "Enter" && showCreateNew) {
+                event.preventDefault();
+                void createNewValue();
+              }
+            }}
+          />
+        </styled.div>
+
+        <Combobox.Trigger asChild>
+          <IconButton
+            aria-label={triggerLabel}
+            position="absolute"
+            right="0"
+            size={size}
+            top="[50%]"
+            transform="translateY(-50%)"
+            type="button"
+            variant="ghost"
+          >
+            <SelectIcon />
+          </IconButton>
+        </Combobox.Trigger>
+      </Combobox.Control>
+
+      {isOpen && (
+        <PickerContent
+          createItem={createItem}
+          floatingRef={setFloating}
+          floatingStyles={floatingStyles}
+          queryError={queryError}
+          queryInput={queryInput}
+          queryResults={filteredQueryResults}
+          selectedItems={value}
+        />
+      )}
+    </Combobox.Root>
+  );
+}
+
+type PickerContentProps = {
+  createItem?: PickerCollectionItem;
+  floatingRef: Ref<HTMLDivElement>;
+  floatingStyles: CSSProperties;
+  queryError?: string | null;
+  queryInput: string;
+  queryResults: MultiSelectPickerItem[];
+  selectedItems: MultiSelectPickerItem[];
+};
+
+function PickerContent({
+  createItem,
+  floatingRef,
+  floatingStyles,
+  queryError,
+  queryInput,
+  queryResults,
+  selectedItems,
+}: PickerContentProps) {
+  const hasOptions = queryResults.length > 0 || createItem !== undefined;
+
+  return (
+    <FloatingPortal>
+      <Combobox.Content
+        ref={floatingRef}
+        style={floatingStyles}
+        zIndex="popover"
+      >
+        <Combobox.List>
+          {selectedItems.length > 0 && (
+            <Combobox.ItemGroup>
+              <PickerGroupLabel>Selected</PickerGroupLabel>
+              {selectedItems.map((item) => (
+                <PickerOption key={item.value} item={item} />
+              ))}
+            </Combobox.ItemGroup>
           )}
-        </HStack>
-      </Menu.Trigger>
 
-      <Portal>
-        <Menu.Positioner zIndex="popover">
-          <Menu.Content zIndex="popover">
-            <Menu.ItemGroup pl="2" py="1">
-              <Input
-                size={size}
-                value={queryInput}
-                placeholder="Search..."
-                aria-label="Search for items"
-                {...inputVariantProps}
-                onChange={handleQuery}
-                onKeyDown={handleKeyDown}
-              />
-            </Menu.ItemGroup>
+          {!queryError && queryResults.length > 0 && (
+            <Combobox.ItemGroup>
+              <PickerGroupLabel>
+                {queryInput ? "Results" : "Available"}
+              </PickerGroupLabel>
+              {queryResults.map((item) => (
+                <PickerOption key={item.value} item={item} />
+              ))}
+            </Combobox.ItemGroup>
+          )}
 
-            {value.length > 0 && (
-              <Menu.ItemGroup>
-                <Menu.ItemGroupLabel>Selected</Menu.ItemGroupLabel>
-                {value.map((item) => {
-                  return (
-                    <Menu.Item
-                      key={item.value}
-                      value={item.value}
-                      closeOnSelect={false}
-                      asChild
-                    >
-                      <WStack alignItems="center" cursor="default">
-                        <span>{item.label}</span>
+          {!queryError && createItem && (
+            <Combobox.ItemGroup>
+              <PickerGroupLabel>Create new</PickerGroupLabel>
+              <Combobox.Item item={createItem}>
+                <Combobox.ItemText>{createItem.label}</Combobox.ItemText>
+                <AddIcon aria-hidden="true" />
+              </Combobox.Item>
+            </Combobox.ItemGroup>
+          )}
+        </Combobox.List>
 
-                        <CancelAction
-                          onClick={handleRemoveItem(item)}
-                          aria-label={`Remove ${item.label}`}
-                        />
-                      </WStack>
-                    </Menu.Item>
-                  );
-                })}
-              </Menu.ItemGroup>
-            )}
+        {queryError ? (
+          <styled.div p="2">
+            <Unready error={queryError} />
+          </styled.div>
+        ) : (
+          !hasOptions && (
+            <styled.div px="2" py="3" role="status">
+              <Text variant="supporting" color="text.muted">
+                {queryInput
+                  ? `No results for “${queryInput}”`
+                  : "No options available"}
+              </Text>
+            </styled.div>
+          )
+        )}
+      </Combobox.Content>
+    </FloatingPortal>
+  );
+}
 
-            {queryError ? (
-              <Menu.ItemGroup p="2">
-                <Unready error={queryError} />
-              </Menu.ItemGroup>
-            ) : (
-              <>
-                {filteredQueryResults && filteredQueryResults.length > 0 && (
-                  <Menu.ItemGroup>
-                    <Menu.ItemGroupLabel>Results</Menu.ItemGroupLabel>
-                    {filteredQueryResults.map((item) => {
-                      return (
-                        <Menu.Item
-                          key={item.value}
-                          value={item.value}
-                          closeOnSelect={false}
-                          onSelect={handleAddResult(item)}
-                        >
-                          {item.label}
-                        </Menu.Item>
-                      );
-                    })}
-                  </Menu.ItemGroup>
-                )}
+function PickerGroupLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <Combobox.ItemGroupLabel asChild>
+      <Text as="div" variant="metadata" fontWeight="medium">
+        {children}
+      </Text>
+    </Combobox.ItemGroupLabel>
+  );
+}
 
-                {showCreateNew && (
-                  <Menu.ItemGroup>
-                    <Menu.ItemGroupLabel>Create new</Menu.ItemGroupLabel>
-                    <Menu.Item
-                      value={`new-${queryInput}`}
-                      closeOnSelect={false}
-                      onSelect={handleAddNewValue}
-                    >
-                      Create "{queryInput}"
-                    </Menu.Item>
-                  </Menu.ItemGroup>
-                )}
-
-                {queryInput &&
-                  !queryError &&
-                  !filteredQueryResults?.length &&
-                  !showCreateNew && (
-                    <Menu.ItemGroup p="2">
-                      <Text variant="supporting" color="text.muted">
-                        No results found
-                      </Text>
-                    </Menu.ItemGroup>
-                  )}
-              </>
-            )}
-          </Menu.Content>
-        </Menu.Positioner>
-      </Portal>
-    </Menu.Root>
+function PickerOption({ item }: { item: MultiSelectPickerItem }) {
+  return (
+    <Combobox.Item item={item}>
+      <Combobox.ItemText>
+        <styled.span lineClamp="1" title={item.label}>
+          {item.label}
+        </styled.span>
+      </Combobox.ItemText>
+      <Combobox.ItemIndicator>
+        <CheckIcon />
+      </Combobox.ItemIndicator>
+    </Combobox.Item>
   );
 }

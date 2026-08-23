@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -11,29 +11,7 @@ function openPicker() {
 }
 
 function getSearchInput() {
-  return screen.getByRole("textbox", { name: "Search for items" });
-}
-
-function rect({
-  left,
-  right,
-  width,
-}: {
-  left: number;
-  right: number;
-  width: number;
-}): DOMRect {
-  return {
-    x: left,
-    y: 0,
-    top: 0,
-    bottom: 20,
-    left,
-    right,
-    width,
-    height: 20,
-    toJSON: () => ({}),
-  } as DOMRect;
+  return screen.getByRole("combobox", { name: "Search for items" });
 }
 
 describe("MultiSelectPicker", () => {
@@ -80,7 +58,7 @@ describe("MultiSelectPicker", () => {
     );
 
     await openPicker();
-    await user.click(screen.getByRole("menuitem", { name: "Beta" }));
+    await user.click(screen.getByRole("option", { name: "Beta" }));
 
     await waitFor(() =>
       expect(onChange).toHaveBeenCalledWith([
@@ -90,17 +68,41 @@ describe("MultiSelectPicker", () => {
     );
   });
 
-  it("creates a new item from Enter and clears the query input", async () => {
+  it("selects the highlighted result with the keyboard", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn().mockResolvedValue(undefined);
+    const result = { label: "Beta", value: "beta" };
 
     render(
       <MultiSelectPicker
         value={[]}
         onQuery={vi.fn()}
         onChange={onChange}
-        allowNewValues
+        queryResults={[result]}
       />,
+    );
+
+    const input = getSearchInput();
+    await user.type(input, "bet");
+    await user.keyboard("{ArrowDown}{Enter}");
+
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith([result]));
+  });
+
+  it("creates a new item from Enter without submitting an enclosing form", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn().mockResolvedValue(undefined);
+    const onSubmit = vi.fn((event: React.FormEvent) => event.preventDefault());
+
+    render(
+      <form onSubmit={onSubmit}>
+        <MultiSelectPicker
+          value={[]}
+          onQuery={vi.fn()}
+          onChange={onChange}
+          allowNewValues
+        />
+      </form>,
     );
 
     await openPicker();
@@ -113,9 +115,10 @@ describe("MultiSelectPicker", () => {
       ]),
     );
     await waitFor(() => expect(input).toHaveValue(""));
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  it("removes a selected item from the selected section", async () => {
+  it("removes a selected item by toggling its selected option", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn().mockResolvedValue(undefined);
 
@@ -128,9 +131,43 @@ describe("MultiSelectPicker", () => {
     );
 
     await openPicker();
-    await user.click(screen.getByRole("button", { name: "Remove Alpha" }));
+    await user.click(screen.getByRole("option", { name: "Alpha" }));
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith([]));
+  });
+
+  it("removes the last selected item with Backspace from an empty input", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn().mockResolvedValue(undefined);
+    const value = [...baseValue, { label: "Beta", value: "beta" }];
+
+    render(
+      <MultiSelectPicker value={value} onQuery={vi.fn()} onChange={onChange} />,
+    );
+
+    const input = getSearchInput();
+    await user.click(input);
+    await user.keyboard("{Backspace}");
+
+    expect(onChange).toHaveBeenCalledWith(baseValue);
+  });
+
+  it("keeps selected items when Backspace edits a query", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn().mockResolvedValue(undefined);
+
+    render(
+      <MultiSelectPicker
+        value={baseValue}
+        onQuery={vi.fn()}
+        onChange={onChange}
+      />,
+    );
+
+    const input = getSearchInput();
+    await user.type(input, "a{Backspace}");
+
+    expect(onChange).not.toHaveBeenCalled();
   });
 
   it("shows no-results state when searching with no matches", async () => {
@@ -148,61 +185,28 @@ describe("MultiSelectPicker", () => {
     await openPicker();
     await user.type(getSearchInput(), "zzz");
 
-    expect(screen.getByText("No results found")).toBeInTheDocument();
+    expect(screen.getByText("No results for “zzz”")).toBeInTheDocument();
   });
 
-  it("shows hidden badge count when badges overflow the trigger", async () => {
-    const value = [
-      { label: "One", value: "one" },
-      { label: "Two", value: "two" },
-      { label: "Three", value: "three" },
-    ];
+  it("keeps receiving text input after opening from its trigger", async () => {
+    const user = userEvent.setup();
+    const onQuery = vi.fn();
 
-    const { rerender } = render(
+    render(
       <MultiSelectPicker
-        value={value}
-        onQuery={vi.fn()}
+        value={baseValue}
+        onQuery={onQuery}
         onChange={vi.fn().mockResolvedValue(undefined)}
+        queryResults={[{ label: "Beta", value: "beta" }]}
       />,
     );
 
-    const trigger = screen.getByRole("button", {
-      name: /Select items, 3 selected/i,
-    });
-    const container = trigger.querySelector("div");
-    const one = screen.getByText("One");
-    const two = screen.getByText("Two");
-    const three = screen.getByText("Three");
+    await openPicker();
+    const input = getSearchInput();
+    await user.type(input, "bet");
 
-    expect(container).not.toBeNull();
-
-    Object.defineProperty(container!, "getBoundingClientRect", {
-      configurable: true,
-      value: () => rect({ left: 0, right: 100, width: 100 }),
-    });
-    Object.defineProperty(one, "getBoundingClientRect", {
-      configurable: true,
-      value: () => rect({ left: 0, right: 40, width: 40 }),
-    });
-    Object.defineProperty(two, "getBoundingClientRect", {
-      configurable: true,
-      value: () => rect({ left: 101, right: 131, width: 30 }),
-    });
-    Object.defineProperty(three, "getBoundingClientRect", {
-      configurable: true,
-      value: () => rect({ left: 90, right: 150, width: 60 }),
-    });
-
-    rerender(
-      <MultiSelectPicker
-        value={[...value]}
-        onQuery={vi.fn()}
-        onChange={vi.fn().mockResolvedValue(undefined)}
-      />,
-    );
-
-    await waitFor(() => {
-      expect(within(trigger).getAllByText("+2").length).toBeGreaterThan(0);
-    });
+    expect(input).toHaveValue("bet");
+    expect(onQuery.mock.calls.at(-1)?.[0]).toBe("bet");
+    expect(screen.getByRole("option", { name: "Beta" })).toBeVisible();
   });
 });

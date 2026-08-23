@@ -127,7 +127,7 @@ export function RobotToolsetConfigurationForm(props: RobotToolsetFormProps) {
               queryResults={queryResults}
               queryError={error ? "Failed to load tools." : undefined}
               inputPlaceholder="Select tools..."
-              triggerProps={{ "aria-label": "Select Tools" }}
+              ariaLabel="Select Tools"
               size="sm"
             />
           ) : (

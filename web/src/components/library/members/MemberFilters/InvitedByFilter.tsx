@@ -73,11 +73,9 @@ export function InvitedByFilter() {
       inputPlaceholder="Invited by"
       value={value}
       size="sm"
-      triggerProps={{
-        width: "full",
-        minW: "32",
-        flexShrink: "1",
-      }}
+      width="full"
+      minW="32"
+      flexShrink="1"
       onQuery={handleQuery}
       queryResults={searchResults}
       onChange={handleChange}

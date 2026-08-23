@@ -83,11 +83,9 @@ export function RoleFilter() {
       queryResults={searchResults}
       queryError={deriveError(error)}
       size="sm"
-      triggerProps={{
-        width: "full",
-        minW: "32",
-        flexShrink: "1",
-      }}
+      width="full"
+      minW="32"
+      flexShrink="1"
     />
   );
 }

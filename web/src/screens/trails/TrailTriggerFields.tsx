@@ -293,7 +293,7 @@ function EventTriggerFields({
           onQuery={setQuery}
           queryResults={queryResults}
           inputPlaceholder="Select events..."
-          triggerProps={{ "aria-label": "Select events" }}
+          ariaLabel="Select events"
           size="md"
         />
         <FormErrorText>{form.formState.errors.events?.message}</FormErrorText>

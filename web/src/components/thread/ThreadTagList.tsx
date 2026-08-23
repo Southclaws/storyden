@@ -56,7 +56,7 @@ export function ThreadTagList(props: Props) {
         inputPlaceholder="Add tags..."
         autoColour={true}
         size="sm"
-        triggerProps={{ disabled: props.disabled }}
+        disabled={props.disabled}
       />
     );
   }

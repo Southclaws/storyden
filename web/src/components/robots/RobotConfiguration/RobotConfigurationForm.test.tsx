@@ -136,15 +136,19 @@ describe("RobotConfigurationForm", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "Select Toolsets" }));
+    await user.type(
+      screen.getByRole("combobox", { name: "Select Toolsets" }),
+      "discussion",
+    );
     await user.click(
-      screen.getByRole("menuitem", { name: "Discussion management" }),
+      screen.getByRole("option", { name: "Discussion management" }),
     );
     await user.click(
       screen.getByRole("button", { name: "Select individual tools" }),
     );
 
     expect(
-      screen.queryByRole("button", { name: "Remove Get thread" }),
+      screen.queryByRole("option", { name: "Get thread" }),
     ).not.toBeInTheDocument();
   });
 
@@ -180,7 +184,7 @@ describe("RobotConfigurationForm", () => {
     );
 
     expect(
-      screen.queryByRole("menuitem", { name: "Inspect document" }),
+      screen.queryByRole("option", { name: "Inspect document" }),
     ).not.toBeInTheDocument();
   });
 });

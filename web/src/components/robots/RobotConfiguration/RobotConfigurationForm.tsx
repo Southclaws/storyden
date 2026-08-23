@@ -214,7 +214,7 @@ export function RobotConfigurationForm(props: Props) {
             queryResults={filteredToolsetOptions}
             queryError={toolsetError ? "Failed to load Toolsets." : undefined}
             inputPlaceholder="Select Toolsets..."
-            triggerProps={{ "aria-label": "Select Toolsets" }}
+            ariaLabel="Select Toolsets"
             size="sm"
           />
           <Text variant="supporting">
@@ -232,7 +232,7 @@ export function RobotConfigurationForm(props: Props) {
             queryResults={filteredToolOptions}
             queryError={toolError ? "Failed to load tools." : undefined}
             inputPlaceholder="Select tools..."
-            triggerProps={{ "aria-label": "Select individual tools" }}
+            ariaLabel="Select individual tools"
             size="sm"
           />
           <Text variant="supporting">

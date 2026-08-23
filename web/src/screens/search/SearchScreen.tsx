@@ -123,11 +123,9 @@ export function SearchScreen(props: Props) {
             queryError={filters.authorsError}
             inputPlaceholder="Authors..."
             size="sm"
-            triggerProps={{
-              width: "full",
-              minW: "32",
-              flexShrink: "1",
-            }}
+            width="full"
+            minW="32"
+            flexShrink="1"
           />
 
           {filters.showCategories && (
@@ -139,11 +137,9 @@ export function SearchScreen(props: Props) {
               queryError={filters.categoriesError}
               inputPlaceholder="Categories..."
               size="sm"
-              triggerProps={{
-                width: "full",
-                minW: "32",
-                flexShrink: "1",
-              }}
+              width="full"
+              minW="32"
+              flexShrink="1"
             />
           )}
 
@@ -156,11 +152,9 @@ export function SearchScreen(props: Props) {
               queryError={filters.tagsError}
               inputPlaceholder="Tags..."
               size="sm"
-              triggerProps={{
-                width: "full",
-                minW: "32",
-                flexShrink: "1",
-              }}
+              width="full"
+              minW="32"
+              flexShrink="1"
             />
           )}
         </Flex>
