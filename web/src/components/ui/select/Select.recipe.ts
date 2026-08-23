@@ -191,7 +191,8 @@ export const select = defineSlotRecipe({
         },
         label: { fontSize: "xs", lineHeight: "1.125rem" },
         trigger: {
-          px: "2.5",
+          pl: "2.5",
+          pr: "1",
           h: "6",
           minW: "9",
           fontSize: "xs",
@@ -218,7 +219,8 @@ export const select = defineSlotRecipe({
         },
         label: { fontSize: "sm", lineHeight: "1.25rem" },
         trigger: {
-          px: "2.5",
+          pl: "2.5",
+          pr: "2",
           h: "8",
           minW: "9",
           fontSize: "sm",
