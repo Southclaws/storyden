@@ -106,6 +106,21 @@ type Story = StoryObj<typeof meta>;
 
 export const Completed: Story = {};
 
+export const EventTriggered: Story = {
+  args: {
+    trail: {
+      ...baseTrail,
+      id: "trail_event_check",
+      name: "Published content check",
+      trigger: {
+        type: "event",
+        events: ["EventThreadPublished", "EventNodePublished"],
+      },
+      next_occurrence_at: undefined,
+    },
+  },
+};
+
 export const NeedsAttention: Story = {
   args: {
     runs: [
