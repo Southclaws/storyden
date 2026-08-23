@@ -100,6 +100,17 @@ describe("RobotConfigurationForm", () => {
             requires_workspace: false,
             toolset_only: false,
           },
+          {
+            id: "content_search",
+            callable_name: "content_search",
+            name: "Content Search",
+            description: "Search site content",
+            source: "native",
+            available: true,
+            requires_confirmation: false,
+            requires_workspace: false,
+            toolset_only: false,
+          },
         ],
       },
       error: undefined,
@@ -143,6 +154,14 @@ describe("RobotConfigurationForm", () => {
     await user.click(
       screen.getByRole("option", { name: "Discussion management" }),
     );
+
+    expect(
+      screen.getByRole("option", { name: "Discussion management" }),
+    ).toHaveAttribute("data-state", "checked");
+    expect(screen.getByText("Discussion management", { selector: "span" }))
+      .toBeVisible();
+
+    await user.keyboard("{Escape}");
     await user.click(
       screen.getByRole("button", { name: "Select individual tools" }),
     );
@@ -150,6 +169,12 @@ describe("RobotConfigurationForm", () => {
     expect(
       screen.queryByRole("option", { name: "Get thread" }),
     ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("option", { name: "Content Search" }));
+
+    expect(
+      screen.getByRole("option", { name: "Content Search" }),
+    ).toHaveAttribute("data-state", "checked");
   });
 
   it("omits Toolset-only capabilities from individual tool selection", async () => {

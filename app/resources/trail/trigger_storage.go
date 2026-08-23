@@ -25,6 +25,7 @@ type triggerEventRecord struct {
 	TrailID      string          `json:"trail_id"`
 	TrailRunID   string          `json:"trail_run_id"`
 	Kind         RunKind         `json:"kind"`
+	EventName    string          `json:"event_name,omitempty"`
 	Trigger      json.RawMessage `json:"trigger"`
 	Payload      json.RawMessage `json:"payload,omitempty"`
 	ScheduledFor *time.Time      `json:"scheduled_for,omitempty"`
@@ -116,7 +117,37 @@ func decodeTriggerSnapshot(raw json.RawMessage) (Trigger, error) {
 	}
 }
 
+func materialiseEventPayload(eventName string, payload json.RawMessage) (json.RawMessage, error) {
+	if !validEvent(eventName) {
+		return nil, ErrInvalidEventTrigger
+	}
+
+	var fields map[string]json.RawMessage
+	if err := json.Unmarshal(payload, &fields); err != nil {
+		return nil, fmt.Errorf("decode Trail source event payload: %w", err)
+	}
+	if fields == nil {
+		return nil, errors.New("Trail source event payload must be an object")
+	}
+
+	event, err := json.Marshal(eventName)
+	if err != nil {
+		return nil, err
+	}
+	fields["event"] = event
+
+	encoded, err := json.Marshal(fields)
+	if err != nil {
+		return nil, fmt.Errorf("encode Trail source event payload: %w", err)
+	}
+	return encoded, nil
+}
+
 func encodeTriggerEvent(event TriggerEvent) (json.RawMessage, error) {
+	if event.Kind == RunKindEvent && !validEvent(event.EventName) {
+		return nil, ErrInvalidEventTrigger
+	}
+
 	trigger, err := encodeTriggerSnapshot(event.Trigger)
 	if err != nil {
 		return nil, err
@@ -126,6 +157,7 @@ func encodeTriggerEvent(event TriggerEvent) (json.RawMessage, error) {
 		TrailID:      event.TrailID,
 		TrailRunID:   event.TrailRunID,
 		Kind:         event.Kind,
+		EventName:    event.EventName,
 		Trigger:      trigger,
 		Payload:      event.Payload,
 		ScheduledFor: event.ScheduledFor,
@@ -144,11 +176,15 @@ func decodeTriggerEvent(raw json.RawMessage) (TriggerEvent, error) {
 	if err != nil {
 		return TriggerEvent{}, err
 	}
+	if record.Kind == RunKindEvent && !validEvent(record.EventName) {
+		return TriggerEvent{}, ErrInvalidEventTrigger
+	}
 
 	return TriggerEvent{
 		TrailID:      record.TrailID,
 		TrailRunID:   record.TrailRunID,
 		Kind:         record.Kind,
+		EventName:    record.EventName,
 		Trigger:      trigger,
 		Payload:      record.Payload,
 		ScheduledFor: record.ScheduledFor,

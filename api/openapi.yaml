@@ -14061,7 +14061,7 @@ components:
 
     TrailRunProps:
       type: object
-      required: [trail_id, trigger, status, actions]
+      required: [trail_id, status, actions]
       properties:
         trail_id: { $ref: "#/components/schemas/Identifier" }
         trigger: { $ref: "#/components/schemas/TrailTriggerSnapshot" }

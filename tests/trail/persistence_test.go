@@ -125,6 +125,7 @@ func TestTrailScheduledOccurrenceMaterialisation(t *testing.T) {
 				a.JSONEq(string(config), string(run.ActionRuns[0].Config))
 
 				event := run.Trigger
+				r.NotNil(event)
 				a.Equal(definition.ID.String(), event.TrailID)
 				a.Equal(run.ID.String(), event.TrailRunID)
 				a.Equal(trail.RunKindScheduled, event.Kind)
@@ -207,9 +208,14 @@ func TestTrailEventOccurrenceMaterialisation(t *testing.T) {
 			a.JSONEq(string(actionConfig), string(run.ActionRuns[0].Config))
 
 			event := run.Trigger
+			r.NotNil(event)
 			a.Equal(trail.RunKindEvent, event.Kind)
+			a.Equal("EventThreadUpdated", event.EventName)
 			a.Equal(observedAt, event.ObservedAt)
-			a.JSONEq(string(sourcePayload), string(event.Payload))
+			a.JSONEq(`{
+				"event":"EventThreadUpdated",
+				"id":"thread-one"
+			}`, string(event.Payload))
 			a.Equal([]string{"EventThreadPublished", "EventThreadUpdated"}, event.Trigger.Event().Events)
 
 			stored, err := repository.Get(root, definition.ID)
@@ -277,6 +283,7 @@ func TestTrailActionFanoutAndRecovery(t *testing.T) {
 				a.Nil(manual.ScheduledFor)
 
 				event := manual.Trigger
+				r.NotNil(event)
 				a.Equal(manual.ID.String(), event.TrailRunID)
 				a.Equal(creatorID.String(), event.InitiatedBy)
 				a.Equal(trail.RunKindManual, event.Kind)

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useWatch } from "react-hook-form";
 
 import { useRobotToolsList } from "@/api/openapi-client/robots";
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
@@ -28,7 +29,10 @@ export function RobotToolsetConfigurationForm(props: RobotToolsetFormProps) {
   const { data, error } = useRobotToolsList();
   const [query, setQuery] = useState("");
   const tools = data?.tools ?? [];
-  const selectedToolIDs = form.watch("tools");
+  const selectedToolIDs = useWatch({
+    control: form.control,
+    name: "tools",
+  });
   const selectedTools: MultiSelectPickerItem[] = selectedToolIDs.map((id) => {
     const tool = tools.find((candidate) => candidate.id === id);
     return { label: tool?.name ?? id, value: id };

@@ -109,6 +109,7 @@ type TriggerEvent struct {
 	TrailID      string
 	TrailRunID   string
 	Kind         RunKind
+	EventName    string
 	Trigger      Trigger
 	Payload      json.RawMessage
 	ScheduledFor *time.Time
@@ -121,7 +122,7 @@ type Run struct {
 	TrailID      ID
 	InitiatedBy  *xid.ID
 	Kind         RunKind
-	Trigger      TriggerEvent
+	Trigger      *TriggerEvent
 	ScheduledFor *time.Time
 	Status       RunStatus
 	FinishedAt   *time.Time

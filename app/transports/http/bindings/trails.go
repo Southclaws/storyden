@@ -472,9 +472,13 @@ func serialiseTrailRunList(input []*trail.Run) (openapi.TrailRunList, error) {
 }
 
 func serialiseTrailRun(input *trail.Run) (openapi.TrailRun, error) {
-	trigger, err := serialiseTrailTriggerSnapshot(input.Trigger)
-	if err != nil {
-		return openapi.TrailRun{}, err
+	var trigger *openapi.TrailTriggerSnapshot
+	if input.Trigger != nil {
+		value, err := serialiseTrailTriggerSnapshot(*input.Trigger)
+		if err != nil {
+			return openapi.TrailRun{}, err
+		}
+		trigger = &value
 	}
 
 	actions, err := serialiseTrailActionRunList(input.ActionRuns)

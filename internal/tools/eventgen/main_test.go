@@ -25,6 +25,46 @@ func TestExtractEventsIncludesFrontendMetadata(t *testing.T) {
 	if first.Description != "Emitted when a thread is visible as published, either on create or after a visibility change." {
 		t.Fatalf("unexpected first event description: %q", first.Description)
 	}
+	if len(first.Fields) != 1 {
+		t.Fatalf("unexpected first event fields: %#v", first.Fields)
+	}
+	if first.Fields[0] != (EventField{Name: "id", Description: "Thread post ID", Required: true}) {
+		t.Fatalf("unexpected first event field: %#v", first.Fields[0])
+	}
+}
+
+func TestGenerateEventDefinitionsIncludesPayloadSemantics(t *testing.T) {
+	generated, err := generateEventDefinitions([]Event{
+		{
+			TypeName:    "EventThreadPublished",
+			Description: "Emitted when a thread becomes published.",
+			Fields: []EventField{
+				{
+					Name:        "id",
+					Description: "Thread post ID",
+					Required:    true,
+				},
+			},
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	output := string(generated)
+	for _, expected := range []string{
+		`type EventDefinition struct`,
+		`EventEventThreadPublished: {`,
+		`Description: "Emitted when a thread becomes published."`,
+		`Name:        "id"`,
+		`Description: "Thread post ID"`,
+		`Required:    true`,
+		`func LookupEventDefinition(event Event) (EventDefinition, bool)`,
+	} {
+		if !strings.Contains(output, expected) {
+			t.Errorf("generated output missing %q", expected)
+		}
+	}
 }
 
 func TestGenerateWebEventNamesIncludesEscapedCatalogue(t *testing.T) {

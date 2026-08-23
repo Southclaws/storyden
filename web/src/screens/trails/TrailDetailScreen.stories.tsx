@@ -187,6 +187,18 @@ export const EmptyHistory: Story = {
   },
 };
 
+export const UnavailableTriggerDetails: Story = {
+  args: {
+    runs: [
+      {
+        ...completedRun,
+        id: "run_unavailable_trigger",
+        trigger: undefined,
+      },
+    ],
+  },
+};
+
 export const LongContent: Story = {
   args: {
     trail: {
@@ -301,7 +313,7 @@ function run({
   actions,
 }: {
   id: string;
-  kind: TrailRun["trigger"]["kind"];
+  kind: NonNullable<TrailRun["trigger"]>["kind"];
   status: TrailRun["status"];
   minutes: number;
   actions: TrailActionRun[];

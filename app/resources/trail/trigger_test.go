@@ -5,9 +5,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/rs/xid"
 	"github.com/stretchr/testify/require"
 
 	"github.com/Southclaws/storyden/app/resources/recurrence"
+	"github.com/Southclaws/storyden/internal/ent"
+	entrun "github.com/Southclaws/storyden/internal/ent/trailrun"
 )
 
 func TestEventTriggerValidation(t *testing.T) {
@@ -121,6 +124,7 @@ func TestTriggerEventStorageRoundTrip(t *testing.T) {
 		TrailID:     "trail-1",
 		TrailRunID:  "run-1",
 		Kind:        RunKindEvent,
+		EventName:   "EventThreadPublished",
 		Trigger:     trigger,
 		Payload:     payload,
 		ObservedAt:  observedAt,
@@ -131,6 +135,7 @@ func TestTriggerEventStorageRoundTrip(t *testing.T) {
 		"trail_id":"trail-1",
 		"trail_run_id":"run-1",
 		"kind":"event",
+		"event_name":"EventThreadPublished",
 		"trigger":{"type":"event","events":["EventThreadPublished","EventNodeUpdated"]},
 		"payload":{"thread_id":"thread-1"},
 		"observed_at":"2026-08-23T10:15:00Z",
@@ -142,10 +147,26 @@ func TestTriggerEventStorageRoundTrip(t *testing.T) {
 	require.Equal(t, "trail-1", decoded.TrailID)
 	require.Equal(t, "run-1", decoded.TrailRunID)
 	require.Equal(t, RunKindEvent, decoded.Kind)
+	require.Equal(t, "EventThreadPublished", decoded.EventName)
 	require.Equal(t, []string{"EventThreadPublished", "EventNodeUpdated"}, decoded.Trigger.Event().Events)
 	require.JSONEq(t, string(payload), string(decoded.Payload))
 	require.Equal(t, observedAt, decoded.ObservedAt)
 	require.Equal(t, "account-1", decoded.InitiatedBy)
+}
+
+func TestMaterialiseEventPayload(t *testing.T) {
+	t.Parallel()
+
+	payload, err := materialiseEventPayload(
+		"EventThreadUpdated",
+		json.RawMessage(`{"event":"","id":"thread-1","title":"Welcome"}`),
+	)
+	require.NoError(t, err)
+	require.JSONEq(t, `{
+		"event":"EventThreadUpdated",
+		"id":"thread-1",
+		"title":"Welcome"
+	}`, string(payload))
 }
 
 func TestDecodeTriggerRejectsInvalidStorage(t *testing.T) {
@@ -156,4 +177,25 @@ func TestDecodeTriggerRejectsInvalidStorage(t *testing.T) {
 
 	_, err = decodeTrigger("event", json.RawMessage(`{"events":["not-an-event"]}`))
 	require.ErrorIs(t, err, ErrInvalidEventTrigger)
+}
+
+func TestMapRunPreservesHistoryWithInvalidTrigger(t *testing.T) {
+	t.Parallel()
+
+	now := time.Date(2026, time.August, 23, 18, 0, 0, 0, time.UTC)
+	row := &ent.TrailRun{
+		ID:             xid.New(),
+		TrailID:        xid.New(),
+		Kind:           entrun.KindScheduled,
+		TriggerPayload: json.RawMessage(`{"invalid":true}`),
+		Status:         entrun.StatusCompleted,
+		CreatedAt:      now,
+		UpdatedAt:      now,
+	}
+
+	run, err := mapRun(row)
+	require.NoError(t, err)
+	require.Nil(t, run.Trigger)
+	require.Equal(t, RunStatusCompleted, run.Status)
+	require.Equal(t, now, run.CreatedAt)
 }

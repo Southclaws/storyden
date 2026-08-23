@@ -14,7 +14,8 @@ import type { TrailTriggerSnapshot } from "./trailTriggerSnapshot";
 
 export interface TrailRunProps {
   trail_id: Identifier;
-  trigger: TrailTriggerSnapshot;
+  /** Absent when the persisted trigger snapshot cannot be decoded. */
+  trigger?: TrailTriggerSnapshot;
   status: TrailRunStatus;
   scheduled_for?: string;
   actions: TrailActionRunList;

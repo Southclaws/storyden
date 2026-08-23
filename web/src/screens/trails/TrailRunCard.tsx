@@ -31,12 +31,19 @@ export function TrailRunCard({
   onCancelAction,
 }: TrailRunCardProps) {
   const occurrence = run.scheduled_for ?? run.createdAt;
-  const runType =
-    run.trigger.kind === "manual"
-      ? "Manual"
-      : run.trigger.kind === "event"
-        ? "Event"
-        : "Scheduled";
+  let runType = "Run";
+
+  switch (run.trigger?.kind) {
+    case "manual":
+      runType = "Manual run";
+      break;
+    case "event":
+      runType = "Event run";
+      break;
+    case "scheduled":
+      runType = "Scheduled run";
+      break;
+  }
 
   return (
     <CardBox
@@ -53,7 +60,7 @@ export function TrailRunCard({
           </styled.h3>
 
           <Text as="span" variant="metadata">
-            {runType} run at{" "}
+            {runType} at{" "}
             <styled.time dateTime={occurrence}>
               {formatOccurrence(occurrence)}
             </styled.time>
@@ -62,6 +69,17 @@ export function TrailRunCard({
 
         <TrailRunStatusBadge status={run.status} />
       </WStack>
+
+      {!run.trigger && (
+        <Text
+          padding="3"
+          borderTopWidth="thin"
+          borderColor="border.default"
+          variant="supporting"
+        >
+          Trigger details are unavailable for this run.
+        </Text>
+      )}
 
       {run.status === "skipped" ? (
         <Text

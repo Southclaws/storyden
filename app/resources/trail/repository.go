@@ -369,12 +369,17 @@ func (r *Repository) MaterialiseEvent(ctx context.Context, id ID, eventName stri
 		if eventTrigger == nil || !slices.Contains(eventTrigger.Events, eventName) {
 			return nil
 		}
+		sourcePayload, err = materialiseEventPayload(eventName, sourcePayload)
+		if err != nil {
+			return err
+		}
 
 		runID = xid.New()
 		event := TriggerEvent{
 			TrailID:    id.String(),
 			TrailRunID: runID.String(),
 			Kind:       RunKindEvent,
+			EventName:  eventName,
 			Trigger:    definition,
 			Payload:    sourcePayload,
 			ObservedAt: observedAt.UTC(),
@@ -923,9 +928,9 @@ func mapRun(row *ent.TrailRun) (*Run, error) {
 	if err != nil {
 		return nil, err
 	}
-	trigger, err := decodeTriggerEvent(row.TriggerPayload)
-	if err != nil {
-		return nil, err
+	var trigger *TriggerEvent
+	if decoded, err := decodeTriggerEvent(row.TriggerPayload); err == nil {
+		trigger = &decoded
 	}
 	result := &Run{
 		ID:           RunID(row.ID),

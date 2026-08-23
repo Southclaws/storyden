@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useWatch } from "react-hook-form";
 
 import {
   useRobotModelsList,
@@ -55,8 +56,14 @@ export function RobotConfigurationForm(props: Props) {
   const models = modelData?.models ?? [];
   const availableTools = toolData?.tools ?? [];
   const availableToolsets = toolsetData?.toolsets ?? [];
-  const selectedToolIDs = form.watch("tools");
-  const selectedToolsetIDs = form.watch("toolsets");
+  const selectedToolIDs = useWatch({
+    control: form.control,
+    name: "tools",
+  });
+  const selectedToolsetIDs = useWatch({
+    control: form.control,
+    name: "toolsets",
+  });
   const selectedTools: MultiSelectPickerItem[] = selectedToolIDs.map((id) => {
     const tool = availableTools.find((candidate) => candidate.id === id);
     return { label: tool?.name ?? id, value: id };
