@@ -156,20 +156,55 @@ func Preview(schedule *Schedule, after time.Time, count int) []time.Time {
 // AdvancePast returns the latest occurrence at or before now and the next
 // future occurrence.
 func AdvancePast(schedule *Schedule, first, now time.Time) (time.Time, time.Time, bool) {
+	if schedule == nil || schedule.location == nil || schedule.anchor.IsZero() || first.After(now) {
+		return time.Time{}, time.Time{}, false
+	}
+
+	remaining, ok := occurrencesAfter(schedule, first)
+	if !ok {
+		return time.Time{}, time.Time{}, false
+	}
+
 	latest := first
 	cursor := first
-	for steps := 0; steps < 10000; steps++ {
-		next, ok := schedule.NextAfter(cursor)
+	for remaining != 0 {
+		next, ok := schedule.nextUnbounded(cursor)
 		if !ok {
 			return latest, time.Time{}, true
 		}
 		if next.After(now) {
 			return latest, next.UTC(), true
 		}
+
 		latest = next
 		cursor = next
+		if remaining > 0 {
+			remaining--
+		}
 	}
-	return time.Time{}, time.Time{}, false
+
+	return latest, time.Time{}, true
+}
+
+func occurrencesAfter(schedule *Schedule, occurrence time.Time) (int, bool) {
+	if schedule.Rule.Count == nil {
+		return -1, true
+	}
+
+	cursor := schedule.anchor.Add(-time.Nanosecond)
+	for index := 0; index < *schedule.Rule.Count; index++ {
+		next, ok := schedule.nextUnbounded(cursor)
+		if !ok || next.After(occurrence) {
+			return 0, false
+		}
+		if next.Equal(occurrence) {
+			return *schedule.Rule.Count - index - 1, true
+		}
+
+		cursor = next
+	}
+
+	return 0, false
 }
 
 func validateRule(rule Rule) error {

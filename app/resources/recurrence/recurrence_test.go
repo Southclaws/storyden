@@ -119,6 +119,38 @@ func TestNormalisesSelectorOrder(t *testing.T) {
 	assert.JSONEq(t, `{"start":"2026-12-24T18:00:00","timezone":"UTC","rule":{"frequency":"yearly","interval":1,"by_month":[1,12],"by_month_day":[1,24]}}`, string(encoded))
 }
 
+func TestAdvancePastMoreThanTenThousandOccurrences(t *testing.T) {
+	t.Parallel()
+
+	schedule, err := Parse(json.RawMessage(`{"start":"2024-01-01T00:00:00","timezone":"UTC","rule":{"frequency":"hourly","interval":1}}`))
+	require.NoError(t, err)
+
+	first := time.Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC)
+	now := first.Add(10_001*time.Hour + 30*time.Minute)
+
+	latest, following, ok := AdvancePast(schedule, first, now)
+
+	require.True(t, ok)
+	assert.Equal(t, first.Add(10_001*time.Hour), latest)
+	assert.Equal(t, first.Add(10_002*time.Hour), following)
+}
+
+func TestAdvancePastHonoursFiniteCount(t *testing.T) {
+	t.Parallel()
+
+	schedule, err := Parse(json.RawMessage(`{"start":"2026-01-01T09:00:00","timezone":"UTC","rule":{"frequency":"daily","interval":1,"count":3}}`))
+	require.NoError(t, err)
+
+	first := time.Date(2026, time.January, 2, 9, 0, 0, 0, time.UTC)
+	now := time.Date(2026, time.February, 1, 0, 0, 0, 0, time.UTC)
+
+	latest, following, ok := AdvancePast(schedule, first, now)
+
+	require.True(t, ok)
+	assert.Equal(t, time.Date(2026, time.January, 3, 9, 0, 0, 0, time.UTC), latest)
+	assert.True(t, following.IsZero())
+}
+
 func TestValidate(t *testing.T) {
 	t.Parallel()
 
