@@ -92,6 +92,11 @@ func (r *Runtime) schedulerTick(ctx context.Context, now time.Time) error {
 	}
 
 	if !r.schedulerReady {
+		if err := r.skipOfflineGap(ctx, now); err != nil {
+			return err
+		}
+
+		r.schedulerReady = true
 		return nil
 	}
 
