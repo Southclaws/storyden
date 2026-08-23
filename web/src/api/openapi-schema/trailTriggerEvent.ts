@@ -7,11 +7,13 @@
  *
  * OpenAPI spec version: v1.26.15-post
  */
+import type { TrailTriggerEventType } from "./trailTriggerEventType";
 
-export type TrailTriggerType =
-  (typeof TrailTriggerType)[keyof typeof TrailTriggerType];
-
-export const TrailTriggerType = {
-  schedule: "schedule",
-  event: "event",
-} as const;
+export interface TrailTriggerEvent {
+  type: TrailTriggerEventType;
+  /**
+   * A Storyden event name from the canonical event catalogue.
+   * @minLength 1
+   */
+  event: string;
+}

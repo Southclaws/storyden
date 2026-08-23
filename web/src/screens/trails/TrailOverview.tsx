@@ -1,6 +1,7 @@
 import { Trail } from "@/api/openapi-schema";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { CalendarIcon } from "@/components/ui/icons/Calendar";
+import { TrailIcon } from "@/components/ui/icons/Trail";
 import { Text } from "@/components/ui/text";
 import { describeTrailSchedule, formatOccurrence } from "@/lib/trails";
 import { Box, HStack, WStack, styled } from "@/styled-system/jsx";
@@ -9,6 +10,11 @@ import { pluralise } from "@/utils/text";
 import { TrailStatusBadge } from "./TrailStatusBadge";
 
 export function TrailOverview({ trail }: { trail: Trail }) {
+  const schedule =
+    trail.trigger.type === "schedule" ? trail.trigger.schedule : undefined;
+  const event =
+    trail.trigger.type === "event" ? trail.trigger.event : undefined;
+
   return (
     <styled.section aria-label="Trail details">
       <WStack alignItems="center" gap="4" flexWrap="wrap" marginTop="4">
@@ -51,19 +57,28 @@ export function TrailOverview({ trail }: { trail: Trail }) {
       >
         <Box minWidth="0" gridColumn={{ base: "1 / -1", md: "auto" }}>
           <HStack gap="1" alignItems="center">
-            <CalendarIcon
-              width="4"
-              height="4"
-              color="text.muted"
-              flexShrink="0"
-            />
+            {schedule ? (
+              <CalendarIcon
+                width="4"
+                height="4"
+                color="text.muted"
+                flexShrink="0"
+              />
+            ) : (
+              <TrailIcon
+                width="4"
+                height="4"
+                color="text.muted"
+                flexShrink="0"
+              />
+            )}
             <Text
               as="span"
               variant="metadata"
               fontWeight="bold"
               textTransform="uppercase"
             >
-              Schedule
+              {schedule ? "Schedule" : "Event"}
             </Text>
           </HStack>
           <Text
@@ -72,17 +87,17 @@ export function TrailOverview({ trail }: { trail: Trail }) {
             overflowWrap="anywhere"
             display="block"
           >
-            {describeTrailSchedule(trail.trigger.schedule)}
+            {schedule ? describeTrailSchedule(schedule) : event}
           </Text>
           <Text as="span" variant="metadata" display="block">
-            {trail.trigger.schedule.timezone}
+            {schedule ? schedule.timezone : "Runs when this event occurs"}
           </Text>
         </Box>
 
         <Occurrence
           label="Next run"
           value={trail.next_occurrence_at}
-          empty="No future run"
+          empty={schedule ? "No future run" : "Waiting for event"}
           emphasis
         />
       </styled.div>

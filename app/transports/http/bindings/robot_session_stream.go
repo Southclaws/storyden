@@ -229,10 +229,10 @@ func invocationContextFromRequest(context *openapi.RobotChatContext) storydenage
 
 	result := storydenagent.InvocationContext{}
 	if context.DatagraphItem != nil {
-		result["datagraph_item"] = context.DatagraphItem
+		result[storydenagent.InvocationContextKeyDatagraphItem] = context.DatagraphItem
 	}
 	if context.PageType != nil {
-		result["page_type"] = *context.PageType
+		result[storydenagent.InvocationContextKeyPageType] = *context.PageType
 	}
 	return result
 }

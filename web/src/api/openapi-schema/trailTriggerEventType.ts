@@ -8,10 +8,9 @@
  * OpenAPI spec version: v1.26.15-post
  */
 
-export type TrailTriggerType =
-  (typeof TrailTriggerType)[keyof typeof TrailTriggerType];
+export type TrailTriggerEventType =
+  (typeof TrailTriggerEventType)[keyof typeof TrailTriggerEventType];
 
-export const TrailTriggerType = {
-  schedule: "schedule",
+export const TrailTriggerEventType = {
   event: "event",
 } as const;

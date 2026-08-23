@@ -275,6 +275,19 @@ func deserialiseTrailTrigger(input openapi.TrailTrigger) (trail.TriggerType, jso
 
 		return kind, config, nil
 
+	case openapi.TrailTriggerEvent:
+		kind, err := trail.NewTriggerType(string(trigger.Type))
+		if err != nil {
+			return trail.TriggerType{}, nil, err
+		}
+
+		config, err := json.Marshal(trail.EventTriggerConfig{Event: trigger.Event})
+		if err != nil {
+			return trail.TriggerType{}, nil, err
+		}
+
+		return kind, config, nil
+
 	default:
 		return trail.TriggerType{}, nil, fault.Newf("invalid Trail trigger type %T", value)
 	}
@@ -384,21 +397,36 @@ func serialiseTrail(input *trail.Trail) (openapi.Trail, error) {
 }
 
 func serialiseTrailTrigger(kind trail.TriggerType, data json.RawMessage) (openapi.TrailTrigger, error) {
-	if kind != trail.TriggerTypeSchedule {
-		return openapi.TrailTrigger{}, trail.ErrUnsupportedTrigger
-	}
-
-	schedule, err := recurrence.Parse(data)
-	if err != nil {
-		return openapi.TrailTrigger{}, err
-	}
-
 	trigger := openapi.TrailTrigger{}
-	if err := trigger.FromTrailTriggerSchedule(openapi.TrailTriggerSchedule{
-		Type:     openapi.TrailTriggerType(kind.String()),
-		Schedule: serialiseRecurrenceSchedule(schedule),
-	}); err != nil {
-		return openapi.TrailTrigger{}, err
+	switch kind {
+	case trail.TriggerTypeSchedule:
+		schedule, err := recurrence.Parse(data)
+		if err != nil {
+			return openapi.TrailTrigger{}, err
+		}
+
+		if err := trigger.FromTrailTriggerSchedule(openapi.TrailTriggerSchedule{
+			Type:     openapi.TrailTriggerType(kind.String()),
+			Schedule: serialiseRecurrenceSchedule(schedule),
+		}); err != nil {
+			return openapi.TrailTrigger{}, err
+		}
+
+	case trail.TriggerTypeEvent:
+		var config trail.EventTriggerConfig
+		if err := json.Unmarshal(data, &config); err != nil {
+			return openapi.TrailTrigger{}, err
+		}
+
+		if err := trigger.FromTrailTriggerEvent(openapi.TrailTriggerEvent{
+			Type:  openapi.TrailTriggerType(kind.String()),
+			Event: config.Event,
+		}); err != nil {
+			return openapi.TrailTrigger{}, err
+		}
+
+	default:
+		return openapi.TrailTrigger{}, trail.ErrUnsupportedTrigger
 	}
 
 	return trigger, nil
@@ -507,6 +535,15 @@ func serialiseTrailTriggerSnapshot(input json.RawMessage) (openapi.TrailTriggerS
 		initiatedBy = opt.New(openapi.Identifier(event.InitiatedBy))
 	}
 
+	var payload *openapi.ArbitraryData
+	if len(event.Payload) > 0 {
+		var value openapi.ArbitraryData
+		if err := json.Unmarshal(event.Payload, &value); err != nil {
+			return openapi.TrailTriggerSnapshot{}, err
+		}
+		payload = &value
+	}
+
 	return openapi.TrailTriggerSnapshot{
 		TrailId:      event.TrailID,
 		TrailRunId:   event.TrailRunID,
@@ -515,6 +552,7 @@ func serialiseTrailTriggerSnapshot(input json.RawMessage) (openapi.TrailTriggerS
 		ScheduledFor: event.ScheduledFor,
 		ObservedAt:   event.ObservedAt,
 		InitiatedBy:  initiatedBy.Ptr(),
+		Payload:      payload,
 	}, nil
 }
 
@@ -522,12 +560,24 @@ func serialiseTrailTriggerFromSnapshot(input json.RawMessage) (openapi.TrailTrig
 	var trigger struct {
 		Type     trail.TriggerType `json:"type"`
 		Schedule json.RawMessage   `json:"schedule"`
+		Event    string            `json:"event"`
 	}
 	if err := json.Unmarshal(input, &trigger); err != nil {
 		return openapi.TrailTrigger{}, err
 	}
 
-	return serialiseTrailTrigger(trigger.Type, trigger.Schedule)
+	switch trigger.Type {
+	case trail.TriggerTypeSchedule:
+		return serialiseTrailTrigger(trigger.Type, trigger.Schedule)
+	case trail.TriggerTypeEvent:
+		config, err := json.Marshal(trail.EventTriggerConfig{Event: trigger.Event})
+		if err != nil {
+			return openapi.TrailTrigger{}, err
+		}
+		return serialiseTrailTrigger(trigger.Type, config)
+	default:
+		return openapi.TrailTrigger{}, trail.ErrUnsupportedTrigger
+	}
 }
 
 func serialiseTrailActionRunList(input []*trail.ActionRun) (openapi.TrailActionRunList, error) {

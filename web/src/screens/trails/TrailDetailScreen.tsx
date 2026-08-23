@@ -146,7 +146,10 @@ export function TrailDetailView({
   onCancelAction,
 }: TrailDetailViewProps) {
   const robotNames = new Map(robots.map((robot) => [robot.id, robot.name]));
-  const editable = trail.status !== "archived" && trail.status !== "finished";
+  const editable =
+    trail.trigger.type === "schedule" &&
+    trail.status !== "archived" &&
+    trail.status !== "finished";
 
   return (
     <LStack gap="2" alignItems="stretch" minWidth="0">

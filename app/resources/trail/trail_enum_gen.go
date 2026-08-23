@@ -190,6 +190,7 @@ type RunKind struct {
 
 var (
 	RunKindScheduled = RunKind{runKindScheduled}
+	RunKindEvent     = RunKind{runKindEvent}
 	RunKindManual    = RunKind{runKindManual}
 )
 
@@ -232,6 +233,8 @@ func NewRunKind(__iNpUt__ string) (RunKind, error) {
 	switch __iNpUt__ {
 	case string(runKindScheduled):
 		return RunKindScheduled, nil
+	case string(runKindEvent):
+		return RunKindEvent, nil
 	case string(runKindManual):
 		return RunKindManual, nil
 	default:
@@ -373,6 +376,7 @@ type TriggerType struct {
 
 var (
 	TriggerTypeSchedule = TriggerType{triggerTypeSchedule}
+	TriggerTypeEvent    = TriggerType{triggerTypeEvent}
 )
 
 func (r TriggerType) Format(f fmt.State, verb rune) {
@@ -414,6 +418,8 @@ func NewTriggerType(__iNpUt__ string) (TriggerType, error) {
 	switch __iNpUt__ {
 	case string(triggerTypeSchedule):
 		return TriggerTypeSchedule, nil
+	case string(triggerTypeEvent):
+		return TriggerTypeEvent, nil
 	default:
 		return TriggerType{}, fmt.Errorf("invalid value for type 'TriggerType': '%s'", __iNpUt__)
 	}

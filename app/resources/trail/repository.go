@@ -100,15 +100,19 @@ func (r *Repository) Update(
 	}
 	now := time.Now().UTC()
 	err := ent.WithTx(ctx, r.db, func(tx *ent.Tx) error {
-		updated, err := tx.Trail.Update().
+		update := tx.Trail.Update().
 			Where(enttrail.IDEQ(xid.ID(id))).
 			SetName(name).
 			SetDescription(description).
 			SetStatus(enttrail.Status(status.String())).
 			SetTriggerType(triggerType.String()).
-			SetTriggerConfig(triggerConfig).
-			SetNillableNextOccurrenceAt(nextOccurrenceAt.Ptr()).
-			Save(ctx)
+			SetTriggerConfig(triggerConfig)
+		if next := nextOccurrenceAt.Ptr(); next != nil {
+			update.SetNextOccurrenceAt(*next)
+		} else {
+			update.ClearNextOccurrenceAt()
+		}
+		updated, err := update.Save(ctx)
 		if err != nil {
 			return err
 		}
@@ -183,10 +187,36 @@ func (r *Repository) List(ctx context.Context) ([]*Trail, error) {
 	return result, nil
 }
 
+type EventTriggerDefinition struct {
+	ID     ID
+	Config json.RawMessage
+}
+
+func (r *Repository) ActiveEventTriggers(ctx context.Context) ([]EventTriggerDefinition, error) {
+	rows, err := r.db.Trail.Query().
+		Where(
+			enttrail.StatusEQ(enttrail.StatusActive),
+			enttrail.TriggerTypeEQ(TriggerTypeEvent.String()),
+		).
+		Select(enttrail.FieldID, enttrail.FieldTriggerConfig).
+		All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	result := make([]EventTriggerDefinition, len(rows))
+	for i, row := range rows {
+		result[i] = EventTriggerDefinition{ID: ID(row.ID), Config: row.TriggerConfig}
+	}
+
+	return result, nil
+}
+
 func (r *Repository) Due(ctx context.Context, now time.Time, limit int) ([]*Trail, error) {
 	rows, err := r.db.Trail.Query().
 		Where(
 			enttrail.StatusEQ(enttrail.StatusActive),
+			enttrail.TriggerTypeEQ(TriggerTypeSchedule.String()),
 			enttrail.NextOccurrenceAtNotNil(),
 			enttrail.NextOccurrenceAtLTE(now.UTC()),
 		).
@@ -293,6 +323,87 @@ func (r *Repository) MaterialiseScheduled(ctx context.Context, id ID, expectedCu
 	}
 	run, err := r.GetRun(ctx, RunID(runID))
 	return run, true, err
+}
+
+func (r *Repository) MaterialiseEvent(ctx context.Context, id ID, eventName string, sourcePayload json.RawMessage, observedAt time.Time) (RunID, bool, error) {
+	var runID xid.ID
+	created := false
+	err := ent.WithTx(ctx, r.db, func(tx *ent.Tx) error {
+		trailRow, err := tx.Trail.Query().
+			Where(
+				enttrail.IDEQ(xid.ID(id)),
+				enttrail.StatusEQ(enttrail.StatusActive),
+				enttrail.TriggerTypeEQ(TriggerTypeEvent.String()),
+			).
+			WithActions(activeActions).
+			Only(ctx)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return nil
+			}
+			return err
+		}
+
+		var config EventTriggerConfig
+		if err := json.Unmarshal(trailRow.TriggerConfig, &config); err != nil {
+			return err
+		}
+		if config.Event != eventName {
+			return nil
+		}
+
+		runID = xid.New()
+		trigger, err := serialiseTrigger(trailRow.TriggerType, trailRow.TriggerConfig)
+		if err != nil {
+			return err
+		}
+		event := TriggerEvent{
+			TrailID: id.String(), TrailRunID: runID.String(), Kind: RunKindEvent,
+			Trigger: trigger, Payload: sourcePayload, ObservedAt: observedAt.UTC(),
+		}
+		payload, err := json.Marshal(event)
+		if err != nil {
+			return err
+		}
+
+		// Event occurrences are automatic runs. The existing database kind keeps
+		// that distinction from manual runs while the immutable trigger snapshot
+		// carries the more specific event kind.
+		if _, err := tx.TrailRun.Create().
+			SetID(runID).
+			SetTrailID(xid.ID(id)).
+			SetKind(entrun.KindScheduled).
+			SetTriggerPayload(payload).
+			SetStatus(entrun.StatusQueued).
+			Save(ctx); err != nil {
+			return err
+		}
+		for _, action := range trailRow.Edges.Actions {
+			if _, err := tx.TrailActionRun.Create().
+				SetRunID(runID).
+				SetActionID(action.ID).
+				SetKind(action.Kind).
+				SetConfig(action.Config).
+				SetStatus(entactionrun.StatusQueued).
+				Save(ctx); err != nil {
+				return err
+			}
+		}
+		if _, err := tx.Trail.UpdateOneID(xid.ID(id)).SetLastOccurrenceAt(observedAt.UTC()).Save(ctx); err != nil {
+			return err
+		}
+
+		created = true
+		return nil
+	})
+	if err != nil {
+		return RunID{}, false, fault.Wrap(err, fctx.With(ctx))
+	}
+	if !created {
+		return RunID{}, false, nil
+	}
+
+	return RunID(runID), true, nil
 }
 
 func (r *Repository) MaterialiseManual(ctx context.Context, id ID, initiatedBy xid.ID) (*Run, error) {
@@ -826,11 +937,25 @@ func serialiseTrigger(triggerType string, config json.RawMessage) (json.RawMessa
 	if err != nil {
 		return nil, err
 	}
-	if kind != TriggerTypeSchedule {
+
+	switch kind {
+	case TriggerTypeSchedule:
+		return json.Marshal(struct {
+			Type     string          `json:"type"`
+			Schedule json.RawMessage `json:"schedule"`
+		}{Type: triggerType, Schedule: config})
+
+	case TriggerTypeEvent:
+		var event EventTriggerConfig
+		if err := json.Unmarshal(config, &event); err != nil {
+			return nil, err
+		}
+		return json.Marshal(struct {
+			Type  string `json:"type"`
+			Event string `json:"event"`
+		}{Type: triggerType, Event: event.Event})
+
+	default:
 		return nil, fmt.Errorf("%w: %q", ErrUnsupportedTrigger, triggerType)
 	}
-	return json.Marshal(struct {
-		Type     string          `json:"type"`
-		Schedule json.RawMessage `json:"schedule"`
-	}{Type: triggerType, Schedule: config})
 }

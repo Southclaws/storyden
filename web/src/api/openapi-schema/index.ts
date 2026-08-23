@@ -1052,6 +1052,8 @@ export * from "./trailSchedulePreviewProps";
 export * from "./trailSchedulePreviewResult";
 export * from "./trailStatus";
 export * from "./trailTrigger";
+export * from "./trailTriggerEvent";
+export * from "./trailTriggerEventType";
 export * from "./trailTriggerSchedule";
 export * from "./trailTriggerScheduleType";
 export * from "./trailTriggerSnapshot";

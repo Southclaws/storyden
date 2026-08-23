@@ -12,5 +12,6 @@ export type TrailRunKind = (typeof TrailRunKind)[keyof typeof TrailRunKind];
 
 export const TrailRunKind = {
   scheduled: "scheduled",
+  event: "event",
   manual: "manual",
 } as const;

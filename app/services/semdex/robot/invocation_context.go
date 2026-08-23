@@ -1,5 +1,15 @@
 package robot
 
+const (
+	InvocationContextKeyDatagraphItem    = "datagraph_item"
+	InvocationContextKeyPageType         = "page_type"
+	InvocationContextKeyTrailID          = "trail_id"
+	InvocationContextKeyTrailRunID       = "trail_run_id"
+	InvocationContextKeyTrailActionRunID = "trail_action_run_id"
+	InvocationContextKeyTrailTrigger     = "trail_trigger"
+	InvocationContextKeyTrailTriggerKind = "trail_trigger_kind"
+)
+
 // InvocationContext is optional, client-defined prompt context captured when
 // an input is submitted. It is deliberately transport- and client-agnostic:
 // callers may describe a Storyden surface, a mobile application state, an

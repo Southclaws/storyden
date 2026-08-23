@@ -162,6 +162,80 @@ func TestTrailScheduledOccurrenceMaterialisation(t *testing.T) {
 	}))
 }
 
+func TestTrailEventOccurrenceMaterialisation(t *testing.T) {
+	tests.ParallelIfNotSharedPostgres(t)
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		accounts *account_writer.Writer,
+		repository *trail.Repository,
+	) {
+		lc.Append(fx.StartHook(func() {
+			r := require.New(t)
+			a := assert.New(t)
+
+			_, creator := e2e.WithAccount(root, accounts, seed.Account_001_Odin)
+			actionConfig := json.RawMessage(`{"type":"robot_run","robot_ref":"robot-one","instruction":"Respond to the published thread"}`)
+			definition, err := repository.Create(
+				root,
+				xid.ID(creator.ID),
+				"Published thread responder",
+				"",
+				trail.StatusActive,
+				trail.TriggerTypeEvent,
+				json.RawMessage(`{"event":"EventThreadPublished"}`),
+				[]trail.ActionSpec{{Kind: trail.ActionKindRobotRun, Config: actionConfig}},
+				opt.NewEmpty[time.Time](),
+			)
+			r.NoError(err)
+
+			observedAt := time.Date(2040, time.January, 10, 9, 0, 0, 0, time.UTC)
+			sourcePayload := json.RawMessage(`{"id":"thread-one"}`)
+			runID, created, err := repository.MaterialiseEvent(
+				root,
+				definition.ID,
+				"EventThreadPublished",
+				sourcePayload,
+				observedAt,
+			)
+			r.NoError(err)
+			r.True(created)
+			run, err := repository.GetRun(root, runID)
+			r.NoError(err)
+			r.NotNil(run)
+			r.Len(run.ActionRuns, 1)
+			a.Equal(trail.RunKindScheduled, run.Kind)
+			a.Nil(run.ScheduledFor)
+			a.JSONEq(string(actionConfig), string(run.ActionRuns[0].Config))
+
+			var event trail.TriggerEvent
+			r.NoError(json.Unmarshal(run.TriggerPayload, &event))
+			a.Equal(trail.RunKindEvent, event.Kind)
+			a.Equal(observedAt, event.ObservedAt)
+			a.JSONEq(string(sourcePayload), string(event.Payload))
+			a.JSONEq(`{"type":"event","event":"EventThreadPublished"}`, string(event.Trigger))
+
+			stored, err := repository.Get(root, definition.ID)
+			r.NoError(err)
+			r.NotNil(stored.LastOccurrenceAt)
+			a.Equal(observedAt, *stored.LastOccurrenceAt)
+			a.Nil(stored.NextOccurrenceAt)
+
+			notCreated, ok, err := repository.MaterialiseEvent(
+				root,
+				definition.ID,
+				"EventNodePublished",
+				sourcePayload,
+				observedAt.Add(time.Minute),
+			)
+			r.NoError(err)
+			a.False(ok)
+			a.Equal(trail.RunID{}, notCreated)
+		}))
+	}))
+}
+
 func TestTrailActionFanoutAndRecovery(t *testing.T) {
 	tests.ParallelIfNotSharedPostgres(t)
 

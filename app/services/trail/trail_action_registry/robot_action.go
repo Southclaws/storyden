@@ -116,9 +116,7 @@ func (a *RobotActionAdapter) Start(ctx context.Context, run *trail.ActionRun) er
 		creator.ID.String(),
 		sessionID.String(),
 		genai.NewContentFromText(config.Instruction, genai.RoleUser),
-		robotservice.InvocationContext{
-			"trail_id": run.Trail.ID.String(), "trail_run_id": run.RunID.String(), "trail_action_run_id": run.ID.String(),
-		},
+		trailInvocationContext(run),
 		robotservice.RunOptions{Mode: robotservice.ModeUnattended, Source: robotservice.SourceScheduled},
 	); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
@@ -130,6 +128,25 @@ func (a *RobotActionAdapter) Start(ctx context.Context, run *trail.ActionRun) er
 	}
 
 	return a.trails.SetActionRunTarget(ctx, run.ID, *run.LeaseToken, target)
+}
+
+func trailInvocationContext(run *trail.ActionRun) robotservice.InvocationContext {
+	invocation := robotservice.InvocationContext{
+		robotservice.InvocationContextKeyTrailID:          run.Trail.ID.String(),
+		robotservice.InvocationContextKeyTrailRunID:       run.RunID.String(),
+		robotservice.InvocationContextKeyTrailActionRunID: run.ID.String(),
+	}
+
+	if run.Run != nil && len(run.Run.TriggerPayload) > 0 {
+		invocation[robotservice.InvocationContextKeyTrailTrigger] = json.RawMessage(run.Run.TriggerPayload)
+
+		var event trail.TriggerEvent
+		if json.Unmarshal(run.Run.TriggerPayload, &event) == nil {
+			invocation[robotservice.InvocationContextKeyTrailTriggerKind] = event.Kind.String()
+		}
+	}
+
+	return invocation
 }
 
 func trailRobotSessionName(trailName string, runNumber int) string {

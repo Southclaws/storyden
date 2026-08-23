@@ -31,7 +31,12 @@ export function TrailRunCard({
   onCancelAction,
 }: TrailRunCardProps) {
   const occurrence = run.scheduled_for ?? run.createdAt;
-  const runType = run.trigger.kind === "manual" ? "Manual" : "Scheduled";
+  const runType =
+    run.trigger.kind === "manual"
+      ? "Manual"
+      : run.trigger.kind === "event"
+        ? "Event"
+        : "Scheduled";
 
   return (
     <CardBox

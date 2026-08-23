@@ -13938,10 +13938,12 @@ components:
     TrailTrigger:
       oneOf:
         - $ref: "#/components/schemas/TrailTriggerSchedule"
+        - $ref: "#/components/schemas/TrailTriggerEvent"
       discriminator:
         propertyName: type
         mapping:
           schedule: "#/components/schemas/TrailTriggerSchedule"
+          event: "#/components/schemas/TrailTriggerEvent"
 
     TrailTriggerSchedule:
       type: object
@@ -13950,9 +13952,20 @@ components:
         type: { $ref: "#/components/schemas/TrailTriggerType" }
         schedule: { $ref: "#/components/schemas/RecurrenceSchedule" }
 
+    TrailTriggerEvent:
+      type: object
+      required: [type, event]
+      properties:
+        type: { $ref: "#/components/schemas/TrailTriggerType" }
+        event:
+          type: string
+          minLength: 1
+          example: EventThreadPublished
+          description: A Storyden event name from the canonical event catalogue.
+
     TrailTriggerType:
       type: string
-      enum: [schedule]
+      enum: [schedule, event]
 
     TrailSchedulePreviewProps:
       type: object
@@ -14055,7 +14068,7 @@ components:
 
     TrailRunKind:
       type: string
-      enum: [scheduled, manual]
+      enum: [scheduled, event, manual]
 
     TrailRunStatus:
       type: string
@@ -14082,6 +14095,8 @@ components:
         scheduled_for: { type: string, format: date-time }
         observed_at: { type: string, format: date-time }
         initiated_by: { $ref: "#/components/schemas/Identifier" }
+        payload:
+          $ref: "#/components/schemas/ArbitraryData"
 
     TrailActionRun:
       allOf:

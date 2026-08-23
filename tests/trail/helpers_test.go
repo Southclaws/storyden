@@ -28,8 +28,20 @@ func trailTrigger(t *testing.T, schedule openapi.RecurrenceSchedule) openapi.Tra
 
 	trigger := openapi.TrailTrigger{}
 	require.NoError(t, trigger.FromTrailTriggerSchedule(openapi.TrailTriggerSchedule{
-		Type:     openapi.Schedule,
+		Type:     openapi.TrailTriggerTypeSchedule,
 		Schedule: schedule,
+	}))
+
+	return trigger
+}
+
+func trailEventTrigger(t *testing.T, event string) openapi.TrailTrigger {
+	t.Helper()
+
+	trigger := openapi.TrailTrigger{}
+	require.NoError(t, trigger.FromTrailTriggerEvent(openapi.TrailTriggerEvent{
+		Type:  openapi.TrailTriggerTypeEvent,
+		Event: event,
 	}))
 
 	return trigger
@@ -107,6 +119,15 @@ func requireScheduleTrigger(t *testing.T, trigger openapi.TrailTrigger) openapi.
 	t.Helper()
 
 	result, err := trigger.AsTrailTriggerSchedule()
+	require.NoError(t, err)
+
+	return result
+}
+
+func requireEventTrigger(t *testing.T, trigger openapi.TrailTrigger) openapi.TrailTriggerEvent {
+	t.Helper()
+
+	result, err := trigger.AsTrailTriggerEvent()
 	require.NoError(t, err)
 
 	return result

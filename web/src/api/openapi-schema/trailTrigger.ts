@@ -7,6 +7,7 @@
  *
  * OpenAPI spec version: v1.26.15-post
  */
+import type { TrailTriggerEvent } from "./trailTriggerEvent";
 import type { TrailTriggerSchedule } from "./trailTriggerSchedule";
 
-export type TrailTrigger = TrailTriggerSchedule;
+export type TrailTrigger = TrailTriggerSchedule | TrailTriggerEvent;

@@ -64,7 +64,10 @@ export function initialTrailFormValues(
   timezone: string,
   startDate: string,
 ): TrailFormValues {
-  const schedule = initialValue?.trigger.schedule;
+  const schedule =
+    initialValue?.trigger.type === "schedule"
+      ? initialValue.trigger.schedule
+      : undefined;
   const initialActions = initialValue?.actions ?? [];
 
   return {

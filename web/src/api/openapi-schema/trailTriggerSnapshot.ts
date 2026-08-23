@@ -7,6 +7,7 @@
  *
  * OpenAPI spec version: v1.26.15-post
  */
+import type { ArbitraryData } from "./arbitraryData";
 import type { Identifier } from "./identifier";
 import type { TrailRunKind } from "./trailRunKind";
 import type { TrailTrigger } from "./trailTrigger";
@@ -19,4 +20,5 @@ export interface TrailTriggerSnapshot {
   scheduled_for?: string;
   observed_at: string;
   initiated_by?: Identifier;
+  payload?: ArbitraryData;
 }

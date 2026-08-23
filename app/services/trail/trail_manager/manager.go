@@ -19,11 +19,13 @@ import (
 	"github.com/Southclaws/storyden/app/resources/trail"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/trail/trail_action_registry"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 var (
 	errInvalidName   = fault.New("trail name must be between 1 and 120 characters", ftag.With(ftag.InvalidArgument))
 	errInvalidStatus = fault.New("invalid trail status", ftag.With(ftag.InvalidArgument))
+	errInvalidEvent  = fault.New("invalid trail event", ftag.With(ftag.InvalidArgument))
 	errArchived      = fault.New("archived trail cannot be changed or run", ftag.With(ftag.InvalidArgument))
 )
 
@@ -103,18 +105,38 @@ func (m *Manager) validate(
 		return validatedWrite{}, nil, trail.Status{}, errInvalidName
 	}
 
-	if triggerType != trail.TriggerTypeSchedule {
+	var (
+		schedule    *recurrence.Schedule
+		triggerData json.RawMessage
+	)
+
+	switch triggerType {
+	case trail.TriggerTypeSchedule:
+		parsed, err := recurrence.Parse(triggerConfig)
+		if err != nil {
+			return validatedWrite{}, nil, trail.Status{}, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+
+		triggerData, err = parsed.NormalisedJSON()
+		if err != nil {
+			return validatedWrite{}, nil, trail.Status{}, fault.Wrap(err, fctx.With(ctx))
+		}
+		schedule = parsed
+
+	case trail.TriggerTypeEvent:
+		var config trail.EventTriggerConfig
+		if err := json.Unmarshal(triggerConfig, &config); err != nil || !validEvent(config.Event) {
+			return validatedWrite{}, nil, trail.Status{}, errInvalidEvent
+		}
+
+		var err error
+		triggerData, err = json.Marshal(config)
+		if err != nil {
+			return validatedWrite{}, nil, trail.Status{}, fault.Wrap(err, fctx.With(ctx))
+		}
+
+	default:
 		return validatedWrite{}, nil, trail.Status{}, trail.ErrUnsupportedTrigger
-	}
-
-	schedule, err := recurrence.Parse(triggerConfig)
-	if err != nil {
-		return validatedWrite{}, nil, trail.Status{}, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
-	}
-
-	triggerData, err := schedule.NormalisedJSON()
-	if err != nil {
-		return validatedWrite{}, nil, trail.Status{}, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	if len(actions) == 0 {
@@ -150,15 +172,27 @@ func (m *Manager) validate(
 		}
 	}
 
-	occurrences := recurrence.Preview(schedule, time.Now().UTC(), 1)
 	var next *time.Time
-	if len(occurrences) > 0 {
-		next = &occurrences[0]
-	} else if status == trail.StatusActive {
-		status = trail.StatusFinished
+	if schedule != nil {
+		occurrences := recurrence.Preview(schedule, time.Now().UTC(), 1)
+		if len(occurrences) > 0 {
+			next = &occurrences[0]
+		} else if status == trail.StatusActive {
+			status = trail.StatusFinished
+		}
 	}
 
 	return validatedWrite{Name: name, Description: strings.TrimSpace(description), TriggerConfig: triggerData}, next, status, nil
+}
+
+func validEvent(name string) bool {
+	for _, event := range rpc.EventValues {
+		if string(event) == name {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (m *Manager) Preview(ctx context.Context, raw json.RawMessage, after time.Time) ([]time.Time, error) {

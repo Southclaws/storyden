@@ -62,9 +62,25 @@ func TestTrailCRUD(t *testing.T) {
 				a.NotEqual(created.Actions[0].Id, created.Actions[1].Id)
 
 				trigger := requireScheduleTrigger(t, created.Trigger)
-				a.Equal(openapi.Schedule, trigger.Type)
+				a.Equal(openapi.TrailTriggerTypeSchedule, trigger.Type)
 				a.Equal(openapi.Daily, trigger.Schedule.Rule.Frequency)
 				a.Equal("UTC", trigger.Schedule.Timezone)
+			})
+
+			t.Run("create_event_trigger", func(t *testing.T) {
+				r := require.New(t)
+				a := assert.New(t)
+
+				props := trailProps(t, "Published thread responder", openapi.TrailMutableStatusPaused, firstAction)
+				props.Trigger = trailEventTrigger(t, "EventThreadPublished")
+				created := createTrail(t, root, cl, adminSession, props)
+
+				a.Equal(openapi.TrailStatusPaused, created.Status)
+				a.Nil(created.NextOccurrenceAt)
+				trigger := requireEventTrigger(t, created.Trigger)
+				a.Equal(openapi.TrailTriggerTypeEvent, trigger.Type)
+				a.Equal("EventThreadPublished", trigger.Event)
+				r.Len(created.Actions, 1)
 			})
 
 			t.Run("get", func(t *testing.T) {
@@ -147,6 +163,24 @@ func TestTrailCRUD(t *testing.T) {
 				created = openapi.Trail(*response.JSON200)
 			})
 
+			t.Run("change_to_event_trigger_clears_next_occurrence", func(t *testing.T) {
+				a := assert.New(t)
+
+				response := tests.AssertRequest(cl.TrailUpdateWithResponse(root, created.Id, openapi.TrailMutableProps{
+					Name:        created.Name,
+					Description: &created.Description,
+					Status:      openapi.TrailMutableStatusActive,
+					Trigger:     trailEventTrigger(t, "EventThreadPublished"),
+					Actions:     []openapi.TrailAction{created.Actions[0].Action},
+				}, adminSession))(t, http.StatusOK)
+
+				a.Equal(openapi.TrailStatusActive, response.JSON200.Status)
+				a.Nil(response.JSON200.NextOccurrenceAt)
+				a.Equal("EventThreadPublished", requireEventTrigger(t, response.JSON200.Trigger).Event)
+
+				created = openapi.Trail(*response.JSON200)
+			})
+
 			t.Run("archive_retains_definition", func(t *testing.T) {
 				a := assert.New(t)
 
@@ -225,6 +259,10 @@ func TestTrailValidation(t *testing.T) {
 			invalidSchedule := trailProps(t, "Invalid timezone", openapi.TrailMutableStatusPaused, validAction)
 			invalidSchedule.Trigger = trailTrigger(t, trailSchedule("2090-01-10T09:00:00", "Not/AZone", openapi.Daily))
 			tests["invalid_schedule"] = invalidSchedule
+
+			invalidEvent := trailProps(t, "Invalid event", openapi.TrailMutableStatusPaused, validAction)
+			invalidEvent.Trigger = trailEventTrigger(t, "EventNotReal")
+			tests["invalid_event"] = invalidEvent
 
 			for name, props := range tests {
 				t.Run(name, func(t *testing.T) {

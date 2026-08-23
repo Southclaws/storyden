@@ -38,6 +38,7 @@ type runKindEnum string
 
 const (
 	runKindScheduled runKindEnum = "scheduled"
+	runKindEvent     runKindEnum = "event"
 	runKindManual    runKindEnum = "manual"
 )
 
@@ -67,6 +68,7 @@ type actionKindEnum string
 
 const (
 	triggerTypeSchedule triggerTypeEnum = "schedule"
+	triggerTypeEvent    triggerTypeEnum = "event"
 	actionKindRobotRun  actionKindEnum  = "robot_run"
 )
 
@@ -109,9 +111,14 @@ type TriggerEvent struct {
 	TrailRunID   string          `json:"trail_run_id"`
 	Kind         RunKind         `json:"kind"`
 	Trigger      json.RawMessage `json:"trigger"`
+	Payload      json.RawMessage `json:"payload,omitempty"`
 	ScheduledFor *time.Time      `json:"scheduled_for,omitempty"`
 	ObservedAt   time.Time       `json:"observed_at"`
 	InitiatedBy  string          `json:"initiated_by,omitempty"`
+}
+
+type EventTriggerConfig struct {
+	Event string `json:"event"`
 }
 
 type Run struct {

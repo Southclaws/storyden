@@ -2,6 +2,7 @@ package trail_test
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"testing"
 	"time"
@@ -13,12 +14,15 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/services/trail/trail_runtime"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 	"github.com/Southclaws/storyden/tests"
 	testrobot "github.com/Southclaws/storyden/tests/robot"
 )
@@ -37,6 +41,7 @@ func TestTrailRobotRuntime(t *testing.T) {
 			cl *openapi.ClientWithResponses,
 			sh *e2e.SessionHelper,
 			accounts *account_writer.Writer,
+			bus *pubsub.Bus,
 			_ *trail_runtime.Runtime,
 		) {
 			lc.Append(fx.StartHook(func() {
@@ -61,6 +66,49 @@ func TestTrailRobotRuntime(t *testing.T) {
 					openapi.TrailMutableStatusPaused,
 					trailRobotAction(t, string(robot.JSON200.Id), "Perform the scheduled check"),
 				))
+
+				t.Run("event_trigger_materialises_source_payload", func(t *testing.T) {
+					r := require.New(t)
+					a := assert.New(t)
+
+					props := trailProps(
+						t,
+						"Published thread responder "+xid.New().String(),
+						openapi.TrailMutableStatusActive,
+						trailRobotAction(t, string(robot.JSON200.Id), "Respond to the published thread"),
+					)
+					props.Trigger = trailEventTrigger(t, "EventThreadPublished")
+					eventTrail := createTrail(t, root, cl, adminSession, props)
+					a.Nil(eventTrail.NextOccurrenceAt)
+
+					threadID := post.ID(xid.New())
+					var runID openapi.Identifier
+					r.Eventually(func() bool {
+						bus.Publish(root, &rpc.EventThreadPublished{ID: threadID})
+						history, err := cl.TrailRunListWithResponse(root, eventTrail.Id, adminSession)
+						if err != nil || history == nil || history.JSON200 == nil || len(history.JSON200.Runs) == 0 {
+							return false
+						}
+
+						runID = history.JSON200.Runs[0].Id
+						return true
+					}, 5*time.Second, 100*time.Millisecond)
+
+					run := waitForTrailRun(t, root, cl, adminSession, eventTrail.Id, runID)
+					a.Equal(openapi.TrailRunKindEvent, run.Trigger.Kind)
+					a.Nil(run.ScheduledFor)
+					trigger := requireEventTrigger(t, run.Trigger.Trigger)
+					a.Equal("EventThreadPublished", trigger.Event)
+					r.NotNil(run.Trigger.Payload)
+
+					payload, err := json.Marshal(*run.Trigger.Payload)
+					r.NoError(err)
+					var source struct {
+						ID string `json:"id"`
+					}
+					r.NoError(json.Unmarshal(payload, &source))
+					a.Equal(threadID.String(), source.ID)
+				})
 
 				var first openapi.TrailRun
 
