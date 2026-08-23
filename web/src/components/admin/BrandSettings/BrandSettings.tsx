@@ -48,6 +48,8 @@ export function BrandSettingsForm(props: Props) {
     onClearMotd,
     motdContentInitialValue,
     motdContentResetKey,
+    motdClearPending,
+    canClearMotd,
   } = useBrandSettings(props);
 
   return (
@@ -62,7 +64,13 @@ export function BrandSettingsForm(props: Props) {
       <LStack gap="1">
         <WStack>
           <PageHeading>Brand settings</PageHeading>
-          <Button type="submit">Save</Button>
+          <Button
+            type="submit"
+            loading={formState.isSubmitting}
+            loadingText="Saving..."
+          >
+            Save changes
+          </Button>
         </WStack>
         <Text variant="supporting">
           Manage your community&apos;s identity, appearance and site-wide
@@ -157,18 +165,39 @@ export function BrandSettingsForm(props: Props) {
 
       <WStack mt="2">
         <SectionHeading>Message of the Day</SectionHeading>
-        <Button type="submit" size="sm">
-          Save
+        <Button
+          type="submit"
+          size="sm"
+          loading={formState.isSubmitting}
+          loadingText="Saving..."
+        >
+          Save changes
         </Button>
       </WStack>
 
       <FormControl>
         <WStack alignItems="center">
           <FormLabel>MOTD content</FormLabel>
-          <Button type="button" variant="outline" onClick={onClearMotd}>
-            Clear MOTD
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!canClearMotd || motdClearPending}
+            onClick={onClearMotd}
+          >
+            {motdClearPending ? "MOTD cleared" : "Clear MOTD"}
           </Button>
         </WStack>
+        {motdClearPending && (
+          <FormHelperText
+            aria-live="polite"
+            color="text.default"
+            fontWeight="medium"
+            role="status"
+          >
+            MOTD cleared in this form. Select Save changes to remove it from
+            your site.
+          </FormHelperText>
+        )}
         <CardBox>
           <ContentComposerField
             control={control}
@@ -179,7 +208,9 @@ export function BrandSettingsForm(props: Props) {
           />
           <FormErrorText>{formState.errors.motdContent?.message}</FormErrorText>
         </CardBox>
-        <FormHelperText>Banner message content.</FormHelperText>
+        <FormHelperText>
+          Shown site-wide while the message is active.
+        </FormHelperText>
       </FormControl>
 
       <Stack
@@ -209,6 +240,7 @@ export function BrandSettingsForm(props: Props) {
       <FormControl>
         <FormLabel>MOTD alert type</FormLabel>
         <SelectField<Form, (typeof MOTD_TYPE_COLLECTION.items)[number]>
+          key={`motd-type-${motdContentResetKey ?? "initial"}`}
           control={control}
           name="motdType"
           collection={MOTD_TYPE_COLLECTION}
@@ -221,7 +253,13 @@ export function BrandSettingsForm(props: Props) {
       </FormControl>
 
       <WStack justifyContent="end">
-        <Button type="submit">Save</Button>
+        <Button
+          type="submit"
+          loading={formState.isSubmitting}
+          loadingText="Saving..."
+        >
+          Save changes
+        </Button>
       </WStack>
     </styled.form>
   );

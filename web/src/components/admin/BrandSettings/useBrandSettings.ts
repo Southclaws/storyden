@@ -1,10 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { iconUpload } from "@/api/openapi-client/misc";
+import { isContentEmpty } from "@/lib/content/content";
 import { useSettingsMutation } from "@/lib/settings/mutation";
 import { MotdAlertTypeSchema, Settings } from "@/lib/settings/settings";
 import { getColourVariants } from "@/utils/colour";
@@ -23,7 +24,7 @@ export const FormSchema = z
     motdContent: z.string().optional(),
     motdStartAt: z.string().optional(),
     motdEndAt: z.string().optional(),
-    motdType: MotdAlertTypeSchema.optional(),
+    motdType: z.union([MotdAlertTypeSchema, z.literal("")]).optional(),
   })
   .refine(
     (data) => {
@@ -52,6 +53,7 @@ export function useBrandSettings({ settings }: Props) {
     string | undefined
   >(settings.motd?.content);
   const [motdContentResetKey, setMotdContentResetKey] = useState<string>();
+  const [motdClearRequested, setMotdClearRequested] = useState(false);
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -67,6 +69,16 @@ export function useBrandSettings({ settings }: Props) {
   });
   const [currentIcon, setCurrentIcon] = useState<File | undefined>(undefined);
   const [contrast, setContrast] = useState(1);
+  const [motdContent, motdStartAt, motdEndAt, motdType] = useWatch({
+    control: form.control,
+    name: ["motdContent", "motdStartAt", "motdEndAt", "motdType"],
+  });
+  const hasMotdValue =
+    !isContentEmpty(motdContent) ||
+    Boolean(motdStartAt) ||
+    Boolean(motdEndAt) ||
+    Boolean(motdType);
+  const motdClearPending = motdClearRequested && !hasMotdValue;
 
   useEffect(() => {
     (async () => {
@@ -94,12 +106,12 @@ export function useBrandSettings({ settings }: Props) {
   };
 
   const onSubmit = form.handleSubmit(async (data) => {
-    handle(
+    await handle(
       async () => {
-        const motdType = data["motdType"];
+        const motdType = data["motdType"] || undefined;
         updateColour(data["accentColour"]);
         const hasMotd =
-          Boolean(data["motdContent"]?.trim()) ||
+          !isContentEmpty(data["motdContent"]) ||
           Boolean(data["motdStartAt"]) ||
           Boolean(data["motdEndAt"]) ||
           Boolean(motdType);
@@ -118,6 +130,7 @@ export function useBrandSettings({ settings }: Props) {
               }
             : {},
         });
+        setMotdClearRequested(false);
       },
       {
         promiseToast: {
@@ -161,7 +174,7 @@ export function useBrandSettings({ settings }: Props) {
   };
 
   const onClearMotd = () => {
-    form.setValue("motdContent", undefined, {
+    form.setValue("motdContent", "", {
       shouldDirty: true,
       shouldValidate: true,
     });
@@ -173,13 +186,14 @@ export function useBrandSettings({ settings }: Props) {
       shouldDirty: true,
       shouldValidate: true,
     });
-    form.setValue("motdType", undefined, {
+    form.setValue("motdType", "", {
       shouldDirty: true,
       shouldValidate: true,
     });
 
-    setMotdContentInitialValue(undefined);
+    setMotdContentInitialValue("");
     setMotdContentResetKey(String(Date.now()));
+    setMotdClearRequested(true);
   };
 
   return {
@@ -195,6 +209,8 @@ export function useBrandSettings({ settings }: Props) {
     onClearMotd,
     motdContentInitialValue,
     motdContentResetKey,
+    motdClearPending,
+    canClearMotd: hasMotdValue,
     contrast,
   };
 }
