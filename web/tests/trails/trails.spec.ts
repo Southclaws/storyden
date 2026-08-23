@@ -184,16 +184,19 @@ test.describe("Trails", () => {
         }[];
       }[];
     };
-    await expect(
-      page.getByText(runs.runs[0]?.id ?? "missing run", { exact: true }),
-    ).toHaveCount(0);
-    expect(
-      runs.runs[0]?.actions.map((action) => action.target?.output?.summary),
-    ).toEqual([
-      "The scheduled community prompt was prepared.",
-      "The moderation action needs approval.",
-    ]);
-    const sessionIDs = runs.runs[0]?.actions.flatMap((action) =>
+    const run = runs.runs[0];
+    if (run === undefined) {
+      throw new Error("Trail has no run history");
+    }
+
+    await expect(page.getByText(run.id, { exact: true })).toHaveCount(0);
+    expect(run.actions.map((action) => action.target?.output?.summary)).toEqual(
+      [
+        "The scheduled community prompt was prepared.",
+        "The moderation action needs approval.",
+      ],
+    );
+    const sessionIDs = run.actions.flatMap((action) =>
       action.target === undefined ? [] : [action.target.robot_session_id],
     );
     expect(sessionIDs).toHaveLength(2);
@@ -226,7 +229,7 @@ test.describe("Trails", () => {
       .toContainEqual(
         expect.objectContaining({
           event: "trail_run_attention",
-          target: expect.any(String),
+          target: run.id,
         }),
       );
 
@@ -237,7 +240,7 @@ test.describe("Trails", () => {
       notifications: { event: string; target?: string }[];
     };
     const target = notificationsBody.notifications.find(
-      (item) => item.event === "trail_run_attention",
+      (item) => item.event === "trail_run_attention" && item.target === run.id,
     )?.target;
     if (target === undefined) {
       throw new Error("Trail attention notification has no target");
