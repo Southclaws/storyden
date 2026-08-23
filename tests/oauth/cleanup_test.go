@@ -141,7 +141,7 @@ func TestOAuthCleanup(t *testing.T) {
 
 				deleted, err := ow.DeleteExpiredRefreshTokens(root, cleanupNow.Add(-7*24*time.Hour))
 				r.NoError(err)
-				a.GreaterOrEqual(1, deleted, "only rows past the retention window go")
+				a.Positive(deleted)
 
 				_, err = oq.GetRefreshTokenByTokenHash(root, staleHash)
 				a.Error(err)
