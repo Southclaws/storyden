@@ -1,0 +1,33 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolMemberReinstate
+x-storyden-tool:
+  toolsets:
+    - system.moderation
+  title: Reinstate Member
+  role: MANAGE_SUSPENSIONS
+  annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false }
+title: member_reinstate
+description: Reinstate a suspended community member, restoring their ability to sign in and use the platform.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolMemberReinstateInput" }
+  output: { $ref: "#/definitions/ToolMemberReinstateOutput" }
+definitions:
+  ToolMemberReinstateInput:
+    type: object
+    required: [account_id]
+    additionalProperties: false
+    properties:
+      account_id:
+        type: string
+        pattern: '^[0-9a-v]{20}$'
+        description: Suspended member account identifier, obtainable from member_search or a profile report target.
+  ToolMemberReinstateOutput:
+    type: object
+    required: [account_id, handle, suspended]
+    additionalProperties: false
+    properties:
+      account_id: { type: string, description: Reinstated member account identifier. }
+      handle: { type: string, description: Reinstated member handle. }
+      suspended: { type: boolean, const: false, description: Confirms the member is no longer suspended. }

@@ -1,0 +1,31 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolReportGet
+x-storyden-tool:
+  toolsets:
+    - system.moderation
+  title: Get Report
+  role: MANAGE_REPORTS
+  annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
+title: report_get
+description: Retrieve one moderation report by its identifier.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolReportGetInput" }
+  output: { $ref: "#/definitions/ToolReportGetOutput" }
+definitions:
+  ToolReportGetInput:
+    type: object
+    required: [report_id]
+    additionalProperties: false
+    properties:
+      report_id:
+        type: string
+        pattern: '^[0-9a-v]{20}$'
+        description: Report identifier returned by report_list or report_create.
+  ToolReportGetOutput:
+    type: object
+    required: [report]
+    additionalProperties: false
+    properties:
+      report: { $ref: "../../common/ModerationToolReport.yaml" }

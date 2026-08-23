@@ -19,6 +19,7 @@ import (
 	robotresource "github.com/Southclaws/storyden/app/resources/robot"
 	robottools "github.com/Southclaws/storyden/app/services/semdex/robot/tools"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_documents"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_moderation"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspacestate"
 	"github.com/Southclaws/storyden/lib/mcp"
 )
@@ -38,6 +39,25 @@ func TestSystemDocumentsToolsetOwnsNavigationInstruction(t *testing.T) {
 		return
 	}
 	t.Fatalf("%s is not registered", system_documents.ID)
+}
+
+func TestSystemModerationToolsetExcludesContentPurge(t *testing.T) {
+	for _, definition := range systemDefinitions() {
+		if definition.ID != system_moderation.ID {
+			continue
+		}
+		assert.ElementsMatch(t, []string{
+			"member_reinstate",
+			"member_suspend",
+			"report_create",
+			"report_get",
+			"report_list",
+			"report_update",
+		}, definition.ToolNames)
+		assert.NotContains(t, definition.ToolNames, "content_purge")
+		return
+	}
+	t.Fatalf("%s is not registered", system_moderation.ID)
 }
 
 func TestBuildDeduplicatesToolsSharedByMultipleToolsets(t *testing.T) {

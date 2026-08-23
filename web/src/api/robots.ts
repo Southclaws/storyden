@@ -60,6 +60,12 @@ export interface MCPTools {
   ToolReplySearch?: ReplySearch;
   ToolPostSearch?: PostSearch;
   ToolMemberSearch?: MemberSearch;
+  ToolReportCreate?: ReportCreate;
+  ToolReportList?: ReportList;
+  ToolReportGet?: ReportGet;
+  ToolReportUpdate?: ReportUpdate;
+  ToolMemberSuspend?: MemberSuspend;
+  ToolMemberReinstate?: MemberReinstate;
   [k: string]: unknown;
 }
 /**
@@ -2657,10 +2663,214 @@ export interface MemberSearchItem {
    */
   bio?: string;
 }
+/**
+ * Submit an evidence-based moderation report for a member or content item.
+ */
+export interface ReportCreate {
+  input: ToolReportCreateInput;
+  output: ToolReportCreateOutput;
+  [k: string]: unknown;
+}
+export interface ToolReportCreateInput {
+  /**
+   * Identifier of the content or member being reported.
+   */
+  target_id: string;
+  /**
+   * Kind of the reported target.
+   */
+  target_kind: "post" | "thread" | "reply" | "node" | "collection" | "profile" | "event";
+  /**
+   * Specific policy concern and evidence for a moderator to review.
+   */
+  comment: string;
+}
+export interface ToolReportCreateOutput {
+  report: ModerationToolReport;
+}
+/**
+ * A moderation report and its current triage state.
+ */
+export interface ModerationToolReport {
+  /**
+   * Stable report identifier accepted by report_get and report_update.
+   */
+  id: string;
+  /**
+   * Identifier of the reported content or member.
+   */
+  target_id: string;
+  /**
+   * Kind of the reported target.
+   */
+  target_kind: "post" | "thread" | "reply" | "node" | "collection" | "profile" | "event";
+  /**
+   * Current report triage state.
+   */
+  status: "submitted" | "acknowledged" | "resolved";
+  /**
+   * Reporter-provided reason and supporting context.
+   */
+  comment?: string;
+  /**
+   * Identifier of the account that submitted the report, when present.
+   */
+  reported_by_id?: string;
+  /**
+   * Identifier of the account currently handling the report, when assigned.
+   */
+  handled_by_id?: string;
+  /**
+   * Time the report was submitted in UTC.
+   */
+  created_at: string;
+  /**
+   * Time the report was last updated in UTC.
+   */
+  updated_at: string;
+}
+/**
+ * List submitted moderation reports, optionally narrowed by status or target kind.
+ */
+export interface ReportList {
+  input: ToolReportListInput;
+  output: ToolReportListOutput;
+  [k: string]: unknown;
+}
+export interface ToolReportListInput {
+  /**
+   * Return reports in one triage state. Omit to list all reports.
+   */
+  status?: "submitted" | "acknowledged" | "resolved";
+  /**
+   * Return reports for one kind of target. Omit to include all kinds.
+   */
+  target_kind?: "post" | "thread" | "reply" | "node" | "collection" | "profile" | "event";
+  /**
+   * One-indexed page number, defaulting to 1.
+   */
+  page?: number;
+  /**
+   * Maximum reports to return, defaulting to 20.
+   */
+  page_size?: number;
+}
+export interface ToolReportListOutput {
+  /**
+   * Reports ordered by their most recent update.
+   */
+  reports: ModerationToolReport[];
+  /**
+   * Number of reports returned on this page.
+   */
+  results: number;
+  /**
+   * One-indexed page returned.
+   */
+  page: number;
+  /**
+   * Next page number when more matching reports are available.
+   */
+  next_page?: number;
+}
+/**
+ * Retrieve one moderation report by its identifier.
+ */
+export interface ReportGet {
+  input: ToolReportGetInput;
+  output: ToolReportGetOutput;
+  [k: string]: unknown;
+}
+export interface ToolReportGetInput {
+  /**
+   * Report identifier returned by report_list or report_create.
+   */
+  report_id: string;
+}
+export interface ToolReportGetOutput {
+  report: ModerationToolReport;
+}
+/**
+ * Acknowledge or resolve a moderation report and assign it to the acting moderator.
+ */
+export interface ReportUpdate {
+  input: ToolReportUpdateInput;
+  output: ToolReportUpdateOutput;
+  [k: string]: unknown;
+}
+export interface ToolReportUpdateInput {
+  /**
+   * Report identifier returned by report_list or report_create.
+   */
+  report_id: string;
+  /**
+   * New triage state. Resolve only after the reported concern has been addressed or dismissed.
+   */
+  status: "acknowledged" | "resolved";
+}
+export interface ToolReportUpdateOutput {
+  report: ModerationToolReport;
+}
+/**
+ * Suspend a community member, preventing sign-in and use of the platform while preserving their account and content.
+ */
+export interface MemberSuspend {
+  input: ToolMemberSuspendInput;
+  output: ToolMemberSuspendOutput;
+  [k: string]: unknown;
+}
+export interface ToolMemberSuspendInput {
+  /**
+   * Member account identifier, obtainable from member_search or a profile report target.
+   */
+  account_id: string;
+}
+export interface ToolMemberSuspendOutput {
+  /**
+   * Suspended member account identifier.
+   */
+  account_id: string;
+  /**
+   * Suspended member handle.
+   */
+  handle: string;
+  /**
+   * Confirms the member is suspended.
+   */
+  suspended: true;
+}
+/**
+ * Reinstate a suspended community member, restoring their ability to sign in and use the platform.
+ */
+export interface MemberReinstate {
+  input: ToolMemberReinstateInput;
+  output: ToolMemberReinstateOutput;
+  [k: string]: unknown;
+}
+export interface ToolMemberReinstateInput {
+  /**
+   * Suspended member account identifier, obtainable from member_search or a profile report target.
+   */
+  account_id: string;
+}
+export interface ToolMemberReinstateOutput {
+  /**
+   * Reinstated member account identifier.
+   */
+  account_id: string;
+  /**
+   * Reinstated member handle.
+   */
+  handle: string;
+  /**
+   * Confirms the member is no longer suspended.
+   */
+  suspended: false;
+}
 
-export type ToolName = "content_search" | "document_get" | "document_search" | "document_list" | "document_close" | "tool_search" | "tool_get" | "tool_load" | "robot_create" | "robot_list" | "robot_get" | "robot_update" | "robot_delete" | "robot_search" | "trail_create" | "trail_list" | "trail_get" | "trail_update" | "trail_schedule_preview" | "trail_run_list" | "trail_run_get" | "trail_run_create" | "trail_action_run_cancel" | "toolset_search" | "toolset_load" | "toolset_create" | "toolset_list" | "toolset_get" | "toolset_update" | "toolset_delete" | "library_page_list" | "library_request_page" | "library_page_get" | "library_page_open" | "create_library_page" | "update_library_page" | "library_search_pages" | "library_page_property_schema_get" | "library_page_property_schema_update" | "library_page_properties_update" | "tag_list" | "link_create" | "web_fetch" | "web_open" | "thread_create" | "thread_list" | "thread_get" | "thread_open" | "thread_update" | "thread_reply" | "category_list" | "thread_search" | "reply_search" | "post_search" | "member_search";
+export type ToolName = "content_search" | "document_get" | "document_search" | "document_list" | "document_close" | "tool_search" | "tool_get" | "tool_load" | "robot_create" | "robot_list" | "robot_get" | "robot_update" | "robot_delete" | "robot_search" | "trail_create" | "trail_list" | "trail_get" | "trail_update" | "trail_schedule_preview" | "trail_run_list" | "trail_run_get" | "trail_run_create" | "trail_action_run_cancel" | "toolset_search" | "toolset_load" | "toolset_create" | "toolset_list" | "toolset_get" | "toolset_update" | "toolset_delete" | "library_page_list" | "library_request_page" | "library_page_get" | "library_page_open" | "create_library_page" | "update_library_page" | "library_search_pages" | "library_page_property_schema_get" | "library_page_property_schema_update" | "library_page_properties_update" | "tag_list" | "link_create" | "web_fetch" | "web_open" | "thread_create" | "thread_list" | "thread_get" | "thread_open" | "thread_update" | "thread_reply" | "category_list" | "thread_search" | "reply_search" | "post_search" | "member_search" | "report_create" | "report_list" | "report_get" | "report_update" | "member_suspend" | "member_reinstate";
 
-export const TOOL_NAMES = ["content_search", "document_get", "document_search", "document_list", "document_close", "tool_search", "tool_get", "tool_load", "robot_create", "robot_list", "robot_get", "robot_update", "robot_delete", "robot_search", "trail_create", "trail_list", "trail_get", "trail_update", "trail_schedule_preview", "trail_run_list", "trail_run_get", "trail_run_create", "trail_action_run_cancel", "toolset_search", "toolset_load", "toolset_create", "toolset_list", "toolset_get", "toolset_update", "toolset_delete", "library_page_list", "library_request_page", "library_page_get", "library_page_open", "create_library_page", "update_library_page", "library_search_pages", "library_page_property_schema_get", "library_page_property_schema_update", "library_page_properties_update", "tag_list", "link_create", "web_fetch", "web_open", "thread_create", "thread_list", "thread_get", "thread_open", "thread_update", "thread_reply", "category_list", "thread_search", "reply_search", "post_search", "member_search"] as const;
+export const TOOL_NAMES = ["content_search", "document_get", "document_search", "document_list", "document_close", "tool_search", "tool_get", "tool_load", "robot_create", "robot_list", "robot_get", "robot_update", "robot_delete", "robot_search", "trail_create", "trail_list", "trail_get", "trail_update", "trail_schedule_preview", "trail_run_list", "trail_run_get", "trail_run_create", "trail_action_run_cancel", "toolset_search", "toolset_load", "toolset_create", "toolset_list", "toolset_get", "toolset_update", "toolset_delete", "library_page_list", "library_request_page", "library_page_get", "library_page_open", "create_library_page", "update_library_page", "library_search_pages", "library_page_property_schema_get", "library_page_property_schema_update", "library_page_properties_update", "tag_list", "link_create", "web_fetch", "web_open", "thread_create", "thread_list", "thread_get", "thread_open", "thread_update", "thread_reply", "category_list", "thread_search", "reply_search", "post_search", "member_search", "report_create", "report_list", "report_get", "report_update", "member_suspend", "member_reinstate"] as const;
 
 export type ToolInputMap = {
   "content_search": ToolContentSearchInput;
@@ -2718,6 +2928,12 @@ export type ToolInputMap = {
   "reply_search": ToolReplySearchInput;
   "post_search": ToolPostSearchInput;
   "member_search": ToolMemberSearchInput;
+  "report_create": ToolReportCreateInput;
+  "report_list": ToolReportListInput;
+  "report_get": ToolReportGetInput;
+  "report_update": ToolReportUpdateInput;
+  "member_suspend": ToolMemberSuspendInput;
+  "member_reinstate": ToolMemberReinstateInput;
 };
 
 export type ToolOutputMap = {
@@ -2776,6 +2992,12 @@ export type ToolOutputMap = {
   "reply_search": ToolReplySearchOutput;
   "post_search": ToolPostSearchOutput;
   "member_search": ToolMemberSearchOutput;
+  "report_create": ToolReportCreateOutput;
+  "report_list": ToolReportListOutput;
+  "report_get": ToolReportGetOutput;
+  "report_update": ToolReportUpdateOutput;
+  "member_suspend": ToolMemberSuspendOutput;
+  "member_reinstate": ToolMemberReinstateOutput;
 };
 export type StorydenTools = {
   "content_search": {
@@ -2997,5 +3219,29 @@ export type StorydenTools = {
   "member_search": {
     input: ToolMemberSearchInput;
     output: ToolMemberSearchOutput;
+  };
+  "report_create": {
+    input: ToolReportCreateInput;
+    output: ToolReportCreateOutput;
+  };
+  "report_list": {
+    input: ToolReportListInput;
+    output: ToolReportListOutput;
+  };
+  "report_get": {
+    input: ToolReportGetInput;
+    output: ToolReportGetOutput;
+  };
+  "report_update": {
+    input: ToolReportUpdateInput;
+    output: ToolReportUpdateOutput;
+  };
+  "member_suspend": {
+    input: ToolMemberSuspendInput;
+    output: ToolMemberSuspendOutput;
+  };
+  "member_reinstate": {
+    input: ToolMemberReinstateInput;
+    output: ToolMemberReinstateOutput;
   };
 };

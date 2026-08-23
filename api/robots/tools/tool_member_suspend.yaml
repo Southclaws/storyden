@@ -1,0 +1,33 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolMemberSuspend
+x-storyden-tool:
+  toolsets:
+    - system.moderation
+  title: Suspend Member
+  role: MANAGE_SUSPENSIONS
+  annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false }
+title: member_suspend
+description: Suspend a community member, preventing sign-in and use of the platform while preserving their account and content.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolMemberSuspendInput" }
+  output: { $ref: "#/definitions/ToolMemberSuspendOutput" }
+definitions:
+  ToolMemberSuspendInput:
+    type: object
+    required: [account_id]
+    additionalProperties: false
+    properties:
+      account_id:
+        type: string
+        pattern: '^[0-9a-v]{20}$'
+        description: Member account identifier, obtainable from member_search or a profile report target.
+  ToolMemberSuspendOutput:
+    type: object
+    required: [account_id, handle, suspended]
+    additionalProperties: false
+    properties:
+      account_id: { type: string, description: Suspended member account identifier. }
+      handle: { type: string, description: Suspended member handle. }
+      suspended: { type: boolean, const: true, description: Confirms the member is suspended. }

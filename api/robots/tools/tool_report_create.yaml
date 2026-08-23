@@ -1,0 +1,40 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolReportCreate
+x-storyden-tool:
+  toolsets:
+    - system.moderation
+  title: Create Report
+  role: MANAGE_REPORTS
+  annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false }
+title: report_create
+description: Submit an evidence-based moderation report for a member or content item.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolReportCreateInput" }
+  output: { $ref: "#/definitions/ToolReportCreateOutput" }
+definitions:
+  ToolReportCreateInput:
+    type: object
+    required: [target_id, target_kind, comment]
+    additionalProperties: false
+    properties:
+      target_id:
+        type: string
+        pattern: '^[0-9a-v]{20}$'
+        description: Identifier of the content or member being reported.
+      target_kind:
+        type: string
+        enum: [post, thread, reply, node, collection, profile, event]
+        description: Kind of the reported target.
+      comment:
+        type: string
+        minLength: 1
+        maxLength: 4000
+        description: Specific policy concern and evidence for a moderator to review.
+  ToolReportCreateOutput:
+    type: object
+    required: [report]
+    additionalProperties: false
+    properties:
+      report: { $ref: "../../common/ModerationToolReport.yaml" }

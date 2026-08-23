@@ -20,9 +20,15 @@ var (
 	toolLibraryRequestPage              *ToolDefinition
 	toolLibrarySearchPages              *ToolDefinition
 	toolLinkCreate                      *ToolDefinition
+	toolMemberReinstate                 *ToolDefinition
 	toolMemberSearch                    *ToolDefinition
+	toolMemberSuspend                   *ToolDefinition
 	toolPostSearch                      *ToolDefinition
 	toolReplySearch                     *ToolDefinition
+	toolReportCreate                    *ToolDefinition
+	toolReportGet                       *ToolDefinition
+	toolReportList                      *ToolDefinition
+	toolReportUpdate                    *ToolDefinition
 	toolRobotCreate                     *ToolDefinition
 	toolRobotDelete                     *ToolDefinition
 	toolRobotGet                        *ToolDefinition
@@ -79,9 +85,15 @@ func initAllTools() {
 	toolLibraryRequestPage = initTool("LibraryRequestPage")
 	toolLibrarySearchPages = initTool("LibrarySearchPages")
 	toolLinkCreate = initTool("LinkCreate")
+	toolMemberReinstate = initTool("MemberReinstate")
 	toolMemberSearch = initTool("MemberSearch")
+	toolMemberSuspend = initTool("MemberSuspend")
 	toolPostSearch = initTool("PostSearch")
 	toolReplySearch = initTool("ReplySearch")
+	toolReportCreate = initTool("ReportCreate")
+	toolReportGet = initTool("ReportGet")
+	toolReportList = initTool("ReportList")
+	toolReportUpdate = initTool("ReportUpdate")
 	toolRobotCreate = initTool("RobotCreate")
 	toolRobotDelete = initTool("RobotDelete")
 	toolRobotGet = initTool("RobotGet")
@@ -145,9 +157,15 @@ func AllToolNames() []string {
 		toolLibraryRequestPage.Name,
 		toolLibrarySearchPages.Name,
 		toolLinkCreate.Name,
+		toolMemberReinstate.Name,
 		toolMemberSearch.Name,
+		toolMemberSuspend.Name,
 		toolPostSearch.Name,
 		toolReplySearch.Name,
+		toolReportCreate.Name,
+		toolReportGet.Name,
+		toolReportList.Name,
+		toolReportUpdate.Name,
 		toolRobotCreate.Name,
 		toolRobotDelete.Name,
 		toolRobotGet.Name,
@@ -254,8 +272,16 @@ func GetLinkCreateTool() *ToolDefinition {
 	return toolLinkCreate
 }
 
+func GetMemberReinstateTool() *ToolDefinition {
+	return toolMemberReinstate
+}
+
 func GetMemberSearchTool() *ToolDefinition {
 	return toolMemberSearch
+}
+
+func GetMemberSuspendTool() *ToolDefinition {
+	return toolMemberSuspend
 }
 
 func GetPostSearchTool() *ToolDefinition {
@@ -264,6 +290,22 @@ func GetPostSearchTool() *ToolDefinition {
 
 func GetReplySearchTool() *ToolDefinition {
 	return toolReplySearch
+}
+
+func GetReportCreateTool() *ToolDefinition {
+	return toolReportCreate
+}
+
+func GetReportGetTool() *ToolDefinition {
+	return toolReportGet
+}
+
+func GetReportListTool() *ToolDefinition {
+	return toolReportList
+}
+
+func GetReportUpdateTool() *ToolDefinition {
+	return toolReportUpdate
 }
 
 func GetRobotCreateTool() *ToolDefinition {

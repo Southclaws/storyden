@@ -14800,6 +14800,1238 @@
           "additionalProperties": false
         }
       }
+    },
+    "ToolReportCreate": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolReportCreate",
+      "x-storyden-tool": {
+        "toolsets": [
+          "system.moderation"
+        ],
+        "title": "Create Report",
+        "role": "MANAGE_REPORTS",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        }
+      },
+      "title": "report_create",
+      "description": "Submit an evidence-based moderation report for a member or content item.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": [
+            "target_id",
+            "target_kind",
+            "comment"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "target_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$",
+              "description": "Identifier of the content or member being reported."
+            },
+            "target_kind": {
+              "type": "string",
+              "enum": [
+                "post",
+                "thread",
+                "reply",
+                "node",
+                "collection",
+                "profile",
+                "event"
+              ],
+              "description": "Kind of the reported target."
+            },
+            "comment": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4000,
+              "description": "Specific policy concern and evidence for a moderator to review."
+            }
+          }
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "report"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "report": {
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "type": "object",
+              "description": "A moderation report and its current triage state.",
+              "required": [
+                "id",
+                "target_id",
+                "target_kind",
+                "status",
+                "created_at",
+                "updated_at"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Stable report identifier accepted by report_get and report_update."
+                },
+                "target_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Identifier of the reported content or member."
+                },
+                "target_kind": {
+                  "type": "string",
+                  "enum": [
+                    "post",
+                    "thread",
+                    "reply",
+                    "node",
+                    "collection",
+                    "profile",
+                    "event"
+                  ],
+                  "description": "Kind of the reported target."
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "submitted",
+                    "acknowledged",
+                    "resolved"
+                  ],
+                  "description": "Current report triage state."
+                },
+                "comment": {
+                  "type": "string",
+                  "description": "Reporter-provided reason and supporting context."
+                },
+                "reported_by_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Identifier of the account that submitted the report, when present."
+                },
+                "handled_by_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Identifier of the account currently handling the report, when assigned."
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Time the report was submitted in UTC."
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Time the report was last updated in UTC."
+                }
+              }
+            }
+          }
+        }
+      },
+      "definitions": {
+        "ToolReportCreateInput": {
+          "type": "object",
+          "required": [
+            "target_id",
+            "target_kind",
+            "comment"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "target_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$",
+              "description": "Identifier of the content or member being reported."
+            },
+            "target_kind": {
+              "type": "string",
+              "enum": [
+                "post",
+                "thread",
+                "reply",
+                "node",
+                "collection",
+                "profile",
+                "event"
+              ],
+              "description": "Kind of the reported target."
+            },
+            "comment": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4000,
+              "description": "Specific policy concern and evidence for a moderator to review."
+            }
+          }
+        },
+        "ToolReportCreateOutput": {
+          "type": "object",
+          "required": [
+            "report"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "report": {
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "type": "object",
+              "description": "A moderation report and its current triage state.",
+              "required": [
+                "id",
+                "target_id",
+                "target_kind",
+                "status",
+                "created_at",
+                "updated_at"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Stable report identifier accepted by report_get and report_update."
+                },
+                "target_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Identifier of the reported content or member."
+                },
+                "target_kind": {
+                  "type": "string",
+                  "enum": [
+                    "post",
+                    "thread",
+                    "reply",
+                    "node",
+                    "collection",
+                    "profile",
+                    "event"
+                  ],
+                  "description": "Kind of the reported target."
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "submitted",
+                    "acknowledged",
+                    "resolved"
+                  ],
+                  "description": "Current report triage state."
+                },
+                "comment": {
+                  "type": "string",
+                  "description": "Reporter-provided reason and supporting context."
+                },
+                "reported_by_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Identifier of the account that submitted the report, when present."
+                },
+                "handled_by_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Identifier of the account currently handling the report, when assigned."
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Time the report was submitted in UTC."
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Time the report was last updated in UTC."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ToolReportList": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolReportList",
+      "x-storyden-tool": {
+        "toolsets": [
+          "system.moderation"
+        ],
+        "title": "List Reports",
+        "role": "MANAGE_REPORTS",
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        }
+      },
+      "title": "report_list",
+      "description": "List submitted moderation reports, optionally narrowed by status or target kind.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "submitted",
+                "acknowledged",
+                "resolved"
+              ],
+              "description": "Return reports in one triage state. Omit to list all reports."
+            },
+            "target_kind": {
+              "type": "string",
+              "enum": [
+                "post",
+                "thread",
+                "reply",
+                "node",
+                "collection",
+                "profile",
+                "event"
+              ],
+              "description": "Return reports for one kind of target. Omit to include all kinds."
+            },
+            "page": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "One-indexed page number, defaulting to 1."
+            },
+            "page_size": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "description": "Maximum reports to return, defaulting to 20."
+            }
+          }
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "reports",
+            "results",
+            "page"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "reports": {
+              "type": "array",
+              "description": "Reports ordered by their most recent update.",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "description": "A moderation report and its current triage state.",
+                "required": [
+                  "id",
+                  "target_id",
+                  "target_kind",
+                  "status",
+                  "created_at",
+                  "updated_at"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-v]{20}$",
+                    "description": "Stable report identifier accepted by report_get and report_update."
+                  },
+                  "target_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-v]{20}$",
+                    "description": "Identifier of the reported content or member."
+                  },
+                  "target_kind": {
+                    "type": "string",
+                    "enum": [
+                      "post",
+                      "thread",
+                      "reply",
+                      "node",
+                      "collection",
+                      "profile",
+                      "event"
+                    ],
+                    "description": "Kind of the reported target."
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "submitted",
+                      "acknowledged",
+                      "resolved"
+                    ],
+                    "description": "Current report triage state."
+                  },
+                  "comment": {
+                    "type": "string",
+                    "description": "Reporter-provided reason and supporting context."
+                  },
+                  "reported_by_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-v]{20}$",
+                    "description": "Identifier of the account that submitted the report, when present."
+                  },
+                  "handled_by_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-v]{20}$",
+                    "description": "Identifier of the account currently handling the report, when assigned."
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Time the report was submitted in UTC."
+                  },
+                  "updated_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Time the report was last updated in UTC."
+                  }
+                }
+              }
+            },
+            "results": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of reports returned on this page."
+            },
+            "page": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "One-indexed page returned."
+            },
+            "next_page": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Next page number when more matching reports are available."
+            }
+          }
+        }
+      },
+      "definitions": {
+        "ToolReportListInput": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "submitted",
+                "acknowledged",
+                "resolved"
+              ],
+              "description": "Return reports in one triage state. Omit to list all reports."
+            },
+            "target_kind": {
+              "type": "string",
+              "enum": [
+                "post",
+                "thread",
+                "reply",
+                "node",
+                "collection",
+                "profile",
+                "event"
+              ],
+              "description": "Return reports for one kind of target. Omit to include all kinds."
+            },
+            "page": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "One-indexed page number, defaulting to 1."
+            },
+            "page_size": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "description": "Maximum reports to return, defaulting to 20."
+            }
+          }
+        },
+        "ToolReportListOutput": {
+          "type": "object",
+          "required": [
+            "reports",
+            "results",
+            "page"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "reports": {
+              "type": "array",
+              "description": "Reports ordered by their most recent update.",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "description": "A moderation report and its current triage state.",
+                "required": [
+                  "id",
+                  "target_id",
+                  "target_kind",
+                  "status",
+                  "created_at",
+                  "updated_at"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-v]{20}$",
+                    "description": "Stable report identifier accepted by report_get and report_update."
+                  },
+                  "target_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-v]{20}$",
+                    "description": "Identifier of the reported content or member."
+                  },
+                  "target_kind": {
+                    "type": "string",
+                    "enum": [
+                      "post",
+                      "thread",
+                      "reply",
+                      "node",
+                      "collection",
+                      "profile",
+                      "event"
+                    ],
+                    "description": "Kind of the reported target."
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "submitted",
+                      "acknowledged",
+                      "resolved"
+                    ],
+                    "description": "Current report triage state."
+                  },
+                  "comment": {
+                    "type": "string",
+                    "description": "Reporter-provided reason and supporting context."
+                  },
+                  "reported_by_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-v]{20}$",
+                    "description": "Identifier of the account that submitted the report, when present."
+                  },
+                  "handled_by_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-v]{20}$",
+                    "description": "Identifier of the account currently handling the report, when assigned."
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Time the report was submitted in UTC."
+                  },
+                  "updated_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Time the report was last updated in UTC."
+                  }
+                }
+              }
+            },
+            "results": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of reports returned on this page."
+            },
+            "page": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "One-indexed page returned."
+            },
+            "next_page": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Next page number when more matching reports are available."
+            }
+          }
+        }
+      }
+    },
+    "ToolReportGet": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolReportGet",
+      "x-storyden-tool": {
+        "toolsets": [
+          "system.moderation"
+        ],
+        "title": "Get Report",
+        "role": "MANAGE_REPORTS",
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        }
+      },
+      "title": "report_get",
+      "description": "Retrieve one moderation report by its identifier.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": [
+            "report_id"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "report_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$",
+              "description": "Report identifier returned by report_list or report_create."
+            }
+          }
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "report"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "report": {
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "type": "object",
+              "description": "A moderation report and its current triage state.",
+              "required": [
+                "id",
+                "target_id",
+                "target_kind",
+                "status",
+                "created_at",
+                "updated_at"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Stable report identifier accepted by report_get and report_update."
+                },
+                "target_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Identifier of the reported content or member."
+                },
+                "target_kind": {
+                  "type": "string",
+                  "enum": [
+                    "post",
+                    "thread",
+                    "reply",
+                    "node",
+                    "collection",
+                    "profile",
+                    "event"
+                  ],
+                  "description": "Kind of the reported target."
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "submitted",
+                    "acknowledged",
+                    "resolved"
+                  ],
+                  "description": "Current report triage state."
+                },
+                "comment": {
+                  "type": "string",
+                  "description": "Reporter-provided reason and supporting context."
+                },
+                "reported_by_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Identifier of the account that submitted the report, when present."
+                },
+                "handled_by_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Identifier of the account currently handling the report, when assigned."
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Time the report was submitted in UTC."
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Time the report was last updated in UTC."
+                }
+              }
+            }
+          }
+        }
+      },
+      "definitions": {
+        "ToolReportGetInput": {
+          "type": "object",
+          "required": [
+            "report_id"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "report_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$",
+              "description": "Report identifier returned by report_list or report_create."
+            }
+          }
+        },
+        "ToolReportGetOutput": {
+          "type": "object",
+          "required": [
+            "report"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "report": {
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "type": "object",
+              "description": "A moderation report and its current triage state.",
+              "required": [
+                "id",
+                "target_id",
+                "target_kind",
+                "status",
+                "created_at",
+                "updated_at"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Stable report identifier accepted by report_get and report_update."
+                },
+                "target_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Identifier of the reported content or member."
+                },
+                "target_kind": {
+                  "type": "string",
+                  "enum": [
+                    "post",
+                    "thread",
+                    "reply",
+                    "node",
+                    "collection",
+                    "profile",
+                    "event"
+                  ],
+                  "description": "Kind of the reported target."
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "submitted",
+                    "acknowledged",
+                    "resolved"
+                  ],
+                  "description": "Current report triage state."
+                },
+                "comment": {
+                  "type": "string",
+                  "description": "Reporter-provided reason and supporting context."
+                },
+                "reported_by_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Identifier of the account that submitted the report, when present."
+                },
+                "handled_by_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Identifier of the account currently handling the report, when assigned."
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Time the report was submitted in UTC."
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Time the report was last updated in UTC."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ToolReportUpdate": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolReportUpdate",
+      "x-storyden-tool": {
+        "toolsets": [
+          "system.moderation"
+        ],
+        "title": "Update Report",
+        "role": "MANAGE_REPORTS",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        }
+      },
+      "title": "report_update",
+      "description": "Acknowledge or resolve a moderation report and assign it to the acting moderator.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": [
+            "report_id",
+            "status"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "report_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$",
+              "description": "Report identifier returned by report_list or report_create."
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "acknowledged",
+                "resolved"
+              ],
+              "description": "New triage state. Resolve only after the reported concern has been addressed or dismissed."
+            }
+          }
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "report"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "report": {
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "type": "object",
+              "description": "A moderation report and its current triage state.",
+              "required": [
+                "id",
+                "target_id",
+                "target_kind",
+                "status",
+                "created_at",
+                "updated_at"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Stable report identifier accepted by report_get and report_update."
+                },
+                "target_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Identifier of the reported content or member."
+                },
+                "target_kind": {
+                  "type": "string",
+                  "enum": [
+                    "post",
+                    "thread",
+                    "reply",
+                    "node",
+                    "collection",
+                    "profile",
+                    "event"
+                  ],
+                  "description": "Kind of the reported target."
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "submitted",
+                    "acknowledged",
+                    "resolved"
+                  ],
+                  "description": "Current report triage state."
+                },
+                "comment": {
+                  "type": "string",
+                  "description": "Reporter-provided reason and supporting context."
+                },
+                "reported_by_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Identifier of the account that submitted the report, when present."
+                },
+                "handled_by_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Identifier of the account currently handling the report, when assigned."
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Time the report was submitted in UTC."
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Time the report was last updated in UTC."
+                }
+              }
+            }
+          }
+        }
+      },
+      "definitions": {
+        "ToolReportUpdateInput": {
+          "type": "object",
+          "required": [
+            "report_id",
+            "status"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "report_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$",
+              "description": "Report identifier returned by report_list or report_create."
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "acknowledged",
+                "resolved"
+              ],
+              "description": "New triage state. Resolve only after the reported concern has been addressed or dismissed."
+            }
+          }
+        },
+        "ToolReportUpdateOutput": {
+          "type": "object",
+          "required": [
+            "report"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "report": {
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "type": "object",
+              "description": "A moderation report and its current triage state.",
+              "required": [
+                "id",
+                "target_id",
+                "target_kind",
+                "status",
+                "created_at",
+                "updated_at"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Stable report identifier accepted by report_get and report_update."
+                },
+                "target_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Identifier of the reported content or member."
+                },
+                "target_kind": {
+                  "type": "string",
+                  "enum": [
+                    "post",
+                    "thread",
+                    "reply",
+                    "node",
+                    "collection",
+                    "profile",
+                    "event"
+                  ],
+                  "description": "Kind of the reported target."
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "submitted",
+                    "acknowledged",
+                    "resolved"
+                  ],
+                  "description": "Current report triage state."
+                },
+                "comment": {
+                  "type": "string",
+                  "description": "Reporter-provided reason and supporting context."
+                },
+                "reported_by_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Identifier of the account that submitted the report, when present."
+                },
+                "handled_by_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$",
+                  "description": "Identifier of the account currently handling the report, when assigned."
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Time the report was submitted in UTC."
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Time the report was last updated in UTC."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ToolMemberSuspend": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolMemberSuspend",
+      "x-storyden-tool": {
+        "toolsets": [
+          "system.moderation"
+        ],
+        "title": "Suspend Member",
+        "role": "MANAGE_SUSPENSIONS",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        }
+      },
+      "title": "member_suspend",
+      "description": "Suspend a community member, preventing sign-in and use of the platform while preserving their account and content.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": [
+            "account_id"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "account_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$",
+              "description": "Member account identifier, obtainable from member_search or a profile report target."
+            }
+          }
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "account_id",
+            "handle",
+            "suspended"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "account_id": {
+              "type": "string",
+              "description": "Suspended member account identifier."
+            },
+            "handle": {
+              "type": "string",
+              "description": "Suspended member handle."
+            },
+            "suspended": {
+              "type": "boolean",
+              "const": true,
+              "description": "Confirms the member is suspended."
+            }
+          }
+        }
+      },
+      "definitions": {
+        "ToolMemberSuspendInput": {
+          "type": "object",
+          "required": [
+            "account_id"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "account_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$",
+              "description": "Member account identifier, obtainable from member_search or a profile report target."
+            }
+          }
+        },
+        "ToolMemberSuspendOutput": {
+          "type": "object",
+          "required": [
+            "account_id",
+            "handle",
+            "suspended"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "account_id": {
+              "type": "string",
+              "description": "Suspended member account identifier."
+            },
+            "handle": {
+              "type": "string",
+              "description": "Suspended member handle."
+            },
+            "suspended": {
+              "type": "boolean",
+              "const": true,
+              "description": "Confirms the member is suspended."
+            }
+          }
+        }
+      }
+    },
+    "ToolMemberReinstate": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolMemberReinstate",
+      "x-storyden-tool": {
+        "toolsets": [
+          "system.moderation"
+        ],
+        "title": "Reinstate Member",
+        "role": "MANAGE_SUSPENSIONS",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        }
+      },
+      "title": "member_reinstate",
+      "description": "Reinstate a suspended community member, restoring their ability to sign in and use the platform.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": [
+            "account_id"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "account_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$",
+              "description": "Suspended member account identifier, obtainable from member_search or a profile report target."
+            }
+          }
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "account_id",
+            "handle",
+            "suspended"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "account_id": {
+              "type": "string",
+              "description": "Reinstated member account identifier."
+            },
+            "handle": {
+              "type": "string",
+              "description": "Reinstated member handle."
+            },
+            "suspended": {
+              "type": "boolean",
+              "const": false,
+              "description": "Confirms the member is no longer suspended."
+            }
+          }
+        }
+      },
+      "definitions": {
+        "ToolMemberReinstateInput": {
+          "type": "object",
+          "required": [
+            "account_id"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "account_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$",
+              "description": "Suspended member account identifier, obtainable from member_search or a profile report target."
+            }
+          }
+        },
+        "ToolMemberReinstateOutput": {
+          "type": "object",
+          "required": [
+            "account_id",
+            "handle",
+            "suspended"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "account_id": {
+              "type": "string",
+              "description": "Reinstated member account identifier."
+            },
+            "handle": {
+              "type": "string",
+              "description": "Reinstated member handle."
+            },
+            "suspended": {
+              "type": "boolean",
+              "const": false,
+              "description": "Confirms the member is no longer suspended."
+            }
+          }
+        }
+      }
     }
   }
 }

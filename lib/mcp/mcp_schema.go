@@ -306,6 +306,157 @@ func (j *MemberSearchItem) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
+// A moderation report and its current triage state.
+type ModerationToolReportYaml struct {
+	// Reporter-provided reason and supporting context.
+	Comment *string `json:"comment,omitempty" yaml:"comment,omitempty" mapstructure:"comment,omitempty"`
+
+	// Time the report was submitted in UTC.
+	CreatedAt time.Time `json:"created_at" yaml:"created_at" mapstructure:"created_at"`
+
+	// Identifier of the account currently handling the report, when assigned.
+	HandledById *string `json:"handled_by_id,omitempty" yaml:"handled_by_id,omitempty" mapstructure:"handled_by_id,omitempty"`
+
+	// Stable report identifier accepted by report_get and report_update.
+	Id string `json:"id" yaml:"id" mapstructure:"id"`
+
+	// Identifier of the account that submitted the report, when present.
+	ReportedById *string `json:"reported_by_id,omitempty" yaml:"reported_by_id,omitempty" mapstructure:"reported_by_id,omitempty"`
+
+	// Current report triage state.
+	Status ModerationToolReportYamlStatus `json:"status" yaml:"status" mapstructure:"status"`
+
+	// Identifier of the reported content or member.
+	TargetId string `json:"target_id" yaml:"target_id" mapstructure:"target_id"`
+
+	// Kind of the reported target.
+	TargetKind ModerationToolReportYamlTargetKind `json:"target_kind" yaml:"target_kind" mapstructure:"target_kind"`
+
+	// Time the report was last updated in UTC.
+	UpdatedAt time.Time `json:"updated_at" yaml:"updated_at" mapstructure:"updated_at"`
+}
+
+type ModerationToolReportYamlStatus string
+
+const ModerationToolReportYamlStatusAcknowledged ModerationToolReportYamlStatus = "acknowledged"
+const ModerationToolReportYamlStatusResolved ModerationToolReportYamlStatus = "resolved"
+const ModerationToolReportYamlStatusSubmitted ModerationToolReportYamlStatus = "submitted"
+
+var enumValues_ModerationToolReportYamlStatus = []interface{}{
+	"submitted",
+	"acknowledged",
+	"resolved",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ModerationToolReportYamlStatus) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_ModerationToolReportYamlStatus {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_ModerationToolReportYamlStatus, v)
+	}
+	*j = ModerationToolReportYamlStatus(v)
+	return nil
+}
+
+type ModerationToolReportYamlTargetKind string
+
+const ModerationToolReportYamlTargetKindCollection ModerationToolReportYamlTargetKind = "collection"
+const ModerationToolReportYamlTargetKindEvent ModerationToolReportYamlTargetKind = "event"
+const ModerationToolReportYamlTargetKindNode ModerationToolReportYamlTargetKind = "node"
+const ModerationToolReportYamlTargetKindPost ModerationToolReportYamlTargetKind = "post"
+const ModerationToolReportYamlTargetKindProfile ModerationToolReportYamlTargetKind = "profile"
+const ModerationToolReportYamlTargetKindReply ModerationToolReportYamlTargetKind = "reply"
+const ModerationToolReportYamlTargetKindThread ModerationToolReportYamlTargetKind = "thread"
+
+var enumValues_ModerationToolReportYamlTargetKind = []interface{}{
+	"post",
+	"thread",
+	"reply",
+	"node",
+	"collection",
+	"profile",
+	"event",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ModerationToolReportYamlTargetKind) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_ModerationToolReportYamlTargetKind {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_ModerationToolReportYamlTargetKind, v)
+	}
+	*j = ModerationToolReportYamlTargetKind(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ModerationToolReportYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["created_at"]; raw != nil && !ok {
+		return fmt.Errorf("field created_at in ModerationToolReportYaml: required")
+	}
+	if _, ok := raw["id"]; raw != nil && !ok {
+		return fmt.Errorf("field id in ModerationToolReportYaml: required")
+	}
+	if _, ok := raw["status"]; raw != nil && !ok {
+		return fmt.Errorf("field status in ModerationToolReportYaml: required")
+	}
+	if _, ok := raw["target_id"]; raw != nil && !ok {
+		return fmt.Errorf("field target_id in ModerationToolReportYaml: required")
+	}
+	if _, ok := raw["target_kind"]; raw != nil && !ok {
+		return fmt.Errorf("field target_kind in ModerationToolReportYaml: required")
+	}
+	if _, ok := raw["updated_at"]; raw != nil && !ok {
+		return fmt.Errorf("field updated_at in ModerationToolReportYaml: required")
+	}
+	type Plain ModerationToolReportYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if plain.HandledById != nil {
+		if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(*plain.HandledById)); !matched {
+			return fmt.Errorf("field %s pattern match: must match %s", "HandledById", `^[0-9a-v]{20}$`)
+		}
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.Id)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "Id", `^[0-9a-v]{20}$`)
+	}
+	if plain.ReportedById != nil {
+		if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(*plain.ReportedById)); !matched {
+			return fmt.Errorf("field %s pattern match: must match %s", "ReportedById", `^[0-9a-v]{20}$`)
+		}
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.TargetId)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "TargetId", `^[0-9a-v]{20}$`)
+	}
+	*j = ModerationToolReportYaml(plain)
+	return nil
+}
+
 type OpenDocument struct {
 	// Whether tools use this document when document_id is omitted.
 	Active bool `json:"active" yaml:"active" mapstructure:"active"`
@@ -2949,6 +3100,99 @@ func (j *ToolLinkCreateYaml) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
+type ToolMemberReinstateInput struct {
+	// Suspended member account identifier, obtainable from member_search or a profile
+	// report target.
+	AccountId string `json:"account_id" yaml:"account_id" mapstructure:"account_id"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemberReinstateInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["account_id"]; raw != nil && !ok {
+		return fmt.Errorf("field account_id in ToolMemberReinstateInput: required")
+	}
+	type Plain ToolMemberReinstateInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.AccountId)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "AccountId", `^[0-9a-v]{20}$`)
+	}
+	*j = ToolMemberReinstateInput(plain)
+	return nil
+}
+
+type ToolMemberReinstateOutput struct {
+	// Reinstated member account identifier.
+	AccountId string `json:"account_id" yaml:"account_id" mapstructure:"account_id"`
+
+	// Reinstated member handle.
+	Handle string `json:"handle" yaml:"handle" mapstructure:"handle"`
+
+	// Confirms the member is no longer suspended.
+	Suspended bool `json:"suspended" yaml:"suspended" mapstructure:"suspended"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemberReinstateOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["account_id"]; raw != nil && !ok {
+		return fmt.Errorf("field account_id in ToolMemberReinstateOutput: required")
+	}
+	if _, ok := raw["handle"]; raw != nil && !ok {
+		return fmt.Errorf("field handle in ToolMemberReinstateOutput: required")
+	}
+	if _, ok := raw["suspended"]; raw != nil && !ok {
+		return fmt.Errorf("field suspended in ToolMemberReinstateOutput: required")
+	}
+	type Plain ToolMemberReinstateOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolMemberReinstateOutput(plain)
+	return nil
+}
+
+// Reinstate a suspended community member, restoring their ability to sign in and
+// use the platform.
+type ToolMemberReinstateYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolMemberReinstateInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolMemberReinstateOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemberReinstateYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolMemberReinstateYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolMemberReinstateYaml: required")
+	}
+	type Plain ToolMemberReinstateYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolMemberReinstateYaml(plain)
+	return nil
+}
+
 type ToolMemberSearchInput struct {
 	// Maximum number of results to return (default 10, max 100)
 	MaxResults *int `json:"max_results,omitempty" yaml:"max_results,omitempty" mapstructure:"max_results,omitempty"`
@@ -3042,6 +3286,99 @@ func (j *ToolMemberSearchYaml) UnmarshalJSON(value []byte) error {
 		return err
 	}
 	*j = ToolMemberSearchYaml(plain)
+	return nil
+}
+
+type ToolMemberSuspendInput struct {
+	// Member account identifier, obtainable from member_search or a profile report
+	// target.
+	AccountId string `json:"account_id" yaml:"account_id" mapstructure:"account_id"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemberSuspendInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["account_id"]; raw != nil && !ok {
+		return fmt.Errorf("field account_id in ToolMemberSuspendInput: required")
+	}
+	type Plain ToolMemberSuspendInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.AccountId)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "AccountId", `^[0-9a-v]{20}$`)
+	}
+	*j = ToolMemberSuspendInput(plain)
+	return nil
+}
+
+type ToolMemberSuspendOutput struct {
+	// Suspended member account identifier.
+	AccountId string `json:"account_id" yaml:"account_id" mapstructure:"account_id"`
+
+	// Suspended member handle.
+	Handle string `json:"handle" yaml:"handle" mapstructure:"handle"`
+
+	// Confirms the member is suspended.
+	Suspended bool `json:"suspended" yaml:"suspended" mapstructure:"suspended"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemberSuspendOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["account_id"]; raw != nil && !ok {
+		return fmt.Errorf("field account_id in ToolMemberSuspendOutput: required")
+	}
+	if _, ok := raw["handle"]; raw != nil && !ok {
+		return fmt.Errorf("field handle in ToolMemberSuspendOutput: required")
+	}
+	if _, ok := raw["suspended"]; raw != nil && !ok {
+		return fmt.Errorf("field suspended in ToolMemberSuspendOutput: required")
+	}
+	type Plain ToolMemberSuspendOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolMemberSuspendOutput(plain)
+	return nil
+}
+
+// Suspend a community member, preventing sign-in and use of the platform while
+// preserving their account and content.
+type ToolMemberSuspendYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolMemberSuspendInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolMemberSuspendOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemberSuspendYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolMemberSuspendYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolMemberSuspendYaml: required")
+	}
+	type Plain ToolMemberSuspendYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolMemberSuspendYaml(plain)
 	return nil
 }
 
@@ -3250,6 +3587,522 @@ func (j *ToolReplySearchYaml) UnmarshalJSON(value []byte) error {
 		return err
 	}
 	*j = ToolReplySearchYaml(plain)
+	return nil
+}
+
+type ToolReportCreateInput struct {
+	// Specific policy concern and evidence for a moderator to review.
+	Comment string `json:"comment" yaml:"comment" mapstructure:"comment"`
+
+	// Identifier of the content or member being reported.
+	TargetId string `json:"target_id" yaml:"target_id" mapstructure:"target_id"`
+
+	// Kind of the reported target.
+	TargetKind ToolReportCreateInputTargetKind `json:"target_kind" yaml:"target_kind" mapstructure:"target_kind"`
+}
+
+type ToolReportCreateInputTargetKind string
+
+const ToolReportCreateInputTargetKindCollection ToolReportCreateInputTargetKind = "collection"
+const ToolReportCreateInputTargetKindEvent ToolReportCreateInputTargetKind = "event"
+const ToolReportCreateInputTargetKindNode ToolReportCreateInputTargetKind = "node"
+const ToolReportCreateInputTargetKindPost ToolReportCreateInputTargetKind = "post"
+const ToolReportCreateInputTargetKindProfile ToolReportCreateInputTargetKind = "profile"
+const ToolReportCreateInputTargetKindReply ToolReportCreateInputTargetKind = "reply"
+const ToolReportCreateInputTargetKindThread ToolReportCreateInputTargetKind = "thread"
+
+var enumValues_ToolReportCreateInputTargetKind = []interface{}{
+	"post",
+	"thread",
+	"reply",
+	"node",
+	"collection",
+	"profile",
+	"event",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolReportCreateInputTargetKind) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_ToolReportCreateInputTargetKind {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_ToolReportCreateInputTargetKind, v)
+	}
+	*j = ToolReportCreateInputTargetKind(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolReportCreateInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["comment"]; raw != nil && !ok {
+		return fmt.Errorf("field comment in ToolReportCreateInput: required")
+	}
+	if _, ok := raw["target_id"]; raw != nil && !ok {
+		return fmt.Errorf("field target_id in ToolReportCreateInput: required")
+	}
+	if _, ok := raw["target_kind"]; raw != nil && !ok {
+		return fmt.Errorf("field target_kind in ToolReportCreateInput: required")
+	}
+	type Plain ToolReportCreateInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if len(plain.Comment) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "comment", 1)
+	}
+	if len(plain.Comment) > 4000 {
+		return fmt.Errorf("field %s length: must be <= %d", "comment", 4000)
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.TargetId)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "TargetId", `^[0-9a-v]{20}$`)
+	}
+	*j = ToolReportCreateInput(plain)
+	return nil
+}
+
+type ToolReportCreateOutput struct {
+	// Report corresponds to the JSON schema field "report".
+	Report ModerationToolReportYaml `json:"report" yaml:"report" mapstructure:"report"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolReportCreateOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["report"]; raw != nil && !ok {
+		return fmt.Errorf("field report in ToolReportCreateOutput: required")
+	}
+	type Plain ToolReportCreateOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolReportCreateOutput(plain)
+	return nil
+}
+
+// Submit an evidence-based moderation report for a member or content item.
+type ToolReportCreateYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolReportCreateInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolReportCreateOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolReportCreateYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolReportCreateYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolReportCreateYaml: required")
+	}
+	type Plain ToolReportCreateYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolReportCreateYaml(plain)
+	return nil
+}
+
+type ToolReportGetInput struct {
+	// Report identifier returned by report_list or report_create.
+	ReportId string `json:"report_id" yaml:"report_id" mapstructure:"report_id"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolReportGetInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["report_id"]; raw != nil && !ok {
+		return fmt.Errorf("field report_id in ToolReportGetInput: required")
+	}
+	type Plain ToolReportGetInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.ReportId)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "ReportId", `^[0-9a-v]{20}$`)
+	}
+	*j = ToolReportGetInput(plain)
+	return nil
+}
+
+type ToolReportGetOutput struct {
+	// Report corresponds to the JSON schema field "report".
+	Report ModerationToolReportYaml `json:"report" yaml:"report" mapstructure:"report"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolReportGetOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["report"]; raw != nil && !ok {
+		return fmt.Errorf("field report in ToolReportGetOutput: required")
+	}
+	type Plain ToolReportGetOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolReportGetOutput(plain)
+	return nil
+}
+
+// Retrieve one moderation report by its identifier.
+type ToolReportGetYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolReportGetInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolReportGetOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolReportGetYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolReportGetYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolReportGetYaml: required")
+	}
+	type Plain ToolReportGetYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolReportGetYaml(plain)
+	return nil
+}
+
+type ToolReportListInput struct {
+	// One-indexed page number, defaulting to 1.
+	Page *int `json:"page,omitempty" yaml:"page,omitempty" mapstructure:"page,omitempty"`
+
+	// Maximum reports to return, defaulting to 20.
+	PageSize *int `json:"page_size,omitempty" yaml:"page_size,omitempty" mapstructure:"page_size,omitempty"`
+
+	// Return reports in one triage state. Omit to list all reports.
+	Status *ToolReportListInputStatus `json:"status,omitempty" yaml:"status,omitempty" mapstructure:"status,omitempty"`
+
+	// Return reports for one kind of target. Omit to include all kinds.
+	TargetKind *ToolReportListInputTargetKind `json:"target_kind,omitempty" yaml:"target_kind,omitempty" mapstructure:"target_kind,omitempty"`
+}
+
+type ToolReportListInputStatus string
+
+const ToolReportListInputStatusAcknowledged ToolReportListInputStatus = "acknowledged"
+const ToolReportListInputStatusResolved ToolReportListInputStatus = "resolved"
+const ToolReportListInputStatusSubmitted ToolReportListInputStatus = "submitted"
+
+var enumValues_ToolReportListInputStatus = []interface{}{
+	"submitted",
+	"acknowledged",
+	"resolved",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolReportListInputStatus) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_ToolReportListInputStatus {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_ToolReportListInputStatus, v)
+	}
+	*j = ToolReportListInputStatus(v)
+	return nil
+}
+
+type ToolReportListInputTargetKind string
+
+const ToolReportListInputTargetKindCollection ToolReportListInputTargetKind = "collection"
+const ToolReportListInputTargetKindEvent ToolReportListInputTargetKind = "event"
+const ToolReportListInputTargetKindNode ToolReportListInputTargetKind = "node"
+const ToolReportListInputTargetKindPost ToolReportListInputTargetKind = "post"
+const ToolReportListInputTargetKindProfile ToolReportListInputTargetKind = "profile"
+const ToolReportListInputTargetKindReply ToolReportListInputTargetKind = "reply"
+const ToolReportListInputTargetKindThread ToolReportListInputTargetKind = "thread"
+
+var enumValues_ToolReportListInputTargetKind = []interface{}{
+	"post",
+	"thread",
+	"reply",
+	"node",
+	"collection",
+	"profile",
+	"event",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolReportListInputTargetKind) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_ToolReportListInputTargetKind {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_ToolReportListInputTargetKind, v)
+	}
+	*j = ToolReportListInputTargetKind(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolReportListInput) UnmarshalJSON(value []byte) error {
+	type Plain ToolReportListInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if plain.Page != nil && 1 > *plain.Page {
+		return fmt.Errorf("field %s: must be >= %v", "page", 1)
+	}
+	if plain.PageSize != nil && 100 < *plain.PageSize {
+		return fmt.Errorf("field %s: must be <= %v", "page_size", 100)
+	}
+	if plain.PageSize != nil && 1 > *plain.PageSize {
+		return fmt.Errorf("field %s: must be >= %v", "page_size", 1)
+	}
+	*j = ToolReportListInput(plain)
+	return nil
+}
+
+type ToolReportListOutput struct {
+	// Next page number when more matching reports are available.
+	NextPage *int `json:"next_page,omitempty" yaml:"next_page,omitempty" mapstructure:"next_page,omitempty"`
+
+	// One-indexed page returned.
+	Page int `json:"page" yaml:"page" mapstructure:"page"`
+
+	// Reports ordered by their most recent update.
+	Reports []ModerationToolReportYaml `json:"reports" yaml:"reports" mapstructure:"reports"`
+
+	// Number of reports returned on this page.
+	Results int `json:"results" yaml:"results" mapstructure:"results"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolReportListOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["page"]; raw != nil && !ok {
+		return fmt.Errorf("field page in ToolReportListOutput: required")
+	}
+	if _, ok := raw["reports"]; raw != nil && !ok {
+		return fmt.Errorf("field reports in ToolReportListOutput: required")
+	}
+	if _, ok := raw["results"]; raw != nil && !ok {
+		return fmt.Errorf("field results in ToolReportListOutput: required")
+	}
+	type Plain ToolReportListOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if plain.NextPage != nil && 1 > *plain.NextPage {
+		return fmt.Errorf("field %s: must be >= %v", "next_page", 1)
+	}
+	if 1 > plain.Page {
+		return fmt.Errorf("field %s: must be >= %v", "page", 1)
+	}
+	if 0 > plain.Results {
+		return fmt.Errorf("field %s: must be >= %v", "results", 0)
+	}
+	*j = ToolReportListOutput(plain)
+	return nil
+}
+
+// List submitted moderation reports, optionally narrowed by status or target kind.
+type ToolReportListYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolReportListInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolReportListOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolReportListYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolReportListYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolReportListYaml: required")
+	}
+	type Plain ToolReportListYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolReportListYaml(plain)
+	return nil
+}
+
+type ToolReportUpdateInput struct {
+	// Report identifier returned by report_list or report_create.
+	ReportId string `json:"report_id" yaml:"report_id" mapstructure:"report_id"`
+
+	// New triage state. Resolve only after the reported concern has been addressed or
+	// dismissed.
+	Status ToolReportUpdateInputStatus `json:"status" yaml:"status" mapstructure:"status"`
+}
+
+type ToolReportUpdateInputStatus string
+
+const ToolReportUpdateInputStatusAcknowledged ToolReportUpdateInputStatus = "acknowledged"
+const ToolReportUpdateInputStatusResolved ToolReportUpdateInputStatus = "resolved"
+
+var enumValues_ToolReportUpdateInputStatus = []interface{}{
+	"acknowledged",
+	"resolved",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolReportUpdateInputStatus) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_ToolReportUpdateInputStatus {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_ToolReportUpdateInputStatus, v)
+	}
+	*j = ToolReportUpdateInputStatus(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolReportUpdateInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["report_id"]; raw != nil && !ok {
+		return fmt.Errorf("field report_id in ToolReportUpdateInput: required")
+	}
+	if _, ok := raw["status"]; raw != nil && !ok {
+		return fmt.Errorf("field status in ToolReportUpdateInput: required")
+	}
+	type Plain ToolReportUpdateInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.ReportId)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "ReportId", `^[0-9a-v]{20}$`)
+	}
+	*j = ToolReportUpdateInput(plain)
+	return nil
+}
+
+type ToolReportUpdateOutput struct {
+	// Report corresponds to the JSON schema field "report".
+	Report ModerationToolReportYaml `json:"report" yaml:"report" mapstructure:"report"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolReportUpdateOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["report"]; raw != nil && !ok {
+		return fmt.Errorf("field report in ToolReportUpdateOutput: required")
+	}
+	type Plain ToolReportUpdateOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolReportUpdateOutput(plain)
+	return nil
+}
+
+// Acknowledge or resolve a moderation report and assign it to the acting
+// moderator.
+type ToolReportUpdateYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolReportUpdateInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolReportUpdateOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolReportUpdateYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolReportUpdateYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolReportUpdateYaml: required")
+	}
+	type Plain ToolReportUpdateYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolReportUpdateYaml(plain)
 	return nil
 }
 

@@ -87,6 +87,7 @@ func Build() fx.Option {
 			newTagTools,
 			newLinkTools,
 			newThreadTools,
+			newModerationTools,
 		),
 	)
 }

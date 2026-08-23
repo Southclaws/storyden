@@ -1,0 +1,35 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolReportUpdate
+x-storyden-tool:
+  toolsets:
+    - system.moderation
+  title: Update Report
+  role: MANAGE_REPORTS
+  annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false }
+title: report_update
+description: Acknowledge or resolve a moderation report and assign it to the acting moderator.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolReportUpdateInput" }
+  output: { $ref: "#/definitions/ToolReportUpdateOutput" }
+definitions:
+  ToolReportUpdateInput:
+    type: object
+    required: [report_id, status]
+    additionalProperties: false
+    properties:
+      report_id:
+        type: string
+        pattern: '^[0-9a-v]{20}$'
+        description: Report identifier returned by report_list or report_create.
+      status:
+        type: string
+        enum: [acknowledged, resolved]
+        description: New triage state. Resolve only after the reported concern has been addressed or dismissed.
+  ToolReportUpdateOutput:
+    type: object
+    required: [report]
+    additionalProperties: false
+    properties:
+      report: { $ref: "../../common/ModerationToolReport.yaml" }

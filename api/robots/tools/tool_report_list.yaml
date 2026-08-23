@@ -1,0 +1,58 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolReportList
+x-storyden-tool:
+  toolsets:
+    - system.moderation
+  title: List Reports
+  role: MANAGE_REPORTS
+  annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
+title: report_list
+description: List submitted moderation reports, optionally narrowed by status or target kind.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolReportListInput" }
+  output: { $ref: "#/definitions/ToolReportListOutput" }
+definitions:
+  ToolReportListInput:
+    type: object
+    additionalProperties: false
+    properties:
+      status:
+        type: string
+        enum: [submitted, acknowledged, resolved]
+        description: Return reports in one triage state. Omit to list all reports.
+      target_kind:
+        type: string
+        enum: [post, thread, reply, node, collection, profile, event]
+        description: Return reports for one kind of target. Omit to include all kinds.
+      page:
+        type: integer
+        minimum: 1
+        description: One-indexed page number, defaulting to 1.
+      page_size:
+        type: integer
+        minimum: 1
+        maximum: 100
+        description: Maximum reports to return, defaulting to 20.
+  ToolReportListOutput:
+    type: object
+    required: [reports, results, page]
+    additionalProperties: false
+    properties:
+      reports:
+        type: array
+        description: Reports ordered by their most recent update.
+        items: { $ref: "../../common/ModerationToolReport.yaml" }
+      results:
+        type: integer
+        minimum: 0
+        description: Number of reports returned on this page.
+      page:
+        type: integer
+        minimum: 1
+        description: One-indexed page returned.
+      next_page:
+        type: integer
+        minimum: 1
+        description: Next page number when more matching reports are available.

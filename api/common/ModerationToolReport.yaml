@@ -1,0 +1,41 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+description: A moderation report and its current triage state.
+required: [id, target_id, target_kind, status, created_at, updated_at]
+additionalProperties: false
+properties:
+  id:
+    type: string
+    pattern: '^[0-9a-v]{20}$'
+    description: Stable report identifier accepted by report_get and report_update.
+  target_id:
+    type: string
+    pattern: '^[0-9a-v]{20}$'
+    description: Identifier of the reported content or member.
+  target_kind:
+    type: string
+    enum: [post, thread, reply, node, collection, profile, event]
+    description: Kind of the reported target.
+  status:
+    type: string
+    enum: [submitted, acknowledged, resolved]
+    description: Current report triage state.
+  comment:
+    type: string
+    description: Reporter-provided reason and supporting context.
+  reported_by_id:
+    type: string
+    pattern: '^[0-9a-v]{20}$'
+    description: Identifier of the account that submitted the report, when present.
+  handled_by_id:
+    type: string
+    pattern: '^[0-9a-v]{20}$'
+    description: Identifier of the account currently handling the report, when assigned.
+  created_at:
+    type: string
+    format: date-time
+    description: Time the report was submitted in UTC.
+  updated_at:
+    type: string
+    format: date-time
+    description: Time the report was last updated in UTC.

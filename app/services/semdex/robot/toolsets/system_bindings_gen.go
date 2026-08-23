@@ -7,6 +7,7 @@ import (
 	system_discussions "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_discussions"
 	system_documents "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_documents"
 	system_library "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_library"
+	system_moderation "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_moderation"
 	system_robot_studio "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_robot_studio"
 	system_trails "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_trails"
 )
@@ -43,6 +44,14 @@ func systemDefinitions() []Definition {
 			Description: system_library.Description,
 			Instruction: system_library.Instruction,
 			ToolNames:   append([]string(nil), system_library.ToolNames...),
+			Source:      SourceSystem,
+		},
+		{
+			ID:          system_moderation.ID,
+			Name:        system_moderation.Name,
+			Description: system_moderation.Description,
+			Instruction: system_moderation.Instruction,
+			ToolNames:   append([]string(nil), system_moderation.ToolNames...),
 			Source:      SourceSystem,
 		},
 		{

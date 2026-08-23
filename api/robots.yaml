@@ -164,3 +164,21 @@ definitions:
 
   ToolMemberSearch:
     $ref: "./robots/tools/tool_member_search.yaml"
+
+  ToolReportCreate:
+    $ref: "./robots/tools/tool_report_create.yaml"
+
+  ToolReportList:
+    $ref: "./robots/tools/tool_report_list.yaml"
+
+  ToolReportGet:
+    $ref: "./robots/tools/tool_report_get.yaml"
+
+  ToolReportUpdate:
+    $ref: "./robots/tools/tool_report_update.yaml"
+
+  ToolMemberSuspend:
+    $ref: "./robots/tools/tool_member_suspend.yaml"
+
+  ToolMemberReinstate:
+    $ref: "./robots/tools/tool_member_reinstate.yaml"
