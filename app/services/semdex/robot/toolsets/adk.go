@@ -97,6 +97,10 @@ func (r *Registry) Build(ctx context.Context, refs []string) ([]tool.Toolset, []
 	for _, ref := range uniqueStrings(refs) {
 		def, err := r.Get(ctx, ref)
 		if err != nil {
+			if strings.HasPrefix(ref, "mcp:") {
+				missing = append(missing, ref)
+				continue
+			}
 			return nil, nil, err
 		}
 		if def.Builder != nil {
@@ -467,7 +471,7 @@ func (t *discoveryToolset) ProcessRequest(ctx agent.Context, request *model.LLMR
 				ID:              ref,
 				Name:            ref,
 				Error:           "configured Toolset is no longer registered",
-				SuggestedAction: "Continue without this Toolset and update the Robot configuration when convenient.",
+				SuggestedAction: unavailableConfiguredToolsetAction(ref),
 			})
 			continue
 		}
@@ -614,9 +618,18 @@ func unavailableReferenceAction(def Definition) string {
 		return "Disable or repair the plugin that provides this Toolset, then retry in a new turn."
 	case SourceCustom:
 		return "Update the custom Toolset to remove or replace unavailable tools, then retry in a new turn."
+	case SourceMCP:
+		return "Re-enable or repair the MCP server, refresh its tools, then retry in a new turn."
 	default:
 		return "Continue without this capability and report the failure to an administrator."
 	}
+}
+
+func unavailableConfiguredToolsetAction(ref string) string {
+	if strings.HasPrefix(ref, "mcp:") {
+		return "Re-enable or recreate the MCP server with the same slug, refresh its tools, then retry in a new turn."
+	}
+	return "Continue without this Toolset and update the Robot configuration when convenient."
 }
 
 func runtimeIssueError(issue runtimeIssue) error {

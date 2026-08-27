@@ -212,12 +212,14 @@ export const getRobotCreateUrl = () => {
  * Create a new Robot with the specified configuration. A Robot in Storyden
  * consists of a name and description (for humans) as well as a playbook,
  * and a set of direct tools and reusable Toolsets to interact with Storyden
- * or plugins. The playbook is a detailed set of instructions that guides
+ * plugins, or connected MCP servers. The playbook is a detailed set of
+ * instructions that guides
  * behaviour of the Robot to help it assist members in achieving a specific
  * automation goal.
  * Direct tools support narrowly scoped Robots, while Toolsets bundle tools
  * with optional specialist instructions. Toolsets can be shared across
- * Robots and can come from Storyden, members, or plugins.
+ * Robots and can come from Storyden, members, plugins, or connected MCP
+ * servers.
  * @summary Create a robot
  */
 export const robotCreate = async (
@@ -319,7 +321,7 @@ export const getRobotToolsetsListUrl = () => {
 /**
  * List reusable Toolsets available to Robots. Toolsets group tools with
  * optional instructions and may be provided by Storyden, members, or
- * plugins.
+ * plugins, or connected MCP servers.
  * @summary List Robot Toolsets
  */
 export const robotToolsetsList = async (

@@ -20,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/authentication/oauthremotetoken"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/tools"
+	robottoolsets "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/httpsafe"
 	storydenmcp "github.com/Southclaws/storyden/lib/mcp"
@@ -45,6 +46,7 @@ type Manager struct {
 	logger   *slog.Logger
 	repo     *mcp.Repository
 	registry *tools.Registry
+	toolsets *robottoolsets.Registry
 	settings *settings.SettingsRepository
 	tokens   *oauthremotetoken.Service
 	config   config.Config
@@ -67,6 +69,7 @@ func New(
 	logger *slog.Logger,
 	repo *mcp.Repository,
 	registry *tools.Registry,
+	toolsets *robottoolsets.Registry,
 	settings *settings.SettingsRepository,
 	tokens *oauthremotetoken.Service,
 	cfg config.Config,
@@ -76,6 +79,7 @@ func New(
 		logger:   logger,
 		repo:     repo,
 		registry: registry,
+		toolsets: toolsets,
 		settings: settings,
 		tokens:   tokens,
 		config:   cfg,
@@ -221,6 +225,7 @@ func (m *Manager) RefreshOAuthConnectionServers(ctx context.Context, id oauth_re
 
 func (m *Manager) SyncRegistry(ctx context.Context) error {
 	m.registry.UnregisterPrefix(toolIDPrefix)
+	m.toolsets.UnregisterSourceType(robottoolsets.SourceMCP)
 
 	servers, err := m.repo.ListEnabledServers(ctx)
 	if err != nil {
@@ -237,6 +242,26 @@ func (m *Manager) SyncRegistry(ctx context.Context) error {
 			if err := m.registry.Register(m.makeTool(server, cachedTool)); err != nil {
 				return fmt.Errorf("register MCP tool %q: %w", cachedTool.ID, err)
 			}
+		}
+		toolNames := make([]string, 0, len(server.Tools))
+		for _, cachedTool := range server.Tools {
+			if cachedTool.Enabled {
+				toolNames = append(toolNames, cachedTool.ID)
+			}
+		}
+		description := strings.TrimSpace(server.Description)
+		if description == "" {
+			description = fmt.Sprintf("Tools provided by the %s MCP server.", server.Name)
+		}
+		if err := m.toolsets.Register(robottoolsets.Definition{
+			ID:          ToolsetID(server.Slug),
+			Name:        server.Name,
+			Description: description,
+			ToolNames:   toolNames,
+			Source:      robottoolsets.SourceMCP,
+			SourceRef:   server.ID.String(),
+		}); err != nil {
+			return fmt.Errorf("register MCP Toolset %q: %w", ToolsetID(server.Slug), err)
 		}
 	}
 
@@ -542,6 +567,10 @@ func (h *staticBearerHandler) Authorize(context.Context, *http.Request, *http.Re
 
 func ToolID(serverSlug, remoteName string) string {
 	return toolIDPrefix + serverSlug + ":" + remoteName
+}
+
+func ToolsetID(serverSlug string) string {
+	return toolIDPrefix + serverSlug
 }
 
 func CallableName(providerName, remoteName string) string {

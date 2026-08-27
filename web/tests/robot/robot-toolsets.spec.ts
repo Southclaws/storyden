@@ -35,7 +35,8 @@ test.describe("Robot Toolsets", () => {
       .getByRole("textbox", { name: "Instructions" })
       .fill("Verify sources before reporting findings.");
     await page.getByRole("button", { name: "Select Tools" }).click();
-    await page
+    const toolsMenu = page.getByRole("menu", { name: "Select Tools" });
+    await toolsMenu
       .getByRole("textbox", { name: "Search for items" })
       .fill("List Categories");
     await page.getByRole("menuitem", { name: "List Categories" }).click();

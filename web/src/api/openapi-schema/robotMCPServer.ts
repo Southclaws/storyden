@@ -19,6 +19,8 @@ export type RobotMCPServer = CommonProperties & {
   endpoint_url: string;
   oauth_remote_connection_id?: Identifier;
   enabled: boolean;
+  /** Stable read-only Toolset ID that assigns all enabled tools from this MCP server to a Robot. */
+  toolset_id: string;
   /**
    * Whether this server has a stored Bearer token. The token value
    * is never returned.

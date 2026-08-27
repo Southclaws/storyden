@@ -53,7 +53,7 @@ func TestRobotMCPServerCreateDiscoversBearerProtectedTools(t *testing.T) {
 				adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 				adminSession := sh.WithSession(adminCtx)
 
-				endpoint := newBearerMCPServer(t, "test-token")
+				endpoint, addRemoteTool := newMutableBearerMCPServer(t, "test-token")
 				enabled := true
 				token := "test-token"
 				slug := "test-server-" + xid.New().String()
@@ -72,6 +72,7 @@ func TestRobotMCPServerCreateDiscoversBearerProtectedTools(t *testing.T) {
 				require.NotNil(t, created.JSON200)
 
 				assert.Equal(t, slug, created.JSON200.Slug)
+				assert.Equal(t, mcpclient.ToolsetID(slug), created.JSON200.ToolsetId)
 				assert.True(t, created.JSON200.HasBearerToken)
 				assert.NotContains(t, string(created.Body), token)
 				require.Len(t, created.JSON200.Tools, 1)
@@ -95,6 +96,40 @@ func TestRobotMCPServerCreateDiscoversBearerProtectedTools(t *testing.T) {
 				assert.True(t, found.Available)
 				assert.Equal(t, "mcp", string(found.Source))
 				assert.Equal(t, mcpclient.CallableName("Test MCP Server", "echo"), found.CallableName)
+
+				toolsetCatalogue := tests.AssertRequest(cl.RobotToolsetsListWithResponse(root, adminSession))(t, http.StatusOK)
+				require.NotNil(t, toolsetCatalogue.JSON200)
+				var serverToolset *openapi.RobotToolset
+				for i := range toolsetCatalogue.JSON200.Toolsets {
+					candidate := &toolsetCatalogue.JSON200.Toolsets[i]
+					if candidate.Id == created.JSON200.ToolsetId {
+						serverToolset = candidate
+						break
+					}
+				}
+				require.NotNil(t, serverToolset)
+				assert.Equal(t, openapi.RobotToolsetSourceMcp, serverToolset.Source)
+				require.NotNil(t, serverToolset.SourceRef)
+				assert.Equal(t, string(created.JSON200.Id), *serverToolset.SourceRef)
+				assert.False(t, serverToolset.Editable)
+				assert.Equal(t, []string{"mcp:" + slug + ":echo"}, serverToolset.Tools)
+
+				addRemoteTool("search", "Search events", "Search calendar events by title.")
+				refreshed := tests.AssertRequest(cl.RobotMCPServerRefreshWithResponse(root, created.JSON200.Id, adminSession))(t, http.StatusOK)
+				require.NotNil(t, refreshed.JSON200)
+				require.Len(t, refreshed.JSON200.Tools, 2)
+				assert.Equal(t, "mcp:"+slug+":echo", refreshed.JSON200.Tools[0].Id)
+				assert.Equal(t, "mcp:"+slug+":search", refreshed.JSON200.Tools[1].Id)
+
+				refreshedToolsets := tests.AssertRequest(cl.RobotToolsetsListWithResponse(root, adminSession))(t, http.StatusOK)
+				require.NotNil(t, refreshedToolsets.JSON200)
+				for _, candidate := range refreshedToolsets.JSON200.Toolsets {
+					if candidate.Id == created.JSON200.ToolsetId {
+						assert.Equal(t, []string{"mcp:" + slug + ":echo", "mcp:" + slug + ":search"}, candidate.Tools)
+						return
+					}
+				}
+				require.Fail(t, "refreshed MCP Toolset was not listed")
 			}))
 		}),
 	)
@@ -325,15 +360,24 @@ func TestRobotMCPOAuthRefreshesTokenForRefreshAndToolCall(t *testing.T) {
 
 func newBearerMCPServer(t *testing.T, token string) string {
 	t.Helper()
+	endpoint, _ := newMutableBearerMCPServer(t, token)
+	return endpoint
+}
+
+func newMutableBearerMCPServer(t *testing.T, token string) (string, func(name, title, description string)) {
+	t.Helper()
 
 	server := mcp.NewServer(&mcp.Implementation{Name: "test-mcp", Version: "v1"}, nil)
-	mcp.AddTool(server, &mcp.Tool{
-		Name:        "echo",
-		Title:       "Echo",
-		Description: "Echoes a message.",
-	}, func(ctx context.Context, req *mcp.CallToolRequest, args map[string]any) (*mcp.CallToolResult, map[string]any, error) {
-		return nil, map[string]any{"message": args["message"]}, nil
-	})
+	addTool := func(name, title, description string) {
+		mcp.AddTool(server, &mcp.Tool{
+			Name:        name,
+			Title:       title,
+			Description: description,
+		}, func(ctx context.Context, req *mcp.CallToolRequest, args map[string]any) (*mcp.CallToolResult, map[string]any, error) {
+			return nil, map[string]any{"message": args["message"]}, nil
+		})
+	}
+	addTool("echo", "Echo", "Echoes a message.")
 
 	handler := mcp.NewStreamableHTTPHandler(func(r *http.Request) *mcp.Server {
 		return server
@@ -348,7 +392,7 @@ func newBearerMCPServer(t *testing.T, token string) string {
 	}))
 	t.Cleanup(httpServer.Close)
 
-	return httpServer.URL
+	return httpServer.URL, addTool
 }
 
 func withLoopbackMCPClient() fx.Option {

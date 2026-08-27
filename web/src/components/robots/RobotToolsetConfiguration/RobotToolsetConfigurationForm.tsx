@@ -76,7 +76,9 @@ export function RobotToolsetConfigurationForm(props: RobotToolsetFormProps) {
             <Text variant="supporting">
               {props.toolset.source === "custom"
                 ? "This Toolset is shared by another member. You can use it in your Robots, but only its author can edit it."
-                : "This Toolset is supplied by Storyden or an installed plugin and is managed at its source."}
+                : props.toolset.source === "mcp"
+                  ? "This Toolset mirrors a connected MCP server and is managed from the Robots settings."
+                  : "This Toolset is supplied by Storyden or an installed plugin and is managed at its source."}
             </Text>
           </HStack>
         )}

@@ -57,12 +57,13 @@ A Toolset is a reusable capability package:
 - description used for discovery
 - optional specialist instruction injected while active
 - a set of raw registered tools
-- source metadata: `system`, `custom`, or `plugin`
+- source metadata: `system`, `custom`, `plugin`, or `mcp`
 
 System Toolsets are registered at startup. Custom Toolsets are Ent resources
 owned by an account and managed through `/robots/toolsets`. Plugins may publish
-Toolset definitions alongside their tools; plugin host registration and
-unregistration is atomic for both surfaces.
+Toolset definitions alongside their tools. Each enabled MCP server is mirrored
+as a read-only Toolset containing its enabled cached tools. Provider registration
+and unregistration update the tool and Toolset surfaces together.
 
 Robots store both direct tool names and Toolset references. Direct tools support
 narrow configurations where assigning an entire Toolset would grant unrelated

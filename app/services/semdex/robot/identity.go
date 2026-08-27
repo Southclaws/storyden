@@ -41,7 +41,7 @@ func robotIdentityInstruction(ctx robotIdentityContext) string {
 		}
 	}
 	if len(ctx.Current.UnavailableTools) > 0 {
-		b.WriteString("\nSome configured tools are currently unavailable:\n")
+		b.WriteString("\nSome configured capabilities are currently unavailable:\n")
 		for _, tool := range ctx.Current.UnavailableTools {
 			b.WriteString(fmt.Sprintf("- %s\n", tool))
 		}

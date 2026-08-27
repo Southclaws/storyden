@@ -14,6 +14,8 @@ import {
   getRobotMCPServersListKey,
   getRobotModelsListKey,
   getRobotProvidersListKey,
+  getRobotToolsListKey,
+  getRobotToolsetsListKey,
   getRobotWorkspacesListKey,
   robotMCPServerDelete,
   robotMCPServerRefresh,
@@ -190,7 +192,8 @@ function RobotMCPServersSettings() {
         <LStack gap="1">
           <SectionHeading>MCP servers</SectionHeading>
           <Text variant="supporting">
-            Connect external MCP servers and add their tools to Robots.
+            Connect external MCP servers. Denbot can discover each server as a
+            Toolset, which can also be assigned to custom Robots.
           </Text>
         </LStack>
 
@@ -630,7 +633,11 @@ function RobotMCPServerItem({ server }: { server: RobotMCPServer }) {
           success: "MCP tools refreshed",
         },
         cleanup: async () => {
-          await mutate(getRobotMCPServersListKey());
+          await Promise.all([
+            mutate(getRobotMCPServersListKey()),
+            mutate(getRobotToolsListKey()),
+            mutate(getRobotToolsetsListKey()),
+          ]);
         },
       });
     } finally {
@@ -647,7 +654,11 @@ function RobotMCPServerItem({ server }: { server: RobotMCPServer }) {
           success: "MCP server deleted",
         },
         cleanup: async () => {
-          await mutate(getRobotMCPServersListKey());
+          await Promise.all([
+            mutate(getRobotMCPServersListKey()),
+            mutate(getRobotToolsListKey()),
+            mutate(getRobotToolsetsListKey()),
+          ]);
         },
       });
     } finally {
@@ -709,7 +720,9 @@ function RobotMCPServerItem({ server }: { server: RobotMCPServer }) {
           </HStack>
         </WStack>
 
-        <Text variant="metadata">{server.tools.length} tools cached.</Text>
+        <Text variant="metadata">
+          {server.tools.length} tools available through its MCP Toolset.
+        </Text>
 
         {server.last_error && (
           <Text variant="metadata" color="status.danger.content">

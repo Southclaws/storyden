@@ -47,7 +47,13 @@ func TestRegistrySearchesAcrossSystemPluginAndCustomToolsets(t *testing.T) {
 			require.NoError(t, err)
 
 			logger := slog.New(slog.NewTextHandler(io.Discard, nil))
-			registry := robottoolsets.NewRegistry(logger, repo, robottools.NewRegistry(logger))
+			toolRegistry := robottools.NewRegistry(logger)
+			registry := robottoolsets.NewRegistry(logger, repo, toolRegistry)
+			require.NoError(t, toolRegistry.Register(&robottools.Tool{Definition: &mcp.ToolDefinition{
+				Name:        "mcp:calendar:create_event",
+				Title:       "Create calendar event",
+				Description: "Schedule appointments with invited attendees.",
+			}}))
 			require.NoError(t, registry.Register(robottoolsets.Definition{
 				ID:          "plugin.example.builder",
 				Name:        "Plugin builder",
@@ -63,6 +69,14 @@ func TestRegistrySearchesAcrossSystemPluginAndCustomToolsets(t *testing.T) {
 				Description: "Search and verify web sources",
 				Source:      robottoolsets.SourceSystem,
 			}))
+			require.NoError(t, registry.Register(robottoolsets.Definition{
+				ID:          "mcp:calendar",
+				Name:        "Calendar",
+				Description: "Connected calendar capabilities.",
+				ToolNames:   []string{"mcp:calendar:create_event"},
+				Source:      robottoolsets.SourceMCP,
+				SourceRef:   "mcp-server-1",
+			}))
 
 			results, err := registry.Search(ctx, "plugin", 10)
 			require.NoError(t, err)
@@ -76,6 +90,12 @@ func TestRegistrySearchesAcrossSystemPluginAndCustomToolsets(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, []string{"plugin_build"}, plugin.ToolNames)
 			assert.False(t, plugin.Editable)
+
+			mcpResults, err := registry.Search(ctx, "schedule appointments", 10)
+			require.NoError(t, err)
+			require.Len(t, mcpResults, 1)
+			assert.Equal(t, "mcp:calendar", mcpResults[0].ID)
+			assert.Equal(t, robottoolsets.SourceMCP, mcpResults[0].Source)
 
 			require.NoError(t, registry.Validate(ctx, []string{"system.research", custom.ID.String()}))
 			require.Error(t, registry.Validate(ctx, []string{"missing.toolset"}))
@@ -115,6 +135,13 @@ func TestRegistryComposesDirectToolsWithToolsets(t *testing.T) {
 	assert.EqualError(t, err, `tool "thread_get" cannot be added directly because Toolset "Thread reader" (system.thread_reader) already contains that tool`)
 
 	require.NoError(t, registry.ValidateDirectTools(ctx, []string{"tag_list"}, []string{"system.thread_reader"}))
+
+	built, missing, err := registry.Build(ctx, []string{"mcp:removed-server"})
+	require.NoError(t, err)
+	assert.Empty(t, built)
+	assert.Equal(t, []string{"mcp:removed-server"}, missing)
+	_, _, err = registry.Build(ctx, []string{"system.misspelled"})
+	require.Error(t, err)
 
 	err = registry.ValidateDirectTools(ctx, []string{"thread_read"}, []string{"system.thread_reader"})
 	require.Error(t, err)

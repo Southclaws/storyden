@@ -7,6 +7,8 @@ import { handle } from "@/api/client";
 import { oAuthRemoteDiscover } from "@/api/openapi-client/admin";
 import {
   getRobotMCPServersListKey,
+  getRobotToolsListKey,
+  getRobotToolsetsListKey,
   robotMCPServerCreate,
   robotMCPServerDelete,
   robotMCPServerProbe,
@@ -97,6 +99,14 @@ function RobotMCPOnboardingScreen({ onClose }: { onClose?: () => void }) {
     authorizationUrl !== "" &&
     pendingOAuthServerID !== "";
 
+  async function revalidateMCPCapabilities() {
+    await Promise.all([
+      mutate(getRobotMCPServersListKey()),
+      mutate(getRobotToolsListKey()),
+      mutate(getRobotToolsetsListKey()),
+    ]);
+  }
+
   useEffect(() => {
     if (pendingOAuthServerID === "") {
       return;
@@ -115,7 +125,12 @@ function RobotMCPOnboardingScreen({ onClose }: { onClose?: () => void }) {
     setServer(connectedServer);
     setAuthorizationUrl("");
     setPendingOAuthServerID("");
-  }, [pendingOAuthServerID, serversQuery.data?.servers]);
+    void Promise.all([
+      mutate(getRobotMCPServersListKey()),
+      mutate(getRobotToolsListKey()),
+      mutate(getRobotToolsetsListKey()),
+    ]);
+  }, [mutate, pendingOAuthServerID, serversQuery.data?.servers]);
 
   async function checkConnection() {
     setIsProbing(true);
@@ -196,9 +211,7 @@ function RobotMCPOnboardingScreen({ onClose }: { onClose?: () => void }) {
             loading: "Connecting MCP server...",
             success: "MCP server connected",
           },
-          cleanup: async () => {
-            await mutate(getRobotMCPServersListKey());
-          },
+          cleanup: revalidateMCPCapabilities,
         },
       );
 
@@ -225,9 +238,7 @@ function RobotMCPOnboardingScreen({ onClose }: { onClose?: () => void }) {
         await robotMCPServerDelete(serverID);
       },
       {
-        cleanup: async () => {
-          await mutate(getRobotMCPServersListKey());
-        },
+        cleanup: revalidateMCPCapabilities,
       },
     );
   }
@@ -238,8 +249,8 @@ function RobotMCPOnboardingScreen({ onClose }: { onClose?: () => void }) {
         <LStack gap="2">
           <SectionHeading>{server.name} connected</SectionHeading>
           <Text variant="supporting">
-            {server.tools.length} tools were discovered and added to the Robot
-            tool catalogue.
+            {server.tools.length} tools were discovered. Denbot can load this
+            server as a Toolset, and it can be assigned to custom Robots.
           </Text>
         </LStack>
 
@@ -376,9 +387,7 @@ function RobotMCPOnboardingScreen({ onClose }: { onClose?: () => void }) {
                       loading: "Linking MCP server to OAuth...",
                       success: "MCP server will connect after authorisation",
                     },
-                    cleanup: async () => {
-                      await mutate(getRobotMCPServersListKey());
-                    },
+                    cleanup: revalidateMCPCapabilities,
                   },
                 );
 

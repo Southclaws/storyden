@@ -1298,6 +1298,7 @@ func serialiseRobotMCPServer(server robot_mcp.Server) openapi.RobotMCPServer {
 		EndpointUrl:             server.EndpointURL,
 		OauthRemoteConnectionId: oauthRemoteConnectionID,
 		Enabled:                 server.Enabled,
+		ToolsetId:               mcpclient.ToolsetID(server.Slug),
 		HasBearerToken:          server.HasBearerToken,
 		HasOauthToken:           server.HasOAuthAccessToken,
 		LastRefreshedAt:         server.LastRefreshedAt,

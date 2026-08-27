@@ -158,8 +158,9 @@ describe("RobotConfigurationForm", () => {
     expect(
       screen.getByRole("option", { name: "Discussion management" }),
     ).toHaveAttribute("data-state", "checked");
-    expect(screen.getByText("Discussion management", { selector: "span" }))
-      .toBeVisible();
+    expect(
+      screen.getByText("Discussion management", { selector: "span" }),
+    ).toBeVisible();
 
     await user.keyboard("{Escape}");
     await user.click(
@@ -175,6 +176,48 @@ describe("RobotConfigurationForm", () => {
     expect(
       screen.getByRole("option", { name: "Content Search" }),
     ).toHaveAttribute("data-state", "checked");
+  });
+
+  it("allows an MCP-sourced Toolset to be selected", async () => {
+    const user = userEvent.setup();
+    vi.mocked(useRobotToolsetsList).mockReturnValue({
+      data: {
+        toolsets: [
+          {
+            id: "mcp:calendar",
+            name: "Calendar",
+            description: "Connected calendar capabilities.",
+            instruction: "",
+            tools: ["mcp:calendar:echo"],
+            source: "mcp",
+            source_ref: "server-id",
+            editable: false,
+            usage_count: 0,
+            requires_workspace: false,
+          },
+        ],
+      },
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+      swrKey: ["/robots/toolsets"],
+    });
+
+    render(<RobotConfigurationForm robot={robot} />);
+
+    await user.click(screen.getByRole("button", { name: "Select Toolsets" }));
+    await user.type(
+      screen.getByRole("combobox", { name: "Select Toolsets" }),
+      "calendar",
+    );
+    await user.click(screen.getByRole("option", { name: "Calendar" }));
+
+    expect(screen.getByRole("option", { name: "Calendar" })).toHaveAttribute(
+      "data-state",
+      "checked",
+    );
+    expect(screen.getByText("Calendar", { selector: "span" })).toBeVisible();
   });
 
   it("omits Toolset-only capabilities from individual tool selection", async () => {

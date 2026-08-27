@@ -15,4 +15,5 @@ export const RobotToolsetSource = {
   system: "system",
   custom: "custom",
   plugin: "plugin",
+  mcp: "mcp",
 } as const;

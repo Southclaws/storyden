@@ -24,6 +24,7 @@ const (
 	SourceSystem Source = "system"
 	SourceCustom Source = "custom"
 	SourcePlugin Source = "plugin"
+	SourceMCP    Source = "mcp"
 )
 
 type Builder func(context.Context) (tool.Toolset, error)
@@ -115,6 +116,16 @@ func (r *Registry) UnregisterSource(sourceRef string) {
 	}
 }
 
+func (r *Registry) UnregisterSourceType(source Source) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	for id, def := range r.dynamic {
+		if def.Source == source {
+			delete(r.dynamic, id)
+		}
+	}
+}
+
 func (r *Registry) Get(ctx context.Context, id string) (Definition, error) {
 	r.mu.RLock()
 	def, ok := r.dynamic[id]
@@ -192,7 +203,7 @@ func (r *Registry) Search(ctx context.Context, query string, maxResults int) ([]
 	}
 	results := make([]scored, 0, len(all))
 	for _, def := range all {
-		score := lexicalScore(parsedQuery, def)
+		score := r.lexicalScore(ctx, parsedQuery, def)
 		if score > 0 {
 			results = append(results, scored{def: def, score: score})
 		}
@@ -364,7 +375,7 @@ func fromStored(stored *robot_toolset.Toolset, usage int) Definition {
 	}
 }
 
-func lexicalScore(query searchscore.Query, def Definition) int {
+func (r *Registry) lexicalScore(ctx context.Context, query searchscore.Query, def Definition) int {
 	fields := []searchscore.Field{
 		{Text: def.Name, ExactMatch: 100, SubstringMatch: 40, TermMatch: 8},
 		{Text: def.Description, SubstringMatch: 20, TermMatch: 4},
@@ -372,6 +383,14 @@ func lexicalScore(query searchscore.Query, def Definition) int {
 	}
 	for _, toolName := range def.ToolNames {
 		fields = append(fields, searchscore.Field{Text: toolName, SubstringMatch: 10})
+		registered, err := r.tools.GetTool(ctx, toolName)
+		if err != nil {
+			continue
+		}
+		fields = append(fields,
+			searchscore.Field{Text: registered.Definition.Title, SubstringMatch: 10, TermMatch: 2},
+			searchscore.Field{Text: registered.Definition.Description, SubstringMatch: 10, TermMatch: 2},
+		)
 	}
 	return query.Score(fields...)
 }

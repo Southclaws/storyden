@@ -221,7 +221,7 @@ func TestTrailEventOccurrenceMaterialisation(t *testing.T) {
 			stored, err := repository.Get(root, definition.ID)
 			r.NoError(err)
 			r.NotNil(stored.LastOccurrenceAt)
-			a.Equal(observedAt, *stored.LastOccurrenceAt)
+			a.WithinDuration(observedAt, *stored.LastOccurrenceAt, 0)
 			a.Nil(stored.NextOccurrenceAt)
 
 			notCreated, ok, err := repository.MaterialiseEvent(
