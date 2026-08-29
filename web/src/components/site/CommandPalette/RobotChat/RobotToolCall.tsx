@@ -290,6 +290,8 @@ function RobotToolCallContent({ part }: Props) {
     case "tool-category_list":
       return null;
   }
+
+  return null;
 }
 
 function RobotToolError({ error }: { error: string }) {
