@@ -1,0 +1,17 @@
+steps:
+  - match:
+      tool_result: memory_create
+    respond:
+      text: "Memory stored."
+      finish: "stop"
+  - match:
+      any: true
+    respond:
+      tool_calls:
+        - id: call_memory_create
+          name: memory_create
+          args:
+            content: "Freyja is owned by Southclaws."
+            subject: "Freyja"
+            predicate: "owned by"
+            object: "Southclaws"

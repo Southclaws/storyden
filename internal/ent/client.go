@@ -56,6 +56,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/robot"
 	"github.com/Southclaws/storyden/internal/ent/robotmcpserver"
 	"github.com/Southclaws/storyden/internal/ent/robotmcptool"
+	"github.com/Southclaws/storyden/internal/ent/robotmemory"
 	"github.com/Southclaws/storyden/internal/ent/robotprovidermodel"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
 	"github.com/Southclaws/storyden/internal/ent/robotsessioninput"
@@ -164,6 +165,8 @@ type Client struct {
 	RobotMCPServer *RobotMCPServerClient
 	// RobotMCPTool is the client for interacting with the RobotMCPTool builders.
 	RobotMCPTool *RobotMCPToolClient
+	// RobotMemory is the client for interacting with the RobotMemory builders.
+	RobotMemory *RobotMemoryClient
 	// RobotProviderModel is the client for interacting with the RobotProviderModel builders.
 	RobotProviderModel *RobotProviderModelClient
 	// RobotSession is the client for interacting with the RobotSession builders.
@@ -253,6 +256,7 @@ func (c *Client) init() {
 	c.Robot = NewRobotClient(c.config)
 	c.RobotMCPServer = NewRobotMCPServerClient(c.config)
 	c.RobotMCPTool = NewRobotMCPToolClient(c.config)
+	c.RobotMemory = NewRobotMemoryClient(c.config)
 	c.RobotProviderModel = NewRobotProviderModelClient(c.config)
 	c.RobotSession = NewRobotSessionClient(c.config)
 	c.RobotSessionInput = NewRobotSessionInputClient(c.config)
@@ -404,6 +408,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Robot:                        NewRobotClient(cfg),
 		RobotMCPServer:               NewRobotMCPServerClient(cfg),
 		RobotMCPTool:                 NewRobotMCPToolClient(cfg),
+		RobotMemory:                  NewRobotMemoryClient(cfg),
 		RobotProviderModel:           NewRobotProviderModelClient(cfg),
 		RobotSession:                 NewRobotSessionClient(cfg),
 		RobotSessionInput:            NewRobotSessionInputClient(cfg),
@@ -482,6 +487,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Robot:                        NewRobotClient(cfg),
 		RobotMCPServer:               NewRobotMCPServerClient(cfg),
 		RobotMCPTool:                 NewRobotMCPToolClient(cfg),
+		RobotMemory:                  NewRobotMemoryClient(cfg),
 		RobotProviderModel:           NewRobotProviderModelClient(cfg),
 		RobotSession:                 NewRobotSessionClient(cfg),
 		RobotSessionInput:            NewRobotSessionInputClient(cfg),
@@ -538,11 +544,12 @@ func (c *Client) Use(hooks ...Hook) {
 		c.OAuthClient, c.OAuthDeviceAuthorisation, c.OAuthRefreshToken,
 		c.OAuthRemoteAuthorisationFlow, c.OAuthRemoteConnection, c.Plugin, c.Post,
 		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField, c.React,
-		c.Report, c.Robot, c.RobotMCPServer, c.RobotMCPTool, c.RobotProviderModel,
-		c.RobotSession, c.RobotSessionInput, c.RobotSessionMessage, c.RobotSessionTurn,
-		c.RobotSessionView, c.RobotToolset, c.RobotWorkspace, c.RobotWorkspaceInstance,
-		c.Role, c.Session, c.Setting, c.Tag, c.Trail, c.TrailAction, c.TrailActionRun,
-		c.TrailRun, c.TrailSchedulerLease, c.Warning,
+		c.Report, c.Robot, c.RobotMCPServer, c.RobotMCPTool, c.RobotMemory,
+		c.RobotProviderModel, c.RobotSession, c.RobotSessionInput,
+		c.RobotSessionMessage, c.RobotSessionTurn, c.RobotSessionView, c.RobotToolset,
+		c.RobotWorkspace, c.RobotWorkspaceInstance, c.Role, c.Session, c.Setting,
+		c.Tag, c.Trail, c.TrailAction, c.TrailActionRun, c.TrailRun,
+		c.TrailSchedulerLease, c.Warning,
 	} {
 		n.Use(hooks...)
 	}
@@ -560,11 +567,12 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.OAuthClient, c.OAuthDeviceAuthorisation, c.OAuthRefreshToken,
 		c.OAuthRemoteAuthorisationFlow, c.OAuthRemoteConnection, c.Plugin, c.Post,
 		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField, c.React,
-		c.Report, c.Robot, c.RobotMCPServer, c.RobotMCPTool, c.RobotProviderModel,
-		c.RobotSession, c.RobotSessionInput, c.RobotSessionMessage, c.RobotSessionTurn,
-		c.RobotSessionView, c.RobotToolset, c.RobotWorkspace, c.RobotWorkspaceInstance,
-		c.Role, c.Session, c.Setting, c.Tag, c.Trail, c.TrailAction, c.TrailActionRun,
-		c.TrailRun, c.TrailSchedulerLease, c.Warning,
+		c.Report, c.Robot, c.RobotMCPServer, c.RobotMCPTool, c.RobotMemory,
+		c.RobotProviderModel, c.RobotSession, c.RobotSessionInput,
+		c.RobotSessionMessage, c.RobotSessionTurn, c.RobotSessionView, c.RobotToolset,
+		c.RobotWorkspace, c.RobotWorkspaceInstance, c.Role, c.Session, c.Setting,
+		c.Tag, c.Trail, c.TrailAction, c.TrailActionRun, c.TrailRun,
+		c.TrailSchedulerLease, c.Warning,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -653,6 +661,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.RobotMCPServer.mutate(ctx, m)
 	case *RobotMCPToolMutation:
 		return c.RobotMCPTool.mutate(ctx, m)
+	case *RobotMemoryMutation:
+		return c.RobotMemory.mutate(ctx, m)
 	case *RobotProviderModelMutation:
 		return c.RobotProviderModel.mutate(ctx, m)
 	case *RobotSessionMutation:
@@ -8670,6 +8680,171 @@ func (c *RobotMCPToolClient) mutate(ctx context.Context, m *RobotMCPToolMutation
 	}
 }
 
+// RobotMemoryClient is a client for the RobotMemory schema.
+type RobotMemoryClient struct {
+	config
+}
+
+// NewRobotMemoryClient returns a client for the RobotMemory from the given config.
+func NewRobotMemoryClient(c config) *RobotMemoryClient {
+	return &RobotMemoryClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `robotmemory.Hooks(f(g(h())))`.
+func (c *RobotMemoryClient) Use(hooks ...Hook) {
+	c.hooks.RobotMemory = append(c.hooks.RobotMemory, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `robotmemory.Intercept(f(g(h())))`.
+func (c *RobotMemoryClient) Intercept(interceptors ...Interceptor) {
+	c.inters.RobotMemory = append(c.inters.RobotMemory, interceptors...)
+}
+
+// Create returns a builder for creating a RobotMemory entity.
+func (c *RobotMemoryClient) Create() *RobotMemoryCreate {
+	mutation := newRobotMemoryMutation(c.config, OpCreate)
+	return &RobotMemoryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RobotMemory entities.
+func (c *RobotMemoryClient) CreateBulk(builders ...*RobotMemoryCreate) *RobotMemoryCreateBulk {
+	return &RobotMemoryCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RobotMemoryClient) MapCreateBulk(slice any, setFunc func(*RobotMemoryCreate, int)) *RobotMemoryCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RobotMemoryCreateBulk{err: fmt.Errorf("calling to RobotMemoryClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RobotMemoryCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RobotMemoryCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RobotMemory.
+func (c *RobotMemoryClient) Update() *RobotMemoryUpdate {
+	mutation := newRobotMemoryMutation(c.config, OpUpdate)
+	return &RobotMemoryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RobotMemoryClient) UpdateOne(_m *RobotMemory) *RobotMemoryUpdateOne {
+	mutation := newRobotMemoryMutation(c.config, OpUpdateOne, withRobotMemory(_m))
+	return &RobotMemoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RobotMemoryClient) UpdateOneID(id xid.ID) *RobotMemoryUpdateOne {
+	mutation := newRobotMemoryMutation(c.config, OpUpdateOne, withRobotMemoryID(id))
+	return &RobotMemoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RobotMemory.
+func (c *RobotMemoryClient) Delete() *RobotMemoryDelete {
+	mutation := newRobotMemoryMutation(c.config, OpDelete)
+	return &RobotMemoryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RobotMemoryClient) DeleteOne(_m *RobotMemory) *RobotMemoryDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RobotMemoryClient) DeleteOneID(id xid.ID) *RobotMemoryDeleteOne {
+	builder := c.Delete().Where(robotmemory.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RobotMemoryDeleteOne{builder}
+}
+
+// Query returns a query builder for RobotMemory.
+func (c *RobotMemoryClient) Query() *RobotMemoryQuery {
+	return &RobotMemoryQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRobotMemory},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a RobotMemory entity by its id.
+func (c *RobotMemoryClient) Get(ctx context.Context, id xid.ID) (*RobotMemory, error) {
+	return c.Query().Where(robotmemory.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RobotMemoryClient) GetX(ctx context.Context, id xid.ID) *RobotMemory {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryParent queries the parent edge of a RobotMemory.
+func (c *RobotMemoryClient) QueryParent(_m *RobotMemory) *RobotMemoryQuery {
+	query := (&RobotMemoryClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robotmemory.Table, robotmemory.FieldID, id),
+			sqlgraph.To(robotmemory.Table, robotmemory.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, robotmemory.ParentTable, robotmemory.ParentColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryChildren queries the children edge of a RobotMemory.
+func (c *RobotMemoryClient) QueryChildren(_m *RobotMemory) *RobotMemoryQuery {
+	query := (&RobotMemoryClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robotmemory.Table, robotmemory.FieldID, id),
+			sqlgraph.To(robotmemory.Table, robotmemory.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, robotmemory.ChildrenTable, robotmemory.ChildrenColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RobotMemoryClient) Hooks() []Hook {
+	return c.hooks.RobotMemory
+}
+
+// Interceptors returns the client interceptors.
+func (c *RobotMemoryClient) Interceptors() []Interceptor {
+	return c.inters.RobotMemory
+}
+
+func (c *RobotMemoryClient) mutate(ctx context.Context, m *RobotMemoryMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RobotMemoryCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RobotMemoryUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RobotMemoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RobotMemoryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown RobotMemory mutation op: %q", m.Op())
+	}
+}
+
 // RobotProviderModelClient is a client for the RobotProviderModel schema.
 type RobotProviderModelClient struct {
 	config
@@ -11847,11 +12022,11 @@ type (
 		OAuthAuthorisationRequest, OAuthClient, OAuthDeviceAuthorisation,
 		OAuthRefreshToken, OAuthRemoteAuthorisationFlow, OAuthRemoteConnection, Plugin,
 		Post, PostRead, Property, PropertySchema, PropertySchemaField, React, Report,
-		Robot, RobotMCPServer, RobotMCPTool, RobotProviderModel, RobotSession,
-		RobotSessionInput, RobotSessionMessage, RobotSessionTurn, RobotSessionView,
-		RobotToolset, RobotWorkspace, RobotWorkspaceInstance, Role, Session, Setting,
-		Tag, Trail, TrailAction, TrailActionRun, TrailRun, TrailSchedulerLease,
-		Warning []ent.Hook
+		Robot, RobotMCPServer, RobotMCPTool, RobotMemory, RobotProviderModel,
+		RobotSession, RobotSessionInput, RobotSessionMessage, RobotSessionTurn,
+		RobotSessionView, RobotToolset, RobotWorkspace, RobotWorkspaceInstance, Role,
+		Session, Setting, Tag, Trail, TrailAction, TrailActionRun, TrailRun,
+		TrailSchedulerLease, Warning []ent.Hook
 	}
 	inters struct {
 		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication, Category,
@@ -11861,11 +12036,11 @@ type (
 		OAuthAuthorisationRequest, OAuthClient, OAuthDeviceAuthorisation,
 		OAuthRefreshToken, OAuthRemoteAuthorisationFlow, OAuthRemoteConnection, Plugin,
 		Post, PostRead, Property, PropertySchema, PropertySchemaField, React, Report,
-		Robot, RobotMCPServer, RobotMCPTool, RobotProviderModel, RobotSession,
-		RobotSessionInput, RobotSessionMessage, RobotSessionTurn, RobotSessionView,
-		RobotToolset, RobotWorkspace, RobotWorkspaceInstance, Role, Session, Setting,
-		Tag, Trail, TrailAction, TrailActionRun, TrailRun, TrailSchedulerLease,
-		Warning []ent.Interceptor
+		Robot, RobotMCPServer, RobotMCPTool, RobotMemory, RobotProviderModel,
+		RobotSession, RobotSessionInput, RobotSessionMessage, RobotSessionTurn,
+		RobotSessionView, RobotToolset, RobotWorkspace, RobotWorkspaceInstance, Role,
+		Session, Setting, Tag, Trail, TrailAction, TrailActionRun, TrailRun,
+		TrailSchedulerLease, Warning []ent.Interceptor
 	}
 )
 

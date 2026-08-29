@@ -1,0 +1,53 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolMemorySearch
+x-storyden-tool:
+  toolsets: [system.memory]
+  title: Search Memories
+  role: USE_ROBOTS
+  internal: true
+  toolset_only: true
+  annotations:
+    readOnlyHint: true
+    destructiveHint: false
+    idempotentHint: false
+    openWorldHint: false
+title: memory_search
+description: Recall facts and useful long-term context from the current Robot's active knowledge graph. Every supplied filter is ANDed; use separate focused calls unless an intersection is intended. Search when prior knowledge would help, but not reflexively for self-contained or transient tasks.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolMemorySearchInput" }
+  output: { $ref: "#/definitions/ToolMemorySearchOutput" }
+definitions:
+  ToolMemorySearchInput:
+    type: object
+    additionalProperties: false
+    properties:
+      query:
+        type: string
+        minLength: 1
+        description: Simple keyword search of memory text. Every word is ANDed, so use one or a few closely related words rather than a list of unrelated entities or facts.
+      parent_id:
+        type: string
+        pattern: "^[0-9a-v]{20}$"
+        description: Optional subtree root, included in the search with all of its descendants.
+      subject:
+        type: string
+        description: Fact subject. Exact after normalization unless * is used as a prefix or infix wildcard; search one entity at a time.
+      predicate:
+        type: string
+        description: Fact predicate. Exact after normalization unless * is used as a prefix or infix wildcard.
+      object:
+        type: string
+        description: Fact object. Exact after normalization unless * is used as a prefix or infix wildcard; search one entity at a time.
+  ToolMemorySearchOutput:
+    type: object
+    required: [results, returned, has_more, next_action]
+    additionalProperties: false
+    properties:
+      results:
+        type: array
+        items: { $ref: "../../common/RobotMemorySearchResult.yaml" }
+      returned: { type: integer, minimum: 0 }
+      has_more: { type: boolean }
+      next_action: { type: string }

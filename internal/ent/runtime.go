@@ -46,6 +46,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/robot"
 	"github.com/Southclaws/storyden/internal/ent/robotmcpserver"
 	"github.com/Southclaws/storyden/internal/ent/robotmcptool"
+	"github.com/Southclaws/storyden/internal/ent/robotmemory"
 	"github.com/Southclaws/storyden/internal/ent/robotprovidermodel"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
 	"github.com/Southclaws/storyden/internal/ent/robotsessioninput"
@@ -1700,6 +1701,61 @@ func init() {
 	// robotmcptool.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	robotmcptool.IDValidator = func() func(string) error {
 		validators := robotmcptoolDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	robotmemoryMixin := schema.RobotMemory{}.Mixin()
+	robotmemoryMixinFields0 := robotmemoryMixin[0].Fields()
+	_ = robotmemoryMixinFields0
+	robotmemoryMixinFields1 := robotmemoryMixin[1].Fields()
+	_ = robotmemoryMixinFields1
+	robotmemoryMixinFields2 := robotmemoryMixin[2].Fields()
+	_ = robotmemoryMixinFields2
+	robotmemoryFields := schema.RobotMemory{}.Fields()
+	_ = robotmemoryFields
+	// robotmemoryDescCreatedAt is the schema descriptor for created_at field.
+	robotmemoryDescCreatedAt := robotmemoryMixinFields1[0].Descriptor()
+	// robotmemory.DefaultCreatedAt holds the default value on creation for the created_at field.
+	robotmemory.DefaultCreatedAt = robotmemoryDescCreatedAt.Default.(func() time.Time)
+	// robotmemoryDescUpdatedAt is the schema descriptor for updated_at field.
+	robotmemoryDescUpdatedAt := robotmemoryMixinFields2[0].Descriptor()
+	// robotmemory.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	robotmemory.DefaultUpdatedAt = robotmemoryDescUpdatedAt.Default.(func() time.Time)
+	// robotmemory.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	robotmemory.UpdateDefaultUpdatedAt = robotmemoryDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// robotmemoryDescRobotRef is the schema descriptor for robot_ref field.
+	robotmemoryDescRobotRef := robotmemoryFields[0].Descriptor()
+	// robotmemory.RobotRefValidator is a validator for the "robot_ref" field. It is called by the builders before save.
+	robotmemory.RobotRefValidator = robotmemoryDescRobotRef.Validators[0].(func(string) error)
+	// robotmemoryDescContent is the schema descriptor for content field.
+	robotmemoryDescContent := robotmemoryFields[2].Descriptor()
+	// robotmemory.ContentValidator is a validator for the "content" field. It is called by the builders before save.
+	robotmemory.ContentValidator = robotmemoryDescContent.Validators[0].(func(string) error)
+	// robotmemoryDescLastAccessedAt is the schema descriptor for last_accessed_at field.
+	robotmemoryDescLastAccessedAt := robotmemoryFields[7].Descriptor()
+	// robotmemory.DefaultLastAccessedAt holds the default value on creation for the last_accessed_at field.
+	robotmemory.DefaultLastAccessedAt = robotmemoryDescLastAccessedAt.Default.(func() time.Time)
+	// robotmemoryDescAccessCount is the schema descriptor for access_count field.
+	robotmemoryDescAccessCount := robotmemoryFields[8].Descriptor()
+	// robotmemory.DefaultAccessCount holds the default value on creation for the access_count field.
+	robotmemory.DefaultAccessCount = robotmemoryDescAccessCount.Default.(uint64)
+	// robotmemoryDescID is the schema descriptor for id field.
+	robotmemoryDescID := robotmemoryMixinFields0[0].Descriptor()
+	// robotmemory.DefaultID holds the default value on creation for the id field.
+	robotmemory.DefaultID = robotmemoryDescID.Default.(func() xid.ID)
+	// robotmemory.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	robotmemory.IDValidator = func() func(string) error {
+		validators := robotmemoryDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

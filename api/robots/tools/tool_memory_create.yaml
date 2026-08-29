@@ -1,0 +1,54 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolMemoryCreate
+x-storyden-tool:
+  toolsets: [system.memory]
+  title: Create Memory
+  role: USE_ROBOTS
+  internal: true
+  toolset_only: true
+  annotations:
+    readOnlyHint: false
+    destructiveHint: false
+    idempotentHint: false
+    openWorldHint: false
+title: memory_create
+description: Save a fact or useful piece of long-term context to the current Robot's knowledge graph. For a clear relationship or attribute, supply subject, predicate, and object together. Duplicates are acceptable; do not delay the current task with memory organization.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolMemoryCreateInput" }
+  output: { $ref: "#/definitions/ToolMemoryCreateOutput" }
+definitions:
+  ToolMemoryCreateInput:
+    type: object
+    required: [content]
+    additionalProperties: false
+    properties:
+      parent_id: { type: string, pattern: "^[0-9a-v]{20}$" }
+      content:
+        type: string
+        minLength: 1
+        description: Concise natural-language evidence for this durable memory. It must directly support the structured fact when one is supplied.
+      subject:
+        type: string
+        minLength: 1
+        description: Entity the fact is about. Must be supplied together with predicate and object.
+      predicate:
+        type: string
+        minLength: 1
+        description: Short relationship or attribute such as known_as, owned_by, or works_in. Must be supplied together with subject and object.
+      object:
+        type: string
+        minLength: 1
+        description: Entity or value connected to the subject. Must be supplied together with subject and predicate.
+  ToolMemoryCreateOutput:
+    type: object
+    required: [memory_id, message, next_action]
+    additionalProperties: false
+    properties:
+      memory_id: { type: string, pattern: '^[0-9a-v]{20}$' }
+      subject: { type: string }
+      predicate: { type: string }
+      object: { type: string }
+      message: { type: string }
+      next_action: { type: string }

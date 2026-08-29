@@ -19,6 +19,8 @@ import (
 	robotresource "github.com/Southclaws/storyden/app/resources/robot"
 	robottools "github.com/Southclaws/storyden/app/services/semdex/robot/tools"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_documents"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_memory"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_memory_management"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_moderation"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspacestate"
 	"github.com/Southclaws/storyden/lib/mcp"
@@ -58,6 +60,37 @@ func TestSystemModerationToolsetExcludesContentPurge(t *testing.T) {
 		return
 	}
 	t.Fatalf("%s is not registered", system_moderation.ID)
+}
+
+func TestSystemMemoryToolsetsSeparateUseFromManagement(t *testing.T) {
+	foundMemory := false
+	foundManagement := false
+	for _, definition := range systemDefinitions() {
+		switch definition.ID {
+		case system_memory.ID:
+			foundMemory = true
+			assert.ElementsMatch(t, []string{"memory_create", "memory_search"}, definition.ToolNames)
+			assert.Equal(t, "Knowledge graph memory", definition.Name)
+			assert.Contains(t, definition.Instruction, "Make memory decisions autonomously")
+			assert.Contains(t, definition.Instruction, "Do not search or write memory reflexively")
+			assert.Contains(t, definition.Instruction, "A simple query or automation needs no memory search")
+			assert.Contains(t, definition.Instruction, "Every supplied text term and graph field in one call is ANDed")
+			assert.Contains(t, definition.Instruction, "Do not search merely to prove that no duplicate exists")
+			assert.Contains(t, definition.Instruction, "Duplicates are acceptable and can be consolidated later")
+			assert.Contains(t, definition.Instruction, "always supply subject, predicate, and object together")
+			assert.Contains(t, definition.Instruction, "(barney, is_searching_for, content_by_southclaws)")
+			assert.NotContains(t, definition.Instruction, "memory_open")
+			assert.NotContains(t, definition.Instruction, "memory_update")
+		case system_memory_management.ID:
+			foundManagement = true
+			assert.ElementsMatch(t, []string{"memory_list", "memory_move", "memory_open", "memory_update"}, definition.ToolNames)
+			assert.Equal(t, "Knowledge graph management", definition.Name)
+			assert.Contains(t, definition.Instruction, "deliberate inspection, correction, and consolidation")
+			assert.Contains(t, definition.Instruction, "scheduled maintenance Robot")
+		}
+	}
+	assert.True(t, foundMemory, "%s is not registered", system_memory.ID)
+	assert.True(t, foundManagement, "%s is not registered", system_memory_management.ID)
 }
 
 func TestBuildDeduplicatesToolsSharedByMultipleToolsets(t *testing.T) {

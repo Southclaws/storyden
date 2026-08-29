@@ -1,0 +1,22 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+required: [id, excerpt, state, children]
+additionalProperties: false
+properties:
+  id:
+    type: string
+    pattern: '^[0-9a-v]{20}$'
+  excerpt:
+    type: string
+  subject:
+    type: string
+  predicate:
+    type: string
+  object:
+    type: string
+  state:
+    type: string
+    enum: [active, superseded, archived]
+  children:
+    type: integer
+    minimum: 0

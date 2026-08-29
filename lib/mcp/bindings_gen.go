@@ -23,6 +23,12 @@ var (
 	toolMemberReinstate                 *ToolDefinition
 	toolMemberSearch                    *ToolDefinition
 	toolMemberSuspend                   *ToolDefinition
+	toolMemoryCreate                    *ToolDefinition
+	toolMemoryList                      *ToolDefinition
+	toolMemoryMove                      *ToolDefinition
+	toolMemoryOpen                      *ToolDefinition
+	toolMemorySearch                    *ToolDefinition
+	toolMemoryUpdate                    *ToolDefinition
 	toolPostSearch                      *ToolDefinition
 	toolReplySearch                     *ToolDefinition
 	toolReportCreate                    *ToolDefinition
@@ -88,6 +94,12 @@ func initAllTools() {
 	toolMemberReinstate = initTool("MemberReinstate")
 	toolMemberSearch = initTool("MemberSearch")
 	toolMemberSuspend = initTool("MemberSuspend")
+	toolMemoryCreate = initTool("MemoryCreate")
+	toolMemoryList = initTool("MemoryList")
+	toolMemoryMove = initTool("MemoryMove")
+	toolMemoryOpen = initTool("MemoryOpen")
+	toolMemorySearch = initTool("MemorySearch")
+	toolMemoryUpdate = initTool("MemoryUpdate")
 	toolPostSearch = initTool("PostSearch")
 	toolReplySearch = initTool("ReplySearch")
 	toolReportCreate = initTool("ReportCreate")
@@ -160,6 +172,12 @@ func AllToolNames() []string {
 		toolMemberReinstate.Name,
 		toolMemberSearch.Name,
 		toolMemberSuspend.Name,
+		toolMemoryCreate.Name,
+		toolMemoryList.Name,
+		toolMemoryMove.Name,
+		toolMemoryOpen.Name,
+		toolMemorySearch.Name,
+		toolMemoryUpdate.Name,
 		toolPostSearch.Name,
 		toolReplySearch.Name,
 		toolReportCreate.Name,
@@ -282,6 +300,30 @@ func GetMemberSearchTool() *ToolDefinition {
 
 func GetMemberSuspendTool() *ToolDefinition {
 	return toolMemberSuspend
+}
+
+func GetMemoryCreateTool() *ToolDefinition {
+	return toolMemoryCreate
+}
+
+func GetMemoryListTool() *ToolDefinition {
+	return toolMemoryList
+}
+
+func GetMemoryMoveTool() *ToolDefinition {
+	return toolMemoryMove
+}
+
+func GetMemoryOpenTool() *ToolDefinition {
+	return toolMemoryOpen
+}
+
+func GetMemorySearchTool() *ToolDefinition {
+	return toolMemorySearch
+}
+
+func GetMemoryUpdateTool() *ToolDefinition {
+	return toolMemoryUpdate
 }
 
 func GetPostSearchTool() *ToolDefinition {

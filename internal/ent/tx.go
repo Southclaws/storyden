@@ -94,6 +94,8 @@ type Tx struct {
 	RobotMCPServer *RobotMCPServerClient
 	// RobotMCPTool is the client for interacting with the RobotMCPTool builders.
 	RobotMCPTool *RobotMCPToolClient
+	// RobotMemory is the client for interacting with the RobotMemory builders.
+	RobotMemory *RobotMemoryClient
 	// RobotProviderModel is the client for interacting with the RobotProviderModel builders.
 	RobotProviderModel *RobotProviderModelClient
 	// RobotSession is the client for interacting with the RobotSession builders.
@@ -303,6 +305,7 @@ func (tx *Tx) init() {
 	tx.Robot = NewRobotClient(tx.config)
 	tx.RobotMCPServer = NewRobotMCPServerClient(tx.config)
 	tx.RobotMCPTool = NewRobotMCPToolClient(tx.config)
+	tx.RobotMemory = NewRobotMemoryClient(tx.config)
 	tx.RobotProviderModel = NewRobotProviderModelClient(tx.config)
 	tx.RobotSession = NewRobotSessionClient(tx.config)
 	tx.RobotSessionInput = NewRobotSessionInputClient(tx.config)

@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_discussions"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_documents"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_library"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_memory"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_robot_studio"
 )
 
@@ -45,6 +46,7 @@ func Definition() agent_registry.Definition {
 			system_documents.ID,
 			system_discussions.ID,
 			system_library.ID,
+			system_memory.ID,
 			system_robot_studio.ID,
 		},
 		Capabilities: []string{"tool_search", "toolset_search", "robot_search", "delegation"},

@@ -76,6 +76,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/report/report_writer"
 	"github.com/Southclaws/storyden/app/resources/robot/llm_provider"
 	robot_mcp "github.com/Southclaws/storyden/app/resources/robot/mcp"
+	"github.com/Southclaws/storyden/app/resources/robot/robot_memory"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_model_cache"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_querier"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
@@ -129,6 +130,7 @@ func Build() fx.Option {
 			thread_cache.New,
 			reaction_repo.New,
 			robot_model_cache.New,
+			robot_memory.New,
 			robot_mcp.New,
 			robot_querier.New,
 			robot_writer.New,

@@ -126,6 +126,9 @@ type RobotMCPServer func(*sql.Selector)
 // RobotMCPTool is the predicate function for robotmcptool builders.
 type RobotMCPTool func(*sql.Selector)
 
+// RobotMemory is the predicate function for robotmemory builders.
+type RobotMemory func(*sql.Selector)
+
 // RobotProviderModel is the predicate function for robotprovidermodel builders.
 type RobotProviderModel func(*sql.Selector)
 
