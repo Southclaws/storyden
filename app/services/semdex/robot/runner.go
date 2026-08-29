@@ -387,15 +387,15 @@ func (s *Agent) runResolvedAgent(
 		Capabilities:     spec.Capabilities,
 		UnavailableTools: missingTools,
 	}
-	memoryRoot := ""
+	memoryRoot := opt.NewEmpty[robotMemoryRoot]()
 	if slices.Contains(spec.ToolsetRefs, system_memory.ID) {
 		root, hasMore, err := s.memoryRepo.ActiveRoot(ctx, spec.RobotRef, robot_memory.RootLimit)
 		if err != nil {
 			return errorSeq(fmt.Errorf("load Robot memory root: %w", err))
 		}
-		memoryRoot = formatMemoryRoot(root, hasMore)
+		memoryRoot = opt.New(mapMemoryRoot(root, hasMore))
 	}
-	identityContext := s.buildRobotIdentityContext(sessionID, currentIdentity, runOptions.Delegation != nil, memoryRoot)
+	identityContext := newRobotIdentityContext(currentIdentity, runOptions.Delegation != nil, memoryRoot)
 
 	if runOptions.Delegation == nil {
 		backgroundTools, err := newBackgroundToolset()
