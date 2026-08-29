@@ -7,6 +7,8 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 	adkagent "google.golang.org/adk/v2/agent"
+
+	"github.com/Southclaws/storyden/app/resources/robot/robot_memory"
 )
 
 type robotIdentity struct {
@@ -18,8 +20,9 @@ type robotIdentity struct {
 }
 
 type robotIdentityContext struct {
-	Current   robotIdentity
-	Delegated bool
+	Current    robotIdentity
+	Delegated  bool
+	MemoryRoot string
 }
 
 func robotIdentityInstruction(ctx robotIdentityContext) string {
@@ -47,6 +50,11 @@ func robotIdentityInstruction(ctx robotIdentityContext) string {
 		}
 		b.WriteString("Continue with available capabilities and mention a missing capability only when it blocks the task.\n")
 	}
+	if ctx.MemoryRoot != "" {
+		b.WriteString("\n## Shared knowledge graph memory\n\n")
+		b.WriteString(ctx.MemoryRoot)
+		b.WriteString("\n")
+	}
 	b.WriteString("\nDo not repeat an unchanged tool call when its inputs and underlying state have not changed. Use the result already returned, choose a more specific capability, or explain what information is unavailable.\n")
 	if ctx.Delegated {
 		b.WriteString("\nStay within the delegated scope. If blocked, state exactly what Denbot needs to resolve.\n")
@@ -56,8 +64,28 @@ func robotIdentityInstruction(ctx robotIdentityContext) string {
 	return b.String()
 }
 
-func (s *Agent) buildRobotIdentityContext(_ string, current robotIdentity, delegated bool) robotIdentityContext {
-	return robotIdentityContext{Current: current, Delegated: delegated}
+func (s *Agent) buildRobotIdentityContext(_ string, current robotIdentity, delegated bool, memoryRoot string) robotIdentityContext {
+	return robotIdentityContext{Current: current, Delegated: delegated, MemoryRoot: memoryRoot}
+}
+
+func formatMemoryRoot(items []*robot_memory.Item, hasMore bool) string {
+	if len(items) == 0 {
+		return "There are no active top-level knowledge graph nodes. Do not create session-specific task state. Save a useful long-term fact directly when one emerges."
+	}
+	var b strings.Builder
+	b.WriteString("Active top-level knowledge graph nodes (short content excerpts and IDs only):\n")
+	for _, item := range items {
+		memory := item.Memory
+		b.WriteString(fmt.Sprintf("- %s (%s)", item.Excerpt, memory.ID))
+		if fact, ok := memory.Fact.Get(); ok {
+			b.WriteString(fmt.Sprintf(" [%s, %s, %s]", fact.Subject, fact.Predicate, fact.Object))
+		}
+		b.WriteString("\n")
+	}
+	if hasMore {
+		b.WriteString("- Additional top-level memories were omitted. Use a focused memory_search when they may be relevant.\n")
+	}
+	return strings.TrimSpace(b.String())
 }
 
 func robotInstructionProvider(spec *resolvedAgentSpec, identity robotIdentityContext) func(adkagent.ReadonlyContext) (string, error) {

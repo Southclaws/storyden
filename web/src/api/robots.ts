@@ -19,6 +19,12 @@ export interface MCPTools {
   ToolRobotUpdate?: RobotUpdate;
   ToolRobotDelete?: RobotDelete;
   ToolRobotSearch?: RobotSearch;
+  ToolMemoryList?: MemoryList;
+  ToolMemoryOpen?: MemoryOpen;
+  ToolMemorySearch?: MemorySearch;
+  ToolMemoryCreate?: MemoryCreate;
+  ToolMemoryUpdate?: MemoryUpdate;
+  ToolMemoryMove?: MemoryMove;
   ToolTrailCreate?: TrailCreate;
   ToolTrailList?: TrailList;
   ToolTrailGet?: TrailGet;
@@ -742,6 +748,182 @@ export interface RobotSearchResult {
   delegate_to: string;
   name: string;
   description: string;
+}
+/**
+ * Inspect up to 25 immediate children of the current Robot's knowledge graph root or one known memory. This is a management tool; prefer memory_search when recalling facts or when the relevant branch is unknown.
+ */
+export interface MemoryList {
+  input: ToolMemoryListInput;
+  output: ToolMemoryListOutput;
+  [k: string]: unknown;
+}
+export interface ToolMemoryListInput {
+  /**
+   * Parent memory identifier. Omit to list the top level.
+   */
+  parent_id?: string;
+}
+export interface ToolMemoryListOutput {
+  memories: RobotMemorySummary[];
+  returned: number;
+  has_more: boolean;
+  next_action: string;
+}
+export interface RobotMemorySummary {
+  id: string;
+  excerpt: string;
+  subject?: string;
+  predicate?: string;
+  object?: string;
+  state: "active" | "superseded" | "archived";
+  children: number;
+}
+/**
+ * Inspect one knowledge graph memory with its complete prose evidence, optional subject/predicate/object fact, compact path, and immediate children. This is a management tool and records an access.
+ */
+export interface MemoryOpen {
+  input: ToolMemoryOpenInput;
+  output: ToolMemoryOpenOutput;
+  [k: string]: unknown;
+}
+export interface ToolMemoryOpenInput {
+  id: string;
+}
+export interface ToolMemoryOpenOutput {
+  memory: RobotMemoryRecord;
+  path: RobotMemorySummary[];
+  children: RobotMemorySummary[];
+  next_action: string;
+}
+export interface RobotMemoryRecord {
+  id: string;
+  robot_ref: string;
+  parent_id?: string;
+  content: string;
+  subject?: string;
+  predicate?: string;
+  object?: string;
+  state: "active" | "superseded" | "archived";
+  created_at: string;
+  updated_at: string;
+  last_accessed_at: string;
+  access_count: number;
+}
+/**
+ * Recall facts and useful long-term context from the current Robot's active knowledge graph. Every supplied filter is ANDed; use separate focused calls unless an intersection is intended. Search when prior knowledge would help, but not reflexively for self-contained or transient tasks.
+ */
+export interface MemorySearch {
+  input: ToolMemorySearchInput;
+  output: ToolMemorySearchOutput;
+  [k: string]: unknown;
+}
+export interface ToolMemorySearchInput {
+  /**
+   * Simple keyword search of memory text. Every word is ANDed, so use one or a few closely related words rather than a list of unrelated entities or facts.
+   */
+  query?: string;
+  /**
+   * Optional subtree root, included in the search with all of its descendants.
+   */
+  parent_id?: string;
+  /**
+   * Fact subject. Exact after normalization unless * is used as a prefix or infix wildcard; search one entity at a time.
+   */
+  subject?: string;
+  /**
+   * Fact predicate. Exact after normalization unless * is used as a prefix or infix wildcard.
+   */
+  predicate?: string;
+  /**
+   * Fact object. Exact after normalization unless * is used as a prefix or infix wildcard; search one entity at a time.
+   */
+  object?: string;
+}
+export interface ToolMemorySearchOutput {
+  results: RobotMemorySearchResult[];
+  returned: number;
+  has_more: boolean;
+  next_action: string;
+}
+export interface RobotMemorySearchResult {
+  memory_id: string;
+  subject?: string;
+  predicate?: string;
+  object?: string;
+  excerpt: string;
+}
+/**
+ * Save a fact or useful piece of long-term context to the current Robot's knowledge graph. For a clear relationship or attribute, supply subject, predicate, and object together. Duplicates are acceptable; do not delay the current task with memory organization.
+ */
+export interface MemoryCreate {
+  input: ToolMemoryCreateInput;
+  output: ToolMemoryCreateOutput;
+  [k: string]: unknown;
+}
+export interface ToolMemoryCreateInput {
+  parent_id?: string;
+  /**
+   * Concise natural-language evidence for this durable memory. It must directly support the structured fact when one is supplied.
+   */
+  content: string;
+  /**
+   * Entity the fact is about. Must be supplied together with predicate and object.
+   */
+  subject?: string;
+  /**
+   * Short relationship or attribute such as known_as, owned_by, or works_in. Must be supplied together with subject and object.
+   */
+  predicate?: string;
+  /**
+   * Entity or value connected to the subject. Must be supplied together with subject and predicate.
+   */
+  object?: string;
+}
+export interface ToolMemoryCreateOutput {
+  memory_id: string;
+  subject?: string;
+  predicate?: string;
+  object?: string;
+  message: string;
+  next_action: string;
+}
+/**
+ * Correct or extend an opened knowledge graph memory node. Clear relationships and attributes should carry subject, predicate, and object together; supplying all three as empty strings clears the fact. Inactive memories remain available by ID and navigation but are excluded from search.
+ */
+export interface MemoryUpdate {
+  input: ToolMemoryUpdateInput;
+  output: ToolMemoryUpdateOutput;
+  [k: string]: unknown;
+}
+export interface ToolMemoryUpdateInput {
+  id: string;
+  content?: string;
+  subject?: string;
+  predicate?: string;
+  object?: string;
+  state?: "active" | "superseded" | "archived";
+}
+export interface ToolMemoryUpdateOutput {
+  memory: RobotMemoryRecord;
+  message: string;
+  next_action: string;
+}
+/**
+ * Reorganize the current Robot's knowledge graph by moving one memory beneath another, or to the top level when parent_id is omitted. The operation rejects cross-Robot parents and hierarchy cycles.
+ */
+export interface MemoryMove {
+  input: ToolMemoryMoveInput;
+  output: ToolMemoryMoveOutput;
+  [k: string]: unknown;
+}
+export interface ToolMemoryMoveInput {
+  id: string;
+  parent_id?: string;
+}
+export interface ToolMemoryMoveOutput {
+  memory: RobotMemoryRecord;
+  message: string;
+  next_action: string;
 }
 /**
  * Create a scheduled or event-driven Trail.
@@ -2868,9 +3050,9 @@ export interface ToolMemberReinstateOutput {
   suspended: false;
 }
 
-export type ToolName = "content_search" | "document_get" | "document_search" | "document_list" | "document_close" | "tool_search" | "tool_get" | "tool_load" | "robot_create" | "robot_list" | "robot_get" | "robot_update" | "robot_delete" | "robot_search" | "trail_create" | "trail_list" | "trail_get" | "trail_update" | "trail_schedule_preview" | "trail_run_list" | "trail_run_get" | "trail_run_create" | "trail_action_run_cancel" | "toolset_search" | "toolset_load" | "toolset_create" | "toolset_list" | "toolset_get" | "toolset_update" | "toolset_delete" | "library_page_list" | "library_request_page" | "library_page_get" | "library_page_open" | "create_library_page" | "update_library_page" | "library_search_pages" | "library_page_property_schema_get" | "library_page_property_schema_update" | "library_page_properties_update" | "tag_list" | "link_create" | "web_fetch" | "web_open" | "thread_create" | "thread_list" | "thread_get" | "thread_open" | "thread_update" | "thread_reply" | "category_list" | "thread_search" | "reply_search" | "post_search" | "member_search" | "report_create" | "report_list" | "report_get" | "report_update" | "member_suspend" | "member_reinstate";
+export type ToolName = "content_search" | "document_get" | "document_search" | "document_list" | "document_close" | "tool_search" | "tool_get" | "tool_load" | "robot_create" | "robot_list" | "robot_get" | "robot_update" | "robot_delete" | "robot_search" | "memory_list" | "memory_open" | "memory_search" | "memory_create" | "memory_update" | "memory_move" | "trail_create" | "trail_list" | "trail_get" | "trail_update" | "trail_schedule_preview" | "trail_run_list" | "trail_run_get" | "trail_run_create" | "trail_action_run_cancel" | "toolset_search" | "toolset_load" | "toolset_create" | "toolset_list" | "toolset_get" | "toolset_update" | "toolset_delete" | "library_page_list" | "library_request_page" | "library_page_get" | "library_page_open" | "create_library_page" | "update_library_page" | "library_search_pages" | "library_page_property_schema_get" | "library_page_property_schema_update" | "library_page_properties_update" | "tag_list" | "link_create" | "web_fetch" | "web_open" | "thread_create" | "thread_list" | "thread_get" | "thread_open" | "thread_update" | "thread_reply" | "category_list" | "thread_search" | "reply_search" | "post_search" | "member_search" | "report_create" | "report_list" | "report_get" | "report_update" | "member_suspend" | "member_reinstate";
 
-export const TOOL_NAMES = ["content_search", "document_get", "document_search", "document_list", "document_close", "tool_search", "tool_get", "tool_load", "robot_create", "robot_list", "robot_get", "robot_update", "robot_delete", "robot_search", "trail_create", "trail_list", "trail_get", "trail_update", "trail_schedule_preview", "trail_run_list", "trail_run_get", "trail_run_create", "trail_action_run_cancel", "toolset_search", "toolset_load", "toolset_create", "toolset_list", "toolset_get", "toolset_update", "toolset_delete", "library_page_list", "library_request_page", "library_page_get", "library_page_open", "create_library_page", "update_library_page", "library_search_pages", "library_page_property_schema_get", "library_page_property_schema_update", "library_page_properties_update", "tag_list", "link_create", "web_fetch", "web_open", "thread_create", "thread_list", "thread_get", "thread_open", "thread_update", "thread_reply", "category_list", "thread_search", "reply_search", "post_search", "member_search", "report_create", "report_list", "report_get", "report_update", "member_suspend", "member_reinstate"] as const;
+export const TOOL_NAMES = ["content_search", "document_get", "document_search", "document_list", "document_close", "tool_search", "tool_get", "tool_load", "robot_create", "robot_list", "robot_get", "robot_update", "robot_delete", "robot_search", "memory_list", "memory_open", "memory_search", "memory_create", "memory_update", "memory_move", "trail_create", "trail_list", "trail_get", "trail_update", "trail_schedule_preview", "trail_run_list", "trail_run_get", "trail_run_create", "trail_action_run_cancel", "toolset_search", "toolset_load", "toolset_create", "toolset_list", "toolset_get", "toolset_update", "toolset_delete", "library_page_list", "library_request_page", "library_page_get", "library_page_open", "create_library_page", "update_library_page", "library_search_pages", "library_page_property_schema_get", "library_page_property_schema_update", "library_page_properties_update", "tag_list", "link_create", "web_fetch", "web_open", "thread_create", "thread_list", "thread_get", "thread_open", "thread_update", "thread_reply", "category_list", "thread_search", "reply_search", "post_search", "member_search", "report_create", "report_list", "report_get", "report_update", "member_suspend", "member_reinstate"] as const;
 
 export type ToolInputMap = {
   "content_search": ToolContentSearchInput;
@@ -2887,6 +3069,12 @@ export type ToolInputMap = {
   "robot_update": ToolRobotUpdateInput;
   "robot_delete": ToolRobotDeleteInput;
   "robot_search": ToolRobotSearchInput;
+  "memory_list": ToolMemoryListInput;
+  "memory_open": ToolMemoryOpenInput;
+  "memory_search": ToolMemorySearchInput;
+  "memory_create": ToolMemoryCreateInput;
+  "memory_update": ToolMemoryUpdateInput;
+  "memory_move": ToolMemoryMoveInput;
   "trail_create": ToolTrailCreateInput;
   "trail_list": ToolTrailListInput;
   "trail_get": ToolTrailGetInput;
@@ -2951,6 +3139,12 @@ export type ToolOutputMap = {
   "robot_update": ToolRobotUpdateOutput;
   "robot_delete": ToolRobotDeleteOutput;
   "robot_search": ToolRobotSearchOutput;
+  "memory_list": ToolMemoryListOutput;
+  "memory_open": ToolMemoryOpenOutput;
+  "memory_search": ToolMemorySearchOutput;
+  "memory_create": ToolMemoryCreateOutput;
+  "memory_update": ToolMemoryUpdateOutput;
+  "memory_move": ToolMemoryMoveOutput;
   "trail_create": ToolTrailCreateOutput;
   "trail_list": ToolTrailListOutput;
   "trail_get": ToolTrailGetOutput;
@@ -3055,6 +3249,30 @@ export type StorydenTools = {
   "robot_search": {
     input: ToolRobotSearchInput;
     output: ToolRobotSearchOutput;
+  };
+  "memory_list": {
+    input: ToolMemoryListInput;
+    output: ToolMemoryListOutput;
+  };
+  "memory_open": {
+    input: ToolMemoryOpenInput;
+    output: ToolMemoryOpenOutput;
+  };
+  "memory_search": {
+    input: ToolMemorySearchInput;
+    output: ToolMemorySearchOutput;
+  };
+  "memory_create": {
+    input: ToolMemoryCreateInput;
+    output: ToolMemoryCreateOutput;
+  };
+  "memory_update": {
+    input: ToolMemoryUpdateInput;
+    output: ToolMemoryUpdateOutput;
+  };
+  "memory_move": {
+    input: ToolMemoryMoveInput;
+    output: ToolMemoryMoveOutput;
   };
   "trail_create": {
     input: ToolTrailCreateInput;

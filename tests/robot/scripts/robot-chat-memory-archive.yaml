@@ -1,0 +1,33 @@
+steps:
+  - match:
+      tool_result: memory_update
+    respond:
+      text: "The stale memory was archived."
+      finish: "stop"
+  - match:
+      tool_result: memory_open
+    respond:
+      tool_calls:
+        - id: call_memory_archive_update
+          name: memory_update
+          args:
+            id: "d8818ueot5pfij6bvm90"
+            state: archived
+  - match:
+      tool_result: memory_search
+    respond:
+      tool_calls:
+        - id: call_memory_archive_open
+          name: memory_open
+          args:
+            id: "d8818ueot5pfij6bvm90"
+  - match:
+      contains: "archive freyja's stale owner memory"
+    respond:
+      tool_calls:
+        - id: call_memory_archive_search
+          name: memory_search
+          args:
+            subject: "Freyja"
+            predicate: "owned by"
+            object: "Southclaws"

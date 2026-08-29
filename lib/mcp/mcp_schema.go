@@ -1166,6 +1166,255 @@ func (j *RobotItem) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
+type RobotMemoryRecordYaml struct {
+	// AccessCount corresponds to the JSON schema field "access_count".
+	AccessCount int `json:"access_count" yaml:"access_count" mapstructure:"access_count"`
+
+	// Content corresponds to the JSON schema field "content".
+	Content string `json:"content" yaml:"content" mapstructure:"content"`
+
+	// CreatedAt corresponds to the JSON schema field "created_at".
+	CreatedAt time.Time `json:"created_at" yaml:"created_at" mapstructure:"created_at"`
+
+	// Id corresponds to the JSON schema field "id".
+	Id string `json:"id" yaml:"id" mapstructure:"id"`
+
+	// LastAccessedAt corresponds to the JSON schema field "last_accessed_at".
+	LastAccessedAt time.Time `json:"last_accessed_at" yaml:"last_accessed_at" mapstructure:"last_accessed_at"`
+
+	// Object corresponds to the JSON schema field "object".
+	Object *string `json:"object,omitempty" yaml:"object,omitempty" mapstructure:"object,omitempty"`
+
+	// ParentId corresponds to the JSON schema field "parent_id".
+	ParentId *string `json:"parent_id,omitempty" yaml:"parent_id,omitempty" mapstructure:"parent_id,omitempty"`
+
+	// Predicate corresponds to the JSON schema field "predicate".
+	Predicate *string `json:"predicate,omitempty" yaml:"predicate,omitempty" mapstructure:"predicate,omitempty"`
+
+	// RobotRef corresponds to the JSON schema field "robot_ref".
+	RobotRef string `json:"robot_ref" yaml:"robot_ref" mapstructure:"robot_ref"`
+
+	// State corresponds to the JSON schema field "state".
+	State RobotMemoryRecordYamlState `json:"state" yaml:"state" mapstructure:"state"`
+
+	// Subject corresponds to the JSON schema field "subject".
+	Subject *string `json:"subject,omitempty" yaml:"subject,omitempty" mapstructure:"subject,omitempty"`
+
+	// UpdatedAt corresponds to the JSON schema field "updated_at".
+	UpdatedAt time.Time `json:"updated_at" yaml:"updated_at" mapstructure:"updated_at"`
+}
+
+type RobotMemoryRecordYamlState string
+
+const RobotMemoryRecordYamlStateActive RobotMemoryRecordYamlState = "active"
+const RobotMemoryRecordYamlStateArchived RobotMemoryRecordYamlState = "archived"
+const RobotMemoryRecordYamlStateSuperseded RobotMemoryRecordYamlState = "superseded"
+
+var enumValues_RobotMemoryRecordYamlState = []interface{}{
+	"active",
+	"superseded",
+	"archived",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *RobotMemoryRecordYamlState) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_RobotMemoryRecordYamlState {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_RobotMemoryRecordYamlState, v)
+	}
+	*j = RobotMemoryRecordYamlState(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *RobotMemoryRecordYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["access_count"]; raw != nil && !ok {
+		return fmt.Errorf("field access_count in RobotMemoryRecordYaml: required")
+	}
+	if _, ok := raw["content"]; raw != nil && !ok {
+		return fmt.Errorf("field content in RobotMemoryRecordYaml: required")
+	}
+	if _, ok := raw["created_at"]; raw != nil && !ok {
+		return fmt.Errorf("field created_at in RobotMemoryRecordYaml: required")
+	}
+	if _, ok := raw["id"]; raw != nil && !ok {
+		return fmt.Errorf("field id in RobotMemoryRecordYaml: required")
+	}
+	if _, ok := raw["last_accessed_at"]; raw != nil && !ok {
+		return fmt.Errorf("field last_accessed_at in RobotMemoryRecordYaml: required")
+	}
+	if _, ok := raw["robot_ref"]; raw != nil && !ok {
+		return fmt.Errorf("field robot_ref in RobotMemoryRecordYaml: required")
+	}
+	if _, ok := raw["state"]; raw != nil && !ok {
+		return fmt.Errorf("field state in RobotMemoryRecordYaml: required")
+	}
+	if _, ok := raw["updated_at"]; raw != nil && !ok {
+		return fmt.Errorf("field updated_at in RobotMemoryRecordYaml: required")
+	}
+	type Plain RobotMemoryRecordYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if 0 > plain.AccessCount {
+		return fmt.Errorf("field %s: must be >= %v", "access_count", 0)
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.Id)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "Id", `^[0-9a-v]{20}$`)
+	}
+	if plain.ParentId != nil {
+		if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(*plain.ParentId)); !matched {
+			return fmt.Errorf("field %s pattern match: must match %s", "ParentId", `^[0-9a-v]{20}$`)
+		}
+	}
+	*j = RobotMemoryRecordYaml(plain)
+	return nil
+}
+
+type RobotMemorySearchResultYaml struct {
+	// Excerpt corresponds to the JSON schema field "excerpt".
+	Excerpt string `json:"excerpt" yaml:"excerpt" mapstructure:"excerpt"`
+
+	// MemoryId corresponds to the JSON schema field "memory_id".
+	MemoryId string `json:"memory_id" yaml:"memory_id" mapstructure:"memory_id"`
+
+	// Object corresponds to the JSON schema field "object".
+	Object *string `json:"object,omitempty" yaml:"object,omitempty" mapstructure:"object,omitempty"`
+
+	// Predicate corresponds to the JSON schema field "predicate".
+	Predicate *string `json:"predicate,omitempty" yaml:"predicate,omitempty" mapstructure:"predicate,omitempty"`
+
+	// Subject corresponds to the JSON schema field "subject".
+	Subject *string `json:"subject,omitempty" yaml:"subject,omitempty" mapstructure:"subject,omitempty"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *RobotMemorySearchResultYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["excerpt"]; raw != nil && !ok {
+		return fmt.Errorf("field excerpt in RobotMemorySearchResultYaml: required")
+	}
+	if _, ok := raw["memory_id"]; raw != nil && !ok {
+		return fmt.Errorf("field memory_id in RobotMemorySearchResultYaml: required")
+	}
+	type Plain RobotMemorySearchResultYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.MemoryId)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "MemoryId", `^[0-9a-v]{20}$`)
+	}
+	*j = RobotMemorySearchResultYaml(plain)
+	return nil
+}
+
+type RobotMemorySummaryYaml struct {
+	// Children corresponds to the JSON schema field "children".
+	Children int `json:"children" yaml:"children" mapstructure:"children"`
+
+	// Excerpt corresponds to the JSON schema field "excerpt".
+	Excerpt string `json:"excerpt" yaml:"excerpt" mapstructure:"excerpt"`
+
+	// Id corresponds to the JSON schema field "id".
+	Id string `json:"id" yaml:"id" mapstructure:"id"`
+
+	// Object corresponds to the JSON schema field "object".
+	Object *string `json:"object,omitempty" yaml:"object,omitempty" mapstructure:"object,omitempty"`
+
+	// Predicate corresponds to the JSON schema field "predicate".
+	Predicate *string `json:"predicate,omitempty" yaml:"predicate,omitempty" mapstructure:"predicate,omitempty"`
+
+	// State corresponds to the JSON schema field "state".
+	State RobotMemorySummaryYamlState `json:"state" yaml:"state" mapstructure:"state"`
+
+	// Subject corresponds to the JSON schema field "subject".
+	Subject *string `json:"subject,omitempty" yaml:"subject,omitempty" mapstructure:"subject,omitempty"`
+}
+
+type RobotMemorySummaryYamlState string
+
+const RobotMemorySummaryYamlStateActive RobotMemorySummaryYamlState = "active"
+const RobotMemorySummaryYamlStateArchived RobotMemorySummaryYamlState = "archived"
+const RobotMemorySummaryYamlStateSuperseded RobotMemorySummaryYamlState = "superseded"
+
+var enumValues_RobotMemorySummaryYamlState = []interface{}{
+	"active",
+	"superseded",
+	"archived",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *RobotMemorySummaryYamlState) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_RobotMemorySummaryYamlState {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_RobotMemorySummaryYamlState, v)
+	}
+	*j = RobotMemorySummaryYamlState(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *RobotMemorySummaryYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["children"]; raw != nil && !ok {
+		return fmt.Errorf("field children in RobotMemorySummaryYaml: required")
+	}
+	if _, ok := raw["excerpt"]; raw != nil && !ok {
+		return fmt.Errorf("field excerpt in RobotMemorySummaryYaml: required")
+	}
+	if _, ok := raw["id"]; raw != nil && !ok {
+		return fmt.Errorf("field id in RobotMemorySummaryYaml: required")
+	}
+	if _, ok := raw["state"]; raw != nil && !ok {
+		return fmt.Errorf("field state in RobotMemorySummaryYaml: required")
+	}
+	type Plain RobotMemorySummaryYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if 0 > plain.Children {
+		return fmt.Errorf("field %s: must be >= %v", "children", 0)
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.Id)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "Id", `^[0-9a-v]{20}$`)
+	}
+	*j = RobotMemorySummaryYaml(plain)
+	return nil
+}
+
 type RobotSearchResult struct {
 	// Delegation target name.
 	DelegateTo string `json:"delegate_to" yaml:"delegate_to" mapstructure:"delegate_to"`
@@ -3379,6 +3628,699 @@ func (j *ToolMemberSuspendYaml) UnmarshalJSON(value []byte) error {
 		return err
 	}
 	*j = ToolMemberSuspendYaml(plain)
+	return nil
+}
+
+type ToolMemoryCreateInput struct {
+	// Concise natural-language evidence for this durable memory. It must directly
+	// support the structured fact when one is supplied.
+	Content string `json:"content" yaml:"content" mapstructure:"content"`
+
+	// Entity or value connected to the subject. Must be supplied together with
+	// subject and predicate.
+	Object *string `json:"object,omitempty" yaml:"object,omitempty" mapstructure:"object,omitempty"`
+
+	// ParentId corresponds to the JSON schema field "parent_id".
+	ParentId *string `json:"parent_id,omitempty" yaml:"parent_id,omitempty" mapstructure:"parent_id,omitempty"`
+
+	// Short relationship or attribute such as known_as, owned_by, or works_in. Must
+	// be supplied together with subject and object.
+	Predicate *string `json:"predicate,omitempty" yaml:"predicate,omitempty" mapstructure:"predicate,omitempty"`
+
+	// Entity the fact is about. Must be supplied together with predicate and object.
+	Subject *string `json:"subject,omitempty" yaml:"subject,omitempty" mapstructure:"subject,omitempty"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemoryCreateInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["content"]; raw != nil && !ok {
+		return fmt.Errorf("field content in ToolMemoryCreateInput: required")
+	}
+	type Plain ToolMemoryCreateInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if len(plain.Content) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "content", 1)
+	}
+	if plain.Object != nil && len(*plain.Object) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "object", 1)
+	}
+	if plain.ParentId != nil {
+		if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(*plain.ParentId)); !matched {
+			return fmt.Errorf("field %s pattern match: must match %s", "ParentId", `^[0-9a-v]{20}$`)
+		}
+	}
+	if plain.Predicate != nil && len(*plain.Predicate) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "predicate", 1)
+	}
+	if plain.Subject != nil && len(*plain.Subject) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "subject", 1)
+	}
+	*j = ToolMemoryCreateInput(plain)
+	return nil
+}
+
+type ToolMemoryCreateOutput struct {
+	// MemoryId corresponds to the JSON schema field "memory_id".
+	MemoryId string `json:"memory_id" yaml:"memory_id" mapstructure:"memory_id"`
+
+	// Message corresponds to the JSON schema field "message".
+	Message string `json:"message" yaml:"message" mapstructure:"message"`
+
+	// NextAction corresponds to the JSON schema field "next_action".
+	NextAction string `json:"next_action" yaml:"next_action" mapstructure:"next_action"`
+
+	// Object corresponds to the JSON schema field "object".
+	Object *string `json:"object,omitempty" yaml:"object,omitempty" mapstructure:"object,omitempty"`
+
+	// Predicate corresponds to the JSON schema field "predicate".
+	Predicate *string `json:"predicate,omitempty" yaml:"predicate,omitempty" mapstructure:"predicate,omitempty"`
+
+	// Subject corresponds to the JSON schema field "subject".
+	Subject *string `json:"subject,omitempty" yaml:"subject,omitempty" mapstructure:"subject,omitempty"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemoryCreateOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["memory_id"]; raw != nil && !ok {
+		return fmt.Errorf("field memory_id in ToolMemoryCreateOutput: required")
+	}
+	if _, ok := raw["message"]; raw != nil && !ok {
+		return fmt.Errorf("field message in ToolMemoryCreateOutput: required")
+	}
+	if _, ok := raw["next_action"]; raw != nil && !ok {
+		return fmt.Errorf("field next_action in ToolMemoryCreateOutput: required")
+	}
+	type Plain ToolMemoryCreateOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.MemoryId)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "MemoryId", `^[0-9a-v]{20}$`)
+	}
+	*j = ToolMemoryCreateOutput(plain)
+	return nil
+}
+
+// Save a fact or useful piece of long-term context to the current Robot's
+// knowledge graph. For a clear relationship or attribute, supply subject,
+// predicate, and object together. Duplicates are acceptable; do not delay the
+// current task with memory organization.
+type ToolMemoryCreateYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolMemoryCreateInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolMemoryCreateOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemoryCreateYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolMemoryCreateYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolMemoryCreateYaml: required")
+	}
+	type Plain ToolMemoryCreateYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolMemoryCreateYaml(plain)
+	return nil
+}
+
+type ToolMemoryListInput struct {
+	// Parent memory identifier. Omit to list the top level.
+	ParentId *string `json:"parent_id,omitempty" yaml:"parent_id,omitempty" mapstructure:"parent_id,omitempty"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemoryListInput) UnmarshalJSON(value []byte) error {
+	type Plain ToolMemoryListInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if plain.ParentId != nil {
+		if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(*plain.ParentId)); !matched {
+			return fmt.Errorf("field %s pattern match: must match %s", "ParentId", `^[0-9a-v]{20}$`)
+		}
+	}
+	*j = ToolMemoryListInput(plain)
+	return nil
+}
+
+type ToolMemoryListOutput struct {
+	// HasMore corresponds to the JSON schema field "has_more".
+	HasMore bool `json:"has_more" yaml:"has_more" mapstructure:"has_more"`
+
+	// Memories corresponds to the JSON schema field "memories".
+	Memories []RobotMemorySummaryYaml `json:"memories" yaml:"memories" mapstructure:"memories"`
+
+	// NextAction corresponds to the JSON schema field "next_action".
+	NextAction string `json:"next_action" yaml:"next_action" mapstructure:"next_action"`
+
+	// Returned corresponds to the JSON schema field "returned".
+	Returned int `json:"returned" yaml:"returned" mapstructure:"returned"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemoryListOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["has_more"]; raw != nil && !ok {
+		return fmt.Errorf("field has_more in ToolMemoryListOutput: required")
+	}
+	if _, ok := raw["memories"]; raw != nil && !ok {
+		return fmt.Errorf("field memories in ToolMemoryListOutput: required")
+	}
+	if _, ok := raw["next_action"]; raw != nil && !ok {
+		return fmt.Errorf("field next_action in ToolMemoryListOutput: required")
+	}
+	if _, ok := raw["returned"]; raw != nil && !ok {
+		return fmt.Errorf("field returned in ToolMemoryListOutput: required")
+	}
+	type Plain ToolMemoryListOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if 0 > plain.Returned {
+		return fmt.Errorf("field %s: must be >= %v", "returned", 0)
+	}
+	*j = ToolMemoryListOutput(plain)
+	return nil
+}
+
+// Inspect up to 25 immediate children of the current Robot's knowledge graph root
+// or one known memory. This is a management tool; prefer memory_search when
+// recalling facts or when the relevant branch is unknown.
+type ToolMemoryListYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolMemoryListInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolMemoryListOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemoryListYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolMemoryListYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolMemoryListYaml: required")
+	}
+	type Plain ToolMemoryListYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolMemoryListYaml(plain)
+	return nil
+}
+
+type ToolMemoryMoveInput struct {
+	// Id corresponds to the JSON schema field "id".
+	Id string `json:"id" yaml:"id" mapstructure:"id"`
+
+	// ParentId corresponds to the JSON schema field "parent_id".
+	ParentId *string `json:"parent_id,omitempty" yaml:"parent_id,omitempty" mapstructure:"parent_id,omitempty"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemoryMoveInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["id"]; raw != nil && !ok {
+		return fmt.Errorf("field id in ToolMemoryMoveInput: required")
+	}
+	type Plain ToolMemoryMoveInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.Id)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "Id", `^[0-9a-v]{20}$`)
+	}
+	if plain.ParentId != nil {
+		if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(*plain.ParentId)); !matched {
+			return fmt.Errorf("field %s pattern match: must match %s", "ParentId", `^[0-9a-v]{20}$`)
+		}
+	}
+	*j = ToolMemoryMoveInput(plain)
+	return nil
+}
+
+type ToolMemoryMoveOutput struct {
+	// Memory corresponds to the JSON schema field "memory".
+	Memory RobotMemoryRecordYaml `json:"memory" yaml:"memory" mapstructure:"memory"`
+
+	// Message corresponds to the JSON schema field "message".
+	Message string `json:"message" yaml:"message" mapstructure:"message"`
+
+	// NextAction corresponds to the JSON schema field "next_action".
+	NextAction string `json:"next_action" yaml:"next_action" mapstructure:"next_action"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemoryMoveOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["memory"]; raw != nil && !ok {
+		return fmt.Errorf("field memory in ToolMemoryMoveOutput: required")
+	}
+	if _, ok := raw["message"]; raw != nil && !ok {
+		return fmt.Errorf("field message in ToolMemoryMoveOutput: required")
+	}
+	if _, ok := raw["next_action"]; raw != nil && !ok {
+		return fmt.Errorf("field next_action in ToolMemoryMoveOutput: required")
+	}
+	type Plain ToolMemoryMoveOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolMemoryMoveOutput(plain)
+	return nil
+}
+
+// Reorganize the current Robot's knowledge graph by moving one memory beneath
+// another, or to the top level when parent_id is omitted. The operation rejects
+// cross-Robot parents and hierarchy cycles.
+type ToolMemoryMoveYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolMemoryMoveInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolMemoryMoveOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemoryMoveYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolMemoryMoveYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolMemoryMoveYaml: required")
+	}
+	type Plain ToolMemoryMoveYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolMemoryMoveYaml(plain)
+	return nil
+}
+
+type ToolMemoryOpenInput struct {
+	// Id corresponds to the JSON schema field "id".
+	Id string `json:"id" yaml:"id" mapstructure:"id"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemoryOpenInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["id"]; raw != nil && !ok {
+		return fmt.Errorf("field id in ToolMemoryOpenInput: required")
+	}
+	type Plain ToolMemoryOpenInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.Id)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "Id", `^[0-9a-v]{20}$`)
+	}
+	*j = ToolMemoryOpenInput(plain)
+	return nil
+}
+
+type ToolMemoryOpenOutput struct {
+	// Children corresponds to the JSON schema field "children".
+	Children []RobotMemorySummaryYaml `json:"children" yaml:"children" mapstructure:"children"`
+
+	// Memory corresponds to the JSON schema field "memory".
+	Memory RobotMemoryRecordYaml `json:"memory" yaml:"memory" mapstructure:"memory"`
+
+	// NextAction corresponds to the JSON schema field "next_action".
+	NextAction string `json:"next_action" yaml:"next_action" mapstructure:"next_action"`
+
+	// Path corresponds to the JSON schema field "path".
+	Path []RobotMemorySummaryYaml `json:"path" yaml:"path" mapstructure:"path"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemoryOpenOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["children"]; raw != nil && !ok {
+		return fmt.Errorf("field children in ToolMemoryOpenOutput: required")
+	}
+	if _, ok := raw["memory"]; raw != nil && !ok {
+		return fmt.Errorf("field memory in ToolMemoryOpenOutput: required")
+	}
+	if _, ok := raw["next_action"]; raw != nil && !ok {
+		return fmt.Errorf("field next_action in ToolMemoryOpenOutput: required")
+	}
+	if _, ok := raw["path"]; raw != nil && !ok {
+		return fmt.Errorf("field path in ToolMemoryOpenOutput: required")
+	}
+	type Plain ToolMemoryOpenOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolMemoryOpenOutput(plain)
+	return nil
+}
+
+// Inspect one knowledge graph memory with its complete prose evidence, optional
+// subject/predicate/object fact, compact path, and immediate children. This is a
+// management tool and records an access.
+type ToolMemoryOpenYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolMemoryOpenInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolMemoryOpenOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemoryOpenYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolMemoryOpenYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolMemoryOpenYaml: required")
+	}
+	type Plain ToolMemoryOpenYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolMemoryOpenYaml(plain)
+	return nil
+}
+
+type ToolMemorySearchInput struct {
+	// Fact object. Exact after normalization unless * is used as a prefix or infix
+	// wildcard; search one entity at a time.
+	Object *string `json:"object,omitempty" yaml:"object,omitempty" mapstructure:"object,omitempty"`
+
+	// Optional subtree root, included in the search with all of its descendants.
+	ParentId *string `json:"parent_id,omitempty" yaml:"parent_id,omitempty" mapstructure:"parent_id,omitempty"`
+
+	// Fact predicate. Exact after normalization unless * is used as a prefix or infix
+	// wildcard.
+	Predicate *string `json:"predicate,omitempty" yaml:"predicate,omitempty" mapstructure:"predicate,omitempty"`
+
+	// Simple keyword search of memory text. Every word is ANDed, so use one or a few
+	// closely related words rather than a list of unrelated entities or facts.
+	Query *string `json:"query,omitempty" yaml:"query,omitempty" mapstructure:"query,omitempty"`
+
+	// Fact subject. Exact after normalization unless * is used as a prefix or infix
+	// wildcard; search one entity at a time.
+	Subject *string `json:"subject,omitempty" yaml:"subject,omitempty" mapstructure:"subject,omitempty"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemorySearchInput) UnmarshalJSON(value []byte) error {
+	type Plain ToolMemorySearchInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if plain.ParentId != nil {
+		if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(*plain.ParentId)); !matched {
+			return fmt.Errorf("field %s pattern match: must match %s", "ParentId", `^[0-9a-v]{20}$`)
+		}
+	}
+	if plain.Query != nil && len(*plain.Query) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "query", 1)
+	}
+	*j = ToolMemorySearchInput(plain)
+	return nil
+}
+
+type ToolMemorySearchOutput struct {
+	// HasMore corresponds to the JSON schema field "has_more".
+	HasMore bool `json:"has_more" yaml:"has_more" mapstructure:"has_more"`
+
+	// NextAction corresponds to the JSON schema field "next_action".
+	NextAction string `json:"next_action" yaml:"next_action" mapstructure:"next_action"`
+
+	// Results corresponds to the JSON schema field "results".
+	Results []RobotMemorySearchResultYaml `json:"results" yaml:"results" mapstructure:"results"`
+
+	// Returned corresponds to the JSON schema field "returned".
+	Returned int `json:"returned" yaml:"returned" mapstructure:"returned"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemorySearchOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["has_more"]; raw != nil && !ok {
+		return fmt.Errorf("field has_more in ToolMemorySearchOutput: required")
+	}
+	if _, ok := raw["next_action"]; raw != nil && !ok {
+		return fmt.Errorf("field next_action in ToolMemorySearchOutput: required")
+	}
+	if _, ok := raw["results"]; raw != nil && !ok {
+		return fmt.Errorf("field results in ToolMemorySearchOutput: required")
+	}
+	if _, ok := raw["returned"]; raw != nil && !ok {
+		return fmt.Errorf("field returned in ToolMemorySearchOutput: required")
+	}
+	type Plain ToolMemorySearchOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if 0 > plain.Returned {
+		return fmt.Errorf("field %s: must be >= %v", "returned", 0)
+	}
+	*j = ToolMemorySearchOutput(plain)
+	return nil
+}
+
+// Recall facts and useful long-term context from the current Robot's active
+// knowledge graph. Every supplied filter is ANDed; use separate focused calls
+// unless an intersection is intended. Search when prior knowledge would help, but
+// not reflexively for self-contained or transient tasks.
+type ToolMemorySearchYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolMemorySearchInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolMemorySearchOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemorySearchYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolMemorySearchYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolMemorySearchYaml: required")
+	}
+	type Plain ToolMemorySearchYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolMemorySearchYaml(plain)
+	return nil
+}
+
+type ToolMemoryUpdateInput struct {
+	// Content corresponds to the JSON schema field "content".
+	Content *string `json:"content,omitempty" yaml:"content,omitempty" mapstructure:"content,omitempty"`
+
+	// Id corresponds to the JSON schema field "id".
+	Id string `json:"id" yaml:"id" mapstructure:"id"`
+
+	// Object corresponds to the JSON schema field "object".
+	Object *string `json:"object,omitempty" yaml:"object,omitempty" mapstructure:"object,omitempty"`
+
+	// Predicate corresponds to the JSON schema field "predicate".
+	Predicate *string `json:"predicate,omitempty" yaml:"predicate,omitempty" mapstructure:"predicate,omitempty"`
+
+	// State corresponds to the JSON schema field "state".
+	State *ToolMemoryUpdateInputState `json:"state,omitempty" yaml:"state,omitempty" mapstructure:"state,omitempty"`
+
+	// Subject corresponds to the JSON schema field "subject".
+	Subject *string `json:"subject,omitempty" yaml:"subject,omitempty" mapstructure:"subject,omitempty"`
+}
+
+type ToolMemoryUpdateInputState string
+
+const ToolMemoryUpdateInputStateActive ToolMemoryUpdateInputState = "active"
+const ToolMemoryUpdateInputStateArchived ToolMemoryUpdateInputState = "archived"
+const ToolMemoryUpdateInputStateSuperseded ToolMemoryUpdateInputState = "superseded"
+
+var enumValues_ToolMemoryUpdateInputState = []interface{}{
+	"active",
+	"superseded",
+	"archived",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemoryUpdateInputState) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_ToolMemoryUpdateInputState {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_ToolMemoryUpdateInputState, v)
+	}
+	*j = ToolMemoryUpdateInputState(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemoryUpdateInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["id"]; raw != nil && !ok {
+		return fmt.Errorf("field id in ToolMemoryUpdateInput: required")
+	}
+	type Plain ToolMemoryUpdateInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if plain.Content != nil && len(*plain.Content) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "content", 1)
+	}
+	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.Id)); !matched {
+		return fmt.Errorf("field %s pattern match: must match %s", "Id", `^[0-9a-v]{20}$`)
+	}
+	*j = ToolMemoryUpdateInput(plain)
+	return nil
+}
+
+type ToolMemoryUpdateOutput struct {
+	// Memory corresponds to the JSON schema field "memory".
+	Memory RobotMemoryRecordYaml `json:"memory" yaml:"memory" mapstructure:"memory"`
+
+	// Message corresponds to the JSON schema field "message".
+	Message string `json:"message" yaml:"message" mapstructure:"message"`
+
+	// NextAction corresponds to the JSON schema field "next_action".
+	NextAction string `json:"next_action" yaml:"next_action" mapstructure:"next_action"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemoryUpdateOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["memory"]; raw != nil && !ok {
+		return fmt.Errorf("field memory in ToolMemoryUpdateOutput: required")
+	}
+	if _, ok := raw["message"]; raw != nil && !ok {
+		return fmt.Errorf("field message in ToolMemoryUpdateOutput: required")
+	}
+	if _, ok := raw["next_action"]; raw != nil && !ok {
+		return fmt.Errorf("field next_action in ToolMemoryUpdateOutput: required")
+	}
+	type Plain ToolMemoryUpdateOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolMemoryUpdateOutput(plain)
+	return nil
+}
+
+// Correct or extend an opened knowledge graph memory node. Clear relationships and
+// attributes should carry subject, predicate, and object together; supplying all
+// three as empty strings clears the fact. Inactive memories remain available by ID
+// and navigation but are excluded from search.
+type ToolMemoryUpdateYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolMemoryUpdateInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolMemoryUpdateOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolMemoryUpdateYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolMemoryUpdateYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolMemoryUpdateYaml: required")
+	}
+	type Plain ToolMemoryUpdateYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolMemoryUpdateYaml(plain)
 	return nil
 }
 

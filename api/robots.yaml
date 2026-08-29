@@ -42,6 +42,24 @@ definitions:
   ToolRobotSearch:
     $ref: "./robots/tools/tool_robot_search.yaml"
 
+  ToolMemoryList:
+    $ref: "./robots/tools/tool_memory_list.yaml"
+
+  ToolMemoryOpen:
+    $ref: "./robots/tools/tool_memory_open.yaml"
+
+  ToolMemorySearch:
+    $ref: "./robots/tools/tool_memory_search.yaml"
+
+  ToolMemoryCreate:
+    $ref: "./robots/tools/tool_memory_create.yaml"
+
+  ToolMemoryUpdate:
+    $ref: "./robots/tools/tool_memory_update.yaml"
+
+  ToolMemoryMove:
+    $ref: "./robots/tools/tool_memory_move.yaml"
+
   ToolTrailCreate:
     $ref: "./robots/tools/tool_trail_create.yaml"
 

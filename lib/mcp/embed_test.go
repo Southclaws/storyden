@@ -175,6 +175,42 @@ func TestDocumentNavigationToolsAreToolsetOnly(t *testing.T) {
 	}
 }
 
+func TestMemoryToolsUseProgressiveSurfacesAndCompactOutputs(t *testing.T) {
+	for _, tool := range []*ToolDefinition{GetMemoryCreateTool(), GetMemorySearchTool()} {
+		assert.True(t, tool.ToolsetOnly, tool.Name)
+		assert.Equal(t, []string{"system.memory"}, tool.Toolsets, tool.Name)
+	}
+	for _, tool := range []*ToolDefinition{GetMemoryListTool(), GetMemoryMoveTool(), GetMemoryOpenTool(), GetMemoryUpdateTool()} {
+		assert.True(t, tool.ToolsetOnly, tool.Name)
+		assert.Equal(t, []string{"system.memory_management"}, tool.Toolsets, tool.Name)
+	}
+
+	create := GetMemoryCreateTool()
+	assert.ElementsMatch(t,
+		[]string{"memory_id", "subject", "predicate", "object", "message", "next_action"},
+		schemaPropertyNames(create.OutputSchema),
+	)
+	assert.NotContains(t, create.OutputSchema.Properties, "memory")
+
+	searchItems := GetMemorySearchTool().OutputSchema.Properties["results"].Items
+	require.NotNil(t, searchItems)
+	assert.ElementsMatch(t,
+		[]string{"memory_id", "excerpt", "subject", "predicate", "object"},
+		schemaPropertyNames(searchItems),
+	)
+	assert.NotContains(t, searchItems.Properties, "path")
+	assert.NotContains(t, searchItems.Properties, "updated_at")
+
+	listItems := GetMemoryListTool().OutputSchema.Properties["memories"].Items
+	require.NotNil(t, listItems)
+	assert.ElementsMatch(t,
+		[]string{"id", "excerpt", "subject", "predicate", "object", "state", "children"},
+		schemaPropertyNames(listItems),
+	)
+	assert.NotContains(t, listItems.Properties, "parent_id")
+	assert.NotContains(t, listItems.Properties, "updated_at")
+}
+
 func TestCapabilityDiscoverySchemasAreProgressive(t *testing.T) {
 	toolSearch := GetToolSearchTool()
 	require.NotNil(t, toolSearch.OutputSchema)

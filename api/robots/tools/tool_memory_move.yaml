@@ -1,0 +1,36 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolMemoryMove
+x-storyden-tool:
+  toolsets: [system.memory_management]
+  title: Move Memory
+  role: USE_ROBOTS
+  internal: true
+  toolset_only: true
+  annotations:
+    readOnlyHint: false
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: false
+title: memory_move
+description: Reorganize the current Robot's knowledge graph by moving one memory beneath another, or to the top level when parent_id is omitted. The operation rejects cross-Robot parents and hierarchy cycles.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolMemoryMoveInput" }
+  output: { $ref: "#/definitions/ToolMemoryMoveOutput" }
+definitions:
+  ToolMemoryMoveInput:
+    type: object
+    required: [id]
+    additionalProperties: false
+    properties:
+      id: { type: string, pattern: "^[0-9a-v]{20}$" }
+      parent_id: { type: string, pattern: "^[0-9a-v]{20}$" }
+  ToolMemoryMoveOutput:
+    type: object
+    required: [memory, message, next_action]
+    additionalProperties: false
+    properties:
+      memory: { $ref: "../../common/RobotMemoryRecord.yaml" }
+      message: { type: string }
+      next_action: { type: string }

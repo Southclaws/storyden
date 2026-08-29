@@ -1,0 +1,40 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolMemoryOpen
+x-storyden-tool:
+  toolsets: [system.memory_management]
+  title: Open Memory
+  role: USE_ROBOTS
+  internal: true
+  toolset_only: true
+  annotations:
+    readOnlyHint: true
+    destructiveHint: false
+    idempotentHint: false
+    openWorldHint: false
+title: memory_open
+description: Inspect one knowledge graph memory with its complete prose evidence, optional subject/predicate/object fact, compact path, and immediate children. This is a management tool and records an access.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolMemoryOpenInput" }
+  output: { $ref: "#/definitions/ToolMemoryOpenOutput" }
+definitions:
+  ToolMemoryOpenInput:
+    type: object
+    required: [id]
+    additionalProperties: false
+    properties:
+      id: { type: string, pattern: "^[0-9a-v]{20}$" }
+  ToolMemoryOpenOutput:
+    type: object
+    required: [memory, path, children, next_action]
+    additionalProperties: false
+    properties:
+      memory: { $ref: "../../common/RobotMemoryRecord.yaml" }
+      path:
+        type: array
+        items: { $ref: "../../common/RobotMemorySummary.yaml" }
+      children:
+        type: array
+        items: { $ref: "../../common/RobotMemorySummary.yaml" }
+      next_action: { type: string }

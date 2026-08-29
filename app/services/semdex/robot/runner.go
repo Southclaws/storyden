@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"iter"
 	"log/slog"
+	"slices"
 	"strings"
 
 	"github.com/Southclaws/opt"
@@ -14,7 +15,6 @@ import (
 	"google.golang.org/adk/v2/agent"
 	"google.golang.org/adk/v2/agent/llmagent"
 	"google.golang.org/adk/v2/artifact"
-	"google.golang.org/adk/v2/memory"
 	"google.golang.org/adk/v2/model"
 	"google.golang.org/adk/v2/runner"
 	adksession "google.golang.org/adk/v2/session"
@@ -25,6 +25,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/resources/robot/llm_provider"
 	"github.com/Southclaws/storyden/app/resources/robot/model_ref"
+	"github.com/Southclaws/storyden/app/resources/robot/robot_memory"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_ref"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -36,6 +37,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/semdex/robot/mcpclient"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/tools"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_memory"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -64,7 +66,7 @@ type Agent struct {
 	sessionNamer *SessionNamer
 	workspaces   *WorkspaceManager
 	artifact     artifact.Service
-	memory       memory.Service
+	memoryRepo   *robot_memory.Repository
 	toolProvider *tools.Registry
 	toolsets     *toolsets.Registry
 	agents       *agent_registry.Registry
@@ -144,12 +146,12 @@ func New(
 	sessionRepo *robot_session.Repository,
 	sessionNamer *SessionNamer,
 	workspaceManager *WorkspaceManager,
+	memoryRepo *robot_memory.Repository,
 	toolProvider *tools.Registry,
 	toolsetRegistry *toolsets.Registry,
 	agentRegistry *agent_registry.Registry,
 ) (*Agent, error) {
 	artifactService := artifact.InMemoryService()
-	memoryService := memory.InMemoryService()
 
 	return &Agent{
 		logger:       logger,
@@ -160,7 +162,7 @@ func New(
 		sessionNamer: sessionNamer,
 		workspaces:   workspaceManager,
 		artifact:     artifactService,
-		memory:       memoryService,
+		memoryRepo:   memoryRepo,
 		toolProvider: toolProvider,
 		toolsets:     toolsetRegistry,
 		agents:       agentRegistry,
@@ -385,7 +387,15 @@ func (s *Agent) runResolvedAgent(
 		Capabilities:     spec.Capabilities,
 		UnavailableTools: missingTools,
 	}
-	identityContext := s.buildRobotIdentityContext(sessionID, currentIdentity, runOptions.Delegation != nil)
+	memoryRoot := ""
+	if slices.Contains(spec.ToolsetRefs, system_memory.ID) {
+		root, hasMore, err := s.memoryRepo.ActiveRoot(ctx, spec.RobotRef, robot_memory.RootLimit)
+		if err != nil {
+			return errorSeq(fmt.Errorf("load Robot memory root: %w", err))
+		}
+		memoryRoot = formatMemoryRoot(root, hasMore)
+	}
+	identityContext := s.buildRobotIdentityContext(sessionID, currentIdentity, runOptions.Delegation != nil, memoryRoot)
 
 	if runOptions.Delegation == nil {
 		backgroundTools, err := newBackgroundToolset()
@@ -459,7 +469,6 @@ func (s *Agent) RunADKAgent(
 		Agent:           req.Agent,
 		SessionService:  s.sessions,
 		ArtifactService: s.artifact,
-		MemoryService:   s.memory,
 	})
 	if err != nil {
 		return errorSeq(fmt.Errorf("create adk runner: %w", err))

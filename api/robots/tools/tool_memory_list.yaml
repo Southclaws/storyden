@@ -1,0 +1,40 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolMemoryList
+x-storyden-tool:
+  toolsets: [system.memory_management]
+  title: List Memories
+  role: USE_ROBOTS
+  internal: true
+  toolset_only: true
+  annotations:
+    readOnlyHint: true
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: false
+title: memory_list
+description: Inspect up to 25 immediate children of the current Robot's knowledge graph root or one known memory. This is a management tool; prefer memory_search when recalling facts or when the relevant branch is unknown.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolMemoryListInput" }
+  output: { $ref: "#/definitions/ToolMemoryListOutput" }
+definitions:
+  ToolMemoryListInput:
+    type: object
+    additionalProperties: false
+    properties:
+      parent_id:
+        type: string
+        pattern: "^[0-9a-v]{20}$"
+        description: Parent memory identifier. Omit to list the top level.
+  ToolMemoryListOutput:
+    type: object
+    required: [memories, returned, has_more, next_action]
+    additionalProperties: false
+    properties:
+      memories:
+        type: array
+        items: { $ref: "../../common/RobotMemorySummary.yaml" }
+      returned: { type: integer, minimum: 0 }
+      has_more: { type: boolean }
+      next_action: { type: string }

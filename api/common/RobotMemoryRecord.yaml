@@ -1,0 +1,36 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+required: [id, robot_ref, content, state, created_at, updated_at, last_accessed_at, access_count]
+additionalProperties: false
+properties:
+  id:
+    type: string
+    pattern: '^[0-9a-v]{20}$'
+  robot_ref:
+    type: string
+  parent_id:
+    type: string
+    pattern: '^[0-9a-v]{20}$'
+  content:
+    type: string
+  subject:
+    type: string
+  predicate:
+    type: string
+  object:
+    type: string
+  state:
+    type: string
+    enum: [active, superseded, archived]
+  created_at:
+    type: string
+    format: date-time
+  updated_at:
+    type: string
+    format: date-time
+  last_accessed_at:
+    type: string
+    format: date-time
+  access_count:
+    type: integer
+    minimum: 0

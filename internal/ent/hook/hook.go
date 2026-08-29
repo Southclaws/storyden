@@ -489,6 +489,18 @@ func (f RobotMCPToolFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RobotMCPToolMutation", m)
 }
 
+// The RobotMemoryFunc type is an adapter to allow the use of ordinary
+// function as RobotMemory mutator.
+type RobotMemoryFunc func(context.Context, *ent.RobotMemoryMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RobotMemoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RobotMemoryMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RobotMemoryMutation", m)
+}
+
 // The RobotProviderModelFunc type is an adapter to allow the use of ordinary
 // function as RobotProviderModel mutator.
 type RobotProviderModelFunc func(context.Context, *ent.RobotProviderModelMutation) (ent.Value, error)

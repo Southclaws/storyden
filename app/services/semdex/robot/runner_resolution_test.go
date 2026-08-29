@@ -11,6 +11,8 @@ import (
 	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry/denbot"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_documents"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_memory"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_memory_management"
 )
 
 func TestResolveAgentSpecResolvesDenbot(t *testing.T) {
@@ -31,6 +33,8 @@ func TestResolveAgentSpecResolvesDenbot(t *testing.T) {
 	assert.Equal(t, "Denbot", spec.DisplayName)
 	assert.False(t, spec.DatabaseRobotID.Ok())
 	assert.Contains(t, spec.ToolsetRefs, system_documents.ID)
+	assert.Contains(t, spec.ToolsetRefs, system_memory.ID)
+	assert.NotContains(t, spec.ToolsetRefs, system_memory_management.ID)
 }
 
 func TestResolveAgentSpecRejectsUnknownBuiltin(t *testing.T) {

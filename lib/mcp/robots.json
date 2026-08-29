@@ -2310,6 +2310,811 @@
       ],
       "type": "object"
     },
+    "ToolMemoryCreate": {
+      "$id": "ToolMemoryCreate",
+      "description": "Save a fact or useful piece of long-term context to the current Robot's knowledge graph. For a clear relationship or attribute, supply subject, predicate, and object together. Duplicates are acceptable; do not delay the current task with memory organization.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolMemoryCreateInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolMemoryCreateOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "memory_create",
+      "type": "object",
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false,
+          "readOnlyHint": false
+        },
+        "internal": true,
+        "role": "USE_ROBOTS",
+        "title": "Create Memory",
+        "toolset_only": true,
+        "toolsets": [
+          "system.memory"
+        ]
+      }
+    },
+    "ToolMemoryCreateInput": {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "description": "Concise natural-language evidence for this durable memory. It must directly support the structured fact when one is supplied.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "object": {
+          "description": "Entity or value connected to the subject. Must be supplied together with subject and predicate.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "parent_id": {
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        },
+        "predicate": {
+          "description": "Short relationship or attribute such as known_as, owned_by, or works_in. Must be supplied together with subject and object.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "subject": {
+          "description": "Entity the fact is about. Must be supplied together with predicate and object.",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "content"
+      ],
+      "type": "object"
+    },
+    "ToolMemoryCreateOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "memory_id": {
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "next_action": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "predicate": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "memory_id",
+        "message",
+        "next_action"
+      ],
+      "type": "object"
+    },
+    "ToolMemoryList": {
+      "$id": "ToolMemoryList",
+      "description": "Inspect up to 25 immediate children of the current Robot's knowledge graph root or one known memory. This is a management tool; prefer memory_search when recalling facts or when the relevant branch is unknown.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolMemoryListInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolMemoryListOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "memory_list",
+      "type": "object",
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        },
+        "internal": true,
+        "role": "USE_ROBOTS",
+        "title": "List Memories",
+        "toolset_only": true,
+        "toolsets": [
+          "system.memory_management"
+        ]
+      }
+    },
+    "ToolMemoryListInput": {
+      "additionalProperties": false,
+      "properties": {
+        "parent_id": {
+          "description": "Parent memory identifier. Omit to list the top level.",
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ToolMemoryListOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "has_more": {
+          "type": "boolean"
+        },
+        "memories": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "children": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "excerpt": {
+                "type": "string"
+              },
+              "id": {
+                "pattern": "^[0-9a-v]{20}$",
+                "type": "string"
+              },
+              "object": {
+                "type": "string"
+              },
+              "predicate": {
+                "type": "string"
+              },
+              "state": {
+                "enum": [
+                  "active",
+                  "superseded",
+                  "archived"
+                ],
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "excerpt",
+              "state",
+              "children"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "next_action": {
+          "type": "string"
+        },
+        "returned": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "memories",
+        "returned",
+        "has_more",
+        "next_action"
+      ],
+      "type": "object"
+    },
+    "ToolMemoryMove": {
+      "$id": "ToolMemoryMove",
+      "description": "Reorganize the current Robot's knowledge graph by moving one memory beneath another, or to the top level when parent_id is omitted. The operation rejects cross-Robot parents and hierarchy cycles.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolMemoryMoveInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolMemoryMoveOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "memory_move",
+      "type": "object",
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": false
+        },
+        "internal": true,
+        "role": "USE_ROBOTS",
+        "title": "Move Memory",
+        "toolset_only": true,
+        "toolsets": [
+          "system.memory_management"
+        ]
+      }
+    },
+    "ToolMemoryMoveInput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        },
+        "parent_id": {
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "ToolMemoryMoveOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "memory": {
+          "additionalProperties": false,
+          "properties": {
+            "access_count": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "content": {
+              "type": "string"
+            },
+            "created_at": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "id": {
+              "pattern": "^[0-9a-v]{20}$",
+              "type": "string"
+            },
+            "last_accessed_at": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "object": {
+              "type": "string"
+            },
+            "parent_id": {
+              "pattern": "^[0-9a-v]{20}$",
+              "type": "string"
+            },
+            "predicate": {
+              "type": "string"
+            },
+            "robot_ref": {
+              "type": "string"
+            },
+            "state": {
+              "enum": [
+                "active",
+                "superseded",
+                "archived"
+              ],
+              "type": "string"
+            },
+            "subject": {
+              "type": "string"
+            },
+            "updated_at": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "robot_ref",
+            "content",
+            "state",
+            "created_at",
+            "updated_at",
+            "last_accessed_at",
+            "access_count"
+          ],
+          "type": "object"
+        },
+        "message": {
+          "type": "string"
+        },
+        "next_action": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "memory",
+        "message",
+        "next_action"
+      ],
+      "type": "object"
+    },
+    "ToolMemoryOpen": {
+      "$id": "ToolMemoryOpen",
+      "description": "Inspect one knowledge graph memory with its complete prose evidence, optional subject/predicate/object fact, compact path, and immediate children. This is a management tool and records an access.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolMemoryOpenInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolMemoryOpenOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "memory_open",
+      "type": "object",
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        },
+        "internal": true,
+        "role": "USE_ROBOTS",
+        "title": "Open Memory",
+        "toolset_only": true,
+        "toolsets": [
+          "system.memory_management"
+        ]
+      }
+    },
+    "ToolMemoryOpenInput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "ToolMemoryOpenOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "children": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "children": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "excerpt": {
+                "type": "string"
+              },
+              "id": {
+                "pattern": "^[0-9a-v]{20}$",
+                "type": "string"
+              },
+              "object": {
+                "type": "string"
+              },
+              "predicate": {
+                "type": "string"
+              },
+              "state": {
+                "enum": [
+                  "active",
+                  "superseded",
+                  "archived"
+                ],
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "excerpt",
+              "state",
+              "children"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "memory": {
+          "additionalProperties": false,
+          "properties": {
+            "access_count": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "content": {
+              "type": "string"
+            },
+            "created_at": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "id": {
+              "pattern": "^[0-9a-v]{20}$",
+              "type": "string"
+            },
+            "last_accessed_at": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "object": {
+              "type": "string"
+            },
+            "parent_id": {
+              "pattern": "^[0-9a-v]{20}$",
+              "type": "string"
+            },
+            "predicate": {
+              "type": "string"
+            },
+            "robot_ref": {
+              "type": "string"
+            },
+            "state": {
+              "enum": [
+                "active",
+                "superseded",
+                "archived"
+              ],
+              "type": "string"
+            },
+            "subject": {
+              "type": "string"
+            },
+            "updated_at": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "robot_ref",
+            "content",
+            "state",
+            "created_at",
+            "updated_at",
+            "last_accessed_at",
+            "access_count"
+          ],
+          "type": "object"
+        },
+        "next_action": {
+          "type": "string"
+        },
+        "path": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "children": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "excerpt": {
+                "type": "string"
+              },
+              "id": {
+                "pattern": "^[0-9a-v]{20}$",
+                "type": "string"
+              },
+              "object": {
+                "type": "string"
+              },
+              "predicate": {
+                "type": "string"
+              },
+              "state": {
+                "enum": [
+                  "active",
+                  "superseded",
+                  "archived"
+                ],
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "excerpt",
+              "state",
+              "children"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "memory",
+        "path",
+        "children",
+        "next_action"
+      ],
+      "type": "object"
+    },
+    "ToolMemorySearch": {
+      "$id": "ToolMemorySearch",
+      "description": "Recall facts and useful long-term context from the current Robot's active knowledge graph. Every supplied filter is ANDed; use separate focused calls unless an intersection is intended. Search when prior knowledge would help, but not reflexively for self-contained or transient tasks.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolMemorySearchInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolMemorySearchOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "memory_search",
+      "type": "object",
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        },
+        "internal": true,
+        "role": "USE_ROBOTS",
+        "title": "Search Memories",
+        "toolset_only": true,
+        "toolsets": [
+          "system.memory"
+        ]
+      }
+    },
+    "ToolMemorySearchInput": {
+      "additionalProperties": false,
+      "properties": {
+        "object": {
+          "description": "Fact object. Exact after normalization unless * is used as a prefix or infix wildcard; search one entity at a time.",
+          "type": "string"
+        },
+        "parent_id": {
+          "description": "Optional subtree root, included in the search with all of its descendants.",
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        },
+        "predicate": {
+          "description": "Fact predicate. Exact after normalization unless * is used as a prefix or infix wildcard.",
+          "type": "string"
+        },
+        "query": {
+          "description": "Simple keyword search of memory text. Every word is ANDed, so use one or a few closely related words rather than a list of unrelated entities or facts.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "subject": {
+          "description": "Fact subject. Exact after normalization unless * is used as a prefix or infix wildcard; search one entity at a time.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ToolMemorySearchOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "has_more": {
+          "type": "boolean"
+        },
+        "next_action": {
+          "type": "string"
+        },
+        "results": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "excerpt": {
+                "type": "string"
+              },
+              "memory_id": {
+                "pattern": "^[0-9a-v]{20}$",
+                "type": "string"
+              },
+              "object": {
+                "type": "string"
+              },
+              "predicate": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "memory_id",
+              "excerpt"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "returned": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "results",
+        "returned",
+        "has_more",
+        "next_action"
+      ],
+      "type": "object"
+    },
+    "ToolMemoryUpdate": {
+      "$id": "ToolMemoryUpdate",
+      "description": "Correct or extend an opened knowledge graph memory node. Clear relationships and attributes should carry subject, predicate, and object together; supplying all three as empty strings clears the fact. Inactive memories remain available by ID and navigation but are excluded from search.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolMemoryUpdateInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolMemoryUpdateOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "memory_update",
+      "type": "object",
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": false
+        },
+        "internal": true,
+        "role": "USE_ROBOTS",
+        "title": "Update Memory",
+        "toolset_only": true,
+        "toolsets": [
+          "system.memory_management"
+        ]
+      }
+    },
+    "ToolMemoryUpdateInput": {
+      "additionalProperties": false,
+      "minProperties": 2,
+      "properties": {
+        "content": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "predicate": {
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "active",
+            "superseded",
+            "archived"
+          ],
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "ToolMemoryUpdateOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "memory": {
+          "additionalProperties": false,
+          "properties": {
+            "access_count": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "content": {
+              "type": "string"
+            },
+            "created_at": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "id": {
+              "pattern": "^[0-9a-v]{20}$",
+              "type": "string"
+            },
+            "last_accessed_at": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "object": {
+              "type": "string"
+            },
+            "parent_id": {
+              "pattern": "^[0-9a-v]{20}$",
+              "type": "string"
+            },
+            "predicate": {
+              "type": "string"
+            },
+            "robot_ref": {
+              "type": "string"
+            },
+            "state": {
+              "enum": [
+                "active",
+                "superseded",
+                "archived"
+              ],
+              "type": "string"
+            },
+            "subject": {
+              "type": "string"
+            },
+            "updated_at": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "robot_ref",
+            "content",
+            "state",
+            "created_at",
+            "updated_at",
+            "last_accessed_at",
+            "access_count"
+          ],
+          "type": "object"
+        },
+        "message": {
+          "type": "string"
+        },
+        "next_action": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "memory",
+        "message",
+        "next_action"
+      ],
+      "type": "object"
+    },
     "ToolPostSearch": {
       "$id": "ToolPostSearch",
       "description": "Search published forum threads and replies together in a single query.",

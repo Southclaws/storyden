@@ -54,6 +54,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/robot"
 	"github.com/Southclaws/storyden/internal/ent/robotmcpserver"
 	"github.com/Southclaws/storyden/internal/ent/robotmcptool"
+	"github.com/Southclaws/storyden/internal/ent/robotmemory"
 	"github.com/Southclaws/storyden/internal/ent/robotprovidermodel"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
 	"github.com/Southclaws/storyden/internal/ent/robotsessioninput"
@@ -126,6 +127,7 @@ const (
 	TypeRobot                        = "Robot"
 	TypeRobotMCPServer               = "RobotMCPServer"
 	TypeRobotMCPTool                 = "RobotMCPTool"
+	TypeRobotMemory                  = "RobotMemory"
 	TypeRobotProviderModel           = "RobotProviderModel"
 	TypeRobotSession                 = "RobotSession"
 	TypeRobotSessionInput            = "RobotSessionInput"
@@ -45224,6 +45226,1132 @@ func (m *RobotMCPToolMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown RobotMCPTool edge %s", name)
+}
+
+// RobotMemoryMutation represents an operation that mutates the RobotMemory nodes in the graph.
+type RobotMemoryMutation struct {
+	config
+	op               Op
+	typ              string
+	id               *xid.ID
+	created_at       *time.Time
+	updated_at       *time.Time
+	robot_ref        *string
+	content          *string
+	subject          *string
+	predicate        *string
+	object           *string
+	state            *robotmemory.State
+	last_accessed_at *time.Time
+	access_count     *uint64
+	addaccess_count  *int64
+	clearedFields    map[string]struct{}
+	parent           *xid.ID
+	clearedparent    bool
+	children         map[xid.ID]struct{}
+	removedchildren  map[xid.ID]struct{}
+	clearedchildren  bool
+	done             bool
+	oldValue         func(context.Context) (*RobotMemory, error)
+	predicates       []predicate.RobotMemory
+}
+
+var _ ent.Mutation = (*RobotMemoryMutation)(nil)
+
+// robotmemoryOption allows management of the mutation configuration using functional options.
+type robotmemoryOption func(*RobotMemoryMutation)
+
+// newRobotMemoryMutation creates new mutation for the RobotMemory entity.
+func newRobotMemoryMutation(c config, op Op, opts ...robotmemoryOption) *RobotMemoryMutation {
+	m := &RobotMemoryMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeRobotMemory,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withRobotMemoryID sets the ID field of the mutation.
+func withRobotMemoryID(id xid.ID) robotmemoryOption {
+	return func(m *RobotMemoryMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *RobotMemory
+		)
+		m.oldValue = func(ctx context.Context) (*RobotMemory, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().RobotMemory.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withRobotMemory sets the old RobotMemory of the mutation.
+func withRobotMemory(node *RobotMemory) robotmemoryOption {
+	return func(m *RobotMemoryMutation) {
+		m.oldValue = func(context.Context) (*RobotMemory, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m RobotMemoryMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m RobotMemoryMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of RobotMemory entities.
+func (m *RobotMemoryMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *RobotMemoryMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *RobotMemoryMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().RobotMemory.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *RobotMemoryMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *RobotMemoryMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the RobotMemory entity.
+// If the RobotMemory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMemoryMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *RobotMemoryMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *RobotMemoryMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *RobotMemoryMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the RobotMemory entity.
+// If the RobotMemory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMemoryMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *RobotMemoryMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetRobotRef sets the "robot_ref" field.
+func (m *RobotMemoryMutation) SetRobotRef(s string) {
+	m.robot_ref = &s
+}
+
+// RobotRef returns the value of the "robot_ref" field in the mutation.
+func (m *RobotMemoryMutation) RobotRef() (r string, exists bool) {
+	v := m.robot_ref
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRobotRef returns the old "robot_ref" field's value of the RobotMemory entity.
+// If the RobotMemory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMemoryMutation) OldRobotRef(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRobotRef is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRobotRef requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRobotRef: %w", err)
+	}
+	return oldValue.RobotRef, nil
+}
+
+// ResetRobotRef resets all changes to the "robot_ref" field.
+func (m *RobotMemoryMutation) ResetRobotRef() {
+	m.robot_ref = nil
+}
+
+// SetParentID sets the "parent_id" field.
+func (m *RobotMemoryMutation) SetParentID(x xid.ID) {
+	m.parent = &x
+}
+
+// ParentID returns the value of the "parent_id" field in the mutation.
+func (m *RobotMemoryMutation) ParentID() (r xid.ID, exists bool) {
+	v := m.parent
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldParentID returns the old "parent_id" field's value of the RobotMemory entity.
+// If the RobotMemory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMemoryMutation) OldParentID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldParentID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldParentID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldParentID: %w", err)
+	}
+	return oldValue.ParentID, nil
+}
+
+// ClearParentID clears the value of the "parent_id" field.
+func (m *RobotMemoryMutation) ClearParentID() {
+	m.parent = nil
+	m.clearedFields[robotmemory.FieldParentID] = struct{}{}
+}
+
+// ParentIDCleared returns if the "parent_id" field was cleared in this mutation.
+func (m *RobotMemoryMutation) ParentIDCleared() bool {
+	_, ok := m.clearedFields[robotmemory.FieldParentID]
+	return ok
+}
+
+// ResetParentID resets all changes to the "parent_id" field.
+func (m *RobotMemoryMutation) ResetParentID() {
+	m.parent = nil
+	delete(m.clearedFields, robotmemory.FieldParentID)
+}
+
+// SetContent sets the "content" field.
+func (m *RobotMemoryMutation) SetContent(s string) {
+	m.content = &s
+}
+
+// Content returns the value of the "content" field in the mutation.
+func (m *RobotMemoryMutation) Content() (r string, exists bool) {
+	v := m.content
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContent returns the old "content" field's value of the RobotMemory entity.
+// If the RobotMemory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMemoryMutation) OldContent(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContent: %w", err)
+	}
+	return oldValue.Content, nil
+}
+
+// ResetContent resets all changes to the "content" field.
+func (m *RobotMemoryMutation) ResetContent() {
+	m.content = nil
+}
+
+// SetSubject sets the "subject" field.
+func (m *RobotMemoryMutation) SetSubject(s string) {
+	m.subject = &s
+}
+
+// Subject returns the value of the "subject" field in the mutation.
+func (m *RobotMemoryMutation) Subject() (r string, exists bool) {
+	v := m.subject
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSubject returns the old "subject" field's value of the RobotMemory entity.
+// If the RobotMemory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMemoryMutation) OldSubject(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSubject is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSubject requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSubject: %w", err)
+	}
+	return oldValue.Subject, nil
+}
+
+// ClearSubject clears the value of the "subject" field.
+func (m *RobotMemoryMutation) ClearSubject() {
+	m.subject = nil
+	m.clearedFields[robotmemory.FieldSubject] = struct{}{}
+}
+
+// SubjectCleared returns if the "subject" field was cleared in this mutation.
+func (m *RobotMemoryMutation) SubjectCleared() bool {
+	_, ok := m.clearedFields[robotmemory.FieldSubject]
+	return ok
+}
+
+// ResetSubject resets all changes to the "subject" field.
+func (m *RobotMemoryMutation) ResetSubject() {
+	m.subject = nil
+	delete(m.clearedFields, robotmemory.FieldSubject)
+}
+
+// SetPredicate sets the "predicate" field.
+func (m *RobotMemoryMutation) SetPredicate(s string) {
+	m.predicate = &s
+}
+
+// Predicate returns the value of the "predicate" field in the mutation.
+func (m *RobotMemoryMutation) Predicate() (r string, exists bool) {
+	v := m.predicate
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPredicate returns the old "predicate" field's value of the RobotMemory entity.
+// If the RobotMemory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMemoryMutation) OldPredicate(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPredicate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPredicate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPredicate: %w", err)
+	}
+	return oldValue.Predicate, nil
+}
+
+// ClearPredicate clears the value of the "predicate" field.
+func (m *RobotMemoryMutation) ClearPredicate() {
+	m.predicate = nil
+	m.clearedFields[robotmemory.FieldPredicate] = struct{}{}
+}
+
+// PredicateCleared returns if the "predicate" field was cleared in this mutation.
+func (m *RobotMemoryMutation) PredicateCleared() bool {
+	_, ok := m.clearedFields[robotmemory.FieldPredicate]
+	return ok
+}
+
+// ResetPredicate resets all changes to the "predicate" field.
+func (m *RobotMemoryMutation) ResetPredicate() {
+	m.predicate = nil
+	delete(m.clearedFields, robotmemory.FieldPredicate)
+}
+
+// SetObject sets the "object" field.
+func (m *RobotMemoryMutation) SetObject(s string) {
+	m.object = &s
+}
+
+// Object returns the value of the "object" field in the mutation.
+func (m *RobotMemoryMutation) Object() (r string, exists bool) {
+	v := m.object
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldObject returns the old "object" field's value of the RobotMemory entity.
+// If the RobotMemory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMemoryMutation) OldObject(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldObject is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldObject requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldObject: %w", err)
+	}
+	return oldValue.Object, nil
+}
+
+// ClearObject clears the value of the "object" field.
+func (m *RobotMemoryMutation) ClearObject() {
+	m.object = nil
+	m.clearedFields[robotmemory.FieldObject] = struct{}{}
+}
+
+// ObjectCleared returns if the "object" field was cleared in this mutation.
+func (m *RobotMemoryMutation) ObjectCleared() bool {
+	_, ok := m.clearedFields[robotmemory.FieldObject]
+	return ok
+}
+
+// ResetObject resets all changes to the "object" field.
+func (m *RobotMemoryMutation) ResetObject() {
+	m.object = nil
+	delete(m.clearedFields, robotmemory.FieldObject)
+}
+
+// SetState sets the "state" field.
+func (m *RobotMemoryMutation) SetState(r robotmemory.State) {
+	m.state = &r
+}
+
+// State returns the value of the "state" field in the mutation.
+func (m *RobotMemoryMutation) State() (r robotmemory.State, exists bool) {
+	v := m.state
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldState returns the old "state" field's value of the RobotMemory entity.
+// If the RobotMemory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMemoryMutation) OldState(ctx context.Context) (v robotmemory.State, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldState is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldState requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldState: %w", err)
+	}
+	return oldValue.State, nil
+}
+
+// ResetState resets all changes to the "state" field.
+func (m *RobotMemoryMutation) ResetState() {
+	m.state = nil
+}
+
+// SetLastAccessedAt sets the "last_accessed_at" field.
+func (m *RobotMemoryMutation) SetLastAccessedAt(t time.Time) {
+	m.last_accessed_at = &t
+}
+
+// LastAccessedAt returns the value of the "last_accessed_at" field in the mutation.
+func (m *RobotMemoryMutation) LastAccessedAt() (r time.Time, exists bool) {
+	v := m.last_accessed_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastAccessedAt returns the old "last_accessed_at" field's value of the RobotMemory entity.
+// If the RobotMemory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMemoryMutation) OldLastAccessedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastAccessedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastAccessedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastAccessedAt: %w", err)
+	}
+	return oldValue.LastAccessedAt, nil
+}
+
+// ResetLastAccessedAt resets all changes to the "last_accessed_at" field.
+func (m *RobotMemoryMutation) ResetLastAccessedAt() {
+	m.last_accessed_at = nil
+}
+
+// SetAccessCount sets the "access_count" field.
+func (m *RobotMemoryMutation) SetAccessCount(u uint64) {
+	m.access_count = &u
+	m.addaccess_count = nil
+}
+
+// AccessCount returns the value of the "access_count" field in the mutation.
+func (m *RobotMemoryMutation) AccessCount() (r uint64, exists bool) {
+	v := m.access_count
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccessCount returns the old "access_count" field's value of the RobotMemory entity.
+// If the RobotMemory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMemoryMutation) OldAccessCount(ctx context.Context) (v uint64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccessCount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccessCount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccessCount: %w", err)
+	}
+	return oldValue.AccessCount, nil
+}
+
+// AddAccessCount adds u to the "access_count" field.
+func (m *RobotMemoryMutation) AddAccessCount(u int64) {
+	if m.addaccess_count != nil {
+		*m.addaccess_count += u
+	} else {
+		m.addaccess_count = &u
+	}
+}
+
+// AddedAccessCount returns the value that was added to the "access_count" field in this mutation.
+func (m *RobotMemoryMutation) AddedAccessCount() (r int64, exists bool) {
+	v := m.addaccess_count
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetAccessCount resets all changes to the "access_count" field.
+func (m *RobotMemoryMutation) ResetAccessCount() {
+	m.access_count = nil
+	m.addaccess_count = nil
+}
+
+// ClearParent clears the "parent" edge to the RobotMemory entity.
+func (m *RobotMemoryMutation) ClearParent() {
+	m.clearedparent = true
+	m.clearedFields[robotmemory.FieldParentID] = struct{}{}
+}
+
+// ParentCleared reports if the "parent" edge to the RobotMemory entity was cleared.
+func (m *RobotMemoryMutation) ParentCleared() bool {
+	return m.ParentIDCleared() || m.clearedparent
+}
+
+// ParentIDs returns the "parent" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ParentID instead. It exists only for internal usage by the builders.
+func (m *RobotMemoryMutation) ParentIDs() (ids []xid.ID) {
+	if id := m.parent; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetParent resets all changes to the "parent" edge.
+func (m *RobotMemoryMutation) ResetParent() {
+	m.parent = nil
+	m.clearedparent = false
+}
+
+// AddChildIDs adds the "children" edge to the RobotMemory entity by ids.
+func (m *RobotMemoryMutation) AddChildIDs(ids ...xid.ID) {
+	if m.children == nil {
+		m.children = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.children[ids[i]] = struct{}{}
+	}
+}
+
+// ClearChildren clears the "children" edge to the RobotMemory entity.
+func (m *RobotMemoryMutation) ClearChildren() {
+	m.clearedchildren = true
+}
+
+// ChildrenCleared reports if the "children" edge to the RobotMemory entity was cleared.
+func (m *RobotMemoryMutation) ChildrenCleared() bool {
+	return m.clearedchildren
+}
+
+// RemoveChildIDs removes the "children" edge to the RobotMemory entity by IDs.
+func (m *RobotMemoryMutation) RemoveChildIDs(ids ...xid.ID) {
+	if m.removedchildren == nil {
+		m.removedchildren = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.children, ids[i])
+		m.removedchildren[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedChildren returns the removed IDs of the "children" edge to the RobotMemory entity.
+func (m *RobotMemoryMutation) RemovedChildrenIDs() (ids []xid.ID) {
+	for id := range m.removedchildren {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ChildrenIDs returns the "children" edge IDs in the mutation.
+func (m *RobotMemoryMutation) ChildrenIDs() (ids []xid.ID) {
+	for id := range m.children {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetChildren resets all changes to the "children" edge.
+func (m *RobotMemoryMutation) ResetChildren() {
+	m.children = nil
+	m.clearedchildren = false
+	m.removedchildren = nil
+}
+
+// Where appends a list predicates to the RobotMemoryMutation builder.
+func (m *RobotMemoryMutation) Where(ps ...predicate.RobotMemory) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the RobotMemoryMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *RobotMemoryMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.RobotMemory, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *RobotMemoryMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *RobotMemoryMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (RobotMemory).
+func (m *RobotMemoryMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *RobotMemoryMutation) Fields() []string {
+	fields := make([]string, 0, 11)
+	if m.created_at != nil {
+		fields = append(fields, robotmemory.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, robotmemory.FieldUpdatedAt)
+	}
+	if m.robot_ref != nil {
+		fields = append(fields, robotmemory.FieldRobotRef)
+	}
+	if m.parent != nil {
+		fields = append(fields, robotmemory.FieldParentID)
+	}
+	if m.content != nil {
+		fields = append(fields, robotmemory.FieldContent)
+	}
+	if m.subject != nil {
+		fields = append(fields, robotmemory.FieldSubject)
+	}
+	if m.predicate != nil {
+		fields = append(fields, robotmemory.FieldPredicate)
+	}
+	if m.object != nil {
+		fields = append(fields, robotmemory.FieldObject)
+	}
+	if m.state != nil {
+		fields = append(fields, robotmemory.FieldState)
+	}
+	if m.last_accessed_at != nil {
+		fields = append(fields, robotmemory.FieldLastAccessedAt)
+	}
+	if m.access_count != nil {
+		fields = append(fields, robotmemory.FieldAccessCount)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *RobotMemoryMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case robotmemory.FieldCreatedAt:
+		return m.CreatedAt()
+	case robotmemory.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case robotmemory.FieldRobotRef:
+		return m.RobotRef()
+	case robotmemory.FieldParentID:
+		return m.ParentID()
+	case robotmemory.FieldContent:
+		return m.Content()
+	case robotmemory.FieldSubject:
+		return m.Subject()
+	case robotmemory.FieldPredicate:
+		return m.Predicate()
+	case robotmemory.FieldObject:
+		return m.Object()
+	case robotmemory.FieldState:
+		return m.State()
+	case robotmemory.FieldLastAccessedAt:
+		return m.LastAccessedAt()
+	case robotmemory.FieldAccessCount:
+		return m.AccessCount()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *RobotMemoryMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case robotmemory.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case robotmemory.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case robotmemory.FieldRobotRef:
+		return m.OldRobotRef(ctx)
+	case robotmemory.FieldParentID:
+		return m.OldParentID(ctx)
+	case robotmemory.FieldContent:
+		return m.OldContent(ctx)
+	case robotmemory.FieldSubject:
+		return m.OldSubject(ctx)
+	case robotmemory.FieldPredicate:
+		return m.OldPredicate(ctx)
+	case robotmemory.FieldObject:
+		return m.OldObject(ctx)
+	case robotmemory.FieldState:
+		return m.OldState(ctx)
+	case robotmemory.FieldLastAccessedAt:
+		return m.OldLastAccessedAt(ctx)
+	case robotmemory.FieldAccessCount:
+		return m.OldAccessCount(ctx)
+	}
+	return nil, fmt.Errorf("unknown RobotMemory field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotMemoryMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case robotmemory.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case robotmemory.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case robotmemory.FieldRobotRef:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRobotRef(v)
+		return nil
+	case robotmemory.FieldParentID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetParentID(v)
+		return nil
+	case robotmemory.FieldContent:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContent(v)
+		return nil
+	case robotmemory.FieldSubject:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSubject(v)
+		return nil
+	case robotmemory.FieldPredicate:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPredicate(v)
+		return nil
+	case robotmemory.FieldObject:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetObject(v)
+		return nil
+	case robotmemory.FieldState:
+		v, ok := value.(robotmemory.State)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetState(v)
+		return nil
+	case robotmemory.FieldLastAccessedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastAccessedAt(v)
+		return nil
+	case robotmemory.FieldAccessCount:
+		v, ok := value.(uint64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccessCount(v)
+		return nil
+	}
+	return fmt.Errorf("unknown RobotMemory field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *RobotMemoryMutation) AddedFields() []string {
+	var fields []string
+	if m.addaccess_count != nil {
+		fields = append(fields, robotmemory.FieldAccessCount)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *RobotMemoryMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case robotmemory.FieldAccessCount:
+		return m.AddedAccessCount()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotMemoryMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case robotmemory.FieldAccessCount:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddAccessCount(v)
+		return nil
+	}
+	return fmt.Errorf("unknown RobotMemory numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *RobotMemoryMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(robotmemory.FieldParentID) {
+		fields = append(fields, robotmemory.FieldParentID)
+	}
+	if m.FieldCleared(robotmemory.FieldSubject) {
+		fields = append(fields, robotmemory.FieldSubject)
+	}
+	if m.FieldCleared(robotmemory.FieldPredicate) {
+		fields = append(fields, robotmemory.FieldPredicate)
+	}
+	if m.FieldCleared(robotmemory.FieldObject) {
+		fields = append(fields, robotmemory.FieldObject)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *RobotMemoryMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *RobotMemoryMutation) ClearField(name string) error {
+	switch name {
+	case robotmemory.FieldParentID:
+		m.ClearParentID()
+		return nil
+	case robotmemory.FieldSubject:
+		m.ClearSubject()
+		return nil
+	case robotmemory.FieldPredicate:
+		m.ClearPredicate()
+		return nil
+	case robotmemory.FieldObject:
+		m.ClearObject()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotMemory nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *RobotMemoryMutation) ResetField(name string) error {
+	switch name {
+	case robotmemory.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case robotmemory.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case robotmemory.FieldRobotRef:
+		m.ResetRobotRef()
+		return nil
+	case robotmemory.FieldParentID:
+		m.ResetParentID()
+		return nil
+	case robotmemory.FieldContent:
+		m.ResetContent()
+		return nil
+	case robotmemory.FieldSubject:
+		m.ResetSubject()
+		return nil
+	case robotmemory.FieldPredicate:
+		m.ResetPredicate()
+		return nil
+	case robotmemory.FieldObject:
+		m.ResetObject()
+		return nil
+	case robotmemory.FieldState:
+		m.ResetState()
+		return nil
+	case robotmemory.FieldLastAccessedAt:
+		m.ResetLastAccessedAt()
+		return nil
+	case robotmemory.FieldAccessCount:
+		m.ResetAccessCount()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotMemory field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *RobotMemoryMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.parent != nil {
+		edges = append(edges, robotmemory.EdgeParent)
+	}
+	if m.children != nil {
+		edges = append(edges, robotmemory.EdgeChildren)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *RobotMemoryMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case robotmemory.EdgeParent:
+		if id := m.parent; id != nil {
+			return []ent.Value{*id}
+		}
+	case robotmemory.EdgeChildren:
+		ids := make([]ent.Value, 0, len(m.children))
+		for id := range m.children {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *RobotMemoryMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.removedchildren != nil {
+		edges = append(edges, robotmemory.EdgeChildren)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *RobotMemoryMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case robotmemory.EdgeChildren:
+		ids := make([]ent.Value, 0, len(m.removedchildren))
+		for id := range m.removedchildren {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *RobotMemoryMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedparent {
+		edges = append(edges, robotmemory.EdgeParent)
+	}
+	if m.clearedchildren {
+		edges = append(edges, robotmemory.EdgeChildren)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *RobotMemoryMutation) EdgeCleared(name string) bool {
+	switch name {
+	case robotmemory.EdgeParent:
+		return m.clearedparent
+	case robotmemory.EdgeChildren:
+		return m.clearedchildren
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *RobotMemoryMutation) ClearEdge(name string) error {
+	switch name {
+	case robotmemory.EdgeParent:
+		m.ClearParent()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotMemory unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *RobotMemoryMutation) ResetEdge(name string) error {
+	switch name {
+	case robotmemory.EdgeParent:
+		m.ResetParent()
+		return nil
+	case robotmemory.EdgeChildren:
+		m.ResetChildren()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotMemory edge %s", name)
 }
 
 // RobotProviderModelMutation represents an operation that mutates the RobotProviderModel nodes in the graph.

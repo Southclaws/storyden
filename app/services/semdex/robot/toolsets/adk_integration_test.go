@@ -19,9 +19,33 @@ import (
 	"github.com/Southclaws/storyden/app/resources/robot/robot_toolset"
 	robottools "github.com/Southclaws/storyden/app/services/semdex/robot/tools"
 	robottoolsets "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_memory_management"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/lib/mcp"
 )
+
+func TestMemoryManagementToolsetIsDiscoverable(t *testing.T) {
+	integration.Test(t, nil, fx.Invoke(func(
+		lc fx.Lifecycle,
+		ctx context.Context,
+		registry *robottoolsets.Registry,
+	) {
+		lc.Append(fx.StartHook(func() {
+			results, err := registry.Search(ctx, "knowledge graph management", 20)
+			require.NoError(t, err)
+
+			for _, result := range results {
+				if result.ID == system_memory_management.ID {
+					assert.Equal(t, "Knowledge graph management", result.Name)
+					assert.ElementsMatch(t, []string{"memory_list", "memory_move", "memory_open", "memory_update"}, result.ToolNames)
+					return
+				}
+			}
+
+			t.Fatalf("%s was not returned by Toolset search", system_memory_management.ID)
+		}))
+	}))
+}
 
 func TestDiscoveryContinuesWhenRegisteredCapabilitiesFailToInitialize(t *testing.T) {
 	t.Parallel()

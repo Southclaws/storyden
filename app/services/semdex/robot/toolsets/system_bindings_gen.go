@@ -7,6 +7,8 @@ import (
 	system_discussions "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_discussions"
 	system_documents "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_documents"
 	system_library "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_library"
+	system_memory "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_memory"
+	system_memory_management "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_memory_management"
 	system_moderation "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_moderation"
 	system_robot_studio "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_robot_studio"
 	system_trails "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_trails"
@@ -44,6 +46,22 @@ func systemDefinitions() []Definition {
 			Description: system_library.Description,
 			Instruction: system_library.Instruction,
 			ToolNames:   append([]string(nil), system_library.ToolNames...),
+			Source:      SourceSystem,
+		},
+		{
+			ID:          system_memory.ID,
+			Name:        system_memory.Name,
+			Description: system_memory.Description,
+			Instruction: system_memory.Instruction,
+			ToolNames:   append([]string(nil), system_memory.ToolNames...),
+			Source:      SourceSystem,
+		},
+		{
+			ID:          system_memory_management.ID,
+			Name:        system_memory_management.Name,
+			Description: system_memory_management.Description,
+			Instruction: system_memory_management.Instruction,
+			ToolNames:   append([]string(nil), system_memory_management.ToolNames...),
 			Source:      SourceSystem,
 		},
 		{

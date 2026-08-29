@@ -81,6 +81,7 @@ func Build() fx.Option {
 			newDocumentTools,
 			newToolDiscoveryTools,
 			newRobotTools,
+			newMemoryTools,
 			newToolsetTools,
 			newSearchTools,
 			newLibraryTools,

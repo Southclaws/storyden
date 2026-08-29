@@ -1,0 +1,31 @@
+steps:
+  - match:
+      tool_result: memory_search
+    respond:
+      text: "Freyja is owned by Southclaws."
+      finish: "stop"
+  - match:
+      tool_result: memory_create
+    respond:
+      text: "I'll remember that about Freyja."
+      finish: "stop"
+  - match:
+      contains: "who owns freyja"
+    respond:
+      tool_calls:
+        - id: call_memory_workflow_search
+          name: memory_search
+          args:
+            subject: "Freyja"
+            predicate: "owned by"
+  - match:
+      contains: "freyja is owned by southclaws"
+    respond:
+      tool_calls:
+        - id: call_memory_workflow_create
+          name: memory_create
+          args:
+            content: "Freyja is owned by Southclaws."
+            subject: "Freyja"
+            predicate: "owned by"
+            object: "Southclaws"

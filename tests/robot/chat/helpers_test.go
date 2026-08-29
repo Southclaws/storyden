@@ -33,6 +33,10 @@ const (
 	mockModelReplySearch        = "mock/../scripts/robot-chat-reply-search.yaml"
 	mockModelPostSearch         = "mock/../scripts/robot-chat-post-search.yaml"
 	mockModelMemberSearch       = "mock/../scripts/robot-chat-member-search.yaml"
+	mockModelMemoryCreate       = "mock/../scripts/robot-chat-memory-create.yaml"
+	mockModelMemoryWorkflow     = "mock/../scripts/robot-chat-memory-workflow.yaml"
+	mockModelMemoryManagement   = "mock/../scripts/robot-chat-memory-management.yaml"
+	mockModelMemoryArchive      = "mock/../scripts/robot-chat-memory-archive.yaml"
 )
 
 func robotToolsetsPtr(ids ...string) *openapi.RobotToolsetRefList {

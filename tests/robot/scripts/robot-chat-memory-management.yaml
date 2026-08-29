@@ -1,0 +1,67 @@
+steps:
+  - match:
+      tool_result: memory_move
+    respond:
+      text: "Freyja's memory was corrected and organized."
+      finish: "stop"
+  - match:
+      tool_result: memory_update
+    respond:
+      tool_calls:
+        - id: call_memory_management_move
+          name: memory_move
+          args:
+            id: "cto7nm2funp55p1bujvg"
+            parent_id: "cto7n8ifunp55p1bujv0"
+  - match:
+      tool_result: memory_open
+    respond:
+      tool_calls:
+        - id: call_memory_management_update
+          name: memory_update
+          args:
+            id: "cto7nm2funp55p1bujvg"
+            content: "Freyja is owned by Barney."
+            subject: "Freyja"
+            predicate: "owned by"
+            object: "Barney"
+  - match:
+      tool_result: memory_list
+    respond:
+      tool_calls:
+        - id: call_memory_management_open
+          name: memory_open
+          args:
+            id: "cto7nm2funp55p1bujvg"
+  - match:
+      tool_result: toolset_load
+    respond:
+      tool_calls:
+        - id: call_memory_management_list
+          name: memory_list
+          args: {}
+  - match:
+      tool_result: toolset_get
+    respond:
+      tool_calls:
+        - id: call_memory_management_load
+          name: toolset_load
+          args:
+            toolsets:
+              - system.memory_management
+  - match:
+      tool_result: toolset_search
+    respond:
+      tool_calls:
+        - id: call_memory_management_get
+          name: toolset_get
+          args:
+            id: system.memory_management
+  - match:
+      contains: "correct freyja's owner"
+    respond:
+      tool_calls:
+        - id: call_memory_management_search
+          name: toolset_search
+          args:
+            query: "knowledge graph management"

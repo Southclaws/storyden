@@ -1523,6 +1523,62 @@ var (
 			},
 		},
 	}
+	// RobotMemoriesColumns holds the columns for the "robot_memories" table.
+	RobotMemoriesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "robot_ref", Type: field.TypeString},
+		{Name: "content", Type: field.TypeString},
+		{Name: "subject", Type: field.TypeString, Nullable: true},
+		{Name: "predicate", Type: field.TypeString, Nullable: true},
+		{Name: "object", Type: field.TypeString, Nullable: true},
+		{Name: "state", Type: field.TypeEnum, Enums: []string{"active", "superseded", "archived"}, Default: "active"},
+		{Name: "last_accessed_at", Type: field.TypeTime},
+		{Name: "access_count", Type: field.TypeUint64, Default: 0},
+		{Name: "parent_id", Type: field.TypeString, Nullable: true, Size: 20},
+	}
+	// RobotMemoriesTable holds the schema information for the "robot_memories" table.
+	RobotMemoriesTable = &schema.Table{
+		Name:       "robot_memories",
+		Columns:    RobotMemoriesColumns,
+		PrimaryKey: []*schema.Column{RobotMemoriesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "robot_memories_robot_memories_children",
+				Columns:    []*schema.Column{RobotMemoriesColumns[11]},
+				RefColumns: []*schema.Column{RobotMemoriesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "robotmemory_robot_ref_parent_id_state",
+				Unique:  false,
+				Columns: []*schema.Column{RobotMemoriesColumns[3], RobotMemoriesColumns[11], RobotMemoriesColumns[8]},
+			},
+			{
+				Name:    "robotmemory_robot_ref_state_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{RobotMemoriesColumns[3], RobotMemoriesColumns[8], RobotMemoriesColumns[2]},
+			},
+			{
+				Name:    "robotmemory_subject",
+				Unique:  false,
+				Columns: []*schema.Column{RobotMemoriesColumns[5]},
+			},
+			{
+				Name:    "robotmemory_predicate",
+				Unique:  false,
+				Columns: []*schema.Column{RobotMemoriesColumns[6]},
+			},
+			{
+				Name:    "robotmemory_object",
+				Unique:  false,
+				Columns: []*schema.Column{RobotMemoriesColumns[7]},
+			},
+		},
+	}
 	// RobotProviderModelsColumns holds the columns for the "robot_provider_models" table.
 	RobotProviderModelsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -2410,6 +2466,7 @@ var (
 		RobotsTable,
 		RobotMcpServersTable,
 		RobotMcpToolsTable,
+		RobotMemoriesTable,
 		RobotProviderModelsTable,
 		RobotSessionsTable,
 		RobotSessionInputsTable,
@@ -2515,6 +2572,7 @@ func init() {
 	RobotMcpServersTable.ForeignKeys[0].RefTable = AccountsTable
 	RobotMcpServersTable.ForeignKeys[1].RefTable = OauthRemoteConnectionsTable
 	RobotMcpToolsTable.ForeignKeys[0].RefTable = RobotMcpServersTable
+	RobotMemoriesTable.ForeignKeys[0].RefTable = RobotMemoriesTable
 	RobotSessionsTable.ForeignKeys[0].RefTable = AccountsTable
 	RobotSessionInputsTable.ForeignKeys[0].RefTable = AccountsTable
 	RobotSessionInputsTable.ForeignKeys[1].RefTable = RobotSessionsTable

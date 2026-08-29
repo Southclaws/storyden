@@ -1,0 +1,16 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+required: [memory_id, excerpt]
+additionalProperties: false
+properties:
+  memory_id:
+    type: string
+    pattern: '^[0-9a-v]{20}$'
+  subject:
+    type: string
+  predicate:
+    type: string
+  object:
+    type: string
+  excerpt:
+    type: string

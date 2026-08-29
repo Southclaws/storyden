@@ -2519,6 +2519,1414 @@
         }
       }
     },
+    "ToolMemoryList": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolMemoryList",
+      "x-storyden-tool": {
+        "toolsets": [
+          "system.memory_management"
+        ],
+        "title": "List Memories",
+        "role": "USE_ROBOTS",
+        "internal": true,
+        "toolset_only": true,
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        }
+      },
+      "title": "memory_list",
+      "description": "Inspect up to 25 immediate children of the current Robot's knowledge graph root or one known memory. This is a management tool; prefer memory_search when recalling facts or when the relevant branch is unknown.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "parent_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$",
+              "description": "Parent memory identifier. Omit to list the top level."
+            }
+          }
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "memories",
+            "returned",
+            "has_more",
+            "next_action"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "memories": {
+              "type": "array",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "required": [
+                  "id",
+                  "excerpt",
+                  "state",
+                  "children"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-v]{20}$"
+                  },
+                  "excerpt": {
+                    "type": "string"
+                  },
+                  "subject": {
+                    "type": "string"
+                  },
+                  "predicate": {
+                    "type": "string"
+                  },
+                  "object": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "superseded",
+                      "archived"
+                    ]
+                  },
+                  "children": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
+            },
+            "returned": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "has_more": {
+              "type": "boolean"
+            },
+            "next_action": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "definitions": {
+        "ToolMemoryListInput": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "parent_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$",
+              "description": "Parent memory identifier. Omit to list the top level."
+            }
+          }
+        },
+        "ToolMemoryListOutput": {
+          "type": "object",
+          "required": [
+            "memories",
+            "returned",
+            "has_more",
+            "next_action"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "memories": {
+              "type": "array",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "required": [
+                  "id",
+                  "excerpt",
+                  "state",
+                  "children"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-v]{20}$"
+                  },
+                  "excerpt": {
+                    "type": "string"
+                  },
+                  "subject": {
+                    "type": "string"
+                  },
+                  "predicate": {
+                    "type": "string"
+                  },
+                  "object": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "superseded",
+                      "archived"
+                    ]
+                  },
+                  "children": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
+            },
+            "returned": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "has_more": {
+              "type": "boolean"
+            },
+            "next_action": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "ToolMemoryOpen": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolMemoryOpen",
+      "x-storyden-tool": {
+        "toolsets": [
+          "system.memory_management"
+        ],
+        "title": "Open Memory",
+        "role": "USE_ROBOTS",
+        "internal": true,
+        "toolset_only": true,
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        }
+      },
+      "title": "memory_open",
+      "description": "Inspect one knowledge graph memory with its complete prose evidence, optional subject/predicate/object fact, compact path, and immediate children. This is a management tool and records an access.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$"
+            }
+          }
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "memory",
+            "path",
+            "children",
+            "next_action"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "memory": {
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "type": "object",
+              "required": [
+                "id",
+                "robot_ref",
+                "content",
+                "state",
+                "created_at",
+                "updated_at",
+                "last_accessed_at",
+                "access_count"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$"
+                },
+                "robot_ref": {
+                  "type": "string"
+                },
+                "parent_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$"
+                },
+                "content": {
+                  "type": "string"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "predicate": {
+                  "type": "string"
+                },
+                "object": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "active",
+                    "superseded",
+                    "archived"
+                  ]
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "last_accessed_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "access_count": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "path": {
+              "type": "array",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "required": [
+                  "id",
+                  "excerpt",
+                  "state",
+                  "children"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-v]{20}$"
+                  },
+                  "excerpt": {
+                    "type": "string"
+                  },
+                  "subject": {
+                    "type": "string"
+                  },
+                  "predicate": {
+                    "type": "string"
+                  },
+                  "object": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "superseded",
+                      "archived"
+                    ]
+                  },
+                  "children": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
+            },
+            "children": {
+              "type": "array",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "required": [
+                  "id",
+                  "excerpt",
+                  "state",
+                  "children"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-v]{20}$"
+                  },
+                  "excerpt": {
+                    "type": "string"
+                  },
+                  "subject": {
+                    "type": "string"
+                  },
+                  "predicate": {
+                    "type": "string"
+                  },
+                  "object": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "superseded",
+                      "archived"
+                    ]
+                  },
+                  "children": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
+            },
+            "next_action": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "definitions": {
+        "ToolMemoryOpenInput": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$"
+            }
+          }
+        },
+        "ToolMemoryOpenOutput": {
+          "type": "object",
+          "required": [
+            "memory",
+            "path",
+            "children",
+            "next_action"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "memory": {
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "type": "object",
+              "required": [
+                "id",
+                "robot_ref",
+                "content",
+                "state",
+                "created_at",
+                "updated_at",
+                "last_accessed_at",
+                "access_count"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$"
+                },
+                "robot_ref": {
+                  "type": "string"
+                },
+                "parent_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$"
+                },
+                "content": {
+                  "type": "string"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "predicate": {
+                  "type": "string"
+                },
+                "object": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "active",
+                    "superseded",
+                    "archived"
+                  ]
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "last_accessed_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "access_count": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "path": {
+              "type": "array",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "required": [
+                  "id",
+                  "excerpt",
+                  "state",
+                  "children"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-v]{20}$"
+                  },
+                  "excerpt": {
+                    "type": "string"
+                  },
+                  "subject": {
+                    "type": "string"
+                  },
+                  "predicate": {
+                    "type": "string"
+                  },
+                  "object": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "superseded",
+                      "archived"
+                    ]
+                  },
+                  "children": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
+            },
+            "children": {
+              "type": "array",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "required": [
+                  "id",
+                  "excerpt",
+                  "state",
+                  "children"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-v]{20}$"
+                  },
+                  "excerpt": {
+                    "type": "string"
+                  },
+                  "subject": {
+                    "type": "string"
+                  },
+                  "predicate": {
+                    "type": "string"
+                  },
+                  "object": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "superseded",
+                      "archived"
+                    ]
+                  },
+                  "children": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
+            },
+            "next_action": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "ToolMemorySearch": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolMemorySearch",
+      "x-storyden-tool": {
+        "toolsets": [
+          "system.memory"
+        ],
+        "title": "Search Memories",
+        "role": "USE_ROBOTS",
+        "internal": true,
+        "toolset_only": true,
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        }
+      },
+      "title": "memory_search",
+      "description": "Recall facts and useful long-term context from the current Robot's active knowledge graph. Every supplied filter is ANDed; use separate focused calls unless an intersection is intended. Search when prior knowledge would help, but not reflexively for self-contained or transient tasks.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "query": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Simple keyword search of memory text. Every word is ANDed, so use one or a few closely related words rather than a list of unrelated entities or facts."
+            },
+            "parent_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$",
+              "description": "Optional subtree root, included in the search with all of its descendants."
+            },
+            "subject": {
+              "type": "string",
+              "description": "Fact subject. Exact after normalization unless * is used as a prefix or infix wildcard; search one entity at a time."
+            },
+            "predicate": {
+              "type": "string",
+              "description": "Fact predicate. Exact after normalization unless * is used as a prefix or infix wildcard."
+            },
+            "object": {
+              "type": "string",
+              "description": "Fact object. Exact after normalization unless * is used as a prefix or infix wildcard; search one entity at a time."
+            }
+          }
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "results",
+            "returned",
+            "has_more",
+            "next_action"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "required": [
+                  "memory_id",
+                  "excerpt"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "memory_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-v]{20}$"
+                  },
+                  "subject": {
+                    "type": "string"
+                  },
+                  "predicate": {
+                    "type": "string"
+                  },
+                  "object": {
+                    "type": "string"
+                  },
+                  "excerpt": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "returned": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "has_more": {
+              "type": "boolean"
+            },
+            "next_action": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "definitions": {
+        "ToolMemorySearchInput": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "query": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Simple keyword search of memory text. Every word is ANDed, so use one or a few closely related words rather than a list of unrelated entities or facts."
+            },
+            "parent_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$",
+              "description": "Optional subtree root, included in the search with all of its descendants."
+            },
+            "subject": {
+              "type": "string",
+              "description": "Fact subject. Exact after normalization unless * is used as a prefix or infix wildcard; search one entity at a time."
+            },
+            "predicate": {
+              "type": "string",
+              "description": "Fact predicate. Exact after normalization unless * is used as a prefix or infix wildcard."
+            },
+            "object": {
+              "type": "string",
+              "description": "Fact object. Exact after normalization unless * is used as a prefix or infix wildcard; search one entity at a time."
+            }
+          }
+        },
+        "ToolMemorySearchOutput": {
+          "type": "object",
+          "required": [
+            "results",
+            "returned",
+            "has_more",
+            "next_action"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "required": [
+                  "memory_id",
+                  "excerpt"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "memory_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-v]{20}$"
+                  },
+                  "subject": {
+                    "type": "string"
+                  },
+                  "predicate": {
+                    "type": "string"
+                  },
+                  "object": {
+                    "type": "string"
+                  },
+                  "excerpt": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "returned": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "has_more": {
+              "type": "boolean"
+            },
+            "next_action": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "ToolMemoryCreate": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolMemoryCreate",
+      "x-storyden-tool": {
+        "toolsets": [
+          "system.memory"
+        ],
+        "title": "Create Memory",
+        "role": "USE_ROBOTS",
+        "internal": true,
+        "toolset_only": true,
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        }
+      },
+      "title": "memory_create",
+      "description": "Save a fact or useful piece of long-term context to the current Robot's knowledge graph. For a clear relationship or attribute, supply subject, predicate, and object together. Duplicates are acceptable; do not delay the current task with memory organization.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": [
+            "content"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "parent_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$"
+            },
+            "content": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Concise natural-language evidence for this durable memory. It must directly support the structured fact when one is supplied."
+            },
+            "subject": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Entity the fact is about. Must be supplied together with predicate and object."
+            },
+            "predicate": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Short relationship or attribute such as known_as, owned_by, or works_in. Must be supplied together with subject and object."
+            },
+            "object": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Entity or value connected to the subject. Must be supplied together with subject and predicate."
+            }
+          }
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "memory_id",
+            "message",
+            "next_action"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "memory_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$"
+            },
+            "subject": {
+              "type": "string"
+            },
+            "predicate": {
+              "type": "string"
+            },
+            "object": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "next_action": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "definitions": {
+        "ToolMemoryCreateInput": {
+          "type": "object",
+          "required": [
+            "content"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "parent_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$"
+            },
+            "content": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Concise natural-language evidence for this durable memory. It must directly support the structured fact when one is supplied."
+            },
+            "subject": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Entity the fact is about. Must be supplied together with predicate and object."
+            },
+            "predicate": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Short relationship or attribute such as known_as, owned_by, or works_in. Must be supplied together with subject and object."
+            },
+            "object": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Entity or value connected to the subject. Must be supplied together with subject and predicate."
+            }
+          }
+        },
+        "ToolMemoryCreateOutput": {
+          "type": "object",
+          "required": [
+            "memory_id",
+            "message",
+            "next_action"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "memory_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$"
+            },
+            "subject": {
+              "type": "string"
+            },
+            "predicate": {
+              "type": "string"
+            },
+            "object": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "next_action": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "ToolMemoryUpdate": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolMemoryUpdate",
+      "x-storyden-tool": {
+        "toolsets": [
+          "system.memory_management"
+        ],
+        "title": "Update Memory",
+        "role": "USE_ROBOTS",
+        "internal": true,
+        "toolset_only": true,
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        }
+      },
+      "title": "memory_update",
+      "description": "Correct or extend an opened knowledge graph memory node. Clear relationships and attributes should carry subject, predicate, and object together; supplying all three as empty strings clears the fact. Inactive memories remain available by ID and navigation but are excluded from search.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "minProperties": 2,
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$"
+            },
+            "content": {
+              "type": "string",
+              "minLength": 1
+            },
+            "subject": {
+              "type": "string"
+            },
+            "predicate": {
+              "type": "string"
+            },
+            "object": {
+              "type": "string"
+            },
+            "state": {
+              "type": "string",
+              "enum": [
+                "active",
+                "superseded",
+                "archived"
+              ]
+            }
+          }
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "memory",
+            "message",
+            "next_action"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "memory": {
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "type": "object",
+              "required": [
+                "id",
+                "robot_ref",
+                "content",
+                "state",
+                "created_at",
+                "updated_at",
+                "last_accessed_at",
+                "access_count"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$"
+                },
+                "robot_ref": {
+                  "type": "string"
+                },
+                "parent_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$"
+                },
+                "content": {
+                  "type": "string"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "predicate": {
+                  "type": "string"
+                },
+                "object": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "active",
+                    "superseded",
+                    "archived"
+                  ]
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "last_accessed_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "access_count": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "message": {
+              "type": "string"
+            },
+            "next_action": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "definitions": {
+        "ToolMemoryUpdateInput": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "minProperties": 2,
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$"
+            },
+            "content": {
+              "type": "string",
+              "minLength": 1
+            },
+            "subject": {
+              "type": "string"
+            },
+            "predicate": {
+              "type": "string"
+            },
+            "object": {
+              "type": "string"
+            },
+            "state": {
+              "type": "string",
+              "enum": [
+                "active",
+                "superseded",
+                "archived"
+              ]
+            }
+          }
+        },
+        "ToolMemoryUpdateOutput": {
+          "type": "object",
+          "required": [
+            "memory",
+            "message",
+            "next_action"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "memory": {
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "type": "object",
+              "required": [
+                "id",
+                "robot_ref",
+                "content",
+                "state",
+                "created_at",
+                "updated_at",
+                "last_accessed_at",
+                "access_count"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$"
+                },
+                "robot_ref": {
+                  "type": "string"
+                },
+                "parent_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$"
+                },
+                "content": {
+                  "type": "string"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "predicate": {
+                  "type": "string"
+                },
+                "object": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "active",
+                    "superseded",
+                    "archived"
+                  ]
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "last_accessed_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "access_count": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "message": {
+              "type": "string"
+            },
+            "next_action": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "ToolMemoryMove": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolMemoryMove",
+      "x-storyden-tool": {
+        "toolsets": [
+          "system.memory_management"
+        ],
+        "title": "Move Memory",
+        "role": "USE_ROBOTS",
+        "internal": true,
+        "toolset_only": true,
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        }
+      },
+      "title": "memory_move",
+      "description": "Reorganize the current Robot's knowledge graph by moving one memory beneath another, or to the top level when parent_id is omitted. The operation rejects cross-Robot parents and hierarchy cycles.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$"
+            },
+            "parent_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$"
+            }
+          }
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "memory",
+            "message",
+            "next_action"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "memory": {
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "type": "object",
+              "required": [
+                "id",
+                "robot_ref",
+                "content",
+                "state",
+                "created_at",
+                "updated_at",
+                "last_accessed_at",
+                "access_count"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$"
+                },
+                "robot_ref": {
+                  "type": "string"
+                },
+                "parent_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$"
+                },
+                "content": {
+                  "type": "string"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "predicate": {
+                  "type": "string"
+                },
+                "object": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "active",
+                    "superseded",
+                    "archived"
+                  ]
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "last_accessed_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "access_count": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "message": {
+              "type": "string"
+            },
+            "next_action": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "definitions": {
+        "ToolMemoryMoveInput": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$"
+            },
+            "parent_id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$"
+            }
+          }
+        },
+        "ToolMemoryMoveOutput": {
+          "type": "object",
+          "required": [
+            "memory",
+            "message",
+            "next_action"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "memory": {
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "type": "object",
+              "required": [
+                "id",
+                "robot_ref",
+                "content",
+                "state",
+                "created_at",
+                "updated_at",
+                "last_accessed_at",
+                "access_count"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$"
+                },
+                "robot_ref": {
+                  "type": "string"
+                },
+                "parent_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-v]{20}$"
+                },
+                "content": {
+                  "type": "string"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "predicate": {
+                  "type": "string"
+                },
+                "object": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "active",
+                    "superseded",
+                    "archived"
+                  ]
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "last_accessed_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "access_count": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "message": {
+              "type": "string"
+            },
+            "next_action": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
     "ToolTrailCreate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolTrailCreate",

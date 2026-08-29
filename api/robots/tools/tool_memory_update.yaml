@@ -1,0 +1,41 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolMemoryUpdate
+x-storyden-tool:
+  toolsets: [system.memory_management]
+  title: Update Memory
+  role: USE_ROBOTS
+  internal: true
+  toolset_only: true
+  annotations:
+    readOnlyHint: false
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: false
+title: memory_update
+description: Correct or extend an opened knowledge graph memory node. Clear relationships and attributes should carry subject, predicate, and object together; supplying all three as empty strings clears the fact. Inactive memories remain available by ID and navigation but are excluded from search.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolMemoryUpdateInput" }
+  output: { $ref: "#/definitions/ToolMemoryUpdateOutput" }
+definitions:
+  ToolMemoryUpdateInput:
+    type: object
+    required: [id]
+    minProperties: 2
+    additionalProperties: false
+    properties:
+      id: { type: string, pattern: "^[0-9a-v]{20}$" }
+      content: { type: string, minLength: 1 }
+      subject: { type: string }
+      predicate: { type: string }
+      object: { type: string }
+      state: { type: string, enum: [active, superseded, archived] }
+  ToolMemoryUpdateOutput:
+    type: object
+    required: [memory, message, next_action]
+    additionalProperties: false
+    properties:
+      memory: { $ref: "../../common/RobotMemoryRecord.yaml" }
+      message: { type: string }
+      next_action: { type: string }
