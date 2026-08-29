@@ -209,4 +209,21 @@ describe("MultiSelectPicker", () => {
     expect(onQuery.mock.calls.at(-1)?.[0]).toBe("bet");
     expect(screen.getByRole("option", { name: "Beta" })).toBeVisible();
   });
+
+  it("does not constrain the popup from its zero-size first measurement", async () => {
+    render(
+      <MultiSelectPicker
+        value={baseValue}
+        onQuery={vi.fn()}
+        onChange={vi.fn().mockResolvedValue(undefined)}
+        queryResults={[{ label: "Beta", value: "beta" }]}
+      />,
+    );
+
+    await openPicker();
+
+    await waitFor(() =>
+      expect(screen.getByRole("listbox").style.maxHeight).toBe(""),
+    );
+  });
 });

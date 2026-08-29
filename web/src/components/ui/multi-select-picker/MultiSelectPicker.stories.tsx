@@ -177,6 +177,25 @@ export const WideField: Story = {
   ),
 };
 
+export const NearViewportEdge: Story = {
+  parameters: {
+    layout: "fullscreen",
+    docs: {
+      description: {
+        story:
+          "The popup flips above the field on its first open when the viewport edge leaves insufficient room below.",
+      },
+    },
+  },
+  render: () => (
+    <styled.div alignItems="flex-end" display="flex" minH="screen" p="4">
+      <LStack width="full" maxW="lg">
+        <ControlledPicker inputPlaceholder="Select capabilities..." />
+      </LStack>
+    </styled.div>
+  ),
+};
+
 export const Error: Story = {
   render: () => (
     <LStack width="full" maxW="lg">

@@ -132,6 +132,12 @@ export function MultiSelectPicker({
       floatingSize({
         padding: positioning?.overflowPadding ?? 8,
         apply({ availableHeight, availableWidth, elements, rects }) {
+          // Ark mounts the content before it has layout. Constraining that
+          // zero-size pass would prevent flip() from seeing its real height.
+          if (rects.floating.width === 0 || rects.floating.height === 0) {
+            return;
+          }
+
           const width = Math.min(
             rects.reference.width,
             512,
