@@ -19,12 +19,6 @@ func UnattendedFinishToolName() string {
 	return unattendedFinishToolName
 }
 
-const unattendedInstruction = `## Unattended Invocation
-
-You are running unattended. No user is available for questions, elicitations, or confirmations. Complete the task using the tools available to this Robot. If required information is missing, a required user interaction cannot be completed, a tool is unavailable, or an action is blocked by permissions or policy, stop with a blocked or failed status.
-
-When the unattended run is complete or cannot continue, your final action must be calling the robot_run_finish tool exactly once. Do not ask the user to respond in chat. Do not provide a normal final text answer instead of calling robot_run_finish.`
-
 type unattendedFinishInput struct {
 	Status    string                     `json:"status"`
 	Summary   string                     `json:"summary"`
