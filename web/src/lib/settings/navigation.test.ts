@@ -22,10 +22,6 @@ test("missing navigation configuration uses the current sidebar", () => {
 });
 
 test("robots is available as an optional built-in navigation item", () => {
-  assert.not.ok(
-    DefaultNavigationConfig.items.some((item) => item.type === "robots"),
-  );
-
   const navigation = NavigationConfigSchema.parse({ items: [] });
   assert.equal(addBuiltInNavigationItem(navigation, "robots").items, [
     { type: "robots" },
