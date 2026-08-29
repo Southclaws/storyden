@@ -8,7 +8,6 @@ import (
 	"github.com/rs/xid"
 	adkagent "google.golang.org/adk/v2/agent"
 
-	robotresource "github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_memory"
 )
 
@@ -32,15 +31,8 @@ type robotMemoryRoot struct {
 }
 
 type robotMemoryRootItem struct {
-	ID      string
-	Excerpt string
-	Fact    opt.Optional[robotMemoryRootFact]
-}
-
-type robotMemoryRootFact struct {
-	Subject   string
-	Predicate string
-	Object    string
+	ID       string
+	Children int
 }
 
 type robotInstructionContext struct {
@@ -52,15 +44,8 @@ func mapMemoryRoot(items []*robot_memory.Item, hasMore bool) robotMemoryRoot {
 	return robotMemoryRoot{
 		Items: dt.Map(items, func(item *robot_memory.Item) robotMemoryRootItem {
 			return robotMemoryRootItem{
-				ID:      item.Memory.ID.String(),
-				Excerpt: item.Excerpt,
-				Fact: opt.Map(item.Memory.Fact, func(fact robotresource.MemoryFact) robotMemoryRootFact {
-					return robotMemoryRootFact{
-						Subject:   fact.Subject,
-						Predicate: fact.Predicate,
-						Object:    fact.Object,
-					}
-				}),
+				ID:       item.Memory.ID.String(),
+				Children: item.Children,
 			}
 		}),
 		HasMore: hasMore,

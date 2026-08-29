@@ -15,10 +15,11 @@ Some configured capabilities are currently unavailable:
 {{end}}{{if .MemoryRoot.Ok}}{{with .MemoryRoot.OrZero}}
 ## Shared knowledge graph memory
 {{if .Items}}
-Active top-level knowledge graph nodes (short content excerpts and IDs only):
-{{range .Items}}- {{printf "%q" .Excerpt}} (`{{.ID}}`){{if .Fact.Ok}}{{with .Fact.OrZero}} [{{printf "%q" .Subject}}, {{printf "%q" .Predicate}}, {{printf "%q" .Object}}]{{end}}{{end}}
-{{end}}{{if .HasMore}}- Additional top-level memories were omitted. Use a focused memory_search when they may be relevant.
-{{end}}{{else}}
+Active top-level memory IDs, most recently updated first:
+{{range .Items}}- `{{.ID}}` (direct children: {{.Children}})
+{{end}}{{if .HasMore}}- Additional top-level memory IDs were omitted.
+{{end}}Memory content and graph fields are intentionally omitted from system state. Use memory_search to recall relevant facts as tool output.
+{{else}}
 There are no active top-level knowledge graph nodes. Do not create session-specific task state. Save a useful long-term fact directly when one emerges.
 {{end}}{{end}}{{end}}
 Do not repeat an unchanged tool call when its inputs and underlying state have not changed. Use the result already returned, choose a more specific capability, or explain what information is unavailable.
