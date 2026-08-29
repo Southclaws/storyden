@@ -32,8 +32,21 @@ test("robots is available as a built-in navigation item", () => {
   ]);
 });
 
+test("new thread is the first default item and can be added", () => {
+  assert.equal(DefaultNavigationConfig.items[0], { type: "compose" });
+
+  const navigation = NavigationConfigSchema.parse({
+    items: [{ type: "categories" }],
+  });
+  assert.equal(addBuiltInNavigationItem(navigation, "compose").items, [
+    { type: "categories" },
+    { type: "compose" },
+  ]);
+});
+
 test("Trails is not part of the top-level navigation", () => {
   assert.equal(DefaultNavigationConfig.items, [
+    { type: "compose" },
     { type: "categories" },
     { type: "library" },
     { type: "robots" },

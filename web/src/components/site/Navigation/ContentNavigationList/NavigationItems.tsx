@@ -50,6 +50,7 @@ import { generateXid } from "@/utils/xid";
 
 import { Anchor } from "../Anchors/Anchor";
 import { CollectionsAnchor } from "../Anchors/Collections";
+import { ComposeAnchor } from "../Anchors/Compose";
 import { LinksAnchor } from "../Anchors/Link";
 import { MembersAnchor } from "../Anchors/Members";
 import { RobotsAnchor } from "../Anchors/Robots";
@@ -328,6 +329,8 @@ function NavigationItemContent({
   initialCategoryList?: CategoryListOKResponse;
 }) {
   switch (item.type) {
+    case "compose":
+      return <ComposeAnchor label={BuiltInNavigationItemName.compose} />;
     case "categories":
       return (
         <CategoryList

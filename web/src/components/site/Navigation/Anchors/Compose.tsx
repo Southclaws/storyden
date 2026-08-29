@@ -8,12 +8,15 @@ export const ComposeRoute = "/new";
 export const ComposeLabel = "Post";
 export const ComposeIcon = <CreateIcon />;
 
-export function ComposeAnchor(props: AnchorProps & LinkButtonStyleProps) {
+export function ComposeAnchor({
+  label = ComposeLabel,
+  ...props
+}: AnchorProps & LinkButtonStyleProps & { label?: string }) {
   return (
     <Anchor
       id={ComposeID}
       route={ComposeRoute}
-      label={ComposeLabel}
+      label={label}
       icon={ComposeIcon}
       {...props}
     />

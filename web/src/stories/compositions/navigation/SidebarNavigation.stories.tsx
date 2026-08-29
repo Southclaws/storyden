@@ -7,6 +7,7 @@ import {
   SidebarNavigationSection,
 } from "@/components/site/Navigation/SidebarNavigation";
 import { AddIcon } from "@/components/ui/icons/Add";
+import { CreateIcon } from "@/components/ui/icons/Create";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { LibraryIcon } from "@/components/ui/icons/Library";
 import { LinkIcon } from "@/components/ui/icons/Link";
@@ -62,6 +63,11 @@ export const SiteNavigation: Story = {
     <SidebarPreview>
       <SidebarNavigationPane label="Site navigation" title="Storyden">
         <SidebarNavigationSection>
+          <SidebarNavigationLink
+            href="/new"
+            icon={<CreateIcon />}
+            label="New thread"
+          />
           <SidebarNavigationLink
             active
             href="/"

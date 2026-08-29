@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const BuiltInNavigationItemTypeSchema = z.enum([
+  "compose",
   "categories",
   "library",
   "robots",
@@ -62,9 +63,9 @@ export type NavigationConfig = z.infer<typeof NavigationConfigValueSchema>;
 
 export const DefaultNavigationConfig = {
   items: [
+    { type: "compose" },
     { type: "categories" },
     { type: "library" },
-    { type: "robots" },
     { type: "collections" },
     { type: "links" },
     { type: "members" },
@@ -80,6 +81,7 @@ export const BuiltInNavigationItemName: Record<
   BuiltInNavigationItemType,
   string
 > = {
+  compose: "New thread",
   categories: "Discussion",
   library: "Library",
   robots: "Robots",
