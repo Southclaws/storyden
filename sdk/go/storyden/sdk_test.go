@@ -851,6 +851,108 @@ func TestSendMatchesOutOfOrderResponses(t *testing.T) {
 	}
 }
 
+func TestRunRobotReturnsTypedSuccessAndPartialResponseWithError(t *testing.T) {
+	sessionID := xid.New()
+	requestCount := 0
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		conn, err := websocket.Accept(w, r, nil)
+		if err != nil {
+			return
+		}
+		defer conn.CloseNow()
+
+		for requestCount < 2 {
+			_, message, err := conn.Read(r.Context())
+			require.NoError(t, err)
+
+			var request rpc.PluginToHostRequest
+			require.NoError(t, json.Unmarshal(message, &request))
+			run, ok := request.PluginToHostRequestUnion.(*rpc.RPCRequestRobotRun)
+			require.True(t, ok, "expected robot_run request, got %T", request.PluginToHostRequestUnion)
+			require.Equal(t, rpc.RobotRunModeConversation, run.Params.Mode)
+			require.Equal(t, "robot-example", run.Params.RobotID)
+			require.Equal(t, []rpc.RobotRunMessage{{
+				Role:    rpc.RobotRunMessageRoleUser,
+				Content: "Hello from Discord",
+				Author:  opt.New("Ada"),
+			}}, run.Params.Messages)
+
+			result := &rpc.RPCResponseRobotRun{
+				Method:    "robot_run",
+				Mode:      rpc.RobotRunModeConversation,
+				SessionID: opt.New(sessionID),
+				Events: []rpc.RobotRunEvent{{RobotRunEventUnion: &rpc.RobotRunTextEvent{
+					Type: "text",
+					Text: "Partial answer",
+				}}},
+			}
+			if requestCount == 0 {
+				result.FinalText = opt.New("Partial answer")
+			} else {
+				result.Error = opt.New("model connection closed")
+			}
+
+			response := rpc.PluginToHostResponse{
+				ID:      run.ID,
+				Jsonrpc: "2.0",
+				Result: rpc.PluginToHostResponseUnion{
+					PluginToHostResponseUnionUnion: result,
+				},
+			}
+			encoded, err := json.Marshal(response)
+			require.NoError(t, err)
+			require.NoError(t, conn.Write(r.Context(), websocket.MessageText, encoded))
+			requestCount++
+		}
+
+		_ = conn.Close(websocket.StatusNormalClosure, "done")
+	}))
+	defer srv.Close()
+
+	t.Setenv("STORYDEN_RPC_URL", wsURLWithToken(srv.URL, "sdprt_test_robot_run_123456789012345"))
+
+	pl, err := New(context.Background())
+	require.NoError(t, err)
+	runDone := make(chan error, 1)
+	go func() {
+		runDone <- pl.Run(context.Background())
+	}()
+	require.Eventually(t, func() bool { return pl.getConn() != nil }, 2*time.Second, 10*time.Millisecond)
+
+	params := rpc.RPCRequestRobotRunParams{
+		Mode:    rpc.RobotRunModeConversation,
+		RobotID: "robot-example",
+		Messages: []rpc.RobotRunMessage{{
+			Role:    rpc.RobotRunMessageRoleUser,
+			Content: "Hello from Discord",
+			Author:  opt.New("Ada"),
+		}},
+	}
+
+	success, err := pl.RunRobot(context.Background(), params)
+	require.NoError(t, err)
+	require.NotNil(t, success)
+	assert.Equal(t, sessionID, success.SessionID.OrZero())
+	assert.Equal(t, "Partial answer", success.FinalText.OrZero())
+
+	partial, err := pl.RunRobot(context.Background(), params)
+	require.ErrorContains(t, err, "model connection closed")
+	require.NotNil(t, partial)
+	assert.Equal(t, sessionID, partial.SessionID.OrZero())
+	require.Len(t, partial.Events, 1)
+	textEvent, ok := partial.Events[0].RobotRunEventUnion.(*rpc.RobotRunTextEvent)
+	require.True(t, ok)
+	assert.Equal(t, "Partial answer", textEvent.Text)
+
+	select {
+	case err := <-runDone:
+		require.NoError(t, err)
+	case <-time.After(2 * time.Second):
+		t.Fatal("run did not return")
+	}
+}
+
 func TestConfigureHandlersRunConcurrently(t *testing.T) {
 	slowID := xid.New()
 	fastID := xid.New()

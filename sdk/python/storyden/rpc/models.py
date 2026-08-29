@@ -999,14 +999,39 @@ class RPCRequestRobotRunParamsWorkspace(BaseModel):
     workspace_instance_id: str | None = None
 
 
+"""Role of one imported conversation message."""
+
+class RobotRunMessageRole(str, Enum):
+    USER = "user"
+    ASSISTANT = "assistant"
+
+
+class RobotRunMessage(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    """Optional external display name for the message author."""
+    author: str | None = Field(min_length=1, default=None)
+    """Message content imported into the Robot session."""
+    content: str = Field(min_length=1)
+    role: RobotRunMessageRole
+
+
+"""Execution contract for a plugin Robot invocation."""
+
+class RobotRunMode(str, Enum):
+    CONVERSATION = "conversation"
+    AUTOMATION = "automation"
+
+
 class RPCRequestRobotRunParams(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    """Input message for the robot."""
-    message: str = Field(min_length=1)
+    """New incremental messages to append before starting the turn."""
+    messages: List[RobotRunMessage] = Field(min_length=1)
+    mode: RobotRunMode
     """The Robot to invoke."""
     robot_id: str
-    """Optional existing Robot session ID to continue. If omitted, a new session is created."""
+    """Existing plugin-owned session to continue in conversation mode."""
     session_id: str | None = None
     """Optional workspace mount request. Provide either workspace_id or workspace_instance_id, not both."""
     workspace: RPCRequestRobotRunParamsWorkspace | None = None
@@ -1025,7 +1050,7 @@ class RPCRequestGetConfig(JsonRpcRequest):
     params: RPCRequestGetConfigParams | None = None
 
 
-"""Run a one-shot robot invocation and return the assistant's final text response."""
+"""Run a conversational or one-shot automation Robot invocation."""
 
 class RPCRequestRobotRun(JsonRpcRequest):
     method: Literal["robot_run"]
@@ -1059,6 +1084,41 @@ class RPCResponseAccessGetResult(BaseModel):
     access_key: str
     """Base URL for API requests."""
     apibase_url: AnyUrl
+
+
+class RobotRunTextEvent(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    type: Literal["text"]
+    """Visible assistant text produced during the run."""
+    text: str
+
+
+class RobotRunToolCallEvent(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    type: Literal["tool_call"]
+    """Arguments supplied to the tool."""
+    arguments: Dict[str, Any]
+    """Provider tool call identifier when available."""
+    call_id: str | None = None
+    """Tool name."""
+    name: str = Field(min_length=1)
+
+
+class RobotRunToolResultEvent(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    type: Literal["tool_result"]
+    """Provider tool call identifier when available."""
+    call_id: str | None = None
+    """Tool name."""
+    name: str = Field(min_length=1)
+    """Structured tool result."""
+    result: Dict[str, Any]
+
+RobotRunEvent = Annotated[
+    Union[RobotRunTextEvent, RobotRunToolCallEvent, RobotRunToolResultEvent],
+    Field(discriminator="type"),
+]
+
 
 
 """Reason an unattended Robot invocation needs human attention."""
@@ -1112,15 +1172,20 @@ class RPCResponseGetConfig(BaseModel):
     config: Dict[str, Any]
 
 
-"""Final result of a one-shot robot invocation."""
+"""Result of a conversational or one-shot automation Robot invocation."""
 
 class RPCResponseRobotRun(BaseModel):
     model_config = ConfigDict(extra="forbid")
     method: Literal["robot_run"]
     """Error message if invocation failed."""
     error: str | None = None
-    output: RobotRunOutput | None = None
-    """Robot session ID containing the persisted invocation log."""
+    """Ordered public output events from a conversational run."""
+    events: List[RobotRunEvent] | None = None
+    """Text from the final assistant response in a conversational run."""
+    final_text: str | None = None
+    finalization: RobotRunOutput | None = None
+    mode: RobotRunMode
+    """Robot session containing the persisted invocation log."""
     session_id: str | None = None
 
 PluginToHostResponseUnion = Annotated[

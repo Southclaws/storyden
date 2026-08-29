@@ -1125,12 +1125,33 @@ export interface RPCRequestRobotRunParamsWorkspace {
   workspace_instance_id?: string;
 }
 
+
+// Role of one imported conversation message.
+export type RobotRunMessageRole =
+  | "user"
+  | "assistant";
+
+export interface RobotRunMessage {
+  // Optional external display name for the message author.
+  author?: string;
+  // Message content imported into the Robot session.
+  content: string;
+  role: RobotRunMessageRole;
+}
+
+
+// Execution contract for a plugin Robot invocation.
+export type RobotRunMode =
+  | "conversation"
+  | "automation";
+
 export interface RPCRequestRobotRunParams {
-  // Input message for the robot.
-  message: string;
+  // New incremental messages to append before starting the turn.
+  messages: RobotRunMessage[];
+  mode: RobotRunMode;
   // The Robot to invoke.
   robot_id: string;
-  // Optional existing Robot session ID to continue. If omitted, a new session is created.
+  // Existing plugin-owned session to continue in conversation mode.
   session_id?: string;
   // Optional workspace mount request. Provide either workspace_id or workspace_instance_id, not both.
   workspace?: RPCRequestRobotRunParamsWorkspace;
@@ -1152,7 +1173,7 @@ export interface RPCRequestGetConfig {
   params?: RPCRequestGetConfigParams;
 }
 
-// Run a one-shot robot invocation and return the assistant's final text response.
+// Run a conversational or one-shot automation Robot invocation.
 export interface RPCRequestRobotRun {
   method: "robot_run";
   id: string;
@@ -1192,6 +1213,50 @@ export interface RPCResponseAccessGetResult {
   access_key: string;
   // Base URL for API requests.
   api_base_url: string;
+}
+
+
+export interface RobotRunTextEvent {
+  type: "text";
+  // Visible assistant text produced during the run.
+  text: string;
+}
+
+export interface RobotRunToolCallEvent {
+  type: "tool_call";
+  // Arguments supplied to the tool.
+  arguments: Record<string, unknown>;
+  // Provider tool call identifier when available.
+  call_id?: string;
+  // Tool name.
+  name: string;
+}
+
+export interface RobotRunToolResultEvent {
+  type: "tool_result";
+  // Provider tool call identifier when available.
+  call_id?: string;
+  // Tool name.
+  name: string;
+  // Structured tool result.
+  result: Record<string, unknown>;
+}
+
+export type RobotRunEvent =
+  | RobotRunTextEvent
+  | RobotRunToolCallEvent
+  | RobotRunToolResultEvent;
+
+export function isRobotRunTextEvent(value: RobotRunEvent): value is RobotRunTextEvent {
+  return value.type === "text";
+}
+
+export function isRobotRunToolCallEvent(value: RobotRunEvent): value is RobotRunToolCallEvent {
+  return value.type === "tool_call";
+}
+
+export function isRobotRunToolResultEvent(value: RobotRunEvent): value is RobotRunToolResultEvent {
+  return value.type === "tool_result";
 }
 
 
@@ -1240,13 +1305,18 @@ export interface RPCResponseGetConfig {
   config: Record<string, unknown>;
 }
 
-// Final result of a one-shot robot invocation.
+// Result of a conversational or one-shot automation Robot invocation.
 export interface RPCResponseRobotRun {
   method: "robot_run";
   // Error message if invocation failed.
   error?: string;
-  output?: RobotRunOutput;
-  // Robot session ID containing the persisted invocation log.
+  // Ordered public output events from a conversational run.
+  events?: RobotRunEvent[];
+  // Text from the final assistant response in a conversational run.
+  final_text?: string;
+  finalization?: RobotRunOutput;
+  mode: RobotRunMode;
+  // Robot session containing the persisted invocation log.
   session_id?: string;
 }
 

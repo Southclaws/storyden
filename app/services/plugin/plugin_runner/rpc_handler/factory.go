@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role/role_writer"
 	"github.com/Southclaws/storyden/app/resources/plugin"
 	"github.com/Southclaws/storyden/app/resources/plugin/plugin_reader"
+	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
 	"github.com/Southclaws/storyden/app/services/account/account_role_assign"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/session_coordinator"
 	"github.com/Southclaws/storyden/internal/config"
@@ -25,6 +26,7 @@ type Factory struct {
 	roleAssigner   *account_role_assign.Manager
 	accessKeys     *access_key.Repository
 	pluginReader   *plugin_reader.Reader
+	robotSessions  *robot_session.Repository
 	robotAgent     *session_coordinator.Coordinator
 }
 
@@ -37,6 +39,7 @@ func NewFactory(
 	roleAssigner *account_role_assign.Manager,
 	accessKeys *access_key.Repository,
 	pluginReader *plugin_reader.Reader,
+	robotSessions *robot_session.Repository,
 	robotAgent *session_coordinator.Coordinator,
 ) *Factory {
 	return &Factory{
@@ -48,6 +51,7 @@ func NewFactory(
 		roleAssigner:   roleAssigner,
 		accessKeys:     accessKeys,
 		pluginReader:   pluginReader,
+		robotSessions:  robotSessions,
 		robotAgent:     robotAgent,
 	}
 }
@@ -69,6 +73,7 @@ func (f *Factory) New(
 		f.roleAssigner,
 		f.accessKeys,
 		f.pluginReader,
+		f.robotSessions,
 		f.robotAgent,
 	)
 }

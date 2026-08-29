@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role/role_writer"
 	"github.com/Southclaws/storyden/app/resources/plugin"
 	"github.com/Southclaws/storyden/app/resources/plugin/plugin_reader"
+	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
 	"github.com/Southclaws/storyden/app/services/account/account_role_assign"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/session_coordinator"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
@@ -33,6 +34,7 @@ type Handler struct {
 	roleAssigner   *account_role_assign.Manager
 	accessKeys     *access_key.Repository
 	pluginReader   *plugin_reader.Reader
+	robotSessions  *robot_session.Repository
 	robotAgent     *session_coordinator.Coordinator
 
 	mu           sync.Mutex
@@ -51,6 +53,7 @@ func New(
 	roleAssigner *account_role_assign.Manager,
 	accessKeys *access_key.Repository,
 	pluginReader *plugin_reader.Reader,
+	robotSessions *robot_session.Repository,
 	robotAgent *session_coordinator.Coordinator,
 ) *Handler {
 	return &Handler{
@@ -65,6 +68,7 @@ func New(
 		roleAssigner:   roleAssigner,
 		accessKeys:     accessKeys,
 		pluginReader:   pluginReader,
+		robotSessions:  robotSessions,
 		robotAgent:     robotAgent,
 	}
 }

@@ -1497,12 +1497,47 @@ type RPCRequestRobotRunParamsWorkspace struct {
 	WorkspaceInstanceID opt.Optional[xid.ID] `json:"workspace_instance_id,omitempty"`
 }
 
+// Role of one imported conversation message.
+type RobotRunMessageRole string
+
+const (
+	RobotRunMessageRoleUser      RobotRunMessageRole = "user"
+	RobotRunMessageRoleAssistant RobotRunMessageRole = "assistant"
+)
+
+var RobotRunMessageRoleValues = []RobotRunMessageRole{
+	RobotRunMessageRoleUser,
+	RobotRunMessageRoleAssistant,
+}
+
+type RobotRunMessage struct {
+	// Optional external display name for the message author.
+	Author opt.Optional[string] `json:"author,omitempty"`
+	// Message content imported into the Robot session.
+	Content string              `json:"content"`
+	Role    RobotRunMessageRole `json:"role"`
+}
+
+// Execution contract for a plugin Robot invocation.
+type RobotRunMode string
+
+const (
+	RobotRunModeConversation RobotRunMode = "conversation"
+	RobotRunModeAutomation   RobotRunMode = "automation"
+)
+
+var RobotRunModeValues = []RobotRunMode{
+	RobotRunModeConversation,
+	RobotRunModeAutomation,
+}
+
 type RPCRequestRobotRunParams struct {
-	// Input message for the robot.
-	Message string `json:"message"`
+	// New incremental messages to append before starting the turn.
+	Messages []RobotRunMessage `json:"messages"`
+	Mode     RobotRunMode      `json:"mode"`
 	// The Robot to invoke.
 	RobotID string `json:"robot_id"`
-	// Optional existing Robot session ID to continue. If omitted, a new session is created.
+	// Existing plugin-owned session to continue in conversation mode.
 	SessionID opt.Optional[xid.ID] `json:"session_id,omitempty"`
 	// Optional workspace mount request. Provide either workspace_id or workspace_instance_id, not both.
 	Workspace opt.Optional[RPCRequestRobotRunParamsWorkspace] `json:"workspace,omitempty"`
@@ -1584,7 +1619,7 @@ func (RPCRequestGetConfig) isPluginToHostRequest() {}
 
 func (RPCRequestGetConfig) PluginToHostRequestType() string { return "get_config" }
 
-// Run a one-shot robot invocation and return the assistant's final text response.
+// Run a conversational or one-shot automation Robot invocation.
 type RPCRequestRobotRun struct {
 	ID      xid.ID                   `json:"id"`
 	Jsonrpc string                   `json:"jsonrpc"`
@@ -1612,6 +1647,97 @@ type RPCResponseAccessGetResult struct {
 	// Base URL for API requests.
 	APIBaseURL url.URL `json:"api_base_url"`
 }
+
+type RobotRunEventUnion interface {
+	RobotRunEventType() string
+	isRobotRunEvent()
+}
+
+type RobotRunEvent struct {
+	RobotRunEventUnion
+}
+
+func (w RobotRunEvent) MarshalJSON() ([]byte, error) {
+	if w.RobotRunEventUnion == nil {
+		return []byte("null"), nil
+	}
+	return json.Marshal(w.RobotRunEventUnion)
+}
+
+func (w *RobotRunEvent) UnmarshalJSON(data []byte) error {
+	data = bytes.TrimSpace(data)
+	if bytes.Equal(data, []byte("null")) {
+		w.RobotRunEventUnion = nil
+		return nil
+	}
+
+	var peek struct {
+		Type string `json:"type"`
+	}
+	if err := json.Unmarshal(data, &peek); err != nil {
+		return fmt.Errorf("RobotRunEvent: invalid JSON: %w", err)
+	}
+	if peek.Type == "" {
+		return fmt.Errorf("RobotRunEvent: missing discriminator field %q", "type")
+	}
+
+	var v RobotRunEventUnion
+	switch peek.Type {
+	case "text":
+		v = &RobotRunTextEvent{}
+	case "tool_call":
+		v = &RobotRunToolCallEvent{}
+	case "tool_result":
+		v = &RobotRunToolResultEvent{}
+	default:
+		return fmt.Errorf("RobotRunEvent: unknown type %q", peek.Type)
+	}
+
+	if err := json.Unmarshal(data, v); err != nil {
+		return fmt.Errorf("RobotRunEvent: invalid %q payload: %w", peek.Type, err)
+	}
+
+	w.RobotRunEventUnion = v
+	return nil
+}
+
+type RobotRunTextEvent struct {
+	// Visible assistant text produced during the run.
+	Text string `json:"text"`
+	Type string `json:"type"`
+}
+
+func (RobotRunTextEvent) isRobotRunEvent() {}
+
+func (RobotRunTextEvent) RobotRunEventType() string { return "text" }
+
+type RobotRunToolCallEvent struct {
+	// Arguments supplied to the tool.
+	Arguments map[string]interface{} `json:"arguments"`
+	// Provider tool call identifier when available.
+	CallID opt.Optional[string] `json:"call_id,omitempty"`
+	// Tool name.
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
+func (RobotRunToolCallEvent) isRobotRunEvent() {}
+
+func (RobotRunToolCallEvent) RobotRunEventType() string { return "tool_call" }
+
+type RobotRunToolResultEvent struct {
+	// Provider tool call identifier when available.
+	CallID opt.Optional[string] `json:"call_id,omitempty"`
+	// Tool name.
+	Name string `json:"name"`
+	// Structured tool result.
+	Result map[string]interface{} `json:"result"`
+	Type   string                 `json:"type"`
+}
+
+func (RobotRunToolResultEvent) isRobotRunEvent() {}
+
+func (RobotRunToolResultEvent) RobotRunEventType() string { return "tool_result" }
 
 // Reason an unattended Robot invocation needs human attention.
 type RobotRunAttentionReason string
@@ -1737,13 +1863,18 @@ func (RPCResponseGetConfig) isPluginToHostResponseUnion() {}
 
 func (RPCResponseGetConfig) PluginToHostResponseUnionType() string { return "get_config" }
 
-// Final result of a one-shot robot invocation.
+// Result of a conversational or one-shot automation Robot invocation.
 type RPCResponseRobotRun struct {
 	// Error message if invocation failed.
-	Error  opt.Optional[string]         `json:"error,omitempty"`
-	Method string                       `json:"method"`
-	Output opt.Optional[RobotRunOutput] `json:"output,omitempty"`
-	// Robot session ID containing the persisted invocation log.
+	Error opt.Optional[string] `json:"error,omitempty"`
+	// Ordered public output events from a conversational run.
+	Events []RobotRunEvent `json:"events,omitempty"`
+	// Text from the final assistant response in a conversational run.
+	FinalText    opt.Optional[string]         `json:"final_text,omitempty"`
+	Finalization opt.Optional[RobotRunOutput] `json:"finalization,omitempty"`
+	Method       string                       `json:"method"`
+	Mode         RobotRunMode                 `json:"mode"`
+	// Robot session containing the persisted invocation log.
 	SessionID opt.Optional[xid.ID] `json:"session_id,omitempty"`
 }
 

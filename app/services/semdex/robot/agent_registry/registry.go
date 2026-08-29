@@ -19,6 +19,7 @@ type RunMode string
 
 const (
 	ModeInteractive RunMode = "interactive"
+	ModeHeadless    RunMode = "headless"
 	ModeUnattended  RunMode = "unattended"
 )
 

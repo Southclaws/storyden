@@ -352,7 +352,11 @@ func mapToADKEventsFromMessages(messages []*robot.Message) adksession.Events {
 			// route later user inputs back into the completed specialist task.
 			continue
 		}
-		events = append(events, &message.Event)
+		event := message.Event
+		if author, ok := message.Author.Get(); ok {
+			event.LLMResponse.Content = ContentWithStorydenSpeaker(event.LLMResponse.Content, author)
+		}
+		events = append(events, &event)
 	}
 
 	return events

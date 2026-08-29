@@ -1,5 +1,85 @@
 $schema: "http://json-schema.org/draft-07/schema#"
 $defs:
+  RobotRunMode:
+    type: string
+    enum: ["conversation", "automation"]
+    description: Execution contract for a plugin Robot invocation.
+
+  RobotRunMessageRole:
+    type: string
+    enum: ["user", "assistant"]
+    description: Role of one imported conversation message.
+
+  RobotRunMessage:
+    type: object
+    required: ["role", "content"]
+    properties:
+      role:
+        $ref: "#/$defs/RobotRunMessageRole"
+      content:
+        type: string
+        minLength: 1
+        description: Message content imported into the Robot session.
+      author:
+        type: string
+        minLength: 1
+        description: Optional external display name for the message author.
+
+  RobotRunTextEvent:
+    type: object
+    required: ["type", "text"]
+    properties:
+      type:
+        type: string
+        const: "text"
+      text:
+        type: string
+        description: Visible assistant text produced during the run.
+
+  RobotRunToolCallEvent:
+    type: object
+    required: ["type", "name", "arguments"]
+    properties:
+      type:
+        type: string
+        const: "tool_call"
+      call_id:
+        type: string
+        description: Provider tool call identifier when available.
+      name:
+        type: string
+        minLength: 1
+        description: Tool name.
+      arguments:
+        type: object
+        additionalProperties: true
+        description: Arguments supplied to the tool.
+
+  RobotRunToolResultEvent:
+    type: object
+    required: ["type", "name", "result"]
+    properties:
+      type:
+        type: string
+        const: "tool_result"
+      call_id:
+        type: string
+        description: Provider tool call identifier when available.
+      name:
+        type: string
+        minLength: 1
+        description: Tool name.
+      result:
+        type: object
+        additionalProperties: true
+        description: Structured tool result.
+
+  RobotRunEvent:
+    oneOf:
+      - $ref: "#/$defs/RobotRunTextEvent"
+      - $ref: "#/$defs/RobotRunToolCallEvent"
+      - $ref: "#/$defs/RobotRunToolResultEvent"
+
   RobotRunStatus:
     type: string
     enum: ["completed", "blocked", "failed"]
@@ -42,7 +122,7 @@ $defs:
 
   RPCRequestRobotRun:
     description: >
-      Run a one-shot robot invocation and return the assistant's final text response.
+      Run a conversational or one-shot automation Robot invocation.
     allOf:
       - $ref: "../rpc.yaml#/$defs/JsonRpcRequest"
       - type: object
@@ -53,19 +133,23 @@ $defs:
             const: "robot_run"
           params:
             type: object
-            required: ["message", "robot_id"]
+            required: ["mode", "messages", "robot_id"]
             properties:
-              message:
-                type: string
-                minLength: 1
-                description: Input message for the robot.
+              mode:
+                $ref: "#/$defs/RobotRunMode"
+              messages:
+                type: array
+                minItems: 1
+                items:
+                  $ref: "#/$defs/RobotRunMessage"
+                description: New incremental messages to append before starting the turn.
               robot_id:
                 type: string
                 description: The Robot to invoke.
               session_id:
                 type: string
                 format: xid
-                description: Optional existing Robot session ID to continue. If omitted, a new session is created.
+                description: Existing plugin-owned session to continue in conversation mode.
               workspace:
                 type: object
                 description: Optional workspace mount request. Provide either workspace_id or workspace_instance_id, not both.
@@ -81,19 +165,29 @@ $defs:
 
   RPCResponseRobotRun:
     description: >
-      Final result of a one-shot robot invocation.
+      Result of a conversational or one-shot automation Robot invocation.
     type: object
-    required: ["method"]
+    required: ["method", "mode"]
     properties:
       method:
         type: string
         const: "robot_run"
-      output:
+      mode:
+        $ref: "#/$defs/RobotRunMode"
+      events:
+        type: array
+        items:
+          $ref: "#/$defs/RobotRunEvent"
+        description: Ordered public output events from a conversational run.
+      final_text:
+        type: string
+        description: Text from the final assistant response in a conversational run.
+      finalization:
         $ref: "#/$defs/RobotRunOutput"
       session_id:
         type: string
         format: xid
-        description: Robot session ID containing the persisted invocation log.
+        description: Robot session containing the persisted invocation log.
       error:
         type: string
         description: Error message if invocation failed.

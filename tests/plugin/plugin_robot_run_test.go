@@ -14,6 +14,7 @@ import (
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
+	"google.golang.org/genai"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	resource_plugin "github.com/Southclaws/storyden/app/resources/plugin"
@@ -22,6 +23,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner"
+	robotservice "github.com/Southclaws/storyden/app/services/semdex/robot"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	rpc_transport "github.com/Southclaws/storyden/app/transports/rpc"
 	"github.com/Southclaws/storyden/internal/config"
@@ -56,7 +58,7 @@ func TestExternalPluginRobotRunCompletedStructuredOutput(t *testing.T) {
 
 		result := runRobotRPC(t, root, pl, robotID, "summarise this")
 
-		output, ok := result.Output.Get()
+		output, ok := result.Finalization.Get()
 		r.True(ok, "expected structured output")
 		r.Equal(rpc.RobotRunStatusCompleted, output.Status)
 		r.Equal("Robot run complete.", output.Summary)
@@ -78,25 +80,159 @@ func TestExternalPluginRobotRunContinuesProvidedSession(t *testing.T) {
   - match:
       any: true
     respond:
-      tool_calls:
-        - id: call_finish_1
-          name: robot_run_finish
-          args:
-            status: "completed"
-            summary: "Robot run complete."
+      text: "Conversation reply."
       finish: "stop"
 `)
 		robotID := createRobotForRun(t, root, cl, adminSession, r, scriptName)
 
-		first := runRobotRPC(t, root, pl, robotID, "first turn")
+		first := runRobotConversationRPC(t, root, pl, robotID, []rpc.RobotRunMessage{{Role: rpc.RobotRunMessageRoleUser, Content: "first turn"}})
 		sessionID, ok := first.SessionID.Get()
 		r.True(ok, "expected session_id")
+		r.Equal("Conversation reply.", first.FinalText.OrZero())
 
-		second := runRobotRPC(t, root, pl, robotID, "second turn", sessionID)
+		second := runRobotConversationRPC(t, root, pl, robotID, []rpc.RobotRunMessage{{Role: rpc.RobotRunMessageRoleUser, Content: "second turn"}}, sessionID)
 		continuedSessionID, ok := second.SessionID.Get()
 		r.True(ok, "expected continued session_id")
 		r.Equal(sessionID, continuedSessionID)
 		r.False(second.Error.Ok(), "unexpected error: %v", second.Error)
+	})
+}
+
+func TestExternalPluginRobotRunConversationImportsHistoryAndReturnsPublicEvents(t *testing.T) {
+	withRobotRunPlugin(t, []string{"USE_ROBOTS", "READ_PUBLISHED_LIBRARY"}, func(
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		adminSession openapi.RequestEditorFn,
+		pl *sdk.Plugin,
+		r *require.Assertions,
+		sessionRepo *robot_session.Repository,
+	) {
+		scriptName := writeRobotRunScript(t, `steps:
+  - match:
+      contains: "current question"
+    respond:
+      thought: "private first thought"
+      text: "Checking context."
+      tool_calls:
+        - id: call_request_page_1
+          name: library_request_page
+          args: {}
+  - match:
+      tool_result: library_request_page
+    respond:
+      thought: "private final thought"
+      text: "Final conversational answer."
+      finish: "stop"
+`)
+		robotID := createRobotForRun(t, root, cl, adminSession, r, scriptName, "library_request_page")
+
+		result := runRobotConversationRPC(t, root, pl, robotID, []rpc.RobotRunMessage{
+			{Role: rpc.RobotRunMessageRoleUser, Content: "Earlier question", Author: opt.New("Alice")},
+			{Role: rpc.RobotRunMessageRoleAssistant, Content: "Earlier bot reply"},
+			{Role: rpc.RobotRunMessageRoleUser, Content: "Current question", Author: opt.New("Bob")},
+		})
+
+		r.Equal(rpc.RobotRunModeConversation, result.Mode)
+		r.Equal("Final conversational answer.", result.FinalText.OrZero())
+		r.False(result.Finalization.Ok())
+		r.False(result.Error.Ok(), "unexpected error: %v", result.Error)
+		r.Len(result.Events, 4)
+
+		firstText, ok := result.Events[0].RobotRunEventUnion.(*rpc.RobotRunTextEvent)
+		r.True(ok)
+		r.Equal("Checking context.", firstText.Text)
+		toolCall, ok := result.Events[1].RobotRunEventUnion.(*rpc.RobotRunToolCallEvent)
+		r.True(ok)
+		r.Equal("call_request_page_1", toolCall.CallID.OrZero())
+		r.Equal("library_request_page", toolCall.Name)
+		r.Equal(map[string]any{}, toolCall.Arguments)
+		toolResult, ok := result.Events[2].RobotRunEventUnion.(*rpc.RobotRunToolResultEvent)
+		r.True(ok)
+		r.Equal("call_request_page_1", toolResult.CallID.OrZero())
+		r.Equal("library_request_page", toolResult.Name)
+		r.Equal("blocked", toolResult.Result["status"])
+		finalText, ok := result.Events[3].RobotRunEventUnion.(*rpc.RobotRunTextEvent)
+		r.True(ok)
+		r.Equal("Final conversational answer.", finalText.Text)
+
+		sessionID, ok := result.SessionID.Get()
+		r.True(ok)
+		sess, _, err := sessionRepo.Get(root, robot.SessionID(sessionID), robot.NewMessageCursorParams(opt.NewEmpty[robot.MessageID](), 20))
+		r.NoError(err)
+		r.GreaterOrEqual(len(sess.Messages), 3)
+		r.Equal("Earlier question", sess.Messages[0].Event.Content.Parts[0].Text)
+		r.Equal("Alice", sess.Messages[0].Event.Content.Parts[0].PartMetadata[robotservice.MessageSpeakerMetadataKey])
+		r.Equal(genai.RoleUser, sess.Messages[0].Event.Content.Role)
+		r.Equal("Earlier bot reply", sess.Messages[1].Event.Content.Parts[0].Text)
+		r.Equal(genai.RoleModel, sess.Messages[1].Event.Content.Role)
+		r.Equal("Current question", sess.Messages[2].Event.Content.Parts[0].Text)
+		r.Equal("Bob", sess.Messages[2].Event.Content.Parts[0].PartMetadata[robotservice.MessageSpeakerMetadataKey])
+	})
+}
+
+func TestExternalPluginRobotRunConversationRejectsInvalidContinuation(t *testing.T) {
+	withRobotRunPlugin(t, []string{"USE_ROBOTS"}, func(
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		adminSession openapi.RequestEditorFn,
+		pl *sdk.Plugin,
+		r *require.Assertions,
+		sessionRepo *robot_session.Repository,
+		accountWrite *account_writer.Writer,
+	) {
+		scriptName := writeRobotRunScript(t, `steps:
+  - match:
+      any: true
+    respond:
+      text: "Conversation reply."
+      finish: "stop"
+`)
+		robotID := createRobotForRun(t, root, cl, adminSession, r, scriptName)
+		otherRobotID := createRobotForRun(t, root, cl, adminSession, r, scriptName)
+
+		first := runRobotConversationRPC(t, root, pl, robotID, []rpc.RobotRunMessage{{Role: rpc.RobotRunMessageRoleUser, Content: "first turn"}})
+		sessionID, ok := first.SessionID.Get()
+		r.True(ok)
+		before, _, err := sessionRepo.Get(root, robot.SessionID(sessionID), robot.NewMessageCursorParams(opt.NewEmpty[robot.MessageID](), 20))
+		r.NoError(err)
+
+		wrongRobot, err := pl.RunRobot(root, rpc.RPCRequestRobotRunParams{
+			Mode: rpc.RobotRunModeConversation, RobotID: otherRobotID.String(), SessionID: opt.New(sessionID),
+			Messages: []rpc.RobotRunMessage{{Role: rpc.RobotRunMessageRoleUser, Content: "must not append"}},
+		})
+		r.Error(err)
+		r.NotNil(wrongRobot)
+		r.Contains(wrongRobot.Error.OrZero(), "different Robot")
+
+		after, _, err := sessionRepo.Get(root, robot.SessionID(sessionID), robot.NewMessageCursorParams(opt.NewEmpty[robot.MessageID](), 20))
+		r.NoError(err)
+		r.Len(after.Messages, len(before.Messages))
+
+		missingID := xid.New()
+		missing, err := pl.RunRobot(root, rpc.RPCRequestRobotRunParams{
+			Mode: rpc.RobotRunModeConversation, RobotID: robotID.String(), SessionID: opt.New(missingID),
+			Messages: []rpc.RobotRunMessage{{Role: rpc.RobotRunMessageRoleUser, Content: "must not create"}},
+		})
+		r.Error(err)
+		r.NotNil(missing)
+		r.Contains(missing.Error.OrZero(), "not available")
+		_, _, err = sessionRepo.Get(root, robot.SessionID(missingID), robot.NewMessageCursorParams(opt.NewEmpty[robot.MessageID](), 1))
+		r.Error(err)
+
+		foreignID := robot.SessionID(xid.New())
+		_, foreignAccount := e2e.WithAccount(root, accountWrite, seed.Account_002_Frigg)
+		_, err = sessionRepo.Create(root, foreignID, "Foreign plugin session", foreignAccount.ID, map[string]any{"root_robot_ref": robotID.String()})
+		r.NoError(err)
+		foreign, err := pl.RunRobot(root, rpc.RPCRequestRobotRunParams{
+			Mode: rpc.RobotRunModeConversation, RobotID: robotID.String(), SessionID: opt.New(xid.ID(foreignID)),
+			Messages: []rpc.RobotRunMessage{{Role: rpc.RobotRunMessageRoleUser, Content: "must not cross accounts"}},
+		})
+		r.Error(err)
+		r.NotNil(foreign)
+		r.Contains(foreign.Error.OrZero(), "not available")
+		foreignSession, _, err := sessionRepo.Get(root, foreignID, robot.NewMessageCursorParams(opt.NewEmpty[robot.MessageID](), 20))
+		r.NoError(err)
+		r.Empty(foreignSession.Messages)
 	})
 }
 
@@ -143,7 +279,7 @@ func TestExternalPluginRobotRunBypassesConfirmationForAssignedTool(t *testing.T)
 
 		result := runRobotRPC(t, root, pl, robotID, "delete it")
 
-		output, ok := result.Output.Get()
+		output, ok := result.Finalization.Get()
 		r.True(ok, "expected structured output")
 		r.Equal(rpc.RobotRunStatusCompleted, output.Status)
 		r.Equal("Robot deleted without live confirmation.", output.Summary)
@@ -186,7 +322,7 @@ func TestExternalPluginRobotRunBlocksElicitation(t *testing.T) {
 
 		result := runRobotRPC(t, root, pl, robotID, "choose a page")
 
-		output, ok := result.Output.Get()
+		output, ok := result.Finalization.Get()
 		r.True(ok, "expected structured output")
 		r.Equal(rpc.RobotRunStatusBlocked, output.Status)
 		attention, ok := output.Attention.Get()
@@ -236,7 +372,7 @@ func TestExternalPluginRobotRunMissingToolPermissionFails(t *testing.T) {
 		result := runRobotRPC(t, root, pl, robotID, "delete it")
 
 		r.True(result.Error.Ok(), "expected error")
-		output, ok := result.Output.Get()
+		output, ok := result.Finalization.Get()
 		r.True(ok, "expected failed output")
 		r.Equal(rpc.RobotRunStatusFailed, output.Status)
 		tests.AssertRequest(cl.RobotGetWithResponse(root, openapi.RobotIDParam(victimID), adminSession))(t, http.StatusOK)
@@ -263,7 +399,7 @@ func TestExternalPluginRobotRunMalformedOutputFails(t *testing.T) {
 		result := runRobotRPC(t, root, pl, robotID, "bad output please")
 
 		r.True(result.Error.Ok(), "expected error")
-		output, ok := result.Output.Get()
+		output, ok := result.Finalization.Get()
 		r.True(ok, "expected failed output")
 		r.Equal(rpc.RobotRunStatusFailed, output.Status)
 	})
@@ -337,6 +473,8 @@ func withRobotRunPlugin(t *testing.T, permissions []string, run any) {
 				f(root, cl, adminSession, pl, r)
 			case func(context.Context, *openapi.ClientWithResponses, openapi.RequestEditorFn, *sdk.Plugin, *require.Assertions, *robot_session.Repository):
 				f(root, cl, adminSession, pl, r, sessionRepo)
+			case func(context.Context, *openapi.ClientWithResponses, openapi.RequestEditorFn, *sdk.Plugin, *require.Assertions, *robot_session.Repository, *account_writer.Writer):
+				f(root, cl, adminSession, pl, r, sessionRepo, accountWrite)
 			default:
 				r.Failf("unsupported robot run test function", "%T", run)
 			}
@@ -405,8 +543,9 @@ func runRobotRPC(t *testing.T, ctx context.Context, pl *sdk.Plugin, robotID xid.
 	t.Helper()
 
 	params := rpc.RPCRequestRobotRunParams{
-		Message: message,
-		RobotID: robotID.String(),
+		Mode:     rpc.RobotRunModeAutomation,
+		Messages: []rpc.RobotRunMessage{{Role: rpc.RobotRunMessageRoleUser, Content: message}},
+		RobotID:  robotID.String(),
 	}
 	if len(sessionID) > 0 {
 		params.SessionID = opt.New(sessionID[0])
@@ -422,6 +561,21 @@ func runRobotRPC(t *testing.T, ctx context.Context, pl *sdk.Plugin, robotID xid.
 	typed, ok := result.(*rpc.RPCResponseRobotRun)
 	require.True(t, ok, "expected *rpc.RPCResponseRobotRun, got %T", result)
 	return typed
+}
+
+func runRobotConversationRPC(t *testing.T, ctx context.Context, pl *sdk.Plugin, robotID xid.ID, messages []rpc.RobotRunMessage, sessionID ...xid.ID) *rpc.RPCResponseRobotRun {
+	t.Helper()
+
+	params := rpc.RPCRequestRobotRunParams{Mode: rpc.RobotRunModeConversation, Messages: messages, RobotID: robotID.String()}
+	if len(sessionID) > 0 {
+		params.SessionID = opt.New(sessionID[0])
+	}
+
+	result, err := pl.RunRobot(ctx, params)
+	if err != nil {
+		t.Fatalf("RunRobot failed: %v", err)
+	}
+	return result
 }
 
 func writeRobotRunScript(t *testing.T, content string) string {

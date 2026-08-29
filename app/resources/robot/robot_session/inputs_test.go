@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
+	robotservice "github.com/Southclaws/storyden/app/services/semdex/robot"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_robot_session_input "github.com/Southclaws/storyden/internal/ent/robotsessioninput"
 	"github.com/Southclaws/storyden/internal/integration"
@@ -104,6 +105,97 @@ func TestQueuedInputsRemainIndividualWhenMaterialisedAsOneTurn(t *testing.T) {
 	}))
 }
 
+func TestEnqueueInputPersistsImportedHistoryAndVisibleInputAtomically(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, fx.Invoke(func(
+		lc fx.Lifecycle,
+		ctx context.Context,
+		db *ent.Client,
+		repo *robot_session.Repository,
+	) {
+		lc.Append(fx.StartHook(func() {
+			owner, err := db.Account.Create().SetHandle("imported-history-owner").SetName("Imported History Owner").Save(ctx)
+			require.NoError(t, err)
+			ownerID := account.AccountID(owner.ID)
+			sessionID := robot.SessionID(xid.New())
+			require.NoError(t, createSession(ctx, repo, sessionID, ownerID))
+
+			inputID := robot.InputID(xid.New())
+			history := []*adksession.Event{
+				{
+					InvocationID: inputID.String(),
+					Author:       "user",
+					LLMResponse: model.LLMResponse{
+						Content: &genai.Content{
+							Role: genai.RoleUser,
+							Parts: []*genai.Part{
+								{
+									Text: "first imported message",
+									PartMetadata: map[string]any{
+										robotservice.MessageSpeakerMetadataKey: "Alice",
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					InvocationID: inputID.String(),
+					Author:       "imported_assistant",
+					LLMResponse: model.LLMResponse{
+						Content: genai.NewContentFromText("imported assistant reply", genai.RoleModel),
+					},
+				},
+			}
+			require.NoError(t, repo.EnqueueInput(ctx, robot_session.EnqueueInputParams{
+				ID:            inputID,
+				SessionID:     sessionID,
+				AccountID:     ownerID,
+				SourceKind:    "plugin_rpc",
+				BatchKey:      inputID.String(),
+				InputData:     json.RawMessage(`{"turn":1}`),
+				HistoryEvents: history,
+				VisibleEvent:  opt.New(textEvent("current message", "user")),
+			}))
+
+			sess, _, err := repo.Get(ctx, sessionID, robot.NewMessageCursorParams(opt.NewEmpty[robot.MessageID](), 20))
+			require.NoError(t, err)
+			require.Len(t, sess.Messages, 3)
+			assert.Equal(t, []string{"first imported message", "imported assistant reply", "current message"}, []string{
+				sess.Messages[0].Event.Content.Parts[0].Text,
+				sess.Messages[1].Event.Content.Parts[0].Text,
+				sess.Messages[2].Event.Content.Parts[0].Text,
+			})
+			assert.Equal(t, []string{genai.RoleUser, genai.RoleModel, genai.RoleUser}, []string{
+				sess.Messages[0].Event.Content.Role,
+				sess.Messages[1].Event.Content.Role,
+				sess.Messages[2].Event.Content.Role,
+			})
+			assert.Equal(t, "Alice", sess.Messages[0].Event.Content.Parts[0].PartMetadata[robotservice.MessageSpeakerMetadataKey])
+			assert.False(t, sess.Messages[0].Queued)
+			assert.False(t, sess.Messages[1].Queued)
+			assert.True(t, sess.Messages[2].Queued)
+
+			require.NoError(t, repo.EnqueueInput(ctx, robot_session.EnqueueInputParams{
+				ID:            inputID,
+				SessionID:     sessionID,
+				AccountID:     ownerID,
+				SourceKind:    "plugin_rpc",
+				BatchKey:      inputID.String(),
+				InputData:     json.RawMessage(`{"turn":2}`),
+				HistoryEvents: []*adksession.Event{textEvent("duplicate history", "user")},
+				VisibleEvent:  opt.New(textEvent("duplicate current message", "user")),
+			}))
+
+			afterRetry, _, err := repo.Get(ctx, sessionID, robot.NewMessageCursorParams(opt.NewEmpty[robot.MessageID](), 20))
+			require.NoError(t, err)
+			require.Len(t, afterRetry.Messages, 3)
+			assert.Equal(t, "current message", afterRetry.Messages[2].Event.Content.Parts[0].Text)
+		}))
+	}))
+}
+
 func TestQueuedInputsBecomeRunnableAtTheirScheduledTime(t *testing.T) {
 	t.Parallel()
 
@@ -166,8 +258,12 @@ func enqueueVisibleInput(
 	text string,
 ) error {
 	return repo.EnqueueInput(ctx, robot_session.EnqueueInputParams{
-		ID: inputID, SessionID: sessionID, AccountID: ownerID,
-		SourceKind: "interactive_chat", BatchKey: "same-account-and-runtime", InputData: json.RawMessage(`{}`),
+		ID:           inputID,
+		SessionID:    sessionID,
+		AccountID:    ownerID,
+		SourceKind:   "interactive_chat",
+		BatchKey:     "same-account-and-runtime",
+		InputData:    json.RawMessage(`{}`),
 		VisibleEvent: opt.New(textEvent(text, "user")),
 	})
 }
@@ -176,9 +272,16 @@ func textEvent(text, role string) *adksession.Event {
 	return &adksession.Event{
 		InvocationID: xid.New().String(),
 		Author:       role,
-		LLMResponse: model.LLMResponse{Content: &genai.Content{
-			Role: role, Parts: []*genai.Part{{Text: text}},
-		}},
+		LLMResponse: model.LLMResponse{
+			Content: &genai.Content{
+				Role: role,
+				Parts: []*genai.Part{
+					{
+						Text: text,
+					},
+				},
+			},
+		},
 	}
 }
 

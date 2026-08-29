@@ -77,34 +77,26 @@ func (p *Plugin) BuildAPIClient(ctx context.Context) (*openapi.ClientWithRespons
 	)
 }
 
-func (p *Plugin) RunRobot(ctx context.Context, robotID string, message string) (string, error) {
+func (p *Plugin) RunRobot(ctx context.Context, params rpc.RPCRequestRobotRunParams) (*rpc.RPCResponseRobotRun, error) {
 	req := rpc.RPCRequestRobotRun{
 		Jsonrpc: "2.0",
 		Method:  "robot_run",
-		Params: rpc.RPCRequestRobotRunParams{
-			Message: message,
-			RobotID: robotID,
-		},
+		Params:  params,
 	}
 
 	resp, err := p.Send(ctx, req)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	typed, ok := resp.(*rpc.RPCResponseRobotRun)
 	if !ok {
-		return "", fmt.Errorf("unexpected RPC response type: %T", resp)
+		return nil, fmt.Errorf("unexpected RPC response type: %T", resp)
 	}
 
 	if methodErr, ok := typed.Error.Get(); ok {
-		return "", fmt.Errorf("robot_run error: %s", methodErr)
+		return typed, fmt.Errorf("robot_run error: %s", methodErr)
 	}
 
-	output, ok := typed.Output.Get()
-	if !ok {
-		return "", fmt.Errorf("robot_run output missing")
-	}
-
-	return output.Summary, nil
+	return typed, nil
 }

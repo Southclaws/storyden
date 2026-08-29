@@ -59,43 +59,40 @@ func main() {
 		}
 	}()
 
-	req := rpc.RPCRequestRobotRun{
-		Jsonrpc: "2.0",
-		Method:  "robot_run",
-		Params: rpc.RPCRequestRobotRunParams{
-			RobotID: robotIDString,
-			Message: prompt,
+	params := rpc.RPCRequestRobotRunParams{
+		Mode:    rpc.RobotRunModeAutomation,
+		RobotID: robotIDString,
+		Messages: []rpc.RobotRunMessage{
+			{Role: rpc.RobotRunMessageRoleUser, Content: prompt},
 		},
 	}
 
-	resp, err := sendWhenConnected(ctx, plugin, req)
+	resp, err := runRobotWhenConnected(ctx, plugin, params)
 	if err != nil {
 		exitError(logger, "robot_run", err)
 	}
 
-	typed, ok := resp.(*rpc.RPCResponseRobotRun)
-	if !ok {
-		exitError(logger, "robot_run", fmt.Errorf("unexpected response type %T", resp))
-	}
-
-	if err := printJSON(os.Stdout, typed); err != nil {
+	if err := printJSON(os.Stdout, resp); err != nil {
 		exitError(logger, "print response", err)
 	}
 
-	if methodErr, ok := typed.Error.Get(); ok && methodErr != "" {
+	if methodErr, ok := resp.Error.Get(); ok && methodErr != "" {
 		os.Exit(1)
 	}
 }
 
-func sendWhenConnected(ctx context.Context, plugin *storyden.Plugin, req rpc.RPCRequestRobotRun) (rpc.PluginToHostResponseUnionUnion, error) {
+func runRobotWhenConnected(ctx context.Context, plugin *storyden.Plugin, params rpc.RPCRequestRobotRunParams) (*rpc.RPCResponseRobotRun, error) {
 	connectDeadline := time.Now().Add(connectTimeout)
 
 	for {
 		requestCtx, cancelRequest := context.WithTimeout(ctx, requestTimeout)
-		resp, err := plugin.Send(requestCtx, req)
+		resp, err := plugin.RunRobot(requestCtx, params)
 		cancelRequest()
 		if err == nil {
 			return resp, nil
+		}
+		if resp != nil {
+			return resp, err
 		}
 		if !isConnectionPending(err) {
 			return nil, err

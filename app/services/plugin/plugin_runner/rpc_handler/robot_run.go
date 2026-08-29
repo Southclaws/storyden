@@ -10,8 +10,10 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
+	adksession "google.golang.org/adk/v2/session"
 	"google.golang.org/genai"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	robotresource "github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -20,14 +22,13 @@ import (
 )
 
 func (h *Handler) handleRobotRun(ctx context.Context, req *rpc.RPCRequestRobotRun) (rpc.RPCResponseRobotRun, error) {
-	result := rpc.RPCResponseRobotRun{
-		Method: "robot_run",
+	result := rpc.RPCResponseRobotRun{Method: "robot_run", Mode: req.Params.Mode}
+
+	contents, err := validateRobotRunRequest(req.Params)
+	if err != nil {
+		result.Error = opt.New(err.Error())
+		return result, nil
 	}
-	sessionID := xid.New()
-	if requestedSessionID, ok := req.Params.SessionID.Get(); ok {
-		sessionID = requestedSessionID
-	}
-	result.SessionID = opt.New(sessionID)
 
 	accessConfig, ok := h.manifest.Metadata.Access.Get()
 	if !ok {
@@ -45,7 +46,6 @@ func (h *Handler) handleRobotRun(ctx context.Context, req *rpc.RPCRequestRobotRu
 		return result, nil
 	}
 
-	// Refresh role edges after potential role assignment updates.
 	pluginAccount, err = h.accountQuerier.GetByID(ctx, pluginAccount.ID)
 	if err != nil {
 		result.Error = opt.New(err.Error())
@@ -57,82 +57,186 @@ func (h *Handler) handleRobotRun(ctx context.Context, req *rpc.RPCRequestRobotRu
 		result.Error = opt.New("plugin account does not have USE_ROBOTS permission")
 		return result, nil
 	}
-	if strings.TrimSpace(req.Params.Message) == "" {
-		result.Error = opt.New("message must not be empty")
-		return result, nil
+
+	sessionID := xid.New()
+	if requestedSessionID, ok := req.Params.SessionID.Get(); ok {
+		if err := h.validateRobotRunContinuation(runCtx, requestedSessionID, pluginAccount.ID, req.Params.RobotID); err != nil {
+			result.Error = opt.New(err.Error())
+			return result, nil
+		}
+		sessionID = requestedSessionID
 	}
 
-	stream := h.robotAgent.Run(
+	result.SessionID = opt.New(sessionID)
+
+	runMode := robotservice.ModeHeadless
+	if req.Params.Mode == rpc.RobotRunModeAutomation {
+		runMode = robotservice.ModeUnattended
+	}
+
+	stream := h.robotAgent.RunMessages(
 		runCtx,
 		req.Params.RobotID,
 		pluginAccount.ID.String(),
 		sessionID.String(),
-		&genai.Content{
-			Role: "user",
-			Parts: []*genai.Part{
-				{Text: req.Params.Message},
-			},
-		},
+		contents,
 		nil,
 		robotservice.RunOptions{
-			Mode:      robotservice.ModeUnattended,
+			Mode:      runMode,
 			Source:    robotservice.SourcePluginRPC,
 			Workspace: robotRunWorkspaceSpec(req.Params.Workspace),
 		},
 	)
 
-	var output strings.Builder
-	resultReady := false
+	var automationText strings.Builder
+	finalizationReady := false
 	for event, streamErr := range stream {
 		if streamErr != nil {
-			if resultReady {
+			if req.Params.Mode == rpc.RobotRunModeAutomation && finalizationReady {
 				return result, nil
 			}
-			message := fmsg.GetIssue(streamErr)
-			if message == "" {
-				message = streamErr.Error()
-			}
-			setRobotRunFailure(&result, message, output.String())
+			setRobotRunFailure(&result, friendlyRobotRunError(streamErr), automationText.String())
 			return result, nil
 		}
-		if event == nil || event.LLMResponse.Content == nil {
+		if event == nil || event.LLMResponse.Content == nil || event.Author == "user" {
 			continue
 		}
 
-		var eventText strings.Builder
+		if req.Params.Mode == rpc.RobotRunModeConversation {
+			appendRobotRunEvents(&result, event)
+			continue
+		}
+
 		for _, part := range event.LLMResponse.Content.Parts {
-			if part == nil {
+			if part == nil || part.Thought {
 				continue
 			}
 			if part.Text != "" {
-				eventText.WriteString(part.Text)
+				automationText.WriteString(part.Text)
 			}
-			if !resultReady && part.FunctionResponse != nil && part.FunctionResponse.Name == robotservice.UnattendedFinishToolName() {
-				runOutput, err := robotRunOutputFromMap(part.FunctionResponse.Response)
+			if !finalizationReady && part.FunctionResponse != nil && part.FunctionResponse.Name == robotservice.UnattendedFinishToolName() {
+				finalization, err := robotRunOutputFromMap(part.FunctionResponse.Response)
 				if err != nil {
-					message := "robot_run finish tool produced invalid structured output: " + err.Error()
-					setRobotRunFailure(&result, message, output.String())
-					resultReady = true
+					setRobotRunFailure(&result, "robot_run finish tool produced invalid structured output: "+err.Error(), automationText.String())
+					finalizationReady = true
 					continue
 				}
-				result.Output = opt.New(runOutput)
-				resultReady = true
+				result.Finalization = opt.New(finalization)
+				finalizationReady = true
 			}
 		}
-
-		text := eventText.String()
-		if text == "" {
-			continue
-		}
-		output.WriteString(text)
 	}
-	if resultReady {
+
+	if req.Params.Mode == rpc.RobotRunModeConversation || finalizationReady {
 		return result, nil
 	}
 
-	message := "robot_run did not call the unattended finish tool"
-	setRobotRunFailure(&result, message, output.String())
+	setRobotRunFailure(&result, "robot_run did not call the unattended finish tool", automationText.String())
 	return result, nil
+}
+
+func validateRobotRunRequest(params rpc.RPCRequestRobotRunParams) ([]*genai.Content, error) {
+	if strings.TrimSpace(params.RobotID) == "" {
+		return nil, errors.New("robot_id must not be empty")
+	}
+	if len(params.Messages) == 0 {
+		return nil, errors.New("messages must contain at least one message")
+	}
+	if params.Mode != rpc.RobotRunModeConversation && params.Mode != rpc.RobotRunModeAutomation {
+		return nil, fmt.Errorf("unsupported robot_run mode %q", params.Mode)
+	}
+	if params.Messages[len(params.Messages)-1].Role != rpc.RobotRunMessageRoleUser {
+		return nil, errors.New("the final message must have role user")
+	}
+	if params.Mode == rpc.RobotRunModeAutomation {
+		if len(params.Messages) != 1 {
+			return nil, errors.New("automation mode requires exactly one user message")
+		}
+		if params.SessionID.Ok() {
+			return nil, errors.New("automation mode does not accept session_id")
+		}
+	}
+
+	contents := make([]*genai.Content, len(params.Messages))
+	for i, message := range params.Messages {
+		if strings.TrimSpace(message.Content) == "" {
+			return nil, fmt.Errorf("messages[%d].content must not be empty", i)
+		}
+		author, hasAuthor := message.Author.Get()
+		if hasAuthor && strings.TrimSpace(author) == "" {
+			return nil, fmt.Errorf("messages[%d].author must not be empty", i)
+		}
+
+		role := genai.Role(genai.RoleUser)
+		switch message.Role {
+		case rpc.RobotRunMessageRoleUser:
+		case rpc.RobotRunMessageRoleAssistant:
+			role = genai.RoleModel
+		default:
+			return nil, fmt.Errorf("messages[%d].role is invalid", i)
+		}
+		contents[i] = robotservice.ContentWithSpeaker(role, message.Content, author)
+	}
+
+	return contents, nil
+}
+
+func (h *Handler) validateRobotRunContinuation(ctx context.Context, sessionID xid.ID, accountID account.AccountID, robotRef string) error {
+	sess, _, err := h.robotSessions.Get(ctx, robotresource.SessionID(sessionID), robotresource.NewMessageCursorParams(opt.NewEmpty[robotresource.MessageID](), 1))
+	if err != nil || sess.Human.ID != accountID {
+		return errors.New("session is not available to this plugin")
+	}
+	rootRobotRef, ok := robotservice.SessionRootRobotRef(sess.State).Get()
+	if !ok || rootRobotRef != strings.TrimSpace(robotRef) {
+		return errors.New("session is rooted at a different Robot")
+	}
+	return nil
+}
+
+func appendRobotRunEvents(result *rpc.RPCResponseRobotRun, event *adksession.Event) {
+	if event.LLMResponse.Content.Role == genai.RoleModel {
+		result.FinalText = opt.NewEmpty[string]()
+	}
+	var finalText strings.Builder
+	for _, part := range event.LLMResponse.Content.Parts {
+		if part == nil || part.Thought {
+			continue
+		}
+		switch {
+		case part.Text != "":
+			result.Events = append(result.Events, rpc.RobotRunEvent{RobotRunEventUnion: &rpc.RobotRunTextEvent{Type: "text", Text: part.Text}})
+			if event.LLMResponse.Content.Role == genai.RoleModel {
+				finalText.WriteString(part.Text)
+			}
+		case part.FunctionCall != nil:
+			result.Events = append(result.Events, rpc.RobotRunEvent{RobotRunEventUnion: &rpc.RobotRunToolCallEvent{
+				Type: "tool_call", Name: part.FunctionCall.Name, Arguments: ensureRobotRunMap(part.FunctionCall.Args),
+				CallID: opt.NewIf(part.FunctionCall.ID, func(value string) bool { return value != "" }),
+			}})
+		case part.FunctionResponse != nil:
+			result.Events = append(result.Events, rpc.RobotRunEvent{RobotRunEventUnion: &rpc.RobotRunToolResultEvent{
+				Type: "tool_result", Name: part.FunctionResponse.Name, Result: ensureRobotRunMap(part.FunctionResponse.Response),
+				CallID: opt.NewIf(part.FunctionResponse.ID, func(value string) bool { return value != "" }),
+			}})
+		}
+	}
+	if finalText.Len() > 0 {
+		result.FinalText = opt.New(finalText.String())
+	}
+}
+
+func ensureRobotRunMap(value map[string]any) map[string]any {
+	if value == nil {
+		return map[string]any{}
+	}
+	return value
+}
+
+func friendlyRobotRunError(err error) string {
+	if message := fmsg.GetIssue(err); message != "" {
+		return message
+	}
+	return err.Error()
 }
 
 func robotRunWorkspaceSpec(in opt.Optional[rpc.RPCRequestRobotRunParamsWorkspace]) opt.Optional[robotservice.WorkspaceMountSpec] {
@@ -141,16 +245,13 @@ func robotRunWorkspaceSpec(in opt.Optional[rpc.RPCRequestRobotRunParamsWorkspace
 		return opt.NewEmpty[robotservice.WorkspaceMountSpec]()
 	}
 
-	spec := robotservice.WorkspaceMountSpec{
-		Metadata: map[string]any{},
-	}
+	spec := robotservice.WorkspaceMountSpec{Metadata: map[string]any{}}
 	if id, ok := workspace.WorkspaceID.Get(); ok {
 		spec.WorkspaceID = opt.New(robotresource.WorkspaceID(id))
 	}
 	if id, ok := workspace.WorkspaceInstanceID.Get(); ok {
 		spec.WorkspaceInstanceID = opt.New(robotresource.WorkspaceInstanceID(id))
 	}
-
 	return opt.New(spec)
 }
 
@@ -167,22 +268,28 @@ func robotRunOutputFromMap(data map[string]any) (rpc.RobotRunOutput, error) {
 		return rpc.RobotRunOutput{}, err
 	}
 	if output.Status == "" {
-		return rpc.RobotRunOutput{}, fmt.Errorf("missing status")
+		return rpc.RobotRunOutput{}, errors.New("missing status")
 	}
 	if strings.TrimSpace(output.Summary) == "" {
-		return rpc.RobotRunOutput{}, fmt.Errorf("missing summary")
+		return rpc.RobotRunOutput{}, errors.New("missing summary")
 	}
 	return output, nil
 }
 
 func setRobotRunFailure(result *rpc.RPCResponseRobotRun, errmsg, summary string) {
 	result.Error = opt.New(errmsg)
-	result.Output = opt.New(rpc.RobotRunOutput{
+	if result.Mode != rpc.RobotRunModeAutomation {
+		return
+	}
+	if strings.TrimSpace(summary) == "" {
+		summary = errmsg
+	}
+	result.Finalization = opt.New(rpc.RobotRunOutput{
 		Status:  rpc.RobotRunStatusFailed,
 		Summary: summary,
 		Attention: opt.New(rpc.RobotRunAttention{
 			Reason:  rpc.RobotRunAttentionReasonError,
-			Message: summary,
+			Message: errmsg,
 		}),
 	})
 }

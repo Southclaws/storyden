@@ -252,7 +252,7 @@ func staticStorydenPluginSearch(query string, maxResults int) StorydenSDKSearchR
 		Symbols: []GoSymbolSummary{},
 		Hints: []StorydenSDKHint{
 			{Message: "Use plugin_storyden_sdk_events for manifest event names, event payload fields, and event handler methods."},
-			{Message: "Use pl.RunRobot(ctx, robotID, message) for robot_run; manifest access.permissions must include USE_ROBOTS."},
+			{Message: "Use pl.RunRobot(ctx, rpc.RPCRequestRobotRunParams{Mode: rpc.RobotRunModeConversation, RobotID: robotID, Messages: messages}) for conversational robot_run calls, or RobotRunModeAutomation for a fresh one-shot run; manifest access.permissions must include USE_ROBOTS."},
 			{Message: "Do not use generated HTTP RobotSessionCreate or Robot session streaming endpoints from plugins; those are for UI clients, not plugin-to-host robot execution."},
 			{Message: "For Storyden host HTTP API calls, use client, err := pl.BuildAPIClient(ctx) and reuse the resulting client where appropriate; do not construct raw API clients from plugin internals."},
 			{Message: "If code uses BuildAPIClient or RunRobot, manifest.yaml must include access with a stable bot account handle, display name, and narrow Storyden permission names for the API operations being called."},

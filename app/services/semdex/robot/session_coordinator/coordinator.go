@@ -53,6 +53,8 @@ type CommandEnqueueMessage struct {
 	SessionID         string                         `json:"session_id"`
 	RobotRef          string                         `json:"robot_ref"`
 	AccountID         string                         `json:"account_id"`
+	History           []*genai.Content               `json:"history,omitempty"`
+	HistoryAuthor     string                         `json:"history_author,omitempty"`
 	Content           *genai.Content                 `json:"content,omitempty"`
 	InvocationContext robotservice.InvocationContext `json:"invocation_context,omitempty"`
 	Options           robotservice.RunOptions        `json:"options"`
@@ -184,13 +186,43 @@ func (c *Coordinator) Run(
 	invocationContext robotservice.InvocationContext,
 	options ...robotservice.RunOptions,
 ) iter.Seq2[*adksession.Event, error] {
+	return c.run(ctx, robotRef, userID, sessionID, nil, content, invocationContext, options...)
+}
+
+func (c *Coordinator) RunMessages(
+	ctx context.Context,
+	robotRef string,
+	userID,
+	sessionID string,
+	contents []*genai.Content,
+	invocationContext robotservice.InvocationContext,
+	options ...robotservice.RunOptions,
+) iter.Seq2[*adksession.Event, error] {
+	if len(contents) == 0 {
+		return func(yield func(*adksession.Event, error) bool) {
+			yield(nil, errors.New("Robot run requires at least one message"))
+		}
+	}
+	return c.run(ctx, robotRef, userID, sessionID, contents[:len(contents)-1], contents[len(contents)-1], invocationContext, options...)
+}
+
+func (c *Coordinator) run(
+	ctx context.Context,
+	robotRef string,
+	userID,
+	sessionID string,
+	history []*genai.Content,
+	content *genai.Content,
+	invocationContext robotservice.InvocationContext,
+	options ...robotservice.RunOptions,
+) iter.Seq2[*adksession.Event, error] {
 	return func(yield func(*adksession.Event, error) bool) {
 		inputID := xid.New()
 		var runOptions robotservice.RunOptions
 		if len(options) > 0 {
 			runOptions = options[0]
 		}
-		command, err := c.prepareInput(ctx, inputID, robotRef, userID, sessionID, content, invocationContext, runOptions)
+		command, err := c.prepareInput(ctx, inputID, robotRef, userID, sessionID, history, content, invocationContext, runOptions)
 		if err != nil {
 			yield(nil, err)
 			return
@@ -293,7 +325,7 @@ func (c *Coordinator) Enqueue(
 	if len(options) > 0 {
 		runOptions = options[0]
 	}
-	command, err := c.prepareInput(ctx, xid.ID(inputID), robotRef, userID, sessionID, content, invocationContext, runOptions)
+	command, err := c.prepareInput(ctx, xid.ID(inputID), robotRef, userID, sessionID, nil, content, invocationContext, runOptions)
 	if err != nil {
 		return robotresource.InputID{}, err
 	}
@@ -323,6 +355,7 @@ func (c *Coordinator) prepareInput(
 	robotRef,
 	userID,
 	sessionID string,
+	history []*genai.Content,
 	content *genai.Content,
 	invocationContext robotservice.InvocationContext,
 	options robotservice.RunOptions,
@@ -330,11 +363,21 @@ func (c *Coordinator) prepareInput(
 	if err := c.agent.PrepareSession(ctx, robotRef, userID, sessionID); err != nil {
 		return nil, err
 	}
+	historyAuthor := ""
+	if len(history) > 0 {
+		var err error
+		historyAuthor, err = c.agent.AgentName(ctx, robotRef)
+		if err != nil {
+			return nil, err
+		}
+	}
 	command := &CommandEnqueueMessage{
 		InputID:           inputID,
 		SessionID:         sessionID,
 		RobotRef:          robotRef,
 		AccountID:         userID,
+		History:           history,
+		HistoryAuthor:     historyAuthor,
 		Content:           content,
 		InvocationContext: invocationContext,
 		Options:           options,
@@ -373,7 +416,7 @@ func (c *Coordinator) handleEnqueueMessage(ctx context.Context, command *Command
 		return err
 	}
 	batchKey := string(keyData)
-	if continuation {
+	if continuation || command.Options.Source == robotservice.SourcePluginRPC {
 		batchKey += ":" + command.InputID.String()
 	}
 
@@ -386,9 +429,15 @@ func (c *Coordinator) handleEnqueueMessage(ctx context.Context, command *Command
 		})
 	}
 	if err := c.sessions.EnqueueInput(ctx, robot_session.EnqueueInputParams{
-		ID: robotresource.InputID(command.InputID), SessionID: robotresource.SessionID(sessionXID),
-		AccountID: account.AccountID(accountXID), SourceKind: sourceKind,
-		BatchKey: batchKey, InputData: encoded, NotBefore: opt.NewIf(command.Options.NotBefore, func(value time.Time) bool { return !value.IsZero() }), VisibleEvent: visible,
+		ID:            robotresource.InputID(command.InputID),
+		SessionID:     robotresource.SessionID(sessionXID),
+		AccountID:     account.AccountID(accountXID),
+		SourceKind:    sourceKind,
+		BatchKey:      batchKey,
+		InputData:     encoded,
+		NotBefore:     opt.NewIf(command.Options.NotBefore, func(value time.Time) bool { return !value.IsZero() }),
+		HistoryEvents: importedHistoryEvents(command.InputID, command.HistoryAuthor, command.History),
+		VisibleEvent:  visible,
 	}); err != nil {
 		return err
 	}
@@ -399,6 +448,25 @@ func (c *Coordinator) handleEnqueueMessage(ctx context.Context, command *Command
 		return nil
 	}
 	return c.bus.SendCommand(context.WithoutCancel(ctx), &CommandStartNextTurn{SessionID: command.SessionID})
+}
+
+func importedHistoryEvents(inputID xid.ID, assistantAuthor string, contents []*genai.Content) []*adksession.Event {
+	events := make([]*adksession.Event, 0, len(contents))
+	for _, content := range contents {
+		if content == nil {
+			continue
+		}
+		author := "user"
+		if content.Role == genai.RoleModel {
+			author = assistantAuthor
+		}
+		events = append(events, &adksession.Event{
+			InvocationID: inputID.String(),
+			Author:       author,
+			LLMResponse:  model.LLMResponse{Content: content},
+		})
+	}
+	return events
 }
 
 func shouldProjectUserInput(command *CommandEnqueueMessage, continuation bool) bool {
@@ -635,6 +703,9 @@ func (c *Coordinator) executeTurn(ctx context.Context, command *turnCommand) err
 
 	runCtx, cancel := context.WithCancel(robot_session.WithExecutionLease(ctx, *lease))
 	runCtx = authsession.WithAccountPermissions(runCtx, *initiator, initiator.Roles.Permissions())
+	if command.Options.Source == "" || command.Options.Source == robotservice.SourceInteractiveChat {
+		command.Content = robotservice.ContentWithStorydenSpeaker(command.Content, initiator)
+	}
 	runCtx = robotservice.WithInternalInvocationEnqueuer(runCtx, func(enqueueCtx context.Context, invocation robotservice.InternalInvocation) error {
 		robotRef := invocation.RobotRef
 		if robotRef == "" {

@@ -98,6 +98,7 @@ type RunMode = agent_registry.RunMode
 
 const (
 	ModeInteractive RunMode = agent_registry.ModeInteractive
+	ModeHeadless    RunMode = agent_registry.ModeHeadless
 	ModeUnattended  RunMode = agent_registry.ModeUnattended
 )
 
@@ -170,7 +171,7 @@ func New(
 			// We don't use streaming, it's cliche as fuck.
 			StreamingMode: agent.StreamingModeNone,
 		},
-		beforeModelCallbacks: []llmagent.BeforeModelCallback{agent_history.RepairInterruptedToolCallsBeforeModel(logger), normalizeClientToolResultsBeforeModel(logger, cfg.PublicWebAddress), logBeforeModel(logger)},
+		beforeModelCallbacks: []llmagent.BeforeModelCallback{agent_history.RepairInterruptedToolCallsBeforeModel(logger), normalizeClientToolResultsBeforeModel(logger, cfg.PublicWebAddress), projectMessageSpeakersBeforeModel(), logBeforeModel(logger)},
 		afterModelCallbacks:  []llmagent.AfterModelCallback{logAfterModel(logger)},
 		beforeToolCallbacks:  []llmagent.BeforeToolCallback{logBeforeTool(logger)},
 		afterToolCallbacks:   []llmagent.AfterToolCallback{logAfterTool(logger)},
@@ -220,6 +221,14 @@ func (s *Agent) PrepareSession(ctx context.Context, robotRef, userID, sessionID 
 		return err
 	}
 	return s.sessionRepo.EnsureView(ctx, robot.SessionID(sessionXID), account.AccountID(accountXID))
+}
+
+func (s *Agent) AgentName(ctx context.Context, robotRef string) (string, error) {
+	spec, err := s.resolveAgentSpec(ctx, strings.TrimSpace(robotRef))
+	if err != nil {
+		return "", err
+	}
+	return spec.AgentName, nil
 }
 
 func errorSeq(err error) iter.Seq2[*adksession.Event, error] {
@@ -341,7 +350,7 @@ func (s *Agent) runResolvedAgent(
 		AccountID: userID,
 		SessionID: sessionID,
 	})
-	if runOptions.Mode == ModeUnattended {
+	if isHeadlessMode(runOptions.Mode) {
 		toolCtx = tools.ContextWithConfirmationDisabled(toolCtx)
 	}
 
@@ -589,8 +598,8 @@ func interceptClientSideTools(logger *slog.Logger, registry *tools.Registry, opt
 	return func(ctx agent.Context, tool adktool.Tool, args map[string]any) (map[string]any, error) {
 		registered, isRegistered := registry.FindByADKName(tool.Name())
 		if isRegistered && registered.IsClientTool {
-			if options.Mode == ModeUnattended {
-				logger.Info("blocking client-side tool in unattended run",
+			if isHeadlessMode(options.Mode) {
+				logger.Info("blocking client-side tool in headless run",
 					slog.String("tool_name", tool.Name()),
 					slog.String("call_id", ctx.FunctionCallID()))
 
@@ -618,6 +627,10 @@ func interceptClientSideTools(logger *slog.Logger, registry *tools.Registry, opt
 		// Not a client-side tool, continue to next callback
 		return nil, nil
 	}
+}
+
+func isHeadlessMode(mode RunMode) bool {
+	return mode == ModeHeadless || mode == ModeUnattended
 }
 
 func (s *Agent) ensureSession(ctx context.Context, robotName, rootRobotRef, userID, sessionID string, options ...robot_session.CreateOption) error {

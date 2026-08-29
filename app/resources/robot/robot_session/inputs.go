@@ -25,14 +25,15 @@ import (
 var ErrNoQueuedInputs = errors.New("robot session has no queued inputs")
 
 type EnqueueInputParams struct {
-	ID           robot.InputID
-	SessionID    robot.SessionID
-	AccountID    account.AccountID
-	SourceKind   string
-	BatchKey     string
-	InputData    json.RawMessage
-	NotBefore    opt.Optional[time.Time]
-	VisibleEvent opt.Optional[*adksession.Event]
+	ID            robot.InputID
+	SessionID     robot.SessionID
+	AccountID     account.AccountID
+	SourceKind    string
+	BatchKey      string
+	InputData     json.RawMessage
+	NotBefore     opt.Optional[time.Time]
+	HistoryEvents []*adksession.Event
+	VisibleEvent  opt.Optional[*adksession.Event]
 }
 
 // EnqueueInput durably records one submission and, for human messages, appends
@@ -42,6 +43,30 @@ func (q *Repository) EnqueueInput(ctx context.Context, params EnqueueInputParams
 		return value.UTC()
 	})
 	err := ent.WithTx(ctx, q.db, func(tx *ent.Tx) error {
+		for _, event := range params.HistoryEvents {
+			if event == nil {
+				continue
+			}
+			sequence, err := allocateSessionEventSequence(ctx, tx, params.SessionID, nil)
+			if err != nil {
+				return err
+			}
+			if err := saveMessage(
+				ctx,
+				tx.RobotSessionMessage.Create(),
+				params.SessionID,
+				opt.NewEmpty[account.AccountID](),
+				opt.NewEmpty[robot.Actor](),
+				event,
+				sequence,
+				nil,
+				ent_robot_session_message.EventKindMessage,
+				false,
+			); err != nil {
+				return err
+			}
+		}
+
 		sequence, err := allocateSessionEventSequence(ctx, tx, params.SessionID, nil)
 		if err != nil {
 			return err

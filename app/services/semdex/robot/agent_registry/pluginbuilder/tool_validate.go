@@ -209,7 +209,7 @@ func validationGoFailureNextAction(result ValidateResult) string {
 		case strings.Contains(text, "robotrunwithresponse") ||
 			strings.Contains(text, "robotsessioncreatewithresponse") ||
 			strings.Contains(text, "robotsessioncreate"):
-			return "Replace generated HTTP robot chat calls with pl.RunRobot(ctx, robotID, message), ensure manifest access.permissions includes USE_ROBOTS, then rerun plugin_validate."
+			return "Replace generated HTTP robot chat calls with pl.RunRobot(ctx, rpc.RPCRequestRobotRunParams{...}), ensure manifest access.permissions includes USE_ROBOTS, then rerun plugin_validate."
 		case strings.Contains(text, "undefined") ||
 			strings.Contains(text, "unknown field") ||
 			strings.Contains(text, "has no field or method"):

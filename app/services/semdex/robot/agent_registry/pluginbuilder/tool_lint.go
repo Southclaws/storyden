@@ -138,7 +138,7 @@ func lintUnsupportedStorydenSDKCall(path string, fset *token.FileSet, call *ast.
 		return PluginLintIssue{
 			Path:    path,
 			Line:    fset.Position(selector.Sel.Pos()).Line,
-			Message: "Storyden generated HTTP API has no RobotRunWithResponse plugin API; use pl.RunRobot(ctx, robotID, message) and add USE_ROBOTS access instead",
+			Message: "Storyden generated HTTP API has no RobotRunWithResponse plugin API; use pl.RunRobot(ctx, rpc.RPCRequestRobotRunParams{...}) and add USE_ROBOTS access instead",
 		}, true
 	case "RobotSessionCreate", "RobotSessionCreateWithResponse",
 		"RobotSessionStream", "RobotSessionStreamWithResponse",
@@ -147,7 +147,7 @@ func lintUnsupportedStorydenSDKCall(path string, fset *token.FileSet, call *ast.
 		return PluginLintIssue{
 			Path:    path,
 			Line:    fset.Position(selector.Sel.Pos()).Line,
-			Message: "Storyden Robot session streaming APIs are UI endpoints, not plugin-to-host robot execution; use pl.RunRobot(ctx, robotID, message) and use the returned summary",
+			Message: "Storyden Robot session streaming APIs are UI endpoints, not plugin-to-host robot execution; use pl.RunRobot(ctx, rpc.RPCRequestRobotRunParams{...}) and inspect the typed result",
 		}, true
 	default:
 		return PluginLintIssue{}, false

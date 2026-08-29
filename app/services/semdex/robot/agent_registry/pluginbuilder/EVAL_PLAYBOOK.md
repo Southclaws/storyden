@@ -269,7 +269,7 @@ A passing eval should show:
 
 For Robot integration specifically:
 
-- Correct: `pl.RunRobot(ctx, robotID, message)`.
+- Correct: `pl.RunRobot(ctx, rpc.RPCRequestRobotRunParams{Mode: rpc.RobotRunModeConversation, RobotID: robotID, Messages: messages})`.
 - Incorrect: generated HTTP `RobotSessionCreate`, `RobotSessionCreateWithResponse`,
   `RobotRunWithResponse`, or manually parsing UI chat streams from a plugin.
 - Manifest access includes `USE_ROBOTS` when the plugin calls `RunRobot`.
