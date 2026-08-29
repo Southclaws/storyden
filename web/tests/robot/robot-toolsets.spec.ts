@@ -17,6 +17,13 @@ test.describe("Robot Toolsets", () => {
     const name = `Research tools ${suffix}`;
     const robotName = `Research robot ${suffix}`;
     const updatedDescription = "Reusable tools for focused research tasks.";
+    const selectedPickerValue = (pickerName: string, value: string) =>
+      page
+        .getByRole("group")
+        .filter({
+          has: page.getByRole("combobox", { name: pickerName }),
+        })
+        .getByText(value, { exact: true });
 
     await expect(page.getByRole("heading", { name: "Toolsets" })).toBeVisible();
     const newToolsetLink = page
@@ -35,27 +42,25 @@ test.describe("Robot Toolsets", () => {
       .getByRole("textbox", { name: "Instructions" })
       .fill("Verify sources before reporting findings.");
     await page.getByRole("button", { name: "Select Tools" }).click();
-    const toolsMenu = page.getByRole("menu", { name: "Select Tools" });
-    await toolsMenu
-      .getByRole("textbox", { name: "Search for items" })
+    await page
+      .getByRole("combobox", { name: "Select Tools" })
       .fill("List Categories");
-    await page.getByRole("menuitem", { name: "List Categories" }).click();
+    await page
+      .getByRole("listbox")
+      .getByRole("option", { name: "List Categories", exact: true })
+      .click();
     await page.getByRole("button", { name: "Create" }).click();
 
     await expect(page).toHaveURL(/\/robots\/toolsets\/(?!new$)[^/]+$/);
     await expect(page.getByRole("heading", { name })).toBeVisible();
     await expect(page.getByRole("textbox", { name: "Name" })).toHaveValue(name);
     await expect(
-      page
-        .getByRole("button", { name: "Select Tools" })
-        .getByText("List Categories"),
+      selectedPickerValue("Select Tools", "List Categories"),
     ).toBeVisible();
 
     await page.reload();
     await expect(
-      page
-        .getByRole("button", { name: "Select Tools" })
-        .getByText("List Categories"),
+      selectedPickerValue("Select Tools", "List Categories"),
     ).toBeVisible();
 
     await page
@@ -75,43 +80,34 @@ test.describe("Robot Toolsets", () => {
       .fill("Use the shared Toolset first, then search members when needed.");
 
     await page.getByRole("button", { name: "Select Toolsets" }).click();
-    const toolsetMenu = page.getByRole("menu", { name: "Select Toolsets" });
-    await toolsetMenu
-      .getByRole("textbox", { name: "Search for items" })
-      .fill(name);
-    await toolsetMenu.getByRole("menuitem", { name }).click();
+    await page.getByRole("combobox", { name: "Select Toolsets" }).fill(name);
+    await page
+      .getByRole("listbox")
+      .getByRole("option", { name, exact: true })
+      .click();
+    await page.keyboard.press("Escape");
 
     await page.getByRole("button", { name: "Select individual tools" }).click();
-    const individualToolMenu = page.getByRole("menu", {
-      name: "Select individual tools",
-    });
-    await individualToolMenu
-      .getByRole("textbox", { name: "Search for items" })
+    await page
+      .getByRole("combobox", { name: "Select individual tools" })
       .fill("Member Search");
-    await individualToolMenu
-      .getByRole("menuitem", { name: "Member Search" })
+    await page
+      .getByRole("listbox")
+      .getByRole("option", { name: "Member Search", exact: true })
       .click();
     await page.getByRole("button", { name: "Create" }).click();
 
     await expect(page).toHaveURL(/\/robots\/(?!new$)[^/]+$/);
     await expect(page.getByRole("heading", { name: robotName })).toBeVisible();
+    await expect(selectedPickerValue("Select Toolsets", name)).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Select Toolsets" }).getByText(name),
-    ).toBeVisible();
-    await expect(
-      page
-        .getByRole("button", { name: "Select individual tools" })
-        .getByText("Member Search"),
+      selectedPickerValue("Select individual tools", "Member Search"),
     ).toBeVisible();
 
     await page.reload();
+    await expect(selectedPickerValue("Select Toolsets", name)).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Select Toolsets" }).getByText(name),
-    ).toBeVisible();
-    await expect(
-      page
-        .getByRole("button", { name: "Select individual tools" })
-        .getByText("Member Search"),
+      selectedPickerValue("Select individual tools", "Member Search"),
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Delete robot" }).click();
