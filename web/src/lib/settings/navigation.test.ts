@@ -21,8 +21,8 @@ test("missing navigation configuration uses the current sidebar", () => {
   );
 });
 
-test("robots is available as a built-in navigation item", () => {
-  assert.ok(
+test("robots is available as an optional built-in navigation item", () => {
+  assert.not.ok(
     DefaultNavigationConfig.items.some((item) => item.type === "robots"),
   );
 
@@ -44,12 +44,11 @@ test("new thread is the first default item and can be added", () => {
   ]);
 });
 
-test("Trails is not part of the top-level navigation", () => {
+test("the default navigation contains only first-class items", () => {
   assert.equal(DefaultNavigationConfig.items, [
     { type: "compose" },
     { type: "categories" },
     { type: "library" },
-    { type: "robots" },
     { type: "collections" },
     { type: "links" },
     { type: "members" },
