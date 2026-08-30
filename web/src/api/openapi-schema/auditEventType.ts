@@ -24,4 +24,6 @@ export const AuditEventType = {
   account_warning_deleted: "account_warning_deleted",
   account_password_reset_token_issued: "account_password_reset_token_issued",
   account_password_reset_email_sent: "account_password_reset_email_sent",
+  theme_published: "theme_published",
+  theme_disabled: "theme_disabled",
 } as const;

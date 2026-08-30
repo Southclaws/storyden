@@ -209,6 +209,7 @@ export function NavigationChrome({
         onClick={handleDrawerClick}
         role={isMobileNavigationModal ? "dialog" : undefined}
         tabIndex={-1}
+        data-sd-region="sidebar"
       >
         <div className="navigation__sidebar-top">
           <div
@@ -248,7 +249,7 @@ export function NavigationChrome({
         <div className="navigation__sidebar-bottom">{sidebarBottom}</div>
       </div>
 
-      <div className="navigation__mobile-topbar">
+      <div className="navigation__mobile-topbar" data-sd-region="topbar">
         <MobileCommandBar
           isOpen={isMobileNavigationOpen}
           onClose={closeMobileNavigation}

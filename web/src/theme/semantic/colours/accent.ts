@@ -7,14 +7,16 @@ export const accent = {
   },
   solid: {
     value: {
-      _osLight: "var(--accent-colour-flat-fill-400)",
-      _osDark: "var(--accent-colour-dark-fill-500)",
+      _osLight: "var(--sd-color-accent, var(--accent-colour-flat-fill-400))",
+      _osDark: "var(--sd-color-accent, var(--accent-colour-dark-fill-500))",
     },
   },
   solidForeground: {
     value: {
-      _osLight: "var(--accent-colour-flat-text-400)",
-      _osDark: "var(--accent-colour-dark-text-500)",
+      _osLight:
+        "var(--sd-color-accent-foreground, var(--accent-colour-flat-text-400))",
+      _osDark:
+        "var(--sd-color-accent-foreground, var(--accent-colour-dark-text-500))",
     },
   },
   subtle: {

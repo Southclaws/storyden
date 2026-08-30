@@ -34,4 +34,14 @@ func TestWithAssetSecurityHeaders(t *testing.T) {
 		assert.Empty(t, rec.Header().Get("X-Content-Type-Options"))
 		assert.Empty(t, rec.Header().Get("Content-Security-Policy"))
 	})
+
+	t.Run("neutralises active content on theme asset responses", func(t *testing.T) {
+		t.Parallel()
+
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/api/info/theme/assets/custom-js", nil))
+
+		assert.Equal(t, "nosniff", rec.Header().Get("X-Content-Type-Options"))
+		assert.Equal(t, "default-src 'none'; sandbox", rec.Header().Get("Content-Security-Policy"))
+	})
 }

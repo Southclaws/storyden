@@ -75,6 +75,18 @@ Storyden also derives trusted SSR source addresses from `PROXY_FRONTEND_ADDRESS`
 - `localhost` trusts both `127.0.0.1/32` and `::1/128`
 - literal IP hosts are trusted automatically
 
+### `CUSTOM_THEMES_DISABLE`
+
+<table>
+<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
+<tr><td>default</td><td>`false`</td></tr>
+</table>
+
+Emergency kill switch for installation custom themes. When enabled,
+the public theme manifest is empty and the reference frontend loads no
+custom CSS or JavaScript. The configured manifest is preserved so it
+can be inspected, replaced, or re-enabled later.
+
 ## Development tools
 
 Configuration settings for aiding in development of Storyden clients.

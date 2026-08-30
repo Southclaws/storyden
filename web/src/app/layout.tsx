@@ -4,6 +4,7 @@ import { PropsWithChildren } from "react";
 import { inter, interDisplay } from "@/app/fonts";
 import { serverEnvironment } from "@/config";
 import { getSettings } from "@/lib/settings/settings-server";
+import { getServerThemeManifest } from "@/lib/theme/theme-server";
 import { getColourAsHex } from "@/utils/colour";
 import { getIconURL } from "@/utils/icon";
 
@@ -14,8 +15,15 @@ import { Providers } from "./providers";
 const { API_ADDRESS, WEB_ADDRESS } = serverEnvironment();
 
 export default async function RootLayout({ children }: PropsWithChildren) {
+  const theme = await getServerThemeManifest();
+
   return (
-    <html lang="en" className={`${inter.variable} ${interDisplay.variable}`}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${interDisplay.variable}`}
+      data-sd-theme-api="v1"
+      data-sd-theme-revision={theme.revision || undefined}
+    >
       <head>
         {/*
           NOTE: Because the browser side does not support dynamic environment
@@ -36,6 +44,29 @@ export default async function RootLayout({ children }: PropsWithChildren) {
         */}
         {/* eslint-disable-next-line @next/next/no-css-tags */}
         <link rel="stylesheet" href="/theme.css" />
+
+        {theme.stylesheets.map((asset) => (
+          // eslint-disable-next-line @next/next/no-css-tags
+          <link
+            key={asset.id}
+            rel="stylesheet"
+            href={asset.href}
+            integrity={asset.integrity}
+            crossOrigin="anonymous"
+            data-sd-theme-asset="stylesheet"
+          />
+        ))}
+
+        {theme.scripts.map((asset) => (
+          <script
+            key={asset.id}
+            src={asset.href}
+            integrity={asset.integrity}
+            crossOrigin="anonymous"
+            defer
+            data-sd-theme-asset="script"
+          />
+        ))}
       </head>
 
       <body>

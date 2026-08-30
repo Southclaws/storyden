@@ -2,6 +2,7 @@ package asset_querier
 
 import (
 	"context"
+	"time"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -14,6 +15,18 @@ import (
 
 type Querier struct {
 	db *ent.Client
+}
+
+func (q *Querier) ListOlderThan(ctx context.Context, cutoff time.Time) ([]*asset.Asset, error) {
+	rows, err := q.db.Asset.Query().Where(ent_asset.CreatedAtLT(cutoff)).All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	out := make([]*asset.Asset, 0, len(rows))
+	for _, row := range rows {
+		out = append(out, asset.Map(row))
+	}
+	return out, nil
 }
 
 func New(db *ent.Client) *Querier {

@@ -65,10 +65,19 @@
   --navigation-content-width-max: var(--navigation-content-width-default);
   --navigation-shell-resize-duration: var(--durations-normal);
   --navigation-shell-resize-easing: var(--easings-default);
-  --navigation-shell-viewport-padding: var(--spacing-2);
-  --navigation-shell-viewport-padding-desktop: var(--spacing-4);
-  --navigation-shell-viewport-padding-wide: var(--spacing-6);
-  --navigation-sidebar-width: 18rem;
+  --navigation-shell-viewport-padding: var(
+    --sd-gutter-mobile,
+    var(--spacing-2)
+  );
+  --navigation-shell-viewport-padding-desktop: var(
+    --sd-gutter-tablet,
+    var(--spacing-4)
+  );
+  --navigation-shell-viewport-padding-wide: var(
+    --sd-gutter-desktop,
+    var(--spacing-6)
+  );
+  --navigation-sidebar-width: var(--sd-sidebar-width, 18rem);
   --navigation-sidebar-width-desktop: 16rem;
   --navigation-sidebar-width-wide: 18rem;
   --navigation-content-column-gap: var(--spacing-8);
@@ -173,6 +182,10 @@ body {
 
 html {
   overflow-x: clip;
+}
+
+:focus-visible {
+  outline-color: var(--sd-color-focus-ring, var(--colors-border-strong));
 }
 
 body {

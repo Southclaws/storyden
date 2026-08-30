@@ -15,6 +15,9 @@ import type {
   GetSessionOKResponse,
   GetSpec200,
   InternalServerErrorResponse,
+  NotFoundResponse,
+  ThemeAssetGetOKResponse,
+  ThemeGetOKResponse,
   UnauthorisedResponse,
 } from "../openapi-schema";
 import { fetcher } from "../server";
@@ -399,6 +402,97 @@ export const bannerUpload = async (
     },
     body: assetUploadBody,
   });
+};
+
+export type themeGetResponse200 = {
+  data: ThemeGetOKResponse;
+  status: 200;
+};
+
+export type themeGetResponse304 = {
+  data: void;
+  status: 304;
+};
+
+export type themeGetResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 304>;
+};
+
+export type themeGetResponseSuccess = themeGetResponse200 & {
+  headers: Headers;
+};
+export type themeGetResponseError = (
+  themeGetResponse304 | themeGetResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getThemeGetUrl = () => {
+  return `/info/theme`;
+};
+
+/**
+ * Get the active installation custom theme manifest.
+ */
+export const themeGet = async (
+  options?: Parameters<typeof fetcher>[1],
+): Promise<themeGetResponseSuccess> => {
+  return fetcher<themeGetResponseSuccess>(getThemeGetUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export type themeAssetGetResponse200 = {
+  data: ThemeAssetGetOKResponse;
+  status: 200;
+};
+
+export type themeAssetGetResponse304 = {
+  data: void;
+  status: 304;
+};
+
+export type themeAssetGetResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type themeAssetGetResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 304 | 404>;
+};
+
+export type themeAssetGetResponseSuccess = themeAssetGetResponse200 & {
+  headers: Headers;
+};
+export type themeAssetGetResponseError = (
+  | themeAssetGetResponse304
+  | themeAssetGetResponse404
+  | themeAssetGetResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getThemeAssetGetUrl = (assetFilename: string) => {
+  return `/info/theme/assets/${assetFilename}`;
+};
+
+/**
+ * Download an immutable custom theme stylesheet or script.
+ */
+export const themeAssetGet = async (
+  assetFilename: string,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<themeAssetGetResponseSuccess> => {
+  return fetcher<themeAssetGetResponseSuccess>(
+    getThemeAssetGetUrl(assetFilename),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
 };
 
 export type sendBeaconResponse202 = {

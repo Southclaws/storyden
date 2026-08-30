@@ -26,6 +26,7 @@ export * from './color-picker';
 export * from './combobox';
 export * from './menu';
 export * from './file-upload';
+export * from './floating-panel';
 export * from './popover';
 export * from './progress';
 export * from './page-header';

@@ -20,6 +20,12 @@ import type {
   AdminSettingsGetOKResponse,
   AdminSettingsUpdateBody,
   AdminSettingsUpdateOKResponse,
+  AdminThemeAssetUploadOKResponse,
+  AdminThemeAssetUploadParams,
+  AdminThemeGetOKResponse,
+  AdminThemeUpdateBody,
+  AdminThemeUpdateOKResponse,
+  AssetUploadBody,
   AuditEventCreatedOKResponse,
   AuditEventGetOKResponse,
   AuditEventListOKResponse,
@@ -150,6 +156,329 @@ export const useAdminSettingsUpdate = <
 
   const swrKey = swrOptions?.swrKey ?? getAdminSettingsUpdateMutationKey();
   const swrFn = getAdminSettingsUpdateMutationFetcher(requestOptions);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getAdminThemeGetUrl = () => {
+  return `/admin/theme`;
+};
+
+/**
+ * Get the configured custom theme, including runtime-disabled state.
+ */
+export const adminThemeGet = async (
+  options?: Parameters<typeof fetcher>[1],
+): Promise<AdminThemeGetOKResponse> => {
+  return fetcher<AdminThemeGetOKResponse>(getAdminThemeGetUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getAdminThemeGetKey = () => [`/admin/theme`] as const;
+
+export type AdminThemeGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminThemeGet>>
+>;
+
+export const useAdminThemeGet = <
+  TError =
+    UnauthorisedResponse | ForbiddenResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRConfiguration<Awaited<ReturnType<typeof adminThemeGet>>, TError> & {
+    swrKey?: Key;
+    enabled?: boolean;
+  };
+  request?: SecondParameter<typeof fetcher>;
+}) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ?? (() => (isEnabled ? getAdminThemeGetKey() : null));
+  const swrFn = () => adminThemeGet(requestOptions);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getAdminThemeUpdateUrl = () => {
+  return `/admin/theme`;
+};
+
+/**
+ * Atomically replace the active custom theme manifest.
+ */
+export const adminThemeUpdate = async (
+  adminThemeUpdateBody: AdminThemeUpdateBody,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<AdminThemeUpdateOKResponse> => {
+  return fetcher<AdminThemeUpdateOKResponse>(getAdminThemeUpdateUrl(), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(adminThemeUpdateBody),
+  });
+};
+
+export const getAdminThemeUpdateMutationFetcher = (
+  options?: SecondParameter<typeof fetcher>,
+) => {
+  return (_: Key, { arg }: { arg: AdminThemeUpdateBody }) => {
+    return adminThemeUpdate(arg, options);
+  };
+};
+export const getAdminThemeUpdateMutationKey = () => [`/admin/theme`] as const;
+
+export type AdminThemeUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminThemeUpdate>>
+>;
+
+export const useAdminThemeUpdate = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof adminThemeUpdate>>,
+    TError,
+    Key,
+    AdminThemeUpdateBody,
+    Awaited<ReturnType<typeof adminThemeUpdate>>
+  > & { swrKey?: string };
+  request?: SecondParameter<typeof fetcher>;
+}) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getAdminThemeUpdateMutationKey();
+  const swrFn = getAdminThemeUpdateMutationFetcher(requestOptions);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getAdminThemeDeleteUrl = () => {
+  return `/admin/theme`;
+};
+
+/**
+ * Disable the active custom theme without deleting its assets.
+ */
+export const adminThemeDelete = async (
+  options?: Parameters<typeof fetcher>[1],
+): Promise<NoContentResponse> => {
+  return fetcher<NoContentResponse>(getAdminThemeDeleteUrl(), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getAdminThemeDeleteMutationFetcher = (
+  options?: SecondParameter<typeof fetcher>,
+) => {
+  return (_: Key, __: { arg: Arguments }) => {
+    return adminThemeDelete(options);
+  };
+};
+export const getAdminThemeDeleteMutationKey = () => [`/admin/theme`] as const;
+
+export type AdminThemeDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminThemeDelete>>
+>;
+
+export const useAdminThemeDelete = <
+  TError =
+    UnauthorisedResponse | ForbiddenResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof adminThemeDelete>>,
+    TError,
+    Key,
+    Arguments,
+    Awaited<ReturnType<typeof adminThemeDelete>>
+  > & { swrKey?: string };
+  request?: SecondParameter<typeof fetcher>;
+}) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getAdminThemeDeleteMutationKey();
+  const swrFn = getAdminThemeDeleteMutationFetcher(requestOptions);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getAdminThemeAssetUploadUrl = (
+  params?: AdminThemeAssetUploadParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/admin/theme/assets?${stringifiedParams}`
+    : `/admin/theme/assets`;
+};
+
+/**
+ * Upload an immutable custom theme stylesheet or script.
+ */
+export const adminThemeAssetUpload = async (
+  assetUploadBody?: AssetUploadBody,
+  params?: AdminThemeAssetUploadParams,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<AdminThemeAssetUploadOKResponse> => {
+  return fetcher<AdminThemeAssetUploadOKResponse>(
+    getAdminThemeAssetUploadUrl(params),
+    {
+      ...options,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/octet-stream",
+        ...options?.headers,
+      },
+      body: assetUploadBody,
+    },
+  );
+};
+
+export const getAdminThemeAssetUploadMutationFetcher = (
+  params?: AdminThemeAssetUploadParams,
+  options?: SecondParameter<typeof fetcher>,
+) => {
+  return (_: Key, { arg }: { arg: AssetUploadBody | undefined }) => {
+    return adminThemeAssetUpload(arg, params, options);
+  };
+};
+export const getAdminThemeAssetUploadMutationKey = (
+  params?: AdminThemeAssetUploadParams,
+) => [`/admin/theme/assets`, ...(params ? [params] : [])] as const;
+
+export type AdminThemeAssetUploadMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminThemeAssetUpload>>
+>;
+
+export const useAdminThemeAssetUpload = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
+>(
+  params?: AdminThemeAssetUploadParams,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof adminThemeAssetUpload>>,
+      TError,
+      Key,
+      AssetUploadBody | undefined,
+      Awaited<ReturnType<typeof adminThemeAssetUpload>>
+    > & { swrKey?: string };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getAdminThemeAssetUploadMutationKey(params);
+  const swrFn = getAdminThemeAssetUploadMutationFetcher(params, requestOptions);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getAdminThemeAssetDeleteUrl = (assetFilename: string) => {
+  return `/admin/theme/assets/${assetFilename}`;
+};
+
+/**
+ * Delete an inactive custom theme asset.
+ */
+export const adminThemeAssetDelete = async (
+  assetFilename: string,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<NoContentResponse> => {
+  return fetcher<NoContentResponse>(
+    getAdminThemeAssetDeleteUrl(assetFilename),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};
+
+export const getAdminThemeAssetDeleteMutationFetcher = (
+  assetFilename: string,
+  options?: SecondParameter<typeof fetcher>,
+) => {
+  return (_: Key, __: { arg: Arguments }) => {
+    return adminThemeAssetDelete(assetFilename, options);
+  };
+};
+export const getAdminThemeAssetDeleteMutationKey = (assetFilename: string) =>
+  [`/admin/theme/assets/${assetFilename}`] as const;
+
+export type AdminThemeAssetDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminThemeAssetDelete>>
+>;
+
+export const useAdminThemeAssetDelete = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  assetFilename: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof adminThemeAssetDelete>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof adminThemeAssetDelete>>
+    > & { swrKey?: string };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getAdminThemeAssetDeleteMutationKey(assetFilename);
+  const swrFn = getAdminThemeAssetDeleteMutationFetcher(
+    assetFilename,
+    requestOptions,
+  );
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

@@ -42,6 +42,34 @@ func (m *Mapping) BannerUpload() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageSettings
 }
 
+func (m *Mapping) ThemeGet() (bool, *rbac.Permission) {
+	return false, nil
+}
+
+func (m *Mapping) ThemeAssetGet() (bool, *rbac.Permission) {
+	return false, nil
+}
+
+func (m *Mapping) AdminThemeGet() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) AdminThemeUpdate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) AdminThemeDelete() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) AdminThemeAssetUpload() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) AdminThemeAssetDelete() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
 func (m *Mapping) SendBeacon() (bool, *rbac.Permission) {
 	return false, nil // Public
 }

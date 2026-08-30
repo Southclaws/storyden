@@ -2984,27 +2984,27 @@ const tokens = {
     "variable": "var(--colors-background-gradient-v)"
   },
   "radii.control": {
-    "value": "var(--radii-sm)",
+    "value": "var(--sd-radius-control, var(--radii-sm))",
     "variable": "var(--radii-control)"
   },
   "radii.panel": {
-    "value": "var(--radii-lg)",
+    "value": "var(--sd-radius-panel, var(--radii-lg))",
     "variable": "var(--radii-panel)"
   },
   "radii.overlay": {
-    "value": "var(--radii-xl)",
+    "value": "var(--sd-radius-overlay, var(--radii-xl))",
     "variable": "var(--radii-overlay)"
   },
   "radii.pill": {
-    "value": "var(--radii-full)",
+    "value": "var(--sd-radius-pill, var(--radii-full))",
     "variable": "var(--radii-pill)"
   },
   "fonts.body": {
-    "value": "var(--fonts-inter)",
+    "value": "var(--sd-font-body, var(--fonts-inter))",
     "variable": "var(--fonts-body)"
   },
   "fonts.heading": {
-    "value": "var(--fonts-inter-display)",
+    "value": "var(--sd-font-heading, var(--fonts-inter-display))",
     "variable": "var(--fonts-heading)"
   },
   "blurs.subtle": {
@@ -3096,11 +3096,11 @@ const tokens = {
     "variable": "var(--sizes-layout-readable)"
   },
   "sizes.layout.content": {
-    "value": "var(--sizes-4xl)",
+    "value": "var(--sd-content-width, var(--sizes-4xl))",
     "variable": "var(--sizes-layout-content)"
   },
   "sizes.layout.contentWide": {
-    "value": "var(--sizes-6xl)",
+    "value": "var(--sd-content-wide-width, var(--sizes-6xl))",
     "variable": "var(--sizes-layout-content-wide)"
   },
   "sizes.layout.form": {
@@ -3108,7 +3108,7 @@ const tokens = {
     "variable": "var(--sizes-layout-form)"
   },
   "sizes.layout.sidebar": {
-    "value": "18rem",
+    "value": "var(--sd-sidebar-width, 18rem)",
     "variable": "var(--sizes-layout-sidebar)"
   },
   "sizes.layout.drawer": {
@@ -3128,15 +3128,15 @@ const tokens = {
     "variable": "var(--sizes-viewport-height)"
   },
   "spacing.gutter.mobile": {
-    "value": "var(--spacing-2)",
+    "value": "var(--sd-gutter-mobile, var(--spacing-2))",
     "variable": "var(--spacing-gutter-mobile)"
   },
   "spacing.gutter.tablet": {
-    "value": "var(--spacing-4)",
+    "value": "var(--sd-gutter-tablet, var(--spacing-4))",
     "variable": "var(--spacing-gutter-tablet)"
   },
   "spacing.gutter.desktop": {
-    "value": "var(--spacing-6)",
+    "value": "var(--sd-gutter-desktop, var(--spacing-6))",
     "variable": "var(--spacing-gutter-desktop)"
   },
   "spacing.safeTop": {

@@ -12,6 +12,7 @@ export const DEFAULT_ADMIN_SECTION = "brand";
 export type AdminSectionID =
   | "brand"
   | "interface"
+  | "theme"
   | "moderation"
   | "system"
   | "audit_log"
@@ -66,6 +67,16 @@ export function getAdminSectionGroups(
           label: "Interface",
           description: "Navigation and content display",
         },
+        ...(canViewAdministratorSections
+          ? [
+              {
+                id: "theme" as const,
+                href: "/admin/theme",
+                label: "Custom theme",
+                description: "Installation-wide CSS and JavaScript",
+              },
+            ]
+          : []),
       ],
     },
     {

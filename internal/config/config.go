@@ -56,6 +56,13 @@ type Config struct {
 	   - literal IP hosts are trusted automatically
 	*/
 	SSRTrustedSourceCIDRs string `default:"" envconfig:"SSR_TRUSTED_SOURCE_CIDRS"`
+	/*
+	   Emergency kill switch for installation custom themes. When enabled,
+	   the public theme manifest is empty and the reference frontend loads no
+	   custom CSS or JavaScript. The configured manifest is preserved so it
+	   can be inspected, replaced, or re-enabled later.
+	*/
+	CustomThemesDisable bool `default:"false" envconfig:"CUSTOM_THEMES_DISABLE"`
 
 	// -
 	// Development tools

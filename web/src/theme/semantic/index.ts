@@ -5,14 +5,14 @@ import { colours } from "./colours";
 export const semanticTokens = defineSemanticTokens({
   colors: colours,
   radii: {
-    control: { value: "{radii.sm}" },
-    panel: { value: "{radii.lg}" },
-    overlay: { value: "{radii.xl}" },
-    pill: { value: "{radii.full}" },
+    control: { value: "var(--sd-radius-control, {radii.sm})" },
+    panel: { value: "var(--sd-radius-panel, {radii.lg})" },
+    overlay: { value: "var(--sd-radius-overlay, {radii.xl})" },
+    pill: { value: "var(--sd-radius-pill, {radii.full})" },
   },
   fonts: {
-    body: { value: "{fonts.inter}" },
-    heading: { value: "{fonts.interDisplay}" },
+    body: { value: "var(--sd-font-body, {fonts.inter})" },
+    heading: { value: "var(--sd-font-heading, {fonts.interDisplay})" },
   },
   blurs: {
     subtle: { value: "{blurs.sm}" },
@@ -97,10 +97,10 @@ export const semanticTokens = defineSemanticTokens({
   sizes: {
     layout: {
       readable: { value: "65ch" },
-      content: { value: "{sizes.4xl}" },
-      contentWide: { value: "{sizes.6xl}" },
+      content: { value: "var(--sd-content-width, {sizes.4xl})" },
+      contentWide: { value: "var(--sd-content-wide-width, {sizes.6xl})" },
       form: { value: "{sizes.md}" },
-      sidebar: { value: "18rem" },
+      sidebar: { value: "var(--sd-sidebar-width, 18rem)" },
       drawer: { value: "{sizes.lg}" },
       commandBar: { value: "{sizes.sm}" },
     },
@@ -119,9 +119,9 @@ export const semanticTokens = defineSemanticTokens({
   },
   spacing: {
     gutter: {
-      mobile: { value: "{spacing.2}" },
-      tablet: { value: "{spacing.4}" },
-      desktop: { value: "{spacing.6}" },
+      mobile: { value: "var(--sd-gutter-mobile, {spacing.2})" },
+      tablet: { value: "var(--sd-gutter-tablet, {spacing.4})" },
+      desktop: { value: "var(--sd-gutter-desktop, {spacing.6})" },
     },
     safeBottom: { value: "env(safe-area-inset-bottom)" },
     safeTop: { value: "calc(env(keyboard-inset-height) + 4px)" },

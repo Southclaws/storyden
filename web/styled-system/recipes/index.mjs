@@ -25,6 +25,7 @@ export * from './color-picker.mjs';
 export * from './combobox.mjs';
 export * from './menu.mjs';
 export * from './file-upload.mjs';
+export * from './floating-panel.mjs';
 export * from './popover.mjs';
 export * from './progress.mjs';
 export * from './page-header.mjs';

@@ -1113,6 +1113,20 @@ func serialiseAuditEvent(in *audit.AuditLog) openapi.AuditEvent {
 			AccountId:      openapi.Identifier(accountID),
 			EmailAddressId: openapi.Identifier(emailAddressID),
 		})
+
+	case audit.EventTypeThemePublished:
+		err = out.FromAuditEventThemePublished(openapi.AuditEventThemePublished{
+			Type:     openapi.ThemePublished,
+			Revision: metadataString(in.Metadata, "revision"),
+			Assets:   metadataThemeAssets(in.Metadata),
+		})
+
+	case audit.EventTypeThemeDisabled:
+		err = out.FromAuditEventThemeDisabled(openapi.AuditEventThemeDisabled{
+			Type:     openapi.ThemeDisabled,
+			Revision: metadataString(in.Metadata, "revision"),
+			Assets:   metadataThemeAssets(in.Metadata),
+		})
 	}
 
 	if err != nil {
@@ -1155,4 +1169,34 @@ func metadataString(metadata map[string]any, key string) string {
 	default:
 		return fmt.Sprint(v)
 	}
+}
+
+func metadataThemeAssets(metadata map[string]any) []openapi.AuditEventThemeAsset {
+	items, ok := metadata["assets"].([]any)
+	if !ok {
+		if direct, directOK := metadata["assets"].([]map[string]any); directOK {
+			items = make([]any, 0, len(direct))
+			for _, item := range direct {
+				items = append(items, item)
+			}
+		}
+	}
+	out := make([]openapi.AuditEventThemeAsset, 0, len(items))
+	for _, raw := range items {
+		item, ok := raw.(map[string]any)
+		if !ok {
+			continue
+		}
+		size, _ := item["size"].(float64)
+		if integer, integerOK := item["size"].(int); integerOK {
+			size = float64(integer)
+		}
+		out = append(out, openapi.AuditEventThemeAsset{
+			Filename:  metadataString(item, "filename"),
+			Kind:      openapi.AuditEventThemeAssetKind(metadataString(item, "kind")),
+			Size:      int(size),
+			Integrity: metadataString(item, "integrity"),
+		})
+	}
+	return out
 }

@@ -14,6 +14,12 @@ import type {
   AdminSettingsGetOKResponse,
   AdminSettingsUpdateBody,
   AdminSettingsUpdateOKResponse,
+  AdminThemeAssetUploadOKResponse,
+  AdminThemeAssetUploadParams,
+  AdminThemeGetOKResponse,
+  AdminThemeUpdateBody,
+  AdminThemeUpdateOKResponse,
+  AssetUploadBody,
   AuditEventCreatedOKResponse,
   AuditEventGetOKResponse,
   AuditEventListOKResponse,
@@ -177,6 +183,298 @@ export const adminSettingsUpdate = async (
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...options?.headers },
       body: JSON.stringify(adminSettingsUpdateBody),
+    },
+  );
+};
+
+export type adminThemeGetResponse200 = {
+  data: AdminThemeGetOKResponse;
+  status: 200;
+};
+
+export type adminThemeGetResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type adminThemeGetResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type adminThemeGetResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 401 | 403>;
+};
+
+export type adminThemeGetResponseSuccess = adminThemeGetResponse200 & {
+  headers: Headers;
+};
+export type adminThemeGetResponseError = (
+  | adminThemeGetResponse401
+  | adminThemeGetResponse403
+  | adminThemeGetResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getAdminThemeGetUrl = () => {
+  return `/admin/theme`;
+};
+
+/**
+ * Get the configured custom theme, including runtime-disabled state.
+ */
+export const adminThemeGet = async (
+  options?: Parameters<typeof fetcher>[1],
+): Promise<adminThemeGetResponseSuccess> => {
+  return fetcher<adminThemeGetResponseSuccess>(getAdminThemeGetUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export type adminThemeUpdateResponse200 = {
+  data: AdminThemeUpdateOKResponse;
+  status: 200;
+};
+
+export type adminThemeUpdateResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type adminThemeUpdateResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type adminThemeUpdateResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type adminThemeUpdateResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 403>;
+};
+
+export type adminThemeUpdateResponseSuccess = adminThemeUpdateResponse200 & {
+  headers: Headers;
+};
+export type adminThemeUpdateResponseError = (
+  | adminThemeUpdateResponse400
+  | adminThemeUpdateResponse401
+  | adminThemeUpdateResponse403
+  | adminThemeUpdateResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getAdminThemeUpdateUrl = () => {
+  return `/admin/theme`;
+};
+
+/**
+ * Atomically replace the active custom theme manifest.
+ */
+export const adminThemeUpdate = async (
+  adminThemeUpdateBody: AdminThemeUpdateBody,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<adminThemeUpdateResponseSuccess> => {
+  return fetcher<adminThemeUpdateResponseSuccess>(getAdminThemeUpdateUrl(), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(adminThemeUpdateBody),
+  });
+};
+
+export type adminThemeDeleteResponse204 = {
+  data: NoContentResponse;
+  status: 204;
+};
+
+export type adminThemeDeleteResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type adminThemeDeleteResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type adminThemeDeleteResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 204 | 401 | 403>;
+};
+
+export type adminThemeDeleteResponseSuccess = adminThemeDeleteResponse204 & {
+  headers: Headers;
+};
+export type adminThemeDeleteResponseError = (
+  | adminThemeDeleteResponse401
+  | adminThemeDeleteResponse403
+  | adminThemeDeleteResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getAdminThemeDeleteUrl = () => {
+  return `/admin/theme`;
+};
+
+/**
+ * Disable the active custom theme without deleting its assets.
+ */
+export const adminThemeDelete = async (
+  options?: Parameters<typeof fetcher>[1],
+): Promise<adminThemeDeleteResponseSuccess> => {
+  return fetcher<adminThemeDeleteResponseSuccess>(getAdminThemeDeleteUrl(), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export type adminThemeAssetUploadResponse200 = {
+  data: AdminThemeAssetUploadOKResponse;
+  status: 200;
+};
+
+export type adminThemeAssetUploadResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type adminThemeAssetUploadResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type adminThemeAssetUploadResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type adminThemeAssetUploadResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 403>;
+};
+
+export type adminThemeAssetUploadResponseSuccess =
+  adminThemeAssetUploadResponse200 & {
+    headers: Headers;
+  };
+export type adminThemeAssetUploadResponseError = (
+  | adminThemeAssetUploadResponse400
+  | adminThemeAssetUploadResponse401
+  | adminThemeAssetUploadResponse403
+  | adminThemeAssetUploadResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getAdminThemeAssetUploadUrl = (
+  params?: AdminThemeAssetUploadParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/admin/theme/assets?${stringifiedParams}`
+    : `/admin/theme/assets`;
+};
+
+/**
+ * Upload an immutable custom theme stylesheet or script.
+ */
+export const adminThemeAssetUpload = async (
+  assetUploadBody?: AssetUploadBody,
+  params?: AdminThemeAssetUploadParams,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<adminThemeAssetUploadResponseSuccess> => {
+  return fetcher<adminThemeAssetUploadResponseSuccess>(
+    getAdminThemeAssetUploadUrl(params),
+    {
+      ...options,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/octet-stream",
+        ...options?.headers,
+      },
+      body: assetUploadBody,
+    },
+  );
+};
+
+export type adminThemeAssetDeleteResponse204 = {
+  data: NoContentResponse;
+  status: 204;
+};
+
+export type adminThemeAssetDeleteResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type adminThemeAssetDeleteResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type adminThemeAssetDeleteResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type adminThemeAssetDeleteResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type adminThemeAssetDeleteResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 204 | 400 | 401 | 403 | 404>;
+};
+
+export type adminThemeAssetDeleteResponseSuccess =
+  adminThemeAssetDeleteResponse204 & {
+    headers: Headers;
+  };
+export type adminThemeAssetDeleteResponseError = (
+  | adminThemeAssetDeleteResponse400
+  | adminThemeAssetDeleteResponse401
+  | adminThemeAssetDeleteResponse403
+  | adminThemeAssetDeleteResponse404
+  | adminThemeAssetDeleteResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getAdminThemeAssetDeleteUrl = (assetFilename: string) => {
+  return `/admin/theme/assets/${assetFilename}`;
+};
+
+/**
+ * Delete an inactive custom theme asset.
+ */
+export const adminThemeAssetDelete = async (
+  assetFilename: string,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<adminThemeAssetDeleteResponseSuccess> => {
+  return fetcher<adminThemeAssetDeleteResponseSuccess>(
+    getAdminThemeAssetDeleteUrl(assetFilename),
+    {
+      ...options,
+      method: "DELETE",
     },
   );
 };

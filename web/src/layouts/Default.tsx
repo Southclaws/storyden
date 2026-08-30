@@ -14,6 +14,7 @@ export async function Default({ sidebar, children }: PropsWithChildren<Props>) {
 
   return (
     <Flex
+      data-sd-layout="default"
       minHeight="dvh"
       width="full"
       flexDirection="row"
@@ -22,6 +23,7 @@ export async function Default({ sidebar, children }: PropsWithChildren<Props>) {
     >
       <Navigation sidebar={sidebar}>
         <styled.main
+          data-sd-region="main"
           containerType="inline-size"
           width="full"
           height="full"

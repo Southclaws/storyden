@@ -21,9 +21,16 @@ var (
 	OperationIDIconUpload                             = OperationID{`IconUpload`}
 	OperationIDBannerGet                              = OperationID{`BannerGet`}
 	OperationIDBannerUpload                           = OperationID{`BannerUpload`}
+	OperationIDThemeGet                               = OperationID{`ThemeGet`}
+	OperationIDThemeAssetGet                          = OperationID{`ThemeAssetGet`}
 	OperationIDSendBeacon                             = OperationID{`SendBeacon`}
 	OperationIDAdminSettingsGet                       = OperationID{`AdminSettingsGet`}
 	OperationIDAdminSettingsUpdate                    = OperationID{`AdminSettingsUpdate`}
+	OperationIDAdminThemeGet                          = OperationID{`AdminThemeGet`}
+	OperationIDAdminThemeUpdate                       = OperationID{`AdminThemeUpdate`}
+	OperationIDAdminThemeDelete                       = OperationID{`AdminThemeDelete`}
+	OperationIDAdminThemeAssetUpload                  = OperationID{`AdminThemeAssetUpload`}
+	OperationIDAdminThemeAssetDelete                  = OperationID{`AdminThemeAssetDelete`}
 	OperationIDAccountList                            = OperationID{`AccountList`}
 	OperationIDAuditEventList                         = OperationID{`AuditEventList`}
 	OperationIDEmailQueueList                         = OperationID{`EmailQueueList`}
@@ -325,12 +332,26 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDBannerGet, nil
 	case string(`BannerUpload`):
 		return OperationIDBannerUpload, nil
+	case string(`ThemeGet`):
+		return OperationIDThemeGet, nil
+	case string(`ThemeAssetGet`):
+		return OperationIDThemeAssetGet, nil
 	case string(`SendBeacon`):
 		return OperationIDSendBeacon, nil
 	case string(`AdminSettingsGet`):
 		return OperationIDAdminSettingsGet, nil
 	case string(`AdminSettingsUpdate`):
 		return OperationIDAdminSettingsUpdate, nil
+	case string(`AdminThemeGet`):
+		return OperationIDAdminThemeGet, nil
+	case string(`AdminThemeUpdate`):
+		return OperationIDAdminThemeUpdate, nil
+	case string(`AdminThemeDelete`):
+		return OperationIDAdminThemeDelete, nil
+	case string(`AdminThemeAssetUpload`):
+		return OperationIDAdminThemeAssetUpload, nil
+	case string(`AdminThemeAssetDelete`):
+		return OperationIDAdminThemeAssetDelete, nil
 	case string(`AccountList`):
 		return OperationIDAccountList, nil
 	case string(`AuditEventList`):

@@ -12,9 +12,16 @@ type OperationPermissions interface {
 	IconUpload() (bool, *rbac.Permission)
 	BannerGet() (bool, *rbac.Permission)
 	BannerUpload() (bool, *rbac.Permission)
+	ThemeGet() (bool, *rbac.Permission)
+	ThemeAssetGet() (bool, *rbac.Permission)
 	SendBeacon() (bool, *rbac.Permission)
 	AdminSettingsGet() (bool, *rbac.Permission)
 	AdminSettingsUpdate() (bool, *rbac.Permission)
+	AdminThemeGet() (bool, *rbac.Permission)
+	AdminThemeUpdate() (bool, *rbac.Permission)
+	AdminThemeDelete() (bool, *rbac.Permission)
+	AdminThemeAssetUpload() (bool, *rbac.Permission)
+	AdminThemeAssetDelete() (bool, *rbac.Permission)
 	AccountList() (bool, *rbac.Permission)
 	AuditEventList() (bool, *rbac.Permission)
 	EmailQueueList() (bool, *rbac.Permission)
@@ -281,12 +288,26 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.BannerGet()
 	case "BannerUpload":
 		return optable.BannerUpload()
+	case "ThemeGet":
+		return optable.ThemeGet()
+	case "ThemeAssetGet":
+		return optable.ThemeAssetGet()
 	case "SendBeacon":
 		return optable.SendBeacon()
 	case "AdminSettingsGet":
 		return optable.AdminSettingsGet()
 	case "AdminSettingsUpdate":
 		return optable.AdminSettingsUpdate()
+	case "AdminThemeGet":
+		return optable.AdminThemeGet()
+	case "AdminThemeUpdate":
+		return optable.AdminThemeUpdate()
+	case "AdminThemeDelete":
+		return optable.AdminThemeDelete()
+	case "AdminThemeAssetUpload":
+		return optable.AdminThemeAssetUpload()
+	case "AdminThemeAssetDelete":
+		return optable.AdminThemeAssetDelete()
 	case "AccountList":
 		return optable.AccountList()
 	case "AuditEventList":

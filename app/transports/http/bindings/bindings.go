@@ -64,6 +64,7 @@ type Bindings struct {
 	Version
 	Spec
 	Info
+	Theme
 	Beacon
 	Admin
 	Plugins
@@ -102,6 +103,7 @@ func bindingsProviders() fx.Option {
 		NewVersion,
 		NewSpec,
 		NewInfo,
+		NewTheme,
 		NewBeacon,
 		NewAdmin,
 		NewPlugins,

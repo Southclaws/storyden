@@ -21,6 +21,9 @@ import type {
   GetSessionOKResponse,
   GetSpec200,
   InternalServerErrorResponse,
+  NotFoundResponse,
+  ThemeAssetGetOKResponse,
+  ThemeGetOKResponse,
   UnauthorisedResponse,
 } from "../openapi-schema";
 
@@ -501,6 +504,113 @@ export const useBannerUpload = <
   const swrFn = getBannerUploadMutationFetcher(requestOptions);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getThemeGetUrl = () => {
+  return `/info/theme`;
+};
+
+/**
+ * Get the active installation custom theme manifest.
+ */
+export const themeGet = async (
+  options?: Parameters<typeof fetcher>[1],
+): Promise<ThemeGetOKResponse> => {
+  return fetcher<ThemeGetOKResponse>(getThemeGetUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getThemeGetKey = () => [`/info/theme`] as const;
+
+export type ThemeGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof themeGet>>
+>;
+
+export const useThemeGet = <
+  TError = void | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRConfiguration<Awaited<ReturnType<typeof themeGet>>, TError> & {
+    swrKey?: Key;
+    enabled?: boolean;
+  };
+  request?: SecondParameter<typeof fetcher>;
+}) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ?? (() => (isEnabled ? getThemeGetKey() : null));
+  const swrFn = () => themeGet(requestOptions);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getThemeAssetGetUrl = (assetFilename: string) => {
+  return `/info/theme/assets/${assetFilename}`;
+};
+
+/**
+ * Download an immutable custom theme stylesheet or script.
+ */
+export const themeAssetGet = async (
+  assetFilename: string,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<ThemeAssetGetOKResponse> => {
+  return fetcher<ThemeAssetGetOKResponse>(getThemeAssetGetUrl(assetFilename), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getThemeAssetGetKey = (assetFilename: string) =>
+  [`/info/theme/assets/${assetFilename}`] as const;
+
+export type ThemeAssetGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof themeAssetGet>>
+>;
+
+export const useThemeAssetGet = <
+  TError = void | NotFoundResponse | InternalServerErrorResponse,
+>(
+  assetFilename: string,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof themeAssetGet>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const isEnabled =
+    swrOptions?.enabled !== false &&
+    assetFilename !== null &&
+    assetFilename !== undefined;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getThemeAssetGetKey(assetFilename) : null));
+  const swrFn = () => themeAssetGet(assetFilename, requestOptions);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
 
   return {
     swrKey,

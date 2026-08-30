@@ -247,6 +247,33 @@ paths:
         "200":
           description: OK
 
+  /info/theme:
+    get:
+      operationId: ThemeGet
+      description: Get the active installation custom theme manifest.
+      security: []
+      tags: [misc]
+      parameters: [{ $ref: "#/components/parameters/IfNoneMatch" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "304": { description: Not modified }
+        "200": { $ref: "#/components/responses/ThemeGetOK" }
+
+  /info/theme/assets/{asset_filename}:
+    get:
+      operationId: ThemeAssetGet
+      description: Download an immutable custom theme stylesheet or script.
+      security: []
+      tags: [misc]
+      parameters:
+        - $ref: "#/components/parameters/AssetPathParam"
+        - $ref: "#/components/parameters/IfNoneMatch"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "304": { description: Not modified }
+        "200": { $ref: "#/components/responses/ThemeAssetGetOK" }
+
   /beacon:
     post:
       operationId: SendBeacon
@@ -300,6 +327,67 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AdminSettingsUpdateOK" }
+
+  /admin/theme:
+    get:
+      operationId: AdminThemeGet
+      description: Get the configured custom theme, including runtime-disabled state.
+      tags: [admin]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/AdminThemeGetOK" }
+    put:
+      operationId: AdminThemeUpdate
+      description: Atomically replace the active custom theme manifest.
+      tags: [admin]
+      requestBody: { $ref: "#/components/requestBodies/AdminThemeUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/AdminThemeUpdateOK" }
+    delete:
+      operationId: AdminThemeDelete
+      description: Disable the active custom theme without deleting its assets.
+      tags: [admin]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "204": { $ref: "#/components/responses/NoContent" }
+
+  /admin/theme/assets:
+    post:
+      operationId: AdminThemeAssetUpload
+      description: Upload an immutable custom theme stylesheet or script.
+      tags: [admin]
+      requestBody: { $ref: "#/components/requestBodies/AssetUpload" }
+      parameters:
+        - $ref: "#/components/parameters/ContentLength"
+        - $ref: "#/components/parameters/AssetNameQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/AdminThemeAssetUploadOK" }
+
+  /admin/theme/assets/{asset_filename}:
+    delete:
+      operationId: AdminThemeAssetDelete
+      description: Delete an inactive custom theme asset.
+      tags: [admin]
+      parameters: [$ref: "#/components/parameters/AssetPathParam"]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "204": { $ref: "#/components/responses/NoContent" }
 
   /admin/accounts:
     get:
@@ -4647,6 +4735,14 @@ components:
         type: integer
         x-go-type: int64
 
+    IfNoneMatch:
+      description: Previously observed entity tag for conditional retrieval.
+      name: If-None-Match
+      in: header
+      required: false
+      schema:
+        type: string
+
     AuditEventTypeFilterQuery:
       description: Audit event type filter query
       name: types
@@ -5456,6 +5552,12 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/AdminSettingsMutableProps" }
 
+    AdminThemeUpdate:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ThemeManifestMutable" }
+
     ModerationActionCreate:
       content:
         application/json:
@@ -6002,6 +6104,40 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/SessionInfo"
+
+    ThemeGetOK:
+      description: Active custom theme manifest.
+      headers: { <<: *cache_response_headers }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ThemeManifest" }
+
+    ThemeAssetGetOK:
+      description: Immutable custom theme asset.
+      headers: { <<: *cache_response_headers }
+      content:
+        "*/*":
+          schema:
+            type: string
+            format: binary
+
+    AdminThemeGetOK:
+      description: Configured custom theme manifest.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/AdminThemeManifest" }
+
+    AdminThemeUpdateOK:
+      description: Published custom theme manifest.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/AdminThemeManifest" }
+
+    AdminThemeAssetUploadOK:
+      description: Uploaded immutable custom theme asset.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ThemeAsset" }
 
     AdminSettingsGetOK:
       description: OK
@@ -7331,6 +7467,69 @@ components:
         motd:
           $ref: "#/components/schemas/MessageOfTheDay"
 
+    ThemeAsset:
+      type: object
+      required: [id, filename, path, mime_type, size, integrity]
+      properties:
+        id:
+          $ref: "#/components/schemas/Identifier"
+        filename:
+          type: string
+        path:
+          type: string
+          description: API-relative immutable asset path.
+        mime_type:
+          type: string
+          enum: [text/css, application/javascript]
+        size:
+          type: integer
+          minimum: 1
+        integrity:
+          type: string
+          pattern: '^sha256-[A-Za-z0-9+/]+={0,2}$'
+
+    ThemeManifest:
+      type: object
+      required: [api_version, enabled, revision, stylesheets, scripts]
+      properties:
+        api_version:
+          type: string
+          enum: [v1]
+        enabled:
+          type: boolean
+        revision:
+          type: string
+        stylesheets:
+          type: array
+          maxItems: 32
+          items: { $ref: "#/components/schemas/ThemeAsset" }
+        scripts:
+          type: array
+          maxItems: 32
+          items: { $ref: "#/components/schemas/ThemeAsset" }
+
+    AdminThemeManifest:
+      allOf:
+        - $ref: "#/components/schemas/ThemeManifest"
+        - type: object
+          required: [runtime_disabled]
+          properties:
+            runtime_disabled:
+              type: boolean
+
+    ThemeManifestMutable:
+      type: object
+      required: [stylesheets, scripts]
+      properties:
+        stylesheets:
+          type: array
+          maxItems: 32
+          items: { $ref: "#/components/schemas/Identifier" }
+        scripts:
+          type: array
+          maxItems: 32
+          items: { $ref: "#/components/schemas/Identifier" }
+
     SessionInfo:
       description: |
         The combination of public info and the requesting account's settings.
@@ -7962,6 +8161,8 @@ components:
         - account_warning_deleted
         - account_password_reset_token_issued
         - account_password_reset_email_sent
+        - theme_published
+        - theme_disabled
 
     AuditEventProps:
       required: [id, type, timestamp]
@@ -7991,6 +8192,8 @@ components:
           account_warning_deleted: "#/components/schemas/AuditEventAccountWarningDeleted"
           account_password_reset_token_issued: "#/components/schemas/AuditEventAccountPasswordResetTokenIssued"
           account_password_reset_email_sent: "#/components/schemas/AuditEventAccountPasswordResetEmailSent"
+          theme_published: "#/components/schemas/AuditEventThemePublished"
+          theme_disabled: "#/components/schemas/AuditEventThemeDisabled"
       oneOf:
         - $ref: "#/components/schemas/AuditEventThreadDeleted"
         - $ref: "#/components/schemas/AuditEventThreadReplyDeleted"
@@ -8004,6 +8207,8 @@ components:
         - $ref: "#/components/schemas/AuditEventAccountWarningDeleted"
         - $ref: "#/components/schemas/AuditEventAccountPasswordResetTokenIssued"
         - $ref: "#/components/schemas/AuditEventAccountPasswordResetEmailSent"
+        - $ref: "#/components/schemas/AuditEventThemePublished"
+        - $ref: "#/components/schemas/AuditEventThemeDisabled"
 
     AuditEventThreadDeleted:
       type: object
@@ -8105,6 +8310,34 @@ components:
           description: Email address ID that the reset email was sent to.
           $ref: "#/components/schemas/Identifier"
 
+    AuditEventThemeAsset:
+      type: object
+      required: [filename, kind, size, integrity]
+      properties:
+        filename: { type: string }
+        kind: { type: string, enum: [stylesheet, script] }
+        size: { type: integer }
+        integrity: { type: string }
+
+    AuditEventThemePublished:
+      type: object
+      required: [type, revision, assets]
+      properties:
+        type: { $ref: "#/components/schemas/AuditEventType" }
+        revision: { type: string }
+        assets:
+          type: array
+          items: { $ref: "#/components/schemas/AuditEventThemeAsset" }
+
+    AuditEventThemeDisabled:
+      type: object
+      required: [type, revision, assets]
+      properties:
+        type: { $ref: "#/components/schemas/AuditEventType" }
+        revision: { type: string }
+        assets:
+          type: array
+          items: { $ref: "#/components/schemas/AuditEventThemeAsset" }
     AuditEventList:
       type: array
       items:

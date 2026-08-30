@@ -56,6 +56,16 @@
         - `localhost` trusts both `127.0.0.1/32` and `::1/128`
         - literal IP hosts are trusted automatically
 
+    - env: "CUSTOM_THEMES_DISABLE"
+      name: CustomThemesDisable
+      type: bool
+      default: false
+      description: |-
+        Emergency kill switch for installation custom themes. When enabled,
+        the public theme manifest is empty and the reference frontend loads no
+        custom CSS or JavaScript. The configured manifest is preserved so it
+        can be inspected, replaced, or re-enabled later.
+
 - section: Development tools
   description: |-
     Configuration settings for aiding in development of Storyden clients.

@@ -43,6 +43,29 @@ func (w *Writer) Add(ctx context.Context,
 	return asset.Map(r), nil
 }
 
+func (w *Writer) AddWithMetadata(ctx context.Context,
+	accountID xid.ID,
+	filename asset.Filename,
+	size int,
+	mt mime.Type,
+	metadata asset.Metadata,
+) (*asset.Asset, error) {
+	r, err := w.db.Asset.
+		Create().
+		SetID(filename.GetID()).
+		SetFilename(filename.String()).
+		SetSize(size).
+		SetMimeType(mt.String()).
+		SetMetadata(metadata).
+		SetAccountID(xid.ID(accountID)).
+		Save(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	return asset.Map(r), nil
+}
+
 func (w *Writer) AddVersion(ctx context.Context,
 	accountID xid.ID,
 	filename asset.Filename,

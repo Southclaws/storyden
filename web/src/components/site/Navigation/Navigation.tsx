@@ -24,9 +24,13 @@ export async function Navigation({ children, sidebar }: Props) {
   );
 
   return (
-    <div id="navigation__container" className="navigation__container">
+    <div
+      id="navigation__container"
+      className="navigation__container"
+      data-sd-region="navigation"
+    >
       <div id="navigation__scroll" className="navigation__grid">
-        <div className="navigation__main">
+        <div className="navigation__main" data-sd-region="content">
           {/*  */}
           <VerificationBanner
             session={sessionAccount}

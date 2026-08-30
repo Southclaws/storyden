@@ -1,0 +1,129 @@
+---
+title: Custom themes
+description: The v1 contract for installation-wide CSS and trusted JavaScript.
+---
+
+Custom themes let an administrator change every page in the reference frontend,
+including sign-in and administration pages. A theme is one ordered manifest of
+immutable CSS and JavaScript assets; publishing a draft replaces the live
+manifest atomically.
+
+<Callout type="warn" title="Theme code is trusted code">
+  Published JavaScript runs with Storyden's browser privileges for every
+  visitor. It can read the page, act as the signed-in visitor, and initiate
+  network requests. Custom themes are not sandboxed extensions. Only install
+  code you trust and review.
+</Callout>
+
+## Publishing lifecycle
+
+Open **Admin → Appearance → Custom theme** and select **Enable theme editing**.
+This stores a browser-local flag and opens a draggable, resizable editor over
+the real Storyden interface. The editor follows client-side navigation, so you
+can inspect any real page with browser developer tools while editing ordered CSS
+and JavaScript tabs.
+
+**Save live theme** uploads only new or changed tab sources as immutable assets
+and atomically replaces the live manifest. CSS-only changes replace the active
+styles on the current page immediately. JavaScript changes reload the current
+page so effects from the previous scripts are cleared; the editor returns after
+reload because its enabled flag remains in local storage. Unsaved source is
+browser memory only and is discarded when editing is exited or the page is
+reloaded.
+
+**Disable live theme** removes the manifest from rendered pages without deleting
+its immutable assets. The editor is client-only and is never included in SSR;
+the local flag controls visibility, while API permissions still require an
+`ADMINISTRATOR` account.
+
+There is no theme library or revision history in v1. Recovery is to disable the
+theme, edit and save corrected source, call `DELETE /api/admin/theme`
+directly, or start Storyden with `CUSTOM_THEMES_DISABLE=true`. The deployment
+switch preserves the configured manifest while returning an empty public
+manifest.
+
+Each file is limited to 1 MiB. A manifest may reference at most 32 files and 5
+MiB in total. Published assets have content-derived SRI hashes and immutable
+one-year cache headers. Replaced assets remain available for stale cached
+manifests and become eligible for opportunistic cleanup after 24 hours. Inactive
+assets can also be deleted through the administration API; active assets must be
+removed from the manifest first.
+
+## Loading and caching
+
+The root layout loads assets in this order:
+
+1. Storyden's generated accent stylesheet.
+2. Theme stylesheets in manifest order.
+3. Theme classic deferred scripts in manifest order.
+
+Theme tags include `integrity`, `crossorigin="anonymous"`, and
+`data-sd-theme-asset`. The public manifest uses one minute of browser freshness
+and five minutes of stale-while-revalidate. The reference frontend caches its
+server fetch for five minutes. Publishing through the admin interface expires
+that server cache immediately; publishing through an external API client is
+eventually consistent within five minutes. Fetch, validation, or origin errors
+fail open and do not prevent Storyden from rendering.
+
+## Stable v1 contract
+
+The document root exposes:
+
+```html
+<html data-sd-theme-api="v1" data-sd-theme-revision="…"></html>
+```
+
+Stable layout hooks are `data-sd-layout="default|fullpage"`. Stable region hooks
+are `data-sd-region="navigation|sidebar|topbar|main|content"`.
+
+The supported custom properties are:
+
+- Colours: `--sd-color-canvas`, `--sd-color-surface`, `--sd-color-inset`,
+  `--sd-color-overlay`, `--sd-color-control`, `--sd-color-text`,
+  `--sd-color-text-muted`, `--sd-color-text-subtle`, `--sd-color-border`,
+  `--sd-color-border-muted`, `--sd-color-border-strong`, `--sd-color-accent`,
+  `--sd-color-accent-foreground`, and `--sd-color-focus-ring`.
+- Typography: `--sd-font-body` and `--sd-font-heading`.
+- Shape: `--sd-radius-control`, `--sd-radius-panel`, `--sd-radius-overlay`, and
+  `--sd-radius-pill`.
+- Layout: `--sd-content-width`, `--sd-content-wide-width`,
+  `--sd-sidebar-width`, `--sd-gutter-mobile`, `--sd-gutter-tablet`, and
+  `--sd-gutter-desktop`.
+
+Panda classes, generated internal variables, React internals, undocumented DOM
+structure, and `window.__storyden__` are not public APIs.
+
+## Example stylesheet
+
+```css
+:root {
+  --sd-color-canvas: #fffaf2;
+  --sd-color-surface: #ffffff;
+  --sd-color-text: #2c2118;
+  --sd-color-accent: #b34423;
+  --sd-color-accent-foreground: #ffffff;
+  --sd-font-heading: "Fraunces", Georgia, serif;
+  --sd-radius-panel: 0.25rem;
+  --sd-content-width: 68rem;
+}
+
+[data-sd-region="navigation"] {
+  border-color: color-mix(in srgb, var(--sd-color-accent) 20%, transparent);
+}
+```
+
+## Lifecycle events
+
+Theme scripts may listen for `storyden:ready` after hydration and
+`storyden:navigate` after client-side navigation. Navigation events include the
+new `pathname` in `event.detail`.
+
+```js
+window.addEventListener("storyden:navigate", (event) => {
+  console.log("navigated to", event.detail.pathname);
+});
+```
+
+Storyden's default interface targets WCAG 2.2 AA. Administrators are responsible
+for contrast, focus visibility, motion, keyboard access, and other accessibility
+regressions introduced by custom theme code.

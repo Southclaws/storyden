@@ -17,6 +17,8 @@ import type { AuditEventAccountWarningDeleted } from "./auditEventAccountWarning
 import type { AuditEventAccountWarningUpdated } from "./auditEventAccountWarningUpdated";
 import type { AuditEventModerationNoteCreated } from "./auditEventModerationNoteCreated";
 import type { AuditEventModerationNoteDeleted } from "./auditEventModerationNoteDeleted";
+import type { AuditEventThemeDisabled } from "./auditEventThemeDisabled";
+import type { AuditEventThemePublished } from "./auditEventThemePublished";
 import type { AuditEventThreadDeleted } from "./auditEventThreadDeleted";
 import type { AuditEventThreadReplyDeleted } from "./auditEventThreadReplyDeleted";
 
@@ -32,4 +34,6 @@ export type AuditEventTypeProps =
   | AuditEventAccountWarningUpdated
   | AuditEventAccountWarningDeleted
   | AuditEventAccountPasswordResetTokenIssued
-  | AuditEventAccountPasswordResetEmailSent;
+  | AuditEventAccountPasswordResetEmailSent
+  | AuditEventThemePublished
+  | AuditEventThemeDisabled;
