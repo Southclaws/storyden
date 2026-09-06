@@ -12,6 +12,7 @@ import { colorPicker } from "@/components/ui/color-picker/ColorPicker.recipe";
 import { combobox } from "@/components/ui/combobox/Combobox.recipe";
 import { datePicker } from "@/components/ui/date-picker/DatePicker.recipe";
 import { fileUpload } from "@/components/ui/file-upload/FileUpload.recipe";
+import { floatingPanel } from "@/components/ui/floating-panel/FloatingPanel.recipe";
 import { group } from "@/components/ui/group/Group.recipe";
 import { headingInput } from "@/components/ui/heading-input/HeadingInput.recipe";
 import { inputGroup } from "@/components/ui/input-group/InputGroup.recipe";
@@ -228,6 +229,7 @@ export default defineConfig({
         combobox: combobox,
         menu: menu,
         fileUpload: fileUpload,
+        floatingPanel: floatingPanel,
         popover: popover,
         progress: progress,
         pageHeader: pageHeader,

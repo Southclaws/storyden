@@ -1,20 +1,21 @@
 {
-    "root": true,
-    "title": "Reference",
-    "description": "Reference manuals for specific Storyden features.",
-    "pages": [
-        "---Introduction---",
-        "index",
-        "---Configuring Storyden---",
-        "configuration",
-        "ssr-client-ip",
-        "email",
-        "settings",
-        "---Data management---",
-        "database",
-        "search",
-        "---Authentication---",
-        "oauth",
-        "access-keys"
-    ]
+  "root": true,
+  "title": "Reference",
+  "description": "Reference manuals for specific Storyden features.",
+  "pages": [
+    "---Introduction---",
+    "index",
+    "---Configuring Storyden---",
+    "configuration",
+    "ssr-client-ip",
+    "email",
+    "settings",
+    "custom-themes",
+    "---Data management---",
+    "database",
+    "search",
+    "---Authentication---",
+    "oauth",
+    "access-keys"
+  ]
 }

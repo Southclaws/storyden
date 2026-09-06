@@ -6,6 +6,7 @@ import (
 )
 
 const assetPathPrefix = "/api/assets/"
+const themeAssetPathPrefix = "/api/info/theme/assets/"
 
 // user-uploaded files are served inline from the same origin, so neutralise active content to prevent stored xss
 const assetContentSecurityPolicy = "default-src 'none'; sandbox"
@@ -13,7 +14,7 @@ const assetContentSecurityPolicy = "default-src 'none'; sandbox"
 func (m *Middleware) WithAssetSecurityHeaders() func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if strings.HasPrefix(r.URL.Path, assetPathPrefix) {
+			if strings.HasPrefix(r.URL.Path, assetPathPrefix) || strings.HasPrefix(r.URL.Path, themeAssetPathPrefix) {
 				h := w.Header()
 				h.Set("X-Content-Type-Options", "nosniff")
 				h.Set("Content-Security-Policy", assetContentSecurityPolicy)

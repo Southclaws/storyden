@@ -1,17 +1,15 @@
 import { flatten, zip } from "lodash";
-import { NextResponse } from "next/server";
 
 import { getSettings } from "@/lib/settings/settings-server";
+import { createThemeResourceResponse } from "@/lib/theme/theme-resource";
+import { getServerThemeBundle } from "@/lib/theme/theme-server";
 import { getColourVariants } from "@/utils/colour";
 
-/**
- *
- * @returns A fully static server-side-rendered CSS document that uses the
- *          Storyden installation's accent colour set by the administrator.
- */
-
-export async function GET() {
-  const settings = await getSettings();
+export async function GET(request: Request) {
+  const [settings, theme] = await Promise.all([
+    getSettings(),
+    getServerThemeBundle(),
+  ]);
 
   const cv = getColourVariants(settings.accent_colour);
 
@@ -21,13 +19,11 @@ export async function GET() {
     :root {
       ${rules.join("\n      ")}
     }
+
+    ${theme.stylesheet}
   `;
 
-  return new NextResponse(document, {
-    headers: {
-      "Content-Type": "text/css",
-    },
-  });
+  return createThemeResourceResponse(request, document, "text/css");
 }
 
 // NOTE: literally just so we get syntax highlighting above...

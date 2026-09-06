@@ -10,7 +10,7 @@ import { CloseIcon } from "@/components/ui/icons/Close";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { Text } from "@/components/ui/text";
 import { usePublicRegistration } from "@/lib/settings/registration";
-import { css } from "@/styled-system/css";
+import { css, cx } from "@/styled-system/css";
 import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
 import { cardBox } from "@/styled-system/recipes";
 import { timestamp } from "@/utils/date";
@@ -36,7 +36,13 @@ export function ReplyBox(props: Props) {
   }
 
   return (
-    <VStack w="full" pb="12" gap="2" alignItems="stretch">
+    <VStack
+      className="reply-composer"
+      w="full"
+      pb="12"
+      gap="2"
+      alignItems="stretch"
+    >
       <Admonition
         value={!!postedReply}
         onChange={handlers.handleReplyPostedAdmonitionClose}
@@ -62,7 +68,7 @@ export function ReplyBox(props: Props) {
       </Admonition>
 
       <styled.form
-        className={cardBox()}
+        className={cx("reply-composer__form", cardBox())}
         display="flex"
         flexDirection="column"
         gap="1"

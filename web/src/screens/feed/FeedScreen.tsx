@@ -28,7 +28,7 @@ export async function FeedScreen({ page }: Props) {
   const initialData = await getInitialFeedData(feedConfig, page);
 
   return (
-    <VStack paddingBlockEnd="4">
+    <VStack className="feed-page" data-sd-page="home" paddingBlockEnd="4">
       <FeedScreenContent
         initialData={initialData}
         initialSettings={initialSettings}

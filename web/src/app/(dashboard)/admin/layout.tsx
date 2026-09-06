@@ -65,7 +65,12 @@ export default function Layout({ children }: PropsWithChildren) {
           label="Admin sections"
         />
       </div>
-      <div className="section-navigation-layout__content">{children}</div>
+      <div
+        className="section-navigation-layout__content"
+        data-sd-region="content"
+      >
+        {children}
+      </div>
     </div>
   );
 }

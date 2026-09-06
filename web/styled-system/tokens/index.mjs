@@ -2120,164 +2120,100 @@ const tokens = {
     "variable": "var(--colors-transparent)"
   },
   "colors.accent.light.1": {
-    "value": "var(--accent-colour-flat-fill-50)",
+    "value": "var(--accent-colour-light-1)",
     "variable": "var(--colors-accent-light-1)"
   },
   "colors.accent.light.2": {
-    "value": "var(--accent-colour-flat-fill-100)",
+    "value": "var(--accent-colour-light-2)",
     "variable": "var(--colors-accent-light-2)"
   },
   "colors.accent.light.3": {
-    "value": "var(--accent-colour-flat-fill-200)",
+    "value": "var(--accent-colour-light-3)",
     "variable": "var(--colors-accent-light-3)"
   },
   "colors.accent.light.4": {
-    "value": "var(--accent-colour-flat-fill-300)",
+    "value": "var(--accent-colour-light-4)",
     "variable": "var(--colors-accent-light-4)"
   },
   "colors.accent.light.5": {
-    "value": "var(--accent-colour-flat-fill-400)",
+    "value": "var(--accent-colour-light-5)",
     "variable": "var(--colors-accent-light-5)"
   },
   "colors.accent.light.6": {
-    "value": "var(--accent-colour-flat-fill-500)",
+    "value": "var(--accent-colour-light-6)",
     "variable": "var(--colors-accent-light-6)"
   },
   "colors.accent.light.7": {
-    "value": "var(--accent-colour-flat-fill-600)",
+    "value": "var(--accent-colour-light-7)",
     "variable": "var(--colors-accent-light-7)"
   },
   "colors.accent.light.8": {
-    "value": "var(--accent-colour-flat-fill-700)",
+    "value": "var(--accent-colour-light-8)",
     "variable": "var(--colors-accent-light-8)"
   },
   "colors.accent.light.9": {
-    "value": "var(--accent-colour-flat-fill-800)",
+    "value": "var(--accent-colour-light-9)",
     "variable": "var(--colors-accent-light-9)"
   },
   "colors.accent.light.10": {
-    "value": "var(--accent-colour-flat-fill-900)",
+    "value": "var(--accent-colour-light-10)",
     "variable": "var(--colors-accent-light-10)"
   },
-  "colors.accent.light.text.1": {
-    "value": "var(--accent-colour-flat-text-50)",
-    "variable": "var(--colors-accent-light-text-1)"
+  "colors.accent.light.11": {
+    "value": "var(--accent-colour-light-11)",
+    "variable": "var(--colors-accent-light-11)"
   },
-  "colors.accent.light.text.2": {
-    "value": "var(--accent-colour-flat-text-100)",
-    "variable": "var(--colors-accent-light-text-2)"
-  },
-  "colors.accent.light.text.3": {
-    "value": "var(--accent-colour-flat-text-200)",
-    "variable": "var(--colors-accent-light-text-3)"
-  },
-  "colors.accent.light.text.4": {
-    "value": "var(--accent-colour-flat-text-300)",
-    "variable": "var(--colors-accent-light-text-4)"
-  },
-  "colors.accent.light.text.5": {
-    "value": "var(--accent-colour-flat-text-400)",
-    "variable": "var(--colors-accent-light-text-5)"
-  },
-  "colors.accent.light.text.6": {
-    "value": "var(--accent-colour-flat-text-500)",
-    "variable": "var(--colors-accent-light-text-6)"
-  },
-  "colors.accent.light.text.7": {
-    "value": "var(--accent-colour-flat-text-600)",
-    "variable": "var(--colors-accent-light-text-7)"
-  },
-  "colors.accent.light.text.8": {
-    "value": "var(--accent-colour-flat-text-700)",
-    "variable": "var(--colors-accent-light-text-8)"
-  },
-  "colors.accent.light.text.9": {
-    "value": "var(--accent-colour-flat-text-800)",
-    "variable": "var(--colors-accent-light-text-9)"
-  },
-  "colors.accent.light.text.10": {
-    "value": "var(--accent-colour-flat-text-900)",
-    "variable": "var(--colors-accent-light-text-10)"
+  "colors.accent.light.12": {
+    "value": "var(--accent-colour-light-12)",
+    "variable": "var(--colors-accent-light-12)"
   },
   "colors.accent.dark.1": {
-    "value": "var(--accent-colour-dark-fill-50)",
+    "value": "var(--accent-colour-dark-1)",
     "variable": "var(--colors-accent-dark-1)"
   },
   "colors.accent.dark.2": {
-    "value": "var(--accent-colour-dark-fill-100)",
+    "value": "var(--accent-colour-dark-2)",
     "variable": "var(--colors-accent-dark-2)"
   },
   "colors.accent.dark.3": {
-    "value": "var(--accent-colour-dark-fill-200)",
+    "value": "var(--accent-colour-dark-3)",
     "variable": "var(--colors-accent-dark-3)"
   },
   "colors.accent.dark.4": {
-    "value": "var(--accent-colour-dark-fill-300)",
+    "value": "var(--accent-colour-dark-4)",
     "variable": "var(--colors-accent-dark-4)"
   },
   "colors.accent.dark.5": {
-    "value": "var(--accent-colour-dark-fill-400)",
+    "value": "var(--accent-colour-dark-5)",
     "variable": "var(--colors-accent-dark-5)"
   },
   "colors.accent.dark.6": {
-    "value": "var(--accent-colour-dark-fill-500)",
+    "value": "var(--accent-colour-dark-6)",
     "variable": "var(--colors-accent-dark-6)"
   },
   "colors.accent.dark.7": {
-    "value": "var(--accent-colour-dark-fill-600)",
+    "value": "var(--accent-colour-dark-7)",
     "variable": "var(--colors-accent-dark-7)"
   },
   "colors.accent.dark.8": {
-    "value": "var(--accent-colour-dark-fill-700)",
+    "value": "var(--accent-colour-dark-8)",
     "variable": "var(--colors-accent-dark-8)"
   },
   "colors.accent.dark.9": {
-    "value": "var(--accent-colour-dark-fill-800)",
+    "value": "var(--accent-colour-dark-9)",
     "variable": "var(--colors-accent-dark-9)"
   },
   "colors.accent.dark.10": {
-    "value": "var(--accent-colour-dark-fill-900)",
+    "value": "var(--accent-colour-dark-10)",
     "variable": "var(--colors-accent-dark-10)"
   },
-  "colors.accent.dark.text.1": {
-    "value": "var(--accent-colour-dark-text-50)",
-    "variable": "var(--colors-accent-dark-text-1)"
+  "colors.accent.dark.11": {
+    "value": "var(--accent-colour-dark-11)",
+    "variable": "var(--colors-accent-dark-11)"
   },
-  "colors.accent.dark.text.2": {
-    "value": "var(--accent-colour-dark-text-100)",
-    "variable": "var(--colors-accent-dark-text-2)"
-  },
-  "colors.accent.dark.text.3": {
-    "value": "var(--accent-colour-dark-text-200)",
-    "variable": "var(--colors-accent-dark-text-3)"
-  },
-  "colors.accent.dark.text.4": {
-    "value": "var(--accent-colour-dark-text-300)",
-    "variable": "var(--colors-accent-dark-text-4)"
-  },
-  "colors.accent.dark.text.5": {
-    "value": "var(--accent-colour-dark-text-400)",
-    "variable": "var(--colors-accent-dark-text-5)"
-  },
-  "colors.accent.dark.text.6": {
-    "value": "var(--accent-colour-dark-text-500)",
-    "variable": "var(--colors-accent-dark-text-6)"
-  },
-  "colors.accent.dark.text.7": {
-    "value": "var(--accent-colour-dark-text-600)",
-    "variable": "var(--colors-accent-dark-text-7)"
-  },
-  "colors.accent.dark.text.8": {
-    "value": "var(--accent-colour-dark-text-700)",
-    "variable": "var(--colors-accent-dark-text-8)"
-  },
-  "colors.accent.dark.text.9": {
-    "value": "var(--accent-colour-dark-text-800)",
-    "variable": "var(--colors-accent-dark-text-9)"
-  },
-  "colors.accent.dark.text.10": {
-    "value": "var(--accent-colour-dark-text-900)",
-    "variable": "var(--colors-accent-dark-text-10)"
+  "colors.accent.dark.12": {
+    "value": "var(--accent-colour-dark-12)",
+    "variable": "var(--colors-accent-dark-12)"
   },
   "durations.fastest": {
     "value": "50ms",
@@ -2984,27 +2920,27 @@ const tokens = {
     "variable": "var(--colors-background-gradient-v)"
   },
   "radii.control": {
-    "value": "var(--radii-sm)",
+    "value": "var(--sd-radius-control, var(--radii-sm))",
     "variable": "var(--radii-control)"
   },
   "radii.panel": {
-    "value": "var(--radii-lg)",
+    "value": "var(--sd-radius-panel, var(--radii-lg))",
     "variable": "var(--radii-panel)"
   },
   "radii.overlay": {
-    "value": "var(--radii-xl)",
+    "value": "var(--sd-radius-overlay, var(--radii-xl))",
     "variable": "var(--radii-overlay)"
   },
   "radii.pill": {
-    "value": "var(--radii-full)",
+    "value": "var(--sd-radius-pill, var(--radii-full))",
     "variable": "var(--radii-pill)"
   },
   "fonts.body": {
-    "value": "var(--fonts-inter)",
+    "value": "var(--sd-font-body, var(--fonts-inter))",
     "variable": "var(--fonts-body)"
   },
   "fonts.heading": {
-    "value": "var(--fonts-inter-display)",
+    "value": "var(--sd-font-heading, var(--fonts-inter-display))",
     "variable": "var(--fonts-heading)"
   },
   "blurs.subtle": {
@@ -3096,11 +3032,11 @@ const tokens = {
     "variable": "var(--sizes-layout-readable)"
   },
   "sizes.layout.content": {
-    "value": "var(--sizes-4xl)",
+    "value": "var(--sd-content-width, var(--sizes-4xl))",
     "variable": "var(--sizes-layout-content)"
   },
   "sizes.layout.contentWide": {
-    "value": "var(--sizes-6xl)",
+    "value": "var(--sd-content-wide-width, var(--sizes-6xl))",
     "variable": "var(--sizes-layout-content-wide)"
   },
   "sizes.layout.form": {
@@ -3108,7 +3044,7 @@ const tokens = {
     "variable": "var(--sizes-layout-form)"
   },
   "sizes.layout.sidebar": {
-    "value": "18rem",
+    "value": "var(--sd-sidebar-width, 18rem)",
     "variable": "var(--sizes-layout-sidebar)"
   },
   "sizes.layout.drawer": {
@@ -3128,15 +3064,15 @@ const tokens = {
     "variable": "var(--sizes-viewport-height)"
   },
   "spacing.gutter.mobile": {
-    "value": "var(--spacing-2)",
+    "value": "var(--sd-gutter-mobile, var(--spacing-2))",
     "variable": "var(--spacing-gutter-mobile)"
   },
   "spacing.gutter.tablet": {
-    "value": "var(--spacing-4)",
+    "value": "var(--sd-gutter-tablet, var(--spacing-4))",
     "variable": "var(--spacing-gutter-tablet)"
   },
   "spacing.gutter.desktop": {
-    "value": "var(--spacing-6)",
+    "value": "var(--sd-gutter-desktop, var(--spacing-6))",
     "variable": "var(--spacing-gutter-desktop)"
   },
   "spacing.safeTop": {
@@ -3570,6 +3506,14 @@ const tokens = {
   "colors.accent.10": {
     "value": "var(--colors-accent-10)",
     "variable": "var(--colors-accent-10)"
+  },
+  "colors.accent.11": {
+    "value": "var(--colors-accent-11)",
+    "variable": "var(--colors-accent-11)"
+  },
+  "colors.accent.12": {
+    "value": "var(--colors-accent-12)",
+    "variable": "var(--colors-accent-12)"
   },
   "colors.accent.text": {
     "value": "var(--colors-accent-text)",
@@ -5010,126 +4954,6 @@ const tokens = {
   "colors.colorPalette.dark.a12": {
     "value": "var(--colors-color-palette-dark-a12)",
     "variable": "var(--colors-color-palette-dark-a12)"
-  },
-  "colors.colorPalette.light.text.1": {
-    "value": "var(--colors-color-palette-light-text-1)",
-    "variable": "var(--colors-color-palette-light-text-1)"
-  },
-  "colors.colorPalette.text.1": {
-    "value": "var(--colors-color-palette-text-1)",
-    "variable": "var(--colors-color-palette-text-1)"
-  },
-  "colors.colorPalette.light.text.2": {
-    "value": "var(--colors-color-palette-light-text-2)",
-    "variable": "var(--colors-color-palette-light-text-2)"
-  },
-  "colors.colorPalette.text.2": {
-    "value": "var(--colors-color-palette-text-2)",
-    "variable": "var(--colors-color-palette-text-2)"
-  },
-  "colors.colorPalette.light.text.3": {
-    "value": "var(--colors-color-palette-light-text-3)",
-    "variable": "var(--colors-color-palette-light-text-3)"
-  },
-  "colors.colorPalette.text.3": {
-    "value": "var(--colors-color-palette-text-3)",
-    "variable": "var(--colors-color-palette-text-3)"
-  },
-  "colors.colorPalette.light.text.4": {
-    "value": "var(--colors-color-palette-light-text-4)",
-    "variable": "var(--colors-color-palette-light-text-4)"
-  },
-  "colors.colorPalette.text.4": {
-    "value": "var(--colors-color-palette-text-4)",
-    "variable": "var(--colors-color-palette-text-4)"
-  },
-  "colors.colorPalette.light.text.5": {
-    "value": "var(--colors-color-palette-light-text-5)",
-    "variable": "var(--colors-color-palette-light-text-5)"
-  },
-  "colors.colorPalette.text.5": {
-    "value": "var(--colors-color-palette-text-5)",
-    "variable": "var(--colors-color-palette-text-5)"
-  },
-  "colors.colorPalette.light.text.6": {
-    "value": "var(--colors-color-palette-light-text-6)",
-    "variable": "var(--colors-color-palette-light-text-6)"
-  },
-  "colors.colorPalette.text.6": {
-    "value": "var(--colors-color-palette-text-6)",
-    "variable": "var(--colors-color-palette-text-6)"
-  },
-  "colors.colorPalette.light.text.7": {
-    "value": "var(--colors-color-palette-light-text-7)",
-    "variable": "var(--colors-color-palette-light-text-7)"
-  },
-  "colors.colorPalette.text.7": {
-    "value": "var(--colors-color-palette-text-7)",
-    "variable": "var(--colors-color-palette-text-7)"
-  },
-  "colors.colorPalette.light.text.8": {
-    "value": "var(--colors-color-palette-light-text-8)",
-    "variable": "var(--colors-color-palette-light-text-8)"
-  },
-  "colors.colorPalette.text.8": {
-    "value": "var(--colors-color-palette-text-8)",
-    "variable": "var(--colors-color-palette-text-8)"
-  },
-  "colors.colorPalette.light.text.9": {
-    "value": "var(--colors-color-palette-light-text-9)",
-    "variable": "var(--colors-color-palette-light-text-9)"
-  },
-  "colors.colorPalette.text.9": {
-    "value": "var(--colors-color-palette-text-9)",
-    "variable": "var(--colors-color-palette-text-9)"
-  },
-  "colors.colorPalette.light.text.10": {
-    "value": "var(--colors-color-palette-light-text-10)",
-    "variable": "var(--colors-color-palette-light-text-10)"
-  },
-  "colors.colorPalette.text.10": {
-    "value": "var(--colors-color-palette-text-10)",
-    "variable": "var(--colors-color-palette-text-10)"
-  },
-  "colors.colorPalette.dark.text.1": {
-    "value": "var(--colors-color-palette-dark-text-1)",
-    "variable": "var(--colors-color-palette-dark-text-1)"
-  },
-  "colors.colorPalette.dark.text.2": {
-    "value": "var(--colors-color-palette-dark-text-2)",
-    "variable": "var(--colors-color-palette-dark-text-2)"
-  },
-  "colors.colorPalette.dark.text.3": {
-    "value": "var(--colors-color-palette-dark-text-3)",
-    "variable": "var(--colors-color-palette-dark-text-3)"
-  },
-  "colors.colorPalette.dark.text.4": {
-    "value": "var(--colors-color-palette-dark-text-4)",
-    "variable": "var(--colors-color-palette-dark-text-4)"
-  },
-  "colors.colorPalette.dark.text.5": {
-    "value": "var(--colors-color-palette-dark-text-5)",
-    "variable": "var(--colors-color-palette-dark-text-5)"
-  },
-  "colors.colorPalette.dark.text.6": {
-    "value": "var(--colors-color-palette-dark-text-6)",
-    "variable": "var(--colors-color-palette-dark-text-6)"
-  },
-  "colors.colorPalette.dark.text.7": {
-    "value": "var(--colors-color-palette-dark-text-7)",
-    "variable": "var(--colors-color-palette-dark-text-7)"
-  },
-  "colors.colorPalette.dark.text.8": {
-    "value": "var(--colors-color-palette-dark-text-8)",
-    "variable": "var(--colors-color-palette-dark-text-8)"
-  },
-  "colors.colorPalette.dark.text.9": {
-    "value": "var(--colors-color-palette-dark-text-9)",
-    "variable": "var(--colors-color-palette-dark-text-9)"
-  },
-  "colors.colorPalette.dark.text.10": {
-    "value": "var(--colors-color-palette-dark-text-10)",
-    "variable": "var(--colors-color-palette-dark-text-10)"
   },
   "colors.colorPalette.canvas": {
     "value": "var(--colors-color-palette-canvas)",

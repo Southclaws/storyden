@@ -41,6 +41,7 @@ export function Reply(props: Props) {
 
   return (
     <CardBox
+      className="thread-reply"
       id={reply.id}
       data-targeted={isTargeted || undefined}
       _target={{
@@ -58,6 +59,7 @@ export function Reply(props: Props) {
       }}
     >
       <styled.form
+        className="thread-reply__body"
         display="flex"
         flexDirection="column"
         gap="2"
@@ -117,7 +119,7 @@ export function Reply(props: Props) {
         )}
       </styled.form>
 
-      <WStack>
+      <WStack className="thread-reply__footer">
         <ThreadReactList
           initialSession={initialSession}
           thread={thread}

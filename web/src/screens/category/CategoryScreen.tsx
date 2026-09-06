@@ -69,7 +69,7 @@ export function CategoryScreen(props: ScreenProps) {
   const coverImageURL = getAssetURL(category.cover_image?.path);
 
   return (
-    <LStack>
+    <LStack className="category-page" data-sd-page="category">
       <Breadcrumbs
         index={{ label: DiscussionLabel, href: DiscussionRoute }}
         crumbs={[
@@ -83,8 +83,9 @@ export function CategoryScreen(props: ScreenProps) {
       </Breadcrumbs>
 
       {coverImageURL && (
-        <Box height="auto" width="full">
+        <Box className="category-page__cover" height="auto" width="full">
           <styled.img
+            className="category-page__cover-image"
             src={coverImageURL}
             alt="" // No alt image, decorative
             aria-hidden="true"
@@ -97,14 +98,14 @@ export function CategoryScreen(props: ScreenProps) {
         </Box>
       )}
 
-      <LStack gap="1">
+      <LStack className="category-page__header" gap="1">
         <PageHeading>{category.name}</PageHeading>
 
         <Text variant="supporting">{category.description}</Text>
       </LStack>
 
       {category.children && category.children.length > 0 && (
-        <LStack gap="1">
+        <LStack className="category-page__subcategories" gap="1">
           <SectionHeading>Subcategories</SectionHeading>
           <CategoryLayout layout="grid" categories={category.children} />
         </LStack>

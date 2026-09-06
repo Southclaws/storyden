@@ -15,14 +15,17 @@ export function FeedCoverBlock() {
   }
 
   return (
-    <Box width="full" height="64" position="relative">
+    <Box className="feed-cover" width="full" height="64" position="relative">
       <Image
-        className={css({
-          width: "full",
-          height: "full",
-          borderRadius: "md",
-          objectFit: "cover",
-        })}
+        className={
+          "feed-cover__image " +
+          css({
+            width: "full",
+            height: "full",
+            borderRadius: "md",
+            objectFit: "cover",
+          })
+        }
         src={getBannerURL()}
         alt=""
         fill

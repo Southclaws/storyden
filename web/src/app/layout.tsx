@@ -13,7 +13,7 @@ import { Providers } from "./providers";
 
 const { API_ADDRESS, WEB_ADDRESS } = serverEnvironment();
 
-export default async function RootLayout({ children }: PropsWithChildren) {
+export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en" className={`${inter.variable} ${interDisplay.variable}`}>
       <head>
@@ -35,7 +35,12 @@ export default async function RootLayout({ children }: PropsWithChildren) {
             don't want this to require client-side render or CSS-in-JS.
         */}
         {/* eslint-disable-next-line @next/next/no-css-tags */}
-        <link rel="stylesheet" href="/theme.css" />
+        <link
+          rel="stylesheet"
+          href="/theme.css"
+          data-sd-theme-asset="stylesheet"
+        />
+        <script src="/theme.js" defer data-sd-theme-asset="script" />
       </head>
 
       <body>
@@ -52,7 +57,7 @@ export async function generateViewport(): Promise<Viewport> {
 
   return {
     themeColor: themeColour,
-    colorScheme: "only light",
+    colorScheme: "light dark",
   };
 }
 

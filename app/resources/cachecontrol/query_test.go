@@ -36,3 +36,19 @@ func TestExactETagReturnsNotModified(t *testing.T) {
 
 	assert.True(t, notModified)
 }
+
+func TestOpaqueETagMatchesConditionalRequest(t *testing.T) {
+	query := NewQuery(opt.New(`"older", W/"sha256-current"`))
+
+	matched := query.MatchesETag(`"sha256-current"`)
+
+	assert.True(t, matched)
+}
+
+func TestOpaqueETagDoesNotMatchDifferentValidator(t *testing.T) {
+	query := NewQuery(opt.New(`"sha256-previous"`))
+
+	matched := query.MatchesETag(`"sha256-current"`)
+
+	assert.False(t, matched)
+}

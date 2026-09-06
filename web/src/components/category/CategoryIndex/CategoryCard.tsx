@@ -33,6 +33,7 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
 
   return (
     <CardBox
+      className="category-card"
       position="relative"
       borderWidth="none"
       display="flex"
@@ -44,6 +45,7 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
     >
       {coverImage && (
         <img
+          className="category-card__cover"
           src={coverImage}
           alt="" // No alt image, decorative
           aria-hidden="true"
@@ -51,6 +53,7 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
       )}
 
       <LStack
+        className="category-card__content"
         flex="1"
         p="1"
         borderWidth="thin"
@@ -58,11 +61,17 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
         borderRadius="lg"
         borderTopRadius={coverImage ? "none" : undefined}
       >
-        <LStack h="full" gap="1" justifyContent="space-between">
-          <LStack h="full" gap="1">
-            <WStack alignItems="start">
+        <LStack
+          className="category-card__body"
+          h="full"
+          gap="1"
+          justifyContent="space-between"
+        >
+          <LStack className="category-card__summary" h="full" gap="1">
+            <WStack className="category-card__header" alignItems="start">
               <Link className={linkOverlay()} href={`/d/${category.slug}`}>
                 <styled.h2
+                  className="category-card__title"
                   color="text.default"
                   fontWeight="semibold"
                   fontSize="sm"
@@ -75,11 +84,18 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
               <CategoryMenu category={category} />
             </WStack>
 
-            <Text variant="supporting">{category.description}</Text>
+            <Text className="category-card__description" variant="supporting">
+              {category.description}
+            </Text>
           </LStack>
 
-          <WStack>
-            <HStack gap="1" color="text.muted" fontSize="sm">
+          <WStack className="category-card__footer">
+            <HStack
+              className="category-card__stats"
+              gap="1"
+              color="text.muted"
+              fontSize="sm"
+            >
               <DiscussionIcon w="4" />
               <Text as="span" variant="metadata">
                 {category.postCount} {pluralise(category.postCount, "thread")}
@@ -103,6 +119,7 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
 
               return (
                 <CardBox
+                  className="category-card__subcategory"
                   key={c.id}
                   position="relative"
                   style={cssProps}
@@ -122,6 +139,7 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
                     <HStack gap="1">
                       <Link className={linkOverlay()} href={`/d/${c.slug}`}>
                         <styled.h3
+                          className="category-card__subcategory-title"
                           color="text.default"
                           fontWeight="semibold"
                           fontSize="sm"
@@ -132,7 +150,11 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
                         </styled.h3>
                       </Link>
                       <BulletIcon />
-                      <Text variant="supporting" lineClamp={1}>
+                      <Text
+                        className="category-card__subcategory-description"
+                        variant="supporting"
+                        lineClamp={1}
+                      >
                         {c.description}
                       </Text>
                     </HStack>

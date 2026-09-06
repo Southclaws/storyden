@@ -1,0 +1,393 @@
+/*
+ * open.mp theme for Storyden.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  --openmp-lavender: var(--sd-color-accent-8);
+  --openmp-lavender-soft: var(--sd-color-accent-3);
+  --openmp-purple: var(--sd-color-accent);
+  --openmp-purple-deep: var(--sd-color-accent-text);
+
+  --sd-color-canvas: #f2f3f7;
+  --sd-color-surface: #ffffff;
+  --sd-color-inset: #e9eaf0;
+  --sd-color-overlay: #ffffff;
+  --sd-color-control: #ffffff;
+  --sd-color-text: #292b33;
+  --sd-color-text-muted: #5e6370;
+  --sd-color-text-subtle: #6c7180;
+  --sd-color-border: #d9dbe3;
+  --sd-color-border-muted: #e6e7ec;
+  --sd-color-border-strong: var(--sd-color-accent-7);
+
+  --sd-radius-control: 0.35rem;
+  --sd-radius-panel: 0.65rem;
+  --sd-radius-overlay: 0.75rem;
+  --sd-radius-pill: 999px;
+  --sd-content-width: 72rem;
+  --sd-content-wide-width: 90rem;
+  --sd-sidebar-width: 17rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sd-color-canvas: #15131d;
+    --sd-color-surface: #211e2b;
+    --sd-color-inset: #2b2738;
+    --sd-color-overlay: #282432;
+    --sd-color-control: #2b2738;
+    --sd-color-text: #f4f2f8;
+    --sd-color-text-muted: #c2bdce;
+    --sd-color-text-subtle: #aaa4b8;
+    --sd-color-border: #3d374c;
+    --sd-color-border-muted: #332e40;
+    --sd-color-border-strong: var(--sd-color-accent-7);
+  }
+}
+
+html,
+body {
+  background: var(--sd-color-canvas);
+}
+
+body {
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  color: var(--sd-color-accent-foreground);
+  background: var(--sd-color-accent);
+}
+
+/* Application chrome */
+
+.navigation__leftbar {
+  background: color-mix(
+    in srgb,
+    var(--sd-color-surface) 96%,
+    var(--openmp-lavender)
+  );
+  overflow: hidden;
+  border: 1px solid var(--sd-color-border);
+  border-radius: var(--sd-radius-panel);
+  box-shadow: 0.25rem 0 1.5rem
+    color-mix(in srgb, var(--sd-color-accent) 5%, transparent);
+}
+
+.navigation__sidebar-top {
+  padding: 0.5rem;
+}
+
+.navigation__topbar {
+  background: color-mix(
+    in srgb,
+    var(--sd-color-surface) 94%,
+    var(--openmp-lavender)
+  );
+  border-bottom: 1px solid var(--sd-color-border);
+  box-shadow: 0 0.25rem 1.25rem
+    color-mix(in srgb, var(--sd-color-accent) 8%, transparent);
+}
+
+.navigation-anchor {
+  border-radius: var(--sd-radius-control);
+  transition: color 120ms ease, background-color 120ms ease;
+}
+
+.navigation-anchor:hover,
+.navigation-anchor:focus-visible {
+  color: var(--openmp-purple-deep);
+  background: var(--openmp-lavender-soft);
+}
+
+.navigation-anchor--home {
+  color: var(--openmp-purple);
+}
+
+/* Home composition */
+
+.feed-page {
+  padding-block-start: 0;
+}
+
+.feed-page__blocks {
+  gap: clamp(0.8rem, 1.8vw, 1.25rem);
+}
+
+.feed-page__block--cover {
+  margin-block-end: 0.25rem;
+}
+
+.feed-cover {
+  position: relative;
+  min-height: clamp(10rem, 24vw, 17rem);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--openmp-lavender) 55%, transparent);
+  border-radius: var(--sd-radius-panel);
+  background: var(--openmp-lavender-soft);
+  box-shadow: 0 0.8rem 2rem
+    color-mix(in srgb, var(--sd-color-accent) 10%, transparent);
+  isolation: isolate;
+}
+
+.feed-cover::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(
+      110deg,
+      color-mix(in srgb, var(--sd-color-accent) 76%, transparent),
+      color-mix(in srgb, var(--sd-color-accent-8) 22%, transparent) 62%
+    ),
+    linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--sd-color-accent-12) 20%, transparent),
+      transparent 55%
+    );
+}
+
+.feed-cover__image {
+  min-height: inherit;
+  filter: saturate(0.65) contrast(0.92);
+  transform: scale(1.015);
+}
+
+.feed-page__block--heading .page-heading {
+  color: var(--openmp-purple-deep);
+}
+
+.feed-page__block--heading .page-heading + * {
+  color: var(--sd-color-text-muted);
+}
+
+.category-page__cover {
+  overflow: hidden;
+  border: 1px solid var(--sd-color-border);
+  border-radius: var(--sd-radius-panel);
+  background: var(--openmp-lavender-soft);
+}
+
+.category-page__cover-image {
+  filter: saturate(0.72) contrast(0.94);
+}
+
+.category-page__header .page-heading,
+.thread-page__header .page-heading {
+  color: var(--openmp-purple-deep);
+}
+
+/* Panels and content cards */
+
+.card-box,
+.rich-card__root {
+  border-color: var(--sd-color-border);
+  background: var(--sd-color-surface);
+  box-shadow: 0 0.5rem 1.35rem
+    color-mix(in srgb, var(--sd-color-accent) 8%, transparent);
+}
+
+.category-card {
+  overflow: hidden;
+  border: 0;
+  background: var(--sd-color-surface);
+  box-shadow: 0 0.6rem 1.4rem
+    color-mix(in srgb, var(--sd-color-accent) 10%, transparent);
+}
+
+.category-card__content {
+  gap: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.category-card__body {
+  gap: 0;
+}
+
+.category-card__summary {
+  gap: 0.3rem;
+  padding: 1rem 1.15rem 0.9rem;
+  color: var(--sd-color-accent-foreground);
+  background: linear-gradient(
+    105deg,
+    var(--sd-color-accent),
+    var(--sd-color-accent-10)
+  );
+}
+
+.category-card__title,
+.category-card__title a,
+.category-card__description {
+  color: var(--sd-color-accent-foreground);
+}
+
+.category-card__title a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+.category-card__description {
+  opacity: 0.9;
+}
+
+.category-card__footer {
+  padding: 0.75rem 1.15rem;
+  border-top: 1px solid
+    color-mix(in srgb, var(--sd-color-border) 72%, transparent);
+  background: var(--sd-color-surface);
+}
+
+.category-card__subcategory {
+  border-color: var(--sd-color-border-muted);
+  background: color-mix(
+    in srgb,
+    var(--sd-color-surface) 88%,
+    var(--openmp-lavender-soft)
+  );
+  box-shadow: none;
+}
+
+.category-card__subcategory-title {
+  color: var(--openmp-purple-deep);
+}
+
+.quick-share {
+  border-color: color-mix(
+    in srgb,
+    var(--openmp-lavender) 44%,
+    var(--sd-color-border)
+  );
+  background: color-mix(
+    in srgb,
+    var(--sd-color-surface) 86%,
+    var(--openmp-lavender-soft)
+  );
+  box-shadow: none;
+}
+
+.quick-share:focus-within {
+  border-color: var(--sd-color-focus-ring);
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--sd-color-focus-ring) 24%, transparent);
+}
+
+/* Thread rows: retain Storyden's card anatomy, with open.mp's compact rhythm. */
+
+.thread-feed__list {
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--sd-color-border);
+  border-radius: var(--sd-radius-panel);
+  background: var(--sd-color-surface);
+  box-shadow: 0 0.6rem 1.5rem
+    color-mix(in srgb, var(--sd-color-accent) 9%, transparent);
+}
+
+.thread-feed__list > .rich-card__container .rich-card__root {
+  border: 0;
+  border-bottom: 1px solid var(--sd-color-border);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.thread-feed__list > .rich-card__container:last-child .rich-card__root {
+  border-bottom: 0;
+}
+
+.thread-feed__list > .rich-card__container:nth-child(even) .rich-card__root {
+  background: color-mix(
+    in srgb,
+    var(--sd-color-surface) 89%,
+    var(--openmp-lavender-soft)
+  );
+}
+
+.thread-feed .rich-card__title {
+  color: var(--openmp-purple-deep);
+}
+
+.thread-feed .rich-card__title a:hover {
+  color: var(--openmp-purple);
+}
+
+.thread-page__stats {
+  padding-block: 0.4rem;
+  border-bottom: 1px solid var(--sd-color-border);
+}
+
+.thread-reply {
+  border-left: 3px solid
+    color-mix(in srgb, var(--openmp-lavender) 70%, var(--sd-color-border));
+}
+
+.reply-list__item:nth-of-type(even) .thread-reply {
+  background: color-mix(
+    in srgb,
+    var(--sd-color-surface) 91%,
+    var(--openmp-lavender-soft)
+  );
+}
+
+.reply-composer__form {
+  border-color: color-mix(
+    in srgb,
+    var(--openmp-lavender) 52%,
+    var(--sd-color-border)
+  );
+}
+
+/* Recipe anatomy is a supported theme target; utilities are not. */
+
+.button {
+  font-weight: 600;
+}
+
+.button--variant_solid {
+  box-shadow: 0 0.2rem 0.45rem
+    color-mix(in srgb, var(--sd-color-accent) 18%, transparent);
+}
+
+.button--variant_outline:hover,
+.button--variant_ghost:hover {
+  color: var(--openmp-purple-deep);
+  background: var(--openmp-lavender-soft);
+}
+
+.menu__content,
+.popover__content {
+  border-color: var(--sd-color-border);
+  background: var(--sd-color-overlay);
+  box-shadow: 0 1rem 2.5rem
+    color-mix(in srgb, var(--sd-color-accent) 18%, transparent);
+}
+
+.menu__item[data-highlighted] {
+  color: var(--openmp-purple-deep);
+  background: var(--openmp-lavender-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navigation-anchor {
+    transition: none;
+  }
+}
+
+@media (max-width: 48rem) {
+  .feed-cover {
+    min-height: 9rem;
+    border-radius: 0.5rem;
+  }
+
+  .category-card__summary {
+    padding: 0.85rem 1rem;
+  }
+
+  .category-card__footer {
+    padding-inline: 1rem;
+  }
+}

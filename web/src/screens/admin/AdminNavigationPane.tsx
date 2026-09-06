@@ -29,6 +29,7 @@ import { type AdminSectionID, getAdminSectionGroups } from "./adminSections";
 const sectionIcons: Record<AdminSectionID, ReactNode> = {
   brand: <ColourPipetteIcon />,
   interface: <LayoutIcon />,
+  theme: <ColourPipetteIcon />,
   moderation: <BanIcon />,
   system: <SystemIcon />,
   audit_log: <ArchiveIcon />,
