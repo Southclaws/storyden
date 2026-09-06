@@ -73,18 +73,15 @@ function CategoryLayoutMenu({
     void overwriteBlock({
       ...block,
       layout: value as "grid" | "list",
-    });
-    onConfigured();
+    }).then(() => onConfigured());
   }
 
   return (
-    <Menu.Root lazyMount onSelect={handleSelect}>
-      <Menu.Trigger asChild>
-        <Menu.Item value="layout">
-          <LayoutIcon />
-          Layout
-        </Menu.Item>
-      </Menu.Trigger>
+    <Menu.Root lazyMount closeOnSelect={false} onSelect={handleSelect}>
+      <Menu.TriggerItem>
+        <LayoutIcon />
+        Layout
+      </Menu.TriggerItem>
       <Portal>
         <Menu.Positioner>
           <Menu.Content minW="36">
@@ -116,18 +113,15 @@ function ThreadSourceMenu({
     void overwriteBlock({
       ...block,
       source: value as "all" | "uncategorised",
-    });
-    onConfigured();
+    }).then(() => onConfigured());
   }
 
   return (
-    <Menu.Root lazyMount onSelect={handleSelect}>
-      <Menu.Trigger asChild>
-        <Menu.Item value="source">
-          <SelectIcon />
-          Source
-        </Menu.Item>
-      </Menu.Trigger>
+    <Menu.Root lazyMount closeOnSelect={false} onSelect={handleSelect}>
+      <Menu.TriggerItem>
+        <SelectIcon />
+        Source
+      </Menu.TriggerItem>
       <Portal>
         <Menu.Positioner>
           <Menu.Content minW="40">
@@ -153,18 +147,15 @@ function QuickShareCategoryMenu({
     void overwriteBlock({
       ...block,
       showCategorySelect: value === "show",
-    });
-    onConfigured();
+    }).then(() => onConfigured());
   }
 
   return (
-    <Menu.Root lazyMount onSelect={handleSelect}>
-      <Menu.Trigger asChild>
-        <Menu.Item value="category-select">
-          <SelectIcon />
-          Category picker
-        </Menu.Item>
-      </Menu.Trigger>
+    <Menu.Root lazyMount closeOnSelect={false} onSelect={handleSelect}>
+      <Menu.TriggerItem>
+        <SelectIcon />
+        Category picker
+      </Menu.TriggerItem>
       <Portal>
         <Menu.Positioner>
           <Menu.Content minW="40">
@@ -189,12 +180,10 @@ function LibraryConfigMenu({
   return (
     <>
       <Menu.Root lazyMount>
-        <Menu.Trigger asChild>
-          <Menu.Item value="page">
-            <SelectIcon />
-            Page
-          </Menu.Item>
-        </Menu.Trigger>
+        <Menu.TriggerItem>
+          <SelectIcon />
+          Page
+        </Menu.TriggerItem>
         <Portal>
           <Menu.Positioner>
             <Menu.Content minW="64">
@@ -233,18 +222,15 @@ function LibraryLayoutMenu({
     void overwriteBlock({
       ...block,
       layout: value as "grid" | "list",
-    });
-    onConfigured();
+    }).then(() => onConfigured());
   }
 
   return (
-    <Menu.Root lazyMount onSelect={handleSelect}>
-      <Menu.Trigger asChild>
-        <Menu.Item value="layout">
-          <LayoutIcon />
-          Layout
-        </Menu.Item>
-      </Menu.Trigger>
+    <Menu.Root lazyMount closeOnSelect={false} onSelect={handleSelect}>
+      <Menu.TriggerItem>
+        <LayoutIcon />
+        Layout
+      </Menu.TriggerItem>
       <Portal>
         <Menu.Positioner>
           <Menu.Content minW="36">

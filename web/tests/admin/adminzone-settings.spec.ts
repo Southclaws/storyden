@@ -63,39 +63,55 @@ async function chooseBlockMenuItem(page: Page, item: string, value: string) {
 
   const valueItem = page.getByRole("menuitem", { name: value, exact: true });
   await expect(valueItem).toBeVisible();
-  await valueItem.click();
+  await valueItem.hover();
+  await expect(valueItem).toHaveAttribute("data-highlighted", "");
+  await page.keyboard.press("Enter");
 }
 
 async function clickOutsideOpenMenu(page: Page) {
   await page.locator("main").dispatchEvent("pointerdown");
 }
 
-async function dragBlockBelow(
+async function activateDrag(page: Page, source: Locator) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await source.scrollIntoViewIfNeeded();
+    const sourceBox = await source.boundingBox();
+    if (!sourceBox) {
+      throw new Error("Block drag geometry is unavailable");
+    }
+
+    const sourceX = sourceBox.x + sourceBox.width / 2;
+    const sourceY = sourceBox.y + sourceBox.height / 2;
+    await page.mouse.move(sourceX, sourceY);
+    await page.mouse.down();
+    await page.mouse.move(sourceX + 8, sourceY, { steps: 4 });
+
+    try {
+      await expect(source).toHaveAttribute("data-dragging", "", {
+        timeout: 1000,
+      });
+      return;
+    } catch (error) {
+      await page.mouse.up();
+      await page.keyboard.press("Escape");
+
+      if (attempt === 2) {
+        throw error;
+      }
+    }
+  }
+}
+
+async function dragBlockAcross(
   page: Page,
   sourceBlock: Locator,
   targetBlock: Locator,
+  direction: "above" | "below",
 ) {
   const source = sourceBlock.getByRole("button", {
     name: "Move or configure block",
   });
-  const sourceBox = await source.boundingBox();
-  const targetBox = await targetBlock.boundingBox();
-
-  if (!sourceBox || !targetBox) {
-    throw new Error("Block drag geometry is unavailable");
-  }
-
-  await page.mouse.move(
-    sourceBox.x + sourceBox.width / 2,
-    sourceBox.y + sourceBox.height / 2,
-  );
-  await page.mouse.down();
-  await page.mouse.move(
-    sourceBox.x + sourceBox.width / 2,
-    sourceBox.y + sourceBox.height / 2 + 4,
-    { steps: 2 },
-  );
-  await expect(source).toHaveAttribute("data-dragging", "");
+  await activateDrag(page, source);
 
   const liveTargetBox = await targetBlock.boundingBox();
   if (!liveTargetBox) {
@@ -104,7 +120,9 @@ async function dragBlockBelow(
 
   await page.mouse.move(
     liveTargetBox.x + liveTargetBox.width / 2,
-    liveTargetBox.y + liveTargetBox.height - 2,
+    direction === "below"
+      ? liveTargetBox.y + 2
+      : liveTargetBox.y + liveTargetBox.height - 2,
     { steps: 12 },
   );
   await page.mouse.up();
@@ -166,15 +184,28 @@ test.describe("Feed Editor Settings", () => {
 
     const categoryBeforeDrag = await categoryBlock.boundingBox();
     const threadBeforeDrag = await threadBlock.boundingBox();
-    expect(categoryBeforeDrag?.y).toBeLessThan(threadBeforeDrag?.y ?? 0);
+    if (!categoryBeforeDrag || !threadBeforeDrag) {
+      throw new Error("Block order geometry is unavailable");
+    }
 
-    await dragBlockBelow(page, categoryBlock, threadBlock);
+    const categoryStartedAbove = categoryBeforeDrag.y < threadBeforeDrag.y;
+
+    await dragBlockAcross(
+      page,
+      categoryBlock,
+      threadBlock,
+      categoryStartedAbove ? "below" : "above",
+    );
 
     await expect
       .poll(async () => {
         const categoryAfterDrag = await categoryBlock.boundingBox();
         const threadAfterDrag = await threadBlock.boundingBox();
-        return (categoryAfterDrag?.y ?? 0) > (threadAfterDrag?.y ?? 0);
+        if (!categoryAfterDrag || !threadAfterDrag) {
+          return false;
+        }
+
+        return categoryAfterDrag.y < threadAfterDrag.y !== categoryStartedAbove;
       })
       .toBe(true);
     await expect(

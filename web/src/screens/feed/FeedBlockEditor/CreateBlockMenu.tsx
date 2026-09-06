@@ -18,16 +18,7 @@ type Props = {
   trigger?: React.ReactElement;
 };
 
-export function CreateBlockMenu({
-  index,
-  positioning,
-  trigger = (
-    <Menu.Item value="add">
-      <AddIcon />
-      Add block
-    </Menu.Item>
-  ),
-}: Props) {
+export function CreateBlockMenu({ index, positioning, trigger }: Props) {
   const { addBlock, feed } = useFeedBlockEditor();
   const existing = new Set(feed.blocks.map((block) => block.type));
   const available = AllFeedBlockTypes.filter((type) => !existing.has(type));
@@ -42,7 +33,14 @@ export function CreateBlockMenu({
 
   return (
     <Menu.Root lazyMount onSelect={handleSelect} positioning={positioning}>
-      <Menu.Trigger asChild>{trigger}</Menu.Trigger>
+      {trigger ? (
+        <Menu.Trigger asChild>{trigger}</Menu.Trigger>
+      ) : (
+        <Menu.TriggerItem>
+          <AddIcon />
+          Add block
+        </Menu.TriggerItem>
+      )}
       <Portal>
         <Menu.Positioner>
           <Menu.Content minW="40">

@@ -50,7 +50,11 @@ describe("CreateBlockMenu", () => {
     render(<CreateBlockMenu trigger={<button>Open menu</button>} />);
 
     await user.click(screen.getByRole("button", { name: "Open menu" }));
-    await user.click(screen.getByRole("menuitem", { name: "Directory" }));
+    await waitFor(() => expect(screen.getByRole("menu")).toHaveFocus());
+    await user.keyboard("{End}");
+    const item = screen.getByRole("menuitem", { name: "Directory" });
+    await waitFor(() => expect(item).toHaveAttribute("data-highlighted"));
+    await user.keyboard("{Enter}");
 
     await waitFor(() =>
       expect(emit).toHaveBeenCalledWith("library:add-block", {
@@ -66,7 +70,11 @@ describe("CreateBlockMenu", () => {
     render(<CreateBlockMenu trigger={<button>Open menu</button>} index={0} />);
 
     await user.click(screen.getByRole("button", { name: "Open menu" }));
-    await user.click(screen.getByRole("menuitem", { name: "Directory" }));
+    await waitFor(() => expect(screen.getByRole("menu")).toHaveFocus());
+    await user.keyboard("{End}");
+    const item = screen.getByRole("menuitem", { name: "Directory" });
+    await waitFor(() => expect(item).toHaveAttribute("data-highlighted"));
+    await user.keyboard("{Enter}");
 
     await waitFor(() =>
       expect(emit).toHaveBeenCalledWith("library:add-block", {

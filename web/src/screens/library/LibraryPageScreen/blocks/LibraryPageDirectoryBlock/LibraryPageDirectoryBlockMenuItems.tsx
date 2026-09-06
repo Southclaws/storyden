@@ -49,12 +49,10 @@ function LayoutMenu() {
 
   return (
     <Menu.Root lazyMount onSelect={handleSelect}>
-      <Menu.Trigger asChild>
-        <Menu.Item value="layout">
-          <LayoutIcon />
-          &nbsp;Layout
-        </Menu.Item>
-      </Menu.Trigger>
+      <Menu.TriggerItem>
+        <LayoutIcon />
+        &nbsp;Layout
+      </Menu.TriggerItem>
 
       <Portal>
         <Menu.Positioner>

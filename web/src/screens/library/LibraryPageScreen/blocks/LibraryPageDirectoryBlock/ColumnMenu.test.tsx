@@ -51,19 +51,27 @@ describe("ColumnMenu", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "Open menu" }));
+    await waitFor(() => expect(screen.getByRole("menu")).toHaveFocus());
 
     const input = screen.getByRole("textbox");
     fireEvent.change(input, { target: { value: "Urgency" } });
     expect(actions.setChildPropertyName).toHaveBeenCalledWith("p1", "Urgency");
 
-    await user.click(screen.getByRole("menuitem", { name: /Hide column/ }));
+    await user.keyboard("{Home}");
+    const hideItem = screen.getByRole("menuitem", { name: /Hide column/ });
+    await waitFor(() => expect(hideItem).toHaveAttribute("data-highlighted"));
+    await user.keyboard("{Enter}");
     expect(actions.setChildPropertyHiddenState).toHaveBeenCalledWith(
       "p1",
       true,
     );
 
     await user.click(screen.getByRole("button", { name: "Open menu" }));
-    await user.click(screen.getByRole("menuitem", { name: /Delete/ }));
+    await waitFor(() => expect(screen.getByRole("menu")).toHaveFocus());
+    await user.keyboard("{End}");
+    const deleteItem = screen.getByRole("menuitem", { name: /Delete/ });
+    await waitFor(() => expect(deleteItem).toHaveAttribute("data-highlighted"));
+    await user.keyboard("{Enter}");
     expect(actions.removeChildPropertyByID).toHaveBeenCalledWith("p1");
   });
 

@@ -12,12 +12,7 @@ import { LibraryPageBlock, LibraryPageBlockName } from "@/lib/library/metadata";
 import { useWatch } from "../store";
 
 export function CreateBlockMenu({
-  trigger = (
-    <Menu.Item value="add">
-      <AddIcon />
-      &nbsp;Add Block
-    </Menu.Item>
-  ),
+  trigger,
   positioning = undefined,
   index = undefined,
 }: {
@@ -42,7 +37,14 @@ export function CreateBlockMenu({
 
   return (
     <Menu.Root lazyMount onSelect={handleSelect} positioning={positioning}>
-      <Menu.Trigger asChild>{trigger}</Menu.Trigger>
+      {trigger ? (
+        <Menu.Trigger asChild>{trigger}</Menu.Trigger>
+      ) : (
+        <Menu.TriggerItem>
+          <AddIcon />
+          &nbsp;Add Block
+        </Menu.TriggerItem>
+      )}
 
       <Portal>
         <Menu.Positioner>

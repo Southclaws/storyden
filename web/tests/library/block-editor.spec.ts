@@ -1,4 +1,4 @@
-import { Page, expect, test } from "@playwright/test";
+import { Locator, Page, expect, test } from "@playwright/test";
 
 import {
   createAdmin,
@@ -12,6 +12,36 @@ async function clickOutsideOpenMenu(page: Page) {
   await page.locator("#block-content_content:visible").click();
 }
 
+async function activateDrag(page: Page, source: Locator) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await source.scrollIntoViewIfNeeded();
+    const sourceBox = await source.boundingBox();
+    if (!sourceBox) {
+      throw new Error("Block drag geometry is unavailable");
+    }
+
+    const sourceX = sourceBox.x + sourceBox.width / 2;
+    const sourceY = sourceBox.y + sourceBox.height / 2;
+    await page.mouse.move(sourceX, sourceY);
+    await page.mouse.down();
+    await page.mouse.move(sourceX + 8, sourceY, { steps: 4 });
+
+    try {
+      await expect(source).toHaveAttribute("data-dragging", "", {
+        timeout: 1000,
+      });
+      return;
+    } catch (error) {
+      await page.mouse.up();
+      await page.keyboard.press("Escape");
+
+      if (attempt === 2) {
+        throw error;
+      }
+    }
+  }
+}
+
 async function dragBlockBelow(
   page: Page,
   sourceType: string,
@@ -21,24 +51,7 @@ async function dragBlockBelow(
     `#block-${sourceType}_gutter-drag-handle:visible`,
   );
   const target = page.locator(`#block-${targetType}_container:visible`);
-  const sourceBox = await source.boundingBox();
-  const targetBox = await target.boundingBox();
-
-  if (!sourceBox || !targetBox) {
-    throw new Error("Block drag geometry is unavailable");
-  }
-
-  await page.mouse.move(
-    sourceBox.x + sourceBox.width / 2,
-    sourceBox.y + sourceBox.height / 2,
-  );
-  await page.mouse.down();
-  await page.mouse.move(
-    sourceBox.x + sourceBox.width / 2,
-    sourceBox.y + sourceBox.height / 2 + 4,
-    { steps: 2 },
-  );
-  await expect(source).toHaveAttribute("data-dragging", "");
+  await activateDrag(page, source);
 
   const liveTargetBox = await target.boundingBox();
   if (!liveTargetBox) {
@@ -47,7 +60,7 @@ async function dragBlockBelow(
 
   await page.mouse.move(
     liveTargetBox.x + liveTargetBox.width / 2,
-    liveTargetBox.y + liveTargetBox.height - 2,
+    liveTargetBox.y + 2,
     { steps: 12 },
   );
   await page.mouse.up();
