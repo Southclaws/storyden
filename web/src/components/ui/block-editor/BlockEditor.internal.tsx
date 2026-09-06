@@ -5,6 +5,7 @@ import {
   type ComponentProps,
   forwardRef,
   useEffect,
+  useImperativeHandle,
   useRef,
   useState,
 } from "react";
@@ -80,7 +81,10 @@ export const MenuHandle = forwardRef<HTMLButtonElement, MenuHandleProps>(
     const [internalOpen, setInternalOpen] = useState(false);
     const handleRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
+    const triggerRef = useRef<HTMLButtonElement>(null);
     const menuOpen = open ?? internalOpen;
+
+    useImperativeHandle(ref, () => triggerRef.current as HTMLButtonElement);
 
     function setMenuOpen(nextOpen: boolean) {
       if (open === undefined) {
@@ -117,11 +121,15 @@ export const MenuHandle = forwardRef<HTMLButtonElement, MenuHandleProps>(
           lazyMount
           open={menuOpen}
           onOpenChange={({ open: nextOpen }) => setMenuOpen(nextOpen)}
-          positioning={{ placement: "right-start", gutter: 0 }}
+          positioning={{
+            placement: "right-start",
+            gutter: 0,
+            getAnchorElement: () => triggerRef.current,
+          }}
         >
           <MenuTrigger
             {...triggerProps}
-            ref={ref}
+            ref={triggerRef}
             aria-label={ariaLabel}
             title={triggerProps.title ?? ariaLabel}
             data-dragging={dragging ? "" : undefined}

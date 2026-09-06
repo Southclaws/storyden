@@ -72,6 +72,27 @@ async function clickOutsideOpenMenu(page: Page) {
   await page.locator("main").dispatchEvent("pointerdown");
 }
 
+async function expectMenuAnchoredToTrigger(page: Page, trigger: Locator) {
+  const menuID = await trigger.getAttribute("aria-controls");
+  if (!menuID) {
+    throw new Error("Menu trigger does not control a menu");
+  }
+
+  const menu = page.locator(`[id="${menuID}"]`);
+  await expect(menu).toBeVisible();
+
+  const triggerBox = await trigger.boundingBox();
+  const menuBox = await menu.boundingBox();
+  if (!triggerBox || !menuBox) {
+    throw new Error("Menu positioning geometry is unavailable");
+  }
+
+  expect(
+    Math.abs(menuBox.x - (triggerBox.x + triggerBox.width)),
+  ).toBeLessThanOrEqual(2);
+  expect(Math.abs(menuBox.y - triggerBox.y)).toBeLessThanOrEqual(2);
+}
+
 async function activateDrag(page: Page, source: Locator) {
   for (let attempt = 0; attempt < 3; attempt++) {
     await source.scrollIntoViewIfNeeded();
@@ -145,9 +166,11 @@ test.describe("Feed Editor Settings", () => {
     const categoryBlock = page.locator(
       '.block-editor__root[data-block-type="categories"]:visible',
     );
-    await categoryBlock
-      .getByRole("button", { name: "Move or configure block" })
-      .click();
+    const categoryHandle = categoryBlock.getByRole("button", {
+      name: "Move or configure block",
+    });
+    await categoryHandle.click();
+    await expectMenuAnchoredToTrigger(page, categoryHandle);
 
     const categoryMenuLabel = page
       .locator('[data-scope="menu"][data-part="item-group-label"]')
@@ -162,9 +185,7 @@ test.describe("Feed Editor Settings", () => {
       page.getByRole("menuitem", { name: "Layout", exact: true }),
     ).toBeHidden();
 
-    await categoryBlock
-      .getByRole("button", { name: "Move or configure block" })
-      .click();
+    await categoryHandle.click();
     await chooseBlockMenuItem(page, "Layout", "Grid");
 
     const threadBlock = page.locator(
