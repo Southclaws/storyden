@@ -50,7 +50,7 @@ export function BlockMenu({ block, index }: Props) {
         &nbsp;Delete
       </Menu.Item>
       <BlockConfigMenu index={index} block={block} />
-      {newBlocksAvailable && <CreateBlockMenu />}
+      {newBlocksAvailable && <CreateBlockMenu index={index} />}
     </Menu.ItemGroup>
   );
 }

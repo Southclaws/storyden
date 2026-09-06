@@ -88,7 +88,7 @@ async function dragBlockBelow(
 }
 
 test.describe("Library page block editor", () => {
-  test("keeps menu chrome inert, dismisses outside, configures, and reorders blocks", async ({
+  test("keeps menu chrome inert, dismisses outside, configures, adds, and reorders blocks", async ({
     page,
   }) => {
     const seed = Date.now().toString();
@@ -146,6 +146,28 @@ test.describe("Library page block editor", () => {
     await page.getByRole("menuitem", { name: "Grid", exact: true }).click();
     await expect(
       page.getByRole("menuitem", { name: "Layout", exact: true }),
+    ).toBeHidden();
+
+    await directoryHandle.click();
+    await page
+      .getByRole("menuitem", { name: "Add Block", exact: true })
+      .click();
+    await page
+      .getByRole("menuitem", { name: "Cover image", exact: true })
+      .click();
+
+    await expect(page.locator("#block-cover_container:visible")).toBeVisible();
+    await expect
+      .poll(() =>
+        page
+          .locator(".block-editor__root[data-block-type]")
+          .evaluateAll((blocks) =>
+            blocks.map((block) => block.getAttribute("data-block-type")),
+          ),
+      )
+      .toEqual(["title", "directory", "cover", "content"]);
+    await expect(
+      page.getByRole("menuitem", { name: "Add Block", exact: true }),
     ).toBeHidden();
 
     const titleBlock = page.locator("#block-title_container:visible");

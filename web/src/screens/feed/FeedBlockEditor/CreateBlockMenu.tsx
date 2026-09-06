@@ -1,4 +1,4 @@
-import { MenuSelectionDetails, Portal } from "@ark-ui/react";
+import { Portal } from "@ark-ui/react";
 import { PositioningOptions } from "@zag-js/popper";
 
 import { AddIcon } from "@/components/ui/icons/Add";
@@ -23,8 +23,8 @@ export function CreateBlockMenu({ index, positioning, trigger }: Props) {
   const existing = new Set(feed.blocks.map((block) => block.type));
   const available = AllFeedBlockTypes.filter((type) => !existing.has(type));
 
-  function handleSelect({ value }: MenuSelectionDetails) {
-    void addBlock(value as FeedBlockType, index);
+  function handleAddBlock(type: FeedBlockType) {
+    void addBlock(type, index);
   }
 
   if (available.length === 0) {
@@ -32,7 +32,7 @@ export function CreateBlockMenu({ index, positioning, trigger }: Props) {
   }
 
   return (
-    <Menu.Root lazyMount onSelect={handleSelect} positioning={positioning}>
+    <Menu.Root lazyMount positioning={positioning}>
       {trigger ? (
         <Menu.Trigger asChild>{trigger}</Menu.Trigger>
       ) : (
@@ -45,7 +45,11 @@ export function CreateBlockMenu({ index, positioning, trigger }: Props) {
         <Menu.Positioner>
           <Menu.Content minW="40">
             {available.map((type) => (
-              <Menu.Item key={type} value={type}>
+              <Menu.Item
+                key={type}
+                value={type}
+                onClick={() => handleAddBlock(type)}
+              >
                 <FeedBlockIcon type={type} />
                 {FeedBlockName[type]}
               </Menu.Item>

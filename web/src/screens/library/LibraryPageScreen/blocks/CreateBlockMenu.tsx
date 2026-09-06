@@ -1,4 +1,4 @@
-import { MenuSelectionDetails, Portal } from "@ark-ui/react";
+import { Portal } from "@ark-ui/react";
 import { PositioningOptions } from "@zag-js/popper";
 import { keyBy } from "lodash";
 
@@ -24,9 +24,9 @@ export function CreateBlockMenu({
 
   const currentMetadata = useWatch((s) => s.draft.meta);
 
-  function handleSelect(value: MenuSelectionDetails) {
+  function handleAddBlock(type: LibraryPageBlock["type"]) {
     emit("library:add-block", {
-      type: value.value as LibraryPageBlock["type"],
+      type,
       index: index ?? undefined,
     });
   }
@@ -36,7 +36,7 @@ export function CreateBlockMenu({
   const blockList = allBlockTypes.filter((b) => !existingBlocks[b]);
 
   return (
-    <Menu.Root lazyMount onSelect={handleSelect} positioning={positioning}>
+    <Menu.Root lazyMount positioning={positioning}>
       {trigger ? (
         <Menu.Trigger asChild>{trigger}</Menu.Trigger>
       ) : (
@@ -51,7 +51,11 @@ export function CreateBlockMenu({
           <Menu.Content minW="36">
             {blockList.map((block) => {
               return (
-                <Menu.Item key={block} value={block}>
+                <Menu.Item
+                  key={block}
+                  value={block}
+                  onClick={() => handleAddBlock(block)}
+                >
                   <BlockIcon blockType={block} />
                   &nbsp;
                   {LibraryPageBlockName[block]}
