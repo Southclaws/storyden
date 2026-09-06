@@ -9,7 +9,8 @@ import { FormErrorText } from "@/components/ui/form-error-text";
 import { CreateIcon } from "@/components/ui/icons/Create";
 import { Spinner } from "@/components/ui/spinner";
 import { Card } from "@/components/ui/surface";
-import { Flex, HStack, WStack } from "@/styled-system/jsx";
+import { cx } from "@/styled-system/css";
+import { HStack, WStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { getAssetURL } from "@/utils/asset";
 
@@ -28,11 +29,18 @@ export function QuickShare(props: Props) {
   }
 
   return (
-    <CardBox bgColor="background.control" borderRadius="md">
+    <CardBox
+      className="quick-share"
+      bgColor="background.control"
+      borderRadius="md"
+    >
       <form
-        className={lstack({
-          gap: "2",
-        })}
+        className={cx(
+          "quick-share__form",
+          lstack({
+            gap: "2",
+          }),
+        )}
         ref={formRef}
         onFocus={handlers.handleFocus}
         onSubmit={handlers.handlePost}

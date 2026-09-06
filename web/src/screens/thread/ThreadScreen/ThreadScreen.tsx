@@ -61,8 +61,9 @@ export function ThreadScreen(props: Props) {
 
   return (
     <ReplyProvider>
-      <LStack gap="4">
+      <LStack className="thread-page" data-sd-page="thread" gap="4">
         <styled.form
+          className="thread-page__header"
           display="flex"
           flexDirection="column"
           alignItems="start"
@@ -173,7 +174,7 @@ export function ThreadScreen(props: Props) {
 
         <ThreadStats thread={thread} />
 
-        <VStack w="full">
+        <VStack className="thread-page__replies" w="full">
           {data.thread.replies.total_pages > 1 && (
             <PaginationControls
               path={`/t/${thread.slug}`}
@@ -217,7 +218,7 @@ function ThreadStats({ thread }: { thread: Thread }) {
   const replyLabel = pluralise(replyCount, "reply", "replies");
 
   return (
-    <HStack gap="4" color="text.subtle">
+    <HStack className="thread-page__stats" gap="4" color="text.subtle">
       <styled.span
         display="flex"
         gap="1"

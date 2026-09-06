@@ -4,7 +4,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useCallback, useState } from "react";
+import { ReactNode, useCallback, useState } from "react";
 
 import * as BlockEditor from "@/components/ui/block-editor";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ import { AddIcon } from "@/components/ui/icons/Add";
 import { DragItemFeedBlock } from "@/lib/dragdrop/provider";
 import { useFeedBlockEvent } from "@/lib/feed/events";
 import { FeedBlock, FeedBlockType } from "@/lib/settings/feed";
-import { LStack } from "@/styled-system/jsx";
+import { Box, LStack } from "@/styled-system/jsx";
 
 import { BlockMenu } from "./BlockMenu";
 import { useFeedBlockEditor } from "./Context";
@@ -45,7 +45,7 @@ export function FeedPageBlocks() {
 
   if (!isEditing) {
     return (
-      <LStack gap="4">
+      <LStack className="feed-page__blocks" gap="4" width="full">
         {feed.blocks.map((block) => (
           <FeedBlockRender key={block.type} block={block} />
         ))}
@@ -54,7 +54,7 @@ export function FeedPageBlocks() {
   }
 
   return (
-    <LStack gap="4">
+    <LStack className="feed-page__blocks" gap="4" width="full">
       <SortableContext items={blockIDs} strategy={verticalListSortingStrategy}>
         {feed.blocks.map((block, index) => (
           <FeedBlockEditable key={block.type} block={block} index={index} />
@@ -75,24 +75,44 @@ export function FeedPageBlocks() {
 }
 
 function FeedBlockRender({ block }: { block: FeedBlock }) {
+  let content: ReactNode;
+
   switch (block.type) {
     case "title":
-      return <FeedTitleBlock />;
+      content = <FeedTitleBlock />;
+      break;
     case "subtitle":
-      return <FeedSubtitleBlock />;
+      content = <FeedSubtitleBlock />;
+      break;
     case "content":
-      return <FeedContentBlock />;
+      content = <FeedContentBlock />;
+      break;
     case "cover":
-      return <FeedCoverBlock />;
+      content = <FeedCoverBlock />;
+      break;
     case "categories":
-      return <FeedCategoriesBlock block={block} />;
+      content = <FeedCategoriesBlock block={block} />;
+      break;
     case "threads":
-      return <FeedThreadsBlock block={block} />;
+      content = <FeedThreadsBlock block={block} />;
+      break;
     case "quick-share":
-      return <FeedQuickShareBlock block={block} />;
+      content = <FeedQuickShareBlock block={block} />;
+      break;
     case "library":
-      return <FeedLibraryBlock block={block} />;
+      content = <FeedLibraryBlock block={block} />;
+      break;
   }
+
+  return (
+    <Box
+      className={"feed-page__block feed-page__block--" + block.type}
+      data-sd-block={block.type}
+      width="full"
+    >
+      {content}
+    </Box>
+  );
 }
 
 function FeedBlockEditable({

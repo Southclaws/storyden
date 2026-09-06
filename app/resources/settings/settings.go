@@ -49,6 +49,23 @@ type Settings struct {
 
 	// Motd is an optional announcement banner shown to all site visitors.
 	Motd opt.Optional[MessageOfTheDay]
+
+	// Theme is the installation-wide custom frontend theme. Theme entrypoints
+	// are immutable assets; replacing this value publishes a new live manifest.
+	Theme opt.Optional[ThemeSettings]
+}
+
+type ThemeSettings struct {
+	Stylesheets []ThemeAsset
+	Scripts     []ThemeAsset
+}
+
+type ThemeAsset struct {
+	ID        string
+	Filename  string
+	MIMEType  string
+	Size      int
+	Integrity string
 }
 
 // MessageOfTheDay is a date-bound rich text announcement.
@@ -101,6 +118,14 @@ type RobotProviderSettings struct {
 
 // Merge will combine "updated" into "s" while overwriting any new values.
 func (s *Settings) Merge(updated Settings) error {
+	if updated.Theme.Ok() {
+		// A theme publication is an atomic replacement, including an empty
+		// manifest used to disable the active theme. It must not inherit asset
+		// references from the previously published manifest.
+		s.Theme = updated.Theme
+		updated.Theme = opt.NewEmpty[ThemeSettings]()
+	}
+
 	if updated.Motd.Ok() {
 		next := updated.Motd.OrZero()
 

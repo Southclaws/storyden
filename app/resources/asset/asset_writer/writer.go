@@ -22,20 +22,34 @@ func New(db *ent.Client) *Writer {
 	return &Writer{db}
 }
 
+type Option func(*ent.AssetCreate)
+
+func WithMetadata(metadata asset.Metadata) Option {
+	return func(create *ent.AssetCreate) {
+		create.SetMetadata(metadata)
+	}
+}
+
 func (w *Writer) Add(ctx context.Context,
 	accountID xid.ID,
 	filename asset.Filename,
 	size int,
 	mt mime.Type,
+	opts ...Option,
 ) (*asset.Asset, error) {
-	r, err := w.db.Asset.
+	create := w.db.Asset.
 		Create().
 		SetID(filename.GetID()).
 		SetFilename(filename.String()).
 		SetSize(size).
 		SetMimeType(mt.String()).
-		SetAccountID(xid.ID(accountID)).
-		Save(ctx)
+		SetAccountID(xid.ID(accountID))
+
+	for _, opt := range opts {
+		opt(create)
+	}
+
+	r, err := create.Save(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}

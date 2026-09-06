@@ -3,82 +3,149 @@ import { readableColor } from "polished";
 
 export const FALLBACK_COLOUR = "#27b981";
 
-const ramp = [
-  "50", // 1
-  "100", // 2
-  "200", // 3
-  "300", // 4
-  "400", // 5
-  "500", // 6
-  "600", // 7
-  "700", // 8
-  "800", // 9
-  "900", // 10
+type ScaleStop = readonly [saturation: number, lightness: number];
+
+// The steps follow the same functional progression as the static Radix
+// palettes used elsewhere in Storyden: backgrounds (1-2), controls (3-5),
+// borders (6-8), solid fills (9-10), and text (11-12).
+const lightScale: readonly ScaleStop[] = [
+  [50, 99.2],
+  [78, 98.2],
+  [90, 96.3],
+  [81, 93.7],
+  [75, 90.6],
+  [69, 86.3],
+  [62, 80.6],
+  [60, 73.5],
+  [51, 54.1],
+  [45, 50.2],
+  [45, 49],
+  [50, 25.1],
 ];
 
-const rampSize = 10;
-
-export const flatClampL: [number, number] = [98.7, 51.8];
-export const flatClampC: [number, number] = [2, 45];
-export const flatContrast = 1.241;
-
-export const darkClampL: [number, number] = [35, 20];
-export const darkClampC: [number, number] = [8, 0.5];
-export const darkContrast = 1.33;
+const darkScale: readonly ScaleStop[] = [
+  [23, 8.6],
+  [25, 11],
+  [36, 17.1],
+  [39, 22],
+  [38, 26.1],
+  [35, 31.2],
+  [33, 38.4],
+  [33, 50.4],
+  [51, 54.1],
+  [55, 58.8],
+  [100, 80.8],
+  [77, 91.6],
+];
 
 export function getColourVariants(colour: string): Record<string, string> {
-  const c = parseColourWithFallback(colour);
+  const hue = getHue(colour);
+  const roundedHue = Math.round(hue * 100) / 100;
 
-  const hue = c.oklch()[2];
+  const light = createScale(roundedHue, lightScale, "light");
+  const dark = createScale(roundedHue, darkScale, "dark");
+  const solid = light[8] ?? `hsl(${roundedHue}deg 51% 54.1%)`;
+  const contrast = getReadableTextColour(parseColourWithFallback(solid).hex());
 
-  const rgb = c.hex();
+  const variants: Record<string, string> = {};
 
-  const textColour = getReadableTextColour(rgb);
+  light.forEach((value, index) => {
+    const step = index + 1;
+    const darkValue = dark[index];
 
-  const flatRamp = ramp.reduceRight((o, r, i) => {
-    const [minL, maxL] = flatClampL;
-    const [minC, maxC] = flatClampC;
+    if (!darkValue) return;
 
-    const L = minL + ((maxL - minL) / rampSize) * i * flatContrast;
-    const C = minC + ((maxC - minC) / rampSize) * i;
-
-    const fill = `oklch(${L}% ${C}% ${hue}deg)`;
-
-    const text = getReadableTextColour(parseColourWithFallback(fill).hex());
-
-    return {
-      [`--accent-colour-flat-fill-${r}`]: fill,
-      [`--accent-colour-flat-text-${r}`]: text,
-      ...o,
-    };
-  }, {});
-
-  const darkRamp = ramp.reduceRight((o, r, i) => {
-    const [minL, maxL] = darkClampL;
-    const [minC, maxC] = darkClampC;
-
-    const L = minL + ((maxL - minL) / rampSize) * i * darkContrast;
-    const C = minC + ((maxC - minC) / rampSize) * i;
-
-    const fill = `oklch(${L}% ${C}% ${hue}deg)`;
-
-    const text = getReadableTextColour(parseColourWithFallback(fill).hex());
-
-    return {
-      [`--accent-colour-dark-fill-${r}`]: fill,
-      [`--accent-colour-dark-text-${r}`]: text,
-      ...o,
-    };
-  }, {});
+    variants[`--accent-colour-light-${step}`] = value;
+    variants[`--accent-colour-dark-${step}`] = darkValue;
+    variants[`--sd-color-accent-${step}`] =
+      `light-dark(var(--accent-colour-light-${step}), var(--accent-colour-dark-${step}))`;
+  });
 
   return {
-    "--text-colour": textColour,
-
-    "--accent-colour": `oklch(80% 20% ${hue}deg)`,
-
-    ...flatRamp,
-    ...darkRamp,
+    ...variants,
+    "--accent-colour":
+      "light-dark(var(--accent-colour-light-9), var(--accent-colour-dark-9))",
+    "--accent-colour-contrast": contrast,
+    "--sd-color-accent": "var(--accent-colour)",
+    "--sd-color-accent-emphasized": "var(--sd-color-accent-10)",
+    "--sd-color-accent-foreground": "var(--accent-colour-contrast)",
+    "--sd-color-accent-text": "var(--sd-color-accent-11)",
+    "--sd-color-focus-ring": "var(--sd-color-accent-8)",
   };
+}
+
+function getHue(colour: string): number {
+  const explicitHsl = colour
+    .trim()
+    .match(
+      /^hsla?\(\s*([-+]?(?:\d+(?:\.\d+)?|\.\d+))\s*(deg|grad|rad|turn)?(?:\s|,)/i,
+    );
+
+  if (explicitHsl) {
+    const value = Number(explicitHsl[1]);
+    const unit = explicitHsl[2]?.toLowerCase();
+    const degrees =
+      unit === "turn"
+        ? value * 360
+        : unit === "rad"
+          ? (value * 180) / Math.PI
+          : unit === "grad"
+            ? value * 0.9
+            : value;
+
+    return ((degrees % 360) + 360) % 360;
+  }
+
+  try {
+    const hue = chroma(colour).hsl()[0];
+
+    return Number.isFinite(hue) ? hue : 0;
+  } catch {
+    return chroma(FALLBACK_COLOUR).hsl()[0];
+  }
+}
+
+function createScale(
+  hue: number,
+  stops: readonly ScaleStop[],
+  appearance: "light" | "dark",
+): string[] {
+  const scale = stops.map(
+    ([saturation, lightness]) => `hsl(${hue}deg ${saturation}% ${lightness}%)`,
+  );
+  const background = scale[1];
+  const direction = appearance === "light" ? -1 : 1;
+
+  if (!background) return scale;
+
+  // Radix reserves steps 11 and 12 for readable text. Fixed HSL lightness
+  // cannot satisfy every hue, so move only those two stops until they meet
+  // Storyden's WCAG contrast floor against the scale's subtle background.
+  const textStops = [
+    { index: 10, minimum: 4.5 },
+    { index: 11, minimum: 7 },
+  ] as const;
+
+  textStops.forEach(({ index, minimum }) => {
+    const stop = stops[index];
+    const value = scale[index];
+
+    if (!stop || !value) return;
+
+    let lightness = stop[1];
+
+    while (
+      chroma.contrast(scale[index] ?? value, background) < minimum &&
+      lightness > 0 &&
+      lightness < 100
+    ) {
+      lightness += direction;
+      scale[index] =
+        `hsl(${hue}deg ${stop[0]}% ${Math.round(lightness * 10) / 10}%)`;
+    }
+  });
+
+  return scale;
 }
 
 export function getColourAsHex(colour: string) {
@@ -91,17 +158,6 @@ function parseColourWithFallback(colour: string) {
   } catch (e) {
     return chroma(FALLBACK_COLOUR);
   }
-}
-
-function getHue(c) {
-  const hue = c.oklch["h"];
-  if (!hue) {
-    return 0;
-  }
-  if (isNaN(hue)) {
-    return 0;
-  }
-  return hue;
 }
 
 export function getReadableTextColour(rgb: string): string {

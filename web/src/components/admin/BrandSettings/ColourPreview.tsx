@@ -8,18 +8,21 @@ export function ColourPreview() {
           {[3, 2, 1].map((value) => (
             <Shade
               key={value}
-              fill={`var(--accent-colour-flat-fill-${value})`}
-              text={`var(--accent-colour-flat-text-${value})`}
+              fill={`var(--accent-colour-light-${value})`}
+              text="var(--accent-colour-light-11)"
             />
           ))}
 
-          <Shade fill={`var(--accent-colour)`} text={`var(--text-colour)`} />
+          <Shade
+            fill="var(--sd-color-accent)"
+            text="var(--sd-color-accent-foreground)"
+          />
 
           {[1, 2, 3].map((value) => (
             <Shade
               key={value}
-              fill={`var(--accent-colour-dark-fill-${value})`}
-              text={`var(--accent-colour-dark-text-${value})`}
+              fill={`var(--accent-colour-dark-${value})`}
+              text="var(--accent-colour-dark-11)"
             />
           ))}
         </HStack>

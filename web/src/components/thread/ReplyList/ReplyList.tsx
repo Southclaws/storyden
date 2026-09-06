@@ -22,6 +22,7 @@ export function ReplyList({
 }: Props) {
   return (
     <styled.ol
+      className="reply-list"
       listStyleType="none"
       m="0"
       gap="4"
@@ -38,7 +39,7 @@ export function ReplyList({
           <Fragment key={reply.id}>
             {start && <IntervalDivider interval={{ start, end }} />}
 
-            <styled.li listStyleType="none" m="0">
+            <styled.li className="reply-list__item" listStyleType="none" m="0">
               <Reply
                 initialSession={initialSession}
                 thread={thread}

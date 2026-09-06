@@ -112,8 +112,7 @@ function UndoToastContent({
             height: "100%",
             width: `${progress}%`,
             borderRadius: "9999px",
-            backgroundColor:
-              "light-dark(var(--accent-colour-flat-fill-600), var(--accent-colour-dark-fill-600))",
+            backgroundColor: "var(--sd-color-accent-7)",
           }}
         />
       </div>

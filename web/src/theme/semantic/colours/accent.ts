@@ -1,93 +1,107 @@
 export const accent = {
   text: {
     value: {
-      _osLight: "{colors.accent.light.text.6}",
-      _osDark: "{colors.accent.dark.text.6}",
+      _osLight: "var(--sd-color-accent-text, var(--accent-colour-light-11))",
+      _osDark: "var(--sd-color-accent-text, var(--accent-colour-dark-11))",
     },
   },
   solid: {
     value: {
-      _osLight: "var(--accent-colour-flat-fill-400)",
-      _osDark: "var(--accent-colour-dark-fill-500)",
+      _osLight: "var(--sd-color-accent, var(--accent-colour-light-9))",
+      _osDark: "var(--sd-color-accent, var(--accent-colour-dark-9))",
     },
   },
   solidForeground: {
     value: {
-      _osLight: "var(--accent-colour-flat-text-400)",
-      _osDark: "var(--accent-colour-dark-text-500)",
+      _osLight:
+        "var(--sd-color-accent-foreground, var(--accent-colour-contrast))",
+      _osDark:
+        "var(--sd-color-accent-foreground, var(--accent-colour-contrast))",
     },
   },
   subtle: {
     value: {
-      _osLight: "var(--accent-colour-flat-fill-200)",
-      _osDark: "var(--accent-colour-dark-fill-200)",
+      _osLight: "var(--sd-color-accent-3, var(--accent-colour-light-3))",
+      _osDark: "var(--sd-color-accent-3, var(--accent-colour-dark-3))",
     },
   },
   muted: {
     value: {
-      _osLight: "var(--accent-colour-flat-fill-200)",
-      _osDark: "var(--accent-colour-dark-fill-400)",
+      _osLight: "var(--sd-color-accent-5, var(--accent-colour-light-5))",
+      _osDark: "var(--sd-color-accent-5, var(--accent-colour-dark-5))",
     },
   },
 
   "1": {
     value: {
-      _osLight: "var(--accent-colour-flat-fill-50)",
-      _osDark: "var(--accent-colour-dark-fill-50)",
+      _osLight: "var(--sd-color-accent-1, var(--accent-colour-light-1))",
+      _osDark: "var(--sd-color-accent-1, var(--accent-colour-dark-1))",
     },
   },
   "2": {
     value: {
-      _osLight: "var(--accent-colour-flat-fill-100)",
-      _osDark: "var(--accent-colour-dark-fill-100)",
+      _osLight: "var(--sd-color-accent-2, var(--accent-colour-light-2))",
+      _osDark: "var(--sd-color-accent-2, var(--accent-colour-dark-2))",
     },
   },
   "3": {
     value: {
-      _osLight: "var(--accent-colour-flat-fill-200)",
-      _osDark: "var(--accent-colour-dark-fill-200)",
+      _osLight: "var(--sd-color-accent-3, var(--accent-colour-light-3))",
+      _osDark: "var(--sd-color-accent-3, var(--accent-colour-dark-3))",
     },
   },
   "4": {
     value: {
-      _osLight: "var(--accent-colour-flat-fill-300)",
-      _osDark: "var(--accent-colour-dark-fill-300)",
+      _osLight: "var(--sd-color-accent-4, var(--accent-colour-light-4))",
+      _osDark: "var(--sd-color-accent-4, var(--accent-colour-dark-4))",
     },
   },
   "5": {
     value: {
-      _osLight: "var(--accent-colour-flat-fill-400)",
-      _osDark: "var(--accent-colour-dark-fill-400)",
+      _osLight: "var(--sd-color-accent-5, var(--accent-colour-light-5))",
+      _osDark: "var(--sd-color-accent-5, var(--accent-colour-dark-5))",
     },
   },
   "6": {
     value: {
-      _osLight: "var(--accent-colour-flat-fill-500)",
-      _osDark: "var(--accent-colour-dark-fill-500)",
+      _osLight: "var(--sd-color-accent-6, var(--accent-colour-light-6))",
+      _osDark: "var(--sd-color-accent-6, var(--accent-colour-dark-6))",
     },
   },
   "7": {
     value: {
-      _osLight: "var(--accent-colour-flat-fill-600)",
-      _osDark: "var(--accent-colour-dark-fill-600)",
+      _osLight: "var(--sd-color-accent-7, var(--accent-colour-light-7))",
+      _osDark: "var(--sd-color-accent-7, var(--accent-colour-dark-7))",
     },
   },
   "8": {
     value: {
-      _osLight: "var(--accent-colour-flat-fill-700)",
-      _osDark: "var(--accent-colour-dark-fill-700)",
+      _osLight: "var(--sd-color-accent-8, var(--accent-colour-light-8))",
+      _osDark: "var(--sd-color-accent-8, var(--accent-colour-dark-8))",
     },
   },
   "9": {
     value: {
-      _osLight: "var(--accent-colour-flat-fill-800)",
-      _osDark: "var(--accent-colour-dark-fill-800)",
+      _osLight: "var(--sd-color-accent-9, var(--accent-colour-light-9))",
+      _osDark: "var(--sd-color-accent-9, var(--accent-colour-dark-9))",
     },
   },
   "10": {
     value: {
-      _osLight: "var(--accent-colour-flat-fill-900)",
-      _osDark: "var(--accent-colour-dark-fill-900)",
+      _osLight: "var(--sd-color-accent-10, var(--accent-colour-light-10))",
+      _osDark: "var(--sd-color-accent-10, var(--accent-colour-dark-10))",
+    },
+  },
+  "11": {
+    value: {
+      _osLight: "var(--sd-color-accent-11, var(--accent-colour-light-11))",
+      _osDark: "var(--sd-color-accent-11, var(--accent-colour-dark-11))",
+    },
+  },
+  "12": {
+    value: {
+      _osLight: "var(--sd-color-accent-12, var(--accent-colour-light-12))",
+      _osDark: "var(--sd-color-accent-12, var(--accent-colour-dark-12))",
     },
   },
 };

@@ -60,8 +60,8 @@ export function CategoryIndexScreen(props: CategoryIndexScreenProps) {
   const categoryCount = categories.length;
 
   return (
-    <LStack gap="4">
-      <LStack gap="3">
+    <LStack className="category-index-page" data-sd-page="categories" gap="4">
+      <LStack className="category-index-page__header" gap="3">
         <PageHeader
           title="Discussion categories"
           description={getCategoryDescription(categoryCount)}

@@ -8,6 +8,7 @@ import { ThreadReferenceCard } from "@/components/post/ThreadCard";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { Unready } from "@/components/site/Unready";
 import { type Settings } from "@/lib/settings/settings";
+import { cx } from "@/styled-system/css";
 import { LStack, VStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
@@ -60,11 +61,15 @@ export function ThreadFeed(props: Props & { hideCategoryBadge?: boolean }) {
   }
 
   if (data.threads.length === 0) {
-    return <FeedEmptyState />;
+    return (
+      <VStack className="thread-feed" w="full">
+        <FeedEmptyState />
+      </VStack>
+    );
   }
 
   return (
-    <VStack w="full">
+    <VStack className="thread-feed" w="full">
       {showPaginationTop && (
         <PaginationControls
           path="/"
@@ -74,7 +79,7 @@ export function ThreadFeed(props: Props & { hideCategoryBadge?: boolean }) {
           onClick={handlePageChange}
         />
       )}
-      <ol className={lstack({ gap: "4" })}>
+      <ol className={cx("thread-feed__list", lstack({ gap: "4" }))}>
         {data.threads.map((t) => {
           return (
             <ThreadReferenceCard

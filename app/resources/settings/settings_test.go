@@ -172,4 +172,38 @@ func TestSettingsMerge(t *testing.T) {
 		r.True(ok)
 		a.Empty(overrides)
 	})
+
+	t.Run("typed_theme_replacement_preserves_other_settings", func(t *testing.T) {
+		old := settings.Settings{
+			Title: opt.New("Community title"),
+			Theme: opt.New(settings.ThemeSettings{
+				Stylesheets: []settings.ThemeAsset{{ID: "old-css", Filename: "old.css"}},
+				Scripts:     []settings.ThemeAsset{{ID: "old-js", Filename: "old.js"}},
+			}),
+		}
+		updated := settings.Settings{Theme: opt.New(settings.ThemeSettings{
+			Stylesheets: []settings.ThemeAsset{{ID: "new-css", Filename: "new.css", MIMEType: "text/css", Size: 321, Integrity: "sha256-bmV3"}},
+			Scripts:     []settings.ThemeAsset{},
+		})}
+
+		require.NoError(t, old.Merge(updated))
+		assert.Equal(t, "Community title", old.Title.OrZero())
+		assert.Equal(t, []settings.ThemeAsset{{ID: "new-css", Filename: "new.css", MIMEType: "text/css", Size: 321, Integrity: "sha256-bmV3"}}, old.Theme.OrZero().Stylesheets)
+		assert.Empty(t, old.Theme.OrZero().Scripts)
+	})
+
+	t.Run("empty_theme_replacement_clears_active_assets", func(t *testing.T) {
+		old := settings.Settings{Theme: opt.New(settings.ThemeSettings{
+			Stylesheets: []settings.ThemeAsset{{ID: "old-css", Filename: "old.css"}},
+			Scripts:     []settings.ThemeAsset{{ID: "old-js", Filename: "old.js"}},
+		})}
+		updated := settings.Settings{Theme: opt.New(settings.ThemeSettings{
+			Stylesheets: []settings.ThemeAsset{},
+			Scripts:     []settings.ThemeAsset{},
+		})}
+
+		require.NoError(t, old.Merge(updated))
+		assert.Empty(t, old.Theme.OrZero().Stylesheets)
+		assert.Empty(t, old.Theme.OrZero().Scripts)
+	})
 }

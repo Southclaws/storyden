@@ -13,6 +13,7 @@ export const button = defineRecipe({
     colorPalette: "gray",
     cursor: "pointer",
     display: "inline-flex",
+    flexShrink: "0",
     fontWeight: "semibold",
     minWidth: "0",
     justifyContent: "center",

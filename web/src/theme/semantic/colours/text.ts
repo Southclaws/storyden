@@ -1,20 +1,20 @@
 export const text = {
   default: {
     value: {
-      _osLight: "{colors.neutral.light.12}",
-      _osDark: "{colors.neutral.dark.12}",
+      _osLight: "var(--sd-color-text, {colors.neutral.light.12})",
+      _osDark: "var(--sd-color-text, {colors.neutral.dark.12})",
     },
   },
   muted: {
     value: {
-      _osLight: "{colors.neutral.light.11}",
-      _osDark: "{colors.neutral.dark.11}",
+      _osLight: "var(--sd-color-text-muted, {colors.neutral.light.11})",
+      _osDark: "var(--sd-color-text-muted, {colors.neutral.dark.11})",
     },
   },
   subtle: {
     value: {
-      _osLight: "{colors.neutral.light.10}",
-      _osDark: "{colors.neutral.dark.10}",
+      _osLight: "var(--sd-color-text-subtle, {colors.neutral.light.10})",
+      _osDark: "var(--sd-color-text-subtle, {colors.neutral.dark.10})",
     },
   },
   disabled: {

@@ -32,6 +32,6 @@ func TestWithRequestInfoProvidesAllGetters(t *testing.T) {
 	assert.Equal(t, "ThreadGet", GetOperationID(ctx))
 	assert.Equal(t, "203.0.113.9", GetClientAddress(ctx))
 	assert.Equal(t, "198.51.100.22", GetSSRClientAddress(ctx))
-	assert.NotZero(t, GetCacheQuery(ctx))
+	assert.True(t, GetCacheQuery(ctx).MatchesETag(`"t-2026-01-02T03:04:05Z"`))
 	assert.NotEmpty(t, GetDeviceName(ctx))
 }
