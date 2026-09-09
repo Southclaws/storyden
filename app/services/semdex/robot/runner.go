@@ -380,6 +380,11 @@ func (s *Agent) runResolvedAgent(
 			resolvedToolsets = append(resolvedToolsets, &tools.Toolset{Registered: directTools, BuildContext: toolCtx})
 		}
 	}
+	clientToolsets, err := buildClientToolsets(s.toolProvider, runOptions.ClientTools)
+	if err != nil {
+		return errorSeq(fmt.Errorf("build client tools: %w", err))
+	}
+	resolvedToolsets = append(resolvedToolsets, clientToolsets...)
 	if runOptions.Mode == ModeUnattended {
 		finishTool, err := newUnattendedFinishTool()
 		if err != nil {
@@ -388,7 +393,8 @@ func (s *Agent) runResolvedAgent(
 		resolvedToolsets = append(resolvedToolsets, &tools.Toolset{ToolList: []adktool.Tool{finishTool}})
 	}
 
-	beforeToolCallbacks := append([]llmagent.BeforeToolCallback{checkToolRBAC, interceptClientSideTools(s.logger, s.toolProvider, runOptions)}, s.beforeToolCallbacks...)
+	beforeToolCallbacks := append([]llmagent.BeforeToolCallback{checkToolRBAC, interceptClientSideTools(s.logger, s.toolProvider, invocationContext, runOptions)}, s.beforeToolCallbacks...)
+	afterModelCallbacks := append([]llmagent.AfterModelCallback{annotateClientToolCalls(runOptions.ClientTools, invocationContext)}, s.afterModelCallbacks...)
 	currentIdentity := robotIdentity{
 		ID:               spec.DatabaseRobotID,
 		Name:             spec.DisplayName,
@@ -431,7 +437,7 @@ func (s *Agent) runResolvedAgent(
 		Mode:                      llmagent.ModeChat,
 		Toolsets:                  resolvedToolsets,
 		BeforeModelCallbacks:      s.beforeModelCallbacks,
-		AfterModelCallbacks:       s.afterModelCallbacks,
+		AfterModelCallbacks:       afterModelCallbacks,
 		BeforeToolCallbacks:       beforeToolCallbacks,
 		AfterToolCallbacks:        s.afterToolCallbacks,
 	})
@@ -594,10 +600,11 @@ func (s *Agent) canReuseWorkspaceMount(ctx context.Context, sessionID robot.Sess
 // - Wasting tokens on back-and-forth with placeholder data
 //
 // RELATED: Vercel AI SDK client-side tools, Google ADK tool confirmation (Python-only)
-func interceptClientSideTools(logger *slog.Logger, registry *tools.Registry, options RunOptions) llmagent.BeforeToolCallback {
+func interceptClientSideTools(logger *slog.Logger, registry *tools.Registry, invocationContext InvocationContext, options RunOptions) llmagent.BeforeToolCallback {
 	return func(ctx agent.Context, tool adktool.Tool, args map[string]any) (map[string]any, error) {
 		registered, isRegistered := registry.FindByADKName(tool.Name())
-		if isRegistered && registered.IsClientTool {
+		clientDefinition, isWebMCPTool := options.ClientTools.Find(tool.Name())
+		if isWebMCPTool || (isRegistered && registered.IsClientTool) {
 			if isHeadlessMode(options.Mode) {
 				logger.Info("blocking client-side tool in headless run",
 					slog.String("tool_name", tool.Name()),
@@ -618,10 +625,20 @@ func interceptClientSideTools(logger *slog.Logger, registry *tools.Registry, opt
 
 			// Return a special marker that tells SSE handler to pause and wait for client
 			// This result will NOT be sent to the LLM - see sse.go:isClientSidePending
-			return map[string]any{
+			result := map[string]any{
 				"_client_side_pending": true,
 				"tool_call_id":         ctx.FunctionCallID(),
-			}, nil
+			}
+			if isWebMCPTool {
+				result["_client_tool"] = map[string]any{
+					"source":      agent_registry.ClientToolSourceWebMCP,
+					"client_id":   options.ClientTools.ClientID,
+					"scope":       invocationContext,
+					"title":       clientDefinition.Title,
+					"annotations": clientDefinition.Annotations,
+				}
+			}
+			return result, nil
 		}
 
 		// Not a client-side tool, continue to next callback

@@ -1,0 +1,42 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: ToolLibraryPageBlockAdd
+x-storyden-tool:
+  title: Add Library Page Block
+  path_prefix: /l/
+  annotations:
+    readOnlyHint: false
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: false
+    untrustedContentHint: false
+title: library_page_block_add
+description: Add a currently hidden block to the current Library page.
+type: object
+required: [input, output]
+properties:
+  input:
+    $ref: "#/definitions/ToolLibraryPageBlockAddInput"
+  output:
+    $ref: "#/definitions/ToolLibraryPageBlockAddOutput"
+definitions:
+  ToolLibraryPageBlockAddInput:
+    type: object
+    required: [block]
+    properties:
+      block:
+        $ref: "./common/library_page_layout.yaml#/definitions/LibraryPageLayoutBlockType"
+      after_block:
+        $ref: "./common/library_page_layout.yaml#/definitions/LibraryPageLayoutBlockType"
+        description: Existing block after which to insert the block; omit to append it.
+    additionalProperties: false
+
+  ToolLibraryPageBlockAddOutput:
+    type: object
+    required: [message, layout]
+    properties:
+      message:
+        type: string
+        description: Summary of the added block.
+      layout:
+        $ref: "./common/library_page_layout.yaml"
+    additionalProperties: false

@@ -1,0 +1,19 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+definitions:
+  ToolLibraryPageLayoutGet:
+    $ref: "./tool_library_page_layout_get.yaml"
+
+  ToolLibraryPageBlockAdd:
+    $ref: "./tool_library_page_block_add.yaml"
+
+  ToolLibraryPageBlockRemove:
+    $ref: "./tool_library_page_block_remove.yaml"
+
+  ToolLibraryPageBlockMove:
+    $ref: "./tool_library_page_block_move.yaml"
+
+  ToolLibraryPageBlockAssetsUpdate:
+    $ref: "./tool_library_page_block_assets_update.yaml"
+
+  ToolLibraryPageBlockDirectoryUpdate:
+    $ref: "./tool_library_page_block_directory_update.yaml"

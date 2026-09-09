@@ -50,9 +50,10 @@ type RunOptions struct {
 	Mode   RunMode
 	Source RunSource
 
-	Workspace  opt.Optional[WorkspaceMountSpec]
-	NotBefore  time.Time
-	Delegation *DelegationRun
+	Workspace   opt.Optional[WorkspaceMountSpec]
+	NotBefore   time.Time
+	Delegation  *DelegationRun
+	ClientTools *ClientToolContext
 }
 
 type ADKRunRequest struct {

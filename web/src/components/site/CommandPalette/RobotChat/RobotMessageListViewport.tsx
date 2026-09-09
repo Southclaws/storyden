@@ -99,6 +99,12 @@ export function RobotMessageListViewport({ surface }: Props) {
     }
   }, [handleLoadOlder, updateNearBottom]);
 
+  const handleNewMessagesClick = () => {
+    wasNearBottomRef.current = true;
+    setShowNewMessages(false);
+    scrollToBottom();
+  };
+
   useLayoutEffect(() => {
     const pendingAnchor = pendingAnchorRef.current;
     const scroller = scrollerRef.current;
@@ -223,10 +229,7 @@ export function RobotMessageListViewport({ surface }: Props) {
         </Box>
         <NewMessagesButton
           visible={showNewMessages}
-          onClick={() => {
-            setShowNewMessages(false);
-            scrollToBottom();
-          }}
+          onClick={handleNewMessagesClick}
         />
       </Box>
     );
@@ -259,10 +262,7 @@ export function RobotMessageListViewport({ surface }: Props) {
       </VStack>
       <NewMessagesButton
         visible={showNewMessages}
-        onClick={() => {
-          setShowNewMessages(false);
-          scrollToBottom();
-        }}
+        onClick={handleNewMessagesClick}
       />
     </Box>
   );

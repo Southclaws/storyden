@@ -10,6 +10,7 @@
 import type { RobotChatContext } from "./robotChatContext";
 import type { RobotChatRequestData } from "./robotChatRequestData";
 import type { RobotChatRequestMessagesItem } from "./robotChatRequestMessagesItem";
+import type { RobotClientToolContext } from "./robotClientToolContext";
 import type { RobotWorkspaceMountRequest } from "./robotWorkspaceMountRequest";
 
 export interface RobotChatRequest {
@@ -32,4 +33,5 @@ export interface RobotChatRequest {
   /** Context about the page/item the user is viewing */
   context?: RobotChatContext;
   workspace?: RobotWorkspaceMountRequest;
+  client_tools?: RobotClientToolContext;
 }

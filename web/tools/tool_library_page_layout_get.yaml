@@ -1,0 +1,36 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: ToolLibraryPageLayoutGet
+x-storyden-tool:
+  title: Get Library Page Layout
+  path_prefix: /l/
+  annotations:
+    readOnlyHint: true
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: false
+    untrustedContentHint: false
+title: library_page_layout_get
+description: Retrieve the block layout of the current Library page.
+type: object
+required: [input, output]
+properties:
+  input:
+    $ref: "#/definitions/ToolLibraryPageLayoutGetInput"
+  output:
+    $ref: "#/definitions/ToolLibraryPageLayoutGetOutput"
+definitions:
+  ToolLibraryPageLayoutGetInput:
+    type: object
+    properties: {}
+    additionalProperties: false
+
+  ToolLibraryPageLayoutGetOutput:
+    type: object
+    required: [message, layout]
+    properties:
+      message:
+        type: string
+        description: Summary of the retrieved layout.
+      layout:
+        $ref: "./common/library_page_layout.yaml"
+    additionalProperties: false

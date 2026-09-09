@@ -98,7 +98,9 @@ func getProvidedPendingToolIDs(messages []chatMessage, pendingToolIDs []string) 
 		if part.ToolCallId == "" {
 			continue
 		}
-		if part.State != "output-available" && part.State != "approval-responded" {
+		if part.State != "output-available" &&
+			part.State != "output-error" &&
+			part.State != "approval-responded" {
 			continue
 		}
 		if _, ok := pending[part.ToolCallId]; ok {

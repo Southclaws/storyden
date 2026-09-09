@@ -13522,6 +13522,57 @@ components:
         workspace_instance_id:
           $ref: "#/components/schemas/Identifier"
 
+    RobotClientTool:
+      type: object
+      description: |
+        A page-local WebMCP tool available to this interactive Robot turn.
+      required: [name, description, inputSchema]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: "^[A-Za-z][A-Za-z0-9_-]*$"
+        title:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+          minLength: 1
+          maxLength: 4096
+        inputSchema:
+          type: object
+          additionalProperties: true
+        annotations:
+          $ref: "#/components/schemas/RobotClientToolAnnotations"
+
+    RobotClientToolContext:
+      type: object
+      description: Browser instance and its currently registered WebMCP tools.
+      required: [client_id, tools]
+      properties:
+        client_id:
+          type: string
+          minLength: 1
+          maxLength: 128
+        tools:
+          type: array
+          maxItems: 32
+          items:
+            $ref: "#/components/schemas/RobotClientTool"
+
+    RobotClientToolAnnotations:
+      type: object
+      description: |
+        WebMCP behavior and safety hints supplied by the active browser page.
+      properties:
+        readOnlyHint:
+          type: boolean
+        untrustedContentHint:
+          type: boolean
+        consequentialHint:
+          type: boolean
+
     RobotChatRequest:
       type: object
       required: [id, messages]
@@ -13557,6 +13608,8 @@ components:
           description: Context about the page/item the user is viewing
         workspace:
           $ref: "#/components/schemas/RobotWorkspaceMountRequest"
+        client_tools:
+          $ref: "#/components/schemas/RobotClientToolContext"
 
     RobotChatContext:
       type: object
@@ -13954,6 +14007,8 @@ components:
           "$ref": "#/components/schemas/Id"
         toolName:
           "$ref": "#/components/schemas/NonEmptyString"
+        dynamic:
+          type: boolean
         providerMetadata:
           $ref: "#/components/schemas/ArbitraryData"
 
@@ -13987,6 +14042,8 @@ components:
           "$ref": "#/components/schemas/NonEmptyString"
         input:
           $ref: "#/components/schemas/ArbitraryData"
+        dynamic:
+          type: boolean
         providerMetadata:
           $ref: "#/components/schemas/ArbitraryData"
 

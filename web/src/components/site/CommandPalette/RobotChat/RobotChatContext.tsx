@@ -49,6 +49,14 @@ import { deriveError } from "@/utils/error";
 import { generateXid } from "@/utils/xid";
 
 import { useRobotPageContext } from "./useRobotChatContext";
+import {
+  ClientToolCall,
+  clientToolCallFromPart,
+  usePendingWebMCPToolCalls,
+  useWebMCPClientTools,
+  useWebMCPToolOutputSubmitter,
+} from "./useWebMCPClientTools";
+import { getCurrentWebMCPClientToolContext } from "./webMCPClient";
 
 const MUTATIVE_ROBOT_TOOLS: ToolName[] = [
   "robot_create",
@@ -81,13 +89,6 @@ function threadListKeyFilterFn(key: unknown) {
 }
 
 const typedSchema = mcpSchema as JSONSchema7;
-
-type ClientToolCall = {
-  toolName: string;
-  toolCallId: string;
-  input: unknown;
-  dynamic?: boolean;
-};
 
 type HandleToolCallOptions = {
   toolCall: ClientToolCall;
@@ -207,6 +208,8 @@ export function RobotChatContext({
 
   const [errorState, setErrorState] = useState<string | undefined>(undefined);
   const getPageContext = useRobotPageContext();
+  const { handleWebMCPToolCall, setToolOutputSubmitter } =
+    useWebMCPClientTools(getPageContext);
 
   const handleSetSelectedWorkspaceID = useCallback(
     (workspaceID: string | undefined) => {
@@ -242,6 +245,7 @@ export function RobotChatContext({
             ? (JSON.parse(init.body) as Record<string, unknown>)
             : {};
         const pageContext = await getPageContext();
+        const clientTools = await getCurrentWebMCPClientToolContext();
 
         request = {
           ...request,
@@ -249,6 +253,7 @@ export function RobotChatContext({
             ...body,
             robotId: rootRobotID === DENBOT_ID ? undefined : rootRobotID,
             context: pageContext ?? body["context"],
+            client_tools: clientTools,
             workspace: selectedWorkspaceID
               ? { workspace_id: selectedWorkspaceID }
               : body["workspace"],
@@ -281,6 +286,10 @@ export function RobotChatContext({
   const handleToolCall = useCallback(
     async ({ toolCall }: HandleToolCallOptions) => {
       console.debug("[RobotChat] onToolCall", toolCall);
+
+      if (await handleWebMCPToolCall(toolCall)) {
+        return;
+      }
 
       if (!isStorydenToolCall(toolCall)) {
         const toolName = toolCall.toolName;
@@ -317,7 +326,7 @@ export function RobotChatContext({
         await mutate(getTrailListKey());
       }
     },
-    [mutate],
+    [handleWebMCPToolCall, mutate],
   );
 
   const handleStreamData = useCallback(
@@ -427,6 +436,9 @@ export function RobotChatContext({
     },
   });
 
+  useWebMCPToolOutputSubmitter(setToolOutputSubmitter, chat.addToolOutput);
+  usePendingWebMCPToolCalls(chat.messages, handleWebMCPToolCall);
+
   const observerCallbacksRef = useRef({ handleStreamData, handleToolCall });
   const setMessagesRef = useRef(chat.setMessages);
   const observerFetchClient = useMemo<typeof fetch>(() => {
@@ -453,13 +465,11 @@ export function RobotChatContext({
       setMessagesRef.current((messages) => upsertMessage(messages, message));
       for (const part of message.parts) {
         if (
-          !part.type.startsWith("tool-") ||
+          (part.type !== "dynamic-tool" && !part.type.startsWith("tool-")) ||
           !("toolCallId" in part) ||
           !part.toolCallId ||
           !("state" in part) ||
-          part.state === "output-available" ||
-          part.state === "output-error" ||
-          part.state === "approval-responded" ||
+          part.state !== "input-available" ||
           handledToolCallIDs.has(part.toolCallId)
         ) {
           continue;
@@ -467,11 +477,7 @@ export function RobotChatContext({
         handledToolCallIDs.add(part.toolCallId);
         void observerCallbacksRef.current
           .handleToolCall({
-            toolCall: {
-              toolCallId: part.toolCallId,
-              toolName: part.type.replace(/^tool-/, ""),
-              input: "input" in part ? part.input : undefined,
-            },
+            toolCall: clientToolCallFromPart(part),
           })
           .catch((error) => setErrorState(deriveError(error)));
       }
@@ -900,9 +906,9 @@ export function assistantHasTextAfterToolOutput(message: StorydenUIMessage) {
 
   for (const part of message.parts) {
     if (
-      part.type.startsWith("tool-") &&
+      (part.type === "dynamic-tool" || part.type.startsWith("tool-")) &&
       "state" in part &&
-      part.state === "output-available"
+      (part.state === "output-available" || part.state === "output-error")
     ) {
       sawToolOutput = true;
       continue;
@@ -956,8 +962,11 @@ function assistantToolPartsInCurrentStep(message: StorydenUIMessage) {
 
   return message.parts
     .slice(lastStepStartIndex + 1)
-    .filter((part) => part.type.startsWith("tool-"))
-    .filter((part) => !("providerExecuted" in part && part.providerExecuted));
+    .filter(
+      (part) =>
+        (part.type === "dynamic-tool" || part.type.startsWith("tool-")) &&
+        !("providerExecuted" in part && part.providerExecuted),
+    );
 }
 
 export function hasUnhydratedToolOutput(
@@ -968,36 +977,43 @@ export function hasUnhydratedToolOutput(
 
   for (const message of incomingMessages) {
     for (const part of message.parts ?? []) {
-      if (
-        part.type.startsWith("tool-") &&
-        "toolCallId" in part &&
-        part.toolCallId &&
-        "state" in part
-      ) {
-        incomingToolStates.set(part.toolCallId, part.state);
+      const toolState = readClientToolState(part);
+      if (toolState) {
+        incomingToolStates.set(toolState.toolCallId, toolState.state);
       }
     }
   }
 
   for (const message of localMessages) {
     for (const part of message.parts ?? []) {
+      const toolState = readClientToolState(part);
       if (
-        !part.type.startsWith("tool-") ||
-        !("toolCallId" in part) ||
-        !part.toolCallId ||
-        !("state" in part) ||
-        part.state !== "output-available"
+        !toolState ||
+        !["output-available", "output-error"].includes(toolState.state)
       ) {
         continue;
       }
 
-      if (incomingToolStates.get(part.toolCallId) !== "output-available") {
+      if (incomingToolStates.get(toolState.toolCallId) !== toolState.state) {
         return true;
       }
     }
   }
 
   return false;
+}
+
+function readClientToolState(part: StorydenUIMessage["parts"][number]) {
+  if (
+    (part.type !== "dynamic-tool" && !part.type.startsWith("tool-")) ||
+    !("toolCallId" in part) ||
+    !part.toolCallId ||
+    !("state" in part)
+  ) {
+    return undefined;
+  }
+
+  return { toolCallId: part.toolCallId, state: part.state };
 }
 
 export function shouldReplaceMessages(

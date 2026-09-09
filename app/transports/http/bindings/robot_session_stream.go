@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	storydenagent "github.com/Southclaws/storyden/app/services/semdex/robot"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry/denbot"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/tools"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -53,14 +54,15 @@ func (f robotSessionStreamHeadResponseFunc) VisitRobotSessionStreamHeadResponse(
 }
 
 type chatRequest struct {
-	ID        string                    `json:"id"`
-	ThreadID  string                    `json:"threadId"`
-	SessionID string                    `json:"sessionId"`
-	RobotID   string                    `json:"robotId,omitempty"`
-	Messages  []chatMessage             `json:"messages"`
-	Data      any                       `json:"data"`
-	Context   *openapi.RobotChatContext `json:"context,omitempty"`
-	Workspace *workspaceMountRequest    `json:"workspace,omitempty"`
+	ID          string                          `json:"id"`
+	ThreadID    string                          `json:"threadId"`
+	SessionID   string                          `json:"sessionId"`
+	RobotID     string                          `json:"robotId,omitempty"`
+	Messages    []chatMessage                   `json:"messages"`
+	Data        any                             `json:"data"`
+	Context     *openapi.RobotChatContext       `json:"context,omitempty"`
+	Workspace   *workspaceMountRequest          `json:"workspace,omitempty"`
+	ClientTools *openapi.RobotClientToolContext `json:"client_tools,omitempty"`
 }
 
 type workspaceMountRequest struct {
@@ -86,6 +88,7 @@ type chatPart struct {
 	ToolName   string          `json:"toolName,omitempty"`
 	Input      json.RawMessage `json:"input,omitempty"`
 	Output     json.RawMessage `json:"output,omitempty"`
+	ErrorText  string          `json:"errorText,omitempty"`
 	Approval   *chatApproval   `json:"approval,omitempty"`
 }
 
@@ -173,6 +176,11 @@ func (r *Robots) createSessionTurn(ctx context.Context, w http.ResponseWriter, b
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	clientTools, err := clientToolContextFromRequest(req.ClientTools)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	initMessage, err := getLastMessage(req.Messages, pendingToolIDs, r.logger)
 	if err != nil {
@@ -199,9 +207,10 @@ func (r *Robots) createSessionTurn(ctx context.Context, w http.ResponseWriter, b
 	)
 
 	inputID, err := r.coordinator.Enqueue(ctx, robot.InputID(lastMessageID), robotRef, accountID.String(), sessionID, initMessage, invocationContext, storydenagent.RunOptions{
-		Mode:      storydenagent.ModeInteractive,
-		Source:    storydenagent.SourceInteractiveChat,
-		Workspace: workspaceSpec,
+		Mode:        storydenagent.ModeInteractive,
+		Source:      storydenagent.SourceInteractiveChat,
+		Workspace:   workspaceSpec,
+		ClientTools: clientTools,
 	})
 	if err != nil {
 		r.logger.Error("Robot turn start", slog.String("error", err.Error()))
@@ -220,6 +229,38 @@ func (r *Robots) createSessionTurn(ctx context.Context, w http.ResponseWriter, b
 		SessionId: openapi.Identifier(robotSessionID.String()),
 		MessageId: openapi.Identifier(inputID.String()),
 	})
+}
+
+func clientToolContextFromRequest(input *openapi.RobotClientToolContext) (*agent_registry.ClientToolContext, error) {
+	if input == nil {
+		return nil, nil
+	}
+
+	definitions := make([]agent_registry.ClientToolDefinition, 0, len(input.Tools))
+	for _, inputTool := range input.Tools {
+		definition := agent_registry.ClientToolDefinition{
+			Name:        inputTool.Name,
+			Description: inputTool.Description,
+			InputSchema: inputTool.InputSchema,
+		}
+		if inputTool.Title != nil {
+			definition.Title = *inputTool.Title
+		}
+		if annotations := inputTool.Annotations; annotations != nil {
+			if annotations.ReadOnlyHint != nil {
+				definition.Annotations.ReadOnlyHint = *annotations.ReadOnlyHint
+			}
+			if annotations.UntrustedContentHint != nil {
+				definition.Annotations.UntrustedContentHint = *annotations.UntrustedContentHint
+			}
+			if annotations.ConsequentialHint != nil {
+				definition.Annotations.ConsequentialHint = *annotations.ConsequentialHint
+			}
+		}
+		definitions = append(definitions, definition)
+	}
+
+	return storydenagent.NewClientToolContext(input.ClientId, definitions)
 }
 
 func invocationContextFromRequest(context *openapi.RobotChatContext) storydenagent.InvocationContext {
@@ -396,47 +437,15 @@ func getLastMessage(messages []chatMessage, pendingToolIDs []string, logger *slo
 				continue
 			}
 
-			if strings.HasPrefix(part.Type, "tool-") && part.State == "output-available" {
-				if part.ToolCallId == "" {
-					return nil, fmt.Errorf("tool result missing toolCallId: type=%s", part.Type)
+			result, handled, err := resolveClientToolResult(part, pendingSet, logger)
+			if err != nil {
+				return nil, err
+			}
+			if handled {
+				if result != nil {
+					content.Parts = append(content.Parts, result)
 				}
-
-				if len(pendingSet) > 0 && !pendingSet[part.ToolCallId] {
-					logger.Debug("skipping tool result not in pending list",
-						slog.String("tool_call_id", part.ToolCallId),
-						slog.String("tool_name", part.ToolName))
-					continue
-				}
-
-				output, err := resolveToolOutput(part)
-				if err != nil {
-					return nil, fmt.Errorf("failed to parse tool output for %s: %w", part.ToolCallId, err)
-				}
-
-				toolName := part.ToolName
-				if toolName == "" && strings.HasPrefix(part.Type, "tool-") {
-					toolName = strings.TrimPrefix(part.Type, "tool-")
-				}
-				if isStorydenConfirmationOutput(part.Output) {
-					toolName = toolconfirmation.FunctionCallName
-				}
-
-				if toolName == "" {
-					return nil, fmt.Errorf("tool result missing tool name: type=%s, toolCallId=%s", part.Type, part.ToolCallId)
-				}
-
-				content.Parts = append(content.Parts, &genai.Part{
-					FunctionResponse: &genai.FunctionResponse{
-						ID:       part.ToolCallId,
-						Name:     toolName,
-						Response: output,
-					},
-				})
-
-				logger.Debug("tool result received from frontend",
-					slog.String("tool_call_id", part.ToolCallId),
-					slog.String("tool_name", toolName),
-					slog.Any("output", output))
+				continue
 			}
 		}
 	}
@@ -448,12 +457,71 @@ func getLastMessage(messages []chatMessage, pendingToolIDs []string, logger *slo
 	return content, nil
 }
 
-func resolveToolOutput(part chatPart) (map[string]any, error) {
-	var output map[string]any
-	if err := json.Unmarshal(part.Output, &output); err != nil {
-		return nil, err
+func resolveClientToolResult(part chatPart, pendingSet map[string]bool, logger *slog.Logger) (*genai.Part, bool, error) {
+	isToolPart := part.Type == "dynamic-tool" || strings.HasPrefix(part.Type, "tool-")
+	isCompleted := part.State == "output-available" || part.State == "output-error"
+	if !isToolPart || !isCompleted {
+		return nil, false, nil
+	}
+	if part.ToolCallId == "" {
+		return nil, true, fmt.Errorf("tool result missing toolCallId: type=%s", part.Type)
+	}
+	if len(pendingSet) > 0 && !pendingSet[part.ToolCallId] {
+		logger.Debug("skipping tool result not in pending list",
+			slog.String("tool_call_id", part.ToolCallId),
+			slog.String("tool_name", part.ToolName))
+		return nil, true, nil
 	}
 
+	var output map[string]any
+	if part.State == "output-error" {
+		output = map[string]any{"error": part.ErrorText}
+	} else {
+		var err error
+		output, err = resolveToolOutput(part)
+		if err != nil {
+			return nil, true, fmt.Errorf("failed to parse tool output for %s: %w", part.ToolCallId, err)
+		}
+	}
+
+	toolName := part.ToolName
+	if toolName == "" && strings.HasPrefix(part.Type, "tool-") {
+		toolName = strings.TrimPrefix(part.Type, "tool-")
+	}
+	if strings.HasPrefix(part.Type, "tool-") && isStorydenConfirmationOutput(part.Output) {
+		toolName = toolconfirmation.FunctionCallName
+	}
+	if toolName == "" {
+		return nil, true, fmt.Errorf("tool result missing tool name: type=%s, toolCallId=%s", part.Type, part.ToolCallId)
+	}
+
+	logger.Debug("tool result received from frontend",
+		slog.String("tool_call_id", part.ToolCallId),
+		slog.String("tool_name", toolName),
+		slog.Any("output", output))
+
+	return &genai.Part{
+		FunctionResponse: &genai.FunctionResponse{
+			ID:       part.ToolCallId,
+			Name:     toolName,
+			Response: output,
+		},
+	}, true, nil
+}
+
+func resolveToolOutput(part chatPart) (map[string]any, error) {
+	var decoded any
+	if err := json.Unmarshal(part.Output, &decoded); err != nil {
+		return nil, err
+	}
+	output, ok := decoded.(map[string]any)
+	if !ok {
+		return map[string]any{"result": decoded}, nil
+	}
+
+	if !strings.HasPrefix(part.Type, "tool-") {
+		return output, nil
+	}
 	confirmation, ok := output["_storyden_confirmation"].(map[string]any)
 	if !ok {
 		return output, nil
@@ -584,7 +652,7 @@ func hasPendingConfirmation(event *adksession.Event) bool {
 	return false
 }
 
-func sendToolCall(ctx context.Context, event *adksession.Event, part *genai.Part, emitter partEmitter, toolRegistry *tools.Registry, logger *slog.Logger) {
+func sendToolCall(ctx context.Context, part *genai.Part, emitter partEmitter, toolRegistry *tools.Registry, logger *slog.Logger) {
 	fc := part.FunctionCall
 	if fc == nil {
 		return
@@ -598,10 +666,12 @@ func sendToolCall(ctx context.Context, event *adksession.Event, part *genai.Part
 		slog.String("tool_call_id", toolCallId),
 		slog.String("tool_name", toolName),
 		slog.Any("args", fc.Args),
-		slog.Any("long_running_ids", event.LongRunningToolIDs),
 	)
 
-	metadata := robotprojection.ToolMetadataFromRegistry(ctx, toolRegistry)(toolName)
+	metadata := robotprojection.ClientToolMetadataFromPart(part, toolName)
+	if metadata == nil {
+		metadata = robotprojection.ToolMetadataFromRegistry(ctx, toolRegistry)(toolName)
+	}
 	for _, streamPart := range robotprojection.FunctionCallStreamPartsWithMetadata(fc, metadata) {
 		_ = emitter.Send(streamPart)
 	}
@@ -644,7 +714,7 @@ func sendToolConfirmationCall(
 			Args: original.Args,
 		},
 	}
-	sendToolCall(ctx, event, confirmationPart, emitter, toolRegistry, logger)
+	sendToolCall(ctx, confirmationPart, emitter, toolRegistry, logger)
 	_ = emitter.Send(robotprojection.ToolApprovalRequestStreamPart(fc.ID, fc.ID))
 }
 

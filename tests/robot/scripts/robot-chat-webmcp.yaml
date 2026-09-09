@@ -1,0 +1,15 @@
+steps:
+  - match:
+      contains: "use the browser to add the assets block"
+    respond:
+      tool_calls:
+        - id: call_webmcp_add_assets
+          name: library_page_block_add
+          args:
+            block: assets
+            after_block: directory
+  - match:
+      tool_result: library_page_block_add
+    respond:
+      text: "The browser added the assets block."
+      finish: "stop"

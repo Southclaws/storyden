@@ -7,15 +7,17 @@
  *
  * OpenAPI spec version: v1.26.15-post
  */
-import type { ArbitraryData } from "./arbitraryData";
-import type { Id } from "./id";
-import type { NonEmptyString } from "./nonEmptyString";
-import type { ToolInputStartPartType } from "./toolInputStartPartType";
+import type { RobotClientTool } from "./robotClientTool";
 
-export interface ToolInputStartPart {
-  type: ToolInputStartPartType;
-  toolCallId: Id;
-  toolName: NonEmptyString;
-  dynamic?: boolean;
-  providerMetadata?: ArbitraryData;
+/**
+ * Browser instance and its currently registered WebMCP tools.
+ */
+export interface RobotClientToolContext {
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  client_id: string;
+  /** @maxItems 32 */
+  tools: RobotClientTool[];
 }

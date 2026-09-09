@@ -7,15 +7,5 @@
  *
  * OpenAPI spec version: v1.26.15-post
  */
-import type { ArbitraryData } from "./arbitraryData";
-import type { Id } from "./id";
-import type { NonEmptyString } from "./nonEmptyString";
-import type { ToolInputStartPartType } from "./toolInputStartPartType";
 
-export interface ToolInputStartPart {
-  type: ToolInputStartPartType;
-  toolCallId: Id;
-  toolName: NonEmptyString;
-  dynamic?: boolean;
-  providerMetadata?: ArbitraryData;
-}
+export type RobotClientToolInputSchema = { [key: string]: unknown };

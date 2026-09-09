@@ -130,6 +130,25 @@ describe("assistantToolOutputsAreComplete", () => {
 
     expect(assistantToolOutputsAreComplete(message)).toBe(true);
   });
+
+  it("auto-submits a completed dynamic client tool", () => {
+    const message = {
+      id: "message-1",
+      role: "assistant",
+      parts: [
+        {
+          type: "dynamic-tool",
+          toolName: "library_page_block_add",
+          toolCallId: "call_add",
+          state: "output-available",
+          input: { block: "assets" },
+          output: { blocks: [{ type: "assets" }] },
+        },
+      ],
+    } as unknown as StorydenUIMessage;
+
+    expect(assistantToolOutputsAreComplete(message)).toBe(true);
+  });
 });
 
 describe("assistantCompletedToolOutputIDs", () => {
@@ -167,6 +186,25 @@ describe("assistantCompletedToolOutputIDs", () => {
     } as unknown as StorydenUIMessage;
 
     expect(assistantCompletedToolOutputIDs(message)).toEqual([]);
+  });
+
+  it("returns completed dynamic client tool IDs", () => {
+    const message = {
+      id: "message-1",
+      role: "assistant",
+      parts: [
+        {
+          type: "dynamic-tool",
+          toolName: "library_page_block_add",
+          toolCallId: "call_add",
+          state: "output-available",
+          input: { block: "assets" },
+          output: { blocks: [{ type: "assets" }] },
+        },
+      ],
+    } as unknown as StorydenUIMessage;
+
+    expect(assistantCompletedToolOutputIDs(message)).toEqual(["call_add"]);
   });
 });
 
@@ -241,6 +279,42 @@ describe("hasUnhydratedToolOutput", () => {
     ] as unknown as StorydenUIMessage[];
 
     expect(hasUnhydratedToolOutput(messages, messages)).toBe(false);
+  });
+
+  it("preserves a local dynamic tool error until incoming history catches up", () => {
+    const localMessages = [
+      {
+        id: "message-1",
+        role: "assistant",
+        parts: [
+          {
+            type: "dynamic-tool",
+            toolCallId: "call_1",
+            toolName: "library_page_layout_get",
+            state: "output-error",
+            input: {},
+            errorText: "The page tool is unavailable.",
+          },
+        ],
+      },
+    ] as unknown as StorydenUIMessage[];
+    const incomingMessages = [
+      {
+        id: "message-1",
+        role: "assistant",
+        parts: [
+          {
+            type: "dynamic-tool",
+            toolCallId: "call_1",
+            toolName: "library_page_layout_get",
+            state: "input-available",
+            input: {},
+          },
+        ],
+      },
+    ] as unknown as StorydenUIMessage[];
+
+    expect(hasUnhydratedToolOutput(localMessages, incomingMessages)).toBe(true);
   });
 });
 
