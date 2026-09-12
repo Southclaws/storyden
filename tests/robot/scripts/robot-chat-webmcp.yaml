@@ -3,6 +3,13 @@ steps:
       contains: "use the browser to add the assets block"
     respond:
       tool_calls:
+        - id: call_webmcp_start_edit
+          name: library_page_edit_start
+          args: {}
+  - match:
+      tool_result: library_page_edit_start
+    respond:
+      tool_calls:
         - id: call_webmcp_add_assets
           name: library_page_block_add
           args:

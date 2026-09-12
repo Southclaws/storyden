@@ -1,5 +1,6 @@
 import { Page, expect, test } from "@playwright/test";
 import { randomUUID } from "node:crypto";
+import { unlink, writeFile } from "node:fs/promises";
 
 import {
   createAdmin,
@@ -12,8 +13,13 @@ import {
 } from "../robot/helpers";
 
 const PASSWORD = "TestPassword123!";
-const LIBRARY_TOOL_NAMES = [
+const ROBOT_SCRIPT_DIR = "../tests/robot/scripts";
+const LIBRARY_VIEW_TOOL_NAMES = [
+  "library_page_edit_start",
   "library_page_layout_get",
+] as const;
+const LIBRARY_TOOL_NAMES = [
+  ...LIBRARY_VIEW_TOOL_NAMES,
   "library_page_block_add",
   "library_page_block_remove",
   "library_page_block_move",
@@ -154,14 +160,14 @@ async function expectLibraryTools(page: Page, expected: readonly string[]) {
 }
 
 test.describe("Library page WebMCP", () => {
-  test("mounts only during quick edit and safely describes blocks without configuration", async ({
+  test("exposes safe view tools and mounts layout mutations only during quick edit", async ({
     page,
   }) => {
     const libraryPage = await createLibraryPageFixture();
     await loginAsFixtureAdmin(page);
     await page.goto(`/l/${libraryPage.slug}`);
 
-    await expectLibraryTools(page, []);
+    await expectLibraryTools(page, LIBRARY_VIEW_TOOL_NAMES);
 
     await page.getByRole("button", { name: "Edit", exact: true }).click();
     await page.getByRole("menuitem", { name: "Quick edit" }).click();
@@ -193,7 +199,7 @@ test.describe("Library page WebMCP", () => {
     });
 
     await page.getByRole("button", { name: "View", exact: true }).click();
-    await expectLibraryTools(page, []);
+    await expectLibraryTools(page, LIBRARY_VIEW_TOOL_NAMES);
   });
 
   test("applies progressive edits, rejects stale instructions, and persists the resulting order", async ({
@@ -278,17 +284,16 @@ test.describe("Library page WebMCP", () => {
     try {
       const libraryPage = await createLibraryPageFixture();
       await loginAsFixtureAdmin(page);
-      await enterQuickEdit(page, libraryPage.slug);
-      await expectLibraryTools(page, LIBRARY_TOOL_NAMES);
+      await page.goto(`/l/${libraryPage.slug}`);
+      await expectLibraryTools(page, LIBRARY_VIEW_TOOL_NAMES);
 
-      let firstRobotRequest: Record<string, unknown> | undefined;
+      const robotRequests: Record<string, unknown>[] = [];
       page.on("request", (request) => {
         if (
-          !firstRobotRequest &&
           request.method() === "POST" &&
           request.url().endsWith("/api/robots/sessions")
         ) {
-          firstRobotRequest = request.postDataJSON() as Record<string, unknown>;
+          robotRequests.push(request.postDataJSON() as Record<string, unknown>);
         }
       });
 
@@ -303,6 +308,12 @@ test.describe("Library page WebMCP", () => {
 
       await expect(
         palette.getByRole("group", {
+          name: "Library Page Edit Start tool call",
+          exact: true,
+        }),
+      ).toBeVisible({ timeout: 15000 });
+      await expect(
+        palette.getByRole("group", {
           name: "Library Page Block Add tool call",
           exact: true,
         }),
@@ -313,6 +324,7 @@ test.describe("Library page WebMCP", () => {
         }),
       ).toBeVisible({ timeout: 15000 });
 
+      const firstRobotRequest = robotRequests[0];
       const requestContext = firstRobotRequest?.["context"] as
         { datagraph_item?: { id?: string; slug?: string } } | undefined;
       const clientTools = firstRobotRequest?.["client_tools"] as
@@ -323,12 +335,24 @@ test.describe("Library page WebMCP", () => {
       });
       expect(clientTools?.client_id).toBeTruthy();
       expect(clientTools?.tools?.map((tool) => tool.name).sort()).toEqual(
-        [...LIBRARY_TOOL_NAMES].sort(),
+        [...LIBRARY_VIEW_TOOL_NAMES].sort(),
       );
+      await expect
+        .poll(() =>
+          robotRequests.some((request) => {
+            const context = request["client_tools"] as
+              { tools?: { name: string }[] } | undefined;
+            return context?.tools?.some(
+              (tool) => tool.name === "library_page_block_add",
+            );
+          }),
+        )
+        .toBe(true);
 
       await expect(
         page.locator("#block-assets_content #gallery-strip"),
       ).toBeVisible();
+      await expectLibraryTools(page, LIBRARY_TOOL_NAMES);
       await expect(palette).toBeVisible();
       const persisted = await executeLibraryTool(
         page,
@@ -344,6 +368,63 @@ test.describe("Library page WebMCP", () => {
         ],
       });
     } finally {
+      await setupRobotProviderWithScript(DEFAULT_ROBOT_MODEL);
+    }
+  });
+
+  test("revalidates the mounted page after a backend Robot edit completes", async ({
+    page,
+  }) => {
+    const libraryPage = await createLibraryPageFixture();
+    const updatedName = `Robot updated page ${randomUUID()}`;
+    const prompt = "rename the current library page through the backend";
+    const scriptName = `e2e-library-page-revalidate-${randomUUID()}.yaml`;
+    const scriptPath = `${ROBOT_SCRIPT_DIR}/${scriptName}`;
+
+    try {
+      await writeFile(
+        scriptPath,
+        `steps:
+  - match:
+      contains: "${prompt}"
+    respond:
+      tool_calls:
+        - id: call_update_library_page
+          name: update_library_page
+          args:
+            id: "${libraryPage.id}"
+            name: "${updatedName}"
+  - match:
+      tool_result: update_library_page
+    respond:
+      text: "The backend updated the Library page."
+      finish: "stop"
+`,
+      );
+      await setupRobotProviderWithScript(`mock/../robot/scripts/${scriptName}`);
+      await loginAsFixtureAdmin(page);
+      await page.goto(`/l/${libraryPage.slug}`);
+      await expectLibraryTools(page, LIBRARY_VIEW_TOOL_NAMES);
+
+      await page.keyboard.press("ControlOrMeta+k");
+      const palette = page.getByRole("dialog", { name: "Command Menu" });
+      const commandInput = palette.getByRole("combobox", {
+        name: "Command Menu",
+      });
+      await commandInput.fill(prompt);
+      await commandInput.press("Enter");
+
+      await expect(
+        palette.getByText("The backend updated the Library page.", {
+          exact: true,
+        }),
+      ).toBeVisible({ timeout: 15000 });
+      await expect(
+        page.locator("h1").filter({ hasText: updatedName }),
+      ).toHaveText(updatedName, { timeout: 15000 });
+      await expect(palette).toBeVisible();
+    } finally {
+      await unlink(scriptPath).catch(() => undefined);
       await setupRobotProviderWithScript(DEFAULT_ROBOT_MODEL);
     }
   });

@@ -18,11 +18,21 @@ type WaitForSave = (
   expected: LibraryPageLayout,
 ) => Promise<void>;
 
+type LibraryPageLayoutToolImplementations = Pick<
+  WebMCPToolImplementations,
+  | "library_page_layout_get"
+  | "library_page_block_add"
+  | "library_page_block_remove"
+  | "library_page_block_move"
+  | "library_page_block_assets_update"
+  | "library_page_block_directory_update"
+>;
+
 export function createLibraryPageLayoutToolImplementations(
   store: NodeStoreAPI,
   waitForSave: WaitForSave = waitForLibraryPageLayoutSave,
-): WebMCPToolImplementations {
-  const implementations: WebMCPToolImplementations = {
+): LibraryPageLayoutToolImplementations {
+  const implementations: LibraryPageLayoutToolImplementations = {
     library_page_layout_get: () => {
       const layout = getDraftLayout(store);
 

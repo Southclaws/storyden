@@ -45,9 +45,14 @@ import {
 import { StorydenUIMessage, toStorydenUIMessages } from "@/api/robots-types";
 import mcpSchema from "@/api/robots.json";
 import { API_ADDRESS } from "@/config";
+import { libraryBus } from "@/lib/library/events";
 import { deriveError } from "@/utils/error";
 import { generateXid } from "@/utils/xid";
 
+import {
+  findCompletedStorydenToolCalls,
+  isKnownToolName,
+} from "./completedToolCalls";
 import { useRobotPageContext } from "./useRobotChatContext";
 import {
   ClientToolCall,
@@ -80,6 +85,13 @@ const MUTATIVE_TRAIL_TOOLS: ToolName[] = [
   "trail_action_run_cancel",
 ];
 
+const MUTATIVE_LIBRARY_TOOLS: ToolName[] = [
+  "create_library_page",
+  "update_library_page",
+  "library_page_property_schema_update",
+  "library_page_properties_update",
+];
+
 export const DENBOT_NAME = "Denbot";
 export const DENBOT_ID = "denbot";
 
@@ -102,10 +114,6 @@ type StorydenToolCall = {
     dynamic?: false;
   };
 }[ToolName];
-
-function isKnownToolName(name: string): name is ToolName {
-  return (TOOL_NAMES as readonly string[]).includes(name);
-}
 
 function isStorydenToolCall(
   toolCall: ClientToolCall,
@@ -192,6 +200,14 @@ export function RobotChatContext({
     initialSelectedWorkspaceID,
   );
   const autoSubmittedToolOutputIDsRef = useRef<Set<string>>(new Set());
+  const [handledCompletedToolCallIDs] = useState(
+    () =>
+      new Set(
+        findCompletedStorydenToolCalls(initialMessages ?? []).map(
+          ({ toolCallId }) => toolCallId,
+        ),
+      ),
+  );
   const [sessionId] = useState(() => initialSessionID ?? generateXid());
   const [streamStartOffset] = useState(initialStreamOffset ?? "-1");
   const [isSessionConfirmed, setIsSessionConfirmed] =
@@ -294,21 +310,13 @@ export function RobotChatContext({
       if (!isStorydenToolCall(toolCall)) {
         const toolName = toolCall.toolName;
         console.warn(`Unknown tool name: ${toolName} list: ${TOOL_NAMES}`);
-        return;
       }
+    },
+    [handleWebMCPToolCall],
+  );
 
-      const toolName = toolCall.toolName;
-
-      if (
-        toolName === "robot_delete" ||
-        toolName === "toolset_delete" ||
-        toolName === "library_request_page"
-      ) {
-        return;
-      }
-
-      // NOTE: When a tool is called that internally mutates the robot list
-      // (create, update, delete), we need to tell SWR to re-validate the list.
+  const handleCompletedStorydenToolCall = useCallback(
+    async (toolName: ToolName) => {
       if (MUTATIVE_ROBOT_TOOLS.includes(toolName)) {
         await Promise.all([
           mutate(getRobotsListKey()),
@@ -316,8 +324,6 @@ export function RobotChatContext({
         ]);
       }
 
-      // NOTE: When a tool is called that internally mutates threads
-      // (create, update, reply), we need to tell SWR to re-validate the feed.
       if (MUTATIVE_THREAD_TOOLS.includes(toolName)) {
         await mutate(threadListKeyFilterFn);
       }
@@ -325,8 +331,12 @@ export function RobotChatContext({
       if (MUTATIVE_TRAIL_TOOLS.includes(toolName)) {
         await mutate(getTrailListKey());
       }
+
+      if (MUTATIVE_LIBRARY_TOOLS.includes(toolName)) {
+        libraryBus.emit("library:revalidate", {});
+      }
     },
-    [handleWebMCPToolCall, mutate],
+    [mutate],
   );
 
   const handleStreamData = useCallback(
@@ -435,6 +445,23 @@ export function RobotChatContext({
       return true;
     },
   });
+
+  useEffect(() => {
+    for (const toolCall of findCompletedStorydenToolCalls(chat.messages)) {
+      if (handledCompletedToolCallIDs.has(toolCall.toolCallId)) {
+        continue;
+      }
+
+      handledCompletedToolCallIDs.add(toolCall.toolCallId);
+      void handleCompletedStorydenToolCall(toolCall.toolName).catch((error) =>
+        setErrorState(deriveError(error)),
+      );
+    }
+  }, [
+    chat.messages,
+    handleCompletedStorydenToolCall,
+    handledCompletedToolCallIDs,
+  ]);
 
   useWebMCPToolOutputSubmitter(setToolOutputSubmitter, chat.addToolOutput);
   usePendingWebMCPToolCalls(chat.messages, handleWebMCPToolCall);
@@ -717,31 +744,8 @@ export function RobotChatContext({
         id: input.approvalId,
         approved: input.approved,
       });
-
-      if (
-        !input.approved ||
-        !input.toolName ||
-        !isKnownToolName(input.toolName)
-      ) {
-        return;
-      }
-
-      if (MUTATIVE_ROBOT_TOOLS.includes(input.toolName)) {
-        await Promise.all([
-          mutate(getRobotsListKey()),
-          mutate(getRobotToolsetsListKey()),
-        ]);
-      }
-
-      if (MUTATIVE_THREAD_TOOLS.includes(input.toolName)) {
-        await mutate(threadListKeyFilterFn);
-      }
-
-      if (MUTATIVE_TRAIL_TOOLS.includes(input.toolName)) {
-        await mutate(getTrailListKey());
-      }
     },
-    [chat, mutate],
+    [chat],
   );
 
   const resolveLibraryPageRequest = useCallback(

@@ -1,5 +1,8 @@
 $schema: "http://json-schema.org/draft-07/schema#"
 definitions:
+  ToolLibraryPageEditStart:
+    $ref: "./tool_library_page_edit_start.yaml"
+
   ToolLibraryPageLayoutGet:
     $ref: "./tool_library_page_layout_get.yaml"
 

@@ -10,6 +10,69 @@ import {
   reconcileMessages,
   shouldReplaceMessages,
 } from "./RobotChatContext";
+import { findCompletedStorydenToolCalls } from "./completedToolCalls";
+
+describe("findCompletedStorydenToolCalls", () => {
+  it("returns a backend tool only after its output is available", () => {
+    const messages = [
+      {
+        id: "message-1",
+        role: "assistant",
+        parts: [
+          {
+            type: "tool-update_library_page",
+            toolCallId: "call_pending",
+            state: "input-available",
+            input: { id: "page-1", name: "Still pending" },
+          },
+          {
+            type: "tool-update_library_page",
+            toolCallId: "call_complete",
+            state: "output-available",
+            input: { id: "page-1", name: "Updated" },
+            output: { id: "page-1", slug: "page", name: "Updated" },
+          },
+        ],
+      },
+    ] as unknown as StorydenUIMessage[];
+
+    expect(findCompletedStorydenToolCalls(messages)).toEqual([
+      {
+        toolCallId: "call_complete",
+        toolName: "update_library_page",
+      },
+    ]);
+  });
+
+  it("ignores failed, unknown, and frontend-dynamic tools", () => {
+    const messages = [
+      {
+        id: "message-1",
+        role: "assistant",
+        parts: [
+          {
+            type: "tool-update_library_page",
+            toolCallId: "call_failed",
+            state: "output-error",
+          },
+          {
+            type: "tool-unknown_tool",
+            toolCallId: "call_unknown",
+            state: "output-available",
+          },
+          {
+            type: "dynamic-tool",
+            toolName: "library_page_block_add",
+            toolCallId: "call_webmcp",
+            state: "output-available",
+          },
+        ],
+      },
+    ] as unknown as StorydenUIMessage[];
+
+    expect(findCompletedStorydenToolCalls(messages)).toEqual([]);
+  });
+});
 
 describe("assistantHasTextAfterToolOutput", () => {
   it("allows assistant text before a pending confirmation tool", () => {

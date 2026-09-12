@@ -5,6 +5,7 @@
  */
 
 export interface WebMCPTools {
+  ToolLibraryPageEditStart?: LibraryPageEditStart;
   ToolLibraryPageLayoutGet?: LibraryPageLayoutGet;
   ToolLibraryPageBlockAdd?: LibraryPageBlockAdd;
   ToolLibraryPageBlockRemove?: LibraryPageBlockRemove;
@@ -12,6 +13,21 @@ export interface WebMCPTools {
   ToolLibraryPageBlockAssetsUpdate?: LibraryPageBlockAssetsUpdate;
   ToolLibraryPageBlockDirectoryUpdate?: LibraryPageBlockDirectoryUpdate;
   [k: string]: unknown;
+}
+/**
+ * Enter quick edit mode for the current Library page so frontend-only layout tools can make the immediate change the user requested. Use this only when the user clearly asked to edit the live page. If it is unclear whether they want a quick edit or a version draft, ask them before calling this tool.
+ */
+export interface LibraryPageEditStart {
+  input: ToolLibraryPageEditStartInput;
+  output: ToolLibraryPageEditStartOutput;
+  [k: string]: unknown;
+}
+export interface ToolLibraryPageEditStartInput {}
+export interface ToolLibraryPageEditStartOutput {
+  /**
+   * Summary of the active edit mode.
+   */
+  message: string;
 }
 /**
  * Retrieve the block layout of the current Library page.
@@ -149,11 +165,12 @@ export interface ToolLibraryPageBlockDirectoryUpdateOutput {
   layout: LibraryPageLayout;
 }
 
-export type WebMCPToolName = "library_page_layout_get" | "library_page_block_add" | "library_page_block_remove" | "library_page_block_move" | "library_page_block_assets_update" | "library_page_block_directory_update";
+export type WebMCPToolName = "library_page_edit_start" | "library_page_layout_get" | "library_page_block_add" | "library_page_block_remove" | "library_page_block_move" | "library_page_block_assets_update" | "library_page_block_directory_update";
 
-export const WEBMCP_TOOL_NAMES = ["library_page_layout_get", "library_page_block_add", "library_page_block_remove", "library_page_block_move", "library_page_block_assets_update", "library_page_block_directory_update"] as const;
+export const WEBMCP_TOOL_NAMES = ["library_page_edit_start", "library_page_layout_get", "library_page_block_add", "library_page_block_remove", "library_page_block_move", "library_page_block_assets_update", "library_page_block_directory_update"] as const;
 
 export type WebMCPToolInputMap = {
+  "library_page_edit_start": ToolLibraryPageEditStartInput;
   "library_page_layout_get": ToolLibraryPageLayoutGetInput;
   "library_page_block_add": ToolLibraryPageBlockAddInput;
   "library_page_block_remove": ToolLibraryPageBlockRemoveInput;
@@ -163,6 +180,7 @@ export type WebMCPToolInputMap = {
 };
 
 export type WebMCPToolOutputMap = {
+  "library_page_edit_start": ToolLibraryPageEditStartOutput;
   "library_page_layout_get": ToolLibraryPageLayoutGetOutput;
   "library_page_block_add": ToolLibraryPageBlockAddOutput;
   "library_page_block_remove": ToolLibraryPageBlockRemoveOutput;
@@ -180,6 +198,37 @@ export type WebMCPToolImplementations = {
 };
 
 export const WEBMCP_TOOL_DEFINITIONS = {
+  "library_page_edit_start": {
+    "name": "library_page_edit_start",
+    "title": "Start Library Page Quick Edit",
+    "description": "Enter quick edit mode for the current Library page so frontend-only layout tools can make the immediate change the user requested. Use this only when the user clearly asked to edit the live page. If it is unclear whether they want a quick edit or a version draft, ask them before calling this tool.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "outputSchema": {
+      "type": "object",
+      "required": [
+        "message"
+      ],
+      "properties": {
+        "message": {
+          "type": "string",
+          "description": "Summary of the active edit mode."
+        }
+      },
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "untrustedContentHint": false
+    },
+    "pathPrefix": "/l/"
+  },
   "library_page_layout_get": {
     "name": "library_page_layout_get",
     "title": "Get Library Page Layout",

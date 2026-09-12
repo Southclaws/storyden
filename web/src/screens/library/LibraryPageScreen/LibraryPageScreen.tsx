@@ -63,7 +63,7 @@ const LibraryPageForm = memo((props: LibraryPageScreenProps) => {
     <LibraryPageProvider node={props.node} childNodes={props.childNodes}>
       <LibraryPageEditProvider disabled={props.embedded}>
         {!props.embedded && <LibraryPageAutosaveController />}
-        <LibraryPageWebMCPTools />
+        {!props.embedded && <LibraryPageWebMCPTools />}
         <LibraryPage embedded={props.embedded} />
       </LibraryPageEditProvider>
     </LibraryPageProvider>

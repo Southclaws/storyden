@@ -10,7 +10,7 @@ import * as BlockEditor from "@/components/ui/block-editor";
 import { Button } from "@/components/ui/button";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { DragItemLibraryBlock } from "@/lib/dragdrop/provider";
-import { useLibraryBlockEvent } from "@/lib/library/events";
+import { useLibraryEvent } from "@/lib/library/events";
 import { LibraryPageBlock, LibraryPageBlockType } from "@/lib/library/metadata";
 
 import { useLibraryPageContext } from "../Context";
@@ -47,7 +47,7 @@ export function LibraryPageBlocks() {
     },
     [moveBlock, meta],
   );
-  useLibraryBlockEvent("library:reorder-block", ({ activeId, overId }) => {
+  useLibraryEvent("library:reorder-block", ({ activeId, overId }) => {
     handleReorder(activeId, overId);
   });
 
@@ -57,7 +57,7 @@ export function LibraryPageBlocks() {
     },
     [addBlock],
   );
-  useLibraryBlockEvent("library:add-block", ({ type, index }) => {
+  useLibraryEvent("library:add-block", ({ type, index }) => {
     handleAddBlock(type, index);
   });
 
@@ -67,7 +67,7 @@ export function LibraryPageBlocks() {
     },
     [removeBlock],
   );
-  useLibraryBlockEvent("library:remove-block", ({ type }) => {
+  useLibraryEvent("library:remove-block", ({ type }) => {
     handleRemoveBlock(type);
   });
 
