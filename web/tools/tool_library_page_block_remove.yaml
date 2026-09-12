@@ -1,0 +1,39 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: ToolLibraryPageBlockRemove
+x-storyden-tool:
+  title: Remove Library Page Block
+  path_prefix: /l/
+  annotations:
+    readOnlyHint: false
+    destructiveHint: true
+    idempotentHint: true
+    openWorldHint: false
+    untrustedContentHint: false
+title: library_page_block_remove
+description: Remove a visible block from the current Library page without deleting its content.
+type: object
+required: [input, output]
+properties:
+  input:
+    $ref: "#/definitions/ToolLibraryPageBlockRemoveInput"
+  output:
+    $ref: "#/definitions/ToolLibraryPageBlockRemoveOutput"
+definitions:
+  ToolLibraryPageBlockRemoveInput:
+    type: object
+    required: [block]
+    properties:
+      block:
+        $ref: "./common/library_page_layout.yaml#/definitions/LibraryPageLayoutBlockType"
+    additionalProperties: false
+
+  ToolLibraryPageBlockRemoveOutput:
+    type: object
+    required: [message, layout]
+    properties:
+      message:
+        type: string
+        description: Summary of the removed block.
+      layout:
+        $ref: "./common/library_page_layout.yaml"
+    additionalProperties: false

@@ -151,7 +151,7 @@ func (p *turnProjector) project(event robot.SessionEvent, toolRegistry *tools.Re
 				} else if toolRequiresConfirmation(p.ctx, toolRegistry, part.FunctionCall.Name) {
 					continue
 				} else {
-					sendToolCall(p.ctx, adkEvent, part, p.collector, toolRegistry, p.logger)
+					sendToolCall(p.ctx, part, p.collector, toolRegistry, p.logger)
 				}
 			}
 			if part.FunctionResponse != nil {

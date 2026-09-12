@@ -1,0 +1,42 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: ToolLibraryPageBlockMove
+x-storyden-tool:
+  title: Move Library Page Block
+  path_prefix: /l/
+  annotations:
+    readOnlyHint: false
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: false
+    untrustedContentHint: false
+title: library_page_block_move
+description: Move a visible block within the current Library page layout.
+type: object
+required: [input, output]
+properties:
+  input:
+    $ref: "#/definitions/ToolLibraryPageBlockMoveInput"
+  output:
+    $ref: "#/definitions/ToolLibraryPageBlockMoveOutput"
+definitions:
+  ToolLibraryPageBlockMoveInput:
+    type: object
+    required: [block]
+    properties:
+      block:
+        $ref: "./common/library_page_layout.yaml#/definitions/LibraryPageLayoutBlockType"
+      before_block:
+        $ref: "./common/library_page_layout.yaml#/definitions/LibraryPageLayoutBlockType"
+        description: Existing block before which to place the block; omit to move it to the end.
+    additionalProperties: false
+
+  ToolLibraryPageBlockMoveOutput:
+    type: object
+    required: [message, layout]
+    properties:
+      message:
+        type: string
+        description: Summary of the moved block.
+      layout:
+        $ref: "./common/library_page_layout.yaml"
+    additionalProperties: false

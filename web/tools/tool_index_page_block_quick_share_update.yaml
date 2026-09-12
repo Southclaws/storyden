@@ -1,0 +1,39 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: ToolIndexPageBlockQuickShareUpdate
+x-storyden-tool:
+  title: Update Index Page Quick Share Block
+  path_prefix: /
+  annotations:
+    readOnlyHint: false
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: false
+    untrustedContentHint: false
+title: index_page_block_quick_share_update
+description: Configure the category picker on the visible quick-share block on the current index page.
+type: object
+required: [input, output]
+properties:
+  input:
+    $ref: "#/definitions/ToolIndexPageBlockQuickShareUpdateInput"
+  output:
+    $ref: "#/definitions/ToolIndexPageBlockQuickShareUpdateOutput"
+definitions:
+  ToolIndexPageBlockQuickShareUpdateInput:
+    type: object
+    required: [show_category_select]
+    properties:
+      show_category_select:
+        type: boolean
+    additionalProperties: false
+
+  ToolIndexPageBlockQuickShareUpdateOutput:
+    type: object
+    required: [message, layout]
+    properties:
+      message:
+        type: string
+        description: Summary of the updated quick-share block.
+      layout:
+        $ref: "./common/index_page_layout.yaml"
+    additionalProperties: false

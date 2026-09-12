@@ -8,6 +8,7 @@ import {
   NodeWithChildren,
   PropertyType,
 } from "@/api/openapi-schema";
+import { libraryBus } from "@/lib/library/events";
 
 import { LibraryPageProvider, useLibraryPageContext } from "./Context";
 import { LibraryPageAutosaveController } from "./LibraryPageAutosaveController";
@@ -15,6 +16,7 @@ import { NodeStoreAPI } from "./store";
 
 const mocks = vi.hoisted(() => ({
   nodeUpdate: vi.fn(),
+  nodeGet: vi.fn(),
   nodeUpdateChildrenPropertySchema: vi.fn(),
   nodeVersionCreate: vi.fn(),
   nodeVersionUpdate: vi.fn(),
@@ -22,6 +24,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("@/api/openapi-client/nodes", () => ({
+  nodeGet: mocks.nodeGet,
   nodeUpdate: mocks.nodeUpdate,
   nodeUpdateChildrenPropertySchema: mocks.nodeUpdateChildrenPropertySchema,
   nodeVersionCreate: mocks.nodeVersionCreate,
@@ -50,6 +53,7 @@ describe("LibraryPageProvider direct autosave", () => {
     vi.useFakeTimers();
     vi.clearAllMocks();
     mocks.nodeUpdateChildrenPropertySchema.mockResolvedValue(undefined);
+    mocks.nodeGet.mockResolvedValue(node("root"));
     mocks.revalidate.mockResolvedValue(undefined);
   });
 
@@ -80,6 +84,69 @@ describe("LibraryPageProvider direct autosave", () => {
     expect(mocks.revalidate).toHaveBeenCalledWith(updated);
     expect(store.getState().original.name).toBe("Renamed");
     expect(store.getState().draft.name).toBe("Renamed");
+  });
+
+  it("revalidates and hydrates the store when a backend Robot mutation announces an external page change", async () => {
+    const updated = node("root", { name: "Backend Robot name" });
+    mocks.nodeGet.mockResolvedValue(updated);
+    const store = await renderProvider(node("root"));
+
+    await act(async () => {
+      libraryBus.emit("library:revalidate", {});
+      await Promise.resolve();
+    });
+
+    expect(mocks.revalidate).toHaveBeenCalledOnce();
+    expect(store.getState().original.name).toBe("Backend Robot name");
+    expect(store.getState().draft.name).toBe("Backend Robot name");
+  });
+
+  it("ignores an older external revalidation response that finishes last", async () => {
+    let resolveOlder = (_node: NodeWithChildren) => {};
+    let resolveNewer = (_node: NodeWithChildren) => {};
+    const olderResponse = new Promise<NodeWithChildren>((resolve) => {
+      resolveOlder = resolve;
+    });
+    const newerResponse = new Promise<NodeWithChildren>((resolve) => {
+      resolveNewer = resolve;
+    });
+    mocks.nodeGet
+      .mockImplementationOnce(() => olderResponse)
+      .mockImplementationOnce(() => newerResponse);
+    const store = await renderProvider(node("root"));
+
+    act(() => {
+      libraryBus.emit("library:revalidate", {});
+      libraryBus.emit("library:revalidate", {});
+    });
+
+    await act(async () => {
+      resolveNewer(node("root", { name: "Newer response" }));
+      await newerResponse;
+    });
+    await vi.waitFor(() => expect(mocks.revalidate).toHaveBeenCalledOnce());
+
+    await act(async () => {
+      resolveOlder(node("root", { name: "Older response" }));
+      await olderResponse;
+    });
+
+    expect(mocks.revalidate).toHaveBeenCalledOnce();
+    expect(store.getState().original.name).toBe("Newer response");
+    expect(store.getState().draft.name).toBe("Newer response");
+  });
+
+  it("cancels a pending local autosave before revalidating a backend Robot change", async () => {
+    const store = await renderProvider(node("root"));
+
+    act(() => {
+      store.getState().setName("Stale local name");
+      libraryBus.emit("library:revalidate", {});
+    });
+    await flushAutosave();
+
+    expect(mocks.nodeUpdate).not.toHaveBeenCalled();
+    expect(mocks.revalidate).toHaveBeenCalledOnce();
   });
 
   it("does not call update endpoints when the derived mutation is clean", async () => {

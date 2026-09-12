@@ -12,6 +12,7 @@ import (
 	"google.golang.org/genai"
 
 	"github.com/Southclaws/storyden/app/resources/robot"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/presentation"
 	robot_tools "github.com/Southclaws/storyden/app/services/semdex/robot/tools"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -126,10 +127,11 @@ func ADKEventToUIMessageParts(event adksession.Event, hiddenToolCallIDs map[stri
 
 			var uiPart openapi.UIMessagePart
 			var err error
+			partToolMetadata := toolMetadataForPart(adkPart, adkPart.FunctionCall.Name, toolMetadata)
 			if adkPart.FunctionCall.Name == toolconfirmation.FunctionCallName {
-				uiPart, err = ConfirmationFunctionCallToUIPart(adkPart.FunctionCall, toolMetadata)
+				uiPart, err = ConfirmationFunctionCallToUIPart(adkPart.FunctionCall, partToolMetadata)
 			} else {
-				uiPart, err = FunctionCallToUIPart(adkPart.FunctionCall, toolMetadata)
+				uiPart, err = FunctionCallToUIPart(adkPart.FunctionCall, partToolMetadata)
 			}
 			if err != nil {
 				return nil, err
@@ -251,7 +253,8 @@ func FunctionCallToUIPart(fc *genai.FunctionCall, toolMetadata ToolMetadataResol
 		State:      openapi.InputAvailable,
 		Input:      fc.Args,
 	}
-	if metadata := resolveToolMetadata(toolMetadata, fc.Name); metadata != nil {
+	metadata := resolveToolMetadata(toolMetadata, fc.Name)
+	if metadata != nil {
 		inputAvailable.CallProviderMetadata = &metadata
 	}
 
@@ -264,7 +267,12 @@ func FunctionCallToUIPart(fc *genai.FunctionCall, toolMetadata ToolMetadataResol
 	if err := uiPart.FromToolUIPart(toolPart); err != nil {
 		return openapi.UIMessagePart{}, fmt.Errorf("create UI message part from tool part: %w", err)
 	}
-	uiPart.Type = openapi.UIMessagePartType("tool-" + fc.Name)
+	metadataMap, _ := metadata.(map[string]any)
+	if isWebMCPToolMetadata(metadataMap) {
+		uiPart.Type = openapi.UIMessagePartType("dynamic-tool")
+	} else {
+		uiPart.Type = openapi.UIMessagePartType("tool-" + fc.Name)
+	}
 
 	return uiPart, nil
 }
@@ -475,6 +483,10 @@ func FunctionCallStreamPartsWithMetadata(fc *genai.FunctionCall, metadata map[st
 		ToolCallId: fc.ID,
 		ToolName:   fc.Name,
 	}
+	dynamic := isWebMCPToolMetadata(metadata)
+	if dynamic {
+		inputStart.Dynamic = &dynamic
+	}
 	if metadata != nil {
 		providerMetadata := openapi.ArbitraryData(metadata)
 		inputStart.ProviderMetadata = &providerMetadata
@@ -499,6 +511,9 @@ func FunctionCallStreamPartsWithMetadata(fc *genai.FunctionCall, metadata map[st
 		ToolName:   fc.Name,
 		Input:      fc.Args,
 	}
+	if dynamic {
+		inputAvailable.Dynamic = &dynamic
+	}
 	if metadata != nil {
 		providerMetadata := openapi.ArbitraryData(metadata)
 		inputAvailable.ProviderMetadata = &providerMetadata
@@ -508,6 +523,42 @@ func FunctionCallStreamPartsWithMetadata(fc *genai.FunctionCall, metadata map[st
 	parts = append(parts, toolInputAvailablePart)
 
 	return parts
+}
+
+func isWebMCPToolMetadata(metadata map[string]any) bool {
+	storyden, _ := metadata["storyden"].(map[string]any)
+	source, _ := storyden["source"].(string)
+	return source == "webmcp"
+}
+
+func ClientToolMetadataFromPart(part *genai.Part, toolName string) map[string]any {
+	if part == nil || part.PartMetadata == nil {
+		return nil
+	}
+	clientTool, _ := part.PartMetadata[agent_registry.ClientToolMetadataKey].(map[string]any)
+	if clientTool == nil {
+		return nil
+	}
+	return map[string]any{
+		"storyden": map[string]any{
+			"id":                    toolName,
+			"callable_name":         toolName,
+			"source":                clientTool["source"],
+			"requires_confirmation": false,
+			"client_id":             clientTool["client_id"],
+			"scope":                 clientTool["scope"],
+			"title":                 clientTool["title"],
+			"annotations":           clientTool["annotations"],
+		},
+	}
+}
+
+func toolMetadataForPart(part *genai.Part, toolName string, fallback ToolMetadataResolver) ToolMetadataResolver {
+	metadata := ClientToolMetadataFromPart(part, toolName)
+	if metadata == nil {
+		return fallback
+	}
+	return func(string) map[string]any { return metadata }
 }
 
 func ToolApprovalRequestStreamPart(toolCallID string, approvalID string) openapi.StreamPart {

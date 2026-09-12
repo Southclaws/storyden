@@ -105,7 +105,7 @@ tasks:
   # -
 
   generate:
-    deps: [generate:db, generate:openapi, generate:mcp]
+    deps: [generate:db, generate:openapi, generate:mcp, generate:webmcp]
 
   generate:db:
     cmds: [go generate ./internal/ent]
@@ -138,6 +138,11 @@ tasks:
   generate:mcp:frontend:
     cmds:
       - pnpm mcp-schema
+    dir: web
+
+  generate:webmcp:
+    cmds:
+      - pnpm webmcp-schema
     dir: web
 
   # -

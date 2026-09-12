@@ -17,5 +17,6 @@ export interface ToolInputAvailablePart {
   toolCallId: Id;
   toolName: NonEmptyString;
   input: ArbitraryData;
+  dynamic?: boolean;
   providerMetadata?: ArbitraryData;
 }

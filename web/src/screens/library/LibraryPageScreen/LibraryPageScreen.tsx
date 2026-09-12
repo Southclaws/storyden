@@ -16,6 +16,7 @@ import { EditingDraftWarning } from "./EditingDraftWarning";
 import { LibraryPageAutosaveController } from "./LibraryPageAutosaveController";
 import { LibraryPageControls } from "./LibraryPageControls";
 import { LibraryPageVersionReview } from "./LibraryPageVersionReview";
+import { LibraryPageWebMCPTools } from "./LibraryPageWebMCPTools";
 import { LibraryPageBlocks } from "./blocks/LibraryPageBlocks";
 import { LibraryPageEditProvider, useEditState } from "./useEditState";
 
@@ -62,6 +63,7 @@ const LibraryPageForm = memo((props: LibraryPageScreenProps) => {
     <LibraryPageProvider node={props.node} childNodes={props.childNodes}>
       <LibraryPageEditProvider disabled={props.embedded}>
         {!props.embedded && <LibraryPageAutosaveController />}
+        {!props.embedded && <LibraryPageWebMCPTools />}
         <LibraryPage embedded={props.embedded} />
       </LibraryPageEditProvider>
     </LibraryPageProvider>

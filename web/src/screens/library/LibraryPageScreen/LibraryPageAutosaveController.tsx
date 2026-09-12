@@ -8,6 +8,7 @@ import {
   nodeVersionUpdate,
 } from "@/api/openapi-client/nodes";
 import { deriveMutationFromDifference } from "@/lib/library/diff";
+import { useLibraryEvent } from "@/lib/library/events";
 import { hydrateNode } from "@/lib/library/metadata";
 import { deepEqual } from "@/utils/equality";
 
@@ -150,6 +151,8 @@ export function LibraryPageAutosaveController() {
       suppressAutosave,
     ],
   );
+
+  useLibraryEvent("library:revalidate", saveDraft.cancel);
 
   useEffect(() => {
     const unsubscribe = store.subscribe((state, prev) => {

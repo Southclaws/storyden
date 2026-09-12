@@ -8,6 +8,7 @@ import { useSiteEditorState } from "@/lib/settings/site-editor-client";
 
 import { FeedBlockEditorProvider } from "./FeedBlockEditor/Context";
 import { FeedPageBlocks } from "./FeedBlockEditor/FeedPageBlocks";
+import { IndexPageWebMCPTools } from "./FeedBlockEditor/IndexPageWebMCPTools";
 import { InitialData } from "./types";
 
 type Props = {
@@ -24,10 +25,11 @@ export function FeedScreenContent({
   const { settings } = useSettings(initialSettings, true);
   const currentSettings = settings ?? initialSettings;
   const feed = useFeedConfig(currentSettings, false);
-  const { isEditing } = useSiteEditorState({
-    initialSession,
-    initialSettings: currentSettings,
-  });
+  const { isEditingEnabled, isEditing, handleToggleEditing } =
+    useSiteEditorState({
+      initialSession,
+      initialSettings: currentSettings,
+    });
 
   return (
     <FeedBlockEditorProvider
@@ -37,6 +39,11 @@ export function FeedScreenContent({
       initialSettings={currentSettings}
       isEditing={isEditing}
     >
+      <IndexPageWebMCPTools
+        isEditingEnabled={isEditingEnabled}
+        isEditing={isEditing}
+        startEditing={handleToggleEditing}
+      />
       <FeedPageBlocks />
     </FeedBlockEditorProvider>
   );

@@ -23,6 +23,22 @@ vi.mock("./RobotChatContext", () => ({
 }));
 
 describe("RobotToolCall", () => {
+  it("renders the declared name of a dynamic WebMCP tool", () => {
+    const part = {
+      type: "dynamic-tool",
+      toolName: "library_page_block_add",
+      toolCallId: "call-library-block-add",
+      state: "input-available",
+      input: { block: "gallery" },
+    } as unknown as UIMessagePart<UIDataTypes, StorydenTools>;
+
+    render(<RobotToolCall part={part} />);
+
+    expect(
+      screen.getByRole("group", { name: "Library Page Block Add tool call" }),
+    ).toBeInTheDocument();
+  });
+
   it("renders an error-shaped tool result without reading the success payload", () => {
     const message =
       'tool "document_get" is Toolset-only; use Toolset system.documents instead';

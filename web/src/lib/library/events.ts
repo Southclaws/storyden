@@ -4,20 +4,21 @@ import { createEmitter } from "@/utils/emitter";
 
 import { LibraryPageBlockType } from "./metadata";
 
-export type LibraryBlockEvents = {
+export type LibraryEvents = {
   "library:reorder-block": {
     activeId: LibraryPageBlockType;
     overId: LibraryPageBlockType;
   };
   "library:add-block": { type: LibraryPageBlockType; index?: number };
   "library:remove-block": { type: LibraryPageBlockType };
+  "library:revalidate": Record<string, never>;
 };
 
-export const libraryBus = createEmitter<LibraryBlockEvents>();
+export const libraryBus = createEmitter<LibraryEvents>();
 
-export function useLibraryBlockEvent<K extends keyof LibraryBlockEvents>(
+export function useLibraryEvent<K extends keyof LibraryEvents>(
   type: K,
-  handler: (event: LibraryBlockEvents[K]) => void,
+  handler: (event: LibraryEvents[K]) => void,
 ) {
   useEffect(() => {
     libraryBus.on(type, handler);
@@ -28,9 +29,9 @@ export function useLibraryBlockEvent<K extends keyof LibraryBlockEvents>(
 }
 
 export function useEmitLibraryBlockEvent() {
-  return <K extends keyof LibraryBlockEvents>(
+  return <K extends keyof LibraryEvents>(
     type: K,
-    payload: LibraryBlockEvents[K],
+    payload: LibraryEvents[K],
   ) => {
     libraryBus.emit(type, payload);
   };

@@ -1,0 +1,45 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: ToolLibraryPageBlockAssetsUpdate
+x-storyden-tool:
+  title: Update Library Page Assets Block
+  path_prefix: /l/
+  annotations:
+    readOnlyHint: false
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: false
+    untrustedContentHint: false
+title: library_page_block_assets_update
+description: Update the presentation of the visible assets block on the current Library page.
+type: object
+required: [input, output]
+properties:
+  input:
+    $ref: "#/definitions/ToolLibraryPageBlockAssetsUpdateInput"
+  output:
+    $ref: "#/definitions/ToolLibraryPageBlockAssetsUpdateOutput"
+definitions:
+  ToolLibraryPageBlockAssetsUpdateInput:
+    type: object
+    required: [layout]
+    properties:
+      layout:
+        type: string
+        enum: [strip, grid]
+      grid_size:
+        type: integer
+        minimum: 1
+        maximum: 4
+        description: Number of columns used by the grid layout.
+    additionalProperties: false
+
+  ToolLibraryPageBlockAssetsUpdateOutput:
+    type: object
+    required: [message, layout]
+    properties:
+      message:
+        type: string
+        description: Summary of the updated assets block.
+      layout:
+        $ref: "./common/library_page_layout.yaml"
+    additionalProperties: false

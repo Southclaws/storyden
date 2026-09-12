@@ -16,5 +16,6 @@ export interface ToolInputStartPart {
   type: ToolInputStartPartType;
   toolCallId: Id;
   toolName: NonEmptyString;
+  dynamic?: boolean;
   providerMetadata?: ArbitraryData;
 }

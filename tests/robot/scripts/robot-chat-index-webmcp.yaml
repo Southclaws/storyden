@@ -1,0 +1,22 @@
+steps:
+  - match:
+      contains: "use the browser to add the quick-share block"
+    respond:
+      tool_calls:
+        - id: call_index_webmcp_start_edit
+          name: index_page_edit_start
+          args: {}
+  - match:
+      tool_result: index_page_edit_start
+    respond:
+      tool_calls:
+        - id: call_index_webmcp_add_quick_share
+          name: index_page_block_add
+          args:
+            block: quick-share
+            after_block: categories
+  - match:
+      tool_result: index_page_block_add
+    respond:
+      text: "The browser added the quick-share block to the index page."
+      finish: "stop"

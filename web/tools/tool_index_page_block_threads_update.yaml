@@ -1,0 +1,40 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: ToolIndexPageBlockThreadsUpdate
+x-storyden-tool:
+  title: Update Index Page Threads Block
+  path_prefix: /
+  annotations:
+    readOnlyHint: false
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: false
+    untrustedContentHint: false
+title: index_page_block_threads_update
+description: Update the source of the visible threads block on the current index page.
+type: object
+required: [input, output]
+properties:
+  input:
+    $ref: "#/definitions/ToolIndexPageBlockThreadsUpdateInput"
+  output:
+    $ref: "#/definitions/ToolIndexPageBlockThreadsUpdateOutput"
+definitions:
+  ToolIndexPageBlockThreadsUpdateInput:
+    type: object
+    required: [source]
+    properties:
+      source:
+        type: string
+        enum: [all, uncategorised]
+    additionalProperties: false
+
+  ToolIndexPageBlockThreadsUpdateOutput:
+    type: object
+    required: [message, layout]
+    properties:
+      message:
+        type: string
+        description: Summary of the updated threads block.
+      layout:
+        $ref: "./common/index_page_layout.yaml"
+    additionalProperties: false

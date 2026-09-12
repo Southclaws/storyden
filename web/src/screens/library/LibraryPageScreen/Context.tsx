@@ -11,11 +11,14 @@ import {
   useState,
 } from "react";
 
+import { handle } from "@/api/client";
+import { nodeGet } from "@/api/openapi-client/nodes";
 import {
   Identifier,
   NodeListResult,
   NodeWithChildren,
 } from "@/api/openapi-schema";
+import { useLibraryEvent } from "@/lib/library/events";
 import { useLibraryMutation } from "@/lib/library/library";
 import { WithMetadata, hydrateNode } from "@/lib/library/metadata";
 import { deepEqual } from "@/utils/equality";
@@ -61,6 +64,7 @@ export function LibraryPageProvider({
   const nodeWithMeta = useMemo(() => hydrateNode(node), [node]);
   const { revalidate } = useLibraryMutation(node);
   const suppressAutosaveRef = useRef(false);
+  const externalRevalidationRequestRef = useRef(0);
 
   const storeRef = useRef<NodeStoreAPI | null>(null);
   if (storeRef.current === null) {
@@ -83,6 +87,34 @@ export function LibraryPageProvider({
     () => suppressAutosaveRef.current,
     [],
   );
+
+  const handleExternalRevalidation = useCallback(() => {
+    const requestID = ++externalRevalidationRequestRef.current;
+    void handle(
+      async () => {
+        const updated = await nodeGet(node.slug);
+        const store = storeRef.current;
+        if (requestID !== externalRevalidationRequestRef.current || !store) {
+          return;
+        }
+
+        await revalidate(updated);
+        if (requestID !== externalRevalidationRequestRef.current) {
+          return;
+        }
+
+        const hydrated = hydrateNode(updated);
+        suppressAutosave(() => {
+          store.setState({
+            original: hydrated,
+            draft: hydrated,
+          });
+        });
+      },
+      { errorToast: true },
+    );
+  }, [node.slug, revalidate, suppressAutosave]);
+  useLibraryEvent("library:revalidate", handleExternalRevalidation);
 
   // Handle external changes to the original node state. This happens if another
   // source triggers a mutation+revalidation via SWR and the initial must update

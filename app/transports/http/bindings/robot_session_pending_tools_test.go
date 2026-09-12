@@ -68,6 +68,24 @@ func TestReconcilePendingClientToolsBlocksPartialPendingResults(t *testing.T) {
 	assert.Equal(t, "all pending tool interactions from the assistant turn must be resolved together", block.Message)
 }
 
+func TestReconcilePendingClientToolsAcceptsDynamicToolError(t *testing.T) {
+	decision := reconcilePendingClientTools([]chatMessage{{
+		Role: "assistant",
+		Parts: []chatPart{{
+			Type:       "dynamic-tool",
+			State:      "output-error",
+			ToolCallId: "call_add",
+			ToolName:   "library_page_block_add",
+			ErrorText:  "assets block already exists",
+		}},
+	}}, pendingClientTools{IDs: []string{"call_add"}})
+
+	_, ok := decision.Provided["call_add"]
+	assert.True(t, ok)
+	_, blocked := decision.BlockingInteraction.Get()
+	assert.False(t, blocked)
+}
+
 func TestClearPendingClientToolsPreservesOtherState(t *testing.T) {
 	state := clearPendingClientTools(map[string]any{
 		pendingClientToolsStateKey: []string{"call_1"},

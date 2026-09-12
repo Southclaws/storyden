@@ -79,7 +79,13 @@ export function getToolName(
   return rawName.split("_").map(capitalise).join(" ");
 }
 
-export function getRawToolName(part: { type: string }): string {
+export function getRawToolName(part: {
+  type: string;
+  toolName?: string;
+}): string {
+  if (part.type === "dynamic-tool") {
+    return part.toolName ?? "";
+  }
   if (!part.type.startsWith("tool-")) {
     return "";
   }

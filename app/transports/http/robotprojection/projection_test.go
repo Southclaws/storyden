@@ -8,7 +8,87 @@ import (
 	adksession "google.golang.org/adk/v2/session"
 	"google.golang.org/adk/v2/tool/toolconfirmation"
 	"google.golang.org/genai"
+
+	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry"
 )
+
+func TestADKEventToUIMessagePartsProjectsPersistedWebMCPCallAsDynamic(t *testing.T) {
+	event := adksession.Event{LLMResponse: model.LLMResponse{Content: &genai.Content{Parts: []*genai.Part{{
+		FunctionCall: &genai.FunctionCall{
+			ID:   "call-1",
+			Name: "library_page_block_add",
+			Args: map[string]any{"block": "gallery"},
+		},
+		PartMetadata: map[string]any{
+			agent_registry.ClientToolMetadataKey: map[string]any{
+				"source":    "webmcp",
+				"client_id": "browser-1",
+				"scope":     map[string]any{"page_type": "library"},
+			},
+		},
+	}}}}}
+
+	parts, err := ADKEventToUIMessageParts(event, nil, nil)
+	if err != nil {
+		t.Fatalf("ADKEventToUIMessageParts() error = %v", err)
+	}
+	if len(parts) != 1 {
+		t.Fatalf("len(parts) = %d, want 1", len(parts))
+	}
+
+	encoded, err := json.Marshal(parts[0])
+	if err != nil {
+		t.Fatalf("json.Marshal() error = %v", err)
+	}
+	var got struct {
+		Type                 string         `json:"type"`
+		ToolName             string         `json:"toolName"`
+		CallProviderMetadata map[string]any `json:"callProviderMetadata"`
+	}
+	if err := json.Unmarshal(encoded, &got); err != nil {
+		t.Fatalf("json.Unmarshal() error = %v", err)
+	}
+	if got.Type != "dynamic-tool" {
+		t.Fatalf("type = %q, want dynamic-tool", got.Type)
+	}
+	if got.ToolName != "library_page_block_add" {
+		t.Fatalf("toolName = %q, want library_page_block_add", got.ToolName)
+	}
+	storyden, _ := got.CallProviderMetadata["storyden"].(map[string]any)
+	if storyden["client_id"] != "browser-1" {
+		t.Fatalf("callProviderMetadata.storyden.client_id = %#v, want browser-1", storyden["client_id"])
+	}
+}
+
+func TestFunctionCallStreamPartsMarksWebMCPCallDynamic(t *testing.T) {
+	parts := FunctionCallStreamPartsWithMetadata(&genai.FunctionCall{
+		ID:   "call-1",
+		Name: "library_page_layout_get",
+		Args: map[string]any{},
+	}, map[string]any{"storyden": map[string]any{
+		"source":    "webmcp",
+		"client_id": "browser-1",
+	}})
+	if len(parts) != 3 {
+		t.Fatalf("len(parts) = %d, want 3", len(parts))
+	}
+
+	for _, index := range []int{0, 2} {
+		encoded, err := json.Marshal(parts[index])
+		if err != nil {
+			t.Fatalf("json.Marshal(parts[%d]) error = %v", index, err)
+		}
+		var got struct {
+			Dynamic bool `json:"dynamic"`
+		}
+		if err := json.Unmarshal(encoded, &got); err != nil {
+			t.Fatalf("json.Unmarshal(parts[%d]) error = %v", index, err)
+		}
+		if !got.Dynamic {
+			t.Fatalf("parts[%d].dynamic = false, want true", index)
+		}
+	}
+}
 
 func TestFunctionResponseToUIPartDoesNotCopyOutputIntoInput(t *testing.T) {
 	part, err := FunctionResponseToUIPart(&genai.FunctionResponse{

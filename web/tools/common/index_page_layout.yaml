@@ -1,0 +1,47 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+title: IndexPageLayout
+type: object
+required: [blocks]
+properties:
+  blocks:
+    type: array
+    description: Blocks in their rendered order.
+    items:
+      $ref: "#/definitions/IndexPageLayoutBlock"
+additionalProperties: false
+definitions:
+  IndexPageLayoutBlockType:
+    type: string
+    enum:
+      [
+        title,
+        subtitle,
+        content,
+        cover,
+        categories,
+        threads,
+        quick-share,
+        library,
+      ]
+
+  IndexPageLayoutBlock:
+    type: object
+    required: [type]
+    properties:
+      type:
+        $ref: "#/definitions/IndexPageLayoutBlockType"
+      layout:
+        type: string
+        enum: [list, grid]
+        description: Layout mode for a categories or Library block.
+      source:
+        type: string
+        enum: [all, uncategorised]
+        description: Thread source for a threads block.
+      show_category_select:
+        type: boolean
+        description: Whether a quick-share block shows its category picker.
+      node_id:
+        type: string
+        description: Selected Library page ID for a library block; omitted for the Library root.
+    additionalProperties: false

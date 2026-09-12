@@ -1,0 +1,38 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: ToolLibraryPageEditStart
+x-storyden-tool:
+  title: Start Library Page Quick Edit
+  path_prefix: /l/
+  annotations:
+    readOnlyHint: false
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: false
+    untrustedContentHint: false
+title: library_page_edit_start
+description: >-
+  Enter quick edit mode for the current Library page so frontend-only layout
+  tools can make the immediate change the user requested. Use this only when
+  the user clearly asked to edit the live page. If it is unclear whether they
+  want a quick edit or a version draft, ask them before calling this tool.
+type: object
+required: [input, output]
+properties:
+  input:
+    $ref: "#/definitions/ToolLibraryPageEditStartInput"
+  output:
+    $ref: "#/definitions/ToolLibraryPageEditStartOutput"
+definitions:
+  ToolLibraryPageEditStartInput:
+    type: object
+    properties: {}
+    additionalProperties: false
+
+  ToolLibraryPageEditStartOutput:
+    type: object
+    required: [message]
+    properties:
+      message:
+        type: string
+        description: Summary of the active edit mode.
+    additionalProperties: false

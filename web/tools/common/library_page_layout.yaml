@@ -1,0 +1,32 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+title: LibraryPageLayout
+type: object
+required: [blocks]
+properties:
+  blocks:
+    type: array
+    description: Blocks in their rendered order.
+    items:
+      $ref: "#/definitions/LibraryPageLayoutBlock"
+additionalProperties: false
+definitions:
+  LibraryPageLayoutBlockType:
+    type: string
+    enum: [title, cover, link, content, assets, properties, directory, tags]
+
+  LibraryPageLayoutBlock:
+    type: object
+    required: [type]
+    properties:
+      type:
+        $ref: "#/definitions/LibraryPageLayoutBlockType"
+      layout:
+        type: string
+        enum: [strip, grid, table]
+        description: Layout mode for an assets or directory block.
+      grid_size:
+        type: integer
+        minimum: 1
+        maximum: 4
+        description: Column count for an assets block using the grid layout.
+    additionalProperties: false
