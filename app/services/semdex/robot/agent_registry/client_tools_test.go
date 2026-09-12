@@ -49,18 +49,42 @@ func TestNewClientToolContextRejectsNonObjectInputSchema(t *testing.T) {
 	}
 }
 
-func TestNewClientToolContextRejectsOversizedDescription(t *testing.T) {
-	_, err := NewClientToolContext("browser-1", []ClientToolDefinition{{
-		Name:        "oversized_description",
-		Description: strings.Repeat("x", maxClientToolTextSize+1),
-		InputSchema: map[string]any{"type": "object"},
-	}})
-	if err == nil {
-		t.Fatal("NewClientToolContext() error = nil, want description-size error")
+func TestNewClientToolContextRejectsOversizedText(t *testing.T) {
+	tests := []struct {
+		name       string
+		definition ClientToolDefinition
+		expected   string
+	}{
+		{
+			name: "description",
+			definition: ClientToolDefinition{
+				Name:        "oversized_description",
+				Description: strings.Repeat("x", maxClientToolTextSize+1),
+				InputSchema: map[string]any{"type": "object"},
+			},
+			expected: `client tool "oversized_description" description exceeds 4096 bytes`,
+		},
+		{
+			name: "title",
+			definition: ClientToolDefinition{
+				Name:        "oversized_title",
+				Title:       strings.Repeat("x", maxClientToolTextSize+1),
+				Description: "Has an oversized title.",
+				InputSchema: map[string]any{"type": "object"},
+			},
+			expected: `client tool "oversized_title" title exceeds 4096 bytes`,
+		},
 	}
 
-	const expected = `client tool "oversized_description" description exceeds 4096 bytes`
-	if err.Error() != expected {
-		t.Fatalf("NewClientToolContext() error = %q, want %q", err, expected)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := NewClientToolContext("browser-1", []ClientToolDefinition{tt.definition})
+			if err == nil {
+				t.Fatal("NewClientToolContext() error = nil, want text-size error")
+			}
+			if err.Error() != tt.expected {
+				t.Fatalf("NewClientToolContext() error = %q, want %q", err, tt.expected)
+			}
+		})
 	}
 }

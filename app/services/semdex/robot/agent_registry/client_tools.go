@@ -69,6 +69,9 @@ func NewClientToolContext(clientID string, definitions []ClientToolDefinition) (
 		if len(definition.Description) > maxClientToolTextSize {
 			return nil, fmt.Errorf("client tool %q description exceeds %d bytes", definition.Name, maxClientToolTextSize)
 		}
+		if len(definition.Title) > maxClientToolTextSize {
+			return nil, fmt.Errorf("client tool %q title exceeds %d bytes", definition.Name, maxClientToolTextSize)
+		}
 		if _, ok := seen[definition.Name]; ok {
 			return nil, fmt.Errorf("duplicate client tool name %q", definition.Name)
 		}

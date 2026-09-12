@@ -75,6 +75,36 @@ func TestGetLastMessageConvertsDynamicClientToolError(t *testing.T) {
 	assert.Equal(t, map[string]any{"error": "assets block already exists"}, content.Parts[0].FunctionResponse.Response)
 }
 
+func TestGetLastMessageRejectsUnsolicitedDynamicClientToolOutput(t *testing.T) {
+	_, err := getLastMessage([]chatMessage{{
+		Role: "assistant",
+		Parts: []chatPart{{
+			Type:       "dynamic-tool",
+			State:      "output-available",
+			ToolCallId: "call_add",
+			ToolName:   "library_page_block_add",
+			Output:     json.RawMessage(`{"message":"Added the assets block."}`),
+		}},
+	}}, nil, slog.Default())
+
+	require.EqualError(t, err, "user message has no content")
+}
+
+func TestGetLastMessageRejectsUnsolicitedToolApproval(t *testing.T) {
+	_, err := getLastMessage([]chatMessage{{
+		Role: "assistant",
+		Parts: []chatPart{{
+			Type:       "tool-robot_delete",
+			State:      "approval-responded",
+			ToolCallId: "call_confirm",
+			ToolName:   "robot_delete",
+			Approval:   &chatApproval{ID: "call_confirm", Approved: true},
+		}},
+	}}, nil, slog.Default())
+
+	require.EqualError(t, err, "user message has no content")
+}
+
 func TestGetLastMessageWrapsNonObjectDynamicClientToolOutput(t *testing.T) {
 	tests := []struct {
 		name     string

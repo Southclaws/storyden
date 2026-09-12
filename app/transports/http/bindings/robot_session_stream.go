@@ -410,7 +410,7 @@ func getLastMessage(messages []chatMessage, pendingToolIDs []string, logger *slo
 					approvalID = part.ToolCallId
 				}
 
-				if len(pendingSet) > 0 && !pendingSet[approvalID] && !pendingSet[part.ToolCallId] {
+				if !pendingSet[approvalID] && !pendingSet[part.ToolCallId] {
 					logger.Debug("skipping tool approval not in pending list",
 						slog.String("tool_call_id", part.ToolCallId),
 						slog.String("approval_id", approvalID),
@@ -466,7 +466,7 @@ func resolveClientToolResult(part chatPart, pendingSet map[string]bool, logger *
 	if part.ToolCallId == "" {
 		return nil, true, fmt.Errorf("tool result missing toolCallId: type=%s", part.Type)
 	}
-	if len(pendingSet) > 0 && !pendingSet[part.ToolCallId] {
+	if !pendingSet[part.ToolCallId] {
 		logger.Debug("skipping tool result not in pending list",
 			slog.String("tool_call_id", part.ToolCallId),
 			slog.String("tool_name", part.ToolName))

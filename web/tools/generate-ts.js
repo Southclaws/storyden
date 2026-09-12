@@ -44,7 +44,7 @@ function compactSchema(value) {
   );
 }
 
-function getToolEntries(schema, dereferencedSchema) {
+function getToolEntries(schema, dereferencedSchema, schemaRefs) {
   const entries = [];
   const names = new Set();
 
@@ -91,8 +91,10 @@ function getToolEntries(schema, dereferencedSchema) {
         `Tool ${key} must be declared with a $ref in schema.yaml`,
       );
     }
-    const toolSchemaPath = path.resolve(toolsDir, toolRef);
-    const toolSchema = yaml.parse(fs.readFileSync(toolSchemaPath, "utf8"));
+    const toolSchema = schemaRefs.get(toolRef);
+    if (!toolSchema) {
+      throw new Error(`Could not resolve schema for tool ${key}: ${toolRef}`);
+    }
 
     entries.push({
       key,
@@ -175,6 +177,7 @@ export const WEBMCP_TOOL_DEFINITIONS = ${JSON.stringify(definitions, null, 2)} a
 
 async function generate() {
   const schema = yaml.parse(fs.readFileSync(schemaPath, "utf8"));
+  const schemaRefs = await $RefParser.resolve(schemaPath);
   const dereferencedSchema = await $RefParser.dereference(schemaPath, {
     dereference: { circular: "ignore" },
   });
@@ -182,7 +185,7 @@ async function generate() {
   const ajv = new Ajv({ strict: false, validateSchema: true });
   ajv.compile(dereferencedSchema);
 
-  const entries = getToolEntries(schema, dereferencedSchema);
+  const entries = getToolEntries(schema, dereferencedSchema, schemaRefs);
   const wrapperSchema = {
     $schema: "http://json-schema.org/draft-07/schema#",
     definitions: schema.definitions,

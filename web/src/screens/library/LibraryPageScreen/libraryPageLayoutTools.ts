@@ -67,7 +67,13 @@ export function createLibraryPageLayoutToolImplementations(
     },
 
     library_page_block_remove: async ({ block }) => {
-      getBlock(store, block);
+      if (
+        !getDraftBlocks(store).some((candidate) => candidate.type === block)
+      ) {
+        throw new Error(
+          `The ${block} block is not present, so there is nothing to remove.`,
+        );
+      }
       store.getState().removeBlock(block);
 
       return saveLayout(

@@ -140,7 +140,7 @@ describe("Library page WebMCP tool implementations", () => {
     await expect(
       tools.library_page_block_remove({ block: "tags" }),
     ).rejects.toThrow(
-      "The tags block is not present. Add it with library_page_block_add before updating it.",
+      "The tags block is not present, so there is nothing to remove.",
     );
     await expect(
       tools.library_page_block_move({
