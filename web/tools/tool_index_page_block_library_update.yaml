@@ -1,0 +1,49 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: ToolIndexPageBlockLibraryUpdate
+x-storyden-tool:
+  title: Update Index Page Library Block
+  path_prefix: /
+  annotations:
+    readOnlyHint: false
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: false
+    untrustedContentHint: false
+title: index_page_block_library_update
+description: Configure the visible Library block on the current index page.
+type: object
+required: [input, output]
+properties:
+  input:
+    $ref: "#/definitions/ToolIndexPageBlockLibraryUpdateInput"
+  output:
+    $ref: "#/definitions/ToolIndexPageBlockLibraryUpdateOutput"
+definitions:
+  ToolIndexPageBlockLibraryUpdateInput:
+    type: object
+    required: [source]
+    properties:
+      source:
+        type: string
+        enum: [library_root, library_page]
+        description: Show the Library root or a specific Library page.
+      node_id:
+        type: string
+        minLength: 1
+        description: Required when source is library_page; omit when source is library_root.
+      layout:
+        type: string
+        enum: [list, grid]
+        description: Layout for the Library root; omit to preserve it. Specific pages control their own layout.
+    additionalProperties: false
+
+  ToolIndexPageBlockLibraryUpdateOutput:
+    type: object
+    required: [message, layout]
+    properties:
+      message:
+        type: string
+        description: Summary of the updated Library block.
+      layout:
+        $ref: "./common/index_page_layout.yaml"
+    additionalProperties: false

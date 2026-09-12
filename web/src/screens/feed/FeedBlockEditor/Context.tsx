@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect, useRef } from "react";
 
 import { type Account, AdminSettingsMutableProps } from "@/api/openapi-schema";
 import {
@@ -18,17 +18,24 @@ import { Settings } from "@/lib/settings/settings";
 
 import { InitialData } from "../types";
 
-type FeedBlockEditorContextValue = {
+export type FeedBlockEditorActions = {
+  getFeed: () => FeedConfig;
+  addBlock: (type: FeedBlockType, index?: number) => Promise<FeedConfig>;
+  moveBlock: (
+    active: FeedBlockType,
+    over: FeedBlockType,
+  ) => Promise<FeedConfig>;
+  overwriteBlock: (block: FeedBlock) => Promise<FeedConfig>;
+  removeBlock: (type: FeedBlockType) => Promise<FeedConfig>;
+  updateSite: (patch: AdminSettingsMutableProps) => Promise<void>;
+};
+
+type FeedBlockEditorContextValue = FeedBlockEditorActions & {
   feed: FeedConfig;
   initialData: InitialData;
   initialSession?: Account;
   initialSettings?: Settings;
   isEditing: boolean;
-  addBlock: (type: FeedBlockType, index?: number) => Promise<void>;
-  moveBlock: (active: FeedBlockType, over: FeedBlockType) => Promise<void>;
-  overwriteBlock: (block: FeedBlock) => Promise<void>;
-  removeBlock: (type: FeedBlockType) => Promise<void>;
-  updateSite: (patch: AdminSettingsMutableProps) => Promise<void>;
 };
 
 const Context = createContext<FeedBlockEditorContextValue | null>(null);
@@ -62,29 +69,46 @@ export function FeedBlockEditorProvider({
 }: Props) {
   const { updateFeed } = useFeedMutation();
   const { updateSettings } = useSettingsMutation();
+  const feedRef = useRef(feed);
+  useEffect(() => {
+    feedRef.current = feed;
+  }, [feed]);
+
+  function getFeed() {
+    return feedRef.current;
+  }
+
+  async function persistFeed(updated: FeedConfig, current: FeedConfig) {
+    if (updated === current) return current;
+
+    feedRef.current = updated;
+    try {
+      await updateFeed(updated);
+      return updated;
+    } catch (error) {
+      feedRef.current = current;
+      throw error;
+    }
+  }
 
   async function addBlock(type: FeedBlockType, index?: number) {
-    const updated = addFeedBlock(feed, type, index);
-    if (updated === feed) return;
-    await updateFeed(updated);
+    const current = getFeed();
+    return persistFeed(addFeedBlock(current, type, index), current);
   }
 
   async function moveBlock(active: FeedBlockType, over: FeedBlockType) {
-    const updated = reorderFeedBlock(feed, active, over);
-    if (updated === feed) return;
-    await updateFeed(updated);
+    const current = getFeed();
+    return persistFeed(reorderFeedBlock(current, active, over), current);
   }
 
   async function overwriteBlock(updated: FeedBlock) {
-    const next = replaceFeedBlock(feed, updated);
-    if (next === feed) return;
-    await updateFeed(next);
+    const current = getFeed();
+    return persistFeed(replaceFeedBlock(current, updated), current);
   }
 
   async function removeBlock(type: FeedBlockType) {
-    const updated = removeFeedBlock(feed, type);
-    if (updated === feed) return;
-    await updateFeed(updated);
+    const current = getFeed();
+    return persistFeed(removeFeedBlock(current, type), current);
   }
 
   return (
@@ -95,6 +119,7 @@ export function FeedBlockEditorProvider({
         initialSession,
         initialSettings,
         isEditing,
+        getFeed,
         addBlock,
         moveBlock,
         overwriteBlock,

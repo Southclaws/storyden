@@ -20,3 +20,30 @@ definitions:
 
   ToolLibraryPageBlockDirectoryUpdate:
     $ref: "./tool_library_page_block_directory_update.yaml"
+
+  ToolIndexPageEditStart:
+    $ref: "./tool_index_page_edit_start.yaml"
+
+  ToolIndexPageLayoutGet:
+    $ref: "./tool_index_page_layout_get.yaml"
+
+  ToolIndexPageBlockAdd:
+    $ref: "./tool_index_page_block_add.yaml"
+
+  ToolIndexPageBlockRemove:
+    $ref: "./tool_index_page_block_remove.yaml"
+
+  ToolIndexPageBlockMove:
+    $ref: "./tool_index_page_block_move.yaml"
+
+  ToolIndexPageBlockCategoriesUpdate:
+    $ref: "./tool_index_page_block_categories_update.yaml"
+
+  ToolIndexPageBlockThreadsUpdate:
+    $ref: "./tool_index_page_block_threads_update.yaml"
+
+  ToolIndexPageBlockQuickShareUpdate:
+    $ref: "./tool_index_page_block_quick_share_update.yaml"
+
+  ToolIndexPageBlockLibraryUpdate:
+    $ref: "./tool_index_page_block_library_update.yaml"

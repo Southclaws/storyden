@@ -1,0 +1,40 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: ToolIndexPageBlockCategoriesUpdate
+x-storyden-tool:
+  title: Update Index Page Categories Block
+  path_prefix: /
+  annotations:
+    readOnlyHint: false
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: false
+    untrustedContentHint: false
+title: index_page_block_categories_update
+description: Update the presentation of the visible categories block on the current index page.
+type: object
+required: [input, output]
+properties:
+  input:
+    $ref: "#/definitions/ToolIndexPageBlockCategoriesUpdateInput"
+  output:
+    $ref: "#/definitions/ToolIndexPageBlockCategoriesUpdateOutput"
+definitions:
+  ToolIndexPageBlockCategoriesUpdateInput:
+    type: object
+    required: [layout]
+    properties:
+      layout:
+        type: string
+        enum: [list, grid]
+    additionalProperties: false
+
+  ToolIndexPageBlockCategoriesUpdateOutput:
+    type: object
+    required: [message, layout]
+    properties:
+      message:
+        type: string
+        description: Summary of the updated categories block.
+      layout:
+        $ref: "./common/index_page_layout.yaml"
+    additionalProperties: false

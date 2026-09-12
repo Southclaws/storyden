@@ -1,0 +1,39 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: ToolIndexPageBlockRemove
+x-storyden-tool:
+  title: Remove Index Page Block
+  path_prefix: /
+  annotations:
+    readOnlyHint: false
+    destructiveHint: true
+    idempotentHint: true
+    openWorldHint: false
+    untrustedContentHint: false
+title: index_page_block_remove
+description: Remove a visible block from the current index page without deleting its content.
+type: object
+required: [input, output]
+properties:
+  input:
+    $ref: "#/definitions/ToolIndexPageBlockRemoveInput"
+  output:
+    $ref: "#/definitions/ToolIndexPageBlockRemoveOutput"
+definitions:
+  ToolIndexPageBlockRemoveInput:
+    type: object
+    required: [block]
+    properties:
+      block:
+        $ref: "./common/index_page_layout.yaml#/definitions/IndexPageLayoutBlockType"
+    additionalProperties: false
+
+  ToolIndexPageBlockRemoveOutput:
+    type: object
+    required: [message, layout]
+    properties:
+      message:
+        type: string
+        description: Summary of the removed block.
+      layout:
+        $ref: "./common/index_page_layout.yaml"
+    additionalProperties: false
