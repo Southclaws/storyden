@@ -101,6 +101,41 @@ describe("LibraryPageProvider direct autosave", () => {
     expect(store.getState().draft.name).toBe("Backend Robot name");
   });
 
+  it("ignores an older external revalidation response that finishes last", async () => {
+    let resolveOlder = (_node: NodeWithChildren) => {};
+    let resolveNewer = (_node: NodeWithChildren) => {};
+    const olderResponse = new Promise<NodeWithChildren>((resolve) => {
+      resolveOlder = resolve;
+    });
+    const newerResponse = new Promise<NodeWithChildren>((resolve) => {
+      resolveNewer = resolve;
+    });
+    mocks.nodeGet
+      .mockImplementationOnce(() => olderResponse)
+      .mockImplementationOnce(() => newerResponse);
+    const store = await renderProvider(node("root"));
+
+    act(() => {
+      libraryBus.emit("library:revalidate", {});
+      libraryBus.emit("library:revalidate", {});
+    });
+
+    await act(async () => {
+      resolveNewer(node("root", { name: "Newer response" }));
+      await newerResponse;
+    });
+    await vi.waitFor(() => expect(mocks.revalidate).toHaveBeenCalledOnce());
+
+    await act(async () => {
+      resolveOlder(node("root", { name: "Older response" }));
+      await olderResponse;
+    });
+
+    expect(mocks.revalidate).toHaveBeenCalledOnce();
+    expect(store.getState().original.name).toBe("Newer response");
+    expect(store.getState().draft.name).toBe("Newer response");
+  });
+
   it("cancels a pending local autosave before revalidating a backend Robot change", async () => {
     const store = await renderProvider(node("root"));
 

@@ -70,6 +70,7 @@ export function FeedBlockEditorProvider({
   const { updateFeed } = useFeedMutation();
   const { updateSettings } = useSettingsMutation();
   const feedRef = useRef(feed);
+  const mutationQueueRef = useRef<Promise<void> | undefined>(undefined);
   useEffect(() => {
     feedRef.current = feed;
   }, [feed]);
@@ -78,37 +79,44 @@ export function FeedBlockEditorProvider({
     return feedRef.current;
   }
 
-  async function persistFeed(updated: FeedConfig, current: FeedConfig) {
-    if (updated === current) return current;
+  function mutateFeed(mutation: (current: FeedConfig) => FeedConfig) {
+    const result = (mutationQueueRef.current ?? Promise.resolve()).then(
+      async () => {
+        const current = feedRef.current;
+        const updated = mutation(current);
+        if (updated === current) return current;
 
-    feedRef.current = updated;
-    try {
-      await updateFeed(updated);
-      return updated;
-    } catch (error) {
-      feedRef.current = current;
-      throw error;
-    }
+        feedRef.current = updated;
+        try {
+          await updateFeed(updated);
+          return updated;
+        } catch (error) {
+          feedRef.current = current;
+          throw error;
+        }
+      },
+    );
+    mutationQueueRef.current = result.then(
+      () => undefined,
+      () => undefined,
+    );
+    return result;
   }
 
   async function addBlock(type: FeedBlockType, index?: number) {
-    const current = getFeed();
-    return persistFeed(addFeedBlock(current, type, index), current);
+    return mutateFeed((current) => addFeedBlock(current, type, index));
   }
 
   async function moveBlock(active: FeedBlockType, over: FeedBlockType) {
-    const current = getFeed();
-    return persistFeed(reorderFeedBlock(current, active, over), current);
+    return mutateFeed((current) => reorderFeedBlock(current, active, over));
   }
 
   async function overwriteBlock(updated: FeedBlock) {
-    const current = getFeed();
-    return persistFeed(replaceFeedBlock(current, updated), current);
+    return mutateFeed((current) => replaceFeedBlock(current, updated));
   }
 
   async function removeBlock(type: FeedBlockType) {
-    const current = getFeed();
-    return persistFeed(removeFeedBlock(current, type), current);
+    return mutateFeed((current) => removeFeedBlock(current, type));
   }
 
   return (

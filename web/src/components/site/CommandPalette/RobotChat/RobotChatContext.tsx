@@ -453,9 +453,10 @@ export function RobotChatContext({
       }
 
       handledCompletedToolCallIDs.add(toolCall.toolCallId);
-      void handleCompletedStorydenToolCall(toolCall.toolName).catch((error) =>
-        setErrorState(deriveError(error)),
-      );
+      void handleCompletedStorydenToolCall(toolCall.toolName).catch((error) => {
+        handledCompletedToolCallIDs.delete(toolCall.toolCallId);
+        setErrorState(deriveError(error));
+      });
     }
   }, [
     chat.messages,
