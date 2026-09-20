@@ -1497,6 +1497,24 @@ type RPCRequestRobotRunParamsWorkspace struct {
 	WorkspaceInstanceID opt.Optional[xid.ID] `json:"workspace_instance_id,omitempty"`
 }
 
+// Media kind attached to an imported conversation message.
+type RobotRunMediaType string
+
+const (
+	RobotRunMediaTypeImage RobotRunMediaType = "image"
+)
+
+var RobotRunMediaTypeValues = []RobotRunMediaType{
+	RobotRunMediaTypeImage,
+}
+
+type RobotRunMedia struct {
+	// Storyden asset containing the image. Plugins must upload external media to this instance before invoking robot_run.
+	//
+	AssetID xid.ID            `json:"asset_id"`
+	Type    RobotRunMediaType `json:"type"`
+}
+
 // Role of one imported conversation message.
 type RobotRunMessageRole string
 
@@ -1514,8 +1532,11 @@ type RobotRunMessage struct {
 	// Optional external display name for the message author.
 	Author opt.Optional[string] `json:"author,omitempty"`
 	// Message content imported into the Robot session.
-	Content string              `json:"content"`
-	Role    RobotRunMessageRole `json:"role"`
+	Content string `json:"content"`
+	// Ordered image attachments for a user message. The text content is presented to the model first, followed by these media items.
+	//
+	Media []RobotRunMedia     `json:"media,omitempty"`
+	Role  RobotRunMessageRole `json:"role"`
 }
 
 // Execution contract for a plugin Robot invocation.

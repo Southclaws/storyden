@@ -2093,6 +2093,22 @@ func (c *AssetClient) QueryNodes(_m *Asset) *NodeQuery {
 	return query
 }
 
+// QueryRobotMessages queries the robot_messages edge of a Asset.
+func (c *AssetClient) QueryRobotMessages(_m *Asset) *RobotSessionMessageQuery {
+	query := (&RobotSessionMessageClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(asset.Table, asset.FieldID, id),
+			sqlgraph.To(robotsessionmessage.Table, robotsessionmessage.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, asset.RobotMessagesTable, asset.RobotMessagesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryLinks queries the links edge of a Asset.
 func (c *AssetClient) QueryLinks(_m *Asset) *LinkQuery {
 	query := (&LinkClient{config: c.config}).Query()
@@ -9521,6 +9537,22 @@ func (c *RobotSessionMessageClient) QueryAuthor(_m *RobotSessionMessage) *Accoun
 			sqlgraph.From(robotsessionmessage.Table, robotsessionmessage.FieldID, id),
 			sqlgraph.To(account.Table, account.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, robotsessionmessage.AuthorTable, robotsessionmessage.AuthorColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAssets queries the assets edge of a RobotSessionMessage.
+func (c *RobotSessionMessageClient) QueryAssets(_m *RobotSessionMessage) *AssetQuery {
+	query := (&AssetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robotsessionmessage.Table, robotsessionmessage.FieldID, id),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, robotsessionmessage.AssetsTable, robotsessionmessage.AssetsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil

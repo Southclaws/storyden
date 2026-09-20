@@ -1,17 +1,22 @@
 package anthropic
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/anthropics/anthropic-sdk-go"
 	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
 
+	"github.com/Southclaws/storyden/app/resources/asset"
+	robotresource "github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/llmprovider/toolschema"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/model_media"
 )
 
-func convertToAnthropicMessages(req *model.LLMRequest) []anthropic.MessageParam {
+func convertToAnthropicMessages(ctx context.Context, req *model.LLMRequest, media model_media.ImageResolver) ([]anthropic.MessageParam, error) {
 	var messages []anthropic.MessageParam
 
 	for _, content := range req.Contents {
@@ -19,44 +24,82 @@ func convertToAnthropicMessages(req *model.LLMRequest) []anthropic.MessageParam 
 			continue
 		}
 
-		// Tool results come back as FunctionResponse parts regardless of role;
-		// Anthropic expects them in user-turn messages as tool_result blocks.
-		if results := extractAnthropicToolResults(content.Parts); len(results) > 0 {
-			messages = append(messages, anthropic.NewUserMessage(results...))
-			continue
+		message, ok, err := convertAnthropicContent(ctx, content, media)
+		if err != nil {
+			return nil, err
 		}
-
-		switch content.Role {
-		case genai.RoleUser:
-			if text := extractAllText(content.Parts); text != "" {
-				messages = append(messages, anthropic.NewUserMessage(anthropic.NewTextBlock(text)))
-			}
-
-		case genai.RoleModel:
-			var blocks []anthropic.ContentBlockParamUnion
-
-			if text := extractAllText(content.Parts); text != "" {
-				blocks = append(blocks, anthropic.NewTextBlock(text))
-			}
-
-			for _, part := range content.Parts {
-				if part == nil || part.FunctionCall == nil {
-					continue
-				}
-				blocks = append(blocks, anthropic.NewToolUseBlock(
-					part.FunctionCall.ID,
-					anthropicToolInput(part.FunctionCall.Args),
-					part.FunctionCall.Name,
-				))
-			}
-
-			if len(blocks) > 0 {
-				messages = append(messages, anthropic.NewAssistantMessage(blocks...))
-			}
+		if ok {
+			messages = append(messages, message)
 		}
 	}
 
-	return messages
+	return messages, nil
+}
+
+func convertAnthropicContent(ctx context.Context, content *genai.Content, media model_media.ImageResolver) (anthropic.MessageParam, bool, error) {
+	imageIDs, err := robotresource.ImageAssetIDs(content)
+	if err != nil {
+		return anthropic.MessageParam{}, false, err
+	}
+
+	if results := extractAnthropicToolResults(content.Parts); len(results) > 0 {
+		if len(imageIDs) > 0 {
+			return anthropic.MessageParam{}, false, fmt.Errorf("image attachments cannot be combined with tool results")
+		}
+		return anthropic.NewUserMessage(results...), true, nil
+	}
+	if content.Role == genai.RoleUser {
+		return convertAnthropicUserContent(ctx, content, imageIDs, media)
+	}
+	if len(imageIDs) > 0 {
+		return anthropic.MessageParam{}, false, fmt.Errorf("image attachments are only supported on user messages")
+	}
+	if content.Role == genai.RoleModel {
+		return convertAnthropicModelContent(content)
+	}
+	return anthropic.MessageParam{}, false, nil
+}
+
+func convertAnthropicUserContent(ctx context.Context, content *genai.Content, imageIDs []asset.AssetID, media model_media.ImageResolver) (anthropic.MessageParam, bool, error) {
+	var blocks []anthropic.ContentBlockParamUnion
+	if text := extractAllText(content.Parts); text != "" {
+		blocks = append(blocks, anthropic.NewTextBlock(text))
+	}
+	for _, id := range imageIDs {
+		if media == nil {
+			return anthropic.MessageParam{}, false, fmt.Errorf("image asset resolver is not configured")
+		}
+		image, err := media.ResolveImage(ctx, id)
+		if err != nil {
+			return anthropic.MessageParam{}, false, err
+		}
+		blocks = append(blocks, anthropic.NewImageBlock(anthropic.URLImageSourceParam{URL: image.URL}))
+	}
+	if len(blocks) == 0 {
+		return anthropic.MessageParam{}, false, nil
+	}
+	return anthropic.NewUserMessage(blocks...), true, nil
+}
+
+func convertAnthropicModelContent(content *genai.Content) (anthropic.MessageParam, bool, error) {
+	var blocks []anthropic.ContentBlockParamUnion
+	if text := extractAllText(content.Parts); text != "" {
+		blocks = append(blocks, anthropic.NewTextBlock(text))
+	}
+	for _, part := range content.Parts {
+		if part == nil || part.FunctionCall == nil {
+			continue
+		}
+		blocks = append(blocks, anthropic.NewToolUseBlock(
+			part.FunctionCall.ID,
+			anthropicToolInput(part.FunctionCall.Args),
+			part.FunctionCall.Name,
+		))
+	}
+	if len(blocks) == 0 {
+		return anthropic.MessageParam{}, false, nil
+	}
+	return anthropic.NewAssistantMessage(blocks...), true, nil
 }
 
 func anthropicToolInput(args map[string]any) map[string]any {

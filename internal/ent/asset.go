@@ -48,6 +48,8 @@ type AssetEdges struct {
 	Posts []*Post `json:"posts,omitempty"`
 	// Nodes holds the value of the nodes edge.
 	Nodes []*Node `json:"nodes,omitempty"`
+	// RobotMessages holds the value of the robot_messages edge.
+	RobotMessages []*RobotSessionMessage `json:"robot_messages,omitempty"`
 	// Links holds the value of the links edge.
 	Links []*Link `json:"links,omitempty"`
 	// Owner holds the value of the owner edge.
@@ -60,7 +62,7 @@ type AssetEdges struct {
 	Event []*Event `json:"event,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [7]bool
+	loadedTypes [8]bool
 }
 
 // PostsOrErr returns the Posts value or an error if the edge
@@ -81,10 +83,19 @@ func (e AssetEdges) NodesOrErr() ([]*Node, error) {
 	return nil, &NotLoadedError{edge: "nodes"}
 }
 
+// RobotMessagesOrErr returns the RobotMessages value or an error if the edge
+// was not loaded in eager-loading.
+func (e AssetEdges) RobotMessagesOrErr() ([]*RobotSessionMessage, error) {
+	if e.loadedTypes[2] {
+		return e.RobotMessages, nil
+	}
+	return nil, &NotLoadedError{edge: "robot_messages"}
+}
+
 // LinksOrErr returns the Links value or an error if the edge
 // was not loaded in eager-loading.
 func (e AssetEdges) LinksOrErr() ([]*Link, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		return e.Links, nil
 	}
 	return nil, &NotLoadedError{edge: "links"}
@@ -95,7 +106,7 @@ func (e AssetEdges) LinksOrErr() ([]*Link, error) {
 func (e AssetEdges) OwnerOrErr() (*Account, error) {
 	if e.Owner != nil {
 		return e.Owner, nil
-	} else if e.loadedTypes[3] {
+	} else if e.loadedTypes[4] {
 		return nil, &NotFoundError{label: account.Label}
 	}
 	return nil, &NotLoadedError{edge: "owner"}
@@ -106,7 +117,7 @@ func (e AssetEdges) OwnerOrErr() (*Account, error) {
 func (e AssetEdges) ParentOrErr() (*Asset, error) {
 	if e.Parent != nil {
 		return e.Parent, nil
-	} else if e.loadedTypes[4] {
+	} else if e.loadedTypes[5] {
 		return nil, &NotFoundError{label: asset.Label}
 	}
 	return nil, &NotLoadedError{edge: "parent"}
@@ -115,7 +126,7 @@ func (e AssetEdges) ParentOrErr() (*Asset, error) {
 // AssetsOrErr returns the Assets value or an error if the edge
 // was not loaded in eager-loading.
 func (e AssetEdges) AssetsOrErr() ([]*Asset, error) {
-	if e.loadedTypes[5] {
+	if e.loadedTypes[6] {
 		return e.Assets, nil
 	}
 	return nil, &NotLoadedError{edge: "assets"}
@@ -124,7 +135,7 @@ func (e AssetEdges) AssetsOrErr() ([]*Asset, error) {
 // EventOrErr returns the Event value or an error if the edge
 // was not loaded in eager-loading.
 func (e AssetEdges) EventOrErr() ([]*Event, error) {
-	if e.loadedTypes[6] {
+	if e.loadedTypes[7] {
 		return e.Event, nil
 	}
 	return nil, &NotLoadedError{edge: "event"}
@@ -240,6 +251,11 @@ func (_m *Asset) QueryPosts() *PostQuery {
 // QueryNodes queries the "nodes" edge of the Asset entity.
 func (_m *Asset) QueryNodes() *NodeQuery {
 	return NewAssetClient(_m.config).QueryNodes(_m)
+}
+
+// QueryRobotMessages queries the "robot_messages" edge of the Asset entity.
+func (_m *Asset) QueryRobotMessages() *RobotSessionMessageQuery {
+	return NewAssetClient(_m.config).QueryRobotMessages(_m)
 }
 
 // QueryLinks queries the "links" edge of the Asset entity.

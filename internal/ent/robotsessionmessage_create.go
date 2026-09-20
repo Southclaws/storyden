@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/robot"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
@@ -257,6 +258,21 @@ func (_c *RobotSessionMessageCreate) SetAuthor(v *Account) *RobotSessionMessageC
 	return _c.SetAuthorID(v.ID)
 }
 
+// AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
+func (_c *RobotSessionMessageCreate) AddAssetIDs(ids ...xid.ID) *RobotSessionMessageCreate {
+	_c.mutation.AddAssetIDs(ids...)
+	return _c
+}
+
+// AddAssets adds the "assets" edges to the Asset entity.
+func (_c *RobotSessionMessageCreate) AddAssets(v ...*Asset) *RobotSessionMessageCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddAssetIDs(ids...)
+}
+
 // Mutation returns the RobotSessionMessageMutation object of the builder.
 func (_c *RobotSessionMessageCreate) Mutation() *RobotSessionMessageMutation {
 	return _c.mutation
@@ -473,6 +489,22 @@ func (_c *RobotSessionMessageCreate) createSpec() (*RobotSessionMessage, *sqlgra
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.AccountID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.AssetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   robotsessionmessage.AssetsTable,
+			Columns: robotsessionmessage.AssetsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

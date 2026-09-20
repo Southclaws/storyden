@@ -57,6 +57,10 @@ func (h *Handler) handleRobotRun(ctx context.Context, req *rpc.RPCRequestRobotRu
 		result.Error = opt.New("plugin account does not have USE_ROBOTS permission")
 		return result, nil
 	}
+	if err := h.robotMedia.ValidateContents(runCtx, contents); err != nil {
+		result.Error = opt.New(friendlyRobotRunError(err))
+		return result, nil
+	}
 
 	sessionID := xid.New()
 	if requestedSessionID, ok := req.Params.SessionID.Get(); ok {
@@ -159,26 +163,57 @@ func validateRobotRunRequest(params rpc.RPCRequestRobotRunParams) ([]*genai.Cont
 
 	contents := make([]*genai.Content, len(params.Messages))
 	for i, message := range params.Messages {
-		if strings.TrimSpace(message.Content) == "" {
-			return nil, fmt.Errorf("messages[%d].content must not be empty", i)
+		content, err := robotRunContent(message, i)
+		if err != nil {
+			return nil, err
 		}
-		author, hasAuthor := message.Author.Get()
-		if hasAuthor && strings.TrimSpace(author) == "" {
-			return nil, fmt.Errorf("messages[%d].author must not be empty", i)
-		}
-
-		role := genai.Role(genai.RoleUser)
-		switch message.Role {
-		case rpc.RobotRunMessageRoleUser:
-		case rpc.RobotRunMessageRoleAssistant:
-			role = genai.RoleModel
-		default:
-			return nil, fmt.Errorf("messages[%d].role is invalid", i)
-		}
-		contents[i] = robotservice.ContentWithSpeaker(role, message.Content, author)
+		contents[i] = content
 	}
 
 	return contents, nil
+}
+
+func robotRunContent(message rpc.RobotRunMessage, index int) (*genai.Content, error) {
+	if strings.TrimSpace(message.Content) == "" {
+		return nil, fmt.Errorf("messages[%d].content must not be empty", index)
+	}
+	author, hasAuthor := message.Author.Get()
+	if hasAuthor && strings.TrimSpace(author) == "" {
+		return nil, fmt.Errorf("messages[%d].author must not be empty", index)
+	}
+	role, err := robotRunMessageRole(message, index)
+	if err != nil {
+		return nil, err
+	}
+	content := robotservice.ContentWithSpeaker(role, message.Content, author)
+	if err := appendRobotRunMedia(content, message.Media, index); err != nil {
+		return nil, err
+	}
+	return content, nil
+}
+
+func robotRunMessageRole(message rpc.RobotRunMessage, index int) (genai.Role, error) {
+	switch message.Role {
+	case rpc.RobotRunMessageRoleUser:
+		return genai.RoleUser, nil
+	case rpc.RobotRunMessageRoleAssistant:
+		if len(message.Media) > 0 {
+			return "", fmt.Errorf("messages[%d].media is only supported for user messages", index)
+		}
+		return genai.RoleModel, nil
+	default:
+		return "", fmt.Errorf("messages[%d].role is invalid", index)
+	}
+}
+
+func appendRobotRunMedia(content *genai.Content, mediaItems []rpc.RobotRunMedia, messageIndex int) error {
+	for i, media := range mediaItems {
+		if media.Type != rpc.RobotRunMediaTypeImage {
+			return fmt.Errorf("messages[%d].media[%d].type is invalid", messageIndex, i)
+		}
+		content.Parts = append(content.Parts, robotresource.NewImageAssetPart(media.AssetID))
+	}
+	return nil
 }
 
 func (h *Handler) validateRobotRunContinuation(ctx context.Context, sessionID xid.ID, accountID account.AccountID, robotRef string) error {

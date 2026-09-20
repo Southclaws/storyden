@@ -999,6 +999,20 @@ class RPCRequestRobotRunParamsWorkspace(BaseModel):
     workspace_instance_id: str | None = None
 
 
+"""Media kind attached to an imported conversation message."""
+
+class RobotRunMediaType(str, Enum):
+    IMAGE = "image"
+
+
+class RobotRunMedia(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    """Storyden asset containing the image. Plugins must upload external media to this instance before invoking robot_run."""
+    asset_id: str
+    type: RobotRunMediaType
+
+
 """Role of one imported conversation message."""
 
 class RobotRunMessageRole(str, Enum):
@@ -1013,6 +1027,8 @@ class RobotRunMessage(BaseModel):
     author: str | None = Field(min_length=1, default=None)
     """Message content imported into the Robot session."""
     content: str = Field(min_length=1)
+    """Ordered image attachments for a user message. The text content is presented to the model first, followed by these media items."""
+    media: List[RobotRunMedia] | None = None
     role: RobotRunMessageRole
 
 

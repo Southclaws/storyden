@@ -12,6 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/robot/llm_provider"
 	"github.com/Southclaws/storyden/app/resources/robot/model_ref"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/model_media"
 )
 
 var Provider = llm_provider.ProviderOpenAI
@@ -21,6 +22,11 @@ type OpenAI struct {
 	apiKey    string
 	client    *openai.Client
 	modelName string
+	media     model_media.ImageResolver
+}
+
+func New(media *model_media.Resolver) *OpenAI {
+	return &OpenAI{media: media}
 }
 
 func (p *OpenAI) Name() string {
@@ -74,6 +80,10 @@ func (p *OpenAI) ListModels(ctx context.Context) ([]model_ref.Info, error) {
 	return out, nil
 }
 
+func (p *OpenAI) ModelCapabilities(context.Context, model_ref.ModelRef) (llm_provider.ModelCapabilities, error) {
+	return llm_provider.ModelCapabilities{ImageInput: llm_provider.CapabilitySupportUnknown}, nil
+}
+
 func (p *OpenAI) GetADKModelLLM(ctx context.Context, ref model_ref.ModelRef) (model.LLM, error) {
 	p.mu.RLock()
 	apiKey := p.apiKey
@@ -85,6 +95,7 @@ func (p *OpenAI) GetADKModelLLM(ctx context.Context, ref model_ref.ModelRef) (mo
 		apiKey:    apiKey,
 		client:    &client,
 		modelName: ref.Model.String(),
+		media:     p.media,
 	}, nil
 }
 

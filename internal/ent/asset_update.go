@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
+	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	"github.com/rs/xid"
 )
 
@@ -166,6 +167,21 @@ func (_u *AssetUpdate) AddNodes(v ...*Node) *AssetUpdate {
 	return _u.AddNodeIDs(ids...)
 }
 
+// AddRobotMessageIDs adds the "robot_messages" edge to the RobotSessionMessage entity by IDs.
+func (_u *AssetUpdate) AddRobotMessageIDs(ids ...xid.ID) *AssetUpdate {
+	_u.mutation.AddRobotMessageIDs(ids...)
+	return _u
+}
+
+// AddRobotMessages adds the "robot_messages" edges to the RobotSessionMessage entity.
+func (_u *AssetUpdate) AddRobotMessages(v ...*RobotSessionMessage) *AssetUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddRobotMessageIDs(ids...)
+}
+
 // AddLinkIDs adds the "links" edge to the Link entity by IDs.
 func (_u *AssetUpdate) AddLinkIDs(ids ...xid.ID) *AssetUpdate {
 	_u.mutation.AddLinkIDs(ids...)
@@ -286,6 +302,27 @@ func (_u *AssetUpdate) RemoveNodes(v ...*Node) *AssetUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveNodeIDs(ids...)
+}
+
+// ClearRobotMessages clears all "robot_messages" edges to the RobotSessionMessage entity.
+func (_u *AssetUpdate) ClearRobotMessages() *AssetUpdate {
+	_u.mutation.ClearRobotMessages()
+	return _u
+}
+
+// RemoveRobotMessageIDs removes the "robot_messages" edge to RobotSessionMessage entities by IDs.
+func (_u *AssetUpdate) RemoveRobotMessageIDs(ids ...xid.ID) *AssetUpdate {
+	_u.mutation.RemoveRobotMessageIDs(ids...)
+	return _u
+}
+
+// RemoveRobotMessages removes "robot_messages" edges to RobotSessionMessage entities.
+func (_u *AssetUpdate) RemoveRobotMessages(v ...*RobotSessionMessage) *AssetUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveRobotMessageIDs(ids...)
 }
 
 // ClearLinks clears all "links" edges to the Link entity.
@@ -529,6 +566,51 @@ func (_u *AssetUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.RobotMessagesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.RobotMessagesTable,
+			Columns: asset.RobotMessagesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsessionmessage.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedRobotMessagesIDs(); len(nodes) > 0 && !_u.mutation.RobotMessagesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.RobotMessagesTable,
+			Columns: asset.RobotMessagesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsessionmessage.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RobotMessagesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.RobotMessagesTable,
+			Columns: asset.RobotMessagesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsessionmessage.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -882,6 +964,21 @@ func (_u *AssetUpdateOne) AddNodes(v ...*Node) *AssetUpdateOne {
 	return _u.AddNodeIDs(ids...)
 }
 
+// AddRobotMessageIDs adds the "robot_messages" edge to the RobotSessionMessage entity by IDs.
+func (_u *AssetUpdateOne) AddRobotMessageIDs(ids ...xid.ID) *AssetUpdateOne {
+	_u.mutation.AddRobotMessageIDs(ids...)
+	return _u
+}
+
+// AddRobotMessages adds the "robot_messages" edges to the RobotSessionMessage entity.
+func (_u *AssetUpdateOne) AddRobotMessages(v ...*RobotSessionMessage) *AssetUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddRobotMessageIDs(ids...)
+}
+
 // AddLinkIDs adds the "links" edge to the Link entity by IDs.
 func (_u *AssetUpdateOne) AddLinkIDs(ids ...xid.ID) *AssetUpdateOne {
 	_u.mutation.AddLinkIDs(ids...)
@@ -1002,6 +1099,27 @@ func (_u *AssetUpdateOne) RemoveNodes(v ...*Node) *AssetUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveNodeIDs(ids...)
+}
+
+// ClearRobotMessages clears all "robot_messages" edges to the RobotSessionMessage entity.
+func (_u *AssetUpdateOne) ClearRobotMessages() *AssetUpdateOne {
+	_u.mutation.ClearRobotMessages()
+	return _u
+}
+
+// RemoveRobotMessageIDs removes the "robot_messages" edge to RobotSessionMessage entities by IDs.
+func (_u *AssetUpdateOne) RemoveRobotMessageIDs(ids ...xid.ID) *AssetUpdateOne {
+	_u.mutation.RemoveRobotMessageIDs(ids...)
+	return _u
+}
+
+// RemoveRobotMessages removes "robot_messages" edges to RobotSessionMessage entities.
+func (_u *AssetUpdateOne) RemoveRobotMessages(v ...*RobotSessionMessage) *AssetUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveRobotMessageIDs(ids...)
 }
 
 // ClearLinks clears all "links" edges to the Link entity.
@@ -1275,6 +1393,51 @@ func (_u *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error)
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.RobotMessagesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.RobotMessagesTable,
+			Columns: asset.RobotMessagesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsessionmessage.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedRobotMessagesIDs(); len(nodes) > 0 && !_u.mutation.RobotMessagesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.RobotMessagesTable,
+			Columns: asset.RobotMessagesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsessionmessage.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RobotMessagesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.RobotMessagesTable,
+			Columns: asset.RobotMessagesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsessionmessage.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

@@ -9,10 +9,18 @@ import (
 	"github.com/anthropics/anthropic-sdk-go"
 	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
+
+	"github.com/Southclaws/storyden/app/resources/robot/model_ref"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/model_media"
 )
 
 func (m *Anthropic) GenerateContent(ctx context.Context, req *model.LLMRequest, stream bool) iter.Seq2[*model.LLMResponse, error] {
-	messages := convertToAnthropicMessages(req)
+	ref := model_ref.ModelRef{Provider: Provider, Model: model_ref.NewModel(m.modelName)}
+	err := model_media.ValidateModelInput(ctx, m, ref, req.Contents)
+	var messages []anthropic.MessageParam
+	if err == nil {
+		messages, err = convertToAnthropicMessages(ctx, req, m.media)
+	}
 	tools := convertToAnthropicTools(req)
 
 	params := anthropic.MessageNewParams{
@@ -35,6 +43,10 @@ func (m *Anthropic) GenerateContent(ctx context.Context, req *model.LLMRequest, 
 	}
 
 	return func(yield func(*model.LLMResponse, error) bool) {
+		if err != nil {
+			yield(nil, fault.Wrap(err, fctx.With(ctx)))
+			return
+		}
 		if stream {
 			m.generateContentStream(ctx, params, yield)
 		} else {

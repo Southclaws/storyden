@@ -2374,6 +2374,31 @@ var (
 			},
 		},
 	}
+	// RobotSessionMessageAssetsColumns holds the columns for the "robot_session_message_assets" table.
+	RobotSessionMessageAssetsColumns = []*schema.Column{
+		{Name: "robot_session_message_id", Type: field.TypeString, Size: 20},
+		{Name: "asset_id", Type: field.TypeString, Size: 20},
+	}
+	// RobotSessionMessageAssetsTable holds the schema information for the "robot_session_message_assets" table.
+	RobotSessionMessageAssetsTable = &schema.Table{
+		Name:       "robot_session_message_assets",
+		Columns:    RobotSessionMessageAssetsColumns,
+		PrimaryKey: []*schema.Column{RobotSessionMessageAssetsColumns[0], RobotSessionMessageAssetsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "robot_session_message_assets_robot_session_message_id",
+				Columns:    []*schema.Column{RobotSessionMessageAssetsColumns[0]},
+				RefColumns: []*schema.Column{RobotSessionMessagesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "robot_session_message_assets_asset_id",
+				Columns:    []*schema.Column{RobotSessionMessageAssetsColumns[1]},
+				RefColumns: []*schema.Column{AssetsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// TagPostsColumns holds the columns for the "tag_posts" table.
 	TagPostsColumns = []*schema.Column{
 		{Name: "tag_id", Type: field.TypeString, Size: 20},
@@ -2492,6 +2517,7 @@ var (
 		LinkAssetsTable,
 		NodeAssetsTable,
 		PostAssetsTable,
+		RobotSessionMessageAssetsTable,
 		TagPostsTable,
 		TagNodesTable,
 	}
@@ -2609,6 +2635,8 @@ func init() {
 	NodeAssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	PostAssetsTable.ForeignKeys[0].RefTable = PostsTable
 	PostAssetsTable.ForeignKeys[1].RefTable = AssetsTable
+	RobotSessionMessageAssetsTable.ForeignKeys[0].RefTable = RobotSessionMessagesTable
+	RobotSessionMessageAssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	TagPostsTable.ForeignKeys[0].RefTable = TagsTable
 	TagPostsTable.ForeignKeys[1].RefTable = PostsTable
 	TagNodesTable.ForeignKeys[0].RefTable = TagsTable

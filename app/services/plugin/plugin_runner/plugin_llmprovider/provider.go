@@ -13,6 +13,7 @@ import (
 	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
 
+	robotresource "github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/resources/robot/llm_provider"
 	"github.com/Southclaws/storyden/app/resources/robot/model_ref"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner"
@@ -70,6 +71,10 @@ func (p *Provider) ListModels(ctx context.Context) ([]model_ref.Info, error) {
 	}
 
 	return models, nil
+}
+
+func (p *Provider) ModelCapabilities(context.Context, model_ref.ModelRef) (llm_provider.ModelCapabilities, error) {
+	return llm_provider.ModelCapabilities{ImageInput: llm_provider.CapabilitySupportUnsupported}, nil
 }
 
 func modelRaw(m rpc.RobotModelProviderModel) map[string]any {
@@ -135,6 +140,16 @@ func (m *pluginModel) Name() string {
 
 func (m *pluginModel) GenerateContent(ctx context.Context, req *model.LLMRequest, _ bool) iter.Seq2[*model.LLMResponse, error] {
 	return func(yield func(*model.LLMResponse, error) bool) {
+		imageIDs, err := robotresource.ImageAssetIDs(req.Contents...)
+		if err != nil {
+			yield(nil, err)
+			return
+		}
+		if len(imageIDs) > 0 {
+			yield(nil, fmt.Errorf("plugin model provider %s does not support image input", m.provider))
+			return
+		}
+
 		params := convertLLMRequest(m.provider, m.model, req)
 		id := xid.New()
 		resp, err := m.session.Send(ctx, id, &rpc.RPCRequestRobotModelProviderGenerate{

@@ -32,6 +32,10 @@ func (Mock) ListModels(ctx context.Context) ([]model_ref.Info, error) {
 	return nil, nil
 }
 
+func (Mock) ModelCapabilities(context.Context, model_ref.ModelRef) (llm_provider.ModelCapabilities, error) {
+	return llm_provider.ModelCapabilities{ImageInput: llm_provider.CapabilitySupportSupported}, nil
+}
+
 func (Mock) GetADKModelLLM(ctx context.Context, ref model_ref.ModelRef) (model.LLM, error) {
 	return newMockModel(ref.Model.String())
 }

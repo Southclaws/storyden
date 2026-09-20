@@ -49,6 +49,9 @@ func (Asset) Edges() []ent.Edge {
 		edge.From("nodes", Node.Type).
 			Ref("assets"),
 
+		edge.From("robot_messages", RobotSessionMessage.Type).
+			Ref("assets"),
+
 		edge.From("links", Link.Type).
 			Ref("assets"),
 

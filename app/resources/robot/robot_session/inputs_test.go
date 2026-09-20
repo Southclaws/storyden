@@ -16,11 +16,13 @@ import (
 	"google.golang.org/genai"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
 	robotservice "github.com/Southclaws/storyden/app/services/semdex/robot"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_robot_session_input "github.com/Southclaws/storyden/internal/ent/robotsessioninput"
+	ent_robot_session_message "github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	"github.com/Southclaws/storyden/internal/integration"
 )
 
@@ -176,7 +178,6 @@ func TestEnqueueInputPersistsImportedHistoryAndVisibleInputAtomically(t *testing
 			assert.False(t, sess.Messages[0].Queued)
 			assert.False(t, sess.Messages[1].Queued)
 			assert.True(t, sess.Messages[2].Queued)
-
 			require.NoError(t, repo.EnqueueInput(ctx, robot_session.EnqueueInputParams{
 				ID:            inputID,
 				SessionID:     sessionID,
@@ -194,6 +195,61 @@ func TestEnqueueInputPersistsImportedHistoryAndVisibleInputAtomically(t *testing
 			assert.Equal(t, "current message", afterRetry.Messages[2].Event.Content.Parts[0].Text)
 		}))
 	}))
+}
+
+func TestEnqueueInputLinksAssetsFromImportedHistoryAndCurrentMessage(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, fx.Invoke(func(
+		lc fx.Lifecycle,
+		ctx context.Context,
+		db *ent.Client,
+		repo *robot_session.Repository,
+	) {
+		lc.Append(fx.StartHook(func() {
+			owner, err := db.Account.Create().SetHandle("imported-media-owner").SetName("Imported Media Owner").Save(ctx)
+			require.NoError(t, err)
+			ownerID := account.AccountID(owner.ID)
+			sessionID := robot.SessionID(xid.New())
+			require.NoError(t, createSession(ctx, repo, sessionID, ownerID))
+
+			firstImageID := createImageAsset(t, ctx, db, owner.ID, "history.png")
+			secondImageID := createImageAsset(t, ctx, db, owner.ID, "current.png")
+			inputID := robot.InputID(xid.New())
+			history := textEvent("imported message", "user")
+			history.Content.Parts = append(history.Content.Parts,
+				robot.NewImageAssetPart(firstImageID),
+				robot.NewImageAssetPart(secondImageID),
+			)
+			current := textEvent("current message", "user")
+			current.Content.Parts = append(current.Content.Parts, robot.NewImageAssetPart(secondImageID))
+
+			require.NoError(t, repo.EnqueueInput(ctx, robot_session.EnqueueInputParams{
+				ID: inputID, SessionID: sessionID, AccountID: ownerID,
+				SourceKind: "plugin_rpc", BatchKey: inputID.String(), InputData: json.RawMessage(`{"turn":1}`),
+				HistoryEvents: []*adksession.Event{history}, VisibleEvent: opt.New(current),
+			}))
+
+			rows, err := db.RobotSessionMessage.Query().
+				Where(ent_robot_session_message.SessionIDEQ(xid.ID(sessionID))).
+				WithAssets().
+				Order(ent.Asc(ent_robot_session_message.FieldSequence)).
+				All(ctx)
+			require.NoError(t, err)
+			require.Len(t, rows, 2)
+			assert.Len(t, rows[0].Edges.Assets, 2, "all imported history images are linked")
+			assert.Len(t, rows[1].Edges.Assets, 1, "the current plugin input image is linked")
+		}))
+	}))
+}
+
+func createImageAsset(t *testing.T, ctx context.Context, db *ent.Client, ownerID xid.ID, name string) asset.AssetID {
+	t.Helper()
+	id := asset.AssetID(xid.New())
+	_, err := db.Asset.Create().SetID(id).SetAccountID(ownerID).
+		SetFilename(asset.NewExistingFilename(id, name).String()).SetMimeType("image/png").SetSize(1).Save(ctx)
+	require.NoError(t, err)
+	return id
 }
 
 func TestQueuedInputsBecomeRunnableAtTheirScheduledTime(t *testing.T) {

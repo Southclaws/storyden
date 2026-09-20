@@ -1,15 +1,35 @@
 package openai
 
 import (
+	"context"
 	"encoding/json"
 	"testing"
 
 	"github.com/openai/openai-go/v3/responses"
+	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
+
+	"github.com/Southclaws/storyden/app/resources/asset"
+	robotresource "github.com/Southclaws/storyden/app/resources/robot"
+	"github.com/Southclaws/storyden/app/resources/robot/llm_provider"
+	"github.com/Southclaws/storyden/app/resources/robot/model_ref"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/model_media"
 )
+
+type imageResolver map[asset.AssetID]string
+
+func (r imageResolver) ResolveImage(_ context.Context, id asset.AssetID) (model_media.Image, error) {
+	return model_media.Image{AssetID: id, URL: r[id], MIME: "image/png"}, nil
+}
+
+func TestModelCapabilitiesReportsImageSupportUnknown(t *testing.T) {
+	capabilities, err := (&OpenAI{}).ModelCapabilities(context.Background(), model_ref.ModelRef{})
+	require.NoError(t, err)
+	assert.Equal(t, llm_provider.CapabilitySupportUnknown, capabilities.ImageInput)
+}
 
 func TestConvertToOpenAIInputReplaysEmptyToolArgsAsObject(t *testing.T) {
 	req := &model.LLMRequest{
@@ -28,7 +48,8 @@ func TestConvertToOpenAIInputReplaysEmptyToolArgsAsObject(t *testing.T) {
 		},
 	}
 
-	input := convertToOpenAIInput(req)
+	input, err := convertToOpenAIInput(context.Background(), req, nil)
+	require.NoError(t, err)
 	require.Len(t, input, 1)
 
 	toolCall := input[0].OfFunctionCall
@@ -60,7 +81,8 @@ func TestConvertToOpenAIInputPassesThroughToolResult(t *testing.T) {
 		},
 	}
 
-	input := convertToOpenAIInput(req)
+	input, err := convertToOpenAIInput(context.Background(), req, nil)
+	require.NoError(t, err)
 	require.Len(t, input, 1)
 	require.NotNil(t, input[0].OfFunctionCallOutput)
 	assert.Equal(t, "call_123", input[0].OfFunctionCallOutput.CallID)
@@ -84,7 +106,8 @@ func TestConvertOpenAIResponseToGenaiContentPreservesReasoningItems(t *testing.T
 	assert.Equal(t, map[string]any{"page": float64(1)}, content.Parts[1].FunctionCall.Args)
 	assert.Equal(t, "Looking it up.", content.Parts[2].Text)
 
-	input := convertToOpenAIInput(&model.LLMRequest{Contents: []*genai.Content{content}})
+	input, err := convertToOpenAIInput(context.Background(), &model.LLMRequest{Contents: []*genai.Content{content}}, nil)
+	require.NoError(t, err)
 	require.Len(t, input, 3)
 	require.NotNil(t, input[0].OfReasoning)
 	assert.Equal(t, "rs_123", input[0].OfReasoning.ID)
@@ -93,6 +116,51 @@ func TestConvertOpenAIResponseToGenaiContentPreservesReasoningItems(t *testing.T
 	require.NotNil(t, input[1].OfFunctionCall)
 	assert.Equal(t, "call_123", input[1].OfFunctionCall.CallID)
 	require.NotNil(t, input[2].OfMessage)
+}
+
+func TestConvertToOpenAIInputProjectsMultipleStorydenImagesInOrder(t *testing.T) {
+	first := asset.AssetID(xid.New())
+	second := asset.AssetID(xid.New())
+	resolver := imageResolver{
+		first:  "https://storyden.example/api/assets/first.png",
+		second: "https://storyden.example/api/assets/second.webp",
+	}
+	req := &model.LLMRequest{Contents: []*genai.Content{{
+		Role: genai.RoleUser,
+		Parts: []*genai.Part{
+			{Text: "Compare these images."},
+			robotresource.NewImageAssetPart(first),
+			robotresource.NewImageAssetPart(second),
+			robotresource.NewImageAssetPart(first),
+		},
+	}}}
+
+	input, err := convertToOpenAIInput(context.Background(), req, resolver)
+	require.NoError(t, err)
+	require.Len(t, input, 1)
+
+	raw, err := json.Marshal(input[0])
+	require.NoError(t, err)
+	assert.JSONEq(t, `{
+		"role":"user",
+		"content":[
+			{"type":"input_text","text":"Compare these images."},
+			{"type":"input_image","detail":"auto","image_url":"https://storyden.example/api/assets/first.png"},
+			{"type":"input_image","detail":"auto","image_url":"https://storyden.example/api/assets/second.webp"},
+			{"type":"input_image","detail":"auto","image_url":"https://storyden.example/api/assets/first.png"}
+		]
+	}`, string(raw))
+}
+
+func TestConvertToOpenAIInputRejectsExternalMediaParts(t *testing.T) {
+	req := &model.LLMRequest{Contents: []*genai.Content{{
+		Role:  genai.RoleUser,
+		Parts: []*genai.Part{{FileData: &genai.FileData{FileURI: "https://third-party.example/image.png"}}},
+	}}}
+
+	_, err := convertToOpenAIInput(context.Background(), req, nil)
+	require.Error(t, err)
+	assert.ErrorContains(t, err, "must reference a Storyden asset ID")
 }
 
 func TestConvertOpenAIResponseToGenaiContentRejectsMalformedFunctionArguments(t *testing.T) {

@@ -20,11 +20,24 @@ type Config struct {
 	APIKey  string
 }
 
+type CapabilitySupport string
+
+const (
+	CapabilitySupportUnknown     CapabilitySupport = "unknown"
+	CapabilitySupportSupported   CapabilitySupport = "supported"
+	CapabilitySupportUnsupported CapabilitySupport = "unsupported"
+)
+
+type ModelCapabilities struct {
+	ImageInput CapabilitySupport
+}
+
 type Provider interface {
 	Provider() model_ref.Provider
 	RequiresAPIKey() bool
 	Configure(Config)
 	ListModels(ctx context.Context) ([]model_ref.Info, error)
+	ModelCapabilities(ctx context.Context, ref model_ref.ModelRef) (ModelCapabilities, error)
 	GetADKModelLLM(ctx context.Context, ref model_ref.ModelRef) (model.LLM, error)
 	ValidateModel(ctx context.Context, ref model_ref.ModelRef) error
 }

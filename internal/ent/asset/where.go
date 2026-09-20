@@ -547,6 +547,29 @@ func HasNodesWith(preds ...predicate.Node) predicate.Asset {
 	})
 }
 
+// HasRobotMessages applies the HasEdge predicate on the "robot_messages" edge.
+func HasRobotMessages() predicate.Asset {
+	return predicate.Asset(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, RobotMessagesTable, RobotMessagesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRobotMessagesWith applies the HasEdge predicate on the "robot_messages" edge with a given conditions (other predicates).
+func HasRobotMessagesWith(preds ...predicate.RobotSessionMessage) predicate.Asset {
+	return predicate.Asset(func(s *sql.Selector) {
+		step := newRobotMessagesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasLinks applies the HasEdge predicate on the "links" edge.
 func HasLinks() predicate.Asset {
 	return predicate.Asset(func(s *sql.Selector) {

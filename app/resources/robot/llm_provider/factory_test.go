@@ -236,6 +236,10 @@ func (p *fakeProvider) Provider() model_ref.Provider { return testProvider }
 
 func (p *fakeProvider) RequiresAPIKey() bool { return p.requiresAPIKey }
 
+func (p *fakeProvider) ModelCapabilities(context.Context, model_ref.ModelRef) (ModelCapabilities, error) {
+	return ModelCapabilities{ImageInput: CapabilitySupportUnknown}, nil
+}
+
 func (p *fakeProvider) Configure(config Config) {
 	p.mu.Lock()
 	defer p.mu.Unlock()

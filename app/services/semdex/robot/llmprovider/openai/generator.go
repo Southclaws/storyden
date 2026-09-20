@@ -11,10 +11,18 @@ import (
 	"github.com/openai/openai-go/v3/responses"
 	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
+
+	"github.com/Southclaws/storyden/app/resources/robot/model_ref"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/model_media"
 )
 
 func (o *OpenAI) GenerateContent(ctx context.Context, req *model.LLMRequest, stream bool) iter.Seq2[*model.LLMResponse, error] {
-	input := convertToOpenAIInput(req)
+	ref := model_ref.ModelRef{Provider: Provider, Model: model_ref.NewModel(o.modelName)}
+	err := model_media.ValidateModelInput(ctx, o, ref, req.Contents)
+	var input []responses.ResponseInputItemUnionParam
+	if err == nil {
+		input, err = convertToOpenAIInput(ctx, req, o.media)
+	}
 	tools := convertToOpenAITools(req)
 
 	params := responses.ResponseNewParams{
@@ -30,6 +38,10 @@ func (o *OpenAI) GenerateContent(ctx context.Context, req *model.LLMRequest, str
 	}
 
 	return func(yield func(*model.LLMResponse, error) bool) {
+		if err != nil {
+			yield(nil, fault.Wrap(err, fctx.With(ctx)))
+			return
+		}
 		if stream {
 			o.generateContentStream(ctx, params, yield)
 		} else {

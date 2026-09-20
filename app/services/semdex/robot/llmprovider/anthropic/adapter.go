@@ -12,6 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/robot/llm_provider"
 	"github.com/Southclaws/storyden/app/resources/robot/model_ref"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/model_media"
 )
 
 var Provider = llm_provider.ProviderAnthropic
@@ -21,6 +22,11 @@ type Anthropic struct {
 	apiKey    string
 	client    *anthropic.Client
 	modelName string
+	media     model_media.ImageResolver
+}
+
+func New(media *model_media.Resolver) *Anthropic {
+	return &Anthropic{media: media}
 }
 
 func (m *Anthropic) Name() string {
@@ -74,6 +80,28 @@ func (p *Anthropic) ListModels(ctx context.Context) ([]model_ref.Info, error) {
 	return out, nil
 }
 
+func (p *Anthropic) ModelCapabilities(ctx context.Context, ref model_ref.ModelRef) (llm_provider.ModelCapabilities, error) {
+	p.mu.RLock()
+	apiKey := p.apiKey
+	client := p.client
+	p.mu.RUnlock()
+
+	if client == nil {
+		configured := anthropic.NewClient(anthropicoption.WithAPIKey(apiKey))
+		client = &configured
+	}
+	info, err := client.Models.Get(ctx, ref.Model.String(), anthropic.ModelGetParams{})
+	if err != nil {
+		return llm_provider.ModelCapabilities{}, mapError(err)
+	}
+
+	support := llm_provider.CapabilitySupportUnsupported
+	if info.Capabilities.ImageInput.Supported {
+		support = llm_provider.CapabilitySupportSupported
+	}
+	return llm_provider.ModelCapabilities{ImageInput: support}, nil
+}
+
 func (p *Anthropic) GetADKModelLLM(ctx context.Context, ref model_ref.ModelRef) (model.LLM, error) {
 	p.mu.RLock()
 	apiKey := p.apiKey
@@ -85,6 +113,7 @@ func (p *Anthropic) GetADKModelLLM(ctx context.Context, ref model_ref.ModelRef) 
 		apiKey:    apiKey,
 		client:    &client,
 		modelName: ref.Model.String(),
+		media:     p.media,
 	}, nil
 }
 

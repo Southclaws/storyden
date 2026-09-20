@@ -35,6 +35,8 @@ const (
 	EdgePosts = "posts"
 	// EdgeNodes holds the string denoting the nodes edge name in mutations.
 	EdgeNodes = "nodes"
+	// EdgeRobotMessages holds the string denoting the robot_messages edge name in mutations.
+	EdgeRobotMessages = "robot_messages"
 	// EdgeLinks holds the string denoting the links edge name in mutations.
 	EdgeLinks = "links"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
@@ -57,6 +59,11 @@ const (
 	// NodesInverseTable is the table name for the Node entity.
 	// It exists in this package in order to avoid circular dependency with the "node" package.
 	NodesInverseTable = "nodes"
+	// RobotMessagesTable is the table that holds the robot_messages relation/edge. The primary key declared below.
+	RobotMessagesTable = "robot_session_message_assets"
+	// RobotMessagesInverseTable is the table name for the RobotSessionMessage entity.
+	// It exists in this package in order to avoid circular dependency with the "robotsessionmessage" package.
+	RobotMessagesInverseTable = "robot_session_messages"
 	// LinksTable is the table that holds the links relation/edge. The primary key declared below.
 	LinksTable = "link_assets"
 	// LinksInverseTable is the table name for the Link entity.
@@ -106,6 +113,9 @@ var (
 	// NodesPrimaryKey and NodesColumn2 are the table columns denoting the
 	// primary key for the nodes relation (M2M).
 	NodesPrimaryKey = []string{"node_id", "asset_id"}
+	// RobotMessagesPrimaryKey and RobotMessagesColumn2 are the table columns denoting the
+	// primary key for the robot_messages relation (M2M).
+	RobotMessagesPrimaryKey = []string{"robot_session_message_id", "asset_id"}
 	// LinksPrimaryKey and LinksColumn2 are the table columns denoting the
 	// primary key for the links relation (M2M).
 	LinksPrimaryKey = []string{"link_id", "asset_id"}
@@ -205,6 +215,20 @@ func ByNodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByRobotMessagesCount orders the results by robot_messages count.
+func ByRobotMessagesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRobotMessagesStep(), opts...)
+	}
+}
+
+// ByRobotMessages orders the results by robot_messages terms.
+func ByRobotMessages(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRobotMessagesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByLinksCount orders the results by links count.
 func ByLinksCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -272,6 +296,13 @@ func newNodesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(NodesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, NodesTable, NodesPrimaryKey...),
+	)
+}
+func newRobotMessagesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RobotMessagesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, RobotMessagesTable, RobotMessagesPrimaryKey...),
 	)
 }
 func newLinksStep() *sqlgraph.Step {

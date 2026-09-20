@@ -1000,6 +1000,29 @@ func HasAuthorWith(preds ...predicate.Account) predicate.RobotSessionMessage {
 	})
 }
 
+// HasAssets applies the HasEdge predicate on the "assets" edge.
+func HasAssets() predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, AssetsTable, AssetsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAssetsWith applies the HasEdge predicate on the "assets" edge with a given conditions (other predicates).
+func HasAssetsWith(preds ...predicate.Asset) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(func(s *sql.Selector) {
+		step := newAssetsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.RobotSessionMessage) predicate.RobotSessionMessage {
 	return predicate.RobotSessionMessage(sql.AndPredicates(predicates...))

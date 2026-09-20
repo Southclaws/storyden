@@ -11,11 +11,14 @@ import (
 	adksession "google.golang.org/adk/v2/session"
 	"google.golang.org/genai"
 
+	robotresource "github.com/Southclaws/storyden/app/resources/robot"
 	robotservice "github.com/Southclaws/storyden/app/services/semdex/robot"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 func TestValidateRobotRunRequestBuildsRolePreservingContents(t *testing.T) {
+	firstImage := xid.New()
+	secondImage := xid.New()
 	contents, err := validateRobotRunRequest(rpc.RPCRequestRobotRunParams{
 		Mode:    rpc.RobotRunModeConversation,
 		RobotID: "robot-one",
@@ -33,6 +36,10 @@ func TestValidateRobotRunRequestBuildsRolePreservingContents(t *testing.T) {
 				Role:    rpc.RobotRunMessageRoleUser,
 				Content: "third",
 				Author:  opt.New("Bob"),
+				Media: []rpc.RobotRunMedia{
+					{Type: rpc.RobotRunMediaTypeImage, AssetID: firstImage},
+					{Type: rpc.RobotRunMediaTypeImage, AssetID: secondImage},
+				},
 			},
 		},
 	})
@@ -43,6 +50,30 @@ func TestValidateRobotRunRequestBuildsRolePreservingContents(t *testing.T) {
 	assert.Equal(t, []string{"first", "second", "third"}, []string{contents[0].Parts[0].Text, contents[1].Parts[0].Text, contents[2].Parts[0].Text})
 	assert.Equal(t, "Alice", contents[0].Parts[0].PartMetadata[robotservice.MessageSpeakerMetadataKey])
 	assert.Equal(t, "Bob", contents[2].Parts[0].PartMetadata[robotservice.MessageSpeakerMetadataKey])
+	require.Len(t, contents[2].Parts, 3)
+	assert.Equal(t, firstImage.String(), contents[2].Parts[1].PartMetadata[robotresource.ImageAssetIDMetadataKey])
+	assert.Equal(t, secondImage.String(), contents[2].Parts[2].PartMetadata[robotresource.ImageAssetIDMetadataKey])
+}
+
+func TestValidateRobotRunRequestRejectsMediaOnAssistantMessages(t *testing.T) {
+	_, err := validateRobotRunRequest(rpc.RPCRequestRobotRunParams{
+		Mode:    rpc.RobotRunModeConversation,
+		RobotID: "robot-one",
+		Messages: []rpc.RobotRunMessage{
+			{
+				Role:    rpc.RobotRunMessageRoleAssistant,
+				Content: "prior response",
+				Media: []rpc.RobotRunMedia{{
+					Type:    rpc.RobotRunMediaTypeImage,
+					AssetID: xid.New(),
+				}},
+			},
+			{Role: rpc.RobotRunMessageRoleUser, Content: "continue"},
+		},
+	})
+
+	require.Error(t, err)
+	assert.ErrorContains(t, err, "media is only supported for user messages")
 }
 
 func TestValidateRobotRunRequestEnforcesModeContracts(t *testing.T) {

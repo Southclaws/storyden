@@ -113,5 +113,7 @@ func (RobotSessionMessage) Edges() []ent.Edge {
 			Field("account_id").
 			Ref("robot_messages").
 			Unique(),
+
+		edge.To("assets", Asset.Type),
 	}
 }

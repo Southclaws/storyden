@@ -1,7 +1,9 @@
 package openai
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/Southclaws/fault"
@@ -11,12 +13,15 @@ import (
 	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
 
+	"github.com/Southclaws/storyden/app/resources/asset"
+	robotresource "github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/llmprovider/toolschema"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/model_media"
 )
 
 const openAIReasoningItemKey = "openai_reasoning_item"
 
-func convertToOpenAIInput(req *model.LLMRequest) []responses.ResponseInputItemUnionParam {
+func convertToOpenAIInput(ctx context.Context, req *model.LLMRequest, media model_media.ImageResolver) ([]responses.ResponseInputItemUnionParam, error) {
 	var input []responses.ResponseInputItemUnionParam
 
 	if req.Config != nil && req.Config.SystemInstruction != nil {
@@ -31,26 +36,66 @@ func convertToOpenAIInput(req *model.LLMRequest) []responses.ResponseInputItemUn
 			continue
 		}
 
-		// Check for function responses first (they can appear in any role)
-		functionResponses := extractFunctionResponses(content.Parts)
-		if len(functionResponses) > 0 {
-			input = append(input, functionResponses...)
-			continue
+		items, err := convertOpenAIContent(ctx, content, media)
+		if err != nil {
+			return nil, err
 		}
-
-		switch content.Role {
-		case genai.RoleUser:
-			text := extractAllText(content.Parts)
-			if text != "" {
-				input = append(input, responses.ResponseInputItemParamOfMessage(text, responses.EasyInputMessageRoleUser))
-			}
-
-		case genai.RoleModel:
-			input = appendOpenAIModelContent(input, content)
-		}
+		input = append(input, items...)
 	}
 
-	return input
+	return input, nil
+}
+
+func convertOpenAIContent(ctx context.Context, content *genai.Content, media model_media.ImageResolver) ([]responses.ResponseInputItemUnionParam, error) {
+	imageIDs, err := robotresource.ImageAssetIDs(content)
+	if err != nil {
+		return nil, err
+	}
+
+	if functionResponses := extractFunctionResponses(content.Parts); len(functionResponses) > 0 {
+		if len(imageIDs) > 0 {
+			return nil, fmt.Errorf("image attachments cannot be combined with tool results")
+		}
+		return functionResponses, nil
+	}
+
+	if content.Role == genai.RoleUser {
+		message, ok, err := convertOpenAIUserContent(ctx, content, imageIDs, media)
+		if !ok || err != nil {
+			return nil, err
+		}
+		return []responses.ResponseInputItemUnionParam{message}, nil
+	}
+	if len(imageIDs) > 0 {
+		return nil, fmt.Errorf("image attachments are only supported on user messages")
+	}
+	if content.Role == genai.RoleModel {
+		return appendOpenAIModelContent(nil, content), nil
+	}
+	return nil, nil
+}
+
+func convertOpenAIUserContent(ctx context.Context, content *genai.Content, imageIDs []asset.AssetID, media model_media.ImageResolver) (responses.ResponseInputItemUnionParam, bool, error) {
+	var blocks responses.ResponseInputMessageContentListParam
+	if text := extractAllText(content.Parts); text != "" {
+		blocks = append(blocks, responses.ResponseInputContentParamOfInputText(text))
+	}
+	for _, id := range imageIDs {
+		if media == nil {
+			return responses.ResponseInputItemUnionParam{}, false, fmt.Errorf("image asset resolver is not configured")
+		}
+		image, err := media.ResolveImage(ctx, id)
+		if err != nil {
+			return responses.ResponseInputItemUnionParam{}, false, err
+		}
+		block := responses.ResponseInputContentParamOfInputImage(responses.ResponseInputImageDetailAuto)
+		block.OfInputImage.ImageURL = param.NewOpt(image.URL)
+		blocks = append(blocks, block)
+	}
+	if len(blocks) == 0 {
+		return responses.ResponseInputItemUnionParam{}, false, nil
+	}
+	return responses.ResponseInputItemParamOfMessage(blocks, responses.EasyInputMessageRoleUser), true, nil
 }
 
 func extractFunctionResponses(parts []*genai.Part) []responses.ResponseInputItemUnionParam {

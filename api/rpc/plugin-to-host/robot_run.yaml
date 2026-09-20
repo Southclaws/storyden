@@ -10,6 +10,24 @@ $defs:
     enum: ["user", "assistant"]
     description: Role of one imported conversation message.
 
+  RobotRunMediaType:
+    type: string
+    enum: ["image"]
+    description: Media kind attached to an imported conversation message.
+
+  RobotRunMedia:
+    type: object
+    required: ["type", "asset_id"]
+    properties:
+      type:
+        $ref: "#/$defs/RobotRunMediaType"
+      asset_id:
+        type: string
+        format: xid
+        description: >
+          Storyden asset containing the image. Plugins must upload external
+          media to this instance before invoking robot_run.
+
   RobotRunMessage:
     type: object
     required: ["role", "content"]
@@ -24,6 +42,13 @@ $defs:
         type: string
         minLength: 1
         description: Optional external display name for the message author.
+      media:
+        type: array
+        items:
+          $ref: "#/$defs/RobotRunMedia"
+        description: >
+          Ordered image attachments for a user message. The text content is
+          presented to the model first, followed by these media items.
 
   RobotRunTextEvent:
     type: object

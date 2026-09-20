@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	"github.com/rs/xid"
 )
 
@@ -143,6 +144,21 @@ func (_c *AssetCreate) AddNodes(v ...*Node) *AssetCreate {
 		ids[i] = v[i].ID
 	}
 	return _c.AddNodeIDs(ids...)
+}
+
+// AddRobotMessageIDs adds the "robot_messages" edge to the RobotSessionMessage entity by IDs.
+func (_c *AssetCreate) AddRobotMessageIDs(ids ...xid.ID) *AssetCreate {
+	_c.mutation.AddRobotMessageIDs(ids...)
+	return _c
+}
+
+// AddRobotMessages adds the "robot_messages" edges to the RobotSessionMessage entity.
+func (_c *AssetCreate) AddRobotMessages(v ...*RobotSessionMessage) *AssetCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddRobotMessageIDs(ids...)
 }
 
 // AddLinkIDs adds the "links" edge to the Link entity by IDs.
@@ -382,6 +398,22 @@ func (_c *AssetCreate) createSpec() (*Asset, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.RobotMessagesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.RobotMessagesTable,
+			Columns: asset.RobotMessagesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsessionmessage.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

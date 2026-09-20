@@ -1126,6 +1126,17 @@ export interface RPCRequestRobotRunParamsWorkspace {
 }
 
 
+// Media kind attached to an imported conversation message.
+export type RobotRunMediaType =
+  | "image";
+
+export interface RobotRunMedia {
+  // Storyden asset containing the image. Plugins must upload external media to this instance before invoking robot_run.
+  asset_id: string;
+  type: RobotRunMediaType;
+}
+
+
 // Role of one imported conversation message.
 export type RobotRunMessageRole =
   | "user"
@@ -1136,6 +1147,8 @@ export interface RobotRunMessage {
   author?: string;
   // Message content imported into the Robot session.
   content: string;
+  // Ordered image attachments for a user message. The text content is presented to the model first, followed by these media items.
+  media?: RobotRunMedia[];
   role: RobotRunMessageRole;
 }
 

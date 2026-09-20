@@ -67,9 +67,11 @@ type RobotSessionMessageEdges struct {
 	Robot *Robot `json:"robot,omitempty"`
 	// Author holds the value of the author edge.
 	Author *Account `json:"author,omitempty"`
+	// Assets holds the value of the assets edge.
+	Assets []*Asset `json:"assets,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // SessionOrErr returns the Session value or an error if the edge
@@ -103,6 +105,15 @@ func (e RobotSessionMessageEdges) AuthorOrErr() (*Account, error) {
 		return nil, &NotFoundError{label: account.Label}
 	}
 	return nil, &NotLoadedError{edge: "author"}
+}
+
+// AssetsOrErr returns the Assets value or an error if the edge
+// was not loaded in eager-loading.
+func (e RobotSessionMessageEdges) AssetsOrErr() ([]*Asset, error) {
+	if e.loadedTypes[3] {
+		return e.Assets, nil
+	}
+	return nil, &NotLoadedError{edge: "assets"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -270,6 +281,11 @@ func (_m *RobotSessionMessage) QueryRobot() *RobotQuery {
 // QueryAuthor queries the "author" edge of the RobotSessionMessage entity.
 func (_m *RobotSessionMessage) QueryAuthor() *AccountQuery {
 	return NewRobotSessionMessageClient(_m.config).QueryAuthor(_m)
+}
+
+// QueryAssets queries the "assets" edge of the RobotSessionMessage entity.
+func (_m *RobotSessionMessage) QueryAssets() *AssetQuery {
+	return NewRobotSessionMessageClient(_m.config).QueryAssets(_m)
 }
 
 // Update returns a builder for updating this RobotSessionMessage.

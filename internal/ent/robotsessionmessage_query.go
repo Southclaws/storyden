@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -12,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/robot"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
@@ -29,6 +31,7 @@ type RobotSessionMessageQuery struct {
 	withSession *RobotSessionQuery
 	withRobot   *RobotQuery
 	withAuthor  *AccountQuery
+	withAssets  *AssetQuery
 	modifiers   []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -125,6 +128,28 @@ func (_q *RobotSessionMessageQuery) QueryAuthor() *AccountQuery {
 			sqlgraph.From(robotsessionmessage.Table, robotsessionmessage.FieldID, selector),
 			sqlgraph.To(account.Table, account.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, robotsessionmessage.AuthorTable, robotsessionmessage.AuthorColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAssets chains the current query on the "assets" edge.
+func (_q *RobotSessionMessageQuery) QueryAssets() *AssetQuery {
+	query := (&AssetClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robotsessionmessage.Table, robotsessionmessage.FieldID, selector),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, robotsessionmessage.AssetsTable, robotsessionmessage.AssetsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -327,6 +352,7 @@ func (_q *RobotSessionMessageQuery) Clone() *RobotSessionMessageQuery {
 		withSession: _q.withSession.Clone(),
 		withRobot:   _q.withRobot.Clone(),
 		withAuthor:  _q.withAuthor.Clone(),
+		withAssets:  _q.withAssets.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
 		path:      _q.path,
@@ -364,6 +390,17 @@ func (_q *RobotSessionMessageQuery) WithAuthor(opts ...func(*AccountQuery)) *Rob
 		opt(query)
 	}
 	_q.withAuthor = query
+	return _q
+}
+
+// WithAssets tells the query-builder to eager-load the nodes that are connected to
+// the "assets" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *RobotSessionMessageQuery) WithAssets(opts ...func(*AssetQuery)) *RobotSessionMessageQuery {
+	query := (&AssetClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withAssets = query
 	return _q
 }
 
@@ -445,10 +482,11 @@ func (_q *RobotSessionMessageQuery) sqlAll(ctx context.Context, hooks ...queryHo
 	var (
 		nodes       = []*RobotSessionMessage{}
 		_spec       = _q.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			_q.withSession != nil,
 			_q.withRobot != nil,
 			_q.withAuthor != nil,
+			_q.withAssets != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -487,6 +525,13 @@ func (_q *RobotSessionMessageQuery) sqlAll(ctx context.Context, hooks ...queryHo
 	if query := _q.withAuthor; query != nil {
 		if err := _q.loadAuthor(ctx, query, nodes, nil,
 			func(n *RobotSessionMessage, e *Account) { n.Edges.Author = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withAssets; query != nil {
+		if err := _q.loadAssets(ctx, query, nodes,
+			func(n *RobotSessionMessage) { n.Edges.Assets = []*Asset{} },
+			func(n *RobotSessionMessage, e *Asset) { n.Edges.Assets = append(n.Edges.Assets, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -582,6 +627,67 @@ func (_q *RobotSessionMessageQuery) loadAuthor(ctx context.Context, query *Accou
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (_q *RobotSessionMessageQuery) loadAssets(ctx context.Context, query *AssetQuery, nodes []*RobotSessionMessage, init func(*RobotSessionMessage), assign func(*RobotSessionMessage, *Asset)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[xid.ID]*RobotSessionMessage)
+	nids := make(map[xid.ID]map[*RobotSessionMessage]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(robotsessionmessage.AssetsTable)
+		s.Join(joinT).On(s.C(asset.FieldID), joinT.C(robotsessionmessage.AssetsPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(robotsessionmessage.AssetsPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(robotsessionmessage.AssetsPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(xid.ID)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := *values[0].(*xid.ID)
+				inValue := *values[1].(*xid.ID)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*RobotSessionMessage]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Asset](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "assets" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
 		}
 	}
 	return nil

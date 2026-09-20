@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/plugin/plugin_reader"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
 	"github.com/Southclaws/storyden/app/services/account/account_role_assign"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/model_media"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/session_coordinator"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
@@ -36,6 +37,7 @@ type Handler struct {
 	pluginReader   *plugin_reader.Reader
 	robotSessions  *robot_session.Repository
 	robotAgent     *session_coordinator.Coordinator
+	robotMedia     *model_media.Resolver
 
 	mu           sync.Mutex
 	cachedAccess *rpc.RPCResponseAccessGetResult
@@ -55,6 +57,7 @@ func New(
 	pluginReader *plugin_reader.Reader,
 	robotSessions *robot_session.Repository,
 	robotAgent *session_coordinator.Coordinator,
+	robotMedia *model_media.Resolver,
 ) *Handler {
 	return &Handler{
 		installationID: installationID,
@@ -70,6 +73,7 @@ func New(
 		pluginReader:   pluginReader,
 		robotSessions:  robotSessions,
 		robotAgent:     robotAgent,
+		robotMedia:     robotMedia,
 	}
 }
 

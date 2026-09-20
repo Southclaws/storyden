@@ -6561,39 +6561,42 @@ func (m *AccountRolesMutation) ResetEdge(name string) error {
 // AssetMutation represents an operation that mutates the Asset nodes in the graph.
 type AssetMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *xid.ID
-	created_at    *time.Time
-	updated_at    *time.Time
-	filename      *string
-	size          *int
-	addsize       *int
-	mime_type     *string
-	metadata      *map[string]interface{}
-	clearedFields map[string]struct{}
-	posts         map[xid.ID]struct{}
-	removedposts  map[xid.ID]struct{}
-	clearedposts  bool
-	nodes         map[xid.ID]struct{}
-	removednodes  map[xid.ID]struct{}
-	clearednodes  bool
-	links         map[xid.ID]struct{}
-	removedlinks  map[xid.ID]struct{}
-	clearedlinks  bool
-	owner         *xid.ID
-	clearedowner  bool
-	parent        *xid.ID
-	clearedparent bool
-	assets        map[xid.ID]struct{}
-	removedassets map[xid.ID]struct{}
-	clearedassets bool
-	event         map[xid.ID]struct{}
-	removedevent  map[xid.ID]struct{}
-	clearedevent  bool
-	done          bool
-	oldValue      func(context.Context) (*Asset, error)
-	predicates    []predicate.Asset
+	op                    Op
+	typ                   string
+	id                    *xid.ID
+	created_at            *time.Time
+	updated_at            *time.Time
+	filename              *string
+	size                  *int
+	addsize               *int
+	mime_type             *string
+	metadata              *map[string]interface{}
+	clearedFields         map[string]struct{}
+	posts                 map[xid.ID]struct{}
+	removedposts          map[xid.ID]struct{}
+	clearedposts          bool
+	nodes                 map[xid.ID]struct{}
+	removednodes          map[xid.ID]struct{}
+	clearednodes          bool
+	robot_messages        map[xid.ID]struct{}
+	removedrobot_messages map[xid.ID]struct{}
+	clearedrobot_messages bool
+	links                 map[xid.ID]struct{}
+	removedlinks          map[xid.ID]struct{}
+	clearedlinks          bool
+	owner                 *xid.ID
+	clearedowner          bool
+	parent                *xid.ID
+	clearedparent         bool
+	assets                map[xid.ID]struct{}
+	removedassets         map[xid.ID]struct{}
+	clearedassets         bool
+	event                 map[xid.ID]struct{}
+	removedevent          map[xid.ID]struct{}
+	clearedevent          bool
+	done                  bool
+	oldValue              func(context.Context) (*Asset, error)
+	predicates            []predicate.Asset
 }
 
 var _ ent.Mutation = (*AssetMutation)(nil)
@@ -7142,6 +7145,60 @@ func (m *AssetMutation) ResetNodes() {
 	m.removednodes = nil
 }
 
+// AddRobotMessageIDs adds the "robot_messages" edge to the RobotSessionMessage entity by ids.
+func (m *AssetMutation) AddRobotMessageIDs(ids ...xid.ID) {
+	if m.robot_messages == nil {
+		m.robot_messages = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.robot_messages[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRobotMessages clears the "robot_messages" edge to the RobotSessionMessage entity.
+func (m *AssetMutation) ClearRobotMessages() {
+	m.clearedrobot_messages = true
+}
+
+// RobotMessagesCleared reports if the "robot_messages" edge to the RobotSessionMessage entity was cleared.
+func (m *AssetMutation) RobotMessagesCleared() bool {
+	return m.clearedrobot_messages
+}
+
+// RemoveRobotMessageIDs removes the "robot_messages" edge to the RobotSessionMessage entity by IDs.
+func (m *AssetMutation) RemoveRobotMessageIDs(ids ...xid.ID) {
+	if m.removedrobot_messages == nil {
+		m.removedrobot_messages = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.robot_messages, ids[i])
+		m.removedrobot_messages[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRobotMessages returns the removed IDs of the "robot_messages" edge to the RobotSessionMessage entity.
+func (m *AssetMutation) RemovedRobotMessagesIDs() (ids []xid.ID) {
+	for id := range m.removedrobot_messages {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RobotMessagesIDs returns the "robot_messages" edge IDs in the mutation.
+func (m *AssetMutation) RobotMessagesIDs() (ids []xid.ID) {
+	for id := range m.robot_messages {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRobotMessages resets all changes to the "robot_messages" edge.
+func (m *AssetMutation) ResetRobotMessages() {
+	m.robot_messages = nil
+	m.clearedrobot_messages = false
+	m.removedrobot_messages = nil
+}
+
 // AddLinkIDs adds the "links" edge to the Link entity by ids.
 func (m *AssetMutation) AddLinkIDs(ids ...xid.ID) {
 	if m.links == nil {
@@ -7666,12 +7723,15 @@ func (m *AssetMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AssetMutation) AddedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 8)
 	if m.posts != nil {
 		edges = append(edges, asset.EdgePosts)
 	}
 	if m.nodes != nil {
 		edges = append(edges, asset.EdgeNodes)
+	}
+	if m.robot_messages != nil {
+		edges = append(edges, asset.EdgeRobotMessages)
 	}
 	if m.links != nil {
 		edges = append(edges, asset.EdgeLinks)
@@ -7707,6 +7767,12 @@ func (m *AssetMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case asset.EdgeRobotMessages:
+		ids := make([]ent.Value, 0, len(m.robot_messages))
+		for id := range m.robot_messages {
+			ids = append(ids, id)
+		}
+		return ids
 	case asset.EdgeLinks:
 		ids := make([]ent.Value, 0, len(m.links))
 		for id := range m.links {
@@ -7739,12 +7805,15 @@ func (m *AssetMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AssetMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 8)
 	if m.removedposts != nil {
 		edges = append(edges, asset.EdgePosts)
 	}
 	if m.removednodes != nil {
 		edges = append(edges, asset.EdgeNodes)
+	}
+	if m.removedrobot_messages != nil {
+		edges = append(edges, asset.EdgeRobotMessages)
 	}
 	if m.removedlinks != nil {
 		edges = append(edges, asset.EdgeLinks)
@@ -7774,6 +7843,12 @@ func (m *AssetMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case asset.EdgeRobotMessages:
+		ids := make([]ent.Value, 0, len(m.removedrobot_messages))
+		for id := range m.removedrobot_messages {
+			ids = append(ids, id)
+		}
+		return ids
 	case asset.EdgeLinks:
 		ids := make([]ent.Value, 0, len(m.removedlinks))
 		for id := range m.removedlinks {
@@ -7798,12 +7873,15 @@ func (m *AssetMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AssetMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 8)
 	if m.clearedposts {
 		edges = append(edges, asset.EdgePosts)
 	}
 	if m.clearednodes {
 		edges = append(edges, asset.EdgeNodes)
+	}
+	if m.clearedrobot_messages {
+		edges = append(edges, asset.EdgeRobotMessages)
 	}
 	if m.clearedlinks {
 		edges = append(edges, asset.EdgeLinks)
@@ -7831,6 +7909,8 @@ func (m *AssetMutation) EdgeCleared(name string) bool {
 		return m.clearedposts
 	case asset.EdgeNodes:
 		return m.clearednodes
+	case asset.EdgeRobotMessages:
+		return m.clearedrobot_messages
 	case asset.EdgeLinks:
 		return m.clearedlinks
 	case asset.EdgeOwner:
@@ -7868,6 +7948,9 @@ func (m *AssetMutation) ResetEdge(name string) error {
 		return nil
 	case asset.EdgeNodes:
 		m.ResetNodes()
+		return nil
+	case asset.EdgeRobotMessages:
+		m.ResetRobotMessages()
 		return nil
 	case asset.EdgeLinks:
 		m.ResetLinks()
@@ -49664,6 +49747,9 @@ type RobotSessionMessageMutation struct {
 	clearedrobot           bool
 	author                 *xid.ID
 	clearedauthor          bool
+	assets                 map[xid.ID]struct{}
+	removedassets          map[xid.ID]struct{}
+	clearedassets          bool
 	done                   bool
 	oldValue               func(context.Context) (*RobotSessionMessage, error)
 	predicates             []predicate.RobotSessionMessage
@@ -50573,6 +50659,60 @@ func (m *RobotSessionMessageMutation) ResetAuthor() {
 	m.clearedauthor = false
 }
 
+// AddAssetIDs adds the "assets" edge to the Asset entity by ids.
+func (m *RobotSessionMessageMutation) AddAssetIDs(ids ...xid.ID) {
+	if m.assets == nil {
+		m.assets = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.assets[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAssets clears the "assets" edge to the Asset entity.
+func (m *RobotSessionMessageMutation) ClearAssets() {
+	m.clearedassets = true
+}
+
+// AssetsCleared reports if the "assets" edge to the Asset entity was cleared.
+func (m *RobotSessionMessageMutation) AssetsCleared() bool {
+	return m.clearedassets
+}
+
+// RemoveAssetIDs removes the "assets" edge to the Asset entity by IDs.
+func (m *RobotSessionMessageMutation) RemoveAssetIDs(ids ...xid.ID) {
+	if m.removedassets == nil {
+		m.removedassets = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.assets, ids[i])
+		m.removedassets[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAssets returns the removed IDs of the "assets" edge to the Asset entity.
+func (m *RobotSessionMessageMutation) RemovedAssetsIDs() (ids []xid.ID) {
+	for id := range m.removedassets {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AssetsIDs returns the "assets" edge IDs in the mutation.
+func (m *RobotSessionMessageMutation) AssetsIDs() (ids []xid.ID) {
+	for id := range m.assets {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAssets resets all changes to the "assets" edge.
+func (m *RobotSessionMessageMutation) ResetAssets() {
+	m.assets = nil
+	m.clearedassets = false
+	m.removedassets = nil
+}
+
 // Where appends a list predicates to the RobotSessionMessageMutation builder.
 func (m *RobotSessionMessageMutation) Where(ps ...predicate.RobotSessionMessage) {
 	m.predicates = append(m.predicates, ps...)
@@ -51022,7 +51162,7 @@ func (m *RobotSessionMessageMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *RobotSessionMessageMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.session != nil {
 		edges = append(edges, robotsessionmessage.EdgeSession)
 	}
@@ -51031,6 +51171,9 @@ func (m *RobotSessionMessageMutation) AddedEdges() []string {
 	}
 	if m.author != nil {
 		edges = append(edges, robotsessionmessage.EdgeAuthor)
+	}
+	if m.assets != nil {
+		edges = append(edges, robotsessionmessage.EdgeAssets)
 	}
 	return edges
 }
@@ -51051,25 +51194,42 @@ func (m *RobotSessionMessageMutation) AddedIDs(name string) []ent.Value {
 		if id := m.author; id != nil {
 			return []ent.Value{*id}
 		}
+	case robotsessionmessage.EdgeAssets:
+		ids := make([]ent.Value, 0, len(m.assets))
+		for id := range m.assets {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *RobotSessionMessageMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
+	if m.removedassets != nil {
+		edges = append(edges, robotsessionmessage.EdgeAssets)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *RobotSessionMessageMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case robotsessionmessage.EdgeAssets:
+		ids := make([]ent.Value, 0, len(m.removedassets))
+		for id := range m.removedassets {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *RobotSessionMessageMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.clearedsession {
 		edges = append(edges, robotsessionmessage.EdgeSession)
 	}
@@ -51078,6 +51238,9 @@ func (m *RobotSessionMessageMutation) ClearedEdges() []string {
 	}
 	if m.clearedauthor {
 		edges = append(edges, robotsessionmessage.EdgeAuthor)
+	}
+	if m.clearedassets {
+		edges = append(edges, robotsessionmessage.EdgeAssets)
 	}
 	return edges
 }
@@ -51092,6 +51255,8 @@ func (m *RobotSessionMessageMutation) EdgeCleared(name string) bool {
 		return m.clearedrobot
 	case robotsessionmessage.EdgeAuthor:
 		return m.clearedauthor
+	case robotsessionmessage.EdgeAssets:
+		return m.clearedassets
 	}
 	return false
 }
@@ -51125,6 +51290,9 @@ func (m *RobotSessionMessageMutation) ResetEdge(name string) error {
 		return nil
 	case robotsessionmessage.EdgeAuthor:
 		m.ResetAuthor()
+		return nil
+	case robotsessionmessage.EdgeAssets:
+		m.ResetAssets()
 		return nil
 	}
 	return fmt.Errorf("unknown RobotSessionMessage edge %s", name)

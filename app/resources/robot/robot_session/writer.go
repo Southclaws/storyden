@@ -230,6 +230,16 @@ func saveMessage(
 	eventKind ent_robot_session_message.EventKind,
 	hiddenFromProjection bool,
 ) error {
+	if !hiddenFromProjection {
+		assetIDs, err := robot.UniqueImageAssetIDs(event.Content)
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+		if len(assetIDs) > 0 {
+			create.AddAssetIDs(assetIDs...)
+		}
+	}
+
 	create = create.
 		SetSessionID(xid.ID(sessionID)).
 		SetSequence(sequence).
