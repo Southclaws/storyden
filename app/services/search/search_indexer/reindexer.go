@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
+	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	ent_node "github.com/Southclaws/storyden/internal/ent/node"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
@@ -124,7 +125,7 @@ func (idx *Indexer) reindexReplies(ctx context.Context) (int, error) {
 
 func (idx *Indexer) reindexNodes(ctx context.Context) (int, error) {
 	return reindex(ctx, idx, func() ([]datagraph.Item, error) {
-		threads, err := idx.db.Node.Query().
+		nodes, err := idx.db.Node.Query().
 			Where(
 				node.VisibilityEQ(node.VisibilityPublished),
 				func(s *sql.Selector) {
@@ -134,6 +135,10 @@ func (idx *Indexer) reindexNodes(ctx context.Context) (int, error) {
 					))
 				},
 			).
+			WithOwner(func(aq *ent.AccountQuery) {
+				aq.WithAccountRoles()
+			}).
+			WithTags().
 			Order(node.ByUpdatedAt(), node.ByID()).
 			Limit(idx.chunkSize).
 			All(ctx)
@@ -141,7 +146,12 @@ func (idx *Indexer) reindexNodes(ctx context.Context) (int, error) {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		return dt.MapErr(threads, library.ItemRef)
+		const isRoot = false
+		var propertySchemas *library.PropertySchemaTable
+
+		return dt.MapErr(nodes, func(n *ent.Node) (datagraph.Item, error) {
+			return library.MapNode(isRoot, propertySchemas)(n)
+		})
 	}, func(ids []xid.ID, t time.Time) (int, error) {
 		i, err := idx.db.Node.Update().
 			Where(ent_node.IDIn(ids...)).
