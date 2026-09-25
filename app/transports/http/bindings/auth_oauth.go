@@ -13,14 +13,11 @@ import (
 )
 
 func (o *Authentication) OAuthProviderCallback(ctx context.Context, request openapi.OAuthProviderCallbackRequestObject) (openapi.OAuthProviderCallbackResponseObject, error) {
-	service, err := authentication.NewService(request.OauthProvider)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
-	}
+	service := authentication.NewService(request.OauthProvider)
 
 	provider, err := o.authManager.Provider(service)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
 	op, ok := provider.(auth_service.OAuthProvider)
