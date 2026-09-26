@@ -80,11 +80,11 @@ sd node get my-page --format json | jq -r '.content' > content.md
 
 			switch format {
 			case formatJSON:
-				return render.NodeJSON(cmd.OutOrStdout(), node)
+				return render.NodeWithAncestorsJSON(cmd.OutOrStdout(), node)
 			case formatMarkdown:
-				return render.NodeMarkdown(cmd.OutOrStdout(), node)
+				return render.NodeWithAncestorsMarkdown(cmd.OutOrStdout(), node)
 			case formatYAML:
-				return render.NodeYAML(cmd.OutOrStdout(), node)
+				return render.NodeWithAncestorsYAML(cmd.OutOrStdout(), node)
 			default:
 				return fmt.Errorf("unsupported format %q", format)
 			}

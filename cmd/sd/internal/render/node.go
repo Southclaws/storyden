@@ -16,8 +16,37 @@ import (
 	"github.com/Southclaws/storyden/cmd/sd/internal/output"
 )
 
-func NodeJSON(out io.Writer, node *openapi.NodeWithChildren) error {
+func NodeWithAncestorsJSON(out io.Writer, node *openapi.NodeWithAncestors) error {
 	return output.JSON(out, node)
+}
+
+func nodeWithoutAncestors(node *openapi.NodeWithAncestors) *openapi.NodeWithChildren {
+	return &openapi.NodeWithChildren{
+		Assets:              node.Assets,
+		ChildPropertySchema: node.ChildPropertySchema,
+		Children:            node.Children,
+		Content:             node.Content,
+		CreatedAt:           node.CreatedAt,
+		CurrentVersionId:    node.CurrentVersionId,
+		DeletedAt:           node.DeletedAt,
+		Description:         node.Description,
+		HideChildTree:       node.HideChildTree,
+		Id:                  node.Id,
+		Link:                node.Link,
+		Meta:                node.Meta,
+		Misc:                node.Misc,
+		Name:                node.Name,
+		Owner:               node.Owner,
+		Parent:              node.Parent,
+		PrimaryImage:        node.PrimaryImage,
+		Properties:          node.Properties,
+		Recomentations:      node.Recomentations,
+		RelevanceScore:      node.RelevanceScore,
+		Slug:                node.Slug,
+		Tags:                node.Tags,
+		UpdatedAt:           node.UpdatedAt,
+		Visibility:          node.Visibility,
+	}
 }
 
 func NodeMarkdown(out io.Writer, node *openapi.NodeWithChildren) error {
@@ -40,6 +69,10 @@ func NodeMarkdown(out io.Writer, node *openapi.NodeWithChildren) error {
 	return nil
 }
 
+func NodeWithAncestorsMarkdown(out io.Writer, node *openapi.NodeWithAncestors) error {
+	return NodeMarkdown(out, nodeWithoutAncestors(node))
+}
+
 func NodeYAML(out io.Writer, node *openapi.NodeWithChildren) error {
 	payload := yamlNode{
 		Name:        string(node.Name),
@@ -58,6 +91,10 @@ func NodeYAML(out io.Writer, node *openapi.NodeWithChildren) error {
 	}
 
 	return output.YAML(out, payload)
+}
+
+func NodeWithAncestorsYAML(out io.Writer, node *openapi.NodeWithAncestors) error {
+	return NodeYAML(out, nodeWithoutAncestors(node))
 }
 
 func NodeViewString(out io.Writer, node *openapi.NodeWithChildren) (string, error) {
@@ -156,6 +193,10 @@ func NodeViewString(out io.Writer, node *openapi.NodeWithChildren) (string, erro
 	}
 
 	return strings.Join(sections, "\n\n") + "\n", nil
+}
+
+func NodeWithAncestorsViewString(out io.Writer, node *openapi.NodeWithAncestors) (string, error) {
+	return NodeViewString(out, nodeWithoutAncestors(node))
 }
 
 type nodeField struct {

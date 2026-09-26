@@ -70,7 +70,7 @@ func TestNodeSorting(t *testing.T) {
 				return list
 			}
 
-			getNode := func(parent string) openapi.NodeWithChildren {
+			getNode := func(parent string) openapi.NodeWithAncestors {
 				listResponse := tests.AssertRequest(
 					cl.NodeGetWithResponse(root, parent, &openapi.NodeGetParams{}),
 				)(t, http.StatusOK)

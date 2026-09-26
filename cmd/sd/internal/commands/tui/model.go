@@ -33,7 +33,7 @@ type model struct {
 
 	nodes     *openapi.NodeListResult
 	nodeStack []openapi.NodeWithChildren
-	nodeView  *openapi.NodeWithChildren
+	nodeView  *openapi.NodeWithAncestors
 
 	threads    *openapi.ThreadListResult
 	threadView *openapi.Thread

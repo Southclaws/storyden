@@ -27,7 +27,7 @@ type threadPageMsg struct {
 
 type nodeViewMsg struct {
 	seq  int
-	node *openapi.NodeWithChildren
+	node *openapi.NodeWithAncestors
 	err  error
 }
 
