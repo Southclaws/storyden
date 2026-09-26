@@ -10,6 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_cache"
 	"github.com/Southclaws/storyden/app/resources/library/node_properties"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_version/node_version_querier"
@@ -25,6 +26,7 @@ type Updater struct {
 	versionQuerier *node_version_querier.Querier
 	nodeWriter     *node_writer.Writer
 	nsr            *node_properties.SchemaWriter
+	cache          *node_cache.Cache
 }
 
 func New(
@@ -33,6 +35,7 @@ func New(
 	versionQuerier *node_version_querier.Querier,
 	nodeWriter *node_writer.Writer,
 	nsr *node_properties.SchemaWriter,
+	cache *node_cache.Cache,
 ) *Updater {
 	return &Updater{
 		accountQuery:   accountQuery,
@@ -40,6 +43,7 @@ func New(
 		versionQuerier: versionQuerier,
 		nodeWriter:     nodeWriter,
 		nsr:            nsr,
+		cache:          cache,
 	}
 }
 
@@ -105,6 +109,7 @@ func (u *Updater) UpdateSiblings(ctx context.Context, qk library.QueryKey, schem
 	}
 
 	_, err = u.nodeWriter.Update(ctx, qk, node_writer.WithCurrentVersionCleared())
+	u.cache.InvalidateAfterWrite(ctx)
 	if err != nil && !ent.IsNotFound(err) {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

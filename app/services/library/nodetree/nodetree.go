@@ -103,7 +103,7 @@ func (s *service) Move(ctx context.Context, child library.QueryKey, parent libra
 		return nil, fault.Wrap(ErrVisibilityRules, fctx.With(ctx))
 	}
 
-	if err := s.cache.Invalidate(ctx); err != nil {
+	if err := s.cache.InvalidateBeforeWrite(ctx); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -112,19 +112,18 @@ func (s *service) Move(ctx context.Context, child library.QueryKey, parent libra
 	if parentParent, ok := pnode.Parent.Get(); ok {
 		if parentParent.Mark.ID() == cnode.Mark.ID() {
 			cnode, err = s.nodeWriter.Update(ctx, library.NewQueryKey(cnode.Mark), node_writer.WithChildNodeRemove(xid.ID(pnode.Mark.ID())))
+			s.cache.InvalidateAfterWrite(ctx)
 			if err != nil {
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
-			s.cache.InvalidateAfterWrite(ctx)
 		}
 	}
 
 	cnode, err = s.nodeWriter.Update(ctx, library.NewQueryKey(cnode.Mark), node_writer.WithParent(library.NodeID(pnode.Mark.ID())))
+	s.cache.InvalidateAfterWrite(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	s.cache.InvalidateAfterWrite(ctx)
 
 	s.bus.Publish(ctx, &rpc.EventNodeUpdated{
 		ID:   library.NodeID(cnode.Mark.ID()),
@@ -170,16 +169,15 @@ func (s *service) Sever(ctx context.Context, child library.QueryKey, parent libr
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.cache.Invalidate(ctx); err != nil {
+	if err := s.cache.InvalidateBeforeWrite(ctx); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	_, err = s.nodeWriter.Update(ctx, library.NewQueryKey(pnode.Mark), node_writer.WithChildNodeRemove(xid.ID(cnode.Mark.ID())))
+	s.cache.InvalidateAfterWrite(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	s.cache.InvalidateAfterWrite(ctx)
 
 	result, err := s.nodeQuerier.Get(ctx, child)
 	if err != nil {

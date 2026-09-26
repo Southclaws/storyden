@@ -74,6 +74,46 @@ func TestNodeViewRendersMetadataWithoutMarkdownTables(t *testing.T) {
 	a.NotContains(plain, "| Field | Value |")
 }
 
+func TestNodeWithAncestorsPreservesPathInRenderedFormats(t *testing.T) {
+	ancestors := openapi.NodeReferenceList{
+		{Id: "node_root", Name: "Root", Slug: "root"},
+		{Id: "node_section", Name: "Section", Slug: "section"},
+	}
+	node := &openapi.NodeWithAncestors{
+		Ancestors:  ancestors,
+		Name:       "Page",
+		Slug:       "page",
+		Parent:     &openapi.Node{Slug: "section"},
+		Visibility: openapi.VisibilityPublished,
+	}
+
+	var markdown bytes.Buffer
+	require.NoError(t, render.NodeWithAncestorsMarkdown(&markdown, node))
+	assert.Contains(t, markdown.String(), "- **Ancestry:** root / section")
+	assert.Contains(t, markdown.String(), "- **Parent:** section")
+
+	var yamlOutput bytes.Buffer
+	require.NoError(t, render.NodeWithAncestorsYAML(&yamlOutput, node))
+	var decoded struct {
+		Ancestors []struct {
+			ID   string `yaml:"id"`
+			Name string `yaml:"name"`
+			Slug string `yaml:"slug"`
+		} `yaml:"ancestors"`
+		Parent string `yaml:"parent"`
+	}
+	require.NoError(t, yaml.Unmarshal(yamlOutput.Bytes(), &decoded))
+	require.Len(t, decoded.Ancestors, 2)
+	assert.Equal(t, "node_root", decoded.Ancestors[0].ID)
+	assert.Equal(t, "root", decoded.Ancestors[0].Slug)
+	assert.Equal(t, "node_section", decoded.Ancestors[1].ID)
+	assert.Equal(t, "section", decoded.Parent)
+
+	view, err := render.NodeWithAncestorsViewString(&bytes.Buffer{}, node)
+	require.NoError(t, err)
+	assert.Contains(t, view, "root / section")
+}
+
 func testNode(t *testing.T) *openapi.NodeWithChildren {
 	t.Helper()
 

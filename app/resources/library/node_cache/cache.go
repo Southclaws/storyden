@@ -63,12 +63,16 @@ func (c *Cache) Store(ctx context.Context, key string, etag *cachecontrol.ETag) 
 	return c.store.Set(ctx, c.validatorKey(key), etag.Value, cacheTTL)
 }
 
-func (c *Cache) Invalidate(ctx context.Context) error {
+func (c *Cache) InvalidateBeforeWrite(ctx context.Context) error {
+	return c.invalidate(ctx)
+}
+
+func (c *Cache) invalidate(ctx context.Context) error {
 	return c.store.Set(ctx, revisionKey, xid.New().String(), cacheTTL)
 }
 
 func (c *Cache) InvalidateAfterWrite(ctx context.Context) {
-	if err := c.Invalidate(ctx); err != nil {
+	if err := c.invalidate(ctx); err != nil {
 		c.logger.ErrorContext(ctx, "failed to invalidate node cache after write", slog.String("error", err.Error()))
 	}
 }

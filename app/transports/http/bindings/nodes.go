@@ -241,7 +241,7 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 	})
 
 	qk := deserialiseNodeMark(request.NodeSlug)
-	cacheKey := node_cache.CanonicalKey(qk.Queryable)
+	cacheKey := nodeCacheKey(ctx, qk.Queryable)
 
 	etag, notModified := c.node_cache.Check(ctx, reqinfo.GetCacheQuery(ctx), cacheKey)
 	if notModified {
@@ -276,6 +276,21 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 			},
 		},
 	}, nil
+}
+
+func nodeCacheKey(ctx context.Context, key mark.Queryable) string {
+	canonical := node_cache.CanonicalKey(key)
+	acc, ok := session.GetOptAccount(ctx).Get()
+	if !ok {
+		return canonical + ":anonymous"
+	}
+
+	access := "account"
+	if acc.Roles.Permissions().HasAny(rbac.PermissionAdministrator, rbac.PermissionManageLibrary) {
+		access = "manager"
+	}
+
+	return canonical + ":" + acc.ID.String() + ":" + access
 }
 
 func (c *Nodes) NodeListChildren(ctx context.Context, request openapi.NodeListChildrenRequestObject) (openapi.NodeListChildrenResponseObject, error) {

@@ -69,15 +69,15 @@ func (m *Controller) ChangeVisibility(ctx context.Context, qk library.QueryKey, 
 
 	oldVisibility := n.Visibility
 
-	if err := m.cache.Invalidate(ctx); err != nil {
+	if err := m.cache.InvalidateBeforeWrite(ctx); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	n, err = m.nodeWriter.Update(ctx, qk, node_writer.WithVisibility(vis))
+	m.cache.InvalidateAfterWrite(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-	m.cache.InvalidateAfterWrite(ctx)
 
 	// Emit visibility transition events
 	// NOTE: If this changes, remove the node_visibility service and consolidate

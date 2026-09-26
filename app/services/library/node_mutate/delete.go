@@ -52,16 +52,15 @@ func (s *Manager) Delete(ctx context.Context, qk library.QueryKey, d DeleteOptio
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.cache.Invalidate(ctx); err != nil {
+	if err := s.cache.InvalidateBeforeWrite(ctx); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	err = s.nodeWriter.Delete(ctx, qk)
+	s.cache.InvalidateAfterWrite(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	s.cache.InvalidateAfterWrite(ctx)
 
 	s.bus.Publish(ctx, &rpc.EventNodeDeleted{
 		ID:   library.NodeID(n.GetID()),

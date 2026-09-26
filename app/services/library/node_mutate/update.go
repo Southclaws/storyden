@@ -80,27 +80,23 @@ func (s *Manager) update(ctx context.Context, qk library.QueryKey, p Partial, ap
 		}
 	}
 
-	if err := s.cache.Invalidate(ctx); err != nil {
+	if err := s.cache.InvalidateBeforeWrite(ctx); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	n, err = s.nodeWriter.Update(ctx, qk, pre.opts...)
+	s.cache.InvalidateAfterWrite(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.cache.InvalidateAfterWrite(ctx)
-
 	if props, ok := p.Properties.Get(); ok {
 		updatedProperties, err := s.applyPropertyMutations(ctx, n, props)
 		if err != nil {
-			s.cache.InvalidateAfterWrite(ctx)
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
 		n.Properties = opt.New(*updatedProperties)
-
-		s.cache.InvalidateAfterWrite(ctx)
 	}
 
 	// Emit update event

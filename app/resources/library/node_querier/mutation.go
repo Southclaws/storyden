@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/mark"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/node"
@@ -106,21 +107,24 @@ func (q *Querier) Ancestors(ctx context.Context, ids []library.NodeID) (map[libr
 }
 
 // Ancestry returns the ancestors of a node ordered from the root to its parent.
-// The node itself is not included.
-func (q *Querier) Ancestry(ctx context.Context, id library.NodeID) ([]library.NodeReference, error) {
+// The node itself is not included. Visibility rules omit the first inaccessible
+// ancestor and the remainder of the path above it.
+func (q *Querier) Ancestry(ctx context.Context, id library.NodeID, opts ...Option) ([]library.NodeReference, error) {
+	o := &options{}
+	for _, opt := range opts {
+		opt(o)
+	}
+
 	rows, err := q.queryAncestry(ctx, []library.NodeID{id})
 	if err != nil {
 		return nil, err
 	}
 
 	parents := make(map[library.NodeID]library.NodeID, len(rows))
-	references := make(map[library.NodeID]library.NodeReference, len(rows))
+	byID := make(map[library.NodeID]ancestryRow, len(rows))
 	for _, row := range rows {
 		nodeID := library.NodeID(row.ID)
-		references[nodeID] = library.NodeReference{
-			Mark: library.NewMark(row.ID, row.Slug),
-			Name: row.Name,
-		}
+		byID[nodeID] = row
 
 		if row.ParentID != nil {
 			parents[nodeID] = library.NodeID(*row.ParentID)
@@ -135,12 +139,18 @@ func (q *Querier) Ancestry(ctx context.Context, id library.NodeID) ([]library.No
 		}
 		seen[ancestorID] = true
 
-		ancestor, ok := references[ancestorID]
+		row, ok := byID[ancestorID]
 		if !ok {
 			return nil, fmt.Errorf("missing node ancestry record for %s", ancestorID)
 		}
+		if !canViewAncestryRow(o, row) {
+			break
+		}
 
-		ancestry = append(ancestry, ancestor)
+		ancestry = append(ancestry, library.NodeReference{
+			Mark: library.NewMark(row.ID, row.Slug),
+			Name: row.Name,
+		})
 	}
 
 	slices.Reverse(ancestry)
@@ -149,10 +159,30 @@ func (q *Querier) Ancestry(ctx context.Context, id library.NodeID) ([]library.No
 }
 
 type ancestryRow struct {
-	ID       xid.ID  `db:"id"`
-	ParentID *xid.ID `db:"parent_node_id"`
-	Name     string  `db:"name"`
-	Slug     string  `db:"slug"`
+	ID         xid.ID          `db:"id"`
+	ParentID   *xid.ID         `db:"parent_node_id"`
+	AccountID  xid.ID          `db:"account_id"`
+	Name       string          `db:"name"`
+	Slug       string          `db:"slug"`
+	Visibility node.Visibility `db:"visibility"`
+}
+
+func canViewAncestryRow(o *options, row ancestryRow) bool {
+	if !o.visibilityRules {
+		return true
+	}
+
+	acc, ok := o.requestingAccount.Get()
+	if !ok {
+		return row.Visibility == node.VisibilityPublished
+	}
+	if row.AccountID == xid.ID(acc.ID) || row.Visibility == node.VisibilityPublished {
+		return true
+	}
+
+	canViewInReview := acc.Roles.Permissions().HasAny(rbac.PermissionAdministrator, rbac.PermissionManageLibrary)
+
+	return canViewInReview && row.Visibility == node.VisibilityReview
 }
 
 func (q *Querier) queryAncestry(ctx context.Context, ids []library.NodeID) ([]ancestryRow, error) {
@@ -166,10 +196,10 @@ func (q *Querier) queryAncestry(ctx context.Context, ids []library.NodeID) ([]an
 	}
 
 	query, args, err := sqlx.In(`WITH RECURSIVE ancestry AS (
-  SELECT id, parent_node_id, name, slug FROM nodes WHERE id IN (?)
+  SELECT id, parent_node_id, account_id, name, slug, visibility FROM nodes WHERE id IN (?)
   UNION
-  SELECT n.id, n.parent_node_id, n.name, n.slug FROM nodes n JOIN ancestry a ON n.id = a.parent_node_id
-) SELECT id, parent_node_id, name, slug FROM ancestry`, values)
+  SELECT n.id, n.parent_node_id, n.account_id, n.name, n.slug, n.visibility FROM nodes n JOIN ancestry a ON n.id = a.parent_node_id
+) SELECT id, parent_node_id, account_id, name, slug, visibility FROM ancestry`, values)
 	if err != nil {
 		return nil, err
 	}

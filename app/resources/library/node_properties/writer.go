@@ -57,15 +57,15 @@ func (w SchemaWriter) CreateForNode(ctx context.Context, nodeID library.NodeID, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := w.cache.Invalidate(ctx); err != nil {
+	if err := w.cache.InvalidateBeforeWrite(ctx); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	schemaID, err := w.doSchemaUpdates(ctx, node.Edges.PropertySchema, schemas, node)
+	w.cache.InvalidateAfterWrite(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-	w.cache.InvalidateAfterWrite(ctx)
 
 	w.bus.Publish(ctx, rpc.EventNodeUpdated{
 		ID:   library.NodeID(node.ID),
@@ -104,15 +104,15 @@ func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, 
 			Slug: node.Slug,
 		})
 	}
-	if err := w.cache.Invalidate(ctx); err != nil {
+	if err := w.cache.InvalidateBeforeWrite(ctx); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	schema, err := w.updateNodes(ctx, schemas, children...)
+	w.cache.InvalidateAfterWrite(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-	w.cache.InvalidateAfterWrite(ctx)
 
 	w.bus.PublishMany(ctx, events)
 
@@ -153,15 +153,15 @@ func (w *SchemaWriter) UpdateSiblings(ctx context.Context, qk library.QueryKey, 
 			Slug: node.Slug,
 		})
 	}
-	if err := w.cache.Invalidate(ctx); err != nil {
+	if err := w.cache.InvalidateBeforeWrite(ctx); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	schema, err := w.updateNodes(ctx, schemas, siblings...)
+	w.cache.InvalidateAfterWrite(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-	w.cache.InvalidateAfterWrite(ctx)
 
 	w.bus.PublishMany(ctx, events)
 
@@ -282,7 +282,7 @@ func (w *SchemaWriter) Get(ctx context.Context, schemaID xid.ID) (*library.Prope
 }
 
 func (w *SchemaWriter) AddFields(ctx context.Context, schemaID xid.ID, schemas FieldSchemaMutations) (*library.PropertySchema, error) {
-	if err := w.cache.Invalidate(ctx); err != nil {
+	if err := w.cache.InvalidateBeforeWrite(ctx); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -292,16 +292,16 @@ func (w *SchemaWriter) AddFields(ctx context.Context, schemaID xid.ID, schemas F
 	}
 
 	err := w.db.PropertySchemaField.CreateBulk(fields...).Exec(ctx)
+	w.cache.InvalidateAfterWrite(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-	w.cache.InvalidateAfterWrite(ctx)
 
 	return w.Get(ctx, schemaID)
 }
 
 func (w *SchemaWriter) RemoveFields(ctx context.Context, schemaID xid.ID, schemas FieldSchemaMutations) (*library.PropertySchema, error) {
-	if err := w.cache.Invalidate(ctx); err != nil {
+	if err := w.cache.InvalidateBeforeWrite(ctx); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -324,10 +324,11 @@ func (w *SchemaWriter) RemoveFields(ctx context.Context, schemaID xid.ID, schema
 		}
 	}
 
-	if err := tx.Commit(); err != nil {
+	err = tx.Commit()
+	w.cache.InvalidateAfterWrite(ctx)
+	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-	w.cache.InvalidateAfterWrite(ctx)
 
 	return w.Get(ctx, schemaID)
 }

@@ -84,15 +84,15 @@ func (s *Manager) UpdateMany(ctx context.Context, items []BatchUpdate) ([]BatchR
 		events = append(events, batchVisibilityEvents(id, slug, state.Visibility, field.Visibility.Or(state.Visibility))...)
 	}
 
-	if err := s.cache.Invalidate(ctx); err != nil {
+	if err := s.cache.InvalidateBeforeWrite(ctx); err != nil {
 		return nil, err
 	}
 
-	if err := s.nodeWriter.UpdateMany(ctx, writes); err != nil {
+	err = s.nodeWriter.UpdateMany(ctx, writes)
+	s.cache.InvalidateAfterWrite(ctx)
+	if err != nil {
 		return nil, fmt.Errorf("update page batch: %w", err)
 	}
-
-	s.cache.InvalidateAfterWrite(ctx)
 
 	s.bus.PublishMany(ctx, events...)
 

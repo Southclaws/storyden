@@ -19,7 +19,7 @@ type Writer struct {
 }
 
 func (w *Writer) Update(ctx context.Context, nid library.NodeID, schema library.PropertySchema, props library.ExistingPropertyMutations) (*library.PropertyTable, error) {
-	if err := w.cache.Invalidate(ctx); err != nil {
+	if err := w.cache.InvalidateBeforeWrite(ctx); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -56,10 +56,10 @@ func (w *Writer) Update(ctx context.Context, nid library.NodeID, schema library.
 	}
 
 	err = tx.Commit()
+	w.cache.InvalidateAfterWrite(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-	w.cache.InvalidateAfterWrite(ctx)
 
 	return &updated, nil
 }

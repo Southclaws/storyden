@@ -114,16 +114,15 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 
 	// Now handle re-ordering of the node using the before/after/index params.
 	if beforeID, ok := opts.Before.Get(); ok {
-		if err := p.cache.Invalidate(ctx); err != nil {
+		if err := p.cache.InvalidateBeforeWrite(ctx); err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
 		n, err := p.nodeChildren.MoveBefore(ctx, thisnode, beforeID)
+		p.cache.InvalidateAfterWrite(ctx)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
-
-		p.cache.InvalidateAfterWrite(ctx)
 
 		p.bus.Publish(ctx, &rpc.EventNodeUpdated{
 			ID:   library.NodeID(n.Mark.ID()),
@@ -134,16 +133,15 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 	}
 
 	if afterID, ok := opts.After.Get(); ok {
-		if err := p.cache.Invalidate(ctx); err != nil {
+		if err := p.cache.InvalidateBeforeWrite(ctx); err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
 		n, err := p.nodeChildren.MoveAfter(ctx, thisnode, afterID)
+		p.cache.InvalidateAfterWrite(ctx)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
-
-		p.cache.InvalidateAfterWrite(ctx)
 
 		p.bus.Publish(ctx, &rpc.EventNodeUpdated{
 			ID:   library.NodeID(n.Mark.ID()),
@@ -154,16 +152,15 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 	}
 
 	if index, ok := opts.Index.Get(); ok {
-		if err := p.cache.Invalidate(ctx); err != nil {
+		if err := p.cache.InvalidateBeforeWrite(ctx); err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
 		n, err := p.nodeChildren.MoveIndex(ctx, thisnode, index)
+		p.cache.InvalidateAfterWrite(ctx)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
-
-		p.cache.InvalidateAfterWrite(ctx)
 
 		p.bus.Publish(ctx, &rpc.EventNodeUpdated{
 			ID:   library.NodeID(n.Mark.ID()),
