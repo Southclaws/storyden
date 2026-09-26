@@ -1,12 +1,9 @@
-import { last } from "lodash";
-import { uniq } from "lodash/fp";
 import { FormEventHandler, ForwardedRef, Fragment, forwardRef } from "react";
 
-import { Visibility } from "@/api/openapi-schema";
+import { NodeReference, Visibility } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { Input } from "@/components/ui/input";
 import { LinkButton } from "@/components/ui/link-button";
-import { LibraryPath, joinLibraryPath } from "@/screens/library/library-path";
 import { Box, HStack } from "@/styled-system/jsx";
 
 import { BreadcrumbIcon } from "../ui/icons/Breadcrumb";
@@ -14,7 +11,8 @@ import { BreadcrumbIcon } from "../ui/icons/Breadcrumb";
 import { CreatePageAction } from "./CreatePage";
 
 type Props = {
-  libraryPath: LibraryPath;
+  ancestors: NodeReference[];
+  current: NodeReference;
   visibility?: Visibility;
   create: "hide" | "show" | "edit";
   value?: string;
@@ -25,7 +23,8 @@ type Props = {
 
 export const Breadcrumbs_ = (
   {
-    libraryPath,
+    ancestors,
+    current,
     visibility,
     create,
     value,
@@ -39,12 +38,8 @@ export const Breadcrumbs_ = (
   const session = useSession();
   const isEditing = session && create == "edit" && onChange !== undefined;
 
-  // Sometimes, due to bugs, the path can contain duplicate slug entries.
-  const uniquePaths = uniq(libraryPath);
-
   // When editing, the slug edit input takes the place of the last breadcrumb.
-  const paths = isEditing ? uniquePaths.slice(0, -1) : uniquePaths;
-  const current = last(paths);
+  const nodes = isEditing ? ancestors : [...ancestors, current];
 
   return (
     <HStack
@@ -57,11 +52,15 @@ export const Breadcrumbs_ = (
       <LinkButton variant="subtle" flexShrink="0" minW="min" href="/l">
         Library
       </LinkButton>
-      {paths.map((p) => {
-        const isCurrent = p === current && create === "show";
+      {nodes.map((node, index) => {
+        const isCurrent = node.id === current.id && create === "show";
+        const path = nodes
+          .slice(0, index + 1)
+          .map((part) => part.slug)
+          .join("/");
 
         return (
-          <Fragment key={p}>
+          <Fragment key={node.id}>
             <Box flexShrink="0">
               <BreadcrumbIcon />
             </Box>
@@ -91,10 +90,9 @@ export const Breadcrumbs_ = (
               borderWidth={
                 isCurrent && visibility !== "published" ? "thin" : "none"
               }
-              key={p}
-              href={`/l/${joinLibraryPath(paths, p)}`}
+              href={`/l/${path}`}
             >
-              {p}{" "}
+              {node.name}{" "}
               {isCurrent && visibility && visibility !== "published" && (
                 <span>({visibility})</span>
               )}
@@ -107,7 +105,7 @@ export const Breadcrumbs_ = (
           <Box flexShrink="0">
             <BreadcrumbIcon />
           </Box>
-          <CreatePageAction parentSlug={current} />
+          <CreatePageAction parentSlug={current.slug} />
         </>
       )}
       {isEditing && (

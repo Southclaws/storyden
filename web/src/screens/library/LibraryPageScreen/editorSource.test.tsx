@@ -261,7 +261,7 @@ function Harness({
   onStore?: (store: NodeStoreAPI) => void;
 }) {
   return (
-    <LibraryPageProvider node={node}>
+    <LibraryPageProvider node={{ ...node, ancestors: [] }}>
       <LibraryPageEditProvider>
         <EditControls />
         {onStore && <StoreProbe onStore={onStore} />}

@@ -7,9 +7,15 @@
  *
  * OpenAPI spec version: v1.26.15-post
  */
-import type { NodeWithAncestors } from "./nodeWithAncestors";
+import type { Identifier } from "./identifier";
+import type { NodeName } from "./nodeName";
+import type { Slug } from "./slug";
 
 /**
- * Node information and content.
+ * A minimal reference to a library node.
  */
-export type NodeGetOKResponse = NodeWithAncestors;
+export interface NodeReference {
+  id: Identifier;
+  name: NodeName;
+  slug: Slug;
+}

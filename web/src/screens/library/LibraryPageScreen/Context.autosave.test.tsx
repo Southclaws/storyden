@@ -291,7 +291,7 @@ function ProviderHarness({
   children,
 }: PropsWithChildren<{ node: NodeWithChildren }>) {
   return (
-    <LibraryPageProvider node={node}>
+    <LibraryPageProvider node={{ ...node, ancestors: [] }}>
       <LibraryPageAutosaveController />
       {children}
     </LibraryPageProvider>

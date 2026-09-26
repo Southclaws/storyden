@@ -82,6 +82,16 @@ func TestNodesTreeQuerying(t *testing.T) {
 			}, sh.WithSession(ctx))
 			tests.Ok(t, err, node4)
 
+			t.Run("query_node_ancestry", func(t *testing.T) {
+				response, err := cl.NodeGetWithResponse(ctx, slug4, nil, sh.WithSession(ctx))
+				tests.Ok(t, err, response)
+
+				require.Equal(t, []openapi.NodeReference{
+					{Id: node1.JSON200.Id, Name: name1, Slug: slug1},
+					{Id: node3.JSON200.Id, Name: name3, Slug: slug3},
+				}, response.JSON200.Ancestors)
+			})
+
 			t.Run("query_all_top_level", func(t *testing.T) {
 				a := assert.New(t)
 				r := require.New(t)

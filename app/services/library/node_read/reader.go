@@ -45,6 +45,13 @@ func (q *HydratedQuerier) GetBySlug(ctx context.Context, qk library.QueryKey, so
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	ancestors, err := q.nodereader.Ancestry(ctx, library.NodeID(n.Mark.ID()))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	n.Ancestors = ancestors
+
 	return n, nil
 }
 

@@ -7,9 +7,9 @@
  *
  * OpenAPI spec version: v1.26.15-post
  */
-import type { NodeWithAncestors } from "./nodeWithAncestors";
+import type { NodeReference } from "./nodeReference";
 
 /**
- * Node information and content.
+ * Library node references ordered from the root to the parent.
  */
-export type NodeGetOKResponse = NodeWithAncestors;
+export type NodeReferenceList = NodeReference[];

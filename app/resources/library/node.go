@@ -52,6 +52,7 @@ type Node struct {
 	IndexedAt opt.Optional[time.Time]
 
 	Name            string
+	Ancestors       []NodeReference
 	CurrentVersion  opt.Optional[xid.ID]
 	Assets          []*asset.Asset
 	WebLink         opt.Optional[link_ref.LinkRef]
@@ -71,6 +72,11 @@ type Node struct {
 	Metadata        map[string]any
 
 	Nodes []*Node
+}
+
+type NodeReference struct {
+	Mark Mark
+	Name string
 }
 
 func (*Node) GetResourceName() string { return "node" }

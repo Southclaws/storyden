@@ -266,7 +266,7 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 
 	return openapi.NodeGet200JSONResponse{
 		NodeGetOKJSONResponse: openapi.NodeGetOKJSONResponse{
-			Body: serialiseNodeWithItems(node),
+			Body: serialiseNodeWithAncestors(node),
 			Headers: openapi.NodeGetOKResponseHeaders{
 				CacheControl: ptr(getAuthStateCacheControl(ctx, "no-cache")),
 				ETag:         ptr(etag.String()),
@@ -648,6 +648,44 @@ func (c *Nodes) NodeUpdatePosition(ctx context.Context, request openapi.NodeUpda
 
 func serialiseUpdatedNode(in *library.Node) openapi.NodeWithChildren {
 	return serialiseNodeWithItems(in)
+}
+
+func serialiseNodeWithAncestors(in *library.Node) openapi.NodeWithAncestors {
+	node := serialiseNodeWithItems(in)
+
+	return openapi.NodeWithAncestors{
+		Ancestors: dt.Map(in.Ancestors, func(ancestor library.NodeReference) openapi.NodeReference {
+			return openapi.NodeReference{
+				Id:   ancestor.Mark.ID().String(),
+				Name: ancestor.Name,
+				Slug: ancestor.Mark.Slug(),
+			}
+		}),
+		Assets:              node.Assets,
+		ChildPropertySchema: node.ChildPropertySchema,
+		Children:            node.Children,
+		Content:             node.Content,
+		CreatedAt:           node.CreatedAt,
+		CurrentVersionId:    node.CurrentVersionId,
+		DeletedAt:           node.DeletedAt,
+		Description:         node.Description,
+		HideChildTree:       node.HideChildTree,
+		Id:                  node.Id,
+		Link:                node.Link,
+		Meta:                node.Meta,
+		Misc:                node.Misc,
+		Name:                node.Name,
+		Owner:               node.Owner,
+		Parent:              node.Parent,
+		PrimaryImage:        node.PrimaryImage,
+		Properties:          node.Properties,
+		Recomentations:      node.Recomentations,
+		RelevanceScore:      node.RelevanceScore,
+		Slug:                node.Slug,
+		Tags:                node.Tags,
+		UpdatedAt:           node.UpdatedAt,
+		Visibility:          node.Visibility,
+	}
 }
 
 func serialiseNode(in *library.Node) openapi.Node {

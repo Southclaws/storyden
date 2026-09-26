@@ -3,6 +3,7 @@ package node_querier
 import (
 	"context"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/Southclaws/opt"
@@ -86,10 +87,77 @@ func (q *Querier) MutationStates(ctx context.Context, keys []library.QueryKey, s
 	return states, nil
 }
 
+// Ancestors returns the parent relation for the requested nodes and every
+// ancestor reachable from them.
 func (q *Querier) Ancestors(ctx context.Context, ids []library.NodeID) (map[library.NodeID]library.NodeID, error) {
 	parents := make(map[library.NodeID]library.NodeID)
+	rows, err := q.queryAncestry(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, row := range rows {
+		if row.ParentID != nil {
+			parents[library.NodeID(row.ID)] = library.NodeID(*row.ParentID)
+		}
+	}
+
+	return parents, nil
+}
+
+// Ancestry returns the ancestors of a node ordered from the root to its parent.
+// The node itself is not included.
+func (q *Querier) Ancestry(ctx context.Context, id library.NodeID) ([]library.NodeReference, error) {
+	rows, err := q.queryAncestry(ctx, []library.NodeID{id})
+	if err != nil {
+		return nil, err
+	}
+
+	parents := make(map[library.NodeID]library.NodeID, len(rows))
+	references := make(map[library.NodeID]library.NodeReference, len(rows))
+	for _, row := range rows {
+		nodeID := library.NodeID(row.ID)
+		references[nodeID] = library.NodeReference{
+			Mark: library.NewMark(row.ID, row.Slug),
+			Name: row.Name,
+		}
+
+		if row.ParentID != nil {
+			parents[nodeID] = library.NodeID(*row.ParentID)
+		}
+	}
+
+	ancestry := make([]library.NodeReference, 0, len(rows))
+	seen := map[library.NodeID]bool{id: true}
+	for ancestorID, ok := parents[id]; ok; ancestorID, ok = parents[ancestorID] {
+		if seen[ancestorID] {
+			return nil, fmt.Errorf("cycle in node ancestry at %s", ancestorID)
+		}
+		seen[ancestorID] = true
+
+		ancestor, ok := references[ancestorID]
+		if !ok {
+			return nil, fmt.Errorf("missing node ancestry record for %s", ancestorID)
+		}
+
+		ancestry = append(ancestry, ancestor)
+	}
+
+	slices.Reverse(ancestry)
+
+	return ancestry, nil
+}
+
+type ancestryRow struct {
+	ID       xid.ID  `db:"id"`
+	ParentID *xid.ID `db:"parent_node_id"`
+	Name     string  `db:"name"`
+	Slug     string  `db:"slug"`
+}
+
+func (q *Querier) queryAncestry(ctx context.Context, ids []library.NodeID) ([]ancestryRow, error) {
 	if len(ids) == 0 {
-		return parents, nil
+		return []ancestryRow{}, nil
 	}
 
 	values := make([]string, len(ids))
@@ -98,31 +166,18 @@ func (q *Querier) Ancestors(ctx context.Context, ids []library.NodeID) (map[libr
 	}
 
 	query, args, err := sqlx.In(`WITH RECURSIVE ancestry AS (
-  SELECT id, parent_node_id FROM nodes WHERE id IN (?)
+  SELECT id, parent_node_id, name, slug FROM nodes WHERE id IN (?)
   UNION
-  SELECT n.id, n.parent_node_id FROM nodes n JOIN ancestry a ON n.id = a.parent_node_id
-	) SELECT id, parent_node_id FROM ancestry`, values)
+  SELECT n.id, n.parent_node_id, n.name, n.slug FROM nodes n JOIN ancestry a ON n.id = a.parent_node_id
+) SELECT id, parent_node_id, name, slug FROM ancestry`, values)
 	if err != nil {
 		return nil, err
 	}
 
-	rows, err := q.db.QueryContext(ctx, q.raw.Rebind(query), args...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var id xid.ID
-		var parent *xid.ID
-		if err := rows.Scan(&id, &parent); err != nil {
-			return nil, fmt.Errorf("read node ancestry: %w", err)
-		}
-
-		if parent != nil {
-			parents[library.NodeID(id)] = library.NodeID(*parent)
-		}
+	rows := []ancestryRow{}
+	if err := q.raw.SelectContext(ctx, &rows, q.raw.Rebind(query), args...); err != nil {
+		return nil, fmt.Errorf("read node ancestry: %w", err)
 	}
 
-	return parents, rows.Err()
+	return rows, nil
 }

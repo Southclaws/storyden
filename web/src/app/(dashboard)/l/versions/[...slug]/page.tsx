@@ -39,7 +39,6 @@ export default async function Page(props: Props) {
     <LibraryPageVersionHistoryScreen
       node={node}
       versions={versions.versions}
-      libraryPath={slug}
     />
   );
 }

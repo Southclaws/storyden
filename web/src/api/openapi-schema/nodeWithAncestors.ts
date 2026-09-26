@@ -7,9 +7,19 @@
  *
  * OpenAPI spec version: v1.26.15-post
  */
-import type { NodeWithAncestors } from "./nodeWithAncestors";
+import type { NodeReferenceList } from "./nodeReferenceList";
+import type { NodeWithChildren } from "./nodeWithChildren";
 
 /**
- * Node information and content.
+ * The full properties of a node including its child nodes and ancestry.
  */
-export type NodeGetOKResponse = NodeWithAncestors;
+export type NodeWithAncestors = NodeWithChildren & {
+  ancestors: NodeReferenceList;
+} & Required<
+    Pick<
+      NodeWithChildren & {
+        ancestors: NodeReferenceList;
+      },
+      "children"
+    >
+  >;
