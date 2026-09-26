@@ -88,6 +88,61 @@ func TestNodeCacheWithUpdate(t *testing.T) {
 	}))
 }
 
+func TestNodeCacheSeparatesChildSelections(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		aw *account_writer.Writer,
+	) {
+		lc.Append(fx.StartHook(func() {
+			ctx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+			session := sh.WithSession(ctx)
+			visibility := openapi.VisibilityPublished
+			slug := "cache-child-selection-" + uuid.NewString()
+
+			tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				Name:       slug,
+				Slug:       &slug,
+				Visibility: &visibility,
+			}, session))(t, http.StatusOK)
+
+			nameSort := openapi.NodeChildrenSortParam("name")
+			pageOne := openapi.PaginationQuery("1")
+			first := tests.AssertRequest(cl.NodeGetWithResponse(ctx, slug, &openapi.NodeGetParams{
+				ChildrenSort: &nameSort,
+				Page:         &pageOne,
+			}))(t, http.StatusOK)
+			firstETag := first.HTTPResponse.Header.Get("ETag")
+			require.NotEmpty(t, firstETag)
+
+			pageTwo := openapi.PaginationQuery("2")
+			second := tests.AssertRequest(cl.NodeGetWithResponse(ctx, slug, &openapi.NodeGetParams{
+				ChildrenSort: &nameSort,
+				Page:         &pageTwo,
+			}, func(ctx context.Context, request *http.Request) error {
+				request.Header.Set("If-None-Match", firstETag)
+				return nil
+			}))(t, http.StatusOK)
+			secondETag := second.HTTPResponse.Header.Get("ETag")
+			require.NotEmpty(t, secondETag)
+			require.NotEqual(t, firstETag, secondETag)
+
+			descriptionSort := openapi.NodeChildrenSortParam("description")
+			tests.AssertRequest(cl.NodeGetWithResponse(ctx, slug, &openapi.NodeGetParams{
+				ChildrenSort: &descriptionSort,
+				Page:         &pageTwo,
+			}, func(ctx context.Context, request *http.Request) error {
+				request.Header.Set("If-None-Match", secondETag)
+				return nil
+			}))(t, http.StatusOK)
+		}))
+	}))
+}
+
 func TestNodeCacheCanonicalisesIDQueryForms(t *testing.T) {
 	t.Parallel()
 

@@ -241,7 +241,7 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 	})
 
 	qk := deserialiseNodeMark(request.NodeSlug)
-	cacheKey := nodeCacheKey(ctx, qk.Queryable)
+	cacheKey := nodeCacheKey(ctx, qk.Queryable, sortChildrenBy)
 
 	etag, notModified := c.node_cache.Check(ctx, reqinfo.GetCacheQuery(ctx), cacheKey)
 	if notModified {
@@ -278,11 +278,21 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 	}, nil
 }
 
-func nodeCacheKey(ctx context.Context, key mark.Queryable) string {
+func nodeCacheKey(ctx context.Context, key mark.Queryable, sortChildrenBy opt.Optional[node_querier.ChildSortRule]) string {
 	canonical := node_cache.CanonicalKey(key)
+	selection := "children=default"
+	if sort, ok := sortChildrenBy.Get(); ok {
+		params := url.Values{}
+		params.Set("children_direction", sort.Dir)
+		params.Set("children_field", sort.Field)
+		params.Set("children_page", strconv.Itoa(sort.Page.PageOneIndexed()))
+		params.Set("children_page_size", strconv.Itoa(sort.Page.Size()))
+		selection = params.Encode()
+	}
+
 	acc, ok := session.GetOptAccount(ctx).Get()
 	if !ok {
-		return canonical + ":anonymous"
+		return canonical + ":anonymous:" + selection
 	}
 
 	access := "account"
@@ -290,7 +300,7 @@ func nodeCacheKey(ctx context.Context, key mark.Queryable) string {
 		access = "manager"
 	}
 
-	return canonical + ":" + acc.ID.String() + ":" + access
+	return canonical + ":" + acc.ID.String() + ":" + access + ":" + selection
 }
 
 func (c *Nodes) NodeListChildren(ctx context.Context, request openapi.NodeListChildrenRequestObject) (openapi.NodeListChildrenResponseObject, error) {
