@@ -37,7 +37,8 @@ func New(
 			cache: cache,
 			bus:   bus,
 		}, &Writer{
-			db: db,
+			db:    db,
+			cache: cache,
 		}
 }
 
@@ -56,15 +57,13 @@ func (w SchemaWriter) CreateForNode(ctx context.Context, nodeID library.NodeID, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := invalidateNodes(ctx, w.cache, node); err != nil {
+	if err := w.cache.InvalidateBeforeWrite(ctx); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	schemaID, err := w.doSchemaUpdates(ctx, node.Edges.PropertySchema, schemas, node)
+	w.cache.InvalidateAfterWrite(ctx)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-	if err := invalidateNodes(ctx, w.cache, node); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -105,16 +104,13 @@ func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, 
 			Slug: node.Slug,
 		})
 	}
-	affected := append([]*ent.Node{parent}, children...)
-	if err := invalidateNodes(ctx, w.cache, affected...); err != nil {
+	if err := w.cache.InvalidateBeforeWrite(ctx); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	schema, err := w.updateNodes(ctx, schemas, children...)
+	w.cache.InvalidateAfterWrite(ctx)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-	if err := invalidateNodes(ctx, w.cache, affected...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -157,41 +153,19 @@ func (w *SchemaWriter) UpdateSiblings(ctx context.Context, qk library.QueryKey, 
 			Slug: node.Slug,
 		})
 	}
-	affected := append([]*ent.Node{current}, siblings...)
-	if err := invalidateNodes(ctx, w.cache, affected...); err != nil {
+	if err := w.cache.InvalidateBeforeWrite(ctx); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	schema, err := w.updateNodes(ctx, schemas, siblings...)
+	w.cache.InvalidateAfterWrite(ctx)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-	if err := invalidateNodes(ctx, w.cache, affected...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	w.bus.PublishMany(ctx, events)
 
 	return schema, nil
-}
-
-func invalidateNodes(ctx context.Context, cache *node_cache.Cache, nodes ...*ent.Node) error {
-	seen := make(map[xid.ID]struct{}, len(nodes))
-	for _, node := range nodes {
-		if node == nil {
-			continue
-		}
-		if _, ok := seen[node.ID]; ok {
-			continue
-		}
-		seen[node.ID] = struct{}{}
-
-		if err := cache.Invalidate(ctx, node.ID, node.Slug); err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 func (w *SchemaWriter) updateNodes(ctx context.Context, schemas FieldSchemaMutations, nodes ...*ent.Node) (*library.PropertySchema, error) {
@@ -308,12 +282,17 @@ func (w *SchemaWriter) Get(ctx context.Context, schemaID xid.ID) (*library.Prope
 }
 
 func (w *SchemaWriter) AddFields(ctx context.Context, schemaID xid.ID, schemas FieldSchemaMutations) (*library.PropertySchema, error) {
+	if err := w.cache.InvalidateBeforeWrite(ctx); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	fields := []*ent.PropertySchemaFieldCreate{}
 	for _, s := range schemas {
 		fields = append(fields, w.db.PropertySchemaField.Create().SetName(s.Name).SetSort(s.Sort).SetType(s.Type.String()).SetSchemaID(schemaID))
 	}
 
 	err := w.db.PropertySchemaField.CreateBulk(fields...).Exec(ctx)
+	w.cache.InvalidateAfterWrite(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -322,6 +301,10 @@ func (w *SchemaWriter) AddFields(ctx context.Context, schemaID xid.ID, schemas F
 }
 
 func (w *SchemaWriter) RemoveFields(ctx context.Context, schemaID xid.ID, schemas FieldSchemaMutations) (*library.PropertySchema, error) {
+	if err := w.cache.InvalidateBeforeWrite(ctx); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	tx, err := w.db.Tx(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -341,7 +324,9 @@ func (w *SchemaWriter) RemoveFields(ctx context.Context, schemaID xid.ID, schema
 		}
 	}
 
-	if err := tx.Commit(); err != nil {
+	err = tx.Commit()
+	w.cache.InvalidateAfterWrite(ctx)
+	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

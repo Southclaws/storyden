@@ -58,7 +58,13 @@ func (s *Manager) CreateMany(ctx context.Context, items []BatchCreate) ([]BatchR
 		}
 	}
 
-	if err := s.nodeWriter.CreateMany(ctx, owner, writes); err != nil {
+	if err := s.cache.InvalidateBeforeWrite(ctx); err != nil {
+		return nil, err
+	}
+
+	err = s.nodeWriter.CreateMany(ctx, owner, writes)
+	s.cache.InvalidateAfterWrite(ctx)
+	if err != nil {
 		return nil, fmt.Errorf("create page batch: %w", err)
 	}
 

@@ -16,6 +16,8 @@ import { nodeGet } from "@/api/openapi-client/nodes";
 import {
   Identifier,
   NodeListResult,
+  NodeReferenceList,
+  NodeWithAncestors,
   NodeWithChildren,
 } from "@/api/openapi-schema";
 import { useLibraryEvent } from "@/lib/library/events";
@@ -27,6 +29,7 @@ import { NodeStoreAPI, createNodeStore } from "./store";
 
 type LibraryPageContext = {
   nodeID: Identifier;
+  ancestors: NodeReferenceList;
   initialNode: WithMetadata<NodeWithChildren>;
   initialChildren?: NodeListResult;
   store: NodeStoreAPI;
@@ -51,7 +54,7 @@ export function useLibraryPageContext() {
 }
 
 export type Props = {
-  node: NodeWithChildren;
+  node: NodeWithAncestors;
   childNodes?: NodeListResult;
 };
 
@@ -149,6 +152,7 @@ export function LibraryPageProvider({
     <Context.Provider
       value={{
         nodeID: node.id,
+        ancestors: node.ancestors,
         initialNode: nodeWithMeta,
         initialChildren: childNodes,
         store: storeRef.current,

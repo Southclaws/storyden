@@ -82,6 +82,37 @@ func TestNodesTreeQuerying(t *testing.T) {
 			}, sh.WithSession(ctx))
 			tests.Ok(t, err, node4)
 
+			t.Run("query_node_ancestry", func(t *testing.T) {
+				response, err := cl.NodeGetWithResponse(ctx, slug4, nil, sh.WithSession(ctx))
+				tests.Ok(t, err, response)
+
+				require.Equal(t, []openapi.NodeReference{
+					{Id: node1.JSON200.Id, Name: name1, Slug: slug1},
+					{Id: node3.JSON200.Id, Name: name3, Slug: slug3},
+				}, response.JSON200.Ancestors)
+
+				etag := response.HTTPResponse.Header.Get("ETag")
+				require.NotEmpty(t, etag)
+
+				newName := "renamed-node-3"
+				newSlug := newName + uuid.NewString()
+				updated, err := cl.NodeUpdateWithResponse(ctx, slug3, openapi.NodeMutableProps{
+					Name: &newName,
+					Slug: &newSlug,
+				}, sh.WithSession(ctx))
+				tests.Ok(t, err, updated)
+
+				response, err = cl.NodeGetWithResponse(ctx, slug4, nil, sh.WithSession(ctx), func(ctx context.Context, request *http.Request) error {
+					request.Header.Set("If-None-Match", etag)
+					return nil
+				})
+				tests.Ok(t, err, response)
+				require.Equal(t, []openapi.NodeReference{
+					{Id: node1.JSON200.Id, Name: name1, Slug: slug1},
+					{Id: node3.JSON200.Id, Name: newName, Slug: newSlug},
+				}, response.JSON200.Ancestors)
+			})
+
 			t.Run("query_all_top_level", func(t *testing.T) {
 				a := assert.New(t)
 				r := require.New(t)
@@ -253,6 +284,58 @@ func TestNodesTreeQuerying(t *testing.T) {
 
 				r.Len(n4.Children, 0, "node4 has no children")
 			})
+		}))
+	}))
+}
+
+func TestNodeAncestryRespectsViewerVisibility(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		aw *account_writer.Writer,
+	) {
+		lc.Append(fx.StartHook(func() {
+			ctxAdmin, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+			ctxParentOwner, _ := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
+			ctxChildOwner, _ := e2e.WithAccount(root, aw, seed.Account_004_Loki)
+			review := openapi.VisibilityReview
+
+			parentSlug := "ancestry-private-parent-" + uuid.NewString()
+			parent := tests.AssertRequest(cl.NodeCreateWithResponse(ctxParentOwner, openapi.NodeInitialProps{
+				Name:       "Private parent",
+				Slug:       &parentSlug,
+				Visibility: &review,
+			}, sh.WithSession(ctxParentOwner)))(t, http.StatusOK).JSON200
+
+			childSlug := "ancestry-private-child-" + uuid.NewString()
+			child := tests.AssertRequest(cl.NodeCreateWithResponse(ctxChildOwner, openapi.NodeInitialProps{
+				Name:       "Visible child",
+				Slug:       &childSlug,
+				Visibility: &review,
+			}, sh.WithSession(ctxChildOwner)))(t, http.StatusOK).JSON200
+
+			tests.AssertRequest(cl.NodeAddNodeWithResponse(ctxAdmin, parent.Slug, child.Slug, sh.WithSession(ctxAdmin)))(t, http.StatusOK)
+
+			adminView := tests.AssertRequest(cl.NodeGetWithResponse(ctxAdmin, child.Slug, nil, sh.WithSession(ctxAdmin)))(t, http.StatusOK)
+			require.Equal(t, []openapi.NodeReference{{
+				Id:   parent.Id,
+				Name: parent.Name,
+				Slug: parent.Slug,
+			}}, adminView.JSON200.Ancestors)
+
+			adminETag := adminView.HTTPResponse.Header.Get("ETag")
+			require.NotEmpty(t, adminETag)
+
+			ownerView := tests.AssertRequest(cl.NodeGetWithResponse(ctxChildOwner, child.Slug, nil, sh.WithSession(ctxChildOwner), func(ctx context.Context, request *http.Request) error {
+				request.Header.Set("If-None-Match", adminETag)
+				return nil
+			}))(t, http.StatusOK)
+			assert.Empty(t, ownerView.JSON200.Ancestors)
+			assert.Nil(t, ownerView.JSON200.Parent)
 		}))
 	}))
 }

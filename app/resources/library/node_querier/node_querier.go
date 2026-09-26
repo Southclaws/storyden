@@ -14,7 +14,6 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/pagination"
@@ -29,12 +28,11 @@ import (
 type Querier struct {
 	db          *ent.Client
 	raw         *sqlx.DB
-	aq          *account_querier.Querier
 	roleQuerier *role_hydrate.Hydrator
 }
 
-func New(db *ent.Client, raw *sqlx.DB, aq *account_querier.Querier, roleQuerier *role_hydrate.Hydrator) *Querier {
-	return &Querier{db: db, raw: raw, aq: aq, roleQuerier: roleQuerier}
+func New(db *ent.Client, raw *sqlx.DB, roleQuerier *role_hydrate.Hydrator) *Querier {
+	return &Querier{db: db, raw: raw, roleQuerier: roleQuerier}
 }
 
 type options struct {
@@ -42,17 +40,17 @@ type options struct {
 	searchChildrenBy     opt.Optional[string]
 	filterChildrenByTags opt.Optional[[]tag_ref.Name]
 	visibilityRules      bool
-	requestingAccount    *account.AccountID
+	requestingAccount    opt.Optional[account.Account]
 }
 
 type Option func(*options)
 
 // WithVisibilityRulesApplied ensures ownership and visibility rules are applied
 // if not set the default behaviour is no rules applied, all nodes are returned.
-func WithVisibilityRulesApplied(accountID *account.AccountID) Option {
+func WithVisibilityRulesApplied(requestingAccount opt.Optional[account.Account]) Option {
 	return func(o *options) {
 		o.visibilityRules = true
-		o.requestingAccount = accountID
+		o.requestingAccount = requestingAccount
 	}
 }
 
@@ -132,11 +130,6 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 		opt(o)
 	}
 
-	requestingAccount, err := q.getRequestingAccount(ctx, o)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	applyVisibilityRulesPredicate := func(nq *ent.NodeQuery) {
 		if !o.visibilityRules {
 			return
@@ -145,18 +138,18 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 		// Apply visibility rules:
 		// - published nodes are visible to everyone
 		// - non-published nodes are not visible to anyone except the owner
-		if acc, ok := requestingAccount.Get(); ok {
+		if acc, ok := o.requestingAccount.Get(); ok {
 
 			canViewInReview := acc.Roles.Permissions().HasAny(rbac.PermissionAdministrator, rbac.PermissionManageLibrary)
 
 			if canViewInReview {
 				nq.Where(node.Or(
-					node.AccountID(xid.ID(*o.requestingAccount)),
+					node.AccountID(xid.ID(acc.ID)),
 					node.VisibilityIn(node.VisibilityPublished, node.VisibilityReview),
 				))
 			} else {
 				nq.Where(node.Or(
-					node.AccountID(xid.ID(*o.requestingAccount)),
+					node.AccountID(xid.ID(acc.ID)),
 					node.VisibilityEQ(node.VisibilityPublished),
 				))
 			}
@@ -179,6 +172,8 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 				Order(link.ByCreatedAt(sql.OrderDesc()))
 		}).
 		WithParent(func(cq *ent.NodeQuery) {
+			applyVisibilityRulesPredicate(cq)
+
 			cq.
 				WithAssets().
 				WithOwner()
@@ -292,11 +287,6 @@ func (q *Querier) ListChildren(ctx context.Context, qk library.QueryKey, pp pagi
 	})
 
 	// Apply visibility rules
-	requestingAccount, err := q.getRequestingAccount(ctx, o)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	applyVisibilityRulesPredicate := func(nq *ent.NodeQuery) {
 		if !o.visibilityRules {
 			return
@@ -305,18 +295,18 @@ func (q *Querier) ListChildren(ctx context.Context, qk library.QueryKey, pp pagi
 		// Apply visibility rules:
 		// - published nodes are visible to everyone
 		// - non-published nodes are not visible to anyone except the owner
-		if acc, ok := requestingAccount.Get(); ok {
+		if acc, ok := o.requestingAccount.Get(); ok {
 
 			canViewInReview := acc.Roles.Permissions().HasAny(rbac.PermissionAdministrator, rbac.PermissionManageLibrary)
 
 			if canViewInReview {
 				nq.Where(node.Or(
-					node.AccountID(xid.ID(*o.requestingAccount)),
+					node.AccountID(xid.ID(acc.ID)),
 					node.VisibilityIn(node.VisibilityPublished, node.VisibilityReview),
 				))
 			} else {
 				nq.Where(node.Or(
-					node.AccountID(xid.ID(*o.requestingAccount)),
+					node.AccountID(xid.ID(acc.ID)),
 					node.VisibilityEQ(node.VisibilityPublished),
 				))
 			}
@@ -459,20 +449,4 @@ func (q *Querier) ProbeMany(ctx context.Context, ids ...library.NodeID) ([]*libr
 	}
 
 	return result, nil
-}
-
-func (q *Querier) getRequestingAccount(ctx context.Context, o *options) (opt.Optional[account.AccountWithEdges], error) {
-	if !o.visibilityRules {
-		return nil, nil
-	}
-	if o.requestingAccount == nil {
-		return nil, nil
-	}
-
-	acc, err := q.aq.GetByID(ctx, *o.requestingAccount)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return opt.New(*acc), nil
 }

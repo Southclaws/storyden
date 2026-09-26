@@ -16,7 +16,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_cache"
@@ -242,7 +241,7 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 	})
 
 	qk := deserialiseNodeMark(request.NodeSlug)
-	cacheKey := node_cache.CanonicalKey(qk.Queryable)
+	cacheKey := nodeCacheKey(ctx, qk.Queryable, sortChildrenBy)
 
 	etag, notModified := c.node_cache.Check(ctx, reqinfo.GetCacheQuery(ctx), cacheKey)
 	if notModified {
@@ -253,26 +252,55 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 			},
 		}, nil
 	}
+	if etag == nil {
+		etag, _ = c.node_cache.Prepare(ctx, cacheKey)
+	}
 
 	node, err := c.nodeReader.GetBySlug(ctx, qk, sortChildrenBy)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if etag == nil {
-		c.node_cache.Store(ctx, cacheKey, node.UpdatedAt)
-		etag = cachecontrol.NewETag(node.UpdatedAt)
+	var etagHeader *string
+	if etag != nil {
+		_ = c.node_cache.Store(ctx, cacheKey, etag)
+		etagHeader = ptr(etag.String())
 	}
 
 	return openapi.NodeGet200JSONResponse{
 		NodeGetOKJSONResponse: openapi.NodeGetOKJSONResponse{
-			Body: serialiseNodeWithItems(node),
+			Body: serialiseNodeWithAncestors(node),
 			Headers: openapi.NodeGetOKResponseHeaders{
 				CacheControl: ptr(getAuthStateCacheControl(ctx, "no-cache")),
-				ETag:         ptr(etag.String()),
+				ETag:         etagHeader,
 			},
 		},
 	}, nil
+}
+
+func nodeCacheKey(ctx context.Context, key mark.Queryable, sortChildrenBy opt.Optional[node_querier.ChildSortRule]) string {
+	canonical := node_cache.CanonicalKey(key)
+	selection := "children=default"
+	if sort, ok := sortChildrenBy.Get(); ok {
+		params := url.Values{}
+		params.Set("children_direction", sort.Dir)
+		params.Set("children_field", sort.Field)
+		params.Set("children_page", strconv.Itoa(sort.Page.PageOneIndexed()))
+		params.Set("children_page_size", strconv.Itoa(sort.Page.Size()))
+		selection = params.Encode()
+	}
+
+	acc, ok := session.GetOptAccount(ctx).Get()
+	if !ok {
+		return canonical + ":anonymous:" + selection
+	}
+
+	access := "account"
+	if acc.Roles.Permissions().HasAny(rbac.PermissionAdministrator, rbac.PermissionManageLibrary) {
+		access = "manager"
+	}
+
+	return canonical + ":" + acc.ID.String() + ":" + access + ":" + selection
 }
 
 func (c *Nodes) NodeListChildren(ctx context.Context, request openapi.NodeListChildrenRequestObject) (openapi.NodeListChildrenResponseObject, error) {
@@ -648,6 +676,44 @@ func (c *Nodes) NodeUpdatePosition(ctx context.Context, request openapi.NodeUpda
 
 func serialiseUpdatedNode(in *library.Node) openapi.NodeWithChildren {
 	return serialiseNodeWithItems(in)
+}
+
+func serialiseNodeWithAncestors(in *library.Node) openapi.NodeWithAncestors {
+	node := serialiseNodeWithItems(in)
+
+	return openapi.NodeWithAncestors{
+		Ancestors: dt.Map(in.Ancestors, func(ancestor library.NodeReference) openapi.NodeReference {
+			return openapi.NodeReference{
+				Id:   ancestor.Mark.ID().String(),
+				Name: ancestor.Name,
+				Slug: ancestor.Mark.Slug(),
+			}
+		}),
+		Assets:              node.Assets,
+		ChildPropertySchema: node.ChildPropertySchema,
+		Children:            node.Children,
+		Content:             node.Content,
+		CreatedAt:           node.CreatedAt,
+		CurrentVersionId:    node.CurrentVersionId,
+		DeletedAt:           node.DeletedAt,
+		Description:         node.Description,
+		HideChildTree:       node.HideChildTree,
+		Id:                  node.Id,
+		Link:                node.Link,
+		Meta:                node.Meta,
+		Misc:                node.Misc,
+		Name:                node.Name,
+		Owner:               node.Owner,
+		Parent:              node.Parent,
+		PrimaryImage:        node.PrimaryImage,
+		Properties:          node.Properties,
+		Recomentations:      node.Recomentations,
+		RelevanceScore:      node.RelevanceScore,
+		Slug:                node.Slug,
+		Tags:                node.Tags,
+		UpdatedAt:           node.UpdatedAt,
+		Visibility:          node.Visibility,
+	}
 }
 
 func serialiseNode(in *library.Node) openapi.Node {

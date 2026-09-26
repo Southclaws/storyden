@@ -55,7 +55,7 @@ func (m model) documentView() tea.View {
 	case screenNode:
 		if m.nodeView != nil {
 			title = string(m.nodeView.Name)
-			body, err = render.NodeViewString(m.out, m.nodeView)
+			body, err = render.NodeWithAncestorsViewString(m.out, m.nodeView)
 		}
 	case screenThread:
 		if m.threadView != nil {

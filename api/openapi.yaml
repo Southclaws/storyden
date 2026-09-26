@@ -6890,7 +6890,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/NodeWithChildren"
+            $ref: "#/components/schemas/NodeWithAncestors"
 
     NodeUpdateOK:
       description: Node updated.
@@ -11638,6 +11638,32 @@ components:
             children:
               type: array
               items: { $ref: "#/components/schemas/NodeWithChildren" }
+
+    NodeWithAncestors:
+      description: |
+        The full properties of a node including its child nodes and ancestry.
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/NodeWithChildren"
+        - type: object
+          required: [ancestors]
+          properties:
+            ancestors:
+              $ref: "#/components/schemas/NodeReferenceList"
+
+    NodeReference:
+      description: A minimal reference to a library node.
+      type: object
+      required: [id, name, slug]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        name: { $ref: "#/components/schemas/NodeName" }
+        slug: { $ref: "#/components/schemas/NodeSlug" }
+
+    NodeReferenceList:
+      description: Library node references ordered from the root to the parent.
+      type: array
+      items: { $ref: "#/components/schemas/NodeReference" }
 
     NodeName:
       type: string

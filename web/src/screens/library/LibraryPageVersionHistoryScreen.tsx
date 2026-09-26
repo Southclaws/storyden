@@ -3,7 +3,7 @@
 import {
   NodeVersion,
   NodeVersionStatus,
-  NodeWithChildren,
+  NodeWithAncestors,
 } from "@/api/openapi-schema";
 import { Breadcrumbs } from "@/components/library/Breadcrumbs";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
@@ -17,23 +17,24 @@ import { HStack, LStack, WStack } from "@/styled-system/jsx";
 import { PageVersionStatusBadge } from "./LibraryPageScreen/PageVersionStatusBadge";
 
 type Props = {
-  node: NodeWithChildren;
+  node: NodeWithAncestors;
   versions: NodeVersion[];
-  libraryPath: string[];
 };
 
 export function LibraryPageVersionHistoryScreen({
   node,
   versions,
-  libraryPath,
 }: Props) {
-  const pageHref = `/l/${libraryPath.join("/")}`;
+  const pageHref = `/l/${[...node.ancestors, node]
+    .map((part) => part.slug)
+    .join("/")}`;
 
   return (
     <LStack gap="3">
       <WStack>
         <Breadcrumbs
-          libraryPath={libraryPath}
+          ancestors={node.ancestors}
+          current={{ id: node.id, name: node.name, slug: node.slug }}
           visibility={node.visibility}
           create="show"
         />

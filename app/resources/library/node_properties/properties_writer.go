@@ -7,16 +7,22 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_cache"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/property"
 	"github.com/rs/xid"
 )
 
 type Writer struct {
-	db *ent.Client
+	db    *ent.Client
+	cache *node_cache.Cache
 }
 
 func (w *Writer) Update(ctx context.Context, nid library.NodeID, schema library.PropertySchema, props library.ExistingPropertyMutations) (*library.PropertyTable, error) {
+	if err := w.cache.InvalidateBeforeWrite(ctx); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	tx, err := w.db.Tx(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -50,6 +56,7 @@ func (w *Writer) Update(ctx context.Context, nid library.NodeID, schema library.
 	}
 
 	err = tx.Commit()
+	w.cache.InvalidateAfterWrite(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

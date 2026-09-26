@@ -16,13 +16,50 @@ import (
 	"github.com/Southclaws/storyden/cmd/sd/internal/output"
 )
 
-func NodeJSON(out io.Writer, node *openapi.NodeWithChildren) error {
+func NodeWithAncestorsJSON(out io.Writer, node *openapi.NodeWithAncestors) error {
 	return output.JSON(out, node)
 }
 
+func nodeWithoutAncestors(node *openapi.NodeWithAncestors) *openapi.NodeWithChildren {
+	return &openapi.NodeWithChildren{
+		Assets:              node.Assets,
+		ChildPropertySchema: node.ChildPropertySchema,
+		Children:            node.Children,
+		Content:             node.Content,
+		CreatedAt:           node.CreatedAt,
+		CurrentVersionId:    node.CurrentVersionId,
+		DeletedAt:           node.DeletedAt,
+		Description:         node.Description,
+		HideChildTree:       node.HideChildTree,
+		Id:                  node.Id,
+		Link:                node.Link,
+		Meta:                node.Meta,
+		Misc:                node.Misc,
+		Name:                node.Name,
+		Owner:               node.Owner,
+		Parent:              node.Parent,
+		PrimaryImage:        node.PrimaryImage,
+		Properties:          node.Properties,
+		Recomentations:      node.Recomentations,
+		RelevanceScore:      node.RelevanceScore,
+		Slug:                node.Slug,
+		Tags:                node.Tags,
+		UpdatedAt:           node.UpdatedAt,
+		Visibility:          node.Visibility,
+	}
+}
+
 func NodeMarkdown(out io.Writer, node *openapi.NodeWithChildren) error {
+	return nodeMarkdown(out, node, nil)
+}
+
+func NodeWithAncestorsMarkdown(out io.Writer, node *openapi.NodeWithAncestors) error {
+	return nodeMarkdown(out, nodeWithoutAncestors(node), node.Ancestors)
+}
+
+func nodeMarkdown(out io.Writer, node *openapi.NodeWithChildren, ancestors openapi.NodeReferenceList) error {
 	if output.IsTerminal(out) {
-		view, err := NodeViewString(out, node)
+		view, err := nodeViewString(out, node, ancestors)
 		if err != nil {
 			return err
 		}
@@ -31,7 +68,7 @@ func NodeMarkdown(out io.Writer, node *openapi.NodeWithChildren) error {
 		return nil
 	}
 
-	markdown, err := NodeMarkdownString(node)
+	markdown, err := nodeMarkdownString(node, ancestors)
 	if err != nil {
 		return err
 	}
@@ -41,6 +78,14 @@ func NodeMarkdown(out io.Writer, node *openapi.NodeWithChildren) error {
 }
 
 func NodeYAML(out io.Writer, node *openapi.NodeWithChildren) error {
+	return nodeYAML(out, node, nil)
+}
+
+func NodeWithAncestorsYAML(out io.Writer, node *openapi.NodeWithAncestors) error {
+	return nodeYAML(out, nodeWithoutAncestors(node), node.Ancestors)
+}
+
+func nodeYAML(out io.Writer, node *openapi.NodeWithChildren, ancestors openapi.NodeReferenceList) error {
 	payload := yamlNode{
 		Name:        string(node.Name),
 		Slug:        string(node.Slug),
@@ -49,6 +94,7 @@ func NodeYAML(out io.Writer, node *openapi.NodeWithChildren) error {
 		Description: string(node.Description),
 		Tags:        tagNames(node.Tags),
 		Properties:  yamlProperties(node.Properties),
+		Ancestors:   yamlNodeReferences(ancestors),
 	}
 	if node.Parent != nil {
 		payload.Parent = string(node.Parent.Slug)
@@ -61,6 +107,14 @@ func NodeYAML(out io.Writer, node *openapi.NodeWithChildren) error {
 }
 
 func NodeViewString(out io.Writer, node *openapi.NodeWithChildren) (string, error) {
+	return nodeViewString(out, node, nil)
+}
+
+func NodeWithAncestorsViewString(out io.Writer, node *openapi.NodeWithAncestors) (string, error) {
+	return nodeViewString(out, nodeWithoutAncestors(node), node.Ancestors)
+}
+
+func nodeViewString(out io.Writer, node *openapi.NodeWithChildren, ancestors openapi.NodeReferenceList) (string, error) {
 	styles := nodeViewStyles()
 	sections := []string{styles.Title.Render(string(node.Name))}
 
@@ -76,6 +130,9 @@ func NodeViewString(out io.Writer, node *openapi.NodeWithChildren) (string, erro
 		{"Created", node.CreatedAt.Local().Format("2006-01-02 15:04")},
 		{"Updated", node.UpdatedAt.Local().Format("2006-01-02 15:04")},
 		{"Children", fmt.Sprintf("%d", len(node.Children))},
+	}
+	if len(ancestors) > 0 {
+		details = append(details, nodeField{"Ancestry", ancestryPath(ancestors)})
 	}
 	if node.Parent != nil {
 		details = append(details, nodeField{"Parent", string(node.Parent.Slug)})
@@ -260,6 +317,10 @@ func renderAssetLine(asset openapi.Asset, note string, styles nodeStyles) []stri
 }
 
 func NodeMarkdownString(node *openapi.NodeWithChildren) (string, error) {
+	return nodeMarkdownString(node, nil)
+}
+
+func nodeMarkdownString(node *openapi.NodeWithChildren, ancestors openapi.NodeReferenceList) (string, error) {
 	var b strings.Builder
 
 	fmt.Fprintf(&b, "# %s\n\n", node.Name)
@@ -277,6 +338,9 @@ func NodeMarkdownString(node *openapi.NodeWithChildren) (string, error) {
 	writeMarkdownField(&b, "Created", node.CreatedAt.Local().Format("2006-01-02 15:04"))
 	writeMarkdownField(&b, "Updated", node.UpdatedAt.Local().Format("2006-01-02 15:04"))
 	writeMarkdownField(&b, "Children", fmt.Sprintf("%d", len(node.Children)))
+	if len(ancestors) > 0 {
+		writeMarkdownField(&b, "Ancestry", ancestryPath(ancestors))
+	}
 	if node.Parent != nil {
 		writeMarkdownField(&b, "Parent", string(node.Parent.Slug))
 	}
@@ -448,15 +512,22 @@ func tagNames(tags openapi.TagReferenceList) []string {
 }
 
 type yamlNode struct {
-	Name        string         `yaml:"name"`
-	Slug        string         `yaml:"slug"`
-	Visibility  string         `yaml:"visibility"`
-	Owner       string         `yaml:"owner"`
-	Description string         `yaml:"description,omitempty"`
-	Tags        []string       `yaml:"tags,omitempty"`
-	Parent      string         `yaml:"parent,omitempty"`
-	Properties  []yamlProperty `yaml:"properties,omitempty"`
-	Content     string         `yaml:"content,omitempty"`
+	Name        string              `yaml:"name"`
+	Slug        string              `yaml:"slug"`
+	Visibility  string              `yaml:"visibility"`
+	Owner       string              `yaml:"owner"`
+	Description string              `yaml:"description,omitempty"`
+	Tags        []string            `yaml:"tags,omitempty"`
+	Ancestors   []yamlNodeReference `yaml:"ancestors,omitempty"`
+	Parent      string              `yaml:"parent,omitempty"`
+	Properties  []yamlProperty      `yaml:"properties,omitempty"`
+	Content     string              `yaml:"content,omitempty"`
+}
+
+type yamlNodeReference struct {
+	ID   string `yaml:"id"`
+	Name string `yaml:"name"`
+	Slug string `yaml:"slug"`
 }
 
 type yamlProperty struct {
@@ -480,6 +551,32 @@ func yamlProperties(properties []openapi.Property) []yamlProperty {
 	}
 
 	return out
+}
+
+func yamlNodeReferences(nodes openapi.NodeReferenceList) []yamlNodeReference {
+	if len(nodes) == 0 {
+		return nil
+	}
+
+	references := make([]yamlNodeReference, len(nodes))
+	for i, node := range nodes {
+		references[i] = yamlNodeReference{
+			ID:   string(node.Id),
+			Name: string(node.Name),
+			Slug: string(node.Slug),
+		}
+	}
+
+	return references
+}
+
+func ancestryPath(nodes openapi.NodeReferenceList) string {
+	path := make([]string, len(nodes))
+	for i, node := range nodes {
+		path[i] = string(node.Slug)
+	}
+
+	return strings.Join(path, " / ")
 }
 
 var ansiEscapePattern = regexp.MustCompile(`\x1b(?:\[[0-?]*[ -/]*[@-~]|\][^\a]*(?:\a|\x1b\\)|[@-Z\\-_])`)

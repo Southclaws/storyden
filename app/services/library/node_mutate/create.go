@@ -41,7 +41,12 @@ func (s *Manager) Create(ctx context.Context,
 
 	nodeSlug := p.Slug.Or(mark.NewSlugFromName(name))
 
+	if err := s.cache.InvalidateBeforeWrite(ctx); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	n, err := s.nodeWriter.Create(ctx, owner, name, nodeSlug, opts...)
+	s.cache.InvalidateAfterWrite(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

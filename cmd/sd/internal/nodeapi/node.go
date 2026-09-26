@@ -9,7 +9,7 @@ import (
 	"github.com/Southclaws/storyden/cmd/sd/internal/output"
 )
 
-func Fetch(ctx context.Context, client *openapi.ClientWithResponses, slug string) (*openapi.NodeWithChildren, error) {
+func Fetch(ctx context.Context, client *openapi.ClientWithResponses, slug string) (*openapi.NodeWithAncestors, error) {
 	response, err := client.NodeGetWithResponse(ctx, slug, &openapi.NodeGetParams{})
 	if err != nil {
 		return nil, err
