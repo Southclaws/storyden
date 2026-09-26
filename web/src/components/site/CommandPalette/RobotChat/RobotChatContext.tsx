@@ -32,6 +32,7 @@ import {
 import { getThreadListKey } from "@/api/openapi-client/threads";
 import { getTrailListKey } from "@/api/openapi-client/trails";
 import {
+  Asset,
   RobotSessionList,
   RobotSessionStreamEvent,
   RobotWorkspaceList,
@@ -49,6 +50,7 @@ import { libraryBus } from "@/lib/library/events";
 import { deriveError } from "@/utils/error";
 import { generateXid } from "@/utils/xid";
 
+import { buildUserMessageParts } from "./RobotChatMessageParts";
 import {
   findCompletedStorydenToolCalls,
   isKnownToolName,
@@ -129,7 +131,7 @@ type RobotChatContextValue = {
   workspaces: RobotWorkspaceList;
   workspacesReady: boolean;
   sessions: RobotSessionList;
-  sendMessage: (input: { text: string }) => Promise<void>;
+  sendMessage: (input: { text: string; assets?: Asset[] }) => Promise<void>;
   cancelActiveTurn: () => Promise<void>;
   canCancelActiveTurn: boolean;
   isCancelling: boolean;
@@ -650,14 +652,16 @@ export function RobotChatContext({
 
   // Wrapper around chat.sendMessage that includes page and workspace context.
   const sendMessage = useCallback(
-    async (input: { text: string }) => {
+    async (input: { text: string; assets?: Asset[] }) => {
       const pageContext = await getPageContext();
       const currentWorkspaceID = selectedWorkspaceIDRef.current;
+      const assets = input.assets ?? [];
       await chat.sendMessage(
         {
           id: generateXid(),
           role: "user",
-          parts: [{ type: "text", text: input.text }],
+          parts: buildUserMessageParts(input.text, assets),
+          assets,
           queued: true,
         },
         {
@@ -900,8 +904,9 @@ function messageListSignature(messages?: readonly StorydenUIMessage[]) {
           return part.type;
         })
         .join(",");
+      const assets = (message.assets ?? []).map((asset) => asset.id).join(",");
 
-      return `${message.id}:${message.role}:${parts}`;
+      return `${message.id}:${message.role}:${parts}:${assets}`;
     })
     .join("|");
 }

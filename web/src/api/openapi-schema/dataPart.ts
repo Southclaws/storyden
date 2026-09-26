@@ -9,6 +9,11 @@
  */
 import type { ArbitraryData } from "./arbitraryData";
 
+/**
+ * Custom application data carried in UIMessage.parts. Storyden image
+ * attachments use `type: data-storyden-asset` with an `asset_id` string
+ * in `data`; the part's position is the attachment's content order.
+ */
 export interface DataPart {
   /**
    * Custom data part types, e.g. "data-weather".

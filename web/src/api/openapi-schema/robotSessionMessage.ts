@@ -7,6 +7,7 @@
  *
  * OpenAPI spec version: v1.26.15-post
  */
+import type { AssetList } from "./assetList";
 import type { ProfileReference } from "./profileReference";
 import type { RobotReference } from "./robotReference";
 import type { UIMessage } from "./uIMessage";
@@ -16,6 +17,8 @@ export type RobotSessionMessage = UIMessage & {
   created_at: string;
   /** Whether this message is waiting to be claimed by a Robot turn. */
   queued: boolean;
+  /** Image assets attached to this message, in message content order. */
+  assets: AssetList;
   /** Robot that generated this message */
   robot?: RobotReference;
   /** Human author of the message */

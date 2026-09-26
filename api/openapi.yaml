@@ -12924,7 +12924,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/UIMessage"
         - type: object
-          required: [created_at, queued]
+          required: [created_at, queued, assets]
           properties:
             created_at:
               type: string
@@ -12933,6 +12933,9 @@ components:
             queued:
               type: boolean
               description: Whether this message is waiting to be claimed by a Robot turn.
+            assets:
+              $ref: "#/components/schemas/AssetList"
+              description: Image assets attached to this message, in message content order.
             robot:
               $ref: "#/components/schemas/RobotReference"
               description: Robot that generated this message
@@ -13972,6 +13975,10 @@ components:
       required:
         - type
         - data
+      description: |
+        Custom application data carried in UIMessage.parts. Storyden image
+        attachments use `type: data-storyden-asset` with an `asset_id` string
+        in `data`; the part's position is the attachment's content order.
       properties:
         type:
           type: string

@@ -5,9 +5,10 @@ import { Box, HStack } from "@/styled-system/jsx";
 
 export type Props = {
   assets: Asset[];
+  align?: "start" | "end";
 };
 
-export function AssetThumbnailList({ assets }: Props) {
+export function AssetThumbnailList({ assets, align = "start" }: Props) {
   if (assets.length === 0) {
     return null;
   }
@@ -21,7 +22,13 @@ export function AssetThumbnailList({ assets }: Props) {
       scrollSnapType="x"
       scrollSnapStrictness="mandatory"
     >
-      <HStack w="full" h="20" maxW="full">
+      <HStack
+        w="fit"
+        minW="fit"
+        h="20"
+        maxW="full"
+        ml={align === "end" ? "auto" : undefined}
+      >
         {assets.map((a, i) => (
           // Sizing for next/image is measured in px, size tokens are basically
           // 4X, so size token 20 used above is equal to 80px, so we pass 80 here.

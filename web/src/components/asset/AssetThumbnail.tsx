@@ -16,7 +16,8 @@ type Props = {
   set?: Asset[];
   setIndex?: number;
   showDeleteButton?: boolean;
-  handleDelete?: () => Promise<void>;
+  deleteLabel?: string;
+  handleDelete?: () => void | Promise<void>;
 };
 
 const thumbnailStyles = css({
@@ -33,6 +34,7 @@ export function AssetThumbnail({
   set,
   setIndex,
   showDeleteButton = false,
+  deleteLabel = "Remove media from page",
   handleDelete = undefined,
 }: Props) {
   const [view, setView] = useQueryState<string | null>("view", {
@@ -89,7 +91,8 @@ export function AssetThumbnail({
           w="5"
           h="5"
           minW="5"
-          title="Remove media from page"
+          aria-label={deleteLabel}
+          title={deleteLabel}
           onClick={handleDelete}
         >
           <DeleteIcon />

@@ -186,6 +186,7 @@ func enqueueWebMCPChatMessage(
 
 	var textPart openapi.UIMessagePart
 	require.NoError(t, textPart.FromTextUIPart(openapi.TextUIPart{Type: openapi.TextUIPartTypeText, Text: message}))
+	textPart.Type = openapi.UIMessagePartType("text")
 	request.Messages = []openapi.UIMessage{{
 		Id:    xid.New().String(),
 		Role:  openapi.UIMessageRoleUser,

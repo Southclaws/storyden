@@ -71,6 +71,28 @@ describe("projectToolOutputs", () => {
 });
 
 describe("projectRobotMessages", () => {
+  it("keeps an image-only message visible", () => {
+    const messages = [
+      {
+        id: "image-only",
+        role: "user",
+        parts: [],
+        assets: [
+          {
+            id: "d4fa1vkrvimc73eq4jpg",
+            filename: "image.png",
+            path: "/api/assets/d4fa1vkrvimc73eq4jpg-image.png",
+            mime_type: "image/png",
+            width: 800,
+            height: 600,
+          },
+        ],
+      },
+    ] as unknown as StorydenUIMessage[];
+
+    expect(projectRobotMessages(messages)).toEqual(messages);
+  });
+
   it("groups a delegated Robot branch under its parent call", () => {
     const messages = [
       {

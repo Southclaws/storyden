@@ -37,7 +37,8 @@ export function projectRobotMessages(
   );
 
   return projectToolOutputs(withoutDuplicatedNestedTools).filter(
-    (message) => (message.parts ?? []).length > 0,
+    (message) =>
+      (message.parts ?? []).length > 0 || (message.assets ?? []).length > 0,
   );
 }
 
@@ -206,7 +207,7 @@ function projectDelegations(
       applyToolResultToDelegationGroup(group, part);
       return false;
     });
-    if (visibleParts.length > 0) {
+    if (visibleParts.length > 0 || (message.assets ?? []).length > 0) {
       group.messages.push({ ...message, parts: visibleParts });
     }
     group.robot ??= message.robot;

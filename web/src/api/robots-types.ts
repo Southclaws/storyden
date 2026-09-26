@@ -29,6 +29,7 @@ export type StorydenUIDataTypes = {
   session_name: string;
   render_card: RobotRenderCardData;
   delegation: RobotDelegationData;
+  "storyden-asset": { asset_id: string };
 };
 
 export type StorydenUIMessage = UIMessage<
@@ -41,6 +42,7 @@ export type StorydenUIMessage = UIMessage<
       RobotSessionMessage,
       | "created_at"
       | "queued"
+      | "assets"
       | "robot"
       | "author"
       | "branch"

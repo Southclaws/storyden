@@ -4,12 +4,11 @@ import { useRef, useState } from "react";
 
 import { useRobotChat } from "@/components/site/CommandPalette/RobotChat/RobotChatContext";
 import { RobotChatLoadingStatus } from "@/components/site/CommandPalette/RobotChat/RobotChatLoadingStatus";
-import { IconButton } from "@/components/ui/icon-button";
-import { CancelIcon } from "@/components/ui/icons/Cancel";
-import { DiscussionIcon } from "@/components/ui/icons/Discussion";
-import { Textarea } from "@/components/ui/textarea";
-import { HStack, LStack, styled } from "@/styled-system/jsx";
+import { LStack, styled } from "@/styled-system/jsx";
 import { pluralise } from "@/utils/text";
+
+import { RobotChatComposer } from "./RobotChatComposer";
+import { useRobotChatImageAttachments } from "./useRobotChatImageAttachments";
 
 export function FullPageChatInput() {
   const {
@@ -23,24 +22,42 @@ export function FullPageChatInput() {
   } = useRobotChat();
   const [input, setInput] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const {
+    attachments,
+    assets,
+    isDragging,
+    isUploading,
+    addFiles,
+    handlePaste,
+    handleDragEnter,
+    handleDragLeave,
+    handleDragOver,
+    handleDrop,
+    removeAttachment,
+    clearAttachments,
+    restoreAssets,
+  } = useRobotChatImageAttachments();
 
   const isBusy = status === "submitted" || status === "streaming";
+  const canSend =
+    (input.trim().length > 0 || assets.length > 0) && !isUploading;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!canSend) return;
 
     const text = input.trim();
+    const submittedAssets = assets;
     setInput("");
+    clearAttachments();
 
     try {
-      await sendMessage({ text });
-      // Refocus the textarea after sending
+      await sendMessage({ text, assets: submittedAssets });
       textareaRef.current?.focus();
     } catch (err) {
       console.error("sendMessage failed", err);
       setInput((current) => current || text);
-      // Also refocus on error
+      restoreAssets(submittedAssets);
       textareaRef.current?.focus();
     }
   }
@@ -55,6 +72,10 @@ export function FullPageChatInput() {
   return (
     <styled.form
       onSubmit={handleSubmit}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
       w="full"
       flexShrink="0"
       aria-label="Send message to Robot"
@@ -67,40 +88,21 @@ export function FullPageChatInput() {
             queued
           </styled.span>
         )}
-        <HStack w="full" gap="2">
-          <Textarea
-            ref={textareaRef}
-            aria-label="Message"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Type a message..."
-            rows={1}
-            px="3"
-            py="2"
-            borderRadius="md"
-            resize="none"
-          />
-          <IconButton
-            aria-label="Send message"
-            variant="subtle"
-            type="submit"
-            disabled={!input.trim()}
-          >
-            <DiscussionIcon />
-          </IconButton>
-          {canCancelActiveTurn && (
-            <IconButton
-              aria-label="Cancel Robot response"
-              variant="subtle"
-              type="button"
-              loading={isCancelling}
-              onClick={() => void cancelActiveTurn()}
-            >
-              <CancelIcon />
-            </IconButton>
-          )}
-        </HStack>
+        <RobotChatComposer
+          value={input}
+          textareaRef={textareaRef}
+          attachments={attachments}
+          isDragging={isDragging}
+          canSend={canSend}
+          canCancel={canCancelActiveTurn}
+          isCancelling={isCancelling}
+          onChange={(event) => setInput(event.target.value)}
+          onKeyDown={(event) => void handleKeyDown(event)}
+          onPaste={handlePaste}
+          onFiles={addFiles}
+          onRemoveAttachment={removeAttachment}
+          onCancel={() => void cancelActiveTurn()}
+        />
       </LStack>
     </styled.form>
   );

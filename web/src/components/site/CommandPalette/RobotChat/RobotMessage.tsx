@@ -5,8 +5,9 @@ import { useNodeGet } from "@/api/openapi-client/nodes";
 import { usePostLocationGet } from "@/api/openapi-client/posts";
 import { useProfileGet } from "@/api/openapi-client/profiles";
 import { useThreadGet } from "@/api/openapi-client/threads";
-import { ProfileReference, Thread } from "@/api/openapi-schema";
+import { Asset, ProfileReference, Thread } from "@/api/openapi-schema";
 import { RobotRenderCardData, StorydenUIMessage } from "@/api/robots-types";
+import { AssetThumbnailList } from "@/components/asset/AssetThumbnailList";
 import { ContentComposerMarkdown } from "@/components/content/ContentComposerMarkdown/ContentComposerMarkdown";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { CardBox } from "@/components/ui/card-box";
@@ -42,6 +43,7 @@ type Props = {
   id: string;
   role: StorydenUIMessage["role"];
   parts: readonly StorydenUIMessage["parts"][number][];
+  assets: Asset[];
   author?: ProfileReference;
   isCurrentMemberMessage?: boolean;
   isNewestUserMessage?: boolean;
@@ -52,6 +54,7 @@ export function RobotMessage({
   id,
   role,
   parts,
+  assets,
   author,
   isCurrentMemberMessage = false,
   isNewestUserMessage = false,
@@ -81,12 +84,31 @@ export function RobotMessage({
         <MemberBadge profile={author} avatar="hidden" size="xs" name="handle" />
       )}
       {renderMessageParts(parts, isUser)}
+      <RobotMessageAssets assets={assets} isUser={isUser} />
       {isUser && queued && (
         <Text as="span" variant="metadata" color="text.muted">
           Queued
         </Text>
       )}
     </VStack>
+  );
+}
+
+function RobotMessageAssets({
+  assets,
+  isUser,
+}: {
+  assets: Asset[];
+  isUser: boolean;
+}) {
+  if (assets.length === 0) {
+    return null;
+  }
+
+  return (
+    <Box w="full" maxW={isUser ? "3/4" : "full"} overflow="hidden">
+      <AssetThumbnailList assets={assets} align={isUser ? "end" : "start"} />
+    </Box>
   );
 }
 

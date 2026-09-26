@@ -36,6 +36,7 @@ import (
 	robotservice "github.com/Southclaws/storyden/app/services/semdex/robot"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry/denbot"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/mcpclient"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/model_media"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/session_coordinator"
 	robot_tools "github.com/Southclaws/storyden/app/services/semdex/robot/tools"
 	robot_toolsets "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets"
@@ -54,6 +55,7 @@ type Robots struct {
 	workspaceProviders *workspaceprovider.Registry
 	sessionRepo        *robot_session.Repository
 	modelFactory       *llm_provider.Factory
+	modelMedia         *model_media.Resolver
 	settings           *settings_manager.Manager
 	mcp                *mcpclient.Manager
 	tools              *robot_tools.Registry
@@ -71,6 +73,7 @@ func NewRobots(
 	workspaceProviders *workspaceprovider.Registry,
 	sessionRepo *robot_session.Repository,
 	modelFactory *llm_provider.Factory,
+	modelMedia *model_media.Resolver,
 	toolRegistry *robot_tools.Registry,
 	toolsetRegistry *robot_toolsets.Registry,
 	toolsetRepo *robot_toolset.Repository,
@@ -87,6 +90,7 @@ func NewRobots(
 		workspaceProviders: workspaceProviders,
 		sessionRepo:        sessionRepo,
 		modelFactory:       modelFactory,
+		modelMedia:         modelMedia,
 		settings:           settingsManager,
 		mcp:                mcpManager,
 		tools:              toolRegistry,
@@ -1545,6 +1549,7 @@ func serialiseRobotSessionMessage(m *robot.Message, hiddenToolCallIDs map[string
 		Parts:          parts,
 		CreatedAt:      m.CreatedAt,
 		Queued:         m.Queued,
+		Assets:         dt.Map(m.Assets, serialiseAssetPtr),
 		Robot:          serialiseRobotActorReference(m),
 		Author:         opt.Map(m.Author, func(a *account.Account) openapi.ProfileReference { return serialiseProfileReferenceFromAccount(*a) }).Ptr(),
 		Branch:         m.Branch.Ptr(),

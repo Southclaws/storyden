@@ -77,6 +77,12 @@ type chatMessage struct {
 	Metadata json.RawMessage `json:"metadata"`
 }
 
+const storydenAssetDataPartType = "data-storyden-asset"
+
+type storydenAssetData struct {
+	AssetID string `json:"asset_id"`
+}
+
 type chatPart struct {
 	Type       string          `json:"type"`
 	Text       string          `json:"text,omitempty"`
@@ -186,6 +192,11 @@ func (r *Robots) createSessionTurn(ctx context.Context, w http.ResponseWriter, b
 	if err != nil {
 		r.logger.Error("Robot session convert message", slog.String("error", err.Error()))
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	if err := r.modelMedia.ValidateContents(ctx, []*genai.Content{initMessage}); err != nil {
+		r.logger.Error("Robot session validate message media", slog.String("error", err.Error()))
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	invocationContext := invocationContextFromRequest(req.Context)
@@ -384,13 +395,8 @@ func getLastMessage(messages []chatMessage, pendingToolIDs []string, logger *slo
 
 	switch strings.ToLower(lastMessage.Role) {
 	case "user":
-		for _, part := range lastMessage.Parts {
-			switch part.Type {
-			case "text":
-				if part.Text != "" {
-					content.Parts = append(content.Parts, &genai.Part{Text: part.Text})
-				}
-			}
+		if err := appendUserChatMessageParts(content, lastMessage); err != nil {
+			return nil, err
 		}
 
 	case "assistant":
@@ -455,6 +461,29 @@ func getLastMessage(messages []chatMessage, pendingToolIDs []string, logger *slo
 	}
 
 	return content, nil
+}
+
+func appendUserChatMessageParts(content *genai.Content, message chatMessage) error {
+	for index, part := range message.Parts {
+		switch part.Type {
+		case "text":
+			if part.Text != "" {
+				content.Parts = append(content.Parts, &genai.Part{Text: part.Text})
+			}
+		case storydenAssetDataPartType:
+			var data storydenAssetData
+			if err := json.Unmarshal(part.Data, &data); err != nil {
+				return fmt.Errorf("parts[%d].data must be a Storyden asset object", index)
+			}
+			id, err := xid.FromString(data.AssetID)
+			if err != nil {
+				return fmt.Errorf("parts[%d].data.asset_id must be a valid asset ID", index)
+			}
+			content.Parts = append(content.Parts, robot.NewImageAssetPart(id))
+		}
+	}
+
+	return nil
 }
 
 func resolveClientToolResult(part chatPart, pendingSet map[string]bool, logger *slog.Logger) (*genai.Part, bool, error) {

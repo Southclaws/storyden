@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { Asset } from "@/api/openapi-schema";
 import { StorydenUIMessage } from "@/api/robots-types";
 
 import {
@@ -10,7 +11,36 @@ import {
   reconcileMessages,
   shouldReplaceMessages,
 } from "./RobotChatContext";
+import { buildUserMessageParts } from "./RobotChatMessageParts";
 import { findCompletedStorydenToolCalls } from "./completedToolCalls";
+
+describe("buildUserMessageParts", () => {
+  const first = { id: "d4fa1vkrvimc73eq4jpg" } as Asset;
+  const second = { id: "d7g0nnsrvimc3c4bg6sg" } as Asset;
+
+  it("places Storyden asset data parts after the message text", () => {
+    expect(buildUserMessageParts("Compare these.", [first, second])).toEqual([
+      { type: "text", text: "Compare these." },
+      {
+        type: "data-storyden-asset",
+        data: { asset_id: "d4fa1vkrvimc73eq4jpg" },
+      },
+      {
+        type: "data-storyden-asset",
+        data: { asset_id: "d7g0nnsrvimc3c4bg6sg" },
+      },
+    ]);
+  });
+
+  it("supports an image-only user message", () => {
+    expect(buildUserMessageParts("", [first])).toEqual([
+      {
+        type: "data-storyden-asset",
+        data: { asset_id: "d4fa1vkrvimc73eq4jpg" },
+      },
+    ]);
+  });
+});
 
 describe("findCompletedStorydenToolCalls", () => {
   it("returns a backend tool only after its output is available", () => {
@@ -382,6 +412,26 @@ describe("hasUnhydratedToolOutput", () => {
 });
 
 describe("shouldReplaceMessages", () => {
+  it("replaces a message when the server adds an attached asset", () => {
+    const localMessages = [
+      {
+        id: "message-1",
+        role: "user",
+        parts: [{ type: "text", text: "look" }],
+      },
+    ] as unknown as StorydenUIMessage[];
+    const incomingMessages = [
+      {
+        id: "message-1",
+        role: "user",
+        parts: [{ type: "text", text: "look" }],
+        assets: [{ id: "d4fa1vkrvimc73eq4jpg" }],
+      },
+    ] as unknown as StorydenUIMessage[];
+
+    expect(shouldReplaceMessages(localMessages, incomingMessages)).toBe(true);
+  });
+
   it("replaces stale local windows when incoming contains newer message ids", () => {
     const localMessages = [
       { id: "old-1", role: "user", parts: [{ type: "text", text: "old" }] },

@@ -9,6 +9,7 @@ import (
 	"google.golang.org/adk/v2/session"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_robot_session_message "github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 )
@@ -34,6 +35,7 @@ type Message struct {
 	Robot          opt.Optional[*Robot]
 	Actor          opt.Optional[Actor]
 	Author         opt.Optional[*account.Account]
+	Assets         []*asset.Asset
 
 	Event session.Event
 }
@@ -68,6 +70,22 @@ type MessageCursorResult struct {
 }
 
 func MapMessage(m *ent.RobotSessionMessage) (*Message, error) {
+	linkedAssets := make(map[asset.AssetID]*asset.Asset, len(m.Edges.Assets))
+	for _, linked := range m.Edges.Assets {
+		mapped := asset.Map(linked)
+		linkedAssets[mapped.ID] = mapped
+	}
+	assetIDs, err := UniqueImageAssetIDs(m.EventData.ADK().Content)
+	if err != nil {
+		return nil, err
+	}
+	assets := make([]*asset.Asset, 0, len(assetIDs))
+	for _, id := range assetIDs {
+		if linked, ok := linkedAssets[id]; ok {
+			assets = append(assets, linked)
+		}
+	}
+
 	var robotOpt opt.Optional[*Robot]
 	if m.Edges.Robot != nil {
 		r, err := Map(m.Edges.Robot)
@@ -104,6 +122,7 @@ func MapMessage(m *ent.RobotSessionMessage) (*Message, error) {
 		Robot:          robotOpt,
 		Actor:          actorOpt,
 		Author:         authorOpt,
+		Assets:         assets,
 		Event:          m.EventData.ADK(),
 	}, nil
 }

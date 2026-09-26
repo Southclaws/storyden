@@ -242,6 +242,7 @@ func (q *Repository) ReadTurnEvents(ctx context.Context, sessionID robot.Session
 		).
 		WithRobot(func(query *ent.RobotQuery) { query.WithAuthor() }).
 		WithAuthor().
+		WithAssets().
 		Order(ent.Asc(ent_robot_session_message.FieldSequence)).
 		Limit(limit).
 		All(ctx)
@@ -275,6 +276,7 @@ func (q *Repository) ReadSessionEvents(ctx context.Context, sessionID robot.Sess
 		).
 		WithRobot(func(query *ent.RobotQuery) { query.WithAuthor() }).
 		WithAuthor().
+		WithAssets().
 		Order(ent.Asc(ent_robot_session_message.FieldSequence)).
 		Limit(limit).
 		All(ctx)

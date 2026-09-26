@@ -6,6 +6,7 @@ import {
   observeRobotSession,
 } from "./durable-chat-transport";
 import type { RobotSessionStreamEvent } from "./openapi-schema/robotSessionStreamEvent";
+import type { StorydenUIMessage } from "./robots-types";
 
 describe("createDurableChatTransport", () => {
   it("submits a command without coupling it to the response stream", async () => {
@@ -20,7 +21,7 @@ describe("createDurableChatTransport", () => {
         { status: 202, headers: { "Content-Type": "application/json" } },
       );
     });
-    const transport = createDurableChatTransport({
+    const transport = createDurableChatTransport<StorydenUIMessage>({
       api: "http://api.test/api/robots/sessions",
       fetchClient,
       onCommandAccepted,
@@ -30,7 +31,18 @@ describe("createDurableChatTransport", () => {
       trigger: "submit-message",
       chatId: "session-1",
       messageId: undefined,
-      messages: [{ id: "message-1", role: "user", parts: [] }],
+      messages: [
+        {
+          id: "message-1",
+          role: "user",
+          parts: [
+            {
+              type: "data-storyden-asset",
+              data: { asset_id: "d7g0nnsrvimc3c4bg6sg" },
+            },
+          ],
+        },
+      ],
       abortSignal: undefined,
     });
 
@@ -38,6 +50,13 @@ describe("createDurableChatTransport", () => {
     for await (const chunk of response) chunks.push(chunk);
     expect(chunks).toEqual([]);
     expect(fetchClient).toHaveBeenCalledTimes(1);
+    const requestBody = JSON.parse(
+      String(fetchClient.mock.calls[0]?.[1]?.body),
+    );
+    expect(requestBody.messages[0].parts).toContainEqual({
+      type: "data-storyden-asset",
+      data: { asset_id: "d7g0nnsrvimc3c4bg6sg" },
+    });
     expect(onCommandAccepted).toHaveBeenCalledWith({
       sessionId: "session-1",
       messageId: "message-1",

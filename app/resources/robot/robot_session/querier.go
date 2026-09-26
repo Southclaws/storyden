@@ -90,6 +90,7 @@ func (q *Repository) Get(
 			rq.WithAuthor()
 		}).
 		WithAuthor().
+		WithAssets().
 		Order(
 			ent_robot_session_message.ByCreatedAt(sql.OrderDesc()),
 			ent_robot_session_message.ByID(sql.OrderDesc()),
@@ -197,7 +198,8 @@ func (q *Repository) GetWithMessageFilters(
 		WithRobot(func(rq *ent.RobotQuery) {
 			rq.WithAuthor()
 		}).
-		WithAuthor()
+		WithAuthor().
+		WithAssets()
 
 	if numRecentEvents > 0 {
 		// Fetch the N most recent by ordering DESC then reversing, so callers

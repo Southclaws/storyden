@@ -28,6 +28,7 @@ export function RobotChatMessageProjectedList() {
       id={message.id}
       role={message.role}
       parts={message.parts ?? []}
+      assets={message.assets ?? []}
       author={message.author}
       isCurrentMemberMessage={message.author?.id === session?.id}
       isNewestUserMessage={message.id === latestUserMessageId}

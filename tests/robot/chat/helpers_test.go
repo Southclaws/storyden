@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -96,10 +97,32 @@ func enqueueChatMessage(
 	session openapi.RequestEditorFn,
 	sessionID, robotID, message string,
 ) acceptedInput {
+	return enqueueChatMessageWithAssets(t, ctx, ts, session, sessionID, robotID, message)
+}
+
+func enqueueChatMessageWithAssets(
+	t *testing.T,
+	ctx context.Context,
+	ts *httptest.Server,
+	session openapi.RequestEditorFn,
+	sessionID, robotID, message string,
+	assetIDs ...string,
+) acceptedInput {
 	t.Helper()
 
 	var textPart openapi.UIMessagePart
 	require.NoError(t, textPart.FromTextUIPart(openapi.TextUIPart{Type: openapi.TextUIPartTypeText, Text: message}))
+	textPart.Type = openapi.UIMessagePartType("text")
+	parts := []openapi.UIMessagePart{textPart}
+	for _, assetID := range assetIDs {
+		var assetPart openapi.UIMessagePart
+		require.NoError(t, assetPart.FromDataPart(openapi.DataPart{
+			Type: "data-storyden-asset",
+			Data: map[string]any{"asset_id": assetID},
+		}))
+		assetPart.Type = openapi.UIMessagePartType("data-storyden-asset")
+		parts = append(parts, assetPart)
+	}
 
 	body, err := json.Marshal(openapi.RobotChatRequest{
 		Id:        sessionID,
@@ -108,7 +131,7 @@ func enqueueChatMessage(
 		Messages: []openapi.UIMessage{{
 			Id:    xid.New().String(),
 			Role:  openapi.UIMessageRoleUser,
-			Parts: []openapi.UIMessagePart{textPart},
+			Parts: parts,
 		}},
 	})
 	require.NoError(t, err)
@@ -122,7 +145,11 @@ func enqueueChatMessage(
 	require.NoError(t, err)
 	defer resp.Body.Close()
 
-	require.Equal(t, http.StatusAccepted, resp.StatusCode)
+	if resp.StatusCode != http.StatusAccepted {
+		responseBody, readErr := io.ReadAll(resp.Body)
+		require.NoError(t, readErr)
+		require.Equalf(t, http.StatusAccepted, resp.StatusCode, "response body: %s", responseBody)
+	}
 	return decodeAcceptedInput(t, resp)
 }
 
@@ -279,6 +306,7 @@ func doChatWithRobotStatus(
 
 	var textPart openapi.UIMessagePart
 	require.NoError(t, textPart.FromTextUIPart(openapi.TextUIPart{Type: openapi.TextUIPartTypeText, Text: message}))
+	textPart.Type = openapi.UIMessagePartType("text")
 
 	body, err := json.Marshal(openapi.RobotChatRequest{
 		Id:        sessionID,

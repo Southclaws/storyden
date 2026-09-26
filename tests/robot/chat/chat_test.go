@@ -1,7 +1,11 @@
 package chat_test
 
 import (
+	"bytes"
 	"context"
+	"image"
+	"image/color"
+	"image/png"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -12,7 +16,11 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
+	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/seed"
+	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
+	authsession "github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/integration"
@@ -36,10 +44,12 @@ func TestRobotChat(t *testing.T) {
 			cl *openapi.ClientWithResponses,
 			sh *e2e.SessionHelper,
 			aw *account_writer.Writer,
+			uploader *asset_upload.Uploader,
 		) {
 			lc.Append(fx.StartHook(func() {
-				adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+				adminCtx, admin := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 				adminSession := sh.WithSession(adminCtx)
+				uploadContext := authsession.WithAccountPermissions(root, *admin, rbac.NewList(rbac.PermissionUploadAsset))
 
 				t.Run("simple_text_response", func(t *testing.T) {
 					a := assert.New(t)
@@ -69,6 +79,42 @@ func TestRobotChat(t *testing.T) {
 					require.NotEqual(t, -1, sessionPartIndex)
 					require.NotEqual(t, -1, textPartIndex)
 					a.Less(sessionPartIndex, textPartIndex)
+				})
+
+				t.Run("message_image_assets", func(t *testing.T) {
+					first := uploadChatImage(t, uploadContext, uploader, "first.png", color.RGBA{R: 255, A: 255})
+					second := uploadChatImage(t, uploadContext, uploader, "second.png", color.RGBA{B: 255, A: 255})
+					sessionID := xid.New().String()
+					accepted := enqueueChatMessageWithAssets(
+						t,
+						root,
+						ts,
+						adminSession,
+						sessionID,
+						"",
+						"Compare these images.",
+						first.ID.String(),
+						second.ID.String(),
+					)
+					readDurableChatParts(t, root, ts, adminSession, accepted)
+
+					session := tests.AssertRequest(cl.RobotSessionGetWithResponse(root,
+						openapi.RobotSessionIDParam(sessionID),
+						&openapi.RobotSessionGetParams{},
+						adminSession,
+					))(t, 200)
+					require.NotNil(t, session.JSON200)
+
+					var attached []openapi.Asset
+					for _, message := range session.JSON200.MessageList.Messages {
+						if message.Id == accepted.reference.MessageId {
+							attached = message.Assets
+							break
+						}
+					}
+					require.Len(t, attached, 2)
+					assert.Equal(t, first.ID.String(), attached[0].Id)
+					assert.Equal(t, second.ID.String(), attached[1].Id)
 				})
 
 				t.Run("session_messages_cursor_pagination", func(t *testing.T) {
@@ -115,4 +161,29 @@ func TestRobotChat(t *testing.T) {
 			}))
 		}),
 	)
+}
+
+func uploadChatImage(
+	t *testing.T,
+	ctx context.Context,
+	uploader *asset_upload.Uploader,
+	name string,
+	fill color.RGBA,
+) *asset.Asset {
+	t.Helper()
+
+	imageData := image.NewRGBA(image.Rect(0, 0, 1, 1))
+	imageData.SetRGBA(0, 0, fill)
+	var encoded bytes.Buffer
+	require.NoError(t, png.Encode(&encoded, imageData))
+
+	uploaded, err := uploader.Upload(
+		ctx,
+		bytes.NewReader(encoded.Bytes()),
+		int64(encoded.Len()),
+		asset.NewFilename(name),
+		asset_upload.Options{},
+	)
+	require.NoError(t, err)
+	return uploaded
 }

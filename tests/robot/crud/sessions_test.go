@@ -42,6 +42,7 @@ func startSession(t *testing.T, ctx context.Context, ts *httptest.Server, sessio
 
 	var textPart openapi.UIMessagePart
 	require.NoError(t, textPart.FromTextUIPart(openapi.TextUIPart{Type: openapi.TextUIPartTypeText, Text: "hello"}))
+	textPart.Type = openapi.UIMessagePartType("text")
 
 	var robotIDPtr *string
 	if robotID = strings.TrimSpace(robotID); robotID != "" {

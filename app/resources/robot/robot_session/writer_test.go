@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
@@ -125,6 +126,8 @@ func TestAppendMessageLinksMultipleAssetsWithoutLosingContentOrder(t *testing.T)
 			assert.Equal(t, secondID.String(), stored.EventData.Content.Parts[2].PartMetadata[robot.ImageAssetIDMetadataKey])
 			assert.Equal(t, firstID.String(), stored.EventData.Content.Parts[3].PartMetadata[robot.ImageAssetIDMetadataKey])
 
+			assertProjectedRobotMessageAssets(t, ctx, repo, sessionID, []asset.AssetID{firstID, secondID})
+
 			require.NoError(t, db.Asset.DeleteOneID(firstID).Exec(ctx))
 			stored, err = db.RobotSessionMessage.Query().WithAssets().Only(ctx)
 			require.NoError(t, err, "deleting an asset must preserve the message")
@@ -139,6 +142,27 @@ func TestAppendMessageLinksMultipleAssetsWithoutLosingContentOrder(t *testing.T)
 			assert.Zero(t, count, "deleting a message removes only the join-row reference")
 		}))
 	}))
+}
+
+func assertProjectedRobotMessageAssets(
+	t *testing.T,
+	ctx context.Context,
+	repo *robot_session.Repository,
+	sessionID robot.SessionID,
+	expected []asset.AssetID,
+) {
+	t.Helper()
+	session, _, err := repo.Get(ctx, sessionID, robot.NewMessageCursorParams(opt.NewEmpty[robot.MessageID](), 10))
+	require.NoError(t, err)
+	require.Len(t, session.Messages, 1)
+	assert.Equal(t, expected, dt.Map(session.Messages[0].Assets, func(a *asset.Asset) asset.AssetID { return a.ID }))
+
+	events, _, err := repo.ReadSessionEvents(ctx, sessionID, 0, 10)
+	require.NoError(t, err)
+	require.Len(t, events, 1)
+	streamMessage, ok := events[0].Message.Get()
+	require.True(t, ok)
+	assert.Equal(t, expected, dt.Map(streamMessage.Assets, func(a *asset.Asset) asset.AssetID { return a.ID }))
 }
 
 func TestAppendMessageRollsBackStateDeltaWhenMessageFails(t *testing.T) {
