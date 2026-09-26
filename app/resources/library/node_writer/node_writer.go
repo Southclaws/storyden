@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/lexorank"
 	"github.com/Southclaws/opt"
+	"github.com/jmoiron/sqlx"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -29,13 +30,15 @@ import (
 
 type Writer struct {
 	db          *ent.Client
+	raw         *sqlx.DB
 	querier     *node_querier.Querier
 	childWriter *node_children.Writer
 }
 
-func New(db *ent.Client, querier *node_querier.Querier, childWriter *node_children.Writer) *Writer {
+func New(db *ent.Client, raw *sqlx.DB, querier *node_querier.Querier, childWriter *node_children.Writer) *Writer {
 	return &Writer{
 		db:          db,
+		raw:         raw,
 		querier:     querier,
 		childWriter: childWriter,
 	}

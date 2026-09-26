@@ -121,6 +121,89 @@ func (j *DocumentSearchMatch) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
+type LibraryPageBatchResultYaml struct {
+	// Link to the successfully created or updated page.
+	BrowserUrl string `json:"browser_url" yaml:"browser_url" mapstructure:"browser_url"`
+
+	// Id corresponds to the JSON schema field "id".
+	Id string `json:"id" yaml:"id" mapstructure:"id"`
+
+	// Name corresponds to the JSON schema field "name".
+	Name string `json:"name" yaml:"name" mapstructure:"name"`
+
+	// Ref corresponds to the JSON schema field "ref".
+	Ref string `json:"ref" yaml:"ref" mapstructure:"ref"`
+
+	// Slug corresponds to the JSON schema field "slug".
+	Slug string `json:"slug" yaml:"slug" mapstructure:"slug"`
+
+	// Status corresponds to the JSON schema field "status".
+	Status LibraryPageBatchResultYamlStatus `json:"status" yaml:"status" mapstructure:"status"`
+}
+
+type LibraryPageBatchResultYamlStatus string
+
+const LibraryPageBatchResultYamlStatusCreated LibraryPageBatchResultYamlStatus = "created"
+const LibraryPageBatchResultYamlStatusUpdated LibraryPageBatchResultYamlStatus = "updated"
+
+var enumValues_LibraryPageBatchResultYamlStatus = []interface{}{
+	"created",
+	"updated",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *LibraryPageBatchResultYamlStatus) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_LibraryPageBatchResultYamlStatus {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_LibraryPageBatchResultYamlStatus, v)
+	}
+	*j = LibraryPageBatchResultYamlStatus(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *LibraryPageBatchResultYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["browser_url"]; raw != nil && !ok {
+		return fmt.Errorf("field browser_url in LibraryPageBatchResultYaml: required")
+	}
+	if _, ok := raw["id"]; raw != nil && !ok {
+		return fmt.Errorf("field id in LibraryPageBatchResultYaml: required")
+	}
+	if _, ok := raw["name"]; raw != nil && !ok {
+		return fmt.Errorf("field name in LibraryPageBatchResultYaml: required")
+	}
+	if _, ok := raw["ref"]; raw != nil && !ok {
+		return fmt.Errorf("field ref in LibraryPageBatchResultYaml: required")
+	}
+	if _, ok := raw["slug"]; raw != nil && !ok {
+		return fmt.Errorf("field slug in LibraryPageBatchResultYaml: required")
+	}
+	if _, ok := raw["status"]; raw != nil && !ok {
+		return fmt.Errorf("field status in LibraryPageBatchResultYaml: required")
+	}
+	type Plain LibraryPageBatchResultYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = LibraryPageBatchResultYaml(plain)
+	return nil
+}
+
 type LibraryPageSearchItem struct {
 	// Browser URL for this resource. Always present this as a Markdown link when
 	// showing results to the user.
@@ -1456,9 +1539,53 @@ func (j *RobotSearchResult) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
-// An individually composable tool candidate returned by capability discovery; use
-// its ID with tool_get before choosing or loading it.
+type RobotToolAvailabilityYaml string
+
+const RobotToolAvailabilityYamlBlocked RobotToolAvailabilityYaml = "blocked"
+const RobotToolAvailabilityYamlCallable RobotToolAvailabilityYaml = "callable"
+const RobotToolAvailabilityYamlLoadRequired RobotToolAvailabilityYaml = "load_required"
+
+var enumValues_RobotToolAvailabilityYaml = []interface{}{
+	"callable",
+	"load_required",
+	"blocked",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *RobotToolAvailabilityYaml) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_RobotToolAvailabilityYaml {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_RobotToolAvailabilityYaml, v)
+	}
+	*j = RobotToolAvailabilityYaml(v)
+	return nil
+}
+
+// A tool candidate returned by capability discovery. Use id with tool_get to
+// inspect its schema and preconditions before choosing or loading it. When
+// availability is callable, invoke callable_name with the inspected arguments.
+// When load_required, activate the ID with tool_load and use it on the next model
+// step; tools marked toolset_only by tool_get require toolset_get and toolset_load
+// for a declared Toolset instead. When blocked, inspect the preconditions with
+// tool_get and, when available, tool_runtime_issues for initialization failures
+// before attempting activation. Inspection alone does not activate a tool.
 type RobotToolCatalogueItemYaml struct {
+	// Availability corresponds to the JSON schema field "availability".
+	Availability *RobotToolAvailabilityYaml `json:"availability,omitempty" yaml:"availability,omitempty" mapstructure:"availability,omitempty"`
+
+	// Exact function name to invoke when callable; may differ from the stable ID.
+	CallableName string `json:"callable_name" yaml:"callable_name" mapstructure:"callable_name"`
+
 	// The outcome this tool can achieve, used to decide whether its full schema is
 	// worth inspecting.
 	Description string `json:"description" yaml:"description" mapstructure:"description"`
@@ -1476,6 +1603,9 @@ func (j *RobotToolCatalogueItemYaml) UnmarshalJSON(value []byte) error {
 	var raw map[string]interface{}
 	if err := json.Unmarshal(value, &raw); err != nil {
 		return err
+	}
+	if _, ok := raw["callable_name"]; raw != nil && !ok {
+		return fmt.Errorf("field callable_name in RobotToolCatalogueItemYaml: required")
 	}
 	if _, ok := raw["description"]; raw != nil && !ok {
 		return fmt.Errorf("field description in RobotToolCatalogueItemYaml: required")
@@ -2216,7 +2346,7 @@ type ToolLibraryPageCreateInput struct {
 	// name.
 	Slug *string `json:"slug,omitempty" yaml:"slug,omitempty" mapstructure:"slug,omitempty"`
 
-	// Optional tags to categorise this page
+	// Tag names to assign. Missing tags are created automatically.
 	Tags []string `json:"tags,omitempty" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
 
 	// Optional external URL if this page references a topic on another website
@@ -2320,7 +2450,9 @@ func (j *ToolLibraryPageCreateOutput) UnmarshalJSON(value []byte) error {
 }
 
 // Create a new page in the library. A slug will be generated automatically if not
-// provided.
+// provided. Create a parent successfully before creating its children; only
+// independent pages may be created in parallel. For multiple pages use
+// library_pages_create.
 type ToolLibraryPageCreateYaml struct {
 	// Input corresponds to the JSON schema field "input".
 	Input ToolLibraryPageCreateInput `json:"input" yaml:"input" mapstructure:"input"`
@@ -2955,7 +3087,8 @@ type ToolLibraryPageUpdateInput struct {
 	// The new URL slug for the page
 	Slug *string `json:"slug,omitempty" yaml:"slug,omitempty" mapstructure:"slug,omitempty"`
 
-	// New tags to categorise this page
+	// Replacement tag names. Missing tags are created automatically. Omit to preserve
+	// tags; pass an empty array to remove all tags.
 	Tags []string `json:"tags,omitempty" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
 
 	// New external URL reference
@@ -3092,6 +3225,386 @@ func (j *ToolLibraryPageUpdateYaml) UnmarshalJSON(value []byte) error {
 		return err
 	}
 	*j = ToolLibraryPageUpdateYaml(plain)
+	return nil
+}
+
+type ToolLibraryPagesCreateInput struct {
+	// Items corresponds to the JSON schema field "items".
+	Items []ToolLibraryPagesCreateItem `json:"items" yaml:"items" mapstructure:"items"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolLibraryPagesCreateInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["items"]; raw != nil && !ok {
+		return fmt.Errorf("field items in ToolLibraryPagesCreateInput: required")
+	}
+	type Plain ToolLibraryPagesCreateInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if plain.Items != nil && len(plain.Items) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "items", 1)
+	}
+	if len(plain.Items) > 100 {
+		return fmt.Errorf("field %s length: must be <= %d", "items", 100)
+	}
+	*j = ToolLibraryPagesCreateInput(plain)
+	return nil
+}
+
+type ToolLibraryPagesCreateItem struct {
+	// The content of the page in HTML format
+	Content *string `json:"content,omitempty" yaml:"content,omitempty" mapstructure:"content,omitempty"`
+
+	// The name/title of the page
+	Name string `json:"name" yaml:"name" mapstructure:"name"`
+
+	// ID or slug of an existing parent page. Omit to create a root-level page.
+	Parent *string `json:"parent,omitempty" yaml:"parent,omitempty" mapstructure:"parent,omitempty"`
+
+	// Reference of another item in this batch to use as the parent. Mutually
+	// exclusive with parent.
+	ParentRef *string `json:"parent_ref,omitempty" yaml:"parent_ref,omitempty" mapstructure:"parent_ref,omitempty"`
+
+	// Unique reference for matching this item to its result.
+	Ref string `json:"ref" yaml:"ref" mapstructure:"ref"`
+
+	// The unique slug for this page. If not provided, one will be generated from the
+	// name.
+	Slug *string `json:"slug,omitempty" yaml:"slug,omitempty" mapstructure:"slug,omitempty"`
+
+	// Tag names to assign. Missing tags are created automatically.
+	Tags []string `json:"tags,omitempty" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
+
+	// Optional external URL if this page references a topic on another website
+	Url *string `json:"url,omitempty" yaml:"url,omitempty" mapstructure:"url,omitempty"`
+
+	// Visibility of the page (default: published)
+	Visibility *ToolLibraryPagesCreateItemVisibility `json:"visibility,omitempty" yaml:"visibility,omitempty" mapstructure:"visibility,omitempty"`
+}
+
+type ToolLibraryPagesCreateItemVisibility string
+
+const ToolLibraryPagesCreateItemVisibilityDraft ToolLibraryPagesCreateItemVisibility = "draft"
+const ToolLibraryPagesCreateItemVisibilityPublished ToolLibraryPagesCreateItemVisibility = "published"
+
+var enumValues_ToolLibraryPagesCreateItemVisibility = []interface{}{
+	"published",
+	"draft",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolLibraryPagesCreateItemVisibility) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_ToolLibraryPagesCreateItemVisibility {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_ToolLibraryPagesCreateItemVisibility, v)
+	}
+	*j = ToolLibraryPagesCreateItemVisibility(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolLibraryPagesCreateItem) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["name"]; raw != nil && !ok {
+		return fmt.Errorf("field name in ToolLibraryPagesCreateItem: required")
+	}
+	if _, ok := raw["ref"]; raw != nil && !ok {
+		return fmt.Errorf("field ref in ToolLibraryPagesCreateItem: required")
+	}
+	type Plain ToolLibraryPagesCreateItem
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if len(plain.Name) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "name", 1)
+	}
+	if plain.ParentRef != nil && len(*plain.ParentRef) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "parent_ref", 1)
+	}
+	if len(plain.Ref) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "ref", 1)
+	}
+	if len(plain.Ref) > 128 {
+		return fmt.Errorf("field %s length: must be <= %d", "ref", 128)
+	}
+	*j = ToolLibraryPagesCreateItem(plain)
+	return nil
+}
+
+type ToolLibraryPagesCreateOutput struct {
+	// NextAction corresponds to the JSON schema field "next_action".
+	NextAction string `json:"next_action" yaml:"next_action" mapstructure:"next_action"`
+
+	// Results corresponds to the JSON schema field "results".
+	Results []LibraryPageBatchResultYaml `json:"results" yaml:"results" mapstructure:"results"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolLibraryPagesCreateOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["next_action"]; raw != nil && !ok {
+		return fmt.Errorf("field next_action in ToolLibraryPagesCreateOutput: required")
+	}
+	if _, ok := raw["results"]; raw != nil && !ok {
+		return fmt.Errorf("field results in ToolLibraryPagesCreateOutput: required")
+	}
+	type Plain ToolLibraryPagesCreateOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolLibraryPagesCreateOutput(plain)
+	return nil
+}
+
+// Create up to 100 Library pages as one atomic batch. Use parent_ref to refer to
+// another item in this batch; input order does not matter. Inputs and references
+// are validated before writes. Page and tag mutations all commit or all roll back.
+// Optional external link enrichment is best-effort and outside that transaction;
+// link failures do not block pages. Results match input order. Validation errors
+// identify inputs by their one-based position or ref. Repeated requests are not
+// deduplicated. If a response is lost, inspect the Library before submitting
+// again.
+type ToolLibraryPagesCreateYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolLibraryPagesCreateInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolLibraryPagesCreateOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolLibraryPagesCreateYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolLibraryPagesCreateYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolLibraryPagesCreateYaml: required")
+	}
+	type Plain ToolLibraryPagesCreateYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolLibraryPagesCreateYaml(plain)
+	return nil
+}
+
+type ToolLibraryPagesUpdateInput struct {
+	// Items corresponds to the JSON schema field "items".
+	Items []ToolLibraryPagesUpdateItem `json:"items" yaml:"items" mapstructure:"items"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolLibraryPagesUpdateInput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["items"]; raw != nil && !ok {
+		return fmt.Errorf("field items in ToolLibraryPagesUpdateInput: required")
+	}
+	type Plain ToolLibraryPagesUpdateInput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if plain.Items != nil && len(plain.Items) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "items", 1)
+	}
+	if len(plain.Items) > 100 {
+		return fmt.Errorf("field %s length: must be <= %d", "items", 100)
+	}
+	*j = ToolLibraryPagesUpdateInput(plain)
+	return nil
+}
+
+type ToolLibraryPagesUpdateItem struct {
+	// The new content of the page in HTML format
+	Content *string `json:"content,omitempty" yaml:"content,omitempty" mapstructure:"content,omitempty"`
+
+	// The unique identifier of the page to update
+	Id string `json:"id" yaml:"id" mapstructure:"id"`
+
+	// The new name/title of the page
+	Name *string `json:"name,omitempty" yaml:"name,omitempty" mapstructure:"name,omitempty"`
+
+	// New parent page slug. Provide to move the page to a different parent.
+	Parent *string `json:"parent,omitempty" yaml:"parent,omitempty" mapstructure:"parent,omitempty"`
+
+	// Unique reference for matching this item to its result.
+	Ref string `json:"ref" yaml:"ref" mapstructure:"ref"`
+
+	// The new URL slug for the page
+	Slug *string `json:"slug,omitempty" yaml:"slug,omitempty" mapstructure:"slug,omitempty"`
+
+	// Replacement tag names. Missing tags are created automatically. Omit to preserve
+	// tags; pass an empty array to remove all tags.
+	Tags []string `json:"tags,omitempty" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
+
+	// New external URL reference
+	Url *string `json:"url,omitempty" yaml:"url,omitempty" mapstructure:"url,omitempty"`
+
+	// New visibility of the page
+	Visibility *ToolLibraryPagesUpdateItemVisibility `json:"visibility,omitempty" yaml:"visibility,omitempty" mapstructure:"visibility,omitempty"`
+}
+
+type ToolLibraryPagesUpdateItemVisibility string
+
+const ToolLibraryPagesUpdateItemVisibilityDraft ToolLibraryPagesUpdateItemVisibility = "draft"
+const ToolLibraryPagesUpdateItemVisibilityPublished ToolLibraryPagesUpdateItemVisibility = "published"
+
+var enumValues_ToolLibraryPagesUpdateItemVisibility = []interface{}{
+	"published",
+	"draft",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolLibraryPagesUpdateItemVisibility) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_ToolLibraryPagesUpdateItemVisibility {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_ToolLibraryPagesUpdateItemVisibility, v)
+	}
+	*j = ToolLibraryPagesUpdateItemVisibility(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolLibraryPagesUpdateItem) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["id"]; raw != nil && !ok {
+		return fmt.Errorf("field id in ToolLibraryPagesUpdateItem: required")
+	}
+	if _, ok := raw["ref"]; raw != nil && !ok {
+		return fmt.Errorf("field ref in ToolLibraryPagesUpdateItem: required")
+	}
+	type Plain ToolLibraryPagesUpdateItem
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if len(plain.Id) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "id", 1)
+	}
+	if plain.Name != nil && len(*plain.Name) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "name", 1)
+	}
+	if len(plain.Ref) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "ref", 1)
+	}
+	if len(plain.Ref) > 128 {
+		return fmt.Errorf("field %s length: must be <= %d", "ref", 128)
+	}
+	if plain.Slug != nil && len(*plain.Slug) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "slug", 1)
+	}
+	*j = ToolLibraryPagesUpdateItem(plain)
+	return nil
+}
+
+type ToolLibraryPagesUpdateOutput struct {
+	// NextAction corresponds to the JSON schema field "next_action".
+	NextAction string `json:"next_action" yaml:"next_action" mapstructure:"next_action"`
+
+	// Results corresponds to the JSON schema field "results".
+	Results []LibraryPageBatchResultYaml `json:"results" yaml:"results" mapstructure:"results"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolLibraryPagesUpdateOutput) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["next_action"]; raw != nil && !ok {
+		return fmt.Errorf("field next_action in ToolLibraryPagesUpdateOutput: required")
+	}
+	if _, ok := raw["results"]; raw != nil && !ok {
+		return fmt.Errorf("field results in ToolLibraryPagesUpdateOutput: required")
+	}
+	type Plain ToolLibraryPagesUpdateOutput
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolLibraryPagesUpdateOutput(plain)
+	return nil
+}
+
+// Update up to 100 Library pages as one atomic batch. Omitted fields remain
+// unchanged. Targets must identify distinct pages. Inputs and references are
+// validated before writes. Page and tag mutations all commit or all roll back.
+// Optional external link enrichment is best-effort and outside that transaction;
+// link failures do not block pages. Results match input order. Validation errors
+// identify inputs by their one-based position or ref. Repeated requests are not
+// deduplicated. If a response is lost, inspect the Library before submitting
+// again.
+type ToolLibraryPagesUpdateYaml struct {
+	// Input corresponds to the JSON schema field "input".
+	Input ToolLibraryPagesUpdateInput `json:"input" yaml:"input" mapstructure:"input"`
+
+	// Output corresponds to the JSON schema field "output".
+	Output ToolLibraryPagesUpdateOutput `json:"output" yaml:"output" mapstructure:"output"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolLibraryPagesUpdateYaml) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	if _, ok := raw["input"]; raw != nil && !ok {
+		return fmt.Errorf("field input in ToolLibraryPagesUpdateYaml: required")
+	}
+	if _, ok := raw["output"]; raw != nil && !ok {
+		return fmt.Errorf("field output in ToolLibraryPagesUpdateYaml: required")
+	}
+	type Plain ToolLibraryPagesUpdateYaml
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	*j = ToolLibraryPagesUpdateYaml(plain)
 	return nil
 }
 
@@ -6620,6 +7133,12 @@ func (j *ToolToolGetInput) UnmarshalJSON(value []byte) error {
 }
 
 type ToolToolGetOutput struct {
+	// Availability corresponds to the JSON schema field "availability".
+	Availability *RobotToolAvailabilityYaml `json:"availability,omitempty" yaml:"availability,omitempty" mapstructure:"availability,omitempty"`
+
+	// Exact function name to invoke when callable; may differ from the stable ID.
+	CallableName string `json:"callable_name" yaml:"callable_name" mapstructure:"callable_name"`
+
 	// The outcome the tool is designed to achieve and when it should be selected.
 	Description string `json:"description" yaml:"description" mapstructure:"description"`
 
@@ -6658,6 +7177,9 @@ func (j *ToolToolGetOutput) UnmarshalJSON(value []byte) error {
 	if err := json.Unmarshal(value, &raw); err != nil {
 		return err
 	}
+	if _, ok := raw["callable_name"]; raw != nil && !ok {
+		return fmt.Errorf("field callable_name in ToolToolGetOutput: required")
+	}
 	if _, ok := raw["description"]; raw != nil && !ok {
 		return fmt.Errorf("field description in ToolToolGetOutput: required")
 	}
@@ -6693,7 +7215,11 @@ func (j *ToolToolGetOutput) UnmarshalJSON(value []byte) error {
 
 // Get the full schema, Toolset membership, and runtime preconditions of one tool
 // after finding its ID with tool_search. This is inspection only; it does not load
-// or activate the tool.
+// or activate the tool. When availability is callable, invoke callable_name. When
+// load_required, use tool_load, or toolset_get and toolset_load for a declared
+// Toolset if toolset_only. When blocked, resolve workspace preconditions or
+// inspect tool_runtime_issues when available. Loading takes effect on the next
+// model step.
 type ToolToolGetYaml struct {
 	// Input corresponds to the JSON schema field "input".
 	Input ToolToolGetInput `json:"input" yaml:"input" mapstructure:"input"`
@@ -6877,8 +7403,13 @@ func (j *ToolToolSearchOutput) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
-// Search for individual tools that can perform one narrow task. Use tool_get to
-// inspect a candidate's schema before loading it or assigning it to a Robot.
+// Search for individual tools that can perform one narrow task. Use the
+// candidate's id with tool_get to inspect its schema and preconditions.
+// Availability is callable (invoke callable_name), load_required (activate the ID
+// with tool_load, then invoke it on the next model step), or blocked (resolve
+// preconditions or inspect tool_runtime_issues when available). If tool_get marks
+// a tool toolset_only, inspect and load a declared Toolset with toolset_get and
+// toolset_load instead. Inspection alone does not activate a tool.
 type ToolToolSearchYaml struct {
 	// Input corresponds to the JSON schema field "input".
 	Input ToolToolSearchInput `json:"input" yaml:"input" mapstructure:"input"`

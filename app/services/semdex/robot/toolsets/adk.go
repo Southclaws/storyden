@@ -307,7 +307,10 @@ func (r *Registry) Discovery(ctx context.Context, baseRefs ...string) (tool.Tool
 			}
 			canonical = append(canonical, selected.Definition.Name)
 			loaded = append(loaded, mcp.RobotToolCatalogueItemYaml{
-				Id: selected.Definition.Name, Name: name, Description: selected.Definition.Description,
+				Id:           selected.Definition.Name,
+				CallableName: selected.ADKName(),
+				Name:         name,
+				Description:  selected.Definition.Description,
 			})
 		}
 
@@ -535,7 +538,13 @@ func (t *discoveryToolset) ProcessRequest(ctx agent.Context, request *model.LLMR
 			runtimeIssuesToolName,
 		))
 	}
-	return nil
+	blockers := make(map[string]string)
+	for _, issue := range issues {
+		if issue.CapabilityType == "tool" {
+			blockers[issue.ID] = issue.SuggestedAction
+		}
+	}
+	return ctx.State().Set(robottools.ToolBlockersStateKey, blockers)
 }
 
 func addToolOwner(owners map[string]map[string]struct{}, toolName, toolsetID string) {

@@ -12,7 +12,8 @@ x-storyden-tool:
     openWorldHint: false
 title: create_library_page
 description: Create a new page in the library. A slug will be generated
-  automatically if not provided.
+  automatically if not provided. Create a parent successfully before creating its children;
+  only independent pages may be created in parallel. For multiple pages use library_pages_create.
 type: object
 required:
   - input
@@ -60,7 +61,7 @@ definitions:
         type: array
         items:
           type: string
-        description: Optional tags to categorise this page
+        description: Tag names to assign. Missing tags are created automatically.
     additionalProperties: false
   ToolLibraryPageCreateOutput:
     type: object

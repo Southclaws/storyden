@@ -5,6 +5,7 @@ x-storyden-tool:
   toolset_only: true
   toolsets:
     - system.documents
+    - system.web_research
   title: Close Document
   annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false }
 title: document_close

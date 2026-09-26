@@ -308,6 +308,11 @@ func TestDefaultSearchesInspectsLoadsAndUsesIndividualTool(t *testing.T) {
 				stream := doChat(t, root, ts, adminSession, xid.New().String(), "", "exercise one error tool")
 				assert.Equal(t, []string{"tool_search", "tool_get", "tool_load", "throw_an_error"}, collectToolCalls(stream))
 				assert.Equal(t, "Individual tool executed.", strings.Join(collectTextDeltas(stream), ""))
+				inspected := toolOutputByCallID(t, collectToolOutputs(stream), "call_tool_get_1")
+				availability, ok := inspected["availability"].(string)
+				require.True(t, ok, "tool_get must report availability from the current model request")
+				assert.Equal(t, "load_required", availability)
+				assert.Equal(t, "throw_an_error", inspected["callable_name"])
 			}))
 		}),
 	)

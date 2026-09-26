@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	"github.com/Southclaws/storyden/internal/integration"
 )
 
@@ -118,7 +119,7 @@ func TestAppendMessageLinksMultipleAssetsWithoutLosingContentOrder(t *testing.T)
 			err = repo.AppendMessage(ctx, sessionID, opt.New(account.AccountID(owner.ID)), opt.NewEmpty[robot.Actor](), event)
 			require.NoError(t, err)
 
-			stored, err := db.RobotSessionMessage.Query().WithAssets().Only(ctx)
+			stored, err := db.RobotSessionMessage.Query().Where(robotsessionmessage.SessionIDEQ(xid.ID(sessionID))).WithAssets().Only(ctx)
 			require.NoError(t, err)
 			require.Len(t, stored.Edges.Assets, 2, "the relation is a deduplicated asset reference index")
 			require.Len(t, stored.EventData.Content.Parts, 4, "the event remains the ordered model content source")
@@ -129,7 +130,7 @@ func TestAppendMessageLinksMultipleAssetsWithoutLosingContentOrder(t *testing.T)
 			assertProjectedRobotMessageAssets(t, ctx, repo, sessionID, []asset.AssetID{firstID, secondID})
 
 			require.NoError(t, db.Asset.DeleteOneID(firstID).Exec(ctx))
-			stored, err = db.RobotSessionMessage.Query().WithAssets().Only(ctx)
+			stored, err = db.RobotSessionMessage.Query().Where(robotsessionmessage.SessionIDEQ(xid.ID(sessionID))).WithAssets().Only(ctx)
 			require.NoError(t, err, "deleting an asset must preserve the message")
 			require.Len(t, stored.Edges.Assets, 1, "deleting an asset removes only its join-row reference")
 			assert.Equal(t, secondID, stored.Edges.Assets[0].ID)

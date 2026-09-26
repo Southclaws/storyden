@@ -2,7 +2,7 @@ $schema: http://json-schema.org/draft-07/schema#
 $id: ToolWebOpen
 x-storyden-tool:
   internal: true
-  toolsets: []
+  toolsets: [system.web_research]
   title: Open Web Page
   annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true }
 title: web_open

@@ -200,3 +200,9 @@ definitions:
 
   ToolMemberReinstate:
     $ref: "./robots/tools/tool_member_reinstate.yaml"
+
+  ToolLibraryPagesCreate:
+    $ref: "./robots/tools/tool_library_pages_create.yaml"
+
+  ToolLibraryPagesUpdate:
+    $ref: "./robots/tools/tool_library_pages_update.yaml"

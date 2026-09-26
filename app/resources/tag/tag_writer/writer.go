@@ -21,6 +21,9 @@ func New(db *ent.Client) *Writer {
 }
 
 func (w *Writer) Add(ctx context.Context, names ...tag_ref.Name) ([]*tag_ref.Tag, error) {
+	if len(names) == 0 {
+		return []*tag_ref.Tag{}, nil
+	}
 	nameStrings := tag_ref.Names(names).Strings()
 
 	newTags := dt.Map(nameStrings, func(n string) *ent.TagCreate {

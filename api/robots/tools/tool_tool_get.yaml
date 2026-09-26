@@ -7,7 +7,7 @@ x-storyden-tool:
   role: USE_ROBOTS
   annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
 title: tool_get
-description: Get the full schema, Toolset membership, and runtime preconditions of one tool after finding its ID with tool_search. This is inspection only; it does not load or activate the tool.
+description: Get the full schema, Toolset membership, and runtime preconditions of one tool after finding its ID with tool_search. This is inspection only; it does not load or activate the tool. When availability is callable, invoke callable_name. When load_required, use tool_load, or toolset_get and toolset_load for a declared Toolset if toolset_only. When blocked, resolve workspace preconditions or inspect tool_runtime_issues when available. Loading takes effect on the next model step.
 type: object
 required: [input, output]
 properties:
@@ -24,11 +24,14 @@ definitions:
     additionalProperties: false
   ToolToolGetOutput:
     type: object
-    required: [id, name, description, input_schema, toolsets, toolset_only, requires_confirmation, requires_workspace]
+    required: [id, callable_name, name, description, input_schema, toolsets, toolset_only, requires_confirmation, requires_workspace]
     properties:
       id:
         type: string
         description: Stable tool identifier accepted by tool_load and Robot configuration tools unless toolset_only is true.
+      callable_name:
+        type: string
+        description: Exact function name to invoke when callable; may differ from the stable ID.
       name:
         type: string
         description: Human-readable title for explaining or confirming the selected capability.
@@ -43,6 +46,8 @@ definitions:
         type: object
         description: Complete JSON Schema for the tool result when the tool declares one.
         additionalProperties: true
+      availability:
+        $ref: "../../common/RobotToolAvailability.yaml"
       toolsets:
         type: array
         description: Built-in Toolsets that provide this tool together with their specialist instruction and related capabilities.

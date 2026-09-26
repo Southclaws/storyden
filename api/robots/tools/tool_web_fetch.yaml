@@ -1,7 +1,7 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolWebFetch
 x-storyden-tool:
-  toolsets: []
+  toolsets: [system.web_research]
   title: Fetch Web Page
   annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: false, openWorldHint: true }
 title: web_fetch

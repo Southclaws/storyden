@@ -171,7 +171,7 @@ func New(
 			// We don't use streaming, it's cliche as fuck.
 			StreamingMode: agent.StreamingModeNone,
 		},
-		beforeModelCallbacks: []llmagent.BeforeModelCallback{agent_history.RepairInterruptedToolCallsBeforeModel(logger), normalizeClientToolResultsBeforeModel(logger, cfg.PublicWebAddress), projectMessageSpeakersBeforeModel(), logBeforeModel(logger)},
+		beforeModelCallbacks: []llmagent.BeforeModelCallback{agent_history.RepairInterruptedToolCallsBeforeModel(logger), normalizeClientToolResultsBeforeModel(logger, cfg.PublicWebAddress), projectMessageSpeakersBeforeModel(), tools.CaptureCallableTools(), logBeforeModel(logger)},
 		afterModelCallbacks:  []llmagent.AfterModelCallback{logAfterModel(logger)},
 		beforeToolCallbacks:  []llmagent.BeforeToolCallback{logBeforeTool(logger)},
 		afterToolCallbacks:   []llmagent.AfterToolCallback{logAfterTool(logger)},

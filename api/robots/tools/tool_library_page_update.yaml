@@ -59,7 +59,7 @@ definitions:
         type: array
         items:
           type: string
-        description: New tags to categorise this page
+        description: Replacement tag names. Missing tags are created automatically. Omit to preserve tags; pass an empty array to remove all tags.
     additionalProperties: false
   ToolLibraryPageUpdateOutput:
     type: object
