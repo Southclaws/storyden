@@ -139,6 +139,12 @@ func (_c *OAuthClientCreate) SetNillableTokenEndpointAuthMethod(v *string) *OAut
 	return _c
 }
 
+// SetJwks sets the "jwks" field.
+func (_c *OAuthClientCreate) SetJwks(v map[string]interface{}) *OAuthClientCreate {
+	_c.mutation.SetJwks(v)
+	return _c
+}
+
 // SetPkceRequired sets the "pkce_required" field.
 func (_c *OAuthClientCreate) SetPkceRequired(v bool) *OAuthClientCreate {
 	_c.mutation.SetPkceRequired(v)
@@ -440,6 +446,10 @@ func (_c *OAuthClientCreate) createSpec() (*OAuthClient, *sqlgraph.CreateSpec) {
 		_spec.SetField(oauthclient.FieldTokenEndpointAuthMethod, field.TypeString, value)
 		_node.TokenEndpointAuthMethod = value
 	}
+	if value, ok := _c.mutation.Jwks(); ok {
+		_spec.SetField(oauthclient.FieldJwks, field.TypeJSON, value)
+		_node.Jwks = value
+	}
 	if value, ok := _c.mutation.PkceRequired(); ok {
 		_spec.SetField(oauthclient.FieldPkceRequired, field.TypeBool, value)
 		_node.PkceRequired = value
@@ -685,6 +695,24 @@ func (u *OAuthClientUpsert) ClearTokenEndpointAuthMethod() *OAuthClientUpsert {
 	return u
 }
 
+// SetJwks sets the "jwks" field.
+func (u *OAuthClientUpsert) SetJwks(v map[string]interface{}) *OAuthClientUpsert {
+	u.Set(oauthclient.FieldJwks, v)
+	return u
+}
+
+// UpdateJwks sets the "jwks" field to the value that was provided on create.
+func (u *OAuthClientUpsert) UpdateJwks() *OAuthClientUpsert {
+	u.SetExcluded(oauthclient.FieldJwks)
+	return u
+}
+
+// ClearJwks clears the value of the "jwks" field.
+func (u *OAuthClientUpsert) ClearJwks() *OAuthClientUpsert {
+	u.SetNull(oauthclient.FieldJwks)
+	return u
+}
+
 // SetPkceRequired sets the "pkce_required" field.
 func (u *OAuthClientUpsert) SetPkceRequired(v bool) *OAuthClientUpsert {
 	u.Set(oauthclient.FieldPkceRequired, v)
@@ -896,6 +924,27 @@ func (u *OAuthClientUpsertOne) UpdateTokenEndpointAuthMethod() *OAuthClientUpser
 func (u *OAuthClientUpsertOne) ClearTokenEndpointAuthMethod() *OAuthClientUpsertOne {
 	return u.Update(func(s *OAuthClientUpsert) {
 		s.ClearTokenEndpointAuthMethod()
+	})
+}
+
+// SetJwks sets the "jwks" field.
+func (u *OAuthClientUpsertOne) SetJwks(v map[string]interface{}) *OAuthClientUpsertOne {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.SetJwks(v)
+	})
+}
+
+// UpdateJwks sets the "jwks" field to the value that was provided on create.
+func (u *OAuthClientUpsertOne) UpdateJwks() *OAuthClientUpsertOne {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.UpdateJwks()
+	})
+}
+
+// ClearJwks clears the value of the "jwks" field.
+func (u *OAuthClientUpsertOne) ClearJwks() *OAuthClientUpsertOne {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.ClearJwks()
 	})
 }
 
@@ -1285,6 +1334,27 @@ func (u *OAuthClientUpsertBulk) UpdateTokenEndpointAuthMethod() *OAuthClientUpse
 func (u *OAuthClientUpsertBulk) ClearTokenEndpointAuthMethod() *OAuthClientUpsertBulk {
 	return u.Update(func(s *OAuthClientUpsert) {
 		s.ClearTokenEndpointAuthMethod()
+	})
+}
+
+// SetJwks sets the "jwks" field.
+func (u *OAuthClientUpsertBulk) SetJwks(v map[string]interface{}) *OAuthClientUpsertBulk {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.SetJwks(v)
+	})
+}
+
+// UpdateJwks sets the "jwks" field to the value that was provided on create.
+func (u *OAuthClientUpsertBulk) UpdateJwks() *OAuthClientUpsertBulk {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.UpdateJwks()
+	})
+}
+
+// ClearJwks clears the value of the "jwks" field.
+func (u *OAuthClientUpsertBulk) ClearJwks() *OAuthClientUpsertBulk {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.ClearJwks()
 	})
 }
 

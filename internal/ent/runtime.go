@@ -1108,7 +1108,7 @@ func init() {
 	// oauthclient.DefaultTokenEndpointAuthMethod holds the default value on creation for the token_endpoint_auth_method field.
 	oauthclient.DefaultTokenEndpointAuthMethod = oauthclientDescTokenEndpointAuthMethod.Default.(string)
 	// oauthclientDescPkceRequired is the schema descriptor for pkce_required field.
-	oauthclientDescPkceRequired := oauthclientFields[7].Descriptor()
+	oauthclientDescPkceRequired := oauthclientFields[8].Descriptor()
 	// oauthclient.DefaultPkceRequired holds the default value on creation for the pkce_required field.
 	oauthclient.DefaultPkceRequired = oauthclientDescPkceRequired.Default.(bool)
 	// oauthclientDescID is the schema descriptor for id field.

@@ -8,16 +8,7 @@
  * OpenAPI spec version: v1.26.15-post
  */
 
-export interface OAuthTokenProps {
-  grant_type: string;
-  client_id: string;
-  client_secret?: string;
-  scope?: string;
-  device_code?: string;
-  code?: string;
-  redirect_uri?: string;
-  code_verifier?: string;
-  refresh_token?: string;
-  client_assertion_type?: string;
-  client_assertion?: string;
-}
+/**
+ * Public JSON Web Key Set used for private_key_jwt client authentication.
+ */
+export type OAuthClientRegisterPropsJwks = { [key: string]: unknown };

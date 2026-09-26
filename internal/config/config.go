@@ -321,6 +321,8 @@ type Config struct {
 	OAuthSigningKeyID string `envconfig:"OAUTH_SIGNING_KEY_ID"`
 	// Enable RFC 7591 OAuth 2.0 Dynamic Client Registration.
 	OAuthDynamicRegistrationEnabled bool `default:"false" envconfig:"OAUTH_DYNAMIC_REGISTRATION_ENABLED"`
+	// Allow DCR clients using private_key_jwt to atomically provision a bot account bound to the client.
+	OAuthAutonomousAgentRegistrationEnabled bool `default:"false" envconfig:"OAUTH_AUTONOMOUS_AGENT_REGISTRATION_ENABLED"`
 	// Advertise and accept OAuth Client ID Metadata Documents (CIMD), letting clients identify themselves with an https URL client_id that resolves to a hosted metadata document instead of pre-registering.
 	OAuthClientIDMetadataDocumentEnabled bool `default:"false" envconfig:"OAUTH_CIMD_ENABLED"`
 	// Comma-separated list of permission scopes a CIMD client may request. Empty uses a conservative read-only default. Privileged scopes are still gated by OAUTH_CIMD_ALLOW_PRIVILEGED_SCOPES.

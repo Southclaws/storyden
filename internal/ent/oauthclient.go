@@ -38,6 +38,8 @@ type OAuthClient struct {
 	ScopePolicy oauthclient.ScopePolicy `json:"scope_policy,omitempty"`
 	// TokenEndpointAuthMethod holds the value of the "token_endpoint_auth_method" field.
 	TokenEndpointAuthMethod string `json:"token_endpoint_auth_method,omitempty"`
+	// Jwks holds the value of the "jwks" field.
+	Jwks map[string]interface{} `json:"jwks,omitempty"`
 	// PkceRequired holds the value of the "pkce_required" field.
 	PkceRequired bool `json:"pkce_required,omitempty"`
 	// RedirectUris holds the value of the "redirect_uris" field.
@@ -123,7 +125,7 @@ func (*OAuthClient) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case oauthclient.FieldAccountID:
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
-		case oauthclient.FieldRedirectUris, oauthclient.FieldAllowedScopes, oauthclient.FieldAllowedGrants:
+		case oauthclient.FieldJwks, oauthclient.FieldRedirectUris, oauthclient.FieldAllowedScopes, oauthclient.FieldAllowedGrants:
 			values[i] = new([]byte)
 		case oauthclient.FieldPkceRequired:
 			values[i] = new(sql.NullBool)
@@ -209,6 +211,14 @@ func (_m *OAuthClient) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field token_endpoint_auth_method", values[i])
 			} else if value.Valid {
 				_m.TokenEndpointAuthMethod = value.String
+			}
+		case oauthclient.FieldJwks:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field jwks", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &_m.Jwks); err != nil {
+					return fmt.Errorf("unmarshal field jwks: %w", err)
+				}
 			}
 		case oauthclient.FieldPkceRequired:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -331,6 +341,9 @@ func (_m *OAuthClient) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("token_endpoint_auth_method=")
 	builder.WriteString(_m.TokenEndpointAuthMethod)
+	builder.WriteString(", ")
+	builder.WriteString("jwks=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Jwks))
 	builder.WriteString(", ")
 	builder.WriteString("pkce_required=")
 	builder.WriteString(fmt.Sprintf("%v", _m.PkceRequired))

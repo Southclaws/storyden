@@ -137,6 +137,18 @@ func (_u *OAuthClientUpdate) ClearTokenEndpointAuthMethod() *OAuthClientUpdate {
 	return _u
 }
 
+// SetJwks sets the "jwks" field.
+func (_u *OAuthClientUpdate) SetJwks(v map[string]interface{}) *OAuthClientUpdate {
+	_u.mutation.SetJwks(v)
+	return _u
+}
+
+// ClearJwks clears the value of the "jwks" field.
+func (_u *OAuthClientUpdate) ClearJwks() *OAuthClientUpdate {
+	_u.mutation.ClearJwks()
+	return _u
+}
+
 // SetPkceRequired sets the "pkce_required" field.
 func (_u *OAuthClientUpdate) SetPkceRequired(v bool) *OAuthClientUpdate {
 	_u.mutation.SetPkceRequired(v)
@@ -441,6 +453,12 @@ func (_u *OAuthClientUpdate) sqlSave(ctx context.Context) (_node int, err error)
 	}
 	if _u.mutation.TokenEndpointAuthMethodCleared() {
 		_spec.ClearField(oauthclient.FieldTokenEndpointAuthMethod, field.TypeString)
+	}
+	if value, ok := _u.mutation.Jwks(); ok {
+		_spec.SetField(oauthclient.FieldJwks, field.TypeJSON, value)
+	}
+	if _u.mutation.JwksCleared() {
+		_spec.ClearField(oauthclient.FieldJwks, field.TypeJSON)
 	}
 	if value, ok := _u.mutation.PkceRequired(); ok {
 		_spec.SetField(oauthclient.FieldPkceRequired, field.TypeBool, value)
@@ -770,6 +788,18 @@ func (_u *OAuthClientUpdateOne) SetNillableTokenEndpointAuthMethod(v *string) *O
 // ClearTokenEndpointAuthMethod clears the value of the "token_endpoint_auth_method" field.
 func (_u *OAuthClientUpdateOne) ClearTokenEndpointAuthMethod() *OAuthClientUpdateOne {
 	_u.mutation.ClearTokenEndpointAuthMethod()
+	return _u
+}
+
+// SetJwks sets the "jwks" field.
+func (_u *OAuthClientUpdateOne) SetJwks(v map[string]interface{}) *OAuthClientUpdateOne {
+	_u.mutation.SetJwks(v)
+	return _u
+}
+
+// ClearJwks clears the value of the "jwks" field.
+func (_u *OAuthClientUpdateOne) ClearJwks() *OAuthClientUpdateOne {
+	_u.mutation.ClearJwks()
 	return _u
 }
 
@@ -1107,6 +1137,12 @@ func (_u *OAuthClientUpdateOne) sqlSave(ctx context.Context) (_node *OAuthClient
 	}
 	if _u.mutation.TokenEndpointAuthMethodCleared() {
 		_spec.ClearField(oauthclient.FieldTokenEndpointAuthMethod, field.TypeString)
+	}
+	if value, ok := _u.mutation.Jwks(); ok {
+		_spec.SetField(oauthclient.FieldJwks, field.TypeJSON, value)
+	}
+	if _u.mutation.JwksCleared() {
+		_spec.ClearField(oauthclient.FieldJwks, field.TypeJSON)
 	}
 	if value, ok := _u.mutation.PkceRequired(); ok {
 		_spec.SetField(oauthclient.FieldPkceRequired, field.TypeBool, value)

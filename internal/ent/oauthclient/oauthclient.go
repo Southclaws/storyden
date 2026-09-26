@@ -34,6 +34,8 @@ const (
 	FieldScopePolicy = "scope_policy"
 	// FieldTokenEndpointAuthMethod holds the string denoting the token_endpoint_auth_method field in the database.
 	FieldTokenEndpointAuthMethod = "token_endpoint_auth_method"
+	// FieldJwks holds the string denoting the jwks field in the database.
+	FieldJwks = "jwks"
 	// FieldPkceRequired holds the string denoting the pkce_required field in the database.
 	FieldPkceRequired = "pkce_required"
 	// FieldRedirectUris holds the string denoting the redirect_uris field in the database.
@@ -103,6 +105,7 @@ var Columns = []string{
 	FieldType,
 	FieldScopePolicy,
 	FieldTokenEndpointAuthMethod,
+	FieldJwks,
 	FieldPkceRequired,
 	FieldRedirectUris,
 	FieldAllowedScopes,

@@ -9306,6 +9306,10 @@ components:
           type: string
         refresh_token:
           type: string
+        client_assertion_type:
+          type: string
+        client_assertion:
+          type: string
 
     OAuthToken:
       type: object
@@ -9480,6 +9484,10 @@ components:
           items: { type: string }
         scope: { type: string }
         token_endpoint_auth_method: { type: string }
+        jwks:
+          type: object
+          additionalProperties: true
+          description: Public JSON Web Key Set used for private_key_jwt client authentication.
         application_type: { type: string }
         logo_uri: { type: string, format: uri }
         client_uri: { type: string, format: uri }

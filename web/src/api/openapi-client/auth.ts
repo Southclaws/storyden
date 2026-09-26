@@ -1533,6 +1533,15 @@ export const oAuthToken = async (
   if (oAuthTokenBody.refresh_token !== undefined) {
     formUrlEncoded.append(`refresh_token`, oAuthTokenBody.refresh_token);
   }
+  if (oAuthTokenBody.client_assertion_type !== undefined) {
+    formUrlEncoded.append(
+      `client_assertion_type`,
+      oAuthTokenBody.client_assertion_type,
+    );
+  }
+  if (oAuthTokenBody.client_assertion !== undefined) {
+    formUrlEncoded.append(`client_assertion`, oAuthTokenBody.client_assertion);
+  }
 
   return fetcher<OAuthTokenOKResponse>(getOAuthTokenUrl(), {
     ...options,

@@ -36,6 +36,7 @@ type ClientCreate struct {
 	Type                    oauth.ClientType
 	ScopePolicy             opt.Optional[oauth.ScopePolicy]
 	TokenEndpointAuthMethod opt.Optional[string]
+	JWKs                    opt.Optional[map[string]any]
 	PKCERequired            opt.Optional[bool]
 	RedirectURIs            []string
 	AllowedScopes           []string
@@ -115,6 +116,9 @@ func (w *Writer) CreateClient(ctx context.Context, input ClientCreate) (*oauth.C
 	input.TokenEndpointAuthMethod.Call(func(method string) {
 		create.SetTokenEndpointAuthMethod(method)
 	})
+	input.JWKs.Call(func(jwks map[string]any) {
+		create.SetJwks(jwks)
+	})
 	input.PKCERequired.Call(func(required bool) {
 		create.SetPkceRequired(required)
 	})
@@ -122,6 +126,53 @@ func (w *Writer) CreateClient(ctx context.Context, input ClientCreate) (*oauth.C
 	row, err := create.Save(ctx)
 	if err != nil {
 		return nil, wrapWriteError(ctx, err)
+	}
+
+	return oauth.MapClient(row), nil
+}
+
+// CreateAgentClient creates the bot principal and its OAuth credential in one
+// transaction. Keeping their identifiers distinct allows credentials to be
+// replaced later without changing the account which owns existing content.
+func (w *Writer) CreateAgentClient(ctx context.Context, handle string, input ClientCreate) (*oauth.Client, error) {
+	tx, err := w.db.Tx(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	rollback := func(cause error) (*oauth.Client, error) {
+		_ = tx.Rollback()
+		return nil, wrapWriteError(ctx, cause)
+	}
+
+	acc, err := tx.Account.Create().
+		SetHandle(handle).
+		SetName(handle).
+		SetKind("bot").
+		Save(ctx)
+	if err != nil {
+		return rollback(err)
+	}
+
+	create := tx.OAuthClient.Create().
+		SetAccountID(acc.ID).
+		SetClientID(input.ClientID).
+		SetName(input.Name).
+		SetType(oauthclient.Type(input.Type.String())).
+		SetRedirectUris(input.RedirectURIs).
+		SetAllowedScopes(input.AllowedScopes).
+		SetAllowedGrants(input.AllowedGrants)
+	input.ScopePolicy.Call(func(policy oauth.ScopePolicy) { create.SetScopePolicy(oauthclient.ScopePolicy(policy.String())) })
+	input.TokenEndpointAuthMethod.Call(func(method string) { create.SetTokenEndpointAuthMethod(method) })
+	input.JWKs.Call(func(jwks map[string]any) { create.SetJwks(jwks) })
+	input.PKCERequired.Call(func(required bool) { create.SetPkceRequired(required) })
+
+	row, err := create.Save(ctx)
+	if err != nil {
+		return rollback(err)
+	}
+	if err := tx.Commit(); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return oauth.MapClient(row), nil

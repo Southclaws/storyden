@@ -27515,6 +27515,7 @@ type OAuthClientMutation struct {
 	_type                         *oauthclient.Type
 	scope_policy                  *oauthclient.ScopePolicy
 	token_endpoint_auth_method    *string
+	jwks                          *map[string]interface{}
 	pkce_required                 *bool
 	redirect_uris                 *[]string
 	appendredirect_uris           []string
@@ -28009,6 +28010,55 @@ func (m *OAuthClientMutation) ResetTokenEndpointAuthMethod() {
 	delete(m.clearedFields, oauthclient.FieldTokenEndpointAuthMethod)
 }
 
+// SetJwks sets the "jwks" field.
+func (m *OAuthClientMutation) SetJwks(value map[string]interface{}) {
+	m.jwks = &value
+}
+
+// Jwks returns the value of the "jwks" field in the mutation.
+func (m *OAuthClientMutation) Jwks() (r map[string]interface{}, exists bool) {
+	v := m.jwks
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldJwks returns the old "jwks" field's value of the OAuthClient entity.
+// If the OAuthClient object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthClientMutation) OldJwks(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldJwks is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldJwks requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldJwks: %w", err)
+	}
+	return oldValue.Jwks, nil
+}
+
+// ClearJwks clears the value of the "jwks" field.
+func (m *OAuthClientMutation) ClearJwks() {
+	m.jwks = nil
+	m.clearedFields[oauthclient.FieldJwks] = struct{}{}
+}
+
+// JwksCleared returns if the "jwks" field was cleared in this mutation.
+func (m *OAuthClientMutation) JwksCleared() bool {
+	_, ok := m.clearedFields[oauthclient.FieldJwks]
+	return ok
+}
+
+// ResetJwks resets all changes to the "jwks" field.
+func (m *OAuthClientMutation) ResetJwks() {
+	m.jwks = nil
+	delete(m.clearedFields, oauthclient.FieldJwks)
+}
+
 // SetPkceRequired sets the "pkce_required" field.
 func (m *OAuthClientMutation) SetPkceRequired(b bool) {
 	m.pkce_required = &b
@@ -28475,7 +28525,7 @@ func (m *OAuthClientMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *OAuthClientMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 14)
 	if m.created_at != nil {
 		fields = append(fields, oauthclient.FieldCreatedAt)
 	}
@@ -28502,6 +28552,9 @@ func (m *OAuthClientMutation) Fields() []string {
 	}
 	if m.token_endpoint_auth_method != nil {
 		fields = append(fields, oauthclient.FieldTokenEndpointAuthMethod)
+	}
+	if m.jwks != nil {
+		fields = append(fields, oauthclient.FieldJwks)
 	}
 	if m.pkce_required != nil {
 		fields = append(fields, oauthclient.FieldPkceRequired)
@@ -28541,6 +28594,8 @@ func (m *OAuthClientMutation) Field(name string) (ent.Value, bool) {
 		return m.ScopePolicy()
 	case oauthclient.FieldTokenEndpointAuthMethod:
 		return m.TokenEndpointAuthMethod()
+	case oauthclient.FieldJwks:
+		return m.Jwks()
 	case oauthclient.FieldPkceRequired:
 		return m.PkceRequired()
 	case oauthclient.FieldRedirectUris:
@@ -28576,6 +28631,8 @@ func (m *OAuthClientMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldScopePolicy(ctx)
 	case oauthclient.FieldTokenEndpointAuthMethod:
 		return m.OldTokenEndpointAuthMethod(ctx)
+	case oauthclient.FieldJwks:
+		return m.OldJwks(ctx)
 	case oauthclient.FieldPkceRequired:
 		return m.OldPkceRequired(ctx)
 	case oauthclient.FieldRedirectUris:
@@ -28656,6 +28713,13 @@ func (m *OAuthClientMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTokenEndpointAuthMethod(v)
 		return nil
+	case oauthclient.FieldJwks:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetJwks(v)
+		return nil
 	case oauthclient.FieldPkceRequired:
 		v, ok := value.(bool)
 		if !ok {
@@ -28723,6 +28787,9 @@ func (m *OAuthClientMutation) ClearedFields() []string {
 	if m.FieldCleared(oauthclient.FieldTokenEndpointAuthMethod) {
 		fields = append(fields, oauthclient.FieldTokenEndpointAuthMethod)
 	}
+	if m.FieldCleared(oauthclient.FieldJwks) {
+		fields = append(fields, oauthclient.FieldJwks)
+	}
 	return fields
 }
 
@@ -28745,6 +28812,9 @@ func (m *OAuthClientMutation) ClearField(name string) error {
 		return nil
 	case oauthclient.FieldTokenEndpointAuthMethod:
 		m.ClearTokenEndpointAuthMethod()
+		return nil
+	case oauthclient.FieldJwks:
+		m.ClearJwks()
 		return nil
 	}
 	return fmt.Errorf("unknown OAuthClient nullable field %s", name)
@@ -28780,6 +28850,9 @@ func (m *OAuthClientMutation) ResetField(name string) error {
 		return nil
 	case oauthclient.FieldTokenEndpointAuthMethod:
 		m.ResetTokenEndpointAuthMethod()
+		return nil
+	case oauthclient.FieldJwks:
+		m.ResetJwks()
 		return nil
 	case oauthclient.FieldPkceRequired:
 		m.ResetPkceRequired()

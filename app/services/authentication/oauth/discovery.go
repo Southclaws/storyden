@@ -42,7 +42,7 @@ func (s *Service) Discovery() Discovery {
 		ScopesSupported:                   supportedScopes(),
 		SubjectTypesSupported:             []string{"public"},
 		IDTokenSigningAlgValuesSupported:  []string{"RS256"},
-		TokenEndpointAuthMethodsSupported: []string{TokenEndpointAuthMethodNone, TokenEndpointAuthMethodClientSecretBasic, TokenEndpointAuthMethodClientSecretPost},
+		TokenEndpointAuthMethodsSupported: []string{TokenEndpointAuthMethodNone, TokenEndpointAuthMethodClientSecretBasic, TokenEndpointAuthMethodClientSecretPost, TokenEndpointAuthMethodPrivateKeyJWT},
 		ClientIDMetadataDocumentSupported: s.cimdEnabled(),
 	}
 }

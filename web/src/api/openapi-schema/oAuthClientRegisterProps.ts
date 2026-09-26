@@ -7,6 +7,7 @@
  *
  * OpenAPI spec version: v1.26.15-post
  */
+import type { OAuthClientRegisterPropsJwks } from "./oAuthClientRegisterPropsJwks";
 
 /**
  * RFC 7591 client metadata supplied by a dynamically registering client.
@@ -21,6 +22,8 @@ export interface OAuthClientRegisterProps {
   response_types?: string[];
   scope?: string;
   token_endpoint_auth_method?: string;
+  /** Public JSON Web Key Set used for private_key_jwt client authentication. */
+  jwks?: OAuthClientRegisterPropsJwks;
   application_type?: string;
   logo_uri?: string;
   client_uri?: string;

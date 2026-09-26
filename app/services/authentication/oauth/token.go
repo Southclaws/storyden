@@ -3,12 +3,16 @@ package oauth
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/json"
+	"strings"
 	"time"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"github.com/alexedwards/argon2id"
+	"github.com/go-jose/go-jose/v4"
+	jwt "github.com/golang-jwt/jwt/v5"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	oauthresource "github.com/Southclaws/storyden/app/resources/oauth"
@@ -16,15 +20,17 @@ import (
 )
 
 type TokenRequest struct {
-	GrantType    string
-	ClientID     string
-	ClientSecret opt.Optional[string]
-	Scope        opt.Optional[string]
-	DeviceCode   opt.Optional[string]
-	Code         opt.Optional[string]
-	RedirectURI  opt.Optional[string]
-	CodeVerifier opt.Optional[string]
-	RefreshToken opt.Optional[string]
+	GrantType           string
+	ClientID            string
+	ClientSecret        opt.Optional[string]
+	Scope               opt.Optional[string]
+	DeviceCode          opt.Optional[string]
+	Code                opt.Optional[string]
+	RedirectURI         opt.Optional[string]
+	CodeVerifier        opt.Optional[string]
+	RefreshToken        opt.Optional[string]
+	ClientAssertionType opt.Optional[string]
+	ClientAssertion     opt.Optional[string]
 }
 
 type Token struct {
@@ -74,7 +80,7 @@ func (s *Service) exchangeClientCredentials(ctx context.Context, input TokenRequ
 	if !contains(cl.AllowedGrants, GrantTypeClientCredentials) {
 		return nil, oauthError("unauthorized_client", "Client is not authorized for client_credentials grant"), nil
 	}
-	if oauthErr, err := s.authenticateConfidentialClient(ctx, cl, input.ClientSecret); oauthErr != nil || err != nil {
+	if oauthErr, err := s.authenticateConfidentialClient(ctx, cl, input); oauthErr != nil || err != nil {
 		return nil, oauthErr, err
 	}
 
@@ -126,7 +132,7 @@ func (s *Service) exchangeAuthorizationCode(ctx context.Context, input TokenRequ
 	if !contains(cl.AllowedGrants, GrantTypeAuthorizationCode) {
 		return nil, oauthError("unauthorized_client", "Client is not authorized for authorization_code grant"), nil
 	}
-	if oauthErr, err := s.authenticateConfidentialClient(ctx, cl, input.ClientSecret); oauthErr != nil || err != nil {
+	if oauthErr, err := s.authenticateConfidentialClient(ctx, cl, input); oauthErr != nil || err != nil {
 		return nil, oauthErr, err
 	}
 	if !validCodeVerifier(codeVerifier) {
@@ -177,7 +183,7 @@ func (s *Service) exchangeRefreshToken(ctx context.Context, input TokenRequest) 
 	if !contains(cl.AllowedGrants, GrantTypeRefreshToken) {
 		return nil, oauthError("unauthorized_client", "Client is not authorized for refresh_token grant"), nil
 	}
-	if oauthErr, err := s.authenticateConfidentialClient(ctx, cl, input.ClientSecret); oauthErr != nil || err != nil {
+	if oauthErr, err := s.authenticateConfidentialClient(ctx, cl, input); oauthErr != nil || err != nil {
 		return nil, oauthErr, err
 	}
 
@@ -273,9 +279,12 @@ func (s *Service) accountPermissions(ctx context.Context, accountID account.Acco
 	return acc.Roles.Permissions(), nil
 }
 
-func (s *Service) authenticateConfidentialClient(ctx context.Context, client *oauthresource.Client, secret opt.Optional[string]) (*Error, error) {
+func (s *Service) authenticateConfidentialClient(ctx context.Context, client *oauthresource.Client, input TokenRequest) (*Error, error) {
 	if client.Type != oauthresource.ClientTypeConfidential {
 		return nil, nil
+	}
+	if client.TokenEndpointAuthMethod == TokenEndpointAuthMethodPrivateKeyJWT {
+		return s.authenticatePrivateKeyJWT(client, input)
 	}
 
 	hash, ok := client.ClientSecretHash.Get()
@@ -283,7 +292,7 @@ func (s *Service) authenticateConfidentialClient(ctx context.Context, client *oa
 		return oauthError("invalid_client", "Client has no secret configured"), nil
 	}
 
-	raw, ok := secret.Get()
+	raw, ok := input.ClientSecret.Get()
 	if !ok {
 		return oauthError("invalid_client", "Missing client_secret"), nil
 	}
@@ -295,6 +304,61 @@ func (s *Service) authenticateConfidentialClient(ctx context.Context, client *oa
 	if !match {
 		return oauthError("invalid_client", "Invalid client_secret"), nil
 	}
+
+	return nil, nil
+}
+
+const clientAssertionJWTBearer = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+
+func (s *Service) authenticatePrivateKeyJWT(client *oauthresource.Client, input TokenRequest) (*Error, error) {
+	assertionType, ok := input.ClientAssertionType.Get()
+	if !ok || assertionType != clientAssertionJWTBearer {
+		return oauthError("invalid_client", "Missing or unsupported client_assertion_type"), nil
+	}
+	assertion, ok := input.ClientAssertion.Get()
+	if !ok || strings.TrimSpace(assertion) == "" {
+		return oauthError("invalid_client", "Missing client_assertion"), nil
+	}
+
+	rawJWKs, err := json.Marshal(client.JWKs)
+	if err != nil {
+		return nil, err
+	}
+	var keys jose.JSONWebKeySet
+	if err := json.Unmarshal(rawJWKs, &keys); err != nil {
+		return oauthError("invalid_client", "Client key set is invalid"), nil
+	}
+
+	claims := jwt.RegisteredClaims{}
+	parsed, err := jwt.ParseWithClaims(assertion, &claims, func(token *jwt.Token) (any, error) {
+		kid, _ := token.Header["kid"].(string)
+		matches := keys.Key(kid)
+		if len(matches) != 1 {
+			return nil, fault.New("client assertion must select exactly one key")
+		}
+		return matches[0].Key, nil
+	}, jwt.WithAudience(strings.TrimRight(s.issuer, "/")+"/oauth/token"), jwt.WithIssuer(client.ClientID), jwt.WithSubject(client.ClientID), jwt.WithExpirationRequired(), jwt.WithIssuedAt())
+	if err != nil || !parsed.Valid || claims.ID == "" || claims.ExpiresAt == nil || claims.IssuedAt == nil || claims.ExpiresAt.Sub(claims.IssuedAt.Time) > 5*time.Minute {
+		return oauthError("invalid_client", "Invalid client_assertion"), nil
+	}
+
+	// RFC 7523 assertions are one-time credentials. Remember each jti until its
+	// expiry so a captured assertion cannot be replayed during its validity.
+	now := time.Now()
+	s.assertionMu.Lock()
+	defer s.assertionMu.Unlock()
+	if s.usedAssertions == nil {
+		s.usedAssertions = make(map[string]time.Time)
+	}
+	for id, expiry := range s.usedAssertions {
+		if expiry.Before(now) {
+			delete(s.usedAssertions, id)
+		}
+	}
+	if _, exists := s.usedAssertions[claims.ID]; exists {
+		return oauthError("invalid_client", "Client assertion has already been used"), nil
+	}
+	s.usedAssertions[claims.ID] = claims.ExpiresAt.Time
 
 	return nil, nil
 }

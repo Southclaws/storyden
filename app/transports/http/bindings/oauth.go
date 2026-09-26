@@ -705,15 +705,17 @@ func (o OAuth) OAuthToken(ctx context.Context, req openapi.OAuthTokenRequestObje
 	}
 
 	token, oauthErr, err := o.oauth.ExchangeToken(ctx, oauthservice.TokenRequest{
-		GrantType:    req.Body.GrantType,
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
-		Scope:        opt.NewPtr(req.Body.Scope),
-		DeviceCode:   opt.NewPtr(req.Body.DeviceCode),
-		Code:         opt.NewPtr(req.Body.Code),
-		RedirectURI:  opt.NewPtr(req.Body.RedirectUri),
-		CodeVerifier: opt.NewPtr(req.Body.CodeVerifier),
-		RefreshToken: opt.NewPtr(req.Body.RefreshToken),
+		GrantType:           req.Body.GrantType,
+		ClientID:            clientID,
+		ClientSecret:        clientSecret,
+		Scope:               opt.NewPtr(req.Body.Scope),
+		DeviceCode:          opt.NewPtr(req.Body.DeviceCode),
+		Code:                opt.NewPtr(req.Body.Code),
+		RedirectURI:         opt.NewPtr(req.Body.RedirectUri),
+		CodeVerifier:        opt.NewPtr(req.Body.CodeVerifier),
+		RefreshToken:        opt.NewPtr(req.Body.RefreshToken),
+		ClientAssertionType: opt.NewPtr(req.Body.ClientAssertionType),
+		ClientAssertion:     opt.NewPtr(req.Body.ClientAssertion),
 	})
 	if err != nil {
 		return nil, err
@@ -769,6 +771,7 @@ func (o OAuth) OAuthClientRegister(ctx context.Context, req openapi.OAuthClientR
 		ClientURI:               opt.NewPtr(req.Body.ClientUri).OrZero(),
 		TOSURI:                  opt.NewPtr(req.Body.TosUri).OrZero(),
 		PolicyURI:               opt.NewPtr(req.Body.PolicyUri).OrZero(),
+		JWKs:                    opt.NewPtr(req.Body.Jwks).OrZero(),
 	}
 
 	result, oauthErr, err := o.oauth.RegisterClient(ctx, input)

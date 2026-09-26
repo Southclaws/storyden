@@ -51,6 +51,7 @@ type Client struct {
 	Type                    ClientType
 	ScopePolicy             ScopePolicy
 	TokenEndpointAuthMethod string
+	JWKs                    map[string]any
 	RedirectURIs            []string
 	AllowedScopes           []string
 	AllowedGrants           []string
@@ -136,6 +137,7 @@ func MapClient(in *ent.OAuthClient) *Client {
 		Type:                    clientType,
 		ScopePolicy:             scopePolicy,
 		TokenEndpointAuthMethod: in.TokenEndpointAuthMethod,
+		JWKs:                    in.Jwks,
 		RedirectURIs:            in.RedirectUris,
 		AllowedScopes:           in.AllowedScopes,
 		AllowedGrants:           in.AllowedGrants,

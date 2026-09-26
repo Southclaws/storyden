@@ -576,6 +576,16 @@ func TokenEndpointAuthMethodContainsFold(v string) predicate.OAuthClient {
 	return predicate.OAuthClient(sql.FieldContainsFold(FieldTokenEndpointAuthMethod, v))
 }
 
+// JwksIsNil applies the IsNil predicate on the "jwks" field.
+func JwksIsNil() predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldIsNull(FieldJwks))
+}
+
+// JwksNotNil applies the NotNil predicate on the "jwks" field.
+func JwksNotNil() predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldNotNull(FieldJwks))
+}
+
 // PkceRequiredEQ applies the EQ predicate on the "pkce_required" field.
 func PkceRequiredEQ(v bool) predicate.OAuthClient {
 	return predicate.OAuthClient(sql.FieldEQ(FieldPkceRequired, v))

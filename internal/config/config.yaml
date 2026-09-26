@@ -508,6 +508,15 @@
       description: |-
         Enable RFC 7591 OAuth 2.0 Dynamic Client Registration.
 
+    - env: OAUTH_AUTONOMOUS_AGENT_REGISTRATION_ENABLED
+      name: OAuthAutonomousAgentRegistrationEnabled
+      type: bool
+      default: "false"
+      description: |-
+        Allow dynamic clients using private_key_jwt to atomically create and bind a bot account.
+        The DCR client_name is used as the requested account handle. This deliberately permits
+        unknown workloads to create principals and should only be enabled by an administrator.
+
     - env: OAUTH_CIMD_ENABLED
       name: OAuthClientIDMetadataDocumentEnabled
       type: bool

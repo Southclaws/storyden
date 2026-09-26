@@ -25,6 +25,23 @@ Use this when you own the integration and want explicit, audited control over ex
 
 DCR removes the manual setup step, which is convenient for clients that connect to many servers. The trade-off is that _any_ caller can create a client record, so the server takes on the cost of storing, rate-limiting, and (ideally) garbage-collecting these registrations, and must decide how much to trust a self-asserted identity.
 
+### Autonomous agent principals
+
+Administrators can additionally set `OAUTH_AUTONOMOUS_AGENT_REGISTRATION_ENABLED=true` to let an agent provision its own Storyden identity through ordinary DCR. The agent registers with `token_endpoint_auth_method: "private_key_jwt"`, a public `jwks`, and a `client_name` that is also its requested Storyden handle:
+
+```json
+{
+  "client_name": "barneys-claude",
+  "grant_types": ["client_credentials"],
+  "token_endpoint_auth_method": "private_key_jwt",
+  "jwks": { "keys": [{ "kty": "RSA", "kid": "agent-key", "n": "...", "e": "AQAB" }] }
+}
+```
+
+Storyden atomically creates a bot account and a separate OAuth client bound to it. A handle collision rejects the registration. The client then uses a short-lived, uniquely identified private-key JWT assertion with the Client Credentials grant; the resulting access token identifies the bot account in `sub`. Client and account IDs remain distinct so credentials can later be revoked or replaced without deleting the agent's account or posts.
+
+This flag is the administrator's consent for unknown workloads to create principals. It is disabled by default and does not introduce a per-agent browser approval ceremony.
+
 ## Client ID Metadata Documents (CIMD)
 
 <Callout type="warn" title="Draft specification">

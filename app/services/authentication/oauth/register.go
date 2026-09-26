@@ -9,6 +9,7 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/alexedwards/argon2id"
 
@@ -22,6 +23,7 @@ const (
 	TokenEndpointAuthMethodNone              = "none"
 	TokenEndpointAuthMethodClientSecretBasic = "client_secret_basic"
 	TokenEndpointAuthMethodClientSecretPost  = "client_secret_post"
+	TokenEndpointAuthMethodPrivateKeyJWT     = "private_key_jwt"
 )
 
 var dcrDefaultScopes = []string{
@@ -45,6 +47,7 @@ type DynamicClientRegistration struct {
 	ClientURI               string
 	TOSURI                  string
 	PolicyURI               string
+	JWKs                    map[string]any
 }
 
 // DynamicClientRegistrationResult is the resolved RFC 7591 client information
@@ -95,8 +98,20 @@ func (s *Service) RegisterClient(ctx context.Context, input DynamicClientRegistr
 	if oauthErr != nil {
 		return nil, oauthErr, nil
 	}
+	autonomousAgent := authMethod == TokenEndpointAuthMethodPrivateKeyJWT
+	if autonomousAgent && !s.cfg.OAuthAutonomousAgentRegistrationEnabled {
+		return nil, oauthError("invalid_client_metadata", "Autonomous agent registration is not enabled"), nil
+	}
+	if autonomousAgent {
+		if err := account.ValidateHandle(ctx, strings.TrimSpace(input.ClientName)); err != nil {
+			return nil, oauthError("invalid_client_metadata", "client_name must be a valid, available Storyden handle"), nil
+		}
+		if !validPublicJWKSet(input.JWKs) {
+			return nil, oauthError("invalid_client_metadata", "jwks must contain at least one public signing key"), nil
+		}
+	}
 
-	grantTypes, oauthErr := s.resolveDCRGrantTypes(input.GrantTypes)
+	grantTypes, oauthErr := s.resolveDCRGrantTypes(input.GrantTypes, autonomousAgent)
 	if oauthErr != nil {
 		return nil, oauthErr, nil
 	}
@@ -196,7 +211,7 @@ func (s *Service) RegisterClient(ctx context.Context, input DynamicClientRegistr
 	// OAuth 2.1 and RFC 7636 recommend PKCE for all authorization_code flows.
 	pkceRequired := contains(grantTypes, GrantTypeAuthorizationCode)
 
-	client, err := s.tokens.CreateClient(ctx, oauth_writer.ClientCreate{
+	createInput := oauth_writer.ClientCreate{
 		AccountID:               opt.NewEmpty[account.AccountID](),
 		ClientID:                clientID,
 		ClientSecretHash:        clientSecretHash,
@@ -204,12 +219,22 @@ func (s *Service) RegisterClient(ctx context.Context, input DynamicClientRegistr
 		Type:                    clientType,
 		ScopePolicy:             opt.New(oauthresource.ScopePolicyExplicit),
 		TokenEndpointAuthMethod: opt.New(authMethod),
+		JWKs:                    opt.New(input.JWKs),
 		PKCERequired:            opt.New(pkceRequired),
 		RedirectURIs:            redirectURIs,
 		AllowedScopes:           scopes,
 		AllowedGrants:           grantTypes,
-	})
+	}
+	var client *oauthresource.Client
+	if autonomousAgent {
+		client, err = s.tokens.CreateAgentClient(ctx, name, createInput)
+	} else {
+		client, err = s.tokens.CreateClient(ctx, createInput)
+	}
 	if err != nil {
+		if autonomousAgent && ftag.Get(err) == ftag.AlreadyExists {
+			return nil, oauthError("invalid_client_metadata", "client_name is already in use"), nil
+		}
 		return nil, nil, err
 	}
 
@@ -245,12 +270,14 @@ func resolveTokenEndpointAuthMethod(method string) (string, oauthresource.Client
 		return method, oauthresource.ClientTypeConfidential, nil
 	case TokenEndpointAuthMethodClientSecretBasic:
 		return method, oauthresource.ClientTypeConfidential, nil
+	case TokenEndpointAuthMethodPrivateKeyJWT:
+		return method, oauthresource.ClientTypeConfidential, nil
 	default:
 		return "", oauthresource.ClientType{}, oauthError("invalid_client_metadata", "Unsupported token_endpoint_auth_method")
 	}
 }
 
-func (s *Service) resolveDCRGrantTypes(requested []string) ([]string, *Error) {
+func (s *Service) resolveDCRGrantTypes(requested []string, allowClientCredentials bool) ([]string, *Error) {
 	if len(requested) == 0 {
 		return []string{GrantTypeAuthorizationCode, GrantTypeRefreshToken}, nil
 	}
@@ -261,6 +288,9 @@ func (s *Service) resolveDCRGrantTypes(requested []string) ([]string, *Error) {
 	allowed := map[string]struct{}{
 		GrantTypeAuthorizationCode: {},
 		GrantTypeRefreshToken:      {},
+	}
+	if allowClientCredentials {
+		allowed[GrantTypeClientCredentials] = struct{}{}
 	}
 
 	seen := map[string]struct{}{}
@@ -285,6 +315,20 @@ func (s *Service) resolveDCRGrantTypes(requested []string) ([]string, *Error) {
 	}
 
 	return out, nil
+}
+
+func validPublicJWKSet(jwks map[string]any) bool {
+	keys, ok := jwks["keys"].([]any)
+	if !ok || len(keys) == 0 {
+		return false
+	}
+	for _, raw := range keys {
+		key, ok := raw.(map[string]any)
+		if !ok || key["kty"] == nil || key["d"] != nil {
+			return false
+		}
+	}
+	return true
 }
 
 func resolveDCRResponseTypes(requested []string, grantTypes []string) ([]string, *Error) {

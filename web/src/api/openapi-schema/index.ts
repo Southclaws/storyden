@@ -514,6 +514,7 @@ export * from "./oAuthClientRegisterBody";
 export * from "./oAuthClientRegisterErrorResponse";
 export * from "./oAuthClientRegisterOKResponse";
 export * from "./oAuthClientRegisterProps";
+export * from "./oAuthClientRegisterPropsJwks";
 export * from "./oAuthClientRegistration";
 export * from "./oAuthClientScopePolicy";
 export * from "./oAuthClientSelfCreateBody";

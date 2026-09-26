@@ -11,6 +11,7 @@ import (
 	"encoding/pem"
 	"log/slog"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Southclaws/fault"
@@ -48,14 +49,16 @@ type Error struct {
 }
 
 type Service struct {
-	cfg       config.Config
-	clients   *oauth_querier.Querier
-	tokens    *oauth_writer.Writer
-	account   *account_querier.Querier
-	signer    *rsa.PrivateKey
-	kid       string
-	issuer    string
-	cimdCache *cimdCache
+	cfg            config.Config
+	clients        *oauth_querier.Querier
+	tokens         *oauth_writer.Writer
+	account        *account_querier.Querier
+	signer         *rsa.PrivateKey
+	kid            string
+	issuer         string
+	cimdCache      *cimdCache
+	assertionMu    sync.Mutex
+	usedAssertions map[string]time.Time
 }
 
 func (s *Service) Enabled() bool {
@@ -78,12 +81,13 @@ func New(
 
 	if !cfg.OAuthEnabled {
 		service := &Service{
-			cfg:       cfg,
-			clients:   clients,
-			tokens:    tokens,
-			account:   account,
-			issuer:    issuer,
-			cimdCache: newCIMDCache(),
+			cfg:            cfg,
+			clients:        clients,
+			tokens:         tokens,
+			account:        account,
+			issuer:         issuer,
+			cimdCache:      newCIMDCache(),
+			usedAssertions: make(map[string]time.Time),
 		}
 		service.registerCleanupJob(lc, logger)
 
@@ -121,14 +125,15 @@ func New(
 	}
 
 	service := &Service{
-		cfg:       cfg,
-		clients:   clients,
-		tokens:    tokens,
-		account:   account,
-		signer:    pk,
-		kid:       kid,
-		issuer:    issuer,
-		cimdCache: newCIMDCache(),
+		cfg:            cfg,
+		clients:        clients,
+		tokens:         tokens,
+		account:        account,
+		signer:         pk,
+		kid:            kid,
+		issuer:         issuer,
+		cimdCache:      newCIMDCache(),
+		usedAssertions: make(map[string]time.Time),
 	}
 	service.registerCleanupJob(lc, logger)
 
