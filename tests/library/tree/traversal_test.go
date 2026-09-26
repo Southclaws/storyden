@@ -90,6 +90,27 @@ func TestNodesTreeQuerying(t *testing.T) {
 					{Id: node1.JSON200.Id, Name: name1, Slug: slug1},
 					{Id: node3.JSON200.Id, Name: name3, Slug: slug3},
 				}, response.JSON200.Ancestors)
+
+				etag := response.HTTPResponse.Header.Get("ETag")
+				require.NotEmpty(t, etag)
+
+				newName := "renamed-node-3"
+				newSlug := newName + uuid.NewString()
+				updated, err := cl.NodeUpdateWithResponse(ctx, slug3, openapi.NodeMutableProps{
+					Name: &newName,
+					Slug: &newSlug,
+				}, sh.WithSession(ctx))
+				tests.Ok(t, err, updated)
+
+				response, err = cl.NodeGetWithResponse(ctx, slug4, nil, sh.WithSession(ctx), func(ctx context.Context, request *http.Request) error {
+					request.Header.Set("If-None-Match", etag)
+					return nil
+				})
+				tests.Ok(t, err, response)
+				require.Equal(t, []openapi.NodeReference{
+					{Id: node1.JSON200.Id, Name: name1, Slug: slug1},
+					{Id: node3.JSON200.Id, Name: newName, Slug: newSlug},
+				}, response.JSON200.Ancestors)
 			})
 
 			t.Run("query_all_top_level", func(t *testing.T) {

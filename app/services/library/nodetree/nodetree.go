@@ -103,11 +103,7 @@ func (s *service) Move(ctx context.Context, child library.QueryKey, parent libra
 		return nil, fault.Wrap(ErrVisibilityRules, fctx.With(ctx))
 	}
 
-	affected := []*library.Node{cnode, pnode}
-	if oldParent, ok := cnode.Parent.Get(); ok {
-		affected = append(affected, &oldParent)
-	}
-	if err := invalidateNodes(ctx, s.cache, affected...); err != nil {
+	if err := s.cache.Invalidate(ctx); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -119,9 +115,7 @@ func (s *service) Move(ctx context.Context, child library.QueryKey, parent libra
 			if err != nil {
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
-			if err := invalidateNodes(ctx, s.cache, cnode, pnode); err != nil {
-				return nil, fault.Wrap(err, fctx.With(ctx))
-			}
+			s.cache.InvalidateAfterWrite(ctx)
 		}
 	}
 
@@ -130,9 +124,7 @@ func (s *service) Move(ctx context.Context, child library.QueryKey, parent libra
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := invalidateNodes(ctx, s.cache, affected...); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
+	s.cache.InvalidateAfterWrite(ctx)
 
 	s.bus.Publish(ctx, &rpc.EventNodeUpdated{
 		ID:   library.NodeID(cnode.Mark.ID()),
@@ -178,7 +170,7 @@ func (s *service) Sever(ctx context.Context, child library.QueryKey, parent libr
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := invalidateNodes(ctx, s.cache, cnode, pnode); err != nil {
+	if err := s.cache.Invalidate(ctx); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -187,9 +179,7 @@ func (s *service) Sever(ctx context.Context, child library.QueryKey, parent libr
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := invalidateNodes(ctx, s.cache, cnode, pnode); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
+	s.cache.InvalidateAfterWrite(ctx)
 
 	result, err := s.nodeQuerier.Get(ctx, child)
 	if err != nil {
@@ -202,27 +192,6 @@ func (s *service) Sever(ctx context.Context, child library.QueryKey, parent libr
 	})
 
 	return result, nil
-}
-
-func invalidateNodes(ctx context.Context, cache *node_cache.Cache, nodes ...*library.Node) error {
-	seen := make(map[xid.ID]struct{}, len(nodes))
-	for _, node := range nodes {
-		if node == nil {
-			continue
-		}
-
-		id := node.Mark.ID()
-		if _, ok := seen[id]; ok {
-			continue
-		}
-		seen[id] = struct{}{}
-
-		if err := cache.Invalidate(ctx, id, node.GetSlug()); err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 // visibilityRules defines the rules for which visibility levels can be nested.

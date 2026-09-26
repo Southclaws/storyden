@@ -113,13 +113,8 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 	}
 
 	// Now handle re-ordering of the node using the before/after/index params.
-	affected := []*library.Node{thisnode}
-	if parent, ok := thisnode.Parent.Get(); ok {
-		affected = append(affected, &parent)
-	}
-
 	if beforeID, ok := opts.Before.Get(); ok {
-		if err := invalidateNodes(ctx, p.cache, affected...); err != nil {
+		if err := p.cache.Invalidate(ctx); err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
@@ -128,9 +123,7 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		if err := invalidateNodes(ctx, p.cache, affected...); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
+		p.cache.InvalidateAfterWrite(ctx)
 
 		p.bus.Publish(ctx, &rpc.EventNodeUpdated{
 			ID:   library.NodeID(n.Mark.ID()),
@@ -141,7 +134,7 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 	}
 
 	if afterID, ok := opts.After.Get(); ok {
-		if err := invalidateNodes(ctx, p.cache, affected...); err != nil {
+		if err := p.cache.Invalidate(ctx); err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
@@ -150,9 +143,7 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		if err := invalidateNodes(ctx, p.cache, affected...); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
+		p.cache.InvalidateAfterWrite(ctx)
 
 		p.bus.Publish(ctx, &rpc.EventNodeUpdated{
 			ID:   library.NodeID(n.Mark.ID()),
@@ -163,7 +154,7 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 	}
 
 	if index, ok := opts.Index.Get(); ok {
-		if err := invalidateNodes(ctx, p.cache, affected...); err != nil {
+		if err := p.cache.Invalidate(ctx); err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
@@ -172,9 +163,7 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		if err := invalidateNodes(ctx, p.cache, affected...); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
+		p.cache.InvalidateAfterWrite(ctx)
 
 		p.bus.Publish(ctx, &rpc.EventNodeUpdated{
 			ID:   library.NodeID(n.Mark.ID()),

@@ -16,7 +16,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_cache"
@@ -253,15 +252,19 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 			},
 		}, nil
 	}
+	if etag == nil {
+		etag, _ = c.node_cache.Prepare(ctx, cacheKey)
+	}
 
 	node, err := c.nodeReader.GetBySlug(ctx, qk, sortChildrenBy)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if etag == nil {
-		c.node_cache.Store(ctx, cacheKey, node.UpdatedAt)
-		etag = cachecontrol.NewETag(node.UpdatedAt)
+	var etagHeader *string
+	if etag != nil {
+		_ = c.node_cache.Store(ctx, cacheKey, etag)
+		etagHeader = ptr(etag.String())
 	}
 
 	return openapi.NodeGet200JSONResponse{
@@ -269,7 +272,7 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 			Body: serialiseNodeWithAncestors(node),
 			Headers: openapi.NodeGetOKResponseHeaders{
 				CacheControl: ptr(getAuthStateCacheControl(ctx, "no-cache")),
-				ETag:         ptr(etag.String()),
+				ETag:         etagHeader,
 			},
 		},
 	}, nil

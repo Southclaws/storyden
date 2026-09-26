@@ -5,10 +5,11 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_cache"
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
@@ -25,6 +26,7 @@ type Controller struct {
 	nodeQuerier *node_querier.Querier
 	nodeWriter  *node_writer.Writer
 	nc          *node_children.Writer
+	cache       *node_cache.Cache
 	bus         *pubsub.Bus
 }
 
@@ -32,12 +34,14 @@ func New(
 	nodeQuerier *node_querier.Querier,
 	nodeWriter *node_writer.Writer,
 	nc *node_children.Writer,
+	cache *node_cache.Cache,
 	bus *pubsub.Bus,
 ) *Controller {
 	return &Controller{
 		nodeQuerier: nodeQuerier,
 		nodeWriter:  nodeWriter,
 		nc:          nc,
+		cache:       cache,
 		bus:         bus,
 	}
 }
@@ -65,10 +69,15 @@ func (m *Controller) ChangeVisibility(ctx context.Context, qk library.QueryKey, 
 
 	oldVisibility := n.Visibility
 
+	if err := m.cache.Invalidate(ctx); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	n, err = m.nodeWriter.Update(ctx, qk, node_writer.WithVisibility(vis))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+	m.cache.InvalidateAfterWrite(ctx)
 
 	// Emit visibility transition events
 	// NOTE: If this changes, remove the node_visibility service and consolidate

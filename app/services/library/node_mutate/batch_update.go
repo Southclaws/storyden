@@ -3,13 +3,11 @@ package node_mutate
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/library"
-	"github.com/Southclaws/storyden/app/resources/library/node_cache"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
@@ -62,7 +60,6 @@ func (s *Manager) UpdateMany(ctx context.Context, items []BatchUpdate) ([]BatchR
 	options := s.batchOptions(ctx, fields, current, parents)
 	writes := make([]node_writer.UpdateInput, len(items))
 	results := make([]BatchResult, len(items))
-	invalidations := make([]node_cache.Invalidation, len(items))
 	events := make([]any, 0, len(items)*2)
 	for i, id := range ids {
 		field, state := fields[i], current[i]
@@ -83,12 +80,11 @@ func (s *Manager) UpdateMany(ctx context.Context, items []BatchUpdate) ([]BatchR
 			Tags:      field.Tags,
 		}
 		results[i] = BatchResult{Mark: library.NewMark(xid.ID(id), slug), Name: field.Name.Or(state.Name)}
-		invalidations[i] = node_cache.Invalidation{ID: xid.ID(id), Slug: slug, PreviousSlug: state.Mark.Slug()}
 		events = append(events, &rpc.EventNodeUpdated{ID: id, Slug: slug})
 		events = append(events, batchVisibilityEvents(id, slug, state.Visibility, field.Visibility.Or(state.Visibility))...)
 	}
 
-	if err := s.cache.InvalidateMany(ctx, invalidations); err != nil {
+	if err := s.cache.Invalidate(ctx); err != nil {
 		return nil, err
 	}
 
@@ -96,9 +92,7 @@ func (s *Manager) UpdateMany(ctx context.Context, items []BatchUpdate) ([]BatchR
 		return nil, fmt.Errorf("update page batch: %w", err)
 	}
 
-	if err := s.cache.InvalidateMany(ctx, invalidations); err != nil {
-		s.logger.Error("failed to invalidate cache after committed page batch", slog.String("error", err.Error()))
-	}
+	s.cache.InvalidateAfterWrite(ctx)
 
 	s.bus.PublishMany(ctx, events...)
 
