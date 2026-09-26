@@ -3,6 +3,7 @@ package node_mutate
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
@@ -96,7 +97,7 @@ func (s *Manager) UpdateMany(ctx context.Context, items []BatchUpdate) ([]BatchR
 	}
 
 	if err := s.cache.InvalidateMany(ctx, invalidations); err != nil {
-		return nil, fmt.Errorf("invalidate committed page batch: %w", err)
+		s.logger.Error("failed to invalidate cache after committed page batch", slog.String("error", err.Error()))
 	}
 
 	s.bus.PublishMany(ctx, events...)

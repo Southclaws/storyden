@@ -109,6 +109,12 @@ func TestWebResearchGuidanceUsesConversationAvailability(t *testing.T) {
 	require.NoError(t, err)
 	assert.Contains(t, webResearchNextAction(ctx, "https://example.com"), "activate system.web_research with toolset_load")
 
+	require.NoError(t, ctx.state.Set(ToolBlockersStateKey, map[string]string{"web_open": "Ask an administrator to restore web access."}))
+	guidance := webResearchNextAction(ctx, "https://example.com")
+	assert.Contains(t, guidance, "Ask an administrator to restore web access.")
+	assert.NotContains(t, guidance, "activate")
+	require.NoError(t, ctx.state.Set(ToolBlockersStateKey, map[string]string{}))
+
 	_, err = CaptureCallableTools()(ctx, &model.LLMRequest{Tools: map[string]any{}})
 	require.NoError(t, err)
 	assert.Contains(t, webResearchNextAction(ctx, "https://example.com"), "configured tools")

@@ -7,6 +7,7 @@ import (
 	"net/url"
 
 	adkagent "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/session"
 	"google.golang.org/adk/v2/tool"
 	"google.golang.org/adk/v2/tool/functiontool"
 
@@ -80,6 +81,12 @@ func (lt *linkTools) ExecuteWebFetch(ctx context.Context, args mcp.ToolWebFetchI
 }
 
 func webResearchNextAction(ctx context.Context, address string) string {
+	if runtime, ok := ctx.(interface{ ReadonlyState() session.ReadonlyState }); ok {
+		if action := toolBlocker(runtime.ReadonlyState(), mcp.GetWebOpenTool().Name); action != "" {
+			return fmt.Sprintf("Web content reading is blocked. %s", action)
+		}
+	}
+
 	availability := toolAvailability(ctx, &Tool{Definition: mcp.GetWebOpenTool()})
 	if availability == nil {
 		return fmt.Sprintf("If source content is needed, discover and activate web_open, then call it with url %q.", address)
