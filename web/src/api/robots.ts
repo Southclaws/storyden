@@ -72,6 +72,8 @@ export interface MCPTools {
   ToolReportUpdate?: ReportUpdate;
   ToolMemberSuspend?: MemberSuspend;
   ToolMemberReinstate?: MemberReinstate;
+  ToolLibraryPagesCreate?: LibraryPagesCreate;
+  ToolLibraryPagesUpdate?: LibraryPagesUpdate;
   [k: string]: unknown;
 }
 /**
@@ -397,7 +399,7 @@ export interface ToolDocumentCloseOutput {
   next_action: string;
 }
 /**
- * Search for individual tools that can perform one narrow task. Use tool_get to inspect a candidate's schema before loading it or assigning it to a Robot.
+ * Search for individual tools that can perform one narrow task. Use the candidate's id with tool_get to inspect its schema and preconditions. Availability is callable (invoke callable_name), load_required (activate the ID with tool_load, then invoke it on the next model step), or blocked (resolve preconditions or inspect tool_runtime_issues when available). If tool_get marks a tool toolset_only, inspect and load a declared Toolset with toolset_get and toolset_load instead. Inspection alone does not activate a tool.
  */
 export interface ToolSearch {
   input: ToolToolSearchInput;
@@ -425,13 +427,17 @@ export interface ToolToolSearchOutput {
   next_action: string;
 }
 /**
- * An individually composable tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.
+ * A tool candidate returned by capability discovery. Use id with tool_get to inspect its schema and preconditions before choosing or loading it. When availability is callable, invoke callable_name with the inspected arguments. When load_required, activate the ID with tool_load and use it on the next model step; tools marked toolset_only by tool_get require toolset_get and toolset_load for a declared Toolset instead. When blocked, inspect the preconditions with tool_get and, when available, tool_runtime_issues for initialization failures before attempting activation. Inspection alone does not activate a tool.
  */
 export interface RobotToolCatalogueItem {
   /**
    * Stable tool identifier accepted by tool_get, tool_load, and Robot configuration tools.
    */
   id: string;
+  /**
+   * Exact function name to invoke when callable; may differ from the stable ID.
+   */
+  callable_name: string;
   /**
    * Human-readable tool title that helps distinguish similar capabilities.
    */
@@ -440,9 +446,13 @@ export interface RobotToolCatalogueItem {
    * The outcome this tool can achieve, used to decide whether its full schema is worth inspecting.
    */
   description: string;
+  /**
+   * Availability in the current model step, not a permission grant. Omitted outside a conversation. Loading takes effect on the next model step.
+   */
+  availability?: "callable" | "load_required" | "blocked";
 }
 /**
- * Get the full schema, Toolset membership, and runtime preconditions of one tool after finding its ID with tool_search. This is inspection only; it does not load or activate the tool.
+ * Get the full schema, Toolset membership, and runtime preconditions of one tool after finding its ID with tool_search. This is inspection only; it does not load or activate the tool. When availability is callable, invoke callable_name. When load_required, use tool_load, or toolset_get and toolset_load for a declared Toolset if toolset_only. When blocked, resolve workspace preconditions or inspect tool_runtime_issues when available. Loading takes effect on the next model step.
  */
 export interface ToolGet {
   input: ToolToolGetInput;
@@ -460,6 +470,10 @@ export interface ToolToolGetOutput {
    * Stable tool identifier accepted by tool_load and Robot configuration tools unless toolset_only is true.
    */
   id: string;
+  /**
+   * Exact function name to invoke when callable; may differ from the stable ID.
+   */
+  callable_name: string;
   /**
    * Human-readable title for explaining or confirming the selected capability.
    */
@@ -480,6 +494,10 @@ export interface ToolToolGetOutput {
   output_schema?: {
     [k: string]: unknown;
   };
+  /**
+   * Availability in the current model step, not a permission grant. Omitted outside a conversation. Loading takes effect on the next model step.
+   */
+  availability?: "callable" | "load_required" | "blocked";
   /**
    * Built-in Toolsets that provide this tool together with their specialist instruction and related capabilities.
    */
@@ -1828,7 +1846,7 @@ export interface ToolLibraryPageOpenInput {
   id: string;
 }
 /**
- * Create a new page in the library. A slug will be generated automatically if not provided.
+ * Create a new page in the library. A slug will be generated automatically if not provided. Create a parent successfully before creating its children; only independent pages may be created in parallel. For multiple pages use library_pages_create.
  */
 export interface CreateLibraryPage {
   input: ToolLibraryPageCreateInput;
@@ -1861,7 +1879,7 @@ export interface ToolLibraryPageCreateInput {
    */
   url?: string;
   /**
-   * Optional tags to categorise this page
+   * Tag names to assign. Missing tags are created automatically.
    */
   tags?: string[];
 }
@@ -1921,7 +1939,7 @@ export interface ToolLibraryPageUpdateInput {
    */
   parent?: string;
   /**
-   * New tags to categorise this page
+   * Replacement tag names. Missing tags are created automatically. Omit to preserve tags; pass an empty array to remove all tags.
    */
   tags?: string[];
 }
@@ -3049,10 +3067,135 @@ export interface ToolMemberReinstateOutput {
    */
   suspended: false;
 }
+/**
+ * Create up to 100 Library pages as one atomic batch. Use parent_ref to refer to another item in this batch; input order does not matter. Inputs and references are validated before writes. Page and tag mutations all commit or all roll back. Optional external link enrichment is best-effort and outside that transaction; link failures do not block pages. Results match input order. Validation errors identify inputs by their one-based position or ref. Repeated requests are not deduplicated. If a response is lost, inspect the Library before submitting again.
+ */
+export interface LibraryPagesCreate {
+  input: ToolLibraryPagesCreateInput;
+  output: ToolLibraryPagesCreateOutput;
+  [k: string]: unknown;
+}
+export interface ToolLibraryPagesCreateInput {
+  /**
+   * @minItems 1
+   * @maxItems 100
+   */
+  items: [ToolLibraryPagesCreateItem, ...ToolLibraryPagesCreateItem[]];
+}
+export interface ToolLibraryPagesCreateItem {
+  /**
+   * Unique reference for matching this item to its result.
+   */
+  ref: string;
+  /**
+   * The name/title of the page
+   */
+  name: string;
+  /**
+   * The unique slug for this page. If not provided, one will be generated from the name.
+   */
+  slug?: string;
+  /**
+   * The content of the page in HTML format
+   */
+  content?: string;
+  /**
+   * ID or slug of an existing parent page. Omit to create a root-level page.
+   */
+  parent?: string;
+  /**
+   * Visibility of the page (default: published)
+   */
+  visibility?: "published" | "draft";
+  /**
+   * Optional external URL if this page references a topic on another website
+   */
+  url?: string;
+  /**
+   * Tag names to assign. Missing tags are created automatically.
+   */
+  tags?: string[];
+  /**
+   * Reference of another item in this batch to use as the parent. Mutually exclusive with parent.
+   */
+  parent_ref?: string;
+}
+export interface ToolLibraryPagesCreateOutput {
+  results: LibraryPageBatchResult[];
+  next_action: string;
+}
+export interface LibraryPageBatchResult {
+  ref: string;
+  status: "created" | "updated";
+  id: string;
+  slug: string;
+  name: string;
+  /**
+   * Link to the successfully created or updated page.
+   */
+  browser_url: string;
+}
+/**
+ * Update up to 100 Library pages as one atomic batch. Omitted fields remain unchanged. Targets must identify distinct pages. Inputs and references are validated before writes. Page and tag mutations all commit or all roll back. Optional external link enrichment is best-effort and outside that transaction; link failures do not block pages. Results match input order. Validation errors identify inputs by their one-based position or ref. Repeated requests are not deduplicated. If a response is lost, inspect the Library before submitting again.
+ */
+export interface LibraryPagesUpdate {
+  input: ToolLibraryPagesUpdateInput;
+  output: ToolLibraryPagesUpdateOutput;
+  [k: string]: unknown;
+}
+export interface ToolLibraryPagesUpdateInput {
+  /**
+   * @minItems 1
+   * @maxItems 100
+   */
+  items: [ToolLibraryPagesUpdateItem, ...ToolLibraryPagesUpdateItem[]];
+}
+export interface ToolLibraryPagesUpdateItem {
+  /**
+   * Unique reference for matching this item to its result.
+   */
+  ref: string;
+  /**
+   * The unique identifier of the page to update
+   */
+  id: string;
+  /**
+   * The new name/title of the page
+   */
+  name?: string;
+  /**
+   * The new URL slug for the page
+   */
+  slug?: string;
+  /**
+   * The new content of the page in HTML format
+   */
+  content?: string;
+  /**
+   * New visibility of the page
+   */
+  visibility?: "published" | "draft";
+  /**
+   * New external URL reference
+   */
+  url?: string;
+  /**
+   * New parent page slug. Provide to move the page to a different parent.
+   */
+  parent?: string;
+  /**
+   * Replacement tag names. Missing tags are created automatically. Omit to preserve tags; pass an empty array to remove all tags.
+   */
+  tags?: string[];
+}
+export interface ToolLibraryPagesUpdateOutput {
+  results: LibraryPageBatchResult[];
+  next_action: string;
+}
 
-export type ToolName = "content_search" | "document_get" | "document_search" | "document_list" | "document_close" | "tool_search" | "tool_get" | "tool_load" | "robot_create" | "robot_list" | "robot_get" | "robot_update" | "robot_delete" | "robot_search" | "memory_list" | "memory_open" | "memory_search" | "memory_create" | "memory_update" | "memory_move" | "trail_create" | "trail_list" | "trail_get" | "trail_update" | "trail_schedule_preview" | "trail_run_list" | "trail_run_get" | "trail_run_create" | "trail_action_run_cancel" | "toolset_search" | "toolset_load" | "toolset_create" | "toolset_list" | "toolset_get" | "toolset_update" | "toolset_delete" | "library_page_list" | "library_request_page" | "library_page_get" | "library_page_open" | "create_library_page" | "update_library_page" | "library_search_pages" | "library_page_property_schema_get" | "library_page_property_schema_update" | "library_page_properties_update" | "tag_list" | "link_create" | "web_fetch" | "web_open" | "thread_create" | "thread_list" | "thread_get" | "thread_open" | "thread_update" | "thread_reply" | "category_list" | "thread_search" | "reply_search" | "post_search" | "member_search" | "report_create" | "report_list" | "report_get" | "report_update" | "member_suspend" | "member_reinstate";
+export type ToolName = "content_search" | "document_get" | "document_search" | "document_list" | "document_close" | "tool_search" | "tool_get" | "tool_load" | "robot_create" | "robot_list" | "robot_get" | "robot_update" | "robot_delete" | "robot_search" | "memory_list" | "memory_open" | "memory_search" | "memory_create" | "memory_update" | "memory_move" | "trail_create" | "trail_list" | "trail_get" | "trail_update" | "trail_schedule_preview" | "trail_run_list" | "trail_run_get" | "trail_run_create" | "trail_action_run_cancel" | "toolset_search" | "toolset_load" | "toolset_create" | "toolset_list" | "toolset_get" | "toolset_update" | "toolset_delete" | "library_page_list" | "library_request_page" | "library_page_get" | "library_page_open" | "create_library_page" | "update_library_page" | "library_search_pages" | "library_page_property_schema_get" | "library_page_property_schema_update" | "library_page_properties_update" | "tag_list" | "link_create" | "web_fetch" | "web_open" | "thread_create" | "thread_list" | "thread_get" | "thread_open" | "thread_update" | "thread_reply" | "category_list" | "thread_search" | "reply_search" | "post_search" | "member_search" | "report_create" | "report_list" | "report_get" | "report_update" | "member_suspend" | "member_reinstate" | "library_pages_create" | "library_pages_update";
 
-export const TOOL_NAMES = ["content_search", "document_get", "document_search", "document_list", "document_close", "tool_search", "tool_get", "tool_load", "robot_create", "robot_list", "robot_get", "robot_update", "robot_delete", "robot_search", "memory_list", "memory_open", "memory_search", "memory_create", "memory_update", "memory_move", "trail_create", "trail_list", "trail_get", "trail_update", "trail_schedule_preview", "trail_run_list", "trail_run_get", "trail_run_create", "trail_action_run_cancel", "toolset_search", "toolset_load", "toolset_create", "toolset_list", "toolset_get", "toolset_update", "toolset_delete", "library_page_list", "library_request_page", "library_page_get", "library_page_open", "create_library_page", "update_library_page", "library_search_pages", "library_page_property_schema_get", "library_page_property_schema_update", "library_page_properties_update", "tag_list", "link_create", "web_fetch", "web_open", "thread_create", "thread_list", "thread_get", "thread_open", "thread_update", "thread_reply", "category_list", "thread_search", "reply_search", "post_search", "member_search", "report_create", "report_list", "report_get", "report_update", "member_suspend", "member_reinstate"] as const;
+export const TOOL_NAMES = ["content_search", "document_get", "document_search", "document_list", "document_close", "tool_search", "tool_get", "tool_load", "robot_create", "robot_list", "robot_get", "robot_update", "robot_delete", "robot_search", "memory_list", "memory_open", "memory_search", "memory_create", "memory_update", "memory_move", "trail_create", "trail_list", "trail_get", "trail_update", "trail_schedule_preview", "trail_run_list", "trail_run_get", "trail_run_create", "trail_action_run_cancel", "toolset_search", "toolset_load", "toolset_create", "toolset_list", "toolset_get", "toolset_update", "toolset_delete", "library_page_list", "library_request_page", "library_page_get", "library_page_open", "create_library_page", "update_library_page", "library_search_pages", "library_page_property_schema_get", "library_page_property_schema_update", "library_page_properties_update", "tag_list", "link_create", "web_fetch", "web_open", "thread_create", "thread_list", "thread_get", "thread_open", "thread_update", "thread_reply", "category_list", "thread_search", "reply_search", "post_search", "member_search", "report_create", "report_list", "report_get", "report_update", "member_suspend", "member_reinstate", "library_pages_create", "library_pages_update"] as const;
 
 export type ToolInputMap = {
   "content_search": ToolContentSearchInput;
@@ -3122,6 +3265,8 @@ export type ToolInputMap = {
   "report_update": ToolReportUpdateInput;
   "member_suspend": ToolMemberSuspendInput;
   "member_reinstate": ToolMemberReinstateInput;
+  "library_pages_create": ToolLibraryPagesCreateInput;
+  "library_pages_update": ToolLibraryPagesUpdateInput;
 };
 
 export type ToolOutputMap = {
@@ -3192,6 +3337,8 @@ export type ToolOutputMap = {
   "report_update": ToolReportUpdateOutput;
   "member_suspend": ToolMemberSuspendOutput;
   "member_reinstate": ToolMemberReinstateOutput;
+  "library_pages_create": ToolLibraryPagesCreateOutput;
+  "library_pages_update": ToolLibraryPagesUpdateOutput;
 };
 export type StorydenTools = {
   "content_search": {
@@ -3461,5 +3608,13 @@ export type StorydenTools = {
   "member_reinstate": {
     input: ToolMemberReinstateInput;
     output: ToolMemberReinstateOutput;
+  };
+  "library_pages_create": {
+    input: ToolLibraryPagesCreateInput;
+    output: ToolLibraryPagesCreateOutput;
+  };
+  "library_pages_update": {
+    input: ToolLibraryPagesUpdateInput;
+    output: ToolLibraryPagesUpdateOutput;
   };
 };

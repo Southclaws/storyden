@@ -87,7 +87,7 @@ loading it. Loading records active Toolset references in ADK session state and
 makes both their prompt and tools available on the next model step.
 
 Individual capability discovery is deliberately separate. `tool_search`
-returns only tool ID, name, and description; `tool_get` returns the selected
+returns tool ID, callable name, title, description, and conversation availability; `tool_get` returns the selected
 tool's full input/output schema, confirmation requirement, and workspace
 precondition. `tool_get` is
 inspection-only. `tool_load` is the explicit state-changing operation that
@@ -125,8 +125,8 @@ stable IDs to callable ADK names.
 Capability discovery follows progressive disclosure. Search responses never
 dump schemas, Toolset membership, or provenance:
 
-- `tool_search` -> ID, name, description
-- `tool_get` -> full individual schema and runtime preconditions
+- `tool_search` -> ID, callable name, title, description, conversation availability
+- `tool_get` -> full individual schema, runtime preconditions, and conversation availability
 - `tool_load` -> conversation activation
 - `toolset_search` -> ID, name, description
 - `toolset_get` -> full bundle configuration, tool IDs, instruction, runtime preconditions, editability
@@ -203,3 +203,25 @@ Focused runtime coverage lives in:
 The chat integration tests exercise direct-tool execution, same-session
 delegation, branch attribution, collapsed specialist output, and
 search-load-execute behavior for custom Toolsets.
+
+## Library batches and web research
+
+`library_pages_create` and `library_pages_update` delegate to
+`node_mutate.Manager.CreateMany` and `UpdateMany`. Typed domain inputs contain no
+serialization or Robot result fields; future JSON and CSV HTTP imports can use
+the same service. Page and tag writes are atomic, with validation before writes
+and no automatic retries. Optional link enrichment remains best-effort outside
+the transaction. Results preserve input order. See the node_mutate batch README
+for the persistence and failure contract.
+
+`system.web_research` bundles `web_fetch`, `web_open`, and document navigation.
+Use `web_fetch` for metadata, or open the source directly when content is needed.
+Snapshots use the existing document register and its eight-document limit.
+
+Discovery's optional `availability` describes the current model step: `callable`,
+`load_required`, or `blocked`, as a string. The exact `callable_name` is separate
+from availability; shared activation guidance lives in the tool descriptions instead of each result.
+A before-model callback captures the actual tool names after runtime filtering;
+registered tools alone do not imply callability. Loading applies on the next
+model step. This status is not an authorization grant: execution still checks
+permissions. Non-conversation catalogue access omits availability.

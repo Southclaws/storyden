@@ -300,7 +300,8 @@
         "internal": true,
         "toolset_only": true,
         "toolsets": [
-          "system.documents"
+          "system.documents",
+          "system.web_research"
         ],
         "title": "Inspect Document",
         "annotations": {
@@ -551,7 +552,8 @@
         "internal": true,
         "toolset_only": true,
         "toolsets": [
-          "system.documents"
+          "system.documents",
+          "system.web_research"
         ],
         "title": "Search Document",
         "annotations": {
@@ -794,7 +796,8 @@
         "internal": true,
         "toolset_only": true,
         "toolsets": [
-          "system.documents"
+          "system.documents",
+          "system.web_research"
         ],
         "title": "List Open Documents",
         "annotations": {
@@ -1077,7 +1080,8 @@
         "internal": true,
         "toolset_only": true,
         "toolsets": [
-          "system.documents"
+          "system.documents",
+          "system.web_research"
         ],
         "title": "Close Document",
         "annotations": {
@@ -1190,7 +1194,7 @@
         }
       },
       "title": "tool_search",
-      "description": "Search for individual tools that can perform one narrow task. Use tool_get to inspect a candidate's schema before loading it or assigning it to a Robot.",
+      "description": "Search for individual tools that can perform one narrow task. Use the candidate's id with tool_get to inspect its schema and preconditions. Availability is callable (invoke callable_name), load_required (activate the ID with tool_load, then invoke it on the next model step), or blocked (resolve preconditions or inspect tool_runtime_issues when available). If tool_get marks a tool toolset_only, inspect and load a declared Toolset with toolset_get and toolset_load instead. Inspection alone does not activate a tool.",
       "type": "object",
       "required": [
         "input",
@@ -1230,9 +1234,10 @@
               "items": {
                 "$schema": "http://json-schema.org/draft-07/schema#",
                 "type": "object",
-                "description": "An individually composable tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.",
+                "description": "A tool candidate returned by capability discovery. Use id with tool_get to inspect its schema and preconditions before choosing or loading it. When availability is callable, invoke callable_name with the inspected arguments. When load_required, activate the ID with tool_load and use it on the next model step; tools marked toolset_only by tool_get require toolset_get and toolset_load for a declared Toolset instead. When blocked, inspect the preconditions with tool_get and, when available, tool_runtime_issues for initialization failures before attempting activation. Inspection alone does not activate a tool.",
                 "required": [
                   "id",
+                  "callable_name",
                   "name",
                   "description"
                 ],
@@ -1242,6 +1247,10 @@
                     "type": "string",
                     "description": "Stable tool identifier accepted by tool_get, tool_load, and Robot configuration tools."
                   },
+                  "callable_name": {
+                    "type": "string",
+                    "description": "Exact function name to invoke when callable; may differ from the stable ID."
+                  },
                   "name": {
                     "type": "string",
                     "description": "Human-readable tool title that helps distinguish similar capabilities."
@@ -1249,6 +1258,16 @@
                   "description": {
                     "type": "string",
                     "description": "The outcome this tool can achieve, used to decide whether its full schema is worth inspecting."
+                  },
+                  "availability": {
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "type": "string",
+                    "enum": [
+                      "callable",
+                      "load_required",
+                      "blocked"
+                    ],
+                    "description": "Availability in the current model step, not a permission grant. Omitted outside a conversation. Loading takes effect on the next model step."
                   }
                 }
               }
@@ -1295,9 +1314,10 @@
               "items": {
                 "$schema": "http://json-schema.org/draft-07/schema#",
                 "type": "object",
-                "description": "An individually composable tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.",
+                "description": "A tool candidate returned by capability discovery. Use id with tool_get to inspect its schema and preconditions before choosing or loading it. When availability is callable, invoke callable_name with the inspected arguments. When load_required, activate the ID with tool_load and use it on the next model step; tools marked toolset_only by tool_get require toolset_get and toolset_load for a declared Toolset instead. When blocked, inspect the preconditions with tool_get and, when available, tool_runtime_issues for initialization failures before attempting activation. Inspection alone does not activate a tool.",
                 "required": [
                   "id",
+                  "callable_name",
                   "name",
                   "description"
                 ],
@@ -1307,6 +1327,10 @@
                     "type": "string",
                     "description": "Stable tool identifier accepted by tool_get, tool_load, and Robot configuration tools."
                   },
+                  "callable_name": {
+                    "type": "string",
+                    "description": "Exact function name to invoke when callable; may differ from the stable ID."
+                  },
                   "name": {
                     "type": "string",
                     "description": "Human-readable tool title that helps distinguish similar capabilities."
@@ -1314,6 +1338,16 @@
                   "description": {
                     "type": "string",
                     "description": "The outcome this tool can achieve, used to decide whether its full schema is worth inspecting."
+                  },
+                  "availability": {
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "type": "string",
+                    "enum": [
+                      "callable",
+                      "load_required",
+                      "blocked"
+                    ],
+                    "description": "Availability in the current model step, not a permission grant. Omitted outside a conversation. Loading takes effect on the next model step."
                   }
                 }
               }
@@ -1344,7 +1378,7 @@
         }
       },
       "title": "tool_get",
-      "description": "Get the full schema, Toolset membership, and runtime preconditions of one tool after finding its ID with tool_search. This is inspection only; it does not load or activate the tool.",
+      "description": "Get the full schema, Toolset membership, and runtime preconditions of one tool after finding its ID with tool_search. This is inspection only; it does not load or activate the tool. When availability is callable, invoke callable_name. When load_required, use tool_load, or toolset_get and toolset_load for a declared Toolset if toolset_only. When blocked, resolve workspace preconditions or inspect tool_runtime_issues when available. Loading takes effect on the next model step.",
       "type": "object",
       "required": [
         "input",
@@ -1368,6 +1402,7 @@
           "type": "object",
           "required": [
             "id",
+            "callable_name",
             "name",
             "description",
             "input_schema",
@@ -1380,6 +1415,10 @@
             "id": {
               "type": "string",
               "description": "Stable tool identifier accepted by tool_load and Robot configuration tools unless toolset_only is true."
+            },
+            "callable_name": {
+              "type": "string",
+              "description": "Exact function name to invoke when callable; may differ from the stable ID."
             },
             "name": {
               "type": "string",
@@ -1398,6 +1437,16 @@
               "type": "object",
               "description": "Complete JSON Schema for the tool result when the tool declares one.",
               "additionalProperties": true
+            },
+            "availability": {
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "type": "string",
+              "enum": [
+                "callable",
+                "load_required",
+                "blocked"
+              ],
+              "description": "Availability in the current model step, not a permission grant. Omitted outside a conversation. Loading takes effect on the next model step."
             },
             "toolsets": {
               "type": "array",
@@ -1440,6 +1489,7 @@
           "type": "object",
           "required": [
             "id",
+            "callable_name",
             "name",
             "description",
             "input_schema",
@@ -1452,6 +1502,10 @@
             "id": {
               "type": "string",
               "description": "Stable tool identifier accepted by tool_load and Robot configuration tools unless toolset_only is true."
+            },
+            "callable_name": {
+              "type": "string",
+              "description": "Exact function name to invoke when callable; may differ from the stable ID."
             },
             "name": {
               "type": "string",
@@ -1470,6 +1524,16 @@
               "type": "object",
               "description": "Complete JSON Schema for the tool result when the tool declares one.",
               "additionalProperties": true
+            },
+            "availability": {
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "type": "string",
+              "enum": [
+                "callable",
+                "load_required",
+                "blocked"
+              ],
+              "description": "Availability in the current model step, not a permission grant. Omitted outside a conversation. Loading takes effect on the next model step."
             },
             "toolsets": {
               "type": "array",
@@ -1547,9 +1611,10 @@
               "items": {
                 "$schema": "http://json-schema.org/draft-07/schema#",
                 "type": "object",
-                "description": "An individually composable tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.",
+                "description": "A tool candidate returned by capability discovery. Use id with tool_get to inspect its schema and preconditions before choosing or loading it. When availability is callable, invoke callable_name with the inspected arguments. When load_required, activate the ID with tool_load and use it on the next model step; tools marked toolset_only by tool_get require toolset_get and toolset_load for a declared Toolset instead. When blocked, inspect the preconditions with tool_get and, when available, tool_runtime_issues for initialization failures before attempting activation. Inspection alone does not activate a tool.",
                 "required": [
                   "id",
+                  "callable_name",
                   "name",
                   "description"
                 ],
@@ -1559,6 +1624,10 @@
                     "type": "string",
                     "description": "Stable tool identifier accepted by tool_get, tool_load, and Robot configuration tools."
                   },
+                  "callable_name": {
+                    "type": "string",
+                    "description": "Exact function name to invoke when callable; may differ from the stable ID."
+                  },
                   "name": {
                     "type": "string",
                     "description": "Human-readable tool title that helps distinguish similar capabilities."
@@ -1566,6 +1635,16 @@
                   "description": {
                     "type": "string",
                     "description": "The outcome this tool can achieve, used to decide whether its full schema is worth inspecting."
+                  },
+                  "availability": {
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "type": "string",
+                    "enum": [
+                      "callable",
+                      "load_required",
+                      "blocked"
+                    ],
+                    "description": "Availability in the current model step, not a permission grant. Omitted outside a conversation. Loading takes effect on the next model step."
                   }
                 }
               }
@@ -1609,9 +1688,10 @@
               "items": {
                 "$schema": "http://json-schema.org/draft-07/schema#",
                 "type": "object",
-                "description": "An individually composable tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.",
+                "description": "A tool candidate returned by capability discovery. Use id with tool_get to inspect its schema and preconditions before choosing or loading it. When availability is callable, invoke callable_name with the inspected arguments. When load_required, activate the ID with tool_load and use it on the next model step; tools marked toolset_only by tool_get require toolset_get and toolset_load for a declared Toolset instead. When blocked, inspect the preconditions with tool_get and, when available, tool_runtime_issues for initialization failures before attempting activation. Inspection alone does not activate a tool.",
                 "required": [
                   "id",
+                  "callable_name",
                   "name",
                   "description"
                 ],
@@ -1621,6 +1701,10 @@
                     "type": "string",
                     "description": "Stable tool identifier accepted by tool_get, tool_load, and Robot configuration tools."
                   },
+                  "callable_name": {
+                    "type": "string",
+                    "description": "Exact function name to invoke when callable; may differ from the stable ID."
+                  },
                   "name": {
                     "type": "string",
                     "description": "Human-readable tool title that helps distinguish similar capabilities."
@@ -1628,6 +1712,16 @@
                   "description": {
                     "type": "string",
                     "description": "The outcome this tool can achieve, used to decide whether its full schema is worth inspecting."
+                  },
+                  "availability": {
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "type": "string",
+                    "enum": [
+                      "callable",
+                      "load_required",
+                      "blocked"
+                    ],
+                    "description": "Availability in the current model step, not a permission grant. Omitted outside a conversation. Loading takes effect on the next model step."
                   }
                 }
               }
@@ -12006,7 +12100,7 @@
         }
       },
       "title": "create_library_page",
-      "description": "Create a new page in the library. A slug will be generated automatically if not provided.",
+      "description": "Create a new page in the library. A slug will be generated automatically if not provided. Create a parent successfully before creating its children; only independent pages may be created in parallel. For multiple pages use library_pages_create.",
       "type": "object",
       "required": [
         "input",
@@ -12054,7 +12148,7 @@
               "items": {
                 "type": "string"
               },
-              "description": "Optional tags to categorise this page"
+              "description": "Tag names to assign. Missing tags are created automatically."
             }
           },
           "additionalProperties": false
@@ -12130,7 +12224,7 @@
               "items": {
                 "type": "string"
               },
-              "description": "Optional tags to categorise this page"
+              "description": "Tag names to assign. Missing tags are created automatically."
             }
           },
           "additionalProperties": false
@@ -12235,7 +12329,7 @@
               "items": {
                 "type": "string"
               },
-              "description": "New tags to categorise this page"
+              "description": "Replacement tag names. Missing tags are created automatically. Omit to preserve tags; pass an empty array to remove all tags."
             }
           },
           "additionalProperties": false
@@ -12317,7 +12411,7 @@
               "items": {
                 "type": "string"
               },
-              "description": "New tags to categorise this page"
+              "description": "Replacement tag names. Missing tags are created automatically. Omit to preserve tags; pass an empty array to remove all tags."
             }
           },
           "additionalProperties": false
@@ -13498,7 +13592,9 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolWebFetch",
       "x-storyden-tool": {
-        "toolsets": [],
+        "toolsets": [
+          "system.web_research"
+        ],
         "title": "Fetch Web Page",
         "annotations": {
           "readOnlyHint": true,
@@ -13632,7 +13728,9 @@
       "$id": "ToolWebOpen",
       "x-storyden-tool": {
         "internal": true,
-        "toolsets": [],
+        "toolsets": [
+          "system.web_research"
+        ],
         "title": "Open Web Page",
         "annotations": {
           "readOnlyHint": false,
@@ -17436,6 +17534,685 @@
               "type": "boolean",
               "const": false,
               "description": "Confirms the member is no longer suspended."
+            }
+          }
+        }
+      }
+    },
+    "ToolLibraryPagesCreate": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolLibraryPagesCreate",
+      "x-storyden-tool": {
+        "toolsets": [
+          "system.library"
+        ],
+        "title": "Create Library Pages",
+        "role": "MANAGE_LIBRARY",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        }
+      },
+      "title": "library_pages_create",
+      "description": "Create up to 100 Library pages as one atomic batch. Use parent_ref to refer to another item in this batch; input order does not matter. Inputs and references are validated before writes. Page and tag mutations all commit or all roll back. Optional external link enrichment is best-effort and outside that transaction; link failures do not block pages. Results match input order. Validation errors identify inputs by their one-based position or ref. Repeated requests are not deduplicated. If a response is lost, inspect the Library before submitting again.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "items"
+          ],
+          "properties": {
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 100,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "ref",
+                  "name"
+                ],
+                "properties": {
+                  "ref": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "description": "Unique reference for matching this item to its result."
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The name/title of the page"
+                  },
+                  "slug": {
+                    "type": "string",
+                    "description": "The unique slug for this page. If not provided, one will be generated from the name."
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "The content of the page in HTML format"
+                  },
+                  "parent": {
+                    "type": "string",
+                    "description": "ID or slug of an existing parent page. Omit to create a root-level page."
+                  },
+                  "visibility": {
+                    "type": "string",
+                    "enum": [
+                      "published",
+                      "draft"
+                    ],
+                    "description": "Visibility of the page (default: published)"
+                  },
+                  "url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "Optional external URL if this page references a topic on another website"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Tag names to assign. Missing tags are created automatically."
+                  },
+                  "parent_ref": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Reference of another item in this batch to use as the parent. Mutually exclusive with parent."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "output": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "results",
+            "next_action"
+          ],
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "ref",
+                  "status",
+                  "id",
+                  "slug",
+                  "name",
+                  "browser_url"
+                ],
+                "properties": {
+                  "ref": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "created",
+                      "updated"
+                    ]
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "slug": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "browser_url": {
+                    "type": "string",
+                    "description": "Link to the successfully created or updated page."
+                  }
+                }
+              }
+            },
+            "next_action": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "definitions": {
+        "ToolLibraryPagesCreateInput": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "items"
+          ],
+          "properties": {
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 100,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "ref",
+                  "name"
+                ],
+                "properties": {
+                  "ref": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "description": "Unique reference for matching this item to its result."
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The name/title of the page"
+                  },
+                  "slug": {
+                    "type": "string",
+                    "description": "The unique slug for this page. If not provided, one will be generated from the name."
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "The content of the page in HTML format"
+                  },
+                  "parent": {
+                    "type": "string",
+                    "description": "ID or slug of an existing parent page. Omit to create a root-level page."
+                  },
+                  "visibility": {
+                    "type": "string",
+                    "enum": [
+                      "published",
+                      "draft"
+                    ],
+                    "description": "Visibility of the page (default: published)"
+                  },
+                  "url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "Optional external URL if this page references a topic on another website"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Tag names to assign. Missing tags are created automatically."
+                  },
+                  "parent_ref": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Reference of another item in this batch to use as the parent. Mutually exclusive with parent."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "ToolLibraryPagesCreateItem": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "ref",
+            "name"
+          ],
+          "properties": {
+            "ref": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "description": "Unique reference for matching this item to its result."
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The name/title of the page"
+            },
+            "slug": {
+              "type": "string",
+              "description": "The unique slug for this page. If not provided, one will be generated from the name."
+            },
+            "content": {
+              "type": "string",
+              "description": "The content of the page in HTML format"
+            },
+            "parent": {
+              "type": "string",
+              "description": "ID or slug of an existing parent page. Omit to create a root-level page."
+            },
+            "visibility": {
+              "type": "string",
+              "enum": [
+                "published",
+                "draft"
+              ],
+              "description": "Visibility of the page (default: published)"
+            },
+            "url": {
+              "type": "string",
+              "format": "uri",
+              "description": "Optional external URL if this page references a topic on another website"
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Tag names to assign. Missing tags are created automatically."
+            },
+            "parent_ref": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Reference of another item in this batch to use as the parent. Mutually exclusive with parent."
+            }
+          }
+        },
+        "ToolLibraryPagesCreateOutput": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "results",
+            "next_action"
+          ],
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "ref",
+                  "status",
+                  "id",
+                  "slug",
+                  "name",
+                  "browser_url"
+                ],
+                "properties": {
+                  "ref": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "created",
+                      "updated"
+                    ]
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "slug": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "browser_url": {
+                    "type": "string",
+                    "description": "Link to the successfully created or updated page."
+                  }
+                }
+              }
+            },
+            "next_action": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "ToolLibraryPagesUpdate": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolLibraryPagesUpdate",
+      "x-storyden-tool": {
+        "toolsets": [
+          "system.library"
+        ],
+        "title": "Update Library Pages",
+        "role": "MANAGE_LIBRARY",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        }
+      },
+      "title": "library_pages_update",
+      "description": "Update up to 100 Library pages as one atomic batch. Omitted fields remain unchanged. Targets must identify distinct pages. Inputs and references are validated before writes. Page and tag mutations all commit or all roll back. Optional external link enrichment is best-effort and outside that transaction; link failures do not block pages. Results match input order. Validation errors identify inputs by their one-based position or ref. Repeated requests are not deduplicated. If a response is lost, inspect the Library before submitting again.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "items"
+          ],
+          "properties": {
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 100,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "ref",
+                  "id"
+                ],
+                "properties": {
+                  "ref": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "description": "Unique reference for matching this item to its result."
+                  },
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The unique identifier of the page to update"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The new name/title of the page"
+                  },
+                  "slug": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The new URL slug for the page"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "The new content of the page in HTML format"
+                  },
+                  "visibility": {
+                    "type": "string",
+                    "enum": [
+                      "published",
+                      "draft"
+                    ],
+                    "description": "New visibility of the page"
+                  },
+                  "url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "New external URL reference"
+                  },
+                  "parent": {
+                    "type": "string",
+                    "description": "New parent page slug. Provide to move the page to a different parent."
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Replacement tag names. Missing tags are created automatically. Omit to preserve tags; pass an empty array to remove all tags."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "output": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "results",
+            "next_action"
+          ],
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "ref",
+                  "status",
+                  "id",
+                  "slug",
+                  "name",
+                  "browser_url"
+                ],
+                "properties": {
+                  "ref": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "created",
+                      "updated"
+                    ]
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "slug": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "browser_url": {
+                    "type": "string",
+                    "description": "Link to the successfully created or updated page."
+                  }
+                }
+              }
+            },
+            "next_action": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "definitions": {
+        "ToolLibraryPagesUpdateInput": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "items"
+          ],
+          "properties": {
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 100,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "ref",
+                  "id"
+                ],
+                "properties": {
+                  "ref": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "description": "Unique reference for matching this item to its result."
+                  },
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The unique identifier of the page to update"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The new name/title of the page"
+                  },
+                  "slug": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The new URL slug for the page"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "The new content of the page in HTML format"
+                  },
+                  "visibility": {
+                    "type": "string",
+                    "enum": [
+                      "published",
+                      "draft"
+                    ],
+                    "description": "New visibility of the page"
+                  },
+                  "url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "New external URL reference"
+                  },
+                  "parent": {
+                    "type": "string",
+                    "description": "New parent page slug. Provide to move the page to a different parent."
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Replacement tag names. Missing tags are created automatically. Omit to preserve tags; pass an empty array to remove all tags."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "ToolLibraryPagesUpdateItem": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "ref",
+            "id"
+          ],
+          "properties": {
+            "ref": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "description": "Unique reference for matching this item to its result."
+            },
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The unique identifier of the page to update"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The new name/title of the page"
+            },
+            "slug": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The new URL slug for the page"
+            },
+            "content": {
+              "type": "string",
+              "description": "The new content of the page in HTML format"
+            },
+            "visibility": {
+              "type": "string",
+              "enum": [
+                "published",
+                "draft"
+              ],
+              "description": "New visibility of the page"
+            },
+            "url": {
+              "type": "string",
+              "format": "uri",
+              "description": "New external URL reference"
+            },
+            "parent": {
+              "type": "string",
+              "description": "New parent page slug. Provide to move the page to a different parent."
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Replacement tag names. Missing tags are created automatically. Omit to preserve tags; pass an empty array to remove all tags."
+            }
+          }
+        },
+        "ToolLibraryPagesUpdateOutput": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "results",
+            "next_action"
+          ],
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "ref",
+                  "status",
+                  "id",
+                  "slug",
+                  "name",
+                  "browser_url"
+                ],
+                "properties": {
+                  "ref": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "created",
+                      "updated"
+                    ]
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "slug": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "browser_url": {
+                    "type": "string",
+                    "description": "Link to the successfully created or updated page."
+                  }
+                }
+              }
+            },
+            "next_action": {
+              "type": "string"
             }
           }
         }

@@ -1,0 +1,86 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolLibraryPagesCreate
+x-storyden-tool:
+  toolsets: [system.library]
+  title: Create Library Pages
+  role: MANAGE_LIBRARY
+  annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false }
+title: library_pages_create
+description: >-
+  Create up to 100 Library pages as one atomic batch. Use parent_ref to refer to another item in this batch; input order does not matter.
+  Inputs and references are validated before writes. Page and tag mutations all commit or all roll back.
+  Optional external link enrichment is best-effort and outside that transaction; link failures do not block pages.
+  Results match input order. Validation errors identify inputs by their one-based position or ref.
+  Repeated requests are not deduplicated. If a response is lost, inspect the Library before submitting again.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolLibraryPagesCreateInput" }
+  output: { $ref: "#/definitions/ToolLibraryPagesCreateOutput" }
+definitions:
+  ToolLibraryPagesCreateInput:
+    type: object
+    additionalProperties: false
+    required: [items]
+    properties:
+      items:
+        type: array
+        minItems: 1
+        maxItems: 100
+        items: { $ref: "#/definitions/ToolLibraryPagesCreateItem" }
+  ToolLibraryPagesCreateItem:
+    type: object
+    additionalProperties: false
+    required: [ref, name]
+    properties:
+      ref:
+        type: string
+        minLength: 1
+        maxLength: 128
+        description: Unique reference for matching this item to its result.
+      name:
+        type: string
+        minLength: 1
+        description: The name/title of the page
+      slug:
+        type: string
+        description: The unique slug for this page. If not provided, one will be
+          generated from the name.
+      content:
+        type: string
+        description: The content of the page in HTML format
+      parent:
+        type: string
+        description:
+          ID or slug of an existing parent page. Omit to create a root-level page.
+      visibility:
+        type: string
+        enum:
+          - published
+          - draft
+        description: "Visibility of the page (default: published)"
+      url:
+        type: string
+        format: uri
+        description:
+          Optional external URL if this page references a topic on another
+          website
+      tags:
+        type: array
+        items:
+          type: string
+        description: Tag names to assign. Missing tags are created automatically.
+      parent_ref:
+        type: string
+        minLength: 1
+        description: Reference of another item in this batch to use as the parent. Mutually exclusive with parent.
+  ToolLibraryPagesCreateOutput:
+    type: object
+    additionalProperties: false
+    required: [results, next_action]
+    properties:
+      results:
+        type: array
+        items: { $ref: "../../common/LibraryPageBatchResult.yaml" }
+      next_action:
+        type: string

@@ -816,7 +816,8 @@
         "title": "Close Document",
         "toolset_only": true,
         "toolsets": [
-          "system.documents"
+          "system.documents",
+          "system.web_research"
         ]
       }
     },
@@ -885,7 +886,8 @@
         "title": "Inspect Document",
         "toolset_only": true,
         "toolsets": [
-          "system.documents"
+          "system.documents",
+          "system.web_research"
         ]
       }
     },
@@ -1027,7 +1029,8 @@
         "title": "List Open Documents",
         "toolset_only": true,
         "toolsets": [
-          "system.documents"
+          "system.documents",
+          "system.web_research"
         ]
       }
     },
@@ -1084,7 +1087,8 @@
         "title": "Search Document",
         "toolset_only": true,
         "toolsets": [
-          "system.documents"
+          "system.documents",
+          "system.web_research"
         ]
       }
     },
@@ -1158,7 +1162,7 @@
     },
     "ToolLibraryPageCreate": {
       "$id": "ToolLibraryPageCreate",
-      "description": "Create a new page in the library. A slug will be generated automatically if not provided.",
+      "description": "Create a new page in the library. A slug will be generated automatically if not provided. Create a parent successfully before creating its children; only independent pages may be created in parallel. For multiple pages use library_pages_create.",
       "properties": {
         "input": {
           "$ref": "#/definitions/ToolLibraryPageCreateInput"
@@ -1208,7 +1212,7 @@
           "type": "string"
         },
         "tags": {
-          "description": "Optional tags to categorise this page",
+          "description": "Tag names to assign. Missing tags are created automatically.",
           "items": {
             "type": "string"
           },
@@ -1840,7 +1844,7 @@
           "type": "string"
         },
         "tags": {
-          "description": "New tags to categorise this page",
+          "description": "Replacement tag names. Missing tags are created automatically. Omit to preserve tags; pass an empty array to remove all tags.",
           "items": {
             "type": "string"
           },
@@ -1890,6 +1894,325 @@
         "slug",
         "name",
         "browser_url"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPagesCreate": {
+      "$id": "ToolLibraryPagesCreate",
+      "description": "Create up to 100 Library pages as one atomic batch. Use parent_ref to refer to another item in this batch; input order does not matter. Inputs and references are validated before writes. Page and tag mutations all commit or all roll back. Optional external link enrichment is best-effort and outside that transaction; link failures do not block pages. Results match input order. Validation errors identify inputs by their one-based position or ref. Repeated requests are not deduplicated. If a response is lost, inspect the Library before submitting again.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolLibraryPagesCreateInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolLibraryPagesCreateOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "library_pages_create",
+      "type": "object",
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false,
+          "readOnlyHint": false
+        },
+        "role": "MANAGE_LIBRARY",
+        "title": "Create Library Pages",
+        "toolsets": [
+          "system.library"
+        ]
+      }
+    },
+    "ToolLibraryPagesCreateInput": {
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "items": {
+            "$ref": "#/definitions/ToolLibraryPagesCreateItem"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPagesCreateItem": {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "description": "The content of the page in HTML format",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name/title of the page",
+          "minLength": 1,
+          "type": "string"
+        },
+        "parent": {
+          "description": "ID or slug of an existing parent page. Omit to create a root-level page.",
+          "type": "string"
+        },
+        "parent_ref": {
+          "description": "Reference of another item in this batch to use as the parent. Mutually exclusive with parent.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "ref": {
+          "description": "Unique reference for matching this item to its result.",
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "slug": {
+          "description": "The unique slug for this page. If not provided, one will be generated from the name.",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Tag names to assign. Missing tags are created automatically.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "url": {
+          "description": "Optional external URL if this page references a topic on another website",
+          "format": "uri",
+          "type": "string"
+        },
+        "visibility": {
+          "description": "Visibility of the page (default: published)",
+          "enum": [
+            "published",
+            "draft"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "name"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPagesCreateOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "next_action": {
+          "type": "string"
+        },
+        "results": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "browser_url": {
+                "description": "Link to the successfully created or updated page.",
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "ref": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "created",
+                  "updated"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "ref",
+              "status",
+              "id",
+              "slug",
+              "name",
+              "browser_url"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "results",
+        "next_action"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPagesUpdate": {
+      "$id": "ToolLibraryPagesUpdate",
+      "description": "Update up to 100 Library pages as one atomic batch. Omitted fields remain unchanged. Targets must identify distinct pages. Inputs and references are validated before writes. Page and tag mutations all commit or all roll back. Optional external link enrichment is best-effort and outside that transaction; link failures do not block pages. Results match input order. Validation errors identify inputs by their one-based position or ref. Repeated requests are not deduplicated. If a response is lost, inspect the Library before submitting again.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolLibraryPagesUpdateInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolLibraryPagesUpdateOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "library_pages_update",
+      "type": "object",
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false,
+          "readOnlyHint": false
+        },
+        "role": "MANAGE_LIBRARY",
+        "title": "Update Library Pages",
+        "toolsets": [
+          "system.library"
+        ]
+      }
+    },
+    "ToolLibraryPagesUpdateInput": {
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "items": {
+            "$ref": "#/definitions/ToolLibraryPagesUpdateItem"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPagesUpdateItem": {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "description": "The new content of the page in HTML format",
+          "type": "string"
+        },
+        "id": {
+          "description": "The unique identifier of the page to update",
+          "minLength": 1,
+          "type": "string"
+        },
+        "name": {
+          "description": "The new name/title of the page",
+          "minLength": 1,
+          "type": "string"
+        },
+        "parent": {
+          "description": "New parent page slug. Provide to move the page to a different parent.",
+          "type": "string"
+        },
+        "ref": {
+          "description": "Unique reference for matching this item to its result.",
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "slug": {
+          "description": "The new URL slug for the page",
+          "minLength": 1,
+          "type": "string"
+        },
+        "tags": {
+          "description": "Replacement tag names. Missing tags are created automatically. Omit to preserve tags; pass an empty array to remove all tags.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "url": {
+          "description": "New external URL reference",
+          "format": "uri",
+          "type": "string"
+        },
+        "visibility": {
+          "description": "New visibility of the page",
+          "enum": [
+            "published",
+            "draft"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "id"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPagesUpdateOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "next_action": {
+          "type": "string"
+        },
+        "results": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "browser_url": {
+                "description": "Link to the successfully created or updated page.",
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "ref": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "created",
+                  "updated"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "ref",
+              "status",
+              "id",
+              "slug",
+              "name",
+              "browser_url"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "results",
+        "next_action"
       ],
       "type": "object"
     },
@@ -5187,7 +5510,7 @@
     },
     "ToolToolGet": {
       "$id": "ToolToolGet",
-      "description": "Get the full schema, Toolset membership, and runtime preconditions of one tool after finding its ID with tool_search. This is inspection only; it does not load or activate the tool.",
+      "description": "Get the full schema, Toolset membership, and runtime preconditions of one tool after finding its ID with tool_search. This is inspection only; it does not load or activate the tool. When availability is callable, invoke callable_name. When load_required, use tool_load, or toolset_get and toolset_load for a declared Toolset if toolset_only. When blocked, resolve workspace preconditions or inspect tool_runtime_issues when available. Loading takes effect on the next model step.",
       "properties": {
         "input": {
           "$ref": "#/definitions/ToolToolGetInput"
@@ -5232,6 +5555,19 @@
     "ToolToolGetOutput": {
       "additionalProperties": false,
       "properties": {
+        "availability": {
+          "description": "Availability in the current model step, not a permission grant. Omitted outside a conversation. Loading takes effect on the next model step.",
+          "enum": [
+            "callable",
+            "load_required",
+            "blocked"
+          ],
+          "type": "string"
+        },
+        "callable_name": {
+          "description": "Exact function name to invoke when callable; may differ from the stable ID.",
+          "type": "string"
+        },
         "description": {
           "description": "The outcome the tool is designed to achieve and when it should be selected.",
           "type": "string"
@@ -5276,6 +5612,7 @@
       },
       "required": [
         "id",
+        "callable_name",
         "name",
         "description",
         "input_schema",
@@ -5339,8 +5676,21 @@
           "description": "Tools activated for subsequent model steps in this conversation.",
           "items": {
             "additionalProperties": false,
-            "description": "An individually composable tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.",
+            "description": "A tool candidate returned by capability discovery. Use id with tool_get to inspect its schema and preconditions before choosing or loading it. When availability is callable, invoke callable_name with the inspected arguments. When load_required, activate the ID with tool_load and use it on the next model step; tools marked toolset_only by tool_get require toolset_get and toolset_load for a declared Toolset instead. When blocked, inspect the preconditions with tool_get and, when available, tool_runtime_issues for initialization failures before attempting activation. Inspection alone does not activate a tool.",
             "properties": {
+              "availability": {
+                "description": "Availability in the current model step, not a permission grant. Omitted outside a conversation. Loading takes effect on the next model step.",
+                "enum": [
+                  "callable",
+                  "load_required",
+                  "blocked"
+                ],
+                "type": "string"
+              },
+              "callable_name": {
+                "description": "Exact function name to invoke when callable; may differ from the stable ID.",
+                "type": "string"
+              },
               "description": {
                 "description": "The outcome this tool can achieve, used to decide whether its full schema is worth inspecting.",
                 "type": "string"
@@ -5356,6 +5706,7 @@
             },
             "required": [
               "id",
+              "callable_name",
               "name",
               "description"
             ],
@@ -5376,7 +5727,7 @@
     },
     "ToolToolSearch": {
       "$id": "ToolToolSearch",
-      "description": "Search for individual tools that can perform one narrow task. Use tool_get to inspect a candidate's schema before loading it or assigning it to a Robot.",
+      "description": "Search for individual tools that can perform one narrow task. Use the candidate's id with tool_get to inspect its schema and preconditions. Availability is callable (invoke callable_name), load_required (activate the ID with tool_load, then invoke it on the next model step), or blocked (resolve preconditions or inspect tool_runtime_issues when available). If tool_get marks a tool toolset_only, inspect and load a declared Toolset with toolset_get and toolset_load instead. Inspection alone does not activate a tool.",
       "properties": {
         "input": {
           "$ref": "#/definitions/ToolToolSearchInput"
@@ -5436,8 +5787,21 @@
           "description": "Ranked tool candidates with enough context to choose which one to inspect.",
           "items": {
             "additionalProperties": false,
-            "description": "An individually composable tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.",
+            "description": "A tool candidate returned by capability discovery. Use id with tool_get to inspect its schema and preconditions before choosing or loading it. When availability is callable, invoke callable_name with the inspected arguments. When load_required, activate the ID with tool_load and use it on the next model step; tools marked toolset_only by tool_get require toolset_get and toolset_load for a declared Toolset instead. When blocked, inspect the preconditions with tool_get and, when available, tool_runtime_issues for initialization failures before attempting activation. Inspection alone does not activate a tool.",
             "properties": {
+              "availability": {
+                "description": "Availability in the current model step, not a permission grant. Omitted outside a conversation. Loading takes effect on the next model step.",
+                "enum": [
+                  "callable",
+                  "load_required",
+                  "blocked"
+                ],
+                "type": "string"
+              },
+              "callable_name": {
+                "description": "Exact function name to invoke when callable; may differ from the stable ID.",
+                "type": "string"
+              },
               "description": {
                 "description": "The outcome this tool can achieve, used to decide whether its full schema is worth inspecting.",
                 "type": "string"
@@ -5453,6 +5817,7 @@
             },
             "required": [
               "id",
+              "callable_name",
               "name",
               "description"
             ],
@@ -9329,7 +9694,9 @@
           "readOnlyHint": true
         },
         "title": "Fetch Web Page",
-        "toolsets": []
+        "toolsets": [
+          "system.web_research"
+        ]
       }
     },
     "ToolWebFetchInput": {
@@ -9412,7 +9779,9 @@
         },
         "internal": true,
         "title": "Open Web Page",
-        "toolsets": []
+        "toolsets": [
+          "system.web_research"
+        ]
       }
     },
     "ToolWebOpenInput": {

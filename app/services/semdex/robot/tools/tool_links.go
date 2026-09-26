@@ -3,10 +3,10 @@ package tools
 import (
 	"context"
 	"fmt"
-	adkagent "google.golang.org/adk/v2/agent"
 	"log/slog"
 	"net/url"
 
+	adkagent "google.golang.org/adk/v2/agent"
 	"google.golang.org/adk/v2/tool"
 	"google.golang.org/adk/v2/tool/functiontool"
 
@@ -67,10 +67,7 @@ func (lt *linkTools) ExecuteWebFetch(ctx context.Context, args mcp.ToolWebFetchI
 	if err != nil {
 		return nil, err
 	}
-	content, nextAction := contentForAudience(ctx,
-		wc.Content.Plaintext(),
-		fmt.Sprintf("If this page looks relevant to the current task, call web_open with url %q to inspect its document.", u.String()),
-	)
+	content, nextAction := contentForAudience(ctx, wc.Content.Plaintext(), webResearchNextAction(ctx, u.String()))
 	return &mcp.ToolWebFetchOutput{
 		Url:         u.String(),
 		Title:       nonEmptyString(wc.Title),
@@ -80,6 +77,40 @@ func (lt *linkTools) ExecuteWebFetch(ctx context.Context, args mcp.ToolWebFetchI
 		Content:     content,
 		NextAction:  nextAction,
 	}, nil
+}
+
+func webResearchNextAction(ctx context.Context, address string) string {
+	availability := toolAvailability(ctx, &Tool{Definition: mcp.GetWebOpenTool()})
+	if availability == nil {
+		return fmt.Sprintf("If source content is needed, discover and activate web_open, then call it with url %q.", address)
+	}
+
+	if *availability == mcp.RobotToolAvailabilityYamlCallable {
+		if toolIsCallable(ctx, mcp.GetDocumentGetTool()) || toolIsCallable(ctx, mcp.GetDocumentSearchTool()) {
+			return fmt.Sprintf("If source content is needed, call web_open with url %q, then use its document_id with document_search or document_get.", address)
+		}
+
+		return fmt.Sprintf("If source content is needed, call web_open with url %q and read its returned projection. Discover and activate document_search or document_get before using its document_id for further navigation.", address)
+	}
+
+	if toolIsCallable(ctx, mcp.GetToolsetLoadTool()) {
+		return "If source content is needed, activate system.web_research with toolset_load. On the next model step, call web_open and use the included document navigation tools."
+	}
+
+	if toolIsCallable(ctx, mcp.GetToolLoadTool()) {
+		return "If source content is needed, activate web_open with tool_load. On the next model step, call web_open with the source URL and read its returned projection."
+	}
+
+	if toolIsCallable(ctx, mcp.GetToolGetTool()) {
+		return "Web content reading is blocked. Inspect web_open with tool_get for its preconditions and update this Robot's configured tools or Toolsets."
+	}
+
+	return "Web content reading is blocked. Update this Robot's configured tools or Toolsets."
+}
+
+func toolIsCallable(ctx context.Context, definition *mcp.ToolDefinition) bool {
+	availability := toolAvailability(ctx, &Tool{Definition: definition})
+	return availability != nil && *availability == mcp.RobotToolAvailabilityYamlCallable
 }
 
 func (lt *linkTools) newWebOpenTool() *Tool {

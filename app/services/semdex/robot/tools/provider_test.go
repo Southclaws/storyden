@@ -94,10 +94,12 @@ func TestRegistryOmitsToolsetOnlyToolsFromIndividualDiscovery(t *testing.T) {
 
 func TestToolGetReturnsEmptyToolsetArray(t *testing.T) {
 	registry := NewRegistry(slog.New(slog.NewTextHandler(io.Discard, nil)))
-	require.NoError(t, registry.Register(&Tool{Definition: mcp.GetWebOpenTool()}))
+	definition := *mcp.GetWebOpenTool()
+	definition.Name, definition.Toolsets = "standalone", nil
+	require.NoError(t, registry.Register(&Tool{Definition: &definition}))
 	discovery := newToolDiscoveryTools(registry)
 
-	result, err := discovery.get(context.Background(), mcp.ToolToolGetInput{Id: "web_open"})
+	result, err := discovery.get(context.Background(), mcp.ToolToolGetInput{Id: "standalone"})
 	require.NoError(t, err)
 	require.NotNil(t, result.Toolsets)
 	assert.Empty(t, result.Toolsets)

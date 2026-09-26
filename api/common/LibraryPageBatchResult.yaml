@@ -1,0 +1,19 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+additionalProperties: false
+required: [ref, status, id, slug, name, browser_url]
+properties:
+  ref:
+    type: string
+  status:
+    type: string
+    enum: [created, updated]
+  id:
+    type: string
+  slug:
+    type: string
+  name:
+    type: string
+  browser_url:
+    type: string
+    description: Link to the successfully created or updated page.

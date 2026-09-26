@@ -1,0 +1,4 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: string
+enum: [callable, load_required, blocked]
+description: Availability in the current model step, not a permission grant. Omitted outside a conversation. Loading takes effect on the next model step.

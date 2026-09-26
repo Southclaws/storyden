@@ -5,6 +5,7 @@ x-storyden-tool:
   toolset_only: true
   toolsets:
     - system.documents
+    - system.web_research
   title: Search Document
   annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
 title: document_search

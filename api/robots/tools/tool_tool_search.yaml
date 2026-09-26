@@ -7,7 +7,14 @@ x-storyden-tool:
   role: USE_ROBOTS
   annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
 title: tool_search
-description: Search for individual tools that can perform one narrow task. Use tool_get to inspect a candidate's schema before loading it or assigning it to a Robot.
+description: >-
+  Search for individual tools that can perform one narrow task. Use the candidate's
+  id with tool_get to inspect its schema and preconditions. Availability is callable
+  (invoke callable_name), load_required (activate the ID with tool_load, then invoke
+  it on the next model step), or blocked (resolve preconditions or inspect
+  tool_runtime_issues when available). If tool_get marks a tool toolset_only, inspect
+  and load a declared Toolset with toolset_get and toolset_load instead. Inspection
+  alone does not activate a tool.
 type: object
 required: [input, output]
 properties:

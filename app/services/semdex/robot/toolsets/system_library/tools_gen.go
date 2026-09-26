@@ -10,6 +10,8 @@ var ToolNames = []string{
 	"library_page_properties_update",
 	"library_page_property_schema_get",
 	"library_page_property_schema_update",
+	"library_pages_create",
+	"library_pages_update",
 	"library_request_page",
 	"library_search_pages",
 	"update_library_page",

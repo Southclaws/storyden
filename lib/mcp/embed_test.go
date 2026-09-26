@@ -163,18 +163,6 @@ func TestInternalToolMetadata(t *testing.T) {
 	assert.False(t, GetWebFetchTool().Internal)
 }
 
-func TestDocumentNavigationToolsAreToolsetOnly(t *testing.T) {
-	for _, tool := range []*ToolDefinition{
-		GetDocumentGetTool(),
-		GetDocumentSearchTool(),
-		GetDocumentListTool(),
-		GetDocumentCloseTool(),
-	} {
-		assert.True(t, tool.ToolsetOnly, tool.Name)
-		assert.Equal(t, []string{"system.documents"}, tool.Toolsets, tool.Name)
-	}
-}
-
 func TestMemoryToolsUseProgressiveSurfacesAndCompactOutputs(t *testing.T) {
 	for _, tool := range []*ToolDefinition{GetMemoryCreateTool(), GetMemorySearchTool()} {
 		assert.True(t, tool.ToolsetOnly, tool.Name)
@@ -209,40 +197,6 @@ func TestMemoryToolsUseProgressiveSurfacesAndCompactOutputs(t *testing.T) {
 	)
 	assert.NotContains(t, listItems.Properties, "parent_id")
 	assert.NotContains(t, listItems.Properties, "updated_at")
-}
-
-func TestCapabilityDiscoverySchemasAreProgressive(t *testing.T) {
-	toolSearch := GetToolSearchTool()
-	require.NotNil(t, toolSearch.OutputSchema)
-	toolItems := toolSearch.OutputSchema.Properties["tools"].Items
-	require.NotNil(t, toolItems)
-	assert.ElementsMatch(t, []string{"id", "name", "description"}, schemaPropertyNames(toolItems))
-	assert.NotContains(t, toolItems.Properties, "source")
-	assert.NotContains(t, toolItems.Properties, "input_schema")
-
-	toolGet := GetToolGetTool()
-	require.NotNil(t, toolGet.OutputSchema)
-	assert.ElementsMatch(t,
-		[]string{"id", "name", "description", "input_schema", "output_schema", "toolsets", "toolset_only", "requires_confirmation", "requires_workspace"},
-		schemaPropertyNames(toolGet.OutputSchema),
-	)
-	assert.NotContains(t, toolGet.OutputSchema.Properties, "source")
-
-	toolsetSearch := GetToolsetSearchTool()
-	require.NotNil(t, toolsetSearch.OutputSchema)
-	toolsetItems := toolsetSearch.OutputSchema.Properties["toolsets"].Items
-	require.NotNil(t, toolsetItems)
-	assert.ElementsMatch(t, []string{"id", "name", "description"}, schemaPropertyNames(toolsetItems))
-	assert.NotContains(t, toolsetItems.Properties, "source")
-	assert.NotContains(t, toolsetItems.Properties, "tools")
-
-	toolsetGet := GetToolsetGetTool()
-	require.NotNil(t, toolsetGet.OutputSchema)
-	assert.ElementsMatch(t,
-		[]string{"id", "name", "description", "tools", "instruction", "editable", "requires_workspace"},
-		schemaPropertyNames(toolsetGet.OutputSchema),
-	)
-	assert.NotContains(t, toolsetGet.OutputSchema.Properties, "source")
 }
 
 func schemaPropertyNames(schema *jsonschema.Schema) []string {

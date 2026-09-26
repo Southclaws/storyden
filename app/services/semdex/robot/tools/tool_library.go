@@ -96,6 +96,8 @@ func newLibraryTools(
 	registry.Register(t.newLibraryPageOpenTool())
 	registry.Register(t.newLibraryPageCreateTool())
 	registry.Register(t.newLibraryPageUpdateTool())
+	registry.Register(t.newLibraryPagesCreateTool())
+	registry.Register(t.newLibraryPagesUpdateTool())
 	registry.Register(t.newLibrarySearchPagesTool())
 	registry.Register(t.newLibraryPagePropertySchemaGetTool())
 	registry.Register(t.newLibraryPagePropertySchemaUpdateTool())
@@ -365,7 +367,7 @@ func (lt *libraryTools) ExecuteLibraryPageCreate(ctx context.Context, args mcp.T
 	}
 
 	var tagNames opt.Optional[tag_ref.Names]
-	if len(args.Tags) > 0 {
+	if args.Tags != nil {
 		names := dt.Map(args.Tags, func(t string) tag_ref.Name {
 			return tag_ref.NewName(t)
 		})
@@ -467,7 +469,7 @@ func (lt *libraryTools) ExecuteLibraryPageUpdate(ctx context.Context, args mcp.T
 		partial.Parent = opt.New(library.NewKey(*args.Parent))
 	}
 
-	if len(args.Tags) > 0 {
+	if args.Tags != nil {
 		names := dt.Map(args.Tags, func(t string) tag_ref.Name {
 			return tag_ref.NewName(t)
 		})

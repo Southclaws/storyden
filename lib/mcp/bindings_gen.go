@@ -17,6 +17,8 @@ var (
 	toolLibraryPagePropertySchemaUpdate *ToolDefinition
 	toolLibraryPageTree                 *ToolDefinition
 	toolLibraryPageUpdate               *ToolDefinition
+	toolLibraryPagesCreate              *ToolDefinition
+	toolLibraryPagesUpdate              *ToolDefinition
 	toolLibraryRequestPage              *ToolDefinition
 	toolLibrarySearchPages              *ToolDefinition
 	toolLinkCreate                      *ToolDefinition
@@ -88,6 +90,8 @@ func initAllTools() {
 	toolLibraryPagePropertySchemaUpdate = initTool("LibraryPagePropertySchemaUpdate")
 	toolLibraryPageTree = initTool("LibraryPageTree")
 	toolLibraryPageUpdate = initTool("LibraryPageUpdate")
+	toolLibraryPagesCreate = initTool("LibraryPagesCreate")
+	toolLibraryPagesUpdate = initTool("LibraryPagesUpdate")
 	toolLibraryRequestPage = initTool("LibraryRequestPage")
 	toolLibrarySearchPages = initTool("LibrarySearchPages")
 	toolLinkCreate = initTool("LinkCreate")
@@ -166,6 +170,8 @@ func AllToolNames() []string {
 		toolLibraryPagePropertySchemaUpdate.Name,
 		toolLibraryPageTree.Name,
 		toolLibraryPageUpdate.Name,
+		toolLibraryPagesCreate.Name,
+		toolLibraryPagesUpdate.Name,
 		toolLibraryRequestPage.Name,
 		toolLibrarySearchPages.Name,
 		toolLinkCreate.Name,
@@ -276,6 +282,14 @@ func GetLibraryPageTreeTool() *ToolDefinition {
 
 func GetLibraryPageUpdateTool() *ToolDefinition {
 	return toolLibraryPageUpdate
+}
+
+func GetLibraryPagesCreateTool() *ToolDefinition {
+	return toolLibraryPagesCreate
+}
+
+func GetLibraryPagesUpdateTool() *ToolDefinition {
+	return toolLibraryPagesUpdate
 }
 
 func GetLibraryRequestPageTool() *ToolDefinition {

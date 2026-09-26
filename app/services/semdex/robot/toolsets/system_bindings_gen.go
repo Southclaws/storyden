@@ -12,6 +12,7 @@ import (
 	system_moderation "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_moderation"
 	system_robot_studio "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_robot_studio"
 	system_trails "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_trails"
+	system_web_research "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_web_research"
 )
 
 func systemDefinitions() []Definition {
@@ -87,6 +88,14 @@ func systemDefinitions() []Definition {
 			Instruction: system_trails.Instruction,
 			ToolNames:   append([]string(nil), system_trails.ToolNames...),
 			Source:      SourceSystem,
+		},
+		{
+			ID:                  system_web_research.ID,
+			Name:                system_web_research.Name,
+			Description:         system_web_research.Description,
+			InstructionProvider: system_web_research.InstructionProvider,
+			ToolNames:           append([]string(nil), system_web_research.ToolNames...),
+			Source:              SourceSystem,
 		},
 	}
 }

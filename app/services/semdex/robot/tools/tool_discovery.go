@@ -40,7 +40,7 @@ func (t *toolDiscoveryTools) newSearchTool() *Tool {
 	}
 }
 
-func (t *toolDiscoveryTools) search(_ context.Context, input mcp.ToolToolSearchInput) *mcp.ToolToolSearchOutput {
+func (t *toolDiscoveryTools) search(ctx context.Context, input mcp.ToolToolSearchInput) *mcp.ToolToolSearchOutput {
 	maxResults := 0
 	if input.MaxResults != nil {
 		maxResults = *input.MaxResults
@@ -48,13 +48,21 @@ func (t *toolDiscoveryTools) search(_ context.Context, input mcp.ToolToolSearchI
 	results := t.registry.SearchCatalogue(input.Query, maxResults)
 	items := make([]mcp.RobotToolCatalogueItemYaml, 0, len(results))
 	for _, result := range results {
+		selected, err := t.registry.GetTool(ctx, result.ID)
+		if err != nil {
+			continue
+		}
 		items = append(items, mcp.RobotToolCatalogueItemYaml{
-			Id: result.ID, Name: result.Name, Description: result.Description,
+			Id:           result.ID,
+			CallableName: selected.ADKName(),
+			Name:         result.Name,
+			Description:  result.Description,
+			Availability: toolAvailability(ctx, selected),
 		})
 	}
 	return &mcp.ToolToolSearchOutput{
 		Tools:      items,
-		NextAction: "Use tool_get with the selected tool ID to inspect its full schema. Then use tool_load for this conversation, or assign the ID when configuring a Robot or Toolset.",
+		NextAction: "Use tool_get with the selected tool ID to inspect its full schema. Use its availability to determine whether it can be called, needs loading, or is blocked; inspection alone does not activate it. For configuration, assign the ID to a Robot or Toolset.",
 	}
 }
 
@@ -94,6 +102,8 @@ func (t *toolDiscoveryTools) get(ctx context.Context, input mcp.ToolToolGetInput
 	}
 	return &mcp.ToolToolGetOutput{
 		Id:                   selected.Definition.Name,
+		CallableName:         selected.ADKName(),
+		Availability:         toolAvailability(ctx, selected),
 		Name:                 name,
 		Description:          selected.Definition.Description,
 		InputSchema:          inputSchema,
