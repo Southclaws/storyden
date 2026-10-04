@@ -3,16 +3,19 @@ title: Roles
 description: Roles are a way to group members together and assign them specific permissions.
 ---
 
-Roles in Storyden are modelled loosely on Discord roles, so if you're used Discord you'll feel right at home.
+Roles in Storyden are modelled loosely on Discord roles, so if you've used Discord you'll feel right at home.
 
 You can use Roles to control access to certain features via [Permissions](/docs/introduction/members/permissions), or just as a way to group members and give their profile some flair via colours and badges.
 
 ## Default roles
 
-There are two default roles which cannot be changed:
+There are three built-in roles:
 
-- **Member**: This is the default role for all members. It has a set of pre-determined permissions such as posting threads and reading published content.
-- **Admin**: This is a special role that has all permissions, only assign it to those you trust as it has desctuctive powers.
+- **Guest**: Controls what visitors can access before signing in.
+- **Member**: The default role for registered members. Its permissions can be customised for your community.
+- **Admin**: Has full administrative access. Only assign it to people you trust.
+
+![The Roles page showing Admin, Member and Guest alongside custom community roles](/docs/introduction/members/roles.png)
 
 ## Creating custom roles
 
@@ -28,10 +31,6 @@ Members can choose a single role to be their "Badge" which will be displayed nex
 
 ## Customising the **Member** role
 
-<Callout type="warn">
-  At this time, customising the **Member** role is not available. This is a
-  feature we are working on and will be available in the future. This will allow
-  you to do things such as run invite-only communities or use Storyden as a
-  newsletter/blogging platform where only certain members can create threads but
-  members can reply.
-</Callout>
+With permission to manage roles, open the **Roles** page and choose **Edit role** on Member. Adjust the permission checkboxes and save. These defaults apply to all registered members, alongside permissions granted by their other roles.
+
+![Editing the Member role’s appearance and posting permissions](/docs/introduction/members/role-permissions.png)

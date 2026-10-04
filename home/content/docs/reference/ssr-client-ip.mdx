@@ -40,7 +40,7 @@ Client IP settings live in the Admin UI and are applied immediately:
 
 You can use the diagnostic tools in the System settings screen to configure and validate your client IP mode.
 
-![2026-03-24-19-35-20.png](2026-03-24-19-35-20.png)
+![Client IP settings and diagnostics in the System settings screen](/docs/reference/client-ip-diagnostics.png)
 
 There is currently no separate setup for SSR. If you run the frontend as a separate process perhaps for load balancing purposes, you will need to configure your reverse proxy to include `X-Forwarded-For`, the frontend will include this with requests to the API and apply the same logic to incoming requests.
 
@@ -70,7 +70,7 @@ Misconfigured proxies can cause incorrect rate-limit keys and unreliable audit/a
 
 Storyden will warn you if it detects a mismatch or potential internal IP addresses in the client IP resolution process.
 
-![2026-03-24-19-26-13.png](2026-03-24-19-26-13.png)
+![A warning that browser and server-rendered requests resolve to different client IP addresses](/docs/reference/client-ip-mismatch-warning.png)
 
 ## Interpreting `ip_address_ssr`
 

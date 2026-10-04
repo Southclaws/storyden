@@ -2,7 +2,7 @@
 title: Discussion
 ---
 
-Discussion on Storyden takes place in [Threads](./discussion/threads). A thread lives in a single [Category](./discussion/categories) and can also have some [Tags](./discussion/tags).
+Discussion on Storyden takes place in [Threads](./discussion/threads). A thread can belong to a [Category](./discussion/categories) and can also have some [Tags](./discussion/tags).
 
 If you've written a really thought-provoking thread, then it will have [Replies](./discussion/replies) and if you've written an amazing reply, then it will have [Reacts](./discussion/reacts).
 
@@ -36,13 +36,7 @@ The primary type of content in Storyden is the **Post**. A flexible way to repre
 
 The concept will be familiar to anyone who has used WordPress or other CMS platforms.
 
-![A thread with one reply](/docs/2024-09-21-09-34-55.png)
-
-<Callout type="info" emoji="ℹ️">
-  Screenshots of the reference frontend implementation are used throughout this
-  documentation to illustrate concepts. These screenshots may fall out of date
-  as the implementation evolves, but the underlying ideas will remain the same.
-</Callout>
+![A discussion thread with replies from several community members](/docs/introduction/discussion/thread.png)
 
 The Post resource is considered a primitive in the data model. Posts can come in
 different forms with different rules, but they share the same database table.
@@ -53,7 +47,7 @@ In this documentation, we'll cover the Storyden API specification's view on Post
 
 A thread is what you'll see on a traditional forum, a post with zero or more replies. Threads are typically displayed on the main feed or under a category page.
 
-![A thread's content](/docs/2024-09-21-09-56-23.png)
+![A thread's author, category, title, body and reply count](/docs/introduction/discussion/thread-content.png)
 
 Threads have some extra properties compared to replies:
 
@@ -71,7 +65,7 @@ Threads contain the rich text body content of the post, but they do not contain 
 
 A reply is a post in reply to a thread. Replies can be nested, forming a tree structure. They can also be used to reply to other replies, similar to sites like Reddit or Hacker News.
 
-![A reply](/docs/2024-09-21-10-00-30.png)
+![A reply quoting another member’s question](/docs/introduction/discussion/quoted-reply.png)
 
 Replies do not have a title, category, or tags. They are always associated with a thread and are accessible through the `/threads/{thread_mark}` endpoint.
 
@@ -110,4 +104,4 @@ There are two columns that make this work:
 
 To visualise this, lets use Hacker News as an example as it's a very similar structure (at least in terms of outcome)
 
-![Annotated screenshot of a Hacker News thread with a basic reply tree with lines showing the relationships](/docs/2024-09-21-10-45-01.png)
+![Annotated screenshot of a Hacker News thread with a basic reply tree with lines showing the relationships](/docs/introduction/discussion/hacker-news-reply-tree.png)

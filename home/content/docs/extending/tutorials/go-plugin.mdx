@@ -277,11 +277,11 @@ This is the easiest way to iterate.
 2. Add a new plugin in **External** mode.
 3. Paste the manifest contents from `manifest.yaml`.
 
-![2026-02-26-20-32-03.png](2026-02-26-20-32-03.png)
+![Adding Reactbot as an external plugin from its manifest](/docs/extending/tutorials/reactbot-add-external.png)
 
 4. Open the plugin Connection tab and copy the `STORYDEN_RPC_URL=...` value.
 
-![2026-02-26-20-35-49.png](2026-02-26-20-35-49.png)
+![Reactbot’s Connection tab with the STORYDEN_RPC_URL environment variable](/docs/extending/tutorials/reactbot-connection.png)
 
 5. Set the environment variable and run the plugin:
 
@@ -314,11 +314,11 @@ go run .
 
 You'll see the plugin's status flip to a cool spinning animation to indicate it's alive.
 
-![2026-02-26-20-38-24.png](2026-02-26-20-38-24.png)
+![The running status indicator for a connected Reactbot plugin](/docs/extending/tutorials/reactbot-running.png)
 
 Now create a reply in a thread. If permissions and connection are good, the plugin account adds a fire reaction.
 
-![2026-02-26-20-39-56.png](2026-02-26-20-39-56.png)
+![A fire reaction added to a reply by Reactbot](/docs/extending/tutorials/reactbot-fire-reaction.png)
 
 The development cycle is pretty normal, try make some changes, restart the plugin and see it do its thing.
 
@@ -326,7 +326,7 @@ The development cycle is pretty normal, try make some changes, restart the plugi
 
 If you need to subscribe to more events or request more permissions, you can update the manifest in the Admin UI and restart the plugin without needing to repackage. This is a nice advantage of External mode for development.
 
-![2026-02-26-20-34-20.png](2026-02-26-20-34-20.png)
+![Editing Reactbot’s subscribed events and requested permissions](/docs/extending/tutorials/reactbot-edit-manifest.png)
 
 But if you're only changing your own code and logic, you can just do your changes and restart your plugin without touching the manifest at all.
 
@@ -593,7 +593,7 @@ Distribution for this plugin is literally shipping `reactbot.zip` plus a short R
 <Callout type="warn" title="Be a good netizen">
   Always open source distributed plugins. Supervised plugins may run in non-sandboxed environments. Thus, every Storyden instance warns operators about the potential risks.
 
-    ![2026-02-26-20-43-56.png](2026-02-26-20-43-56.png)
+    ![The security warning for plugins running without sandbox isolation](/docs/extending/tutorials/plugin-runtime-security-warning.png)
 
     It's good practice to be transparent about what your plugin does and which permissions it requests, so operators can make informed decisions about whether to install it or not.
 

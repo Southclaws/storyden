@@ -3,25 +3,29 @@ title: Marks
 description: Marks are flexible shapeshifting identifiers for use in slugs and API calls.
 ---
 
-# Marks
-
 Marks are the way resources are identified on the Storyden API.
 
 ## The problem
 
 This is ugly, and not SEO friendly:
 
-![An ugly URL slug with a UUID](/docs/2024-09-21-10-53-18.png)
+```text
+/t/d7la96g5o6lqd95sms0g
+```
 
 This is not necessarily uniqueness friendly, and given slugs are generated from titles, it's not totally unlikely two threads could result in the same slug:
 
-![A pretty URL with a not so unique slug](/docs/2024-09-21-10-55-17.png)
+```text
+/t/scribblers-now-for-up-to-100-players-at-once
+```
 
 ## The solution
 
 You've probably seen this on many other platforms, a unique identifier followed by an SEO-friendly URL slug, derived from the post's title:
 
-![A thread mark URL](/docs/2024-09-21-10-56-22.png)
+```text
+/t/d7la96g5o6lqd95sms0g-scribblers-now-for-up-to-100-players-at-once
+```
 
 ## How they're used
 
@@ -31,10 +35,10 @@ When reading data from the API, you'll almost always have these two pieces of in
 
 Whenever a URL parameter or field on the API uses a mark, it means the ID or the full mark are interchangeable. This allows for flexibility in how you identify resources.
 
-For example, the post at `makeroom.club/p/crk0h7afunp7891n7cg0-very-demure` may be addressed via:
+For example, the post at `makeroom.club/t/d7la96g5o6lqd95sms0g-scribblers-now-for-up-to-100-players-at-once` may be addressed via:
 
-- `crk0h7afunp7891n7cg0-very-demure` the full slug
-- `crk0h7afunp7891n7cg0` just the ID
+- `d7la96g5o6lqd95sms0g-scribblers-now-for-up-to-100-players-at-once` the full slug
+- `d7la96g5o6lqd95sms0g` just the ID
 
 ## Technical details
 
