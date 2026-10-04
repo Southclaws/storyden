@@ -98,35 +98,35 @@ func grantScope(requestedScope string, client *oauthresource.Client, accountPerm
 }
 
 func grantClientCredentialsScope(requestedScope string, client *oauthresource.Client, accountPermissions rbac.Permissions) (string, error) {
-	if requestedScope != "" {
-		if err := validateScopeNames(requestedScope); err != nil {
+	inherit := shouldInheritUserPermissions(client)
+	allowedPermissions := accountPermissions
+	if !inherit {
+		var err error
+		allowedPermissions, err = permissionsFromScopes(client.AllowedScopes)
+		if err != nil {
 			return "", err
 		}
+	}
+
+	if requestedScope == "" {
+		return joinScopes(nil, intersectPermissions(allowedPermissions, accountPermissions).List()), nil
+	}
+
+	if err := validateScopeNames(requestedScope); err != nil {
+		return "", err
+	}
+
+	if !inherit {
 		if err := authorizeScopeNames(requestedScope, client.AllowedScopes); err != nil {
 			return "", err
 		}
-
-		requestedScopes := splitScope(requestedScope)
-		requestedPermissions, err := permissionsFromScopes(requestedScopes)
-		if err != nil {
-			return "", err
-		}
-
-		allowedPermissions, err := permissionsFromScopes(client.AllowedScopes)
-		if err != nil {
-			return "", err
-		}
-
-		grantedPermissions := intersectPermissions(requestedPermissions, allowedPermissions, accountPermissions)
-		return joinScopes(nil, grantedPermissions.List()), nil
 	}
-
-	allowedPermissions, err := permissionsFromScopes(client.AllowedScopes)
+	requestedPermissions, err := permissionsFromScopes(splitScope(requestedScope))
 	if err != nil {
 		return "", err
 	}
 
-	grantedPermissions := intersectPermissions(allowedPermissions, accountPermissions)
+	grantedPermissions := intersectPermissions(requestedPermissions, allowedPermissions, accountPermissions)
 	return joinScopes(nil, grantedPermissions.List()), nil
 }
 

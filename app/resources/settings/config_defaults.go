@@ -3,12 +3,12 @@ package settings
 import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
+	"time"
 
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
-// hydrateConfigDefaults takes an *ent.Setting, maps it to *Settings, and
-// injects config.Config defaults for any values not set in the database.
+// hydrateConfigDefaults fills missing persisted settings with server and domain defaults.
 func (d *SettingsRepository) hydrateConfigDefaults(in *ent.Setting) (*Settings, error) {
 	settings, err := mapSettings(in)
 	if err != nil {
@@ -17,6 +17,7 @@ func (d *SettingsRepository) hydrateConfigDefaults(in *ent.Setting) (*Settings, 
 
 	d.hydrateClientIPDefaults(settings)
 	d.hydrateRateLimitDefaults(settings)
+	d.hydrateOAuthDefaults(settings)
 
 	return settings, nil
 }
@@ -91,5 +92,16 @@ func (d *SettingsRepository) hydrateRateLimitDefaults(settings *Settings) {
 	}
 
 	services.RateLimit = opt.New(rateLimit)
+	settings.Services = opt.New(services)
+}
+
+func (d *SettingsRepository) hydrateOAuthDefaults(settings *Settings) {
+	services := settings.Services.OrZero()
+	oauth := services.OAuth.OrZero()
+	oauth.DynamicRegistrationEnabled = opt.New(oauth.DynamicRegistrationEnabled.Or(false))
+	oauth.AutonomousRegistrationMode = opt.New(oauth.AutonomousRegistrationMode.Or(OAuthAutonomousRegistrationModeDisabled))
+	oauth.RegistrationApprovalTTL = opt.New(oauth.RegistrationApprovalTTL.Or(10 * time.Minute))
+	oauth.RegistrationApprovalURL = opt.New(oauth.RegistrationApprovalURL.OrZero())
+	services.OAuth = opt.New(oauth)
 	settings.Services = opt.New(services)
 }

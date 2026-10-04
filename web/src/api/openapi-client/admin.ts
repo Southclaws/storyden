@@ -16,7 +16,10 @@ import { fetcher } from "../client";
 import type {
   AccountGetOKResponse,
   AdminAccessKeyListOKResponse,
+  AdminOAuthDynamicRegistrationAccessTokenListParams,
   AdminOAuthRefreshTokenListParams,
+  AdminOAuthRegistrationApprovalGetParams,
+  AdminOAuthRegistrationApprovalListParams,
   AdminSettingsGetOKResponse,
   AdminSettingsUpdateBody,
   AdminSettingsUpdateOKResponse,
@@ -35,6 +38,7 @@ import type {
   EmailQueueListOKResponse,
   EmailQueueListParams,
   ForbiddenResponse,
+  Identifier,
   InternalServerErrorResponse,
   ModerationActionCreateBody,
   NoContentResponse,
@@ -44,7 +48,17 @@ import type {
   OAuthClientOKResponse,
   OAuthClientUpdateBody,
   OAuthDeviceAuthorisationListOKResponse,
+  OAuthDynamicRegistrationAccessToken,
+  OAuthDynamicRegistrationAccessTokenCreateProps,
+  OAuthDynamicRegistrationAccessTokenIssued,
+  OAuthDynamicRegistrationAccessTokenListResult,
+  OAuthError,
   OAuthRefreshTokenListOKResponse,
+  OAuthRegistrationApprovalBulkDecision,
+  OAuthRegistrationApprovalBulkResult,
+  OAuthRegistrationApprovalDecision,
+  OAuthRegistrationApprovalListResult,
+  OAuthRegistrationApprovalReview,
   OAuthRemoteAuthorizeOKResponse,
   OAuthRemoteConnectionCreateBody,
   OAuthRemoteConnectionListOKResponse,
@@ -1820,6 +1834,587 @@ export const useOAuthRemoteConnectionAuthorize = <
     oauthRemoteConnectionId,
     requestOptions,
   );
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getAdminOAuthRegistrationApprovalListUrl = (
+  params?: AdminOAuthRegistrationApprovalListParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/admin/oauth/registration-approvals?${stringifiedParams}`
+    : `/admin/oauth/registration-approvals`;
+};
+
+/**
+ * List pending, unexpired autonomous registrations awaiting administrator
+ * approval. Completed, denied, cancelled & expired requests are excluded.
+ */
+export const adminOAuthRegistrationApprovalList = async (
+  params?: AdminOAuthRegistrationApprovalListParams,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<OAuthRegistrationApprovalListResult> => {
+  return fetcher<OAuthRegistrationApprovalListResult>(
+    getAdminOAuthRegistrationApprovalListUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export const getAdminOAuthRegistrationApprovalListKey = (
+  params?: AdminOAuthRegistrationApprovalListParams,
+) =>
+  [`/admin/oauth/registration-approvals`, ...(params ? [params] : [])] as const;
+
+export type AdminOAuthRegistrationApprovalListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminOAuthRegistrationApprovalList>>
+>;
+
+export const useAdminOAuthRegistrationApprovalList = <
+  TError = ForbiddenResponse | InternalServerErrorResponse,
+>(
+  params?: AdminOAuthRegistrationApprovalListParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof adminOAuthRegistrationApprovalList>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() =>
+      isEnabled ? getAdminOAuthRegistrationApprovalListKey(params) : null);
+  const swrFn = () =>
+    adminOAuthRegistrationApprovalList(params, requestOptions);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getAdminOAuthRegistrationApprovalBulkSubmitUrl = () => {
+  return `/admin/oauth/registration-approvals/decision`;
+};
+
+/**
+ * Approve or deny all pending, unexpired registrations created on or
+ * before the queue snapshot time, across all pages. Already decided,
+ * cancelled, consumed and expired requests are excluded. Returns the
+ * number of requests changed; approval creates only when clients poll.
+ */
+export const adminOAuthRegistrationApprovalBulkSubmit = async (
+  oAuthRegistrationApprovalBulkDecision: OAuthRegistrationApprovalBulkDecision,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<OAuthRegistrationApprovalBulkResult> => {
+  return fetcher<OAuthRegistrationApprovalBulkResult>(
+    getAdminOAuthRegistrationApprovalBulkSubmitUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(oAuthRegistrationApprovalBulkDecision),
+    },
+  );
+};
+
+export const getAdminOAuthRegistrationApprovalBulkSubmitMutationFetcher = (
+  options?: SecondParameter<typeof fetcher>,
+) => {
+  return (_: Key, { arg }: { arg: OAuthRegistrationApprovalBulkDecision }) => {
+    return adminOAuthRegistrationApprovalBulkSubmit(arg, options);
+  };
+};
+export const getAdminOAuthRegistrationApprovalBulkSubmitMutationKey = () =>
+  [`/admin/oauth/registration-approvals/decision`] as const;
+
+export type AdminOAuthRegistrationApprovalBulkSubmitMutationResult =
+  NonNullable<
+    Awaited<ReturnType<typeof adminOAuthRegistrationApprovalBulkSubmit>>
+  >;
+
+export const useAdminOAuthRegistrationApprovalBulkSubmit = <
+  TError = BadRequestResponse | ForbiddenResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof adminOAuthRegistrationApprovalBulkSubmit>>,
+    TError,
+    Key,
+    OAuthRegistrationApprovalBulkDecision,
+    Awaited<ReturnType<typeof adminOAuthRegistrationApprovalBulkSubmit>>
+  > & { swrKey?: string };
+  request?: SecondParameter<typeof fetcher>;
+}) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ??
+    getAdminOAuthRegistrationApprovalBulkSubmitMutationKey();
+  const swrFn =
+    getAdminOAuthRegistrationApprovalBulkSubmitMutationFetcher(requestOptions);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getAdminOAuthRegistrationApprovalGetUrl = (
+  params: AdminOAuthRegistrationApprovalGetParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/admin/oauth/registration-approvals/verification?${stringifiedParams}`
+    : `/admin/oauth/registration-approvals/verification`;
+};
+
+/**
+ * Review a pending autonomous registration by its verification code. This
+ * does not approve it or create an account.
+ */
+export const adminOAuthRegistrationApprovalGet = async (
+  params: AdminOAuthRegistrationApprovalGetParams,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<OAuthRegistrationApprovalReview> => {
+  return fetcher<OAuthRegistrationApprovalReview>(
+    getAdminOAuthRegistrationApprovalGetUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export const getAdminOAuthRegistrationApprovalGetKey = (
+  params: AdminOAuthRegistrationApprovalGetParams,
+) =>
+  [
+    `/admin/oauth/registration-approvals/verification`,
+    ...(params ? [params] : []),
+  ] as const;
+
+export type AdminOAuthRegistrationApprovalGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminOAuthRegistrationApprovalGet>>
+>;
+
+export const useAdminOAuthRegistrationApprovalGet = <
+  TError = OAuthError | ForbiddenResponse | InternalServerErrorResponse,
+>(
+  params: AdminOAuthRegistrationApprovalGetParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof adminOAuthRegistrationApprovalGet>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() =>
+      isEnabled ? getAdminOAuthRegistrationApprovalGetKey(params) : null);
+  const swrFn = () => adminOAuthRegistrationApprovalGet(params, requestOptions);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getAdminOAuthRegistrationApprovalSubmitUrl = () => {
+  return `/admin/oauth/registration-approvals/verification`;
+};
+
+/**
+ * Approve or deny a pending autonomous registration. Approval authorizes
+ * creation of a bot on the next client poll and does not grant the
+ * administrator's permissions.
+ */
+export const adminOAuthRegistrationApprovalSubmit = async (
+  oAuthRegistrationApprovalDecision: OAuthRegistrationApprovalDecision,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<NoContentResponse> => {
+  return fetcher<NoContentResponse>(
+    getAdminOAuthRegistrationApprovalSubmitUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(oAuthRegistrationApprovalDecision),
+    },
+  );
+};
+
+export const getAdminOAuthRegistrationApprovalSubmitMutationFetcher = (
+  options?: SecondParameter<typeof fetcher>,
+) => {
+  return (_: Key, { arg }: { arg: OAuthRegistrationApprovalDecision }) => {
+    return adminOAuthRegistrationApprovalSubmit(arg, options);
+  };
+};
+export const getAdminOAuthRegistrationApprovalSubmitMutationKey = () =>
+  [`/admin/oauth/registration-approvals/verification`] as const;
+
+export type AdminOAuthRegistrationApprovalSubmitMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminOAuthRegistrationApprovalSubmit>>
+>;
+
+export const useAdminOAuthRegistrationApprovalSubmit = <
+  TError = OAuthError | ForbiddenResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof adminOAuthRegistrationApprovalSubmit>>,
+    TError,
+    Key,
+    OAuthRegistrationApprovalDecision,
+    Awaited<ReturnType<typeof adminOAuthRegistrationApprovalSubmit>>
+  > & { swrKey?: string };
+  request?: SecondParameter<typeof fetcher>;
+}) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getAdminOAuthRegistrationApprovalSubmitMutationKey();
+  const swrFn =
+    getAdminOAuthRegistrationApprovalSubmitMutationFetcher(requestOptions);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getAdminOAuthDynamicRegistrationAccessTokenListUrl = (
+  params?: AdminOAuthDynamicRegistrationAccessTokenListParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/admin/oauth/dcr-iats?${stringifiedParams}`
+    : `/admin/oauth/dcr-iats`;
+};
+
+/**
+ * List agent registration tokens, including expired and revoked tokens.
+ * Secret values and hashes are never returned.
+ */
+export const adminOAuthDynamicRegistrationAccessTokenList = async (
+  params?: AdminOAuthDynamicRegistrationAccessTokenListParams,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<OAuthDynamicRegistrationAccessTokenListResult> => {
+  return fetcher<OAuthDynamicRegistrationAccessTokenListResult>(
+    getAdminOAuthDynamicRegistrationAccessTokenListUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export const getAdminOAuthDynamicRegistrationAccessTokenListKey = (
+  params?: AdminOAuthDynamicRegistrationAccessTokenListParams,
+) => [`/admin/oauth/dcr-iats`, ...(params ? [params] : [])] as const;
+
+export type AdminOAuthDynamicRegistrationAccessTokenListQueryResult =
+  NonNullable<
+    Awaited<ReturnType<typeof adminOAuthDynamicRegistrationAccessTokenList>>
+  >;
+
+export const useAdminOAuthDynamicRegistrationAccessTokenList = <
+  TError = ForbiddenResponse | InternalServerErrorResponse,
+>(
+  params?: AdminOAuthDynamicRegistrationAccessTokenListParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof adminOAuthDynamicRegistrationAccessTokenList>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() =>
+      isEnabled
+        ? getAdminOAuthDynamicRegistrationAccessTokenListKey(params)
+        : null);
+  const swrFn = () =>
+    adminOAuthDynamicRegistrationAccessTokenList(params, requestOptions);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getAdminOAuthDynamicRegistrationAccessTokenCreateUrl = () => {
+  return `/admin/oauth/dcr-iats`;
+};
+
+/**
+ * Issue an Initial Access Token authorizing autonomous agent registration.
+ * The opaque bearer token is returned once. It grants no account or API
+ * permissions. Expiry is required; max_registrations defaults to one.
+ */
+export const adminOAuthDynamicRegistrationAccessTokenCreate = async (
+  oAuthDynamicRegistrationAccessTokenCreateProps: OAuthDynamicRegistrationAccessTokenCreateProps,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<OAuthDynamicRegistrationAccessTokenIssued> => {
+  return fetcher<OAuthDynamicRegistrationAccessTokenIssued>(
+    getAdminOAuthDynamicRegistrationAccessTokenCreateUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(oAuthDynamicRegistrationAccessTokenCreateProps),
+    },
+  );
+};
+
+export const getAdminOAuthDynamicRegistrationAccessTokenCreateMutationFetcher =
+  (options?: SecondParameter<typeof fetcher>) => {
+    return (
+      _: Key,
+      { arg }: { arg: OAuthDynamicRegistrationAccessTokenCreateProps },
+    ) => {
+      return adminOAuthDynamicRegistrationAccessTokenCreate(arg, options);
+    };
+  };
+export const getAdminOAuthDynamicRegistrationAccessTokenCreateMutationKey =
+  () => [`/admin/oauth/dcr-iats`] as const;
+
+export type AdminOAuthDynamicRegistrationAccessTokenCreateMutationResult =
+  NonNullable<
+    Awaited<ReturnType<typeof adminOAuthDynamicRegistrationAccessTokenCreate>>
+  >;
+
+export const useAdminOAuthDynamicRegistrationAccessTokenCreate = <
+  TError = BadRequestResponse | ForbiddenResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof adminOAuthDynamicRegistrationAccessTokenCreate>>,
+    TError,
+    Key,
+    OAuthDynamicRegistrationAccessTokenCreateProps,
+    Awaited<ReturnType<typeof adminOAuthDynamicRegistrationAccessTokenCreate>>
+  > & { swrKey?: string };
+  request?: SecondParameter<typeof fetcher>;
+}) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ??
+    getAdminOAuthDynamicRegistrationAccessTokenCreateMutationKey();
+  const swrFn =
+    getAdminOAuthDynamicRegistrationAccessTokenCreateMutationFetcher(
+      requestOptions,
+    );
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getAdminOAuthDynamicRegistrationAccessTokenGetUrl = (
+  oauthDcrIatId: Identifier,
+) => {
+  return `/admin/oauth/dcr-iats/${oauthDcrIatId}`;
+};
+
+/**
+ * Read agent registration token metadata without its secret or hash.
+ */
+export const adminOAuthDynamicRegistrationAccessTokenGet = async (
+  oauthDcrIatId: Identifier,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<OAuthDynamicRegistrationAccessToken> => {
+  return fetcher<OAuthDynamicRegistrationAccessToken>(
+    getAdminOAuthDynamicRegistrationAccessTokenGetUrl(oauthDcrIatId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export const getAdminOAuthDynamicRegistrationAccessTokenGetKey = (
+  oauthDcrIatId: Identifier,
+) => [`/admin/oauth/dcr-iats/${oauthDcrIatId}`] as const;
+
+export type AdminOAuthDynamicRegistrationAccessTokenGetQueryResult =
+  NonNullable<
+    Awaited<ReturnType<typeof adminOAuthDynamicRegistrationAccessTokenGet>>
+  >;
+
+export const useAdminOAuthDynamicRegistrationAccessTokenGet = <
+  TError = ForbiddenResponse | NotFoundResponse | InternalServerErrorResponse,
+>(
+  oauthDcrIatId: Identifier,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof adminOAuthDynamicRegistrationAccessTokenGet>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const isEnabled =
+    swrOptions?.enabled !== false &&
+    oauthDcrIatId !== null &&
+    oauthDcrIatId !== undefined;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() =>
+      isEnabled
+        ? getAdminOAuthDynamicRegistrationAccessTokenGetKey(oauthDcrIatId)
+        : null);
+  const swrFn = () =>
+    adminOAuthDynamicRegistrationAccessTokenGet(oauthDcrIatId, requestOptions);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getAdminOAuthDynamicRegistrationAccessTokenRevokeUrl = (
+  oauthDcrIatId: Identifier,
+) => {
+  return `/admin/oauth/dcr-iats/${oauthDcrIatId}`;
+};
+
+/**
+ * Revoke an agent registration token, retaining its metadata and usage
+ * history. Repeated revocation succeeds. Existing clients are unaffected.
+ */
+export const adminOAuthDynamicRegistrationAccessTokenRevoke = async (
+  oauthDcrIatId: Identifier,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<NoContentResponse> => {
+  return fetcher<NoContentResponse>(
+    getAdminOAuthDynamicRegistrationAccessTokenRevokeUrl(oauthDcrIatId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};
+
+export const getAdminOAuthDynamicRegistrationAccessTokenRevokeMutationFetcher =
+  (oauthDcrIatId: Identifier, options?: SecondParameter<typeof fetcher>) => {
+    return (_: Key, __: { arg: Arguments }) => {
+      return adminOAuthDynamicRegistrationAccessTokenRevoke(
+        oauthDcrIatId,
+        options,
+      );
+    };
+  };
+export const getAdminOAuthDynamicRegistrationAccessTokenRevokeMutationKey = (
+  oauthDcrIatId: Identifier,
+) => [`/admin/oauth/dcr-iats/${oauthDcrIatId}`] as const;
+
+export type AdminOAuthDynamicRegistrationAccessTokenRevokeMutationResult =
+  NonNullable<
+    Awaited<ReturnType<typeof adminOAuthDynamicRegistrationAccessTokenRevoke>>
+  >;
+
+export const useAdminOAuthDynamicRegistrationAccessTokenRevoke = <
+  TError = ForbiddenResponse | NotFoundResponse | InternalServerErrorResponse,
+>(
+  oauthDcrIatId: Identifier,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<
+        ReturnType<typeof adminOAuthDynamicRegistrationAccessTokenRevoke>
+      >,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof adminOAuthDynamicRegistrationAccessTokenRevoke>>
+    > & { swrKey?: string };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ??
+    getAdminOAuthDynamicRegistrationAccessTokenRevokeMutationKey(oauthDcrIatId);
+  const swrFn =
+    getAdminOAuthDynamicRegistrationAccessTokenRevokeMutationFetcher(
+      oauthDcrIatId,
+      requestOptions,
+    );
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

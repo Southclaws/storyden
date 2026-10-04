@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/oauthclient"
+	"github.com/Southclaws/storyden/internal/ent/oauthdynamicregistrationaccesstokens"
 	"github.com/rs/xid"
 )
 
@@ -26,6 +27,10 @@ type OAuthClient struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// AccountID holds the value of the "account_id" field.
 	AccountID *xid.ID `json:"account_id,omitempty"`
+	// RegistrationApprovedByAccountID holds the value of the "registration_approved_by_account_id" field.
+	RegistrationApprovedByAccountID *xid.ID `json:"registration_approved_by_account_id,omitempty"`
+	// DcrIatID holds the value of the "dcr_iat_id" field.
+	DcrIatID *xid.ID `json:"dcr_iat_id,omitempty"`
 	// ClientID holds the value of the "client_id" field.
 	ClientID string `json:"client_id,omitempty"`
 	// ClientSecretHash holds the value of the "client_secret_hash" field.
@@ -38,6 +43,8 @@ type OAuthClient struct {
 	ScopePolicy oauthclient.ScopePolicy `json:"scope_policy,omitempty"`
 	// TokenEndpointAuthMethod holds the value of the "token_endpoint_auth_method" field.
 	TokenEndpointAuthMethod string `json:"token_endpoint_auth_method,omitempty"`
+	// Jwks holds the value of the "jwks" field.
+	Jwks map[string]interface{} `json:"jwks,omitempty"`
 	// PkceRequired holds the value of the "pkce_required" field.
 	PkceRequired bool `json:"pkce_required,omitempty"`
 	// RedirectUris holds the value of the "redirect_uris" field.
@@ -54,6 +61,10 @@ type OAuthClient struct {
 
 // OAuthClientEdges holds the relations/edges for other nodes in the graph.
 type OAuthClientEdges struct {
+	// RegistrationApprovedBy holds the value of the registration_approved_by edge.
+	RegistrationApprovedBy *Account `json:"registration_approved_by,omitempty"`
+	// DcrIat holds the value of the dcr_iat edge.
+	DcrIat *OAuthDynamicRegistrationAccessTokens `json:"dcr_iat,omitempty"`
 	// Account holds the value of the account edge.
 	Account *Account `json:"account,omitempty"`
 	// AuthorisationCodes holds the value of the authorisation_codes edge.
@@ -66,7 +77,29 @@ type OAuthClientEdges struct {
 	RefreshTokens []*OAuthRefreshToken `json:"refresh_tokens,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [7]bool
+}
+
+// RegistrationApprovedByOrErr returns the RegistrationApprovedBy value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e OAuthClientEdges) RegistrationApprovedByOrErr() (*Account, error) {
+	if e.RegistrationApprovedBy != nil {
+		return e.RegistrationApprovedBy, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: account.Label}
+	}
+	return nil, &NotLoadedError{edge: "registration_approved_by"}
+}
+
+// DcrIatOrErr returns the DcrIat value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e OAuthClientEdges) DcrIatOrErr() (*OAuthDynamicRegistrationAccessTokens, error) {
+	if e.DcrIat != nil {
+		return e.DcrIat, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: oauthdynamicregistrationaccesstokens.Label}
+	}
+	return nil, &NotLoadedError{edge: "dcr_iat"}
 }
 
 // AccountOrErr returns the Account value or an error if the edge
@@ -74,7 +107,7 @@ type OAuthClientEdges struct {
 func (e OAuthClientEdges) AccountOrErr() (*Account, error) {
 	if e.Account != nil {
 		return e.Account, nil
-	} else if e.loadedTypes[0] {
+	} else if e.loadedTypes[2] {
 		return nil, &NotFoundError{label: account.Label}
 	}
 	return nil, &NotLoadedError{edge: "account"}
@@ -83,7 +116,7 @@ func (e OAuthClientEdges) AccountOrErr() (*Account, error) {
 // AuthorisationCodesOrErr returns the AuthorisationCodes value or an error if the edge
 // was not loaded in eager-loading.
 func (e OAuthClientEdges) AuthorisationCodesOrErr() ([]*OAuthAuthorisationCode, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[3] {
 		return e.AuthorisationCodes, nil
 	}
 	return nil, &NotLoadedError{edge: "authorisation_codes"}
@@ -92,7 +125,7 @@ func (e OAuthClientEdges) AuthorisationCodesOrErr() ([]*OAuthAuthorisationCode, 
 // AuthorisationRequestsOrErr returns the AuthorisationRequests value or an error if the edge
 // was not loaded in eager-loading.
 func (e OAuthClientEdges) AuthorisationRequestsOrErr() ([]*OAuthAuthorisationRequest, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[4] {
 		return e.AuthorisationRequests, nil
 	}
 	return nil, &NotLoadedError{edge: "authorisation_requests"}
@@ -101,7 +134,7 @@ func (e OAuthClientEdges) AuthorisationRequestsOrErr() ([]*OAuthAuthorisationReq
 // DeviceAuthorisationsOrErr returns the DeviceAuthorisations value or an error if the edge
 // was not loaded in eager-loading.
 func (e OAuthClientEdges) DeviceAuthorisationsOrErr() ([]*OAuthDeviceAuthorisation, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[5] {
 		return e.DeviceAuthorisations, nil
 	}
 	return nil, &NotLoadedError{edge: "device_authorisations"}
@@ -110,7 +143,7 @@ func (e OAuthClientEdges) DeviceAuthorisationsOrErr() ([]*OAuthDeviceAuthorisati
 // RefreshTokensOrErr returns the RefreshTokens value or an error if the edge
 // was not loaded in eager-loading.
 func (e OAuthClientEdges) RefreshTokensOrErr() ([]*OAuthRefreshToken, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[6] {
 		return e.RefreshTokens, nil
 	}
 	return nil, &NotLoadedError{edge: "refresh_tokens"}
@@ -121,9 +154,9 @@ func (*OAuthClient) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case oauthclient.FieldAccountID:
+		case oauthclient.FieldAccountID, oauthclient.FieldRegistrationApprovedByAccountID, oauthclient.FieldDcrIatID:
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
-		case oauthclient.FieldRedirectUris, oauthclient.FieldAllowedScopes, oauthclient.FieldAllowedGrants:
+		case oauthclient.FieldJwks, oauthclient.FieldRedirectUris, oauthclient.FieldAllowedScopes, oauthclient.FieldAllowedGrants:
 			values[i] = new([]byte)
 		case oauthclient.FieldPkceRequired:
 			values[i] = new(sql.NullBool)
@@ -173,6 +206,20 @@ func (_m *OAuthClient) assignValues(columns []string, values []any) error {
 				_m.AccountID = new(xid.ID)
 				*_m.AccountID = *value.S.(*xid.ID)
 			}
+		case oauthclient.FieldRegistrationApprovedByAccountID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field registration_approved_by_account_id", values[i])
+			} else if value.Valid {
+				_m.RegistrationApprovedByAccountID = new(xid.ID)
+				*_m.RegistrationApprovedByAccountID = *value.S.(*xid.ID)
+			}
+		case oauthclient.FieldDcrIatID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field dcr_iat_id", values[i])
+			} else if value.Valid {
+				_m.DcrIatID = new(xid.ID)
+				*_m.DcrIatID = *value.S.(*xid.ID)
+			}
 		case oauthclient.FieldClientID:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field client_id", values[i])
@@ -209,6 +256,14 @@ func (_m *OAuthClient) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field token_endpoint_auth_method", values[i])
 			} else if value.Valid {
 				_m.TokenEndpointAuthMethod = value.String
+			}
+		case oauthclient.FieldJwks:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field jwks", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &_m.Jwks); err != nil {
+					return fmt.Errorf("unmarshal field jwks: %w", err)
+				}
 			}
 		case oauthclient.FieldPkceRequired:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -251,6 +306,16 @@ func (_m *OAuthClient) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (_m *OAuthClient) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
+}
+
+// QueryRegistrationApprovedBy queries the "registration_approved_by" edge of the OAuthClient entity.
+func (_m *OAuthClient) QueryRegistrationApprovedBy() *AccountQuery {
+	return NewOAuthClientClient(_m.config).QueryRegistrationApprovedBy(_m)
+}
+
+// QueryDcrIat queries the "dcr_iat" edge of the OAuthClient entity.
+func (_m *OAuthClient) QueryDcrIat() *OAuthDynamicRegistrationAccessTokensQuery {
+	return NewOAuthClientClient(_m.config).QueryDcrIat(_m)
 }
 
 // QueryAccount queries the "account" edge of the OAuthClient entity.
@@ -312,6 +377,16 @@ func (_m *OAuthClient) String() string {
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
+	if v := _m.RegistrationApprovedByAccountID; v != nil {
+		builder.WriteString("registration_approved_by_account_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.DcrIatID; v != nil {
+		builder.WriteString("dcr_iat_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
 	builder.WriteString("client_id=")
 	builder.WriteString(_m.ClientID)
 	builder.WriteString(", ")
@@ -331,6 +406,9 @@ func (_m *OAuthClient) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("token_endpoint_auth_method=")
 	builder.WriteString(_m.TokenEndpointAuthMethod)
+	builder.WriteString(", ")
+	builder.WriteString("jwks=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Jwks))
 	builder.WriteString(", ")
 	builder.WriteString("pkce_required=")
 	builder.WriteString(fmt.Sprintf("%v", _m.PkceRequired))

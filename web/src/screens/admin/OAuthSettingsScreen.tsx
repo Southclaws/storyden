@@ -6,9 +6,12 @@ import {
   useAdminOAuthClientList,
   useAdminOAuthDeviceAuthorisationList,
   useAdminOAuthRefreshTokenList,
+  useAdminSettingsGet,
 } from "@/api/openapi-client/admin";
 import { OAuthSettings } from "@/components/admin/OAuthSettings/OAuthSettings";
 import { Unready } from "@/components/site/Unready";
+import { parseAdminSettings } from "@/lib/settings/settings";
+import { useSettings } from "@/lib/settings/settings-client";
 
 export function OAuthSettingsScreen() {
   const [filters] = useQueryStates({
@@ -16,11 +19,16 @@ export function OAuthSettingsScreen() {
   });
 
   const clients = useAdminOAuthClientList();
+  const settings = useAdminSettingsGet();
+  const publicSettings = useSettings();
   const devices = useAdminOAuthDeviceAuthorisationList();
   const tokens = useAdminOAuthRefreshTokenList({
     page: filters.page.toString(),
   });
 
+  if (!settings.data || !publicSettings.ready) {
+    return <Unready error={settings.error ?? publicSettings.error} />;
+  }
   if (!clients.data) {
     return <Unready error={clients.error} />;
   }
@@ -33,6 +41,10 @@ export function OAuthSettingsScreen() {
 
   return (
     <OAuthSettings
+      settings={{
+        ...parseAdminSettings(settings.data),
+        capabilities: publicSettings.settings.capabilities,
+      }}
       clients={clients.data.clients}
       deviceAuthorisations={devices.data.device_authorisations}
       tokens={tokens.data.tokens}

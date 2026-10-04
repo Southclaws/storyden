@@ -321,6 +321,18 @@ func (f OAuthDeviceAuthorisationFunc) Mutate(ctx context.Context, m ent.Mutation
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OAuthDeviceAuthorisationMutation", m)
 }
 
+// The OAuthDynamicRegistrationAccessTokensFunc type is an adapter to allow the use of ordinary
+// function as OAuthDynamicRegistrationAccessTokens mutator.
+type OAuthDynamicRegistrationAccessTokensFunc func(context.Context, *ent.OAuthDynamicRegistrationAccessTokensMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f OAuthDynamicRegistrationAccessTokensFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.OAuthDynamicRegistrationAccessTokensMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OAuthDynamicRegistrationAccessTokensMutation", m)
+}
+
 // The OAuthRefreshTokenFunc type is an adapter to allow the use of ordinary
 // function as OAuthRefreshToken mutator.
 type OAuthRefreshTokenFunc func(context.Context, *ent.OAuthRefreshTokenMutation) (ent.Value, error)
@@ -331,6 +343,18 @@ func (f OAuthRefreshTokenFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OAuthRefreshTokenMutation", m)
+}
+
+// The OAuthRegistrationApprovalFunc type is an adapter to allow the use of ordinary
+// function as OAuthRegistrationApproval mutator.
+type OAuthRegistrationApprovalFunc func(context.Context, *ent.OAuthRegistrationApprovalMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f OAuthRegistrationApprovalFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.OAuthRegistrationApprovalMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OAuthRegistrationApprovalMutation", m)
 }
 
 // The OAuthRemoteAuthorisationFlowFunc type is an adapter to allow the use of ordinary

@@ -32,7 +32,9 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
 	"github.com/Southclaws/storyden/internal/ent/oauthclient"
 	"github.com/Southclaws/storyden/internal/ent/oauthdeviceauthorisation"
+	"github.com/Southclaws/storyden/internal/ent/oauthdynamicregistrationaccesstokens"
 	"github.com/Southclaws/storyden/internal/ent/oauthrefreshtoken"
+	"github.com/Southclaws/storyden/internal/ent/oauthregistrationapproval"
 	"github.com/Southclaws/storyden/internal/ent/oauthremoteconnection"
 	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -81,6 +83,9 @@ type AccountQuery struct {
 	withMentions                          *MentionProfileQuery
 	withRoles                             *RoleQuery
 	withAuthentication                    *AuthenticationQuery
+	withOauthRegistrationApprovals        *OAuthRegistrationApprovalQuery
+	withApprovedOauthClients              *OAuthClientQuery
+	withOauthDcrIats                      *OAuthDynamicRegistrationAccessTokensQuery
 	withOauthClients                      *OAuthClientQuery
 	withOauthAuthorisationCodes           *OAuthAuthorisationCodeQuery
 	withOauthAuthorisationRequests        *OAuthAuthorisationRequestQuery
@@ -475,6 +480,72 @@ func (_q *AccountQuery) QueryAuthentication() *AuthenticationQuery {
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(authentication.Table, authentication.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.AuthenticationTable, account.AuthenticationColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryOauthRegistrationApprovals chains the current query on the "oauth_registration_approvals" edge.
+func (_q *AccountQuery) QueryOauthRegistrationApprovals() *OAuthRegistrationApprovalQuery {
+	query := (&OAuthRegistrationApprovalClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(oauthregistrationapproval.Table, oauthregistrationapproval.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.OauthRegistrationApprovalsTable, account.OauthRegistrationApprovalsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryApprovedOauthClients chains the current query on the "approved_oauth_clients" edge.
+func (_q *AccountQuery) QueryApprovedOauthClients() *OAuthClientQuery {
+	query := (&OAuthClientClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(oauthclient.Table, oauthclient.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.ApprovedOauthClientsTable, account.ApprovedOauthClientsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryOauthDcrIats chains the current query on the "oauth_dcr_iats" edge.
+func (_q *AccountQuery) QueryOauthDcrIats() *OAuthDynamicRegistrationAccessTokensQuery {
+	query := (&OAuthDynamicRegistrationAccessTokensClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(oauthdynamicregistrationaccesstokens.Table, oauthdynamicregistrationaccesstokens.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.OauthDcrIatsTable, account.OauthDcrIatsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -1437,6 +1508,9 @@ func (_q *AccountQuery) Clone() *AccountQuery {
 		withMentions:                          _q.withMentions.Clone(),
 		withRoles:                             _q.withRoles.Clone(),
 		withAuthentication:                    _q.withAuthentication.Clone(),
+		withOauthRegistrationApprovals:        _q.withOauthRegistrationApprovals.Clone(),
+		withApprovedOauthClients:              _q.withApprovedOauthClients.Clone(),
+		withOauthDcrIats:                      _q.withOauthDcrIats.Clone(),
 		withOauthClients:                      _q.withOauthClients.Clone(),
 		withOauthAuthorisationCodes:           _q.withOauthAuthorisationCodes.Clone(),
 		withOauthAuthorisationRequests:        _q.withOauthAuthorisationRequests.Clone(),
@@ -1640,6 +1714,39 @@ func (_q *AccountQuery) WithAuthentication(opts ...func(*AuthenticationQuery)) *
 		opt(query)
 	}
 	_q.withAuthentication = query
+	return _q
+}
+
+// WithOauthRegistrationApprovals tells the query-builder to eager-load the nodes that are connected to
+// the "oauth_registration_approvals" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithOauthRegistrationApprovals(opts ...func(*OAuthRegistrationApprovalQuery)) *AccountQuery {
+	query := (&OAuthRegistrationApprovalClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withOauthRegistrationApprovals = query
+	return _q
+}
+
+// WithApprovedOauthClients tells the query-builder to eager-load the nodes that are connected to
+// the "approved_oauth_clients" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithApprovedOauthClients(opts ...func(*OAuthClientQuery)) *AccountQuery {
+	query := (&OAuthClientClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withApprovedOauthClients = query
+	return _q
+}
+
+// WithOauthDcrIats tells the query-builder to eager-load the nodes that are connected to
+// the "oauth_dcr_iats" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithOauthDcrIats(opts ...func(*OAuthDynamicRegistrationAccessTokensQuery)) *AccountQuery {
+	query := (&OAuthDynamicRegistrationAccessTokensClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withOauthDcrIats = query
 	return _q
 }
 
@@ -2095,7 +2202,7 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = _q.querySpec()
-		loadedTypes = [49]bool{
+		loadedTypes = [52]bool{
 			_q.withSessions != nil,
 			_q.withPlugins != nil,
 			_q.withEmails != nil,
@@ -2111,6 +2218,9 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 			_q.withMentions != nil,
 			_q.withRoles != nil,
 			_q.withAuthentication != nil,
+			_q.withOauthRegistrationApprovals != nil,
+			_q.withApprovedOauthClients != nil,
+			_q.withOauthDcrIats != nil,
 			_q.withOauthClients != nil,
 			_q.withOauthAuthorisationCodes != nil,
 			_q.withOauthAuthorisationRequests != nil,
@@ -2271,6 +2381,33 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := _q.loadAuthentication(ctx, query, nodes,
 			func(n *Account) { n.Edges.Authentication = []*Authentication{} },
 			func(n *Account, e *Authentication) { n.Edges.Authentication = append(n.Edges.Authentication, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withOauthRegistrationApprovals; query != nil {
+		if err := _q.loadOauthRegistrationApprovals(ctx, query, nodes,
+			func(n *Account) { n.Edges.OauthRegistrationApprovals = []*OAuthRegistrationApproval{} },
+			func(n *Account, e *OAuthRegistrationApproval) {
+				n.Edges.OauthRegistrationApprovals = append(n.Edges.OauthRegistrationApprovals, e)
+			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withApprovedOauthClients; query != nil {
+		if err := _q.loadApprovedOauthClients(ctx, query, nodes,
+			func(n *Account) { n.Edges.ApprovedOauthClients = []*OAuthClient{} },
+			func(n *Account, e *OAuthClient) {
+				n.Edges.ApprovedOauthClients = append(n.Edges.ApprovedOauthClients, e)
+			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withOauthDcrIats; query != nil {
+		if err := _q.loadOauthDcrIats(ctx, query, nodes,
+			func(n *Account) { n.Edges.OauthDcrIats = []*OAuthDynamicRegistrationAccessTokens{} },
+			func(n *Account, e *OAuthDynamicRegistrationAccessTokens) {
+				n.Edges.OauthDcrIats = append(n.Edges.OauthDcrIats, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
@@ -3023,6 +3160,102 @@ func (_q *AccountQuery) loadAuthentication(ctx context.Context, query *Authentic
 		node, ok := nodeids[fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "account_authentication" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadOauthRegistrationApprovals(ctx context.Context, query *OAuthRegistrationApprovalQuery, nodes []*Account, init func(*Account), assign func(*Account, *OAuthRegistrationApproval)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(oauthregistrationapproval.FieldApprovedByAccountID)
+	}
+	query.Where(predicate.OAuthRegistrationApproval(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.OauthRegistrationApprovalsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ApprovedByAccountID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "approved_by_account_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "approved_by_account_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadApprovedOauthClients(ctx context.Context, query *OAuthClientQuery, nodes []*Account, init func(*Account), assign func(*Account, *OAuthClient)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(oauthclient.FieldRegistrationApprovedByAccountID)
+	}
+	query.Where(predicate.OAuthClient(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.ApprovedOauthClientsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.RegistrationApprovedByAccountID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "registration_approved_by_account_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "registration_approved_by_account_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadOauthDcrIats(ctx context.Context, query *OAuthDynamicRegistrationAccessTokensQuery, nodes []*Account, init func(*Account), assign func(*Account, *OAuthDynamicRegistrationAccessTokens)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(oauthdynamicregistrationaccesstokens.FieldCreatorAccountID)
+	}
+	query.Where(predicate.OAuthDynamicRegistrationAccessTokens(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.OauthDcrIatsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.CreatorAccountID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "creator_account_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

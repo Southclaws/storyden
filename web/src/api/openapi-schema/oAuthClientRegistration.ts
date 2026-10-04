@@ -11,7 +11,7 @@
 /**
  * RFC 7591 client information response containing issued credentials and
  * the registered client metadata. `client_secret` is only present for
- * confidential clients. `client_secret_expires_at` is always `0`,
+ * shared-secret clients. `client_secret_expires_at` is always `0`,
  * indicating the secret does not expire.
  */
 export interface OAuthClientRegistration {

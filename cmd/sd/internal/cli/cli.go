@@ -89,3 +89,11 @@ func isHelpRequest(args []string) bool {
 func isCarapaceRequest(args []string) bool {
 	return len(args) > 0 && args[0] == "_carapace"
 }
+
+func ExitCode(err error) int {
+	var coded interface{ ExitCode() int }
+	if errors.As(err, &coded) {
+		return coded.ExitCode()
+	}
+	return 1
+}

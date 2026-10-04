@@ -42,7 +42,9 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
 	"github.com/Southclaws/storyden/internal/ent/oauthclient"
 	"github.com/Southclaws/storyden/internal/ent/oauthdeviceauthorisation"
+	"github.com/Southclaws/storyden/internal/ent/oauthdynamicregistrationaccesstokens"
 	"github.com/Southclaws/storyden/internal/ent/oauthrefreshtoken"
+	"github.com/Southclaws/storyden/internal/ent/oauthregistrationapproval"
 	"github.com/Southclaws/storyden/internal/ent/oauthremoteauthorisationflow"
 	"github.com/Southclaws/storyden/internal/ent/oauthremoteconnection"
 	"github.com/Southclaws/storyden/internal/ent/plugin"
@@ -137,8 +139,12 @@ type Client struct {
 	OAuthClient *OAuthClientClient
 	// OAuthDeviceAuthorisation is the client for interacting with the OAuthDeviceAuthorisation builders.
 	OAuthDeviceAuthorisation *OAuthDeviceAuthorisationClient
+	// OAuthDynamicRegistrationAccessTokens is the client for interacting with the OAuthDynamicRegistrationAccessTokens builders.
+	OAuthDynamicRegistrationAccessTokens *OAuthDynamicRegistrationAccessTokensClient
 	// OAuthRefreshToken is the client for interacting with the OAuthRefreshToken builders.
 	OAuthRefreshToken *OAuthRefreshTokenClient
+	// OAuthRegistrationApproval is the client for interacting with the OAuthRegistrationApproval builders.
+	OAuthRegistrationApproval *OAuthRegistrationApprovalClient
 	// OAuthRemoteAuthorisationFlow is the client for interacting with the OAuthRemoteAuthorisationFlow builders.
 	OAuthRemoteAuthorisationFlow *OAuthRemoteAuthorisationFlowClient
 	// OAuthRemoteConnection is the client for interacting with the OAuthRemoteConnection builders.
@@ -242,7 +248,9 @@ func (c *Client) init() {
 	c.OAuthAuthorisationRequest = NewOAuthAuthorisationRequestClient(c.config)
 	c.OAuthClient = NewOAuthClientClient(c.config)
 	c.OAuthDeviceAuthorisation = NewOAuthDeviceAuthorisationClient(c.config)
+	c.OAuthDynamicRegistrationAccessTokens = NewOAuthDynamicRegistrationAccessTokensClient(c.config)
 	c.OAuthRefreshToken = NewOAuthRefreshTokenClient(c.config)
+	c.OAuthRegistrationApproval = NewOAuthRegistrationApprovalClient(c.config)
 	c.OAuthRemoteAuthorisationFlow = NewOAuthRemoteAuthorisationFlowClient(c.config)
 	c.OAuthRemoteConnection = NewOAuthRemoteConnectionClient(c.config)
 	c.Plugin = NewPluginClient(c.config)
@@ -366,68 +374,70 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:                          ctx,
-		config:                       cfg,
-		Account:                      NewAccountClient(cfg),
-		AccountFollow:                NewAccountFollowClient(cfg),
-		AccountRoles:                 NewAccountRolesClient(cfg),
-		Asset:                        NewAssetClient(cfg),
-		AuditLog:                     NewAuditLogClient(cfg),
-		Authentication:               NewAuthenticationClient(cfg),
-		Category:                     NewCategoryClient(cfg),
-		Collection:                   NewCollectionClient(cfg),
-		CollectionNode:               NewCollectionNodeClient(cfg),
-		CollectionPost:               NewCollectionPostClient(cfg),
-		Email:                        NewEmailClient(cfg),
-		EmailQueue:                   NewEmailQueueClient(cfg),
-		Event:                        NewEventClient(cfg),
-		EventParticipant:             NewEventParticipantClient(cfg),
-		Invitation:                   NewInvitationClient(cfg),
-		LikePost:                     NewLikePostClient(cfg),
-		Link:                         NewLinkClient(cfg),
-		MentionProfile:               NewMentionProfileClient(cfg),
-		ModerationNote:               NewModerationNoteClient(cfg),
-		Node:                         NewNodeClient(cfg),
-		NodeVersion:                  NewNodeVersionClient(cfg),
-		Notification:                 NewNotificationClient(cfg),
-		OAuthAuthorisationCode:       NewOAuthAuthorisationCodeClient(cfg),
-		OAuthAuthorisationRequest:    NewOAuthAuthorisationRequestClient(cfg),
-		OAuthClient:                  NewOAuthClientClient(cfg),
-		OAuthDeviceAuthorisation:     NewOAuthDeviceAuthorisationClient(cfg),
-		OAuthRefreshToken:            NewOAuthRefreshTokenClient(cfg),
-		OAuthRemoteAuthorisationFlow: NewOAuthRemoteAuthorisationFlowClient(cfg),
-		OAuthRemoteConnection:        NewOAuthRemoteConnectionClient(cfg),
-		Plugin:                       NewPluginClient(cfg),
-		Post:                         NewPostClient(cfg),
-		PostRead:                     NewPostReadClient(cfg),
-		Property:                     NewPropertyClient(cfg),
-		PropertySchema:               NewPropertySchemaClient(cfg),
-		PropertySchemaField:          NewPropertySchemaFieldClient(cfg),
-		React:                        NewReactClient(cfg),
-		Report:                       NewReportClient(cfg),
-		Robot:                        NewRobotClient(cfg),
-		RobotMCPServer:               NewRobotMCPServerClient(cfg),
-		RobotMCPTool:                 NewRobotMCPToolClient(cfg),
-		RobotMemory:                  NewRobotMemoryClient(cfg),
-		RobotProviderModel:           NewRobotProviderModelClient(cfg),
-		RobotSession:                 NewRobotSessionClient(cfg),
-		RobotSessionInput:            NewRobotSessionInputClient(cfg),
-		RobotSessionMessage:          NewRobotSessionMessageClient(cfg),
-		RobotSessionTurn:             NewRobotSessionTurnClient(cfg),
-		RobotSessionView:             NewRobotSessionViewClient(cfg),
-		RobotToolset:                 NewRobotToolsetClient(cfg),
-		RobotWorkspace:               NewRobotWorkspaceClient(cfg),
-		RobotWorkspaceInstance:       NewRobotWorkspaceInstanceClient(cfg),
-		Role:                         NewRoleClient(cfg),
-		Session:                      NewSessionClient(cfg),
-		Setting:                      NewSettingClient(cfg),
-		Tag:                          NewTagClient(cfg),
-		Trail:                        NewTrailClient(cfg),
-		TrailAction:                  NewTrailActionClient(cfg),
-		TrailActionRun:               NewTrailActionRunClient(cfg),
-		TrailRun:                     NewTrailRunClient(cfg),
-		TrailSchedulerLease:          NewTrailSchedulerLeaseClient(cfg),
-		Warning:                      NewWarningClient(cfg),
+		ctx:                                  ctx,
+		config:                               cfg,
+		Account:                              NewAccountClient(cfg),
+		AccountFollow:                        NewAccountFollowClient(cfg),
+		AccountRoles:                         NewAccountRolesClient(cfg),
+		Asset:                                NewAssetClient(cfg),
+		AuditLog:                             NewAuditLogClient(cfg),
+		Authentication:                       NewAuthenticationClient(cfg),
+		Category:                             NewCategoryClient(cfg),
+		Collection:                           NewCollectionClient(cfg),
+		CollectionNode:                       NewCollectionNodeClient(cfg),
+		CollectionPost:                       NewCollectionPostClient(cfg),
+		Email:                                NewEmailClient(cfg),
+		EmailQueue:                           NewEmailQueueClient(cfg),
+		Event:                                NewEventClient(cfg),
+		EventParticipant:                     NewEventParticipantClient(cfg),
+		Invitation:                           NewInvitationClient(cfg),
+		LikePost:                             NewLikePostClient(cfg),
+		Link:                                 NewLinkClient(cfg),
+		MentionProfile:                       NewMentionProfileClient(cfg),
+		ModerationNote:                       NewModerationNoteClient(cfg),
+		Node:                                 NewNodeClient(cfg),
+		NodeVersion:                          NewNodeVersionClient(cfg),
+		Notification:                         NewNotificationClient(cfg),
+		OAuthAuthorisationCode:               NewOAuthAuthorisationCodeClient(cfg),
+		OAuthAuthorisationRequest:            NewOAuthAuthorisationRequestClient(cfg),
+		OAuthClient:                          NewOAuthClientClient(cfg),
+		OAuthDeviceAuthorisation:             NewOAuthDeviceAuthorisationClient(cfg),
+		OAuthDynamicRegistrationAccessTokens: NewOAuthDynamicRegistrationAccessTokensClient(cfg),
+		OAuthRefreshToken:                    NewOAuthRefreshTokenClient(cfg),
+		OAuthRegistrationApproval:            NewOAuthRegistrationApprovalClient(cfg),
+		OAuthRemoteAuthorisationFlow:         NewOAuthRemoteAuthorisationFlowClient(cfg),
+		OAuthRemoteConnection:                NewOAuthRemoteConnectionClient(cfg),
+		Plugin:                               NewPluginClient(cfg),
+		Post:                                 NewPostClient(cfg),
+		PostRead:                             NewPostReadClient(cfg),
+		Property:                             NewPropertyClient(cfg),
+		PropertySchema:                       NewPropertySchemaClient(cfg),
+		PropertySchemaField:                  NewPropertySchemaFieldClient(cfg),
+		React:                                NewReactClient(cfg),
+		Report:                               NewReportClient(cfg),
+		Robot:                                NewRobotClient(cfg),
+		RobotMCPServer:                       NewRobotMCPServerClient(cfg),
+		RobotMCPTool:                         NewRobotMCPToolClient(cfg),
+		RobotMemory:                          NewRobotMemoryClient(cfg),
+		RobotProviderModel:                   NewRobotProviderModelClient(cfg),
+		RobotSession:                         NewRobotSessionClient(cfg),
+		RobotSessionInput:                    NewRobotSessionInputClient(cfg),
+		RobotSessionMessage:                  NewRobotSessionMessageClient(cfg),
+		RobotSessionTurn:                     NewRobotSessionTurnClient(cfg),
+		RobotSessionView:                     NewRobotSessionViewClient(cfg),
+		RobotToolset:                         NewRobotToolsetClient(cfg),
+		RobotWorkspace:                       NewRobotWorkspaceClient(cfg),
+		RobotWorkspaceInstance:               NewRobotWorkspaceInstanceClient(cfg),
+		Role:                                 NewRoleClient(cfg),
+		Session:                              NewSessionClient(cfg),
+		Setting:                              NewSettingClient(cfg),
+		Tag:                                  NewTagClient(cfg),
+		Trail:                                NewTrailClient(cfg),
+		TrailAction:                          NewTrailActionClient(cfg),
+		TrailActionRun:                       NewTrailActionRunClient(cfg),
+		TrailRun:                             NewTrailRunClient(cfg),
+		TrailSchedulerLease:                  NewTrailSchedulerLeaseClient(cfg),
+		Warning:                              NewWarningClient(cfg),
 	}, nil
 }
 
@@ -445,68 +455,70 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:                          ctx,
-		config:                       cfg,
-		Account:                      NewAccountClient(cfg),
-		AccountFollow:                NewAccountFollowClient(cfg),
-		AccountRoles:                 NewAccountRolesClient(cfg),
-		Asset:                        NewAssetClient(cfg),
-		AuditLog:                     NewAuditLogClient(cfg),
-		Authentication:               NewAuthenticationClient(cfg),
-		Category:                     NewCategoryClient(cfg),
-		Collection:                   NewCollectionClient(cfg),
-		CollectionNode:               NewCollectionNodeClient(cfg),
-		CollectionPost:               NewCollectionPostClient(cfg),
-		Email:                        NewEmailClient(cfg),
-		EmailQueue:                   NewEmailQueueClient(cfg),
-		Event:                        NewEventClient(cfg),
-		EventParticipant:             NewEventParticipantClient(cfg),
-		Invitation:                   NewInvitationClient(cfg),
-		LikePost:                     NewLikePostClient(cfg),
-		Link:                         NewLinkClient(cfg),
-		MentionProfile:               NewMentionProfileClient(cfg),
-		ModerationNote:               NewModerationNoteClient(cfg),
-		Node:                         NewNodeClient(cfg),
-		NodeVersion:                  NewNodeVersionClient(cfg),
-		Notification:                 NewNotificationClient(cfg),
-		OAuthAuthorisationCode:       NewOAuthAuthorisationCodeClient(cfg),
-		OAuthAuthorisationRequest:    NewOAuthAuthorisationRequestClient(cfg),
-		OAuthClient:                  NewOAuthClientClient(cfg),
-		OAuthDeviceAuthorisation:     NewOAuthDeviceAuthorisationClient(cfg),
-		OAuthRefreshToken:            NewOAuthRefreshTokenClient(cfg),
-		OAuthRemoteAuthorisationFlow: NewOAuthRemoteAuthorisationFlowClient(cfg),
-		OAuthRemoteConnection:        NewOAuthRemoteConnectionClient(cfg),
-		Plugin:                       NewPluginClient(cfg),
-		Post:                         NewPostClient(cfg),
-		PostRead:                     NewPostReadClient(cfg),
-		Property:                     NewPropertyClient(cfg),
-		PropertySchema:               NewPropertySchemaClient(cfg),
-		PropertySchemaField:          NewPropertySchemaFieldClient(cfg),
-		React:                        NewReactClient(cfg),
-		Report:                       NewReportClient(cfg),
-		Robot:                        NewRobotClient(cfg),
-		RobotMCPServer:               NewRobotMCPServerClient(cfg),
-		RobotMCPTool:                 NewRobotMCPToolClient(cfg),
-		RobotMemory:                  NewRobotMemoryClient(cfg),
-		RobotProviderModel:           NewRobotProviderModelClient(cfg),
-		RobotSession:                 NewRobotSessionClient(cfg),
-		RobotSessionInput:            NewRobotSessionInputClient(cfg),
-		RobotSessionMessage:          NewRobotSessionMessageClient(cfg),
-		RobotSessionTurn:             NewRobotSessionTurnClient(cfg),
-		RobotSessionView:             NewRobotSessionViewClient(cfg),
-		RobotToolset:                 NewRobotToolsetClient(cfg),
-		RobotWorkspace:               NewRobotWorkspaceClient(cfg),
-		RobotWorkspaceInstance:       NewRobotWorkspaceInstanceClient(cfg),
-		Role:                         NewRoleClient(cfg),
-		Session:                      NewSessionClient(cfg),
-		Setting:                      NewSettingClient(cfg),
-		Tag:                          NewTagClient(cfg),
-		Trail:                        NewTrailClient(cfg),
-		TrailAction:                  NewTrailActionClient(cfg),
-		TrailActionRun:               NewTrailActionRunClient(cfg),
-		TrailRun:                     NewTrailRunClient(cfg),
-		TrailSchedulerLease:          NewTrailSchedulerLeaseClient(cfg),
-		Warning:                      NewWarningClient(cfg),
+		ctx:                                  ctx,
+		config:                               cfg,
+		Account:                              NewAccountClient(cfg),
+		AccountFollow:                        NewAccountFollowClient(cfg),
+		AccountRoles:                         NewAccountRolesClient(cfg),
+		Asset:                                NewAssetClient(cfg),
+		AuditLog:                             NewAuditLogClient(cfg),
+		Authentication:                       NewAuthenticationClient(cfg),
+		Category:                             NewCategoryClient(cfg),
+		Collection:                           NewCollectionClient(cfg),
+		CollectionNode:                       NewCollectionNodeClient(cfg),
+		CollectionPost:                       NewCollectionPostClient(cfg),
+		Email:                                NewEmailClient(cfg),
+		EmailQueue:                           NewEmailQueueClient(cfg),
+		Event:                                NewEventClient(cfg),
+		EventParticipant:                     NewEventParticipantClient(cfg),
+		Invitation:                           NewInvitationClient(cfg),
+		LikePost:                             NewLikePostClient(cfg),
+		Link:                                 NewLinkClient(cfg),
+		MentionProfile:                       NewMentionProfileClient(cfg),
+		ModerationNote:                       NewModerationNoteClient(cfg),
+		Node:                                 NewNodeClient(cfg),
+		NodeVersion:                          NewNodeVersionClient(cfg),
+		Notification:                         NewNotificationClient(cfg),
+		OAuthAuthorisationCode:               NewOAuthAuthorisationCodeClient(cfg),
+		OAuthAuthorisationRequest:            NewOAuthAuthorisationRequestClient(cfg),
+		OAuthClient:                          NewOAuthClientClient(cfg),
+		OAuthDeviceAuthorisation:             NewOAuthDeviceAuthorisationClient(cfg),
+		OAuthDynamicRegistrationAccessTokens: NewOAuthDynamicRegistrationAccessTokensClient(cfg),
+		OAuthRefreshToken:                    NewOAuthRefreshTokenClient(cfg),
+		OAuthRegistrationApproval:            NewOAuthRegistrationApprovalClient(cfg),
+		OAuthRemoteAuthorisationFlow:         NewOAuthRemoteAuthorisationFlowClient(cfg),
+		OAuthRemoteConnection:                NewOAuthRemoteConnectionClient(cfg),
+		Plugin:                               NewPluginClient(cfg),
+		Post:                                 NewPostClient(cfg),
+		PostRead:                             NewPostReadClient(cfg),
+		Property:                             NewPropertyClient(cfg),
+		PropertySchema:                       NewPropertySchemaClient(cfg),
+		PropertySchemaField:                  NewPropertySchemaFieldClient(cfg),
+		React:                                NewReactClient(cfg),
+		Report:                               NewReportClient(cfg),
+		Robot:                                NewRobotClient(cfg),
+		RobotMCPServer:                       NewRobotMCPServerClient(cfg),
+		RobotMCPTool:                         NewRobotMCPToolClient(cfg),
+		RobotMemory:                          NewRobotMemoryClient(cfg),
+		RobotProviderModel:                   NewRobotProviderModelClient(cfg),
+		RobotSession:                         NewRobotSessionClient(cfg),
+		RobotSessionInput:                    NewRobotSessionInputClient(cfg),
+		RobotSessionMessage:                  NewRobotSessionMessageClient(cfg),
+		RobotSessionTurn:                     NewRobotSessionTurnClient(cfg),
+		RobotSessionView:                     NewRobotSessionViewClient(cfg),
+		RobotToolset:                         NewRobotToolsetClient(cfg),
+		RobotWorkspace:                       NewRobotWorkspaceClient(cfg),
+		RobotWorkspaceInstance:               NewRobotWorkspaceInstanceClient(cfg),
+		Role:                                 NewRoleClient(cfg),
+		Session:                              NewSessionClient(cfg),
+		Setting:                              NewSettingClient(cfg),
+		Tag:                                  NewTagClient(cfg),
+		Trail:                                NewTrailClient(cfg),
+		TrailAction:                          NewTrailActionClient(cfg),
+		TrailActionRun:                       NewTrailActionRunClient(cfg),
+		TrailRun:                             NewTrailRunClient(cfg),
+		TrailSchedulerLease:                  NewTrailSchedulerLeaseClient(cfg),
+		Warning:                              NewWarningClient(cfg),
 	}, nil
 }
 
@@ -541,15 +553,16 @@ func (c *Client) Use(hooks ...Hook) {
 		c.Email, c.EmailQueue, c.Event, c.EventParticipant, c.Invitation, c.LikePost,
 		c.Link, c.MentionProfile, c.ModerationNote, c.Node, c.NodeVersion,
 		c.Notification, c.OAuthAuthorisationCode, c.OAuthAuthorisationRequest,
-		c.OAuthClient, c.OAuthDeviceAuthorisation, c.OAuthRefreshToken,
-		c.OAuthRemoteAuthorisationFlow, c.OAuthRemoteConnection, c.Plugin, c.Post,
-		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField, c.React,
-		c.Report, c.Robot, c.RobotMCPServer, c.RobotMCPTool, c.RobotMemory,
-		c.RobotProviderModel, c.RobotSession, c.RobotSessionInput,
-		c.RobotSessionMessage, c.RobotSessionTurn, c.RobotSessionView, c.RobotToolset,
-		c.RobotWorkspace, c.RobotWorkspaceInstance, c.Role, c.Session, c.Setting,
-		c.Tag, c.Trail, c.TrailAction, c.TrailActionRun, c.TrailRun,
-		c.TrailSchedulerLease, c.Warning,
+		c.OAuthClient, c.OAuthDeviceAuthorisation,
+		c.OAuthDynamicRegistrationAccessTokens, c.OAuthRefreshToken,
+		c.OAuthRegistrationApproval, c.OAuthRemoteAuthorisationFlow,
+		c.OAuthRemoteConnection, c.Plugin, c.Post, c.PostRead, c.Property,
+		c.PropertySchema, c.PropertySchemaField, c.React, c.Report, c.Robot,
+		c.RobotMCPServer, c.RobotMCPTool, c.RobotMemory, c.RobotProviderModel,
+		c.RobotSession, c.RobotSessionInput, c.RobotSessionMessage, c.RobotSessionTurn,
+		c.RobotSessionView, c.RobotToolset, c.RobotWorkspace, c.RobotWorkspaceInstance,
+		c.Role, c.Session, c.Setting, c.Tag, c.Trail, c.TrailAction, c.TrailActionRun,
+		c.TrailRun, c.TrailSchedulerLease, c.Warning,
 	} {
 		n.Use(hooks...)
 	}
@@ -564,15 +577,16 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.Email, c.EmailQueue, c.Event, c.EventParticipant, c.Invitation, c.LikePost,
 		c.Link, c.MentionProfile, c.ModerationNote, c.Node, c.NodeVersion,
 		c.Notification, c.OAuthAuthorisationCode, c.OAuthAuthorisationRequest,
-		c.OAuthClient, c.OAuthDeviceAuthorisation, c.OAuthRefreshToken,
-		c.OAuthRemoteAuthorisationFlow, c.OAuthRemoteConnection, c.Plugin, c.Post,
-		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField, c.React,
-		c.Report, c.Robot, c.RobotMCPServer, c.RobotMCPTool, c.RobotMemory,
-		c.RobotProviderModel, c.RobotSession, c.RobotSessionInput,
-		c.RobotSessionMessage, c.RobotSessionTurn, c.RobotSessionView, c.RobotToolset,
-		c.RobotWorkspace, c.RobotWorkspaceInstance, c.Role, c.Session, c.Setting,
-		c.Tag, c.Trail, c.TrailAction, c.TrailActionRun, c.TrailRun,
-		c.TrailSchedulerLease, c.Warning,
+		c.OAuthClient, c.OAuthDeviceAuthorisation,
+		c.OAuthDynamicRegistrationAccessTokens, c.OAuthRefreshToken,
+		c.OAuthRegistrationApproval, c.OAuthRemoteAuthorisationFlow,
+		c.OAuthRemoteConnection, c.Plugin, c.Post, c.PostRead, c.Property,
+		c.PropertySchema, c.PropertySchemaField, c.React, c.Report, c.Robot,
+		c.RobotMCPServer, c.RobotMCPTool, c.RobotMemory, c.RobotProviderModel,
+		c.RobotSession, c.RobotSessionInput, c.RobotSessionMessage, c.RobotSessionTurn,
+		c.RobotSessionView, c.RobotToolset, c.RobotWorkspace, c.RobotWorkspaceInstance,
+		c.Role, c.Session, c.Setting, c.Tag, c.Trail, c.TrailAction, c.TrailActionRun,
+		c.TrailRun, c.TrailSchedulerLease, c.Warning,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -633,8 +647,12 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.OAuthClient.mutate(ctx, m)
 	case *OAuthDeviceAuthorisationMutation:
 		return c.OAuthDeviceAuthorisation.mutate(ctx, m)
+	case *OAuthDynamicRegistrationAccessTokensMutation:
+		return c.OAuthDynamicRegistrationAccessTokens.mutate(ctx, m)
 	case *OAuthRefreshTokenMutation:
 		return c.OAuthRefreshToken.mutate(ctx, m)
+	case *OAuthRegistrationApprovalMutation:
+		return c.OAuthRegistrationApproval.mutate(ctx, m)
 	case *OAuthRemoteAuthorisationFlowMutation:
 		return c.OAuthRemoteAuthorisationFlow.mutate(ctx, m)
 	case *OAuthRemoteConnectionMutation:
@@ -1047,6 +1065,54 @@ func (c *AccountClient) QueryAuthentication(_m *Account) *AuthenticationQuery {
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(authentication.Table, authentication.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.AuthenticationTable, account.AuthenticationColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryOauthRegistrationApprovals queries the oauth_registration_approvals edge of a Account.
+func (c *AccountClient) QueryOauthRegistrationApprovals(_m *Account) *OAuthRegistrationApprovalQuery {
+	query := (&OAuthRegistrationApprovalClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(oauthregistrationapproval.Table, oauthregistrationapproval.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.OauthRegistrationApprovalsTable, account.OauthRegistrationApprovalsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryApprovedOauthClients queries the approved_oauth_clients edge of a Account.
+func (c *AccountClient) QueryApprovedOauthClients(_m *Account) *OAuthClientQuery {
+	query := (&OAuthClientClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(oauthclient.Table, oauthclient.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.ApprovedOauthClientsTable, account.ApprovedOauthClientsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryOauthDcrIats queries the oauth_dcr_iats edge of a Account.
+func (c *AccountClient) QueryOauthDcrIats(_m *Account) *OAuthDynamicRegistrationAccessTokensQuery {
+	query := (&OAuthDynamicRegistrationAccessTokensClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(oauthdynamicregistrationaccesstokens.Table, oauthdynamicregistrationaccesstokens.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.OauthDcrIatsTable, account.OauthDcrIatsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -5844,6 +5910,38 @@ func (c *OAuthClientClient) GetX(ctx context.Context, id xid.ID) *OAuthClient {
 	return obj
 }
 
+// QueryRegistrationApprovedBy queries the registration_approved_by edge of a OAuthClient.
+func (c *OAuthClientClient) QueryRegistrationApprovedBy(_m *OAuthClient) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthclient.Table, oauthclient.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, oauthclient.RegistrationApprovedByTable, oauthclient.RegistrationApprovedByColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDcrIat queries the dcr_iat edge of a OAuthClient.
+func (c *OAuthClientClient) QueryDcrIat(_m *OAuthClient) *OAuthDynamicRegistrationAccessTokensQuery {
+	query := (&OAuthDynamicRegistrationAccessTokensClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthclient.Table, oauthclient.FieldID, id),
+			sqlgraph.To(oauthdynamicregistrationaccesstokens.Table, oauthdynamicregistrationaccesstokens.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, oauthclient.DcrIatTable, oauthclient.DcrIatColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryAccount queries the account edge of a OAuthClient.
 func (c *OAuthClientClient) QueryAccount(_m *OAuthClient) *AccountQuery {
 	query := (&AccountClient{config: c.config}).Query()
@@ -6130,6 +6228,171 @@ func (c *OAuthDeviceAuthorisationClient) mutate(ctx context.Context, m *OAuthDev
 	}
 }
 
+// OAuthDynamicRegistrationAccessTokensClient is a client for the OAuthDynamicRegistrationAccessTokens schema.
+type OAuthDynamicRegistrationAccessTokensClient struct {
+	config
+}
+
+// NewOAuthDynamicRegistrationAccessTokensClient returns a client for the OAuthDynamicRegistrationAccessTokens from the given config.
+func NewOAuthDynamicRegistrationAccessTokensClient(c config) *OAuthDynamicRegistrationAccessTokensClient {
+	return &OAuthDynamicRegistrationAccessTokensClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `oauthdynamicregistrationaccesstokens.Hooks(f(g(h())))`.
+func (c *OAuthDynamicRegistrationAccessTokensClient) Use(hooks ...Hook) {
+	c.hooks.OAuthDynamicRegistrationAccessTokens = append(c.hooks.OAuthDynamicRegistrationAccessTokens, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `oauthdynamicregistrationaccesstokens.Intercept(f(g(h())))`.
+func (c *OAuthDynamicRegistrationAccessTokensClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OAuthDynamicRegistrationAccessTokens = append(c.inters.OAuthDynamicRegistrationAccessTokens, interceptors...)
+}
+
+// Create returns a builder for creating a OAuthDynamicRegistrationAccessTokens entity.
+func (c *OAuthDynamicRegistrationAccessTokensClient) Create() *OAuthDynamicRegistrationAccessTokensCreate {
+	mutation := newOAuthDynamicRegistrationAccessTokensMutation(c.config, OpCreate)
+	return &OAuthDynamicRegistrationAccessTokensCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OAuthDynamicRegistrationAccessTokens entities.
+func (c *OAuthDynamicRegistrationAccessTokensClient) CreateBulk(builders ...*OAuthDynamicRegistrationAccessTokensCreate) *OAuthDynamicRegistrationAccessTokensCreateBulk {
+	return &OAuthDynamicRegistrationAccessTokensCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OAuthDynamicRegistrationAccessTokensClient) MapCreateBulk(slice any, setFunc func(*OAuthDynamicRegistrationAccessTokensCreate, int)) *OAuthDynamicRegistrationAccessTokensCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OAuthDynamicRegistrationAccessTokensCreateBulk{err: fmt.Errorf("calling to OAuthDynamicRegistrationAccessTokensClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OAuthDynamicRegistrationAccessTokensCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OAuthDynamicRegistrationAccessTokensCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OAuthDynamicRegistrationAccessTokens.
+func (c *OAuthDynamicRegistrationAccessTokensClient) Update() *OAuthDynamicRegistrationAccessTokensUpdate {
+	mutation := newOAuthDynamicRegistrationAccessTokensMutation(c.config, OpUpdate)
+	return &OAuthDynamicRegistrationAccessTokensUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OAuthDynamicRegistrationAccessTokensClient) UpdateOne(_m *OAuthDynamicRegistrationAccessTokens) *OAuthDynamicRegistrationAccessTokensUpdateOne {
+	mutation := newOAuthDynamicRegistrationAccessTokensMutation(c.config, OpUpdateOne, withOAuthDynamicRegistrationAccessTokens(_m))
+	return &OAuthDynamicRegistrationAccessTokensUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OAuthDynamicRegistrationAccessTokensClient) UpdateOneID(id xid.ID) *OAuthDynamicRegistrationAccessTokensUpdateOne {
+	mutation := newOAuthDynamicRegistrationAccessTokensMutation(c.config, OpUpdateOne, withOAuthDynamicRegistrationAccessTokensID(id))
+	return &OAuthDynamicRegistrationAccessTokensUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OAuthDynamicRegistrationAccessTokens.
+func (c *OAuthDynamicRegistrationAccessTokensClient) Delete() *OAuthDynamicRegistrationAccessTokensDelete {
+	mutation := newOAuthDynamicRegistrationAccessTokensMutation(c.config, OpDelete)
+	return &OAuthDynamicRegistrationAccessTokensDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OAuthDynamicRegistrationAccessTokensClient) DeleteOne(_m *OAuthDynamicRegistrationAccessTokens) *OAuthDynamicRegistrationAccessTokensDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OAuthDynamicRegistrationAccessTokensClient) DeleteOneID(id xid.ID) *OAuthDynamicRegistrationAccessTokensDeleteOne {
+	builder := c.Delete().Where(oauthdynamicregistrationaccesstokens.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OAuthDynamicRegistrationAccessTokensDeleteOne{builder}
+}
+
+// Query returns a query builder for OAuthDynamicRegistrationAccessTokens.
+func (c *OAuthDynamicRegistrationAccessTokensClient) Query() *OAuthDynamicRegistrationAccessTokensQuery {
+	return &OAuthDynamicRegistrationAccessTokensQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOAuthDynamicRegistrationAccessTokens},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a OAuthDynamicRegistrationAccessTokens entity by its id.
+func (c *OAuthDynamicRegistrationAccessTokensClient) Get(ctx context.Context, id xid.ID) (*OAuthDynamicRegistrationAccessTokens, error) {
+	return c.Query().Where(oauthdynamicregistrationaccesstokens.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OAuthDynamicRegistrationAccessTokensClient) GetX(ctx context.Context, id xid.ID) *OAuthDynamicRegistrationAccessTokens {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreator queries the creator edge of a OAuthDynamicRegistrationAccessTokens.
+func (c *OAuthDynamicRegistrationAccessTokensClient) QueryCreator(_m *OAuthDynamicRegistrationAccessTokens) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthdynamicregistrationaccesstokens.Table, oauthdynamicregistrationaccesstokens.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, oauthdynamicregistrationaccesstokens.CreatorTable, oauthdynamicregistrationaccesstokens.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryClients queries the clients edge of a OAuthDynamicRegistrationAccessTokens.
+func (c *OAuthDynamicRegistrationAccessTokensClient) QueryClients(_m *OAuthDynamicRegistrationAccessTokens) *OAuthClientQuery {
+	query := (&OAuthClientClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthdynamicregistrationaccesstokens.Table, oauthdynamicregistrationaccesstokens.FieldID, id),
+			sqlgraph.To(oauthclient.Table, oauthclient.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, oauthdynamicregistrationaccesstokens.ClientsTable, oauthdynamicregistrationaccesstokens.ClientsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *OAuthDynamicRegistrationAccessTokensClient) Hooks() []Hook {
+	return c.hooks.OAuthDynamicRegistrationAccessTokens
+}
+
+// Interceptors returns the client interceptors.
+func (c *OAuthDynamicRegistrationAccessTokensClient) Interceptors() []Interceptor {
+	return c.inters.OAuthDynamicRegistrationAccessTokens
+}
+
+func (c *OAuthDynamicRegistrationAccessTokensClient) mutate(ctx context.Context, m *OAuthDynamicRegistrationAccessTokensMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OAuthDynamicRegistrationAccessTokensCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OAuthDynamicRegistrationAccessTokensUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OAuthDynamicRegistrationAccessTokensUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OAuthDynamicRegistrationAccessTokensDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OAuthDynamicRegistrationAccessTokens mutation op: %q", m.Op())
+	}
+}
+
 // OAuthRefreshTokenClient is a client for the OAuthRefreshToken schema.
 type OAuthRefreshTokenClient struct {
 	config
@@ -6324,6 +6587,155 @@ func (c *OAuthRefreshTokenClient) mutate(ctx context.Context, m *OAuthRefreshTok
 		return (&OAuthRefreshTokenDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown OAuthRefreshToken mutation op: %q", m.Op())
+	}
+}
+
+// OAuthRegistrationApprovalClient is a client for the OAuthRegistrationApproval schema.
+type OAuthRegistrationApprovalClient struct {
+	config
+}
+
+// NewOAuthRegistrationApprovalClient returns a client for the OAuthRegistrationApproval from the given config.
+func NewOAuthRegistrationApprovalClient(c config) *OAuthRegistrationApprovalClient {
+	return &OAuthRegistrationApprovalClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `oauthregistrationapproval.Hooks(f(g(h())))`.
+func (c *OAuthRegistrationApprovalClient) Use(hooks ...Hook) {
+	c.hooks.OAuthRegistrationApproval = append(c.hooks.OAuthRegistrationApproval, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `oauthregistrationapproval.Intercept(f(g(h())))`.
+func (c *OAuthRegistrationApprovalClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OAuthRegistrationApproval = append(c.inters.OAuthRegistrationApproval, interceptors...)
+}
+
+// Create returns a builder for creating a OAuthRegistrationApproval entity.
+func (c *OAuthRegistrationApprovalClient) Create() *OAuthRegistrationApprovalCreate {
+	mutation := newOAuthRegistrationApprovalMutation(c.config, OpCreate)
+	return &OAuthRegistrationApprovalCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OAuthRegistrationApproval entities.
+func (c *OAuthRegistrationApprovalClient) CreateBulk(builders ...*OAuthRegistrationApprovalCreate) *OAuthRegistrationApprovalCreateBulk {
+	return &OAuthRegistrationApprovalCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OAuthRegistrationApprovalClient) MapCreateBulk(slice any, setFunc func(*OAuthRegistrationApprovalCreate, int)) *OAuthRegistrationApprovalCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OAuthRegistrationApprovalCreateBulk{err: fmt.Errorf("calling to OAuthRegistrationApprovalClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OAuthRegistrationApprovalCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OAuthRegistrationApprovalCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OAuthRegistrationApproval.
+func (c *OAuthRegistrationApprovalClient) Update() *OAuthRegistrationApprovalUpdate {
+	mutation := newOAuthRegistrationApprovalMutation(c.config, OpUpdate)
+	return &OAuthRegistrationApprovalUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OAuthRegistrationApprovalClient) UpdateOne(_m *OAuthRegistrationApproval) *OAuthRegistrationApprovalUpdateOne {
+	mutation := newOAuthRegistrationApprovalMutation(c.config, OpUpdateOne, withOAuthRegistrationApproval(_m))
+	return &OAuthRegistrationApprovalUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OAuthRegistrationApprovalClient) UpdateOneID(id xid.ID) *OAuthRegistrationApprovalUpdateOne {
+	mutation := newOAuthRegistrationApprovalMutation(c.config, OpUpdateOne, withOAuthRegistrationApprovalID(id))
+	return &OAuthRegistrationApprovalUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OAuthRegistrationApproval.
+func (c *OAuthRegistrationApprovalClient) Delete() *OAuthRegistrationApprovalDelete {
+	mutation := newOAuthRegistrationApprovalMutation(c.config, OpDelete)
+	return &OAuthRegistrationApprovalDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OAuthRegistrationApprovalClient) DeleteOne(_m *OAuthRegistrationApproval) *OAuthRegistrationApprovalDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OAuthRegistrationApprovalClient) DeleteOneID(id xid.ID) *OAuthRegistrationApprovalDeleteOne {
+	builder := c.Delete().Where(oauthregistrationapproval.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OAuthRegistrationApprovalDeleteOne{builder}
+}
+
+// Query returns a query builder for OAuthRegistrationApproval.
+func (c *OAuthRegistrationApprovalClient) Query() *OAuthRegistrationApprovalQuery {
+	return &OAuthRegistrationApprovalQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOAuthRegistrationApproval},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a OAuthRegistrationApproval entity by its id.
+func (c *OAuthRegistrationApprovalClient) Get(ctx context.Context, id xid.ID) (*OAuthRegistrationApproval, error) {
+	return c.Query().Where(oauthregistrationapproval.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OAuthRegistrationApprovalClient) GetX(ctx context.Context, id xid.ID) *OAuthRegistrationApproval {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryApprovedByAccount queries the approved_by_account edge of a OAuthRegistrationApproval.
+func (c *OAuthRegistrationApprovalClient) QueryApprovedByAccount(_m *OAuthRegistrationApproval) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthregistrationapproval.Table, oauthregistrationapproval.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, oauthregistrationapproval.ApprovedByAccountTable, oauthregistrationapproval.ApprovedByAccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *OAuthRegistrationApprovalClient) Hooks() []Hook {
+	return c.hooks.OAuthRegistrationApproval
+}
+
+// Interceptors returns the client interceptors.
+func (c *OAuthRegistrationApprovalClient) Interceptors() []Interceptor {
+	return c.inters.OAuthRegistrationApproval
+}
+
+func (c *OAuthRegistrationApprovalClient) mutate(ctx context.Context, m *OAuthRegistrationApprovalMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OAuthRegistrationApprovalCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OAuthRegistrationApprovalUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OAuthRegistrationApprovalUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OAuthRegistrationApprovalDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OAuthRegistrationApproval mutation op: %q", m.Op())
 	}
 }
 
@@ -12052,9 +12464,10 @@ type (
 		EventParticipant, Invitation, LikePost, Link, MentionProfile, ModerationNote,
 		Node, NodeVersion, Notification, OAuthAuthorisationCode,
 		OAuthAuthorisationRequest, OAuthClient, OAuthDeviceAuthorisation,
-		OAuthRefreshToken, OAuthRemoteAuthorisationFlow, OAuthRemoteConnection, Plugin,
-		Post, PostRead, Property, PropertySchema, PropertySchemaField, React, Report,
-		Robot, RobotMCPServer, RobotMCPTool, RobotMemory, RobotProviderModel,
+		OAuthDynamicRegistrationAccessTokens, OAuthRefreshToken,
+		OAuthRegistrationApproval, OAuthRemoteAuthorisationFlow, OAuthRemoteConnection,
+		Plugin, Post, PostRead, Property, PropertySchema, PropertySchemaField, React,
+		Report, Robot, RobotMCPServer, RobotMCPTool, RobotMemory, RobotProviderModel,
 		RobotSession, RobotSessionInput, RobotSessionMessage, RobotSessionTurn,
 		RobotSessionView, RobotToolset, RobotWorkspace, RobotWorkspaceInstance, Role,
 		Session, Setting, Tag, Trail, TrailAction, TrailActionRun, TrailRun,
@@ -12066,9 +12479,10 @@ type (
 		EventParticipant, Invitation, LikePost, Link, MentionProfile, ModerationNote,
 		Node, NodeVersion, Notification, OAuthAuthorisationCode,
 		OAuthAuthorisationRequest, OAuthClient, OAuthDeviceAuthorisation,
-		OAuthRefreshToken, OAuthRemoteAuthorisationFlow, OAuthRemoteConnection, Plugin,
-		Post, PostRead, Property, PropertySchema, PropertySchemaField, React, Report,
-		Robot, RobotMCPServer, RobotMCPTool, RobotMemory, RobotProviderModel,
+		OAuthDynamicRegistrationAccessTokens, OAuthRefreshToken,
+		OAuthRegistrationApproval, OAuthRemoteAuthorisationFlow, OAuthRemoteConnection,
+		Plugin, Post, PostRead, Property, PropertySchema, PropertySchemaField, React,
+		Report, Robot, RobotMCPServer, RobotMCPTool, RobotMemory, RobotProviderModel,
 		RobotSession, RobotSessionInput, RobotSessionMessage, RobotSessionTurn,
 		RobotSessionView, RobotToolset, RobotWorkspace, RobotWorkspaceInstance, Role,
 		Session, Setting, Tag, Trail, TrailAction, TrailActionRun, TrailRun,

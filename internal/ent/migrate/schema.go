@@ -3,6 +3,7 @@
 package migrate
 
 import (
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/dialect/sql/schema"
 	"entgo.io/ent/schema/field"
 )
@@ -896,11 +897,14 @@ var (
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"public", "confidential"}, Default: "public"},
 		{Name: "scope_policy", Type: field.TypeEnum, Enums: []string{"explicit", "inherit"}, Default: "explicit"},
 		{Name: "token_endpoint_auth_method", Type: field.TypeString, Nullable: true, Default: "client_secret_basic"},
+		{Name: "jwks", Type: field.TypeJSON, Nullable: true},
 		{Name: "pkce_required", Type: field.TypeBool, Default: false},
 		{Name: "redirect_uris", Type: field.TypeJSON},
 		{Name: "allowed_scopes", Type: field.TypeJSON},
 		{Name: "allowed_grants", Type: field.TypeJSON},
+		{Name: "registration_approved_by_account_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "account_id", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "dcr_iat_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// OauthClientsTable holds the schema information for the "oauth_clients" table.
 	OauthClientsTable = &schema.Table{
@@ -909,10 +913,22 @@ var (
 		PrimaryKey: []*schema.Column{OauthClientsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
+				Symbol:     "oauth_clients_accounts_approved_oauth_clients",
+				Columns:    []*schema.Column{OauthClientsColumns[14]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
 				Symbol:     "oauth_clients_accounts_oauth_clients",
-				Columns:    []*schema.Column{OauthClientsColumns[13]},
+				Columns:    []*schema.Column{OauthClientsColumns[15]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "oauth_clients_oauth_dcr_iats_clients",
+				Columns:    []*schema.Column{OauthClientsColumns[16]},
+				RefColumns: []*schema.Column{OauthDcrIatsColumns[0]},
+				OnDelete:   schema.SetNull,
 			},
 		},
 		Indexes: []*schema.Index{
@@ -979,6 +995,32 @@ var (
 			},
 		},
 	}
+	// OauthDcrIatsColumns holds the columns for the "oauth_dcr_iats" table.
+	OauthDcrIatsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "label", Type: field.TypeString, Size: 200},
+		{Name: "token_hash", Type: field.TypeString, Unique: true},
+		{Name: "expires_at", Type: field.TypeTime},
+		{Name: "max_registrations", Type: field.TypeInt},
+		{Name: "registration_count", Type: field.TypeInt, Default: 0},
+		{Name: "revoked_at", Type: field.TypeTime, Nullable: true},
+		{Name: "creator_account_id", Type: field.TypeString, Size: 20},
+	}
+	// OauthDcrIatsTable holds the schema information for the "oauth_dcr_iats" table.
+	OauthDcrIatsTable = &schema.Table{
+		Name:       "oauth_dcr_iats",
+		Columns:    OauthDcrIatsColumns,
+		PrimaryKey: []*schema.Column{OauthDcrIatsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "oauth_dcr_iats_accounts_oauth_dcr_iats",
+				Columns:    []*schema.Column{OauthDcrIatsColumns[8]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// OauthRefreshTokensColumns holds the columns for the "oauth_refresh_tokens" table.
 	OauthRefreshTokensColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -1022,6 +1064,37 @@ var (
 				Name:    "oauthrefreshtoken_token_hash",
 				Unique:  true,
 				Columns: []*schema.Column{OauthRefreshTokensColumns[2]},
+			},
+		},
+	}
+	// OauthRegistrationApprovalsColumns holds the columns for the "oauth_registration_approvals" table.
+	OauthRegistrationApprovalsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "registration_code_hash", Type: field.TypeString, Unique: true},
+		{Name: "verification_code_hash", Type: field.TypeString, Unique: true},
+		{Name: "verification_code_display", Type: field.TypeString},
+		{Name: "metadata", Type: field.TypeJSON},
+		{Name: "expires_at", Type: field.TypeTime},
+		{Name: "next_poll_at", Type: field.TypeTime},
+		{Name: "poll_interval_seconds", Type: field.TypeInt, Default: 5},
+		{Name: "approved_at", Type: field.TypeTime, Nullable: true},
+		{Name: "denied_at", Type: field.TypeTime, Nullable: true},
+		{Name: "cancelled_at", Type: field.TypeTime, Nullable: true},
+		{Name: "consumed_at", Type: field.TypeTime, Nullable: true},
+		{Name: "approved_by_account_id", Type: field.TypeString, Nullable: true, Size: 20},
+	}
+	// OauthRegistrationApprovalsTable holds the schema information for the "oauth_registration_approvals" table.
+	OauthRegistrationApprovalsTable = &schema.Table{
+		Name:       "oauth_registration_approvals",
+		Columns:    OauthRegistrationApprovalsColumns,
+		PrimaryKey: []*schema.Column{OauthRegistrationApprovalsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "oauth_registration_approvals_accounts_oauth_registration_approvals",
+				Columns:    []*schema.Column{OauthRegistrationApprovalsColumns[13]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
@@ -2477,7 +2550,9 @@ var (
 		OauthAuthorisationRequestsTable,
 		OauthClientsTable,
 		OauthDeviceAuthorisationsTable,
+		OauthDcrIatsTable,
 		OauthRefreshTokensTable,
+		OauthRegistrationApprovalsTable,
 		OauthRemoteAuthorisationFlowsTable,
 		OauthRemoteConnectionsTable,
 		PluginsTable,
@@ -2570,12 +2645,19 @@ func init() {
 	OauthAuthorisationRequestsTable.ForeignKeys[0].RefTable = AccountsTable
 	OauthAuthorisationRequestsTable.ForeignKeys[1].RefTable = OauthClientsTable
 	OauthClientsTable.ForeignKeys[0].RefTable = AccountsTable
+	OauthClientsTable.ForeignKeys[1].RefTable = AccountsTable
+	OauthClientsTable.ForeignKeys[2].RefTable = OauthDcrIatsTable
 	OauthDeviceAuthorisationsTable.ForeignKeys[0].RefTable = AccountsTable
 	OauthDeviceAuthorisationsTable.ForeignKeys[1].RefTable = AccountsTable
 	OauthDeviceAuthorisationsTable.ForeignKeys[2].RefTable = OauthClientsTable
+	OauthDcrIatsTable.ForeignKeys[0].RefTable = AccountsTable
+	OauthDcrIatsTable.Annotation = &entsql.Annotation{
+		Table: "oauth_dcr_iats",
+	}
 	OauthRefreshTokensTable.ForeignKeys[0].RefTable = AccountsTable
 	OauthRefreshTokensTable.ForeignKeys[1].RefTable = OauthClientsTable
 	OauthRefreshTokensTable.ForeignKeys[2].RefTable = OauthRefreshTokensTable
+	OauthRegistrationApprovalsTable.ForeignKeys[0].RefTable = AccountsTable
 	OauthRemoteAuthorisationFlowsTable.ForeignKeys[0].RefTable = OauthRemoteConnectionsTable
 	OauthRemoteConnectionsTable.ForeignKeys[0].RefTable = AccountsTable
 	PluginsTable.ForeignKeys[0].RefTable = AccountsTable

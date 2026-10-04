@@ -62,20 +62,8 @@ func New(
 					return err
 				}
 
-				cfg, err := store.Load()
+				name, err := saveLogin(cmd.Context(), store, endpoint, storage, auth)
 				if err != nil {
-					return err
-				}
-
-				name := contextName(cfg, endpoint)
-				cfg.UpsertContext(name, config.Context{
-					APIURL:   endpoint,
-					AuthType: storage,
-					Auth:     auth,
-				})
-				cfg.SetCurrentContext(name)
-
-				if err := store.Save(cfg); err != nil {
 					return err
 				}
 
@@ -98,20 +86,8 @@ func New(
 				return err
 			}
 
-			cfg, err := store.Load()
+			name, err := saveLogin(cmd.Context(), store, client.Endpoint, storage, auth)
 			if err != nil {
-				return err
-			}
-
-			name := contextName(cfg, client.Endpoint)
-			cfg.UpsertContext(name, config.Context{
-				APIURL:   client.Endpoint,
-				AuthType: storage,
-				Auth:     auth,
-			})
-			cfg.SetCurrentContext(name)
-
-			if err := store.Save(cfg); err != nil {
 				return err
 			}
 
@@ -497,13 +473,13 @@ func contextName(cfg *config.Config, apiURL string) string {
 }
 
 func uniqueContextName(cfg *config.Config, base string, apiURL string) string {
-	if ctx, ok := cfg.Contexts[base]; !ok || ctx.APIURL == "" || ctx.APIURL == apiURL {
+	if ctx, ok := cfg.Contexts[base]; !ok || ((ctx.Auth == nil || ctx.Auth.Method != config.AuthMethodOAuthClient) && (ctx.APIURL == "" || ctx.APIURL == apiURL)) {
 		return base
 	}
 
 	for i := 2; ; i++ {
 		name := fmt.Sprintf("%s-%d", base, i)
-		if ctx, ok := cfg.Contexts[name]; !ok || ctx.APIURL == apiURL {
+		if ctx, ok := cfg.Contexts[name]; !ok || ((ctx.Auth == nil || ctx.Auth.Method != config.AuthMethodOAuthClient) && ctx.APIURL == apiURL) {
 			return name
 		}
 	}
@@ -527,4 +503,15 @@ func slug(value string) string {
 	}
 
 	return strings.Trim(builder.String(), "-")
+}
+
+func saveLogin(ctx context.Context, store *config.Store, endpoint string, storage config.AuthStorage, auth *config.Auth) (string, error) {
+	var name string
+	err := store.Update(ctx, func(cfg *config.Config) error {
+		name = contextName(cfg, endpoint)
+		cfg.UpsertContext(name, config.Context{APIURL: endpoint, AuthType: storage, Auth: auth})
+		cfg.SetCurrentContext(name)
+		return nil
+	})
+	return name, err
 }

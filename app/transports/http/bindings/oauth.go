@@ -35,6 +35,7 @@ type OAuth struct {
 
 func NewOAuth(cfg config.Config, oauth *oauthservice.Service, remote *oauthremote.Service, router *echo.Echo) OAuth {
 	router.Use(oauthTokenClientAuth)
+	router.Use(oauthRegistrationAuth)
 	return OAuth{
 		oauth:      oauth,
 		remote:     remote,
@@ -92,77 +93,91 @@ func oauthTokenClientAuth(next echo.HandlerFunc) echo.HandlerFunc {
 }
 
 type OAuthDiscoveryResponse struct {
-	Issuer                            string   `json:"issuer"`
-	AuthorizationEndpoint             string   `json:"authorization_endpoint"`
-	DeviceAuthorizationEndpoint       string   `json:"device_authorization_endpoint"`
-	TokenEndpoint                     string   `json:"token_endpoint"`
-	UserinfoEndpoint                  string   `json:"userinfo_endpoint"`
-	RegistrationEndpoint              string   `json:"registration_endpoint,omitempty"`
-	JWKSURI                           string   `json:"jwks_uri"`
-	ResponseTypesSupported            []string `json:"response_types_supported"`
-	GrantTypesSupported               []string `json:"grant_types_supported"`
-	CodeChallengeMethodsSupported     []string `json:"code_challenge_methods_supported"`
-	ScopesSupported                   []string `json:"scopes_supported"`
-	SubjectTypesSupported             []string `json:"subject_types_supported"`
-	IDTokenSigningAlgValuesSupported  []string `json:"id_token_signing_alg_values_supported"`
-	TokenEndpointAuthMethodsSupported []string `json:"token_endpoint_auth_methods_supported"`
-	ClientIDMetadataDocumentSupported bool     `json:"client_id_metadata_document_supported"`
+	Issuer                                     string   `json:"issuer"`
+	AuthorizationEndpoint                      string   `json:"authorization_endpoint"`
+	DeviceAuthorizationEndpoint                string   `json:"device_authorization_endpoint"`
+	TokenEndpoint                              string   `json:"token_endpoint"`
+	UserinfoEndpoint                           string   `json:"userinfo_endpoint"`
+	RegistrationEndpoint                       string   `json:"registration_endpoint,omitempty"`
+	RegistrationModesSupported                 []string `json:"registration_modes_supported,omitempty"`
+	JWKSURI                                    string   `json:"jwks_uri"`
+	ResponseTypesSupported                     []string `json:"response_types_supported"`
+	GrantTypesSupported                        []string `json:"grant_types_supported"`
+	CodeChallengeMethodsSupported              []string `json:"code_challenge_methods_supported"`
+	ScopesSupported                            []string `json:"scopes_supported"`
+	SubjectTypesSupported                      []string `json:"subject_types_supported"`
+	IDTokenSigningAlgValuesSupported           []string `json:"id_token_signing_alg_values_supported"`
+	TokenEndpointAuthMethodsSupported          []string `json:"token_endpoint_auth_methods_supported"`
+	TokenEndpointAuthSigningAlgValuesSupported []string `json:"token_endpoint_auth_signing_alg_values_supported"`
+	ClientIDMetadataDocumentSupported          bool     `json:"client_id_metadata_document_supported"`
 }
 
-func (o OAuth) OAuthDiscovery(context.Context) OAuthDiscoveryResponse {
-	discovery := o.oauth.Discovery()
+func (o OAuth) OAuthDiscovery(ctx context.Context) (OAuthDiscoveryResponse, error) {
+	discovery, err := o.oauth.Discovery(ctx)
+	if err != nil {
+		return OAuthDiscoveryResponse{}, err
+	}
 
 	return OAuthDiscoveryResponse{
-		Issuer:                            discovery.Issuer,
-		AuthorizationEndpoint:             discovery.AuthorizationEndpoint,
-		DeviceAuthorizationEndpoint:       discovery.DeviceAuthorizationEndpoint,
-		TokenEndpoint:                     discovery.TokenEndpoint,
-		RegistrationEndpoint:              discovery.RegistrationEndpoint,
-		UserinfoEndpoint:                  discovery.UserinfoEndpoint,
-		JWKSURI:                           discovery.JWKSURI,
-		ResponseTypesSupported:            discovery.ResponseTypesSupported,
-		GrantTypesSupported:               discovery.GrantTypesSupported,
-		CodeChallengeMethodsSupported:     discovery.CodeChallengeMethodsSupported,
-		ScopesSupported:                   discovery.ScopesSupported,
-		SubjectTypesSupported:             discovery.SubjectTypesSupported,
-		IDTokenSigningAlgValuesSupported:  discovery.IDTokenSigningAlgValuesSupported,
-		TokenEndpointAuthMethodsSupported: discovery.TokenEndpointAuthMethodsSupported,
-		ClientIDMetadataDocumentSupported: discovery.ClientIDMetadataDocumentSupported,
-	}
+		Issuer:                                     discovery.Issuer,
+		AuthorizationEndpoint:                      discovery.AuthorizationEndpoint,
+		DeviceAuthorizationEndpoint:                discovery.DeviceAuthorizationEndpoint,
+		TokenEndpoint:                              discovery.TokenEndpoint,
+		RegistrationEndpoint:                       discovery.RegistrationEndpoint,
+		RegistrationModesSupported:                 discovery.RegistrationModesSupported,
+		UserinfoEndpoint:                           discovery.UserinfoEndpoint,
+		JWKSURI:                                    discovery.JWKSURI,
+		ResponseTypesSupported:                     discovery.ResponseTypesSupported,
+		GrantTypesSupported:                        discovery.GrantTypesSupported,
+		CodeChallengeMethodsSupported:              discovery.CodeChallengeMethodsSupported,
+		ScopesSupported:                            discovery.ScopesSupported,
+		SubjectTypesSupported:                      discovery.SubjectTypesSupported,
+		IDTokenSigningAlgValuesSupported:           discovery.IDTokenSigningAlgValuesSupported,
+		TokenEndpointAuthMethodsSupported:          discovery.TokenEndpointAuthMethodsSupported,
+		TokenEndpointAuthSigningAlgValuesSupported: discovery.TokenEndpointAuthSigningAlgValuesSupported,
+		ClientIDMetadataDocumentSupported:          discovery.ClientIDMetadataDocumentSupported,
+	}, nil
 }
 
 type OAuthAuthorizationServerMetadata struct {
-	Issuer                            string   `json:"issuer"`
-	AuthorizationEndpoint             string   `json:"authorization_endpoint"`
-	TokenEndpoint                     string   `json:"token_endpoint"`
-	RegistrationEndpoint              string   `json:"registration_endpoint,omitempty"`
-	JWKSURI                           string   `json:"jwks_uri,omitempty"`
-	ScopesSupported                   []string `json:"scopes_supported,omitempty"`
-	ResponseTypesSupported            []string `json:"response_types_supported"`
-	GrantTypesSupported               []string `json:"grant_types_supported,omitempty"`
-	CodeChallengeMethodsSupported     []string `json:"code_challenge_methods_supported,omitempty"`
-	DeviceAuthorizationEndpoint       string   `json:"device_authorization_endpoint,omitempty"`
-	TokenEndpointAuthMethodsSupported []string `json:"token_endpoint_auth_methods_supported"`
-	ClientIDMetadataDocumentSupported bool     `json:"client_id_metadata_document_supported"`
+	Issuer                                     string   `json:"issuer"`
+	AuthorizationEndpoint                      string   `json:"authorization_endpoint"`
+	TokenEndpoint                              string   `json:"token_endpoint"`
+	RegistrationEndpoint                       string   `json:"registration_endpoint,omitempty"`
+	RegistrationModesSupported                 []string `json:"registration_modes_supported,omitempty"`
+	JWKSURI                                    string   `json:"jwks_uri,omitempty"`
+	ScopesSupported                            []string `json:"scopes_supported,omitempty"`
+	ResponseTypesSupported                     []string `json:"response_types_supported"`
+	GrantTypesSupported                        []string `json:"grant_types_supported,omitempty"`
+	CodeChallengeMethodsSupported              []string `json:"code_challenge_methods_supported,omitempty"`
+	DeviceAuthorizationEndpoint                string   `json:"device_authorization_endpoint,omitempty"`
+	TokenEndpointAuthMethodsSupported          []string `json:"token_endpoint_auth_methods_supported"`
+	TokenEndpointAuthSigningAlgValuesSupported []string `json:"token_endpoint_auth_signing_alg_values_supported"`
+	ClientIDMetadataDocumentSupported          bool     `json:"client_id_metadata_document_supported"`
 }
 
-func (o OAuth) OAuthAuthorizationServerMetadata(context.Context) OAuthAuthorizationServerMetadata {
-	discovery := o.oauth.Discovery()
+func (o OAuth) OAuthAuthorizationServerMetadata(ctx context.Context) (OAuthAuthorizationServerMetadata, error) {
+	discovery, err := o.oauth.Discovery(ctx)
+	if err != nil {
+		return OAuthAuthorizationServerMetadata{}, err
+	}
 
 	return OAuthAuthorizationServerMetadata{
-		Issuer:                            discovery.Issuer,
-		AuthorizationEndpoint:             discovery.AuthorizationEndpoint,
-		TokenEndpoint:                     discovery.TokenEndpoint,
-		RegistrationEndpoint:              discovery.RegistrationEndpoint,
-		JWKSURI:                           discovery.JWKSURI,
-		ScopesSupported:                   discovery.ScopesSupported,
-		ResponseTypesSupported:            discovery.ResponseTypesSupported,
-		GrantTypesSupported:               discovery.GrantTypesSupported,
-		CodeChallengeMethodsSupported:     discovery.CodeChallengeMethodsSupported,
-		DeviceAuthorizationEndpoint:       discovery.DeviceAuthorizationEndpoint,
-		TokenEndpointAuthMethodsSupported: discovery.TokenEndpointAuthMethodsSupported,
-		ClientIDMetadataDocumentSupported: discovery.ClientIDMetadataDocumentSupported,
-	}
+		Issuer:                                     discovery.Issuer,
+		AuthorizationEndpoint:                      discovery.AuthorizationEndpoint,
+		TokenEndpoint:                              discovery.TokenEndpoint,
+		RegistrationEndpoint:                       discovery.RegistrationEndpoint,
+		RegistrationModesSupported:                 discovery.RegistrationModesSupported,
+		JWKSURI:                                    discovery.JWKSURI,
+		ScopesSupported:                            discovery.ScopesSupported,
+		ResponseTypesSupported:                     discovery.ResponseTypesSupported,
+		GrantTypesSupported:                        discovery.GrantTypesSupported,
+		CodeChallengeMethodsSupported:              discovery.CodeChallengeMethodsSupported,
+		DeviceAuthorizationEndpoint:                discovery.DeviceAuthorizationEndpoint,
+		TokenEndpointAuthMethodsSupported:          discovery.TokenEndpointAuthMethodsSupported,
+		TokenEndpointAuthSigningAlgValuesSupported: discovery.TokenEndpointAuthSigningAlgValuesSupported,
+		ClientIDMetadataDocumentSupported:          discovery.ClientIDMetadataDocumentSupported,
+	}, nil
 }
 
 // OAuthProtectedResourceMetadata represents RFC 9728 OAuth Protected Resource Metadata.
@@ -705,15 +720,17 @@ func (o OAuth) OAuthToken(ctx context.Context, req openapi.OAuthTokenRequestObje
 	}
 
 	token, oauthErr, err := o.oauth.ExchangeToken(ctx, oauthservice.TokenRequest{
-		GrantType:    req.Body.GrantType,
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
-		Scope:        opt.NewPtr(req.Body.Scope),
-		DeviceCode:   opt.NewPtr(req.Body.DeviceCode),
-		Code:         opt.NewPtr(req.Body.Code),
-		RedirectURI:  opt.NewPtr(req.Body.RedirectUri),
-		CodeVerifier: opt.NewPtr(req.Body.CodeVerifier),
-		RefreshToken: opt.NewPtr(req.Body.RefreshToken),
+		GrantType:           req.Body.GrantType,
+		ClientID:            clientID,
+		ClientSecret:        clientSecret,
+		Scope:               opt.NewPtr(req.Body.Scope),
+		DeviceCode:          opt.NewPtr(req.Body.DeviceCode),
+		Code:                opt.NewPtr(req.Body.Code),
+		RedirectURI:         opt.NewPtr(req.Body.RedirectUri),
+		CodeVerifier:        opt.NewPtr(req.Body.CodeVerifier),
+		RefreshToken:        opt.NewPtr(req.Body.RefreshToken),
+		ClientAssertionType: opt.NewPtr(req.Body.ClientAssertionType),
+		ClientAssertion:     opt.NewPtr(req.Body.ClientAssertion),
 	})
 	if err != nil {
 		return nil, err
@@ -757,7 +774,18 @@ func (o OAuth) OAuthToken(ctx context.Context, req openapi.OAuthTokenRequestObje
 }
 
 func (o OAuth) OAuthClientRegister(ctx context.Context, req openapi.OAuthClientRegisterRequestObject) (openapi.OAuthClientRegisterResponseObject, error) {
+	if req.Body == nil {
+		return openapi.OAuthClientRegister400JSONResponse{OAuthClientRegisterErrorJSONResponse: openapi.OAuthClientRegisterErrorJSONResponse(openapi.OAuthError{Error: "invalid_client_metadata"})}, nil
+	}
+	if req.Body.RegistrationCode != nil {
+		return o.pollOAuthRegistration(ctx, *req.Body.RegistrationCode, opt.NewPtr(req.Body.CancelRegistration).OrZero())
+	}
+	if opt.NewPtr(req.Body.CancelRegistration).OrZero() {
+		return registrationResponse(nil, &oauthservice.Error{Code: "invalid_client_metadata", Description: "cancel_registration requires registration_code"}, false), nil
+	}
 	input := oauthservice.DynamicClientRegistration{
+		InitialAccessToken:      registrationAccessToken(ctx),
+		RegistrationModes:       opt.NewPtr(req.Body.RegistrationMode).OrZero(),
 		ClientName:              opt.NewPtr(req.Body.ClientName).OrZero(),
 		RedirectURIs:            opt.NewPtr(req.Body.RedirectUris).OrZero(),
 		GrantTypes:              opt.NewPtr(req.Body.GrantTypes).OrZero(),
@@ -769,24 +797,14 @@ func (o OAuth) OAuthClientRegister(ctx context.Context, req openapi.OAuthClientR
 		ClientURI:               opt.NewPtr(req.Body.ClientUri).OrZero(),
 		TOSURI:                  opt.NewPtr(req.Body.TosUri).OrZero(),
 		PolicyURI:               opt.NewPtr(req.Body.PolicyUri).OrZero(),
+		JWKs:                    opt.NewPtr(req.Body.Jwks).OrZero(),
 	}
 
 	result, oauthErr, err := o.oauth.RegisterClient(ctx, input)
 	if err != nil {
 		return nil, err
 	}
-	if oauthErr != nil {
-		return openapi.OAuthClientRegister400JSONResponse{
-			OAuthClientRegisterErrorJSONResponse: openapi.OAuthClientRegisterErrorJSONResponse(openapi.OAuthError{
-				Error:            oauthErr.Code,
-				ErrorDescription: &oauthErr.Description,
-			}),
-		}, nil
-	}
-
-	return openapi.OAuthClientRegister201JSONResponse{
-		OAuthClientRegisterOKJSONResponse: openapi.OAuthClientRegisterOKJSONResponse(serialiseOAuthClientRegistration(result)),
-	}, nil
+	return registrationResponse(result, oauthErr, input.InitialAccessToken.Ok()), nil
 }
 
 func (o OAuth) OAuthUserInfo(ctx context.Context, _ openapi.OAuthUserInfoRequestObject) (openapi.OAuthUserInfoResponseObject, error) {
@@ -1001,10 +1019,14 @@ func mapOAuthJWKs(in []oauthservice.JWK) []openapi.OAuthJWK {
 
 func serialiseOAuthClient(in *oauthresource.Client) openapi.OAuthClient {
 	return openapi.OAuthClient{
-		Id:            openapi.Identifier(in.ID.XID().String()),
-		CreatedAt:     openapi.CreatedAt(in.CreatedAt),
-		UpdatedAt:     openapi.UpdatedAt(in.UpdatedAt),
-		AccountId:     opt.Map(in.AccountID, func(id account.AccountID) openapi.Identifier { return openapi.Identifier(id.String()) }).Ptr(),
+		Id:                              openapi.Identifier(in.ID.XID().String()),
+		CreatedAt:                       openapi.CreatedAt(in.CreatedAt),
+		UpdatedAt:                       openapi.UpdatedAt(in.UpdatedAt),
+		AccountId:                       opt.Map(in.AccountID, func(id account.AccountID) openapi.Identifier { return openapi.Identifier(id.String()) }).Ptr(),
+		RegistrationApprovedByAccountId: opt.Map(in.RegistrationApprovedByAccountID, func(id account.AccountID) openapi.Identifier { return openapi.Identifier(id.String()) }).Ptr(),
+		DcrIatId: opt.Map(in.RegistrationAccessTokenID, func(id oauthresource.DynamicRegistrationAccessTokenID) openapi.Identifier {
+			return openapi.Identifier(id.XID().String())
+		}).Ptr(),
 		ClientId:      in.ClientID,
 		Name:          in.Name,
 		Type:          openapi.OAuthClientType(in.Type.String()),

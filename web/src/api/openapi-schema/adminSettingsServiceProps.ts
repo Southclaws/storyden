@@ -9,10 +9,12 @@
  */
 import type { ClientIPServiceSettings } from "./clientIPServiceSettings";
 import type { ModerationServiceSettings } from "./moderationServiceSettings";
+import type { OAuthServiceSettings } from "./oAuthServiceSettings";
 import type { RateLimitServiceSettings } from "./rateLimitServiceSettings";
 import type { RobotServiceSettings } from "./robotServiceSettings";
 
 export interface AdminSettingsServiceProps {
+  oauth?: OAuthServiceSettings;
   client_ip?: ClientIPServiceSettings;
   rate_limiting?: RateLimitServiceSettings;
   moderation?: ModerationServiceSettings;

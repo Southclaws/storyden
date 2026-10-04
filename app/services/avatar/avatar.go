@@ -1,6 +1,7 @@
 package avatar
 
 import (
+	"bytes"
 	"context"
 	"image/png"
 	"io"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/roboticon"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 )
@@ -27,6 +29,24 @@ func (s *service) Exists(ctx context.Context, accountID account.AccountID) bool 
 
 func (s *service) Set(ctx context.Context, accountID account.AccountID, stream io.Reader, size int64) error {
 	if err := s.storage.Write(ctx, avatarPath(accountID), stream, size); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
+}
+
+func (s *service) SetRobot(ctx context.Context, accountID account.AccountID) error {
+	var image bytes.Buffer
+	robot := roboticon.Generate(accountID.String())
+	if err := robot.RenderPNG(&image, 256); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return s.Set(ctx, accountID, &image, int64(image.Len()))
+}
+
+func (s *service) Delete(ctx context.Context, accountID account.AccountID) error {
+	if err := s.storage.Delete(ctx, avatarPath(accountID)); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 

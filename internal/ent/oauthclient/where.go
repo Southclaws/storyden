@@ -71,6 +71,16 @@ func AccountID(v xid.ID) predicate.OAuthClient {
 	return predicate.OAuthClient(sql.FieldEQ(FieldAccountID, v))
 }
 
+// RegistrationApprovedByAccountID applies equality check predicate on the "registration_approved_by_account_id" field. It's identical to RegistrationApprovedByAccountIDEQ.
+func RegistrationApprovedByAccountID(v xid.ID) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldEQ(FieldRegistrationApprovedByAccountID, v))
+}
+
+// DcrIatID applies equality check predicate on the "dcr_iat_id" field. It's identical to DcrIatIDEQ.
+func DcrIatID(v xid.ID) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldEQ(FieldDcrIatID, v))
+}
+
 // ClientID applies equality check predicate on the "client_id" field. It's identical to ClientIDEQ.
 func ClientID(v string) predicate.OAuthClient {
 	return predicate.OAuthClient(sql.FieldEQ(FieldClientID, v))
@@ -254,6 +264,166 @@ func AccountIDEqualFold(v xid.ID) predicate.OAuthClient {
 func AccountIDContainsFold(v xid.ID) predicate.OAuthClient {
 	vc := v.String()
 	return predicate.OAuthClient(sql.FieldContainsFold(FieldAccountID, vc))
+}
+
+// RegistrationApprovedByAccountIDEQ applies the EQ predicate on the "registration_approved_by_account_id" field.
+func RegistrationApprovedByAccountIDEQ(v xid.ID) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldEQ(FieldRegistrationApprovedByAccountID, v))
+}
+
+// RegistrationApprovedByAccountIDNEQ applies the NEQ predicate on the "registration_approved_by_account_id" field.
+func RegistrationApprovedByAccountIDNEQ(v xid.ID) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldNEQ(FieldRegistrationApprovedByAccountID, v))
+}
+
+// RegistrationApprovedByAccountIDIn applies the In predicate on the "registration_approved_by_account_id" field.
+func RegistrationApprovedByAccountIDIn(vs ...xid.ID) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldIn(FieldRegistrationApprovedByAccountID, vs...))
+}
+
+// RegistrationApprovedByAccountIDNotIn applies the NotIn predicate on the "registration_approved_by_account_id" field.
+func RegistrationApprovedByAccountIDNotIn(vs ...xid.ID) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldNotIn(FieldRegistrationApprovedByAccountID, vs...))
+}
+
+// RegistrationApprovedByAccountIDGT applies the GT predicate on the "registration_approved_by_account_id" field.
+func RegistrationApprovedByAccountIDGT(v xid.ID) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldGT(FieldRegistrationApprovedByAccountID, v))
+}
+
+// RegistrationApprovedByAccountIDGTE applies the GTE predicate on the "registration_approved_by_account_id" field.
+func RegistrationApprovedByAccountIDGTE(v xid.ID) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldGTE(FieldRegistrationApprovedByAccountID, v))
+}
+
+// RegistrationApprovedByAccountIDLT applies the LT predicate on the "registration_approved_by_account_id" field.
+func RegistrationApprovedByAccountIDLT(v xid.ID) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldLT(FieldRegistrationApprovedByAccountID, v))
+}
+
+// RegistrationApprovedByAccountIDLTE applies the LTE predicate on the "registration_approved_by_account_id" field.
+func RegistrationApprovedByAccountIDLTE(v xid.ID) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldLTE(FieldRegistrationApprovedByAccountID, v))
+}
+
+// RegistrationApprovedByAccountIDContains applies the Contains predicate on the "registration_approved_by_account_id" field.
+func RegistrationApprovedByAccountIDContains(v xid.ID) predicate.OAuthClient {
+	vc := v.String()
+	return predicate.OAuthClient(sql.FieldContains(FieldRegistrationApprovedByAccountID, vc))
+}
+
+// RegistrationApprovedByAccountIDHasPrefix applies the HasPrefix predicate on the "registration_approved_by_account_id" field.
+func RegistrationApprovedByAccountIDHasPrefix(v xid.ID) predicate.OAuthClient {
+	vc := v.String()
+	return predicate.OAuthClient(sql.FieldHasPrefix(FieldRegistrationApprovedByAccountID, vc))
+}
+
+// RegistrationApprovedByAccountIDHasSuffix applies the HasSuffix predicate on the "registration_approved_by_account_id" field.
+func RegistrationApprovedByAccountIDHasSuffix(v xid.ID) predicate.OAuthClient {
+	vc := v.String()
+	return predicate.OAuthClient(sql.FieldHasSuffix(FieldRegistrationApprovedByAccountID, vc))
+}
+
+// RegistrationApprovedByAccountIDIsNil applies the IsNil predicate on the "registration_approved_by_account_id" field.
+func RegistrationApprovedByAccountIDIsNil() predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldIsNull(FieldRegistrationApprovedByAccountID))
+}
+
+// RegistrationApprovedByAccountIDNotNil applies the NotNil predicate on the "registration_approved_by_account_id" field.
+func RegistrationApprovedByAccountIDNotNil() predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldNotNull(FieldRegistrationApprovedByAccountID))
+}
+
+// RegistrationApprovedByAccountIDEqualFold applies the EqualFold predicate on the "registration_approved_by_account_id" field.
+func RegistrationApprovedByAccountIDEqualFold(v xid.ID) predicate.OAuthClient {
+	vc := v.String()
+	return predicate.OAuthClient(sql.FieldEqualFold(FieldRegistrationApprovedByAccountID, vc))
+}
+
+// RegistrationApprovedByAccountIDContainsFold applies the ContainsFold predicate on the "registration_approved_by_account_id" field.
+func RegistrationApprovedByAccountIDContainsFold(v xid.ID) predicate.OAuthClient {
+	vc := v.String()
+	return predicate.OAuthClient(sql.FieldContainsFold(FieldRegistrationApprovedByAccountID, vc))
+}
+
+// DcrIatIDEQ applies the EQ predicate on the "dcr_iat_id" field.
+func DcrIatIDEQ(v xid.ID) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldEQ(FieldDcrIatID, v))
+}
+
+// DcrIatIDNEQ applies the NEQ predicate on the "dcr_iat_id" field.
+func DcrIatIDNEQ(v xid.ID) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldNEQ(FieldDcrIatID, v))
+}
+
+// DcrIatIDIn applies the In predicate on the "dcr_iat_id" field.
+func DcrIatIDIn(vs ...xid.ID) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldIn(FieldDcrIatID, vs...))
+}
+
+// DcrIatIDNotIn applies the NotIn predicate on the "dcr_iat_id" field.
+func DcrIatIDNotIn(vs ...xid.ID) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldNotIn(FieldDcrIatID, vs...))
+}
+
+// DcrIatIDGT applies the GT predicate on the "dcr_iat_id" field.
+func DcrIatIDGT(v xid.ID) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldGT(FieldDcrIatID, v))
+}
+
+// DcrIatIDGTE applies the GTE predicate on the "dcr_iat_id" field.
+func DcrIatIDGTE(v xid.ID) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldGTE(FieldDcrIatID, v))
+}
+
+// DcrIatIDLT applies the LT predicate on the "dcr_iat_id" field.
+func DcrIatIDLT(v xid.ID) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldLT(FieldDcrIatID, v))
+}
+
+// DcrIatIDLTE applies the LTE predicate on the "dcr_iat_id" field.
+func DcrIatIDLTE(v xid.ID) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldLTE(FieldDcrIatID, v))
+}
+
+// DcrIatIDContains applies the Contains predicate on the "dcr_iat_id" field.
+func DcrIatIDContains(v xid.ID) predicate.OAuthClient {
+	vc := v.String()
+	return predicate.OAuthClient(sql.FieldContains(FieldDcrIatID, vc))
+}
+
+// DcrIatIDHasPrefix applies the HasPrefix predicate on the "dcr_iat_id" field.
+func DcrIatIDHasPrefix(v xid.ID) predicate.OAuthClient {
+	vc := v.String()
+	return predicate.OAuthClient(sql.FieldHasPrefix(FieldDcrIatID, vc))
+}
+
+// DcrIatIDHasSuffix applies the HasSuffix predicate on the "dcr_iat_id" field.
+func DcrIatIDHasSuffix(v xid.ID) predicate.OAuthClient {
+	vc := v.String()
+	return predicate.OAuthClient(sql.FieldHasSuffix(FieldDcrIatID, vc))
+}
+
+// DcrIatIDIsNil applies the IsNil predicate on the "dcr_iat_id" field.
+func DcrIatIDIsNil() predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldIsNull(FieldDcrIatID))
+}
+
+// DcrIatIDNotNil applies the NotNil predicate on the "dcr_iat_id" field.
+func DcrIatIDNotNil() predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldNotNull(FieldDcrIatID))
+}
+
+// DcrIatIDEqualFold applies the EqualFold predicate on the "dcr_iat_id" field.
+func DcrIatIDEqualFold(v xid.ID) predicate.OAuthClient {
+	vc := v.String()
+	return predicate.OAuthClient(sql.FieldEqualFold(FieldDcrIatID, vc))
+}
+
+// DcrIatIDContainsFold applies the ContainsFold predicate on the "dcr_iat_id" field.
+func DcrIatIDContainsFold(v xid.ID) predicate.OAuthClient {
+	vc := v.String()
+	return predicate.OAuthClient(sql.FieldContainsFold(FieldDcrIatID, vc))
 }
 
 // ClientIDEQ applies the EQ predicate on the "client_id" field.
@@ -576,6 +746,16 @@ func TokenEndpointAuthMethodContainsFold(v string) predicate.OAuthClient {
 	return predicate.OAuthClient(sql.FieldContainsFold(FieldTokenEndpointAuthMethod, v))
 }
 
+// JwksIsNil applies the IsNil predicate on the "jwks" field.
+func JwksIsNil() predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldIsNull(FieldJwks))
+}
+
+// JwksNotNil applies the NotNil predicate on the "jwks" field.
+func JwksNotNil() predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldNotNull(FieldJwks))
+}
+
 // PkceRequiredEQ applies the EQ predicate on the "pkce_required" field.
 func PkceRequiredEQ(v bool) predicate.OAuthClient {
 	return predicate.OAuthClient(sql.FieldEQ(FieldPkceRequired, v))
@@ -584,6 +764,52 @@ func PkceRequiredEQ(v bool) predicate.OAuthClient {
 // PkceRequiredNEQ applies the NEQ predicate on the "pkce_required" field.
 func PkceRequiredNEQ(v bool) predicate.OAuthClient {
 	return predicate.OAuthClient(sql.FieldNEQ(FieldPkceRequired, v))
+}
+
+// HasRegistrationApprovedBy applies the HasEdge predicate on the "registration_approved_by" edge.
+func HasRegistrationApprovedBy() predicate.OAuthClient {
+	return predicate.OAuthClient(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, RegistrationApprovedByTable, RegistrationApprovedByColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRegistrationApprovedByWith applies the HasEdge predicate on the "registration_approved_by" edge with a given conditions (other predicates).
+func HasRegistrationApprovedByWith(preds ...predicate.Account) predicate.OAuthClient {
+	return predicate.OAuthClient(func(s *sql.Selector) {
+		step := newRegistrationApprovedByStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasDcrIat applies the HasEdge predicate on the "dcr_iat" edge.
+func HasDcrIat() predicate.OAuthClient {
+	return predicate.OAuthClient(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, DcrIatTable, DcrIatColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDcrIatWith applies the HasEdge predicate on the "dcr_iat" edge with a given conditions (other predicates).
+func HasDcrIatWith(preds ...predicate.OAuthDynamicRegistrationAccessTokens) predicate.OAuthClient {
+	return predicate.OAuthClient(func(s *sql.Selector) {
+		step := newDcrIatStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // HasAccount applies the HasEdge predicate on the "account" edge.

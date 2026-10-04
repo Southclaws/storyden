@@ -58,11 +58,13 @@ import type {
   OAuthDeviceConsentParams,
   OAuthDeviceConsentSubmitBody,
   OAuthDeviceConsentSubmitOKResponse,
+  OAuthError,
   OAuthErrorResponse,
   OAuthJWKSOKResponse,
   OAuthProviderCallbackBody,
   OAuthRefreshTokenListOKResponse,
   OAuthRefreshTokenListParams,
+  OAuthRegistrationPending,
   OAuthRemoteCallbackOKResponse,
   OAuthRemoteCallbackParams,
   OAuthTokenBody,
@@ -1533,6 +1535,15 @@ export const oAuthToken = async (
   if (oAuthTokenBody.refresh_token !== undefined) {
     formUrlEncoded.append(`refresh_token`, oAuthTokenBody.refresh_token);
   }
+  if (oAuthTokenBody.client_assertion_type !== undefined) {
+    formUrlEncoded.append(
+      `client_assertion_type`,
+      oAuthTokenBody.client_assertion_type,
+    );
+  }
+  if (oAuthTokenBody.client_assertion !== undefined) {
+    formUrlEncoded.append(`client_assertion`, oAuthTokenBody.client_assertion);
+  }
 
   return fetcher<OAuthTokenOKResponse>(getOAuthTokenUrl(), {
     ...options,
@@ -1729,29 +1740,44 @@ export const getOAuthClientRegisterUrl = () => {
 /**
  * RFC 7591 OAuth 2.0 Dynamic Client Registration.
  *
- * Allows clients such as MCP connectors to register themselves without
- * prior administrator configuration. Dynamically registered clients are
- * tenant-owned (they have no account owner), use the explicit scope
- * policy, and are restricted to a conservative grant and scope allowlist.
+ * Ordinary Authorization Code clients are tenant-owned and must use PKCE.
+ * Only an explicit grant_types: [client_credentials] request provisions a bot
+ * account and a separate OAuth client atomically, with client_name as its handle.
+ * It requires private_key_jwt and public JWKS. Mixed autonomous and delegated
+ * grants are rejected. Delegated private_key_jwt clients create no account.
+ * Autonomous clients inherit the bot account's current role permissions.
+ * Client credentials token requests without scope receive those permissions;
+ * explicit token scopes may narrow them. The optional runtime setting
+ * services.oauth.autonomous_registration_role_id assigns an additional role
+ * atomically at provisioning; deleted role references are skipped.
  *
- * Authorization Code clients must use PKCE; Storyden enforces PKCE (S256)
- * at the authorize and token endpoints for all clients.
+ * Autonomous registration is controlled by the runtime setting services.oauth.autonomous_registration_mode:
+ * disabled rejects it, protected requires an Initial Access Token in
+ * Authorization: Bearer, and open permits it without a token. Supplied tokens
+ * must always be valid and authorize autonomous registration only. One use is
+ * consumed atomically with successful account and client creation. Invalid
+ * metadata or handle collisions do not consume a use. Ordinary DCR does not
+ * require an IAT. This endpoint is rate limited.
  *
- * Public clients register with `token_endpoint_auth_method: none` and
- * receive no client secret. Confidential clients register with
- * `client_secret_basic` or `client_secret_post` and receive a one-time
- * `client_secret` in the response. The registration endpoint is advertised
- * as `registration_endpoint` by the authorization server metadata
- * documents.
- *
- * This is an unauthenticated endpoint that creates server state, so it
- * is heavily rate limited to prevent abuse.
+ * In approval mode, a valid IAT permits immediate registration. Otherwise,
+ * autonomous clients must opt in with registration_mode: [approval] and
+ * receive 202 with a registration_code and verification challenge. Poll this
+ * endpoint with registration_code; metadata supplied on a poll is ignored.
+ * Approval returns 201 on a subsequent poll. Early polls return 429 with
+ * Retry-After. Denial, expiry, and unknown or consumed codes return 400.
+ * Send registration_code and cancel_registration: true to cancel a pending
+ * request (204). No account or client exists while approval is pending.
+ * Implements draft-dellaert-oauth-approval-based-dcr-00 (experimental).
  */
 export const oAuthClientRegister = async (
   oAuthClientRegisterBody: OAuthClientRegisterBody,
   options?: Parameters<typeof fetcher>[1],
-): Promise<OAuthClientRegisterOKResponse> => {
-  return fetcher<OAuthClientRegisterOKResponse>(getOAuthClientRegisterUrl(), {
+): Promise<
+  OAuthClientRegisterOKResponse | OAuthRegistrationPending | NoContentResponse
+> => {
+  return fetcher<
+    OAuthClientRegisterOKResponse | OAuthRegistrationPending | NoContentResponse
+  >(getOAuthClientRegisterUrl(), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...options?.headers },
@@ -1774,7 +1800,11 @@ export type OAuthClientRegisterMutationResult = NonNullable<
 >;
 
 export const useOAuthClientRegister = <
-  TError = OAuthClientRegisterErrorResponse | InternalServerErrorResponse,
+  TError =
+    | OAuthClientRegisterErrorResponse
+    | OAuthError
+    | void
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof oAuthClientRegister>>,

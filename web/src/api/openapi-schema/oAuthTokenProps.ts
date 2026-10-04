@@ -18,4 +18,6 @@ export interface OAuthTokenProps {
   redirect_uri?: string;
   code_verifier?: string;
   refresh_token?: string;
+  client_assertion_type?: string;
+  client_assertion?: string;
 }

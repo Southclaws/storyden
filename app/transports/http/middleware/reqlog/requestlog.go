@@ -53,11 +53,16 @@ func (m *Middleware) WithLogger() func(http.Handler) http.Handler {
 				clientAddress = r.RemoteAddr
 			}
 
-			ctx, span := m.ins.InstrumentNamed(r.Context(), title,
+			// strip out oauth codes, just in case.
+			query := r.URL.Query()
+			query.Del("verification_code")
+
+			ctx, span := m.ins.InstrumentNamed(
+				r.Context(), title,
 				kv.String("http.request.header.origin", origin),
 				kv.String("client.address", clientAddress),
 				kv.String("http.request.method", r.Method),
-				kv.String("url.query", r.URL.Query().Encode()),
+				kv.String("url.query", query.Encode()),
 				kv.Int("http.request.body.size", int(r.ContentLength)),
 			)
 			defer span.End()
@@ -87,7 +92,8 @@ func (m *Middleware) WithLogger() func(http.Handler) http.Handler {
 
 					err = span.Wrap(err, errorlog)
 
-					logger.Error(errorlog,
+					logger.Error(
+						errorlog,
 						slog.String("error", err.Error()),
 						slog.Any("trace", trace),
 					)

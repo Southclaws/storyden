@@ -10,7 +10,10 @@
 import type {
   AccountGetOKResponse,
   AdminAccessKeyListOKResponse,
+  AdminOAuthDynamicRegistrationAccessTokenListParams,
   AdminOAuthRefreshTokenListParams,
+  AdminOAuthRegistrationApprovalGetParams,
+  AdminOAuthRegistrationApprovalListParams,
   AdminSettingsGetOKResponse,
   AdminSettingsUpdateBody,
   AdminSettingsUpdateOKResponse,
@@ -29,6 +32,7 @@ import type {
   EmailQueueListOKResponse,
   EmailQueueListParams,
   ForbiddenResponse,
+  Identifier,
   InternalServerErrorResponse,
   ModerationActionCreateBody,
   NoContentResponse,
@@ -38,7 +42,17 @@ import type {
   OAuthClientOKResponse,
   OAuthClientUpdateBody,
   OAuthDeviceAuthorisationListOKResponse,
+  OAuthDynamicRegistrationAccessToken,
+  OAuthDynamicRegistrationAccessTokenCreateProps,
+  OAuthDynamicRegistrationAccessTokenIssued,
+  OAuthDynamicRegistrationAccessTokenListResult,
+  OAuthError,
   OAuthRefreshTokenListOKResponse,
+  OAuthRegistrationApprovalBulkDecision,
+  OAuthRegistrationApprovalBulkResult,
+  OAuthRegistrationApprovalDecision,
+  OAuthRegistrationApprovalListResult,
+  OAuthRegistrationApprovalReview,
   OAuthRemoteAuthorizeOKResponse,
   OAuthRemoteConnectionCreateBody,
   OAuthRemoteConnectionListOKResponse,
@@ -1630,6 +1644,473 @@ export const oAuthRemoteConnectionAuthorize = async (
     {
       ...options,
       method: "POST",
+    },
+  );
+};
+
+export type adminOAuthRegistrationApprovalListResponse200 = {
+  data: OAuthRegistrationApprovalListResult;
+  status: 200;
+};
+
+export type adminOAuthRegistrationApprovalListResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type adminOAuthRegistrationApprovalListResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 403>;
+};
+
+export type adminOAuthRegistrationApprovalListResponseSuccess =
+  adminOAuthRegistrationApprovalListResponse200 & {
+    headers: Headers;
+  };
+export type adminOAuthRegistrationApprovalListResponseError = (
+  | adminOAuthRegistrationApprovalListResponse403
+  | adminOAuthRegistrationApprovalListResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getAdminOAuthRegistrationApprovalListUrl = (
+  params?: AdminOAuthRegistrationApprovalListParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/admin/oauth/registration-approvals?${stringifiedParams}`
+    : `/admin/oauth/registration-approvals`;
+};
+
+/**
+ * List pending, unexpired autonomous registrations awaiting administrator
+ * approval. Completed, denied, cancelled & expired requests are excluded.
+ */
+export const adminOAuthRegistrationApprovalList = async (
+  params?: AdminOAuthRegistrationApprovalListParams,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<adminOAuthRegistrationApprovalListResponseSuccess> => {
+  return fetcher<adminOAuthRegistrationApprovalListResponseSuccess>(
+    getAdminOAuthRegistrationApprovalListUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export type adminOAuthRegistrationApprovalBulkSubmitResponse200 = {
+  data: OAuthRegistrationApprovalBulkResult;
+  status: 200;
+};
+
+export type adminOAuthRegistrationApprovalBulkSubmitResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type adminOAuthRegistrationApprovalBulkSubmitResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type adminOAuthRegistrationApprovalBulkSubmitResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 403>;
+};
+
+export type adminOAuthRegistrationApprovalBulkSubmitResponseSuccess =
+  adminOAuthRegistrationApprovalBulkSubmitResponse200 & {
+    headers: Headers;
+  };
+export type adminOAuthRegistrationApprovalBulkSubmitResponseError = (
+  | adminOAuthRegistrationApprovalBulkSubmitResponse400
+  | adminOAuthRegistrationApprovalBulkSubmitResponse403
+  | adminOAuthRegistrationApprovalBulkSubmitResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getAdminOAuthRegistrationApprovalBulkSubmitUrl = () => {
+  return `/admin/oauth/registration-approvals/decision`;
+};
+
+/**
+ * Approve or deny all pending, unexpired registrations created on or
+ * before the queue snapshot time, across all pages. Already decided,
+ * cancelled, consumed and expired requests are excluded. Returns the
+ * number of requests changed; approval creates only when clients poll.
+ */
+export const adminOAuthRegistrationApprovalBulkSubmit = async (
+  oAuthRegistrationApprovalBulkDecision: OAuthRegistrationApprovalBulkDecision,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<adminOAuthRegistrationApprovalBulkSubmitResponseSuccess> => {
+  return fetcher<adminOAuthRegistrationApprovalBulkSubmitResponseSuccess>(
+    getAdminOAuthRegistrationApprovalBulkSubmitUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(oAuthRegistrationApprovalBulkDecision),
+    },
+  );
+};
+
+export type adminOAuthRegistrationApprovalGetResponse200 = {
+  data: OAuthRegistrationApprovalReview;
+  status: 200;
+};
+
+export type adminOAuthRegistrationApprovalGetResponse400 = {
+  data: OAuthError;
+  status: 400;
+};
+
+export type adminOAuthRegistrationApprovalGetResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type adminOAuthRegistrationApprovalGetResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 403>;
+};
+
+export type adminOAuthRegistrationApprovalGetResponseSuccess =
+  adminOAuthRegistrationApprovalGetResponse200 & {
+    headers: Headers;
+  };
+export type adminOAuthRegistrationApprovalGetResponseError = (
+  | adminOAuthRegistrationApprovalGetResponse400
+  | adminOAuthRegistrationApprovalGetResponse403
+  | adminOAuthRegistrationApprovalGetResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getAdminOAuthRegistrationApprovalGetUrl = (
+  params: AdminOAuthRegistrationApprovalGetParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/admin/oauth/registration-approvals/verification?${stringifiedParams}`
+    : `/admin/oauth/registration-approvals/verification`;
+};
+
+/**
+ * Review a pending autonomous registration by its verification code. This
+ * does not approve it or create an account.
+ */
+export const adminOAuthRegistrationApprovalGet = async (
+  params: AdminOAuthRegistrationApprovalGetParams,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<adminOAuthRegistrationApprovalGetResponseSuccess> => {
+  return fetcher<adminOAuthRegistrationApprovalGetResponseSuccess>(
+    getAdminOAuthRegistrationApprovalGetUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export type adminOAuthRegistrationApprovalSubmitResponse204 = {
+  data: NoContentResponse;
+  status: 204;
+};
+
+export type adminOAuthRegistrationApprovalSubmitResponse400 = {
+  data: OAuthError;
+  status: 400;
+};
+
+export type adminOAuthRegistrationApprovalSubmitResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type adminOAuthRegistrationApprovalSubmitResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 204 | 400 | 403>;
+};
+
+export type adminOAuthRegistrationApprovalSubmitResponseSuccess =
+  adminOAuthRegistrationApprovalSubmitResponse204 & {
+    headers: Headers;
+  };
+export type adminOAuthRegistrationApprovalSubmitResponseError = (
+  | adminOAuthRegistrationApprovalSubmitResponse400
+  | adminOAuthRegistrationApprovalSubmitResponse403
+  | adminOAuthRegistrationApprovalSubmitResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getAdminOAuthRegistrationApprovalSubmitUrl = () => {
+  return `/admin/oauth/registration-approvals/verification`;
+};
+
+/**
+ * Approve or deny a pending autonomous registration. Approval authorizes
+ * creation of a bot on the next client poll and does not grant the
+ * administrator's permissions.
+ */
+export const adminOAuthRegistrationApprovalSubmit = async (
+  oAuthRegistrationApprovalDecision: OAuthRegistrationApprovalDecision,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<adminOAuthRegistrationApprovalSubmitResponseSuccess> => {
+  return fetcher<adminOAuthRegistrationApprovalSubmitResponseSuccess>(
+    getAdminOAuthRegistrationApprovalSubmitUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(oAuthRegistrationApprovalDecision),
+    },
+  );
+};
+
+export type adminOAuthDynamicRegistrationAccessTokenListResponse200 = {
+  data: OAuthDynamicRegistrationAccessTokenListResult;
+  status: 200;
+};
+
+export type adminOAuthDynamicRegistrationAccessTokenListResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type adminOAuthDynamicRegistrationAccessTokenListResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 403>;
+};
+
+export type adminOAuthDynamicRegistrationAccessTokenListResponseSuccess =
+  adminOAuthDynamicRegistrationAccessTokenListResponse200 & {
+    headers: Headers;
+  };
+export type adminOAuthDynamicRegistrationAccessTokenListResponseError = (
+  | adminOAuthDynamicRegistrationAccessTokenListResponse403
+  | adminOAuthDynamicRegistrationAccessTokenListResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getAdminOAuthDynamicRegistrationAccessTokenListUrl = (
+  params?: AdminOAuthDynamicRegistrationAccessTokenListParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/admin/oauth/dcr-iats?${stringifiedParams}`
+    : `/admin/oauth/dcr-iats`;
+};
+
+/**
+ * List agent registration tokens, including expired and revoked tokens.
+ * Secret values and hashes are never returned.
+ */
+export const adminOAuthDynamicRegistrationAccessTokenList = async (
+  params?: AdminOAuthDynamicRegistrationAccessTokenListParams,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<adminOAuthDynamicRegistrationAccessTokenListResponseSuccess> => {
+  return fetcher<adminOAuthDynamicRegistrationAccessTokenListResponseSuccess>(
+    getAdminOAuthDynamicRegistrationAccessTokenListUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export type adminOAuthDynamicRegistrationAccessTokenCreateResponse201 = {
+  data: OAuthDynamicRegistrationAccessTokenIssued;
+  status: 201;
+};
+
+export type adminOAuthDynamicRegistrationAccessTokenCreateResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type adminOAuthDynamicRegistrationAccessTokenCreateResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type adminOAuthDynamicRegistrationAccessTokenCreateResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 201 | 400 | 403>;
+};
+
+export type adminOAuthDynamicRegistrationAccessTokenCreateResponseSuccess =
+  adminOAuthDynamicRegistrationAccessTokenCreateResponse201 & {
+    headers: Headers;
+  };
+export type adminOAuthDynamicRegistrationAccessTokenCreateResponseError = (
+  | adminOAuthDynamicRegistrationAccessTokenCreateResponse400
+  | adminOAuthDynamicRegistrationAccessTokenCreateResponse403
+  | adminOAuthDynamicRegistrationAccessTokenCreateResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getAdminOAuthDynamicRegistrationAccessTokenCreateUrl = () => {
+  return `/admin/oauth/dcr-iats`;
+};
+
+/**
+ * Issue an Initial Access Token authorizing autonomous agent registration.
+ * The opaque bearer token is returned once. It grants no account or API
+ * permissions. Expiry is required; max_registrations defaults to one.
+ */
+export const adminOAuthDynamicRegistrationAccessTokenCreate = async (
+  oAuthDynamicRegistrationAccessTokenCreateProps: OAuthDynamicRegistrationAccessTokenCreateProps,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<adminOAuthDynamicRegistrationAccessTokenCreateResponseSuccess> => {
+  return fetcher<adminOAuthDynamicRegistrationAccessTokenCreateResponseSuccess>(
+    getAdminOAuthDynamicRegistrationAccessTokenCreateUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(oAuthDynamicRegistrationAccessTokenCreateProps),
+    },
+  );
+};
+
+export type adminOAuthDynamicRegistrationAccessTokenGetResponse200 = {
+  data: OAuthDynamicRegistrationAccessToken;
+  status: 200;
+};
+
+export type adminOAuthDynamicRegistrationAccessTokenGetResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type adminOAuthDynamicRegistrationAccessTokenGetResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type adminOAuthDynamicRegistrationAccessTokenGetResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 403 | 404>;
+};
+
+export type adminOAuthDynamicRegistrationAccessTokenGetResponseSuccess =
+  adminOAuthDynamicRegistrationAccessTokenGetResponse200 & {
+    headers: Headers;
+  };
+export type adminOAuthDynamicRegistrationAccessTokenGetResponseError = (
+  | adminOAuthDynamicRegistrationAccessTokenGetResponse403
+  | adminOAuthDynamicRegistrationAccessTokenGetResponse404
+  | adminOAuthDynamicRegistrationAccessTokenGetResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getAdminOAuthDynamicRegistrationAccessTokenGetUrl = (
+  oauthDcrIatId: Identifier,
+) => {
+  return `/admin/oauth/dcr-iats/${oauthDcrIatId}`;
+};
+
+/**
+ * Read agent registration token metadata without its secret or hash.
+ */
+export const adminOAuthDynamicRegistrationAccessTokenGet = async (
+  oauthDcrIatId: Identifier,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<adminOAuthDynamicRegistrationAccessTokenGetResponseSuccess> => {
+  return fetcher<adminOAuthDynamicRegistrationAccessTokenGetResponseSuccess>(
+    getAdminOAuthDynamicRegistrationAccessTokenGetUrl(oauthDcrIatId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export type adminOAuthDynamicRegistrationAccessTokenRevokeResponse204 = {
+  data: NoContentResponse;
+  status: 204;
+};
+
+export type adminOAuthDynamicRegistrationAccessTokenRevokeResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type adminOAuthDynamicRegistrationAccessTokenRevokeResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type adminOAuthDynamicRegistrationAccessTokenRevokeResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 204 | 403 | 404>;
+};
+
+export type adminOAuthDynamicRegistrationAccessTokenRevokeResponseSuccess =
+  adminOAuthDynamicRegistrationAccessTokenRevokeResponse204 & {
+    headers: Headers;
+  };
+export type adminOAuthDynamicRegistrationAccessTokenRevokeResponseError = (
+  | adminOAuthDynamicRegistrationAccessTokenRevokeResponse403
+  | adminOAuthDynamicRegistrationAccessTokenRevokeResponse404
+  | adminOAuthDynamicRegistrationAccessTokenRevokeResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getAdminOAuthDynamicRegistrationAccessTokenRevokeUrl = (
+  oauthDcrIatId: Identifier,
+) => {
+  return `/admin/oauth/dcr-iats/${oauthDcrIatId}`;
+};
+
+/**
+ * Revoke an agent registration token, retaining its metadata and usage
+ * history. Repeated revocation succeeds. Existing clients are unaffected.
+ */
+export const adminOAuthDynamicRegistrationAccessTokenRevoke = async (
+  oauthDcrIatId: Identifier,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<adminOAuthDynamicRegistrationAccessTokenRevokeResponseSuccess> => {
+  return fetcher<adminOAuthDynamicRegistrationAccessTokenRevokeResponseSuccess>(
+    getAdminOAuthDynamicRegistrationAccessTokenRevokeUrl(oauthDcrIatId),
+    {
+      ...options,
+      method: "DELETE",
     },
   );
 };

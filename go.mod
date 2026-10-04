@@ -1,6 +1,6 @@
 module github.com/Southclaws/storyden
 
-go 1.26.5
+go 1.27.0
 
 tool (
 	entgo.io/ent/cmd/ent
@@ -15,11 +15,15 @@ require (
 	dario.cat/mergo v1.0.2
 	entgo.io/ent v0.14.6
 	github.com/Southclaws/dt v1.0.1
+	github.com/Southclaws/roboticon v1.0.0
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/carapace-sh/carapace v1.11.6
 	github.com/dustin/go-humanize v1.0.1
+	github.com/fogleman/gg v1.3.0 // indirect
 	github.com/forPelevin/gomoji v1.4.0
 	github.com/getkin/kin-openapi v0.142.0
+	github.com/gofrs/flock v0.12.1
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/labstack/echo/v4 v4.15.4
@@ -70,6 +74,7 @@ require (
 	github.com/getsentry/sentry-go v0.35.3
 	github.com/getsentry/sentry-go/otel v0.35.3
 	github.com/glebarez/go-sqlite v1.22.0
+	github.com/go-jose/go-jose/v4 v4.1.4
 	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/goccy/go-yaml v1.19.2
 	github.com/golang-cz/devslog v0.0.15
@@ -186,7 +191,6 @@ require (
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
-	github.com/go-jose/go-jose/v4 v4.1.4 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect

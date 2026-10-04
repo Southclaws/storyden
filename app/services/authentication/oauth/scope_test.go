@@ -1,9 +1,14 @@
 package oauth
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	oauthresource "github.com/Southclaws/storyden/app/resources/oauth"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 )
 
 func TestValidateScopeNames(t *testing.T) {
@@ -52,6 +57,35 @@ func TestValidateScopeNames(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
+		})
+	}
+}
+
+func TestClientCredentialsScopePolicy(t *testing.T) {
+	permissions := rbac.NewList(rbac.PermissionCreatePost, rbac.PermissionReadPublishedLibrary)
+	for _, tc := range []struct {
+		name      string
+		policy    oauthresource.ScopePolicy
+		requested string
+		want      []string
+		wantError bool
+	}{
+		{"inherit_all", oauthresource.ScopePolicyInheritUserPermissions, "", []string{"CREATE_POST", "READ_PUBLISHED_LIBRARY"}, false},
+		{"inherit_restricted", oauthresource.ScopePolicyInheritUserPermissions, "READ_PUBLISHED_LIBRARY", []string{"READ_PUBLISHED_LIBRARY"}, false},
+		{"inherit_cannot_escalate", oauthresource.ScopePolicyInheritUserPermissions, "ADMINISTRATOR", nil, false},
+		{"inherit_invalid_scope", oauthresource.ScopePolicyInheritUserPermissions, "UNKNOWN", nil, true},
+		{"explicit_ceiling", oauthresource.ScopePolicyExplicit, "", []string{"CREATE_POST"}, false},
+		{"explicit_rejects_outside_allowance", oauthresource.ScopePolicyExplicit, "READ_PUBLISHED_LIBRARY", nil, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			client := &oauthresource.Client{ScopePolicy: tc.policy, AllowedScopes: []string{"CREATE_POST"}}
+			granted, err := grantClientCredentialsScope(tc.requested, client, permissions)
+			if tc.wantError {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			require.ElementsMatch(t, tc.want, strings.Fields(granted))
 		})
 	}
 }

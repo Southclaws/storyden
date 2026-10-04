@@ -29,7 +29,7 @@ import (
 func TestOAuthDynamicClientRegistration(t *testing.T) {
 	t.Parallel()
 
-	integration.Test(t, oauthConfig(t), e2e.Setup(), fx.Invoke(func(
+	integration.Test(t, oauthConfig(t), e2e.Setup(), withOAuthRegistration(t, "disabled"), fx.Invoke(func(
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,

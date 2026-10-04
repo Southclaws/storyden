@@ -50,7 +50,7 @@ func TestEventsCRUD(t *testing.T) {
 					Description:         opt.New("description of my lovely event").Ptr(),
 					Content:             "<body><p>hello world</p></body>",
 					TimeRange:           timerange,
-					ParticipationPolicy: openapi.Open,
+					ParticipationPolicy: openapi.EventParticipationPolicyOpen,
 					Visibility:          openapi.VisibilityPublished,
 					Capacity:            opt.New(14).Ptr(),
 					ThreadCategoryId:    catID,
@@ -67,7 +67,7 @@ func TestEventsCRUD(t *testing.T) {
 				a.Equal("description of my lovely event", create.JSON200.Description)
 				a.WithinDuration(create.JSON200.TimeRange.Start, timerange.Start, time.Second*5)
 				a.WithinDuration(create.JSON200.TimeRange.End, timerange.End, time.Second*5)
-				a.Equal(openapi.Open, create.JSON200.ParticipationPolicy)
+				a.Equal(openapi.EventParticipationPolicyOpen, create.JSON200.ParticipationPolicy)
 				a.Equal(openapi.VisibilityPublished, create.JSON200.Visibility)
 				matchLocation(t, &location.Virtual{}, create.JSON200.Location)
 				a.Equal(14, *create.JSON200.Capacity)

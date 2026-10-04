@@ -32,7 +32,9 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
 	"github.com/Southclaws/storyden/internal/ent/oauthclient"
 	"github.com/Southclaws/storyden/internal/ent/oauthdeviceauthorisation"
+	"github.com/Southclaws/storyden/internal/ent/oauthdynamicregistrationaccesstokens"
 	"github.com/Southclaws/storyden/internal/ent/oauthrefreshtoken"
+	"github.com/Southclaws/storyden/internal/ent/oauthregistrationapproval"
 	"github.com/Southclaws/storyden/internal/ent/oauthremoteconnection"
 	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -458,6 +460,51 @@ func (_c *AccountCreate) AddAuthentication(v ...*Authentication) *AccountCreate 
 		ids[i] = v[i].ID
 	}
 	return _c.AddAuthenticationIDs(ids...)
+}
+
+// AddOauthRegistrationApprovalIDs adds the "oauth_registration_approvals" edge to the OAuthRegistrationApproval entity by IDs.
+func (_c *AccountCreate) AddOauthRegistrationApprovalIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddOauthRegistrationApprovalIDs(ids...)
+	return _c
+}
+
+// AddOauthRegistrationApprovals adds the "oauth_registration_approvals" edges to the OAuthRegistrationApproval entity.
+func (_c *AccountCreate) AddOauthRegistrationApprovals(v ...*OAuthRegistrationApproval) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddOauthRegistrationApprovalIDs(ids...)
+}
+
+// AddApprovedOauthClientIDs adds the "approved_oauth_clients" edge to the OAuthClient entity by IDs.
+func (_c *AccountCreate) AddApprovedOauthClientIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddApprovedOauthClientIDs(ids...)
+	return _c
+}
+
+// AddApprovedOauthClients adds the "approved_oauth_clients" edges to the OAuthClient entity.
+func (_c *AccountCreate) AddApprovedOauthClients(v ...*OAuthClient) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddApprovedOauthClientIDs(ids...)
+}
+
+// AddOauthDcrIatIDs adds the "oauth_dcr_iats" edge to the OAuthDynamicRegistrationAccessTokens entity by IDs.
+func (_c *AccountCreate) AddOauthDcrIatIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddOauthDcrIatIDs(ids...)
+	return _c
+}
+
+// AddOauthDcrIats adds the "oauth_dcr_iats" edges to the OAuthDynamicRegistrationAccessTokens entity.
+func (_c *AccountCreate) AddOauthDcrIats(v ...*OAuthDynamicRegistrationAccessTokens) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddOauthDcrIatIDs(ids...)
 }
 
 // AddOauthClientIDs adds the "oauth_clients" edge to the OAuthClient entity by IDs.
@@ -1408,6 +1455,54 @@ func (_c *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.OauthRegistrationApprovalsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthRegistrationApprovalsTable,
+			Columns: []string{account.OauthRegistrationApprovalsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthregistrationapproval.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.ApprovedOauthClientsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ApprovedOauthClientsTable,
+			Columns: []string{account.ApprovedOauthClientsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.OauthDcrIatsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthDcrIatsTable,
+			Columns: []string{account.OauthDcrIatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdynamicregistrationaccesstokens.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

@@ -11,6 +11,7 @@ import (
 	"encoding/pem"
 	"log/slog"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Southclaws/fault"
@@ -20,6 +21,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/oauth/oauth_querier"
 	"github.com/Southclaws/storyden/app/resources/oauth/oauth_writer"
 	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/resources/settings"
+	"github.com/Southclaws/storyden/app/services/avatar"
 	"github.com/Southclaws/storyden/internal/config"
 )
 
@@ -48,14 +51,18 @@ type Error struct {
 }
 
 type Service struct {
-	cfg       config.Config
-	clients   *oauth_querier.Querier
-	tokens    *oauth_writer.Writer
-	account   *account_querier.Querier
-	signer    *rsa.PrivateKey
-	kid       string
-	issuer    string
-	cimdCache *cimdCache
+	cfg            config.Config
+	settings       *settings.SettingsRepository
+	clients        *oauth_querier.Querier
+	tokens         *oauth_writer.Writer
+	account        *account_querier.Querier
+	avatars        avatar.Service
+	signer         *rsa.PrivateKey
+	kid            string
+	issuer         string
+	cimdCache      *cimdCache
+	assertionMu    sync.Mutex
+	usedAssertions map[string]time.Time
 }
 
 func (s *Service) Enabled() bool {
@@ -73,17 +80,22 @@ func New(
 	clients *oauth_querier.Querier,
 	tokens *oauth_writer.Writer,
 	account *account_querier.Querier,
+	settings *settings.SettingsRepository,
+	avatars avatar.Service,
 ) (*Service, error) {
 	issuer := strings.TrimSuffix(cfg.PublicAPIAddress.String(), "/")
 
 	if !cfg.OAuthEnabled {
 		service := &Service{
-			cfg:       cfg,
-			clients:   clients,
-			tokens:    tokens,
-			account:   account,
-			issuer:    issuer,
-			cimdCache: newCIMDCache(),
+			cfg:            cfg,
+			settings:       settings,
+			avatars:        avatars,
+			clients:        clients,
+			tokens:         tokens,
+			account:        account,
+			issuer:         issuer,
+			cimdCache:      newCIMDCache(),
+			usedAssertions: make(map[string]time.Time),
 		}
 		service.registerCleanupJob(lc, logger)
 
@@ -121,14 +133,17 @@ func New(
 	}
 
 	service := &Service{
-		cfg:       cfg,
-		clients:   clients,
-		tokens:    tokens,
-		account:   account,
-		signer:    pk,
-		kid:       kid,
-		issuer:    issuer,
-		cimdCache: newCIMDCache(),
+		cfg:            cfg,
+		settings:       settings,
+		avatars:        avatars,
+		clients:        clients,
+		tokens:         tokens,
+		account:        account,
+		signer:         pk,
+		kid:            kid,
+		issuer:         issuer,
+		cimdCache:      newCIMDCache(),
+		usedAssertions: make(map[string]time.Time),
 	}
 	service.registerCleanupJob(lc, logger)
 
@@ -176,6 +191,11 @@ func (s *Service) cleanupExpiredRecordsLoop(ctx context.Context, logger *slog.Lo
 func (s *Service) cleanupExpiredRecords(ctx context.Context, logger *slog.Logger) {
 	now := time.Now()
 
+	registrationApprovals, err := s.tokens.DeleteExpiredRegistrationApprovals(ctx, now)
+	if err != nil {
+		logger.Error("failed to clean expired oauth registration approvals", slog.Any("error", err))
+		return
+	}
 	deviceAuthorisations, err := s.tokens.DeleteExpiredDeviceAuthorisations(ctx, now)
 	if err != nil {
 		logger.Error("failed to clean expired oauth device authorizations", slog.Any("error", err))
@@ -200,9 +220,10 @@ func (s *Service) cleanupExpiredRecords(ctx context.Context, logger *slog.Logger
 		return
 	}
 
-	if deviceAuthorisations > 0 || authorizationRequests > 0 || unusedDCRClients > 0 || refreshTokens > 0 {
+	if registrationApprovals > 0 || deviceAuthorisations > 0 || authorizationRequests > 0 || unusedDCRClients > 0 || refreshTokens > 0 {
 		logger.Debug(
 			"cleaned expired oauth records",
+			slog.Int("registration_approvals", registrationApprovals),
 			slog.Int("device_authorizations", deviceAuthorisations),
 			slog.Int("authorization_requests", authorizationRequests),
 			slog.Int("unused_dcr_clients", unusedDCRClients),

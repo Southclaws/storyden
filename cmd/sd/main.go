@@ -16,7 +16,9 @@ import (
 
 	"github.com/Southclaws/storyden/cmd/sd/internal/cli"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/auth"
+	"github.com/Southclaws/storyden/cmd/sd/internal/commands/auth/credentials"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/auth/login"
+	"github.com/Southclaws/storyden/cmd/sd/internal/commands/auth/register"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/auth/remove"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/auth/switcher"
 	configcmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/config"
@@ -62,8 +64,10 @@ import (
 	plugintokenrotate "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/token/rotate"
 	searchcmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/search"
 	threadcmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/thread"
+	threadcreate "github.com/Southclaws/storyden/cmd/sd/internal/commands/thread/create"
 	threadget "github.com/Southclaws/storyden/cmd/sd/internal/commands/thread/get"
 	threadlist "github.com/Southclaws/storyden/cmd/sd/internal/commands/thread/list"
+	threadreply "github.com/Southclaws/storyden/cmd/sd/internal/commands/thread/reply"
 	tuicmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/tui"
 	storeconfig "github.com/Southclaws/storyden/cmd/sd/internal/config"
 	"github.com/Southclaws/storyden/cmd/sd/internal/help"
@@ -71,6 +75,7 @@ import (
 
 func newRootCommand(
 	streams cli.Streams,
+	store *storeconfig.Store,
 	authCommand auth.AuthCommand,
 	configCommand configcmd.ConfigCommand,
 	infoCommand infocmd.InfoCommand,
@@ -126,6 +131,7 @@ sd auth switch
 		SilenceErrors: true,
 	}
 
+	root.PersistentFlags().StringVar(&store.SelectedContext, "context", "", "Use a saved identity without changing the default context")
 	root.SetIn(streams.In)
 	root.SetOut(streams.Out)
 	root.SetErr(streams.Err)
@@ -167,6 +173,10 @@ func main() {
 			cli.NewStreams,
 			newLogger,
 			login.New,
+			register.New,
+			credentials.NewToken,
+			credentials.NewHeaders,
+			credentials.NewStatus,
 			remove.New,
 			switcher.New,
 			auth.New,
@@ -174,6 +184,8 @@ func main() {
 			configcmd.New,
 			infocmd.New,
 			threadlist.New,
+			threadcreate.New,
+			threadreply.New,
 			threadget.New,
 			threadcmd.New,
 			tuicmd.New,
@@ -225,7 +237,7 @@ func main() {
 	if err := app.Start(ctx); err != nil {
 		underlying := dig.RootCause(err)
 		if cli.IsCommandError(underlying) {
-			os.Exit(1)
+			os.Exit(cli.ExitCode(underlying))
 		}
 		fmt.Fprintln(os.Stderr, underlying)
 		os.Exit(1)

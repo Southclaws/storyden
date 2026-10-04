@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"github.com/Southclaws/storyden/cmd/sd/internal/commands/auth/credentials"
+	"github.com/Southclaws/storyden/cmd/sd/internal/commands/auth/register"
 	"github.com/spf13/cobra"
 
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/auth/login"
@@ -13,6 +15,10 @@ type AuthCommand *cobra.Command
 
 func New(
 	loginCommand login.LoginCommand,
+	registerCommand register.RegisterCommand,
+	tokenCommand credentials.TokenCommand,
+	headersCommand credentials.HeadersCommand,
+	statusCommand credentials.StatusCommand,
 	removeCommand remove.RemoveCommand,
 	switchCommand switcher.SwitchCommand,
 ) AuthCommand {
@@ -21,7 +27,7 @@ func New(
 		Short: "Authenticate with Storyden instances",
 	}
 
-	command.AddCommand((loginCommand))
+	command.AddCommand((loginCommand), (registerCommand), (tokenCommand), (headersCommand), (statusCommand))
 	command.AddCommand((removeCommand))
 	command.AddCommand((switchCommand))
 
