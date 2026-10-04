@@ -35,7 +35,7 @@ You can try it right now! Run the image and open http://localhost:8000 in your b
 docker run -p 8000:8000 ghcr.io/southclaws/storyden
 ```
 
-![A screenshot of a Storyden instance](home/public/2025_app_screenshot_viewport.png)
+![A screenshot of a Storyden instance](home/public/2026_app_screenshot.png)
 
 ## Releases and versions
 
