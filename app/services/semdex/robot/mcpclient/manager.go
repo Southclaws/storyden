@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Southclaws/fault"
@@ -43,6 +44,7 @@ const (
 )
 
 type Manager struct {
+	syncMu   sync.Mutex
 	logger   *slog.Logger
 	repo     *mcp.Repository
 	registry *tools.Registry
@@ -224,6 +226,9 @@ func (m *Manager) RefreshOAuthConnectionServers(ctx context.Context, id oauth_re
 }
 
 func (m *Manager) SyncRegistry(ctx context.Context) error {
+	m.syncMu.Lock()
+	defer m.syncMu.Unlock()
+
 	m.registry.UnregisterPrefix(toolIDPrefix)
 	m.toolsets.UnregisterSourceType(robottoolsets.SourceMCP)
 

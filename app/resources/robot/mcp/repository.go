@@ -202,16 +202,16 @@ func (r *Repository) UpsertTools(ctx context.Context, server Server, discovered 
 	now := time.Now()
 	seen := make([]string, 0, len(discovered))
 
-	for _, tool := range discovered {
-		seen = append(seen, tool.RemoteName)
-		existing, err := r.db.RobotMCPTool.Query().
-			Where(
-				ent_robot_mcp_tool.ServerIDEQ(xid.ID(server.ID)),
-				ent_robot_mcp_tool.RemoteNameEQ(tool.RemoteName),
-			).
-			Only(ctx)
-		if ent.IsNotFound(err) {
-			_, err = r.db.RobotMCPTool.Create().
+	err := ent.WithTx(ctx, r.db, func(tx *ent.Tx) error {
+		// Updating the parent serializes tool snapshots across replicas.
+		if err := tx.RobotMCPServer.UpdateOneID(xid.ID(server.ID)).SetUpdatedAt(now).Exec(ctx); err != nil {
+			return err
+		}
+
+		for _, tool := range discovered {
+			seen = append(seen, tool.RemoteName)
+
+			err := tx.RobotMCPTool.Create().
 				SetServerID(xid.ID(server.ID)).
 				SetToolID(tool.ID).
 				SetRemoteName(tool.RemoteName).
@@ -223,38 +223,27 @@ func (r *Repository) UpsertTools(ctx context.Context, server Server, discovered 
 				SetAnnotations(tool.Annotations).
 				SetEnabled(true).
 				SetLastSeenAt(now).
-				Save(ctx)
+				OnConflictColumns(ent_robot_mcp_tool.FieldServerID, ent_robot_mcp_tool.FieldRemoteName).
+				UpdateNewValues().
+				Exec(ctx)
 			if err != nil {
 				return fault.Wrap(err, fctx.With(ctx))
 			}
-			continue
-		}
-		if err != nil {
-			return fault.Wrap(err, fctx.With(ctx))
 		}
 
-		_, err = r.db.RobotMCPTool.UpdateOne(existing).
-			SetCallableName(tool.CallableName).
-			SetTitle(tool.Title).
-			SetDescription(tool.Description).
-			SetInputSchema(tool.InputSchema).
-			SetOutputSchema(tool.OutputSchema).
-			SetAnnotations(tool.Annotations).
-			SetEnabled(true).
-			SetLastSeenAt(now).
-			Save(ctx)
-		if err != nil {
-			return fault.Wrap(err, fctx.With(ctx))
+		update := tx.RobotMCPTool.Update().
+			Where(ent_robot_mcp_tool.ServerIDEQ(xid.ID(server.ID))).
+			SetEnabled(false)
+		if len(seen) > 0 {
+			update.Where(ent_robot_mcp_tool.RemoteNameNotIn(seen...))
 		}
-	}
+		if _, err := update.Save(ctx); err != nil {
+			return err
+		}
 
-	update := r.db.RobotMCPTool.Update().
-		Where(ent_robot_mcp_tool.ServerIDEQ(xid.ID(server.ID))).
-		SetEnabled(false)
-	if len(seen) > 0 {
-		update.Where(ent_robot_mcp_tool.RemoteNameNotIn(seen...))
-	}
-	if _, err := update.Save(ctx); err != nil {
+		return nil
+	})
+	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 

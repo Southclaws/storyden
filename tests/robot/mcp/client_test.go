@@ -115,11 +115,36 @@ func TestRobotMCPServerCreateDiscoversBearerProtectedTools(t *testing.T) {
 				assert.Equal(t, []string{"mcp:" + slug + ":echo"}, serverToolset.Tools)
 
 				addRemoteTool("search", "Search events", "Search calendar events by title.")
-				refreshed := tests.AssertRequest(cl.RobotMCPServerRefreshWithResponse(root, created.JSON200.Id, adminSession))(t, http.StatusOK)
+				refreshed, err := cl.RobotMCPServerRefreshWithResponse(root, created.JSON200.Id, adminSession)
+				require.NoError(t, err)
+				require.Equal(t, http.StatusOK, refreshed.StatusCode(), "%s", refreshed.Body)
 				require.NotNil(t, refreshed.JSON200)
 				require.Len(t, refreshed.JSON200.Tools, 2)
 				assert.Equal(t, "mcp:"+slug+":echo", refreshed.JSON200.Tools[0].Id)
 				assert.Equal(t, "mcp:"+slug+":search", refreshed.JSON200.Tools[1].Id)
+
+				t.Run("concurrent_refresh", func(t *testing.T) {
+					const requests = 16
+					responses := make([]*openapi.RobotMCPServerRefreshResponse, requests)
+					errors := make([]error, requests)
+					start := make(chan struct{})
+					var wg sync.WaitGroup
+					for i := range requests {
+						wg.Go(func() {
+							<-start
+							responses[i], errors[i] = cl.RobotMCPServerRefreshWithResponse(root, created.JSON200.Id, adminSession)
+						})
+					}
+					close(start)
+					wg.Wait()
+
+					for i, response := range responses {
+						require.NoError(t, errors[i])
+						require.Equal(t, http.StatusOK, response.StatusCode(), "%s", response.Body)
+						require.NotNil(t, response.JSON200)
+						require.Len(t, response.JSON200.Tools, 2)
+					}
+				})
 
 				refreshedToolsets := tests.AssertRequest(cl.RobotToolsetsListWithResponse(root, adminSession))(t, http.StatusOK)
 				require.NotNil(t, refreshedToolsets.JSON200)
@@ -133,6 +158,90 @@ func TestRobotMCPServerCreateDiscoversBearerProtectedTools(t *testing.T) {
 			}))
 		}),
 	)
+}
+
+func TestRobotMCPConcurrentRefreshAcrossInstances(t *testing.T) {
+	t.Parallel()
+
+	var cfg config.Config
+	var first *openapi.ClientWithResponses
+	var second *openapi.ClientWithResponses
+	var sh *e2e.SessionHelper
+	var aw *account_writer.Writer
+	var db *ent.Client
+	integration.Test(t, nil, e2e.Setup(), withLoopbackMCPClient(), fx.Populate(&cfg, &first, &sh, &aw, &db))
+	integration.Test(t, &cfg, e2e.Setup(), withLoopbackMCPClient(), fx.Populate(&second))
+
+	ctx := context.Background()
+	adminCtx, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
+	adminSession := sh.WithSession(adminCtx)
+	endpoint, addRemoteTool := newMutableBearerMCPServer(t, "test-token")
+	slug := "replicated-server-" + xid.New().String()
+	created := tests.AssertRequest(first.RobotMCPServerCreateWithResponse(ctx, openapi.RobotMCPServerCreateJSONRequestBody{
+		Name:        "Replicated MCP Server",
+		Slug:        &slug,
+		EndpointUrl: endpoint,
+		Enabled:     new(true),
+		BearerToken: new("test-token"),
+	}, adminSession))(t, http.StatusOK)
+	require.NotNil(t, created.JSON200)
+
+	echoID := "mcp:" + slug + ":echo"
+	echo, err := db.RobotMCPTool.Query().Where(ent_robot_mcp_tool.ToolID(echoID)).Only(ctx)
+	require.NoError(t, err)
+	addRemoteTool("echo", "Updated echo", "Echoes the supplied message.")
+	addRemoteTool("search", "Search events", "Search calendar events by title.")
+
+	const requests = 16
+	responses := make([]*openapi.RobotMCPServerRefreshResponse, requests)
+	errors := make([]error, requests)
+	clients := []*openapi.ClientWithResponses{first, second}
+	start := make(chan struct{})
+	var wg sync.WaitGroup
+	for i := range requests {
+		wg.Go(func() {
+			<-start
+			responses[i], errors[i] = clients[i%len(clients)].RobotMCPServerRefreshWithResponse(ctx, created.JSON200.Id, adminSession)
+		})
+	}
+	close(start)
+	wg.Wait()
+
+	for i, response := range responses {
+		require.NoError(t, errors[i])
+		require.Equal(t, http.StatusOK, response.StatusCode(), "%s", response.Body)
+		require.NotNil(t, response.JSON200)
+		require.Len(t, response.JSON200.Tools, 2)
+	}
+
+	updated, err := db.RobotMCPTool.Query().Where(ent_robot_mcp_tool.ToolID(echoID)).Only(ctx)
+	require.NoError(t, err)
+	require.Equal(t, echo.ID, updated.ID)
+	require.True(t, echo.CreatedAt.Equal(updated.CreatedAt))
+	require.Equal(t, "Updated echo", updated.Title)
+	search, err := db.RobotMCPTool.Query().Where(ent_robot_mcp_tool.ToolID("mcp:" + slug + ":search")).Only(ctx)
+	require.NoError(t, err)
+	require.True(t, search.Enabled)
+	require.Equal(t, "Search events", search.Title)
+
+	t.Run("failed_refresh_preserves_cached_tools", func(t *testing.T) {
+		addRemoteTool("collision-tool", "First collision", "First colliding callable name.")
+		addRemoteTool("collision_tool", "Second collision", "Second colliding callable name.")
+		tests.AssertRequest(first.RobotMCPServerRefreshWithResponse(ctx, created.JSON200.Id, adminSession))(t, http.StatusBadRequest)
+
+		exists, err := db.RobotMCPTool.Query().Where(
+			ent_robot_mcp_tool.ServerID(echo.ServerID),
+			ent_robot_mcp_tool.RemoteNameIn("collision-tool", "collision_tool"),
+		).Exist(ctx)
+		require.NoError(t, err)
+		require.False(t, exists)
+
+		for _, id := range []xid.ID{echo.ID, search.ID} {
+			stored, err := db.RobotMCPTool.Get(ctx, id)
+			require.NoError(t, err)
+			require.True(t, stored.Enabled)
+		}
+	})
 }
 
 func TestRobotMCPRefreshRecordsBearerFailure(t *testing.T) {
