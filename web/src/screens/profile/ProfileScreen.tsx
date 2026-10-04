@@ -13,7 +13,6 @@ import { MoreAction } from "@/components/site/Action/More";
 import { SaveAction } from "@/components/site/Action/Save";
 import { DotSeparator } from "@/components/site/Dot";
 import { Unready } from "@/components/site/Unready";
-import { CardBox } from "@/components/ui/card-box";
 import { LikeIcon } from "@/components/ui/icons/Like";
 import { Input } from "@/components/ui/input";
 import { RelativeTime } from "@/components/ui/relative-time";
@@ -41,134 +40,121 @@ export function ProfileScreen(props: Props) {
 
   return (
     <LStack w="full">
-      <CardBox p="0">
-        <styled.form className={lstack()} p="3" onSubmit={handlers.handleSave}>
-          <Flex
-            direction={{ base: "column-reverse", sm: "row" }}
-            w="full"
-            justify="space-between"
-            alignItems={{ base: "end", sm: "start" }}
-          >
-            {isEditing ? (
-              <HStack w="full" pr={{ base: "0", sm: "24" }}>
-                <MemberAvatar
-                  profile={profile}
-                  size="lg"
-                  editable={isEditing}
-                />
-                <LStack gap="1">
-                  <LStack gap="0">
-                    <Input
-                      maxW={{ base: "full", sm: "64" }}
-                      size="sm"
-                      height="7"
-                      px="2"
-                      borderBottomRadius="none"
-                      fontWeight="bold"
-                      {...form.register("name")}
-                    />
-                    <Input
-                      maxW={{ base: "full", sm: "64" }}
-                      size="sm"
-                      height="7"
-                      px="2"
-                      borderTop="none"
-                      borderTopRadius="none"
-                      {...form.register("handle")}
-                    />
-                  </LStack>
-                  <RoleBadgeList roles={profile.roles} />
-                </LStack>
-              </HStack>
-            ) : (
-              <MemberIdent
-                profile={profile}
-                size="lg"
-                name="full-vertical"
-                showRoles="all"
-              />
-            )}
-
-            <HStack justify="end">
-              {isSelf &&
-                (isEditing ? (
-                  <SaveAction size="sm">Save</SaveAction>
-                ) : (
-                  <EditAction
+      <styled.form className={lstack()} onSubmit={handlers.handleSave}>
+        <Flex
+          direction={{ base: "column-reverse", sm: "row" }}
+          w="full"
+          justify="space-between"
+          alignItems={{ base: "end", sm: "start" }}
+        >
+          {isEditing ? (
+            <HStack w="full" pr={{ base: "0", sm: "24" }}>
+              <MemberAvatar profile={profile} size="lg" editable={isEditing} />
+              <LStack gap="1">
+                <LStack gap="0">
+                  <Input
+                    maxW={{ base: "full", sm: "64" }}
                     size="sm"
-                    variant="ghost"
-                    onClick={handlers.handleSetEditing}
-                  >
-                    Edit
-                  </EditAction>
-                ))}
-              <MemberOptionsMenu profile={profile} asChild>
-                <MoreAction type="button" size="sm" />
-              </MemberOptionsMenu>
+                    height="7"
+                    px="2"
+                    borderBottomRadius="none"
+                    fontWeight="bold"
+                    {...form.register("name")}
+                  />
+                  <Input
+                    maxW={{ base: "full", sm: "64" }}
+                    size="sm"
+                    height="7"
+                    px="2"
+                    borderTop="none"
+                    borderTopRadius="none"
+                    {...form.register("handle")}
+                  />
+                </LStack>
+                <RoleBadgeList roles={profile.roles} />
+              </LStack>
             </HStack>
-          </Flex>
+          ) : (
+            <MemberIdent
+              profile={profile}
+              size="lg"
+              name="full-vertical"
+              showRoles="all"
+            />
+          )}
 
-          <HStack gap="1">
-            <Text variant="supporting" wordBreak="keep-all">
-              Joined{" "}
-              <RelativeTime value={profile.createdAt} textWrap="nowrap" />
-            </Text>
-            <DotSeparator />
-            <HStack
-              gap="1"
-              color="text.muted"
-              wordBreak="keep-all"
-              textWrap="nowrap"
-            >
-              <Box flexShrink="0">
-                <LikeIcon w="4" />
-              </Box>
-              <span>{profile.like_score} likes</span>
-            </HStack>
+          <HStack justify="end">
+            {isSelf &&
+              (isEditing ? (
+                <SaveAction size="sm">Save</SaveAction>
+              ) : (
+                <EditAction
+                  size="sm"
+                  variant="ghost"
+                  onClick={handlers.handleSetEditing}
+                >
+                  Edit
+                </EditAction>
+              ))}
+            <MemberOptionsMenu profile={profile} asChild>
+              <MoreAction type="button" size="sm" />
+            </MemberOptionsMenu>
           </HStack>
+        </Flex>
 
-          {isEmpty && !isEditing ? (
+        <HStack gap="1">
+          <Text variant="supporting" wordBreak="keep-all">
+            Joined <RelativeTime value={profile.createdAt} textWrap="nowrap" />
+          </Text>
+          <DotSeparator />
+          <HStack
+            gap="1"
+            color="text.muted"
+            wordBreak="keep-all"
+            textWrap="nowrap"
+          >
+            <Box flexShrink="0">
+              <LikeIcon w="4" />
+            </Box>
+            <span>{profile.like_score} likes</span>
+          </HStack>
+        </HStack>
+
+        {isEmpty && !isEditing ? (
+          <Text variant="supporting" fontStyle="italic">
+            This profile has no bio yet...
+          </Text>
+        ) : (
+          <ContentComposerField<Form>
+            control={form.control}
+            name="bio"
+            initialValue={profile.bio}
+            disabled={!isEditing}
+            placeholder="This profile has no bio yet..."
+          />
+        )}
+
+        {signaturesEnabled &&
+          (isSignatureEmpty && !isEditing ? (
             <Text variant="supporting" fontStyle="italic">
-              This profile has no bio yet...
+              This profile has no signature yet...
             </Text>
           ) : (
             <ContentComposerField<Form>
               control={form.control}
-              name="bio"
-              initialValue={profile.bio}
+              name="signature"
+              initialValue={profile.signature ?? ""}
               disabled={!isEditing}
-              placeholder="This profile has no bio yet..."
+              placeholder="This profile has no signature yet..."
             />
-          )}
+          ))}
+      </styled.form>
 
-          {signaturesEnabled &&
-            (isSignatureEmpty && !isEditing ? (
-              <Text variant="supporting" fontStyle="italic">
-                This profile has no signature yet...
-              </Text>
-            ) : (
-              <ContentComposerField<Form>
-                control={form.control}
-                name="signature"
-                initialValue={profile.signature ?? ""}
-                disabled={!isEditing}
-                placeholder="This profile has no signature yet..."
-              />
-            ))}
-        </styled.form>
+      {profile.deletedAt && (
+        <ProfileSuspendedBanner date={new Date(profile.deletedAt)} />
+      )}
 
-        {profile.deletedAt && (
-          <Box p="3">
-            <ProfileSuspendedBanner date={new Date(profile.deletedAt)} />
-          </Box>
-        )}
-
-        {canViewAccount && (
-          <Box p="3">
-            <ProfileAccountManagement accountId={profile.id} />
-          </Box>
-        )}
-      </CardBox>
+      {canViewAccount && <ProfileAccountManagement accountId={profile.id} />}
 
       <ProfileContent session={session} profile={profile} />
     </LStack>
