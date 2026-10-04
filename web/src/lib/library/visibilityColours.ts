@@ -1,8 +1,9 @@
 import { Visibility } from "@/api/openapi-schema";
-import { ColorPalette } from "@/styled-system/tokens";
-import { UtilityValues } from "@/styled-system/types/prop-type";
+import type { SystemProperties } from "@/styled-system/types";
 
-export function visibilityColour(v: Visibility): UtilityValues["colorPalette"] {
+export function visibilityColour(
+  v: Visibility,
+): SystemProperties["colorPalette"] {
   switch (v) {
     case Visibility.published:
       return "visibility.published";

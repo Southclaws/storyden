@@ -1,31 +1,14 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface HeadingInputVariant {
-  
-}
-
-type HeadingInputVariantMap = {
-  [key in keyof HeadingInputVariant]: Array<HeadingInputVariant[key]>
-}
-
-
+export type HeadingInputVariant = {}
 
 export type HeadingInputVariantProps = {
-  [key in keyof HeadingInputVariant]?: ConditionalValue<HeadingInputVariant[key]> | undefined
+  [K in keyof HeadingInputVariant]?: ConditionalValue<HeadingInputVariant[K]>
 }
 
-export interface HeadingInputRecipe {
-  
-  __type: HeadingInputVariantProps
-  (props?: HeadingInputVariantProps): string
-  raw: (props?: HeadingInputVariantProps) => HeadingInputVariantProps
-  variantMap: HeadingInputVariantMap
-  variantKeys: Array<keyof HeadingInputVariant>
-  splitVariantProps<Props extends HeadingInputVariantProps>(props: Props): [HeadingInputVariantProps, Pretty<DistributiveOmit<Props, keyof HeadingInputVariantProps>>]
-  getVariantProps: (props?: HeadingInputVariantProps) => HeadingInputVariantProps
-}
+export type HeadingInputVariantMap = RecipeVariantMap<HeadingInputVariant>
 
+export type HeadingInputRecipe = RecipeRuntimeFn<HeadingInputVariantProps, HeadingInputVariantMap>
 
-export declare const headingInput: HeadingInputRecipe
+export declare const headingInput: HeadingInputRecipe;

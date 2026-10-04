@@ -1,31 +1,16 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface AdmonitionVariant {
-  kind: "neutral" | "success" | "failure"
+export type AdmonitionVariant = {
+  kind?: "failure" | "neutral" | "success"
 }
-
-type AdmonitionVariantMap = {
-  [key in keyof AdmonitionVariant]: Array<AdmonitionVariant[key]>
-}
-
-
 
 export type AdmonitionVariantProps = {
-  [key in keyof AdmonitionVariant]?: ConditionalValue<AdmonitionVariant[key]> | undefined
+  [K in keyof AdmonitionVariant]?: ConditionalValue<AdmonitionVariant[K]>
 }
 
-export interface AdmonitionRecipe {
-  
-  __type: AdmonitionVariantProps
-  (props?: AdmonitionVariantProps): string
-  raw: (props?: AdmonitionVariantProps) => AdmonitionVariantProps
-  variantMap: AdmonitionVariantMap
-  variantKeys: Array<keyof AdmonitionVariant>
-  splitVariantProps<Props extends AdmonitionVariantProps>(props: Props): [AdmonitionVariantProps, Pretty<DistributiveOmit<Props, keyof AdmonitionVariantProps>>]
-  getVariantProps: (props?: AdmonitionVariantProps) => AdmonitionVariantProps
-}
+export type AdmonitionVariantMap = RecipeVariantMap<AdmonitionVariant>
 
+export type AdmonitionRecipe = RecipeRuntimeFn<AdmonitionVariantProps, AdmonitionVariantMap>
 
-export declare const admonition: AdmonitionRecipe
+export declare const admonition: AdmonitionRecipe;

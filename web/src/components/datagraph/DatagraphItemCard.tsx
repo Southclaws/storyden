@@ -8,7 +8,7 @@ import {
   DatagraphItemThread,
 } from "@/api/openapi-schema";
 import { HStack, WStack } from "@/styled-system/jsx";
-import { ColorPalette } from "@/styled-system/tokens";
+import type { ColorPalette } from "@/styled-system/types";
 import { getAssetURL } from "@/utils/asset";
 import { htmlToMarkdown } from "@/utils/markdown";
 

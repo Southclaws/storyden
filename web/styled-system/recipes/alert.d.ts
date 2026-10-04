@@ -1,31 +1,18 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface AlertVariant {
-  tone: "danger" | "info" | "success" | "warning"
+export type AlertVariant = {
+  tone?: "danger" | "info" | "success" | "warning"
 }
-
-type AlertVariantMap = {
-  [key in keyof AlertVariant]: Array<AlertVariant[key]>
-}
-
-type AlertSlot = "root" | "content" | "description" | "icon" | "title"
 
 export type AlertVariantProps = {
-  [key in keyof AlertVariant]?: ConditionalValue<AlertVariant[key]> | undefined
+  [K in keyof AlertVariant]?: ConditionalValue<AlertVariant[K]>
 }
 
-export interface AlertRecipe {
-  __slot: AlertSlot
-  __type: AlertVariantProps
-  (props?: AlertVariantProps): Pretty<Record<AlertSlot, string>>
-  raw: (props?: AlertVariantProps) => AlertVariantProps
-  variantMap: AlertVariantMap
-  variantKeys: Array<keyof AlertVariant>
-  splitVariantProps<Props extends AlertVariantProps>(props: Props): [AlertVariantProps, Pretty<DistributiveOmit<Props, keyof AlertVariantProps>>]
-  getVariantProps: (props?: AlertVariantProps) => AlertVariantProps
-}
+export type AlertVariantMap = RecipeVariantMap<AlertVariant>
 
+export type AlertSlot = "root" | "content" | "description" | "icon" | "title"
 
-export declare const alert: AlertRecipe
+export type AlertRecipe = SlotRecipeRuntimeFn<AlertSlot, AlertVariantProps, AlertVariantMap>
+
+export declare const alert: AlertRecipe;

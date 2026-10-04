@@ -1,31 +1,16 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface TooltipVariant {
-  
-}
-
-type TooltipVariantMap = {
-  [key in keyof TooltipVariant]: Array<TooltipVariant[key]>
-}
-
-type TooltipSlot = "trigger" | "arrow" | "arrowTip" | "positioner" | "content"
+export type TooltipVariant = {}
 
 export type TooltipVariantProps = {
-  [key in keyof TooltipVariant]?: ConditionalValue<TooltipVariant[key]> | undefined
+  [K in keyof TooltipVariant]?: ConditionalValue<TooltipVariant[K]>
 }
 
-export interface TooltipRecipe {
-  __slot: TooltipSlot
-  __type: TooltipVariantProps
-  (props?: TooltipVariantProps): Pretty<Record<TooltipSlot, string>>
-  raw: (props?: TooltipVariantProps) => TooltipVariantProps
-  variantMap: TooltipVariantMap
-  variantKeys: Array<keyof TooltipVariant>
-  splitVariantProps<Props extends TooltipVariantProps>(props: Props): [TooltipVariantProps, Pretty<DistributiveOmit<Props, keyof TooltipVariantProps>>]
-  getVariantProps: (props?: TooltipVariantProps) => TooltipVariantProps
-}
+export type TooltipVariantMap = RecipeVariantMap<TooltipVariant>
 
+export type TooltipSlot = "trigger" | "arrow" | "arrowTip" | "positioner" | "content"
 
-export declare const tooltip: TooltipRecipe
+export type TooltipRecipe = SlotRecipeRuntimeFn<TooltipSlot, TooltipVariantProps, TooltipVariantMap>
+
+export declare const tooltip: TooltipRecipe;

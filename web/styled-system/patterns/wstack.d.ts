@@ -1,22 +1,18 @@
-/* eslint-disable */
-import type { SystemStyleObject, ConditionalValue } from '../types/index';
-import type { Properties } from '../types/csstype';
-import type { SystemProperties } from '../types/style-props';
-import type { DistributiveOmit } from '../types/system-types';
-import type { Tokens } from '../tokens/index';
+import type { PatternRuntimeConfig } from '../types/pattern';
+import type { SystemStyleObject } from '../types/system';
 
-export interface WstackProperties {
-   
-}
+export interface WstackProperties {}
 
-interface WstackStyles extends WstackProperties, DistributiveOmit<SystemStyleObject, keyof WstackProperties > {}
+type WstackRestStyles = Omit<SystemStyleObject, keyof WstackProperties>
+
+interface WstackStyles extends WstackProperties, WstackRestStyles {}
 
 interface WstackPatternFn {
   (styles?: WstackStyles): string
   raw: (styles?: WstackStyles) => SystemStyleObject
+  propKeys: Array<keyof WstackProperties>
 }
 
-/**
- * A HStack with full width and spaced children.
- */
+export declare function wstackRaw(styles?: WstackStyles): SystemStyleObject;
+
 export declare const wstack: WstackPatternFn;

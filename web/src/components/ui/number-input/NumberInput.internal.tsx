@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import type { ComponentProps } from "react";
 import { type RefObject, forwardRef } from "react";
-import { createStyleContext } from "styled-system/jsx";
+import { createSlotRecipeContext } from "styled-system/jsx";
 
 import { numberInput } from "@/styled-system/recipes";
 
@@ -16,7 +16,7 @@ import { InputGroup } from "../input-group";
 
 export { NumberInputContext as Context } from "@ark-ui/react/number-input";
 
-const { withProvider, withContext } = createStyleContext(numberInput);
+const { withProvider, withContext } = createSlotRecipeContext(numberInput);
 
 export type RootProps = ComponentProps<typeof Root>;
 export const Root = withProvider(ArkNumberInput.Root, "root");

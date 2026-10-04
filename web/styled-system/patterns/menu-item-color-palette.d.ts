@@ -1,22 +1,18 @@
-/* eslint-disable */
-import type { SystemStyleObject, ConditionalValue } from '../types/index';
-import type { Properties } from '../types/csstype';
-import type { SystemProperties } from '../types/style-props';
-import type { DistributiveOmit } from '../types/system-types';
-import type { Tokens } from '../tokens/index';
+import type { PatternRuntimeConfig } from '../types/pattern';
+import type { SystemStyleObject } from '../types/system';
 
-export interface MenuItemColorPaletteProperties {
-   
-}
+export interface MenuItemColorPaletteProperties {}
 
-interface MenuItemColorPaletteStyles extends MenuItemColorPaletteProperties, DistributiveOmit<SystemStyleObject, keyof MenuItemColorPaletteProperties > {}
+type MenuItemColorPaletteRestStyles = Omit<SystemStyleObject, keyof MenuItemColorPaletteProperties>
+
+interface MenuItemColorPaletteStyles extends MenuItemColorPaletteProperties, MenuItemColorPaletteRestStyles {}
 
 interface MenuItemColorPalettePatternFn {
   (styles?: MenuItemColorPaletteStyles): string
   raw: (styles?: MenuItemColorPaletteStyles) => SystemStyleObject
+  propKeys: Array<keyof MenuItemColorPaletteProperties>
 }
 
-/**
- * A color palette for menu items.
- */
+export declare function menuItemColorPaletteRaw(styles?: MenuItemColorPaletteStyles): SystemStyleObject;
+
 export declare const menuItemColorPalette: MenuItemColorPalettePatternFn;

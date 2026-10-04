@@ -1,31 +1,16 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface FloatingPanelVariant {
-  
-}
-
-type FloatingPanelVariantMap = {
-  [key in keyof FloatingPanelVariant]: Array<FloatingPanelVariant[key]>
-}
-
-type FloatingPanelSlot = "trigger" | "positioner" | "content" | "header" | "body" | "title" | "resizeTrigger" | "dragTrigger" | "stageTrigger" | "closeTrigger" | "control"
+export type FloatingPanelVariant = {}
 
 export type FloatingPanelVariantProps = {
-  [key in keyof FloatingPanelVariant]?: ConditionalValue<FloatingPanelVariant[key]> | undefined
+  [K in keyof FloatingPanelVariant]?: ConditionalValue<FloatingPanelVariant[K]>
 }
 
-export interface FloatingPanelRecipe {
-  __slot: FloatingPanelSlot
-  __type: FloatingPanelVariantProps
-  (props?: FloatingPanelVariantProps): Pretty<Record<FloatingPanelSlot, string>>
-  raw: (props?: FloatingPanelVariantProps) => FloatingPanelVariantProps
-  variantMap: FloatingPanelVariantMap
-  variantKeys: Array<keyof FloatingPanelVariant>
-  splitVariantProps<Props extends FloatingPanelVariantProps>(props: Props): [FloatingPanelVariantProps, Pretty<DistributiveOmit<Props, keyof FloatingPanelVariantProps>>]
-  getVariantProps: (props?: FloatingPanelVariantProps) => FloatingPanelVariantProps
-}
+export type FloatingPanelVariantMap = RecipeVariantMap<FloatingPanelVariant>
 
+export type FloatingPanelSlot = "trigger" | "positioner" | "content" | "header" | "body" | "title" | "resizeTrigger" | "dragTrigger" | "stageTrigger" | "closeTrigger" | "control"
 
-export declare const floatingPanel: FloatingPanelRecipe
+export type FloatingPanelRecipe = SlotRecipeRuntimeFn<FloatingPanelSlot, FloatingPanelVariantProps, FloatingPanelVariantMap>
+
+export declare const floatingPanel: FloatingPanelRecipe;

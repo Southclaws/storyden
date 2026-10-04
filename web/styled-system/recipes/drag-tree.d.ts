@@ -1,34 +1,18 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface DragTreeVariant {
-  /**
- * @default "clamped"
- */
-variant: "clamped" | "scrollable"
+export type DragTreeVariant = {
+  variant?: "clamped" | "scrollable"
 }
-
-type DragTreeVariantMap = {
-  [key in keyof DragTreeVariant]: Array<DragTreeVariant[key]>
-}
-
-type DragTreeSlot = "branch" | "branchContent" | "branchControl" | "branchIndentGuide" | "branchIndicator" | "branchText" | "branchTrigger" | "item" | "itemIndicator" | "itemText" | "label" | "nodeCheckbox" | "nodeRenameInput" | "root" | "tree" | "actions" | "link" | "row" | "dropIndicator" | "dropIndicatorLine"
 
 export type DragTreeVariantProps = {
-  [key in keyof DragTreeVariant]?: ConditionalValue<DragTreeVariant[key]> | undefined
+  [K in keyof DragTreeVariant]?: ConditionalValue<DragTreeVariant[K]>
 }
 
-export interface DragTreeRecipe {
-  __slot: DragTreeSlot
-  __type: DragTreeVariantProps
-  (props?: DragTreeVariantProps): Pretty<Record<DragTreeSlot, string>>
-  raw: (props?: DragTreeVariantProps) => DragTreeVariantProps
-  variantMap: DragTreeVariantMap
-  variantKeys: Array<keyof DragTreeVariant>
-  splitVariantProps<Props extends DragTreeVariantProps>(props: Props): [DragTreeVariantProps, Pretty<DistributiveOmit<Props, keyof DragTreeVariantProps>>]
-  getVariantProps: (props?: DragTreeVariantProps) => DragTreeVariantProps
-}
+export type DragTreeVariantMap = RecipeVariantMap<DragTreeVariant>
 
+export type DragTreeSlot = "branch" | "branchContent" | "branchControl" | "branchIndentGuide" | "branchIndicator" | "branchText" | "branchTrigger" | "item" | "itemIndicator" | "itemText" | "label" | "nodeCheckbox" | "nodeRenameInput" | "root" | "tree" | "actions" | "link" | "row" | "dropIndicator" | "dropIndicatorLine"
 
-export declare const dragTree: DragTreeRecipe
+export type DragTreeRecipe = SlotRecipeRuntimeFn<DragTreeSlot, DragTreeVariantProps, DragTreeVariantMap>
+
+export declare const dragTree: DragTreeRecipe;

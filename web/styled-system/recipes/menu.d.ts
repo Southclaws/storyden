@@ -1,34 +1,18 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface MenuVariant {
-  /**
- * @default "xs"
- */
-size: "xs" | "sm" | "md" | "lg"
+export type MenuVariant = {
+  size?: "lg" | "md" | "sm" | "xs"
 }
-
-type MenuVariantMap = {
-  [key in keyof MenuVariant]: Array<MenuVariant[key]>
-}
-
-type MenuSlot = "arrow" | "arrowTip" | "content" | "contextTrigger" | "indicator" | "item" | "itemGroup" | "itemGroupLabel" | "itemIndicator" | "itemText" | "positioner" | "separator" | "trigger" | "triggerItem"
 
 export type MenuVariantProps = {
-  [key in keyof MenuVariant]?: ConditionalValue<MenuVariant[key]> | undefined
+  [K in keyof MenuVariant]?: ConditionalValue<MenuVariant[K]>
 }
 
-export interface MenuRecipe {
-  __slot: MenuSlot
-  __type: MenuVariantProps
-  (props?: MenuVariantProps): Pretty<Record<MenuSlot, string>>
-  raw: (props?: MenuVariantProps) => MenuVariantProps
-  variantMap: MenuVariantMap
-  variantKeys: Array<keyof MenuVariant>
-  splitVariantProps<Props extends MenuVariantProps>(props: Props): [MenuVariantProps, Pretty<DistributiveOmit<Props, keyof MenuVariantProps>>]
-  getVariantProps: (props?: MenuVariantProps) => MenuVariantProps
-}
+export type MenuVariantMap = RecipeVariantMap<MenuVariant>
 
+export type MenuSlot = "arrow" | "arrowTip" | "content" | "contextTrigger" | "indicator" | "item" | "itemGroup" | "itemGroupLabel" | "itemIndicator" | "itemText" | "positioner" | "separator" | "trigger" | "triggerItem"
 
-export declare const menu: MenuRecipe
+export type MenuRecipe = SlotRecipeRuntimeFn<MenuSlot, MenuVariantProps, MenuVariantMap>
+
+export declare const menu: MenuRecipe;

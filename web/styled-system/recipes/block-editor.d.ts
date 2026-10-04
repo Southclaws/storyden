@@ -1,31 +1,16 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface BlockEditorVariant {
-  
-}
-
-type BlockEditorVariantMap = {
-  [key in keyof BlockEditorVariant]: Array<BlockEditorVariant[key]>
-}
-
-type BlockEditorSlot = "root" | "gutter" | "handle" | "menuTrigger" | "menuAnchor" | "menuContent" | "content"
+export type BlockEditorVariant = {}
 
 export type BlockEditorVariantProps = {
-  [key in keyof BlockEditorVariant]?: ConditionalValue<BlockEditorVariant[key]> | undefined
+  [K in keyof BlockEditorVariant]?: ConditionalValue<BlockEditorVariant[K]>
 }
 
-export interface BlockEditorRecipe {
-  __slot: BlockEditorSlot
-  __type: BlockEditorVariantProps
-  (props?: BlockEditorVariantProps): Pretty<Record<BlockEditorSlot, string>>
-  raw: (props?: BlockEditorVariantProps) => BlockEditorVariantProps
-  variantMap: BlockEditorVariantMap
-  variantKeys: Array<keyof BlockEditorVariant>
-  splitVariantProps<Props extends BlockEditorVariantProps>(props: Props): [BlockEditorVariantProps, Pretty<DistributiveOmit<Props, keyof BlockEditorVariantProps>>]
-  getVariantProps: (props?: BlockEditorVariantProps) => BlockEditorVariantProps
-}
+export type BlockEditorVariantMap = RecipeVariantMap<BlockEditorVariant>
 
+export type BlockEditorSlot = "root" | "gutter" | "handle" | "menuTrigger" | "menuAnchor" | "menuContent" | "content"
 
-export declare const blockEditor: BlockEditorRecipe
+export type BlockEditorRecipe = SlotRecipeRuntimeFn<BlockEditorSlot, BlockEditorVariantProps, BlockEditorVariantMap>
+
+export declare const blockEditor: BlockEditorRecipe;

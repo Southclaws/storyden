@@ -2,10 +2,10 @@
 
 import { ark } from "@ark-ui/react/factory";
 import { type ComponentProps, type ReactNode, forwardRef } from "react";
-import { createStyleContext } from "styled-system/jsx";
+import { createSlotRecipeContext } from "styled-system/jsx";
 import { inputGroup } from "styled-system/recipes";
 
-const { withProvider, withContext } = createStyleContext(inputGroup);
+const { withProvider, withContext } = createSlotRecipeContext(inputGroup);
 
 type RootProps = ComponentProps<typeof Root>;
 const Root = withProvider(ark.div, "root");

@@ -1,34 +1,16 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface TextVariant {
-  /**
- * @default "body"
- */
-variant: "body" | "supporting" | "metadata"
+export type TextVariant = {
+  variant?: "body" | "metadata" | "supporting"
 }
-
-type TextVariantMap = {
-  [key in keyof TextVariant]: Array<TextVariant[key]>
-}
-
-
 
 export type TextVariantProps = {
-  [key in keyof TextVariant]?: ConditionalValue<TextVariant[key]> | undefined
+  [K in keyof TextVariant]?: ConditionalValue<TextVariant[K]>
 }
 
-export interface TextRecipe {
-  
-  __type: TextVariantProps
-  (props?: TextVariantProps): string
-  raw: (props?: TextVariantProps) => TextVariantProps
-  variantMap: TextVariantMap
-  variantKeys: Array<keyof TextVariant>
-  splitVariantProps<Props extends TextVariantProps>(props: Props): [TextVariantProps, Pretty<DistributiveOmit<Props, keyof TextVariantProps>>]
-  getVariantProps: (props?: TextVariantProps) => TextVariantProps
-}
+export type TextVariantMap = RecipeVariantMap<TextVariant>
 
+export type TextRecipe = RecipeRuntimeFn<TextVariantProps, TextVariantMap>
 
-export declare const text: TextRecipe
+export declare const text: TextRecipe;

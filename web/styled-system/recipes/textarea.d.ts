@@ -1,38 +1,17 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface TextareaVariant {
-  /**
- * @default "md"
- */
-size: "sm" | "md" | "lg"
-/**
- * @default "outline"
- */
-variant: "outline" | "ghost" | "inset"
+export type TextareaVariant = {
+  size?: "lg" | "md" | "sm"
+  variant?: "ghost" | "inset" | "outline"
 }
-
-type TextareaVariantMap = {
-  [key in keyof TextareaVariant]: Array<TextareaVariant[key]>
-}
-
-
 
 export type TextareaVariantProps = {
-  [key in keyof TextareaVariant]?: TextareaVariant[key] | undefined
+  [K in keyof TextareaVariant]?: TextareaVariant[K] | undefined
 }
 
-export interface TextareaRecipe {
-  
-  __type: TextareaVariantProps
-  (props?: TextareaVariantProps): string
-  raw: (props?: TextareaVariantProps) => TextareaVariantProps
-  variantMap: TextareaVariantMap
-  variantKeys: Array<keyof TextareaVariant>
-  splitVariantProps<Props extends TextareaVariantProps>(props: Props): [TextareaVariantProps, Pretty<DistributiveOmit<Props, keyof TextareaVariantProps>>]
-  getVariantProps: (props?: TextareaVariantProps) => TextareaVariantProps
-}
+export type TextareaVariantMap = RecipeVariantMap<TextareaVariant>
 
+export type TextareaRecipe = RecipeRuntimeFn<TextareaVariantProps, TextareaVariantMap>
 
-export declare const textarea: TextareaRecipe
+export declare const textarea: TextareaRecipe;

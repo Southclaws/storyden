@@ -1,38 +1,19 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface TableVariant {
-  /**
- * @default "plain"
- */
-variant: "dense" | "plain"
-/**
- * @default "md"
- */
-size: "sm" | "md"
+export type TableVariant = {
+  size?: "md" | "sm"
+  variant?: "dense" | "plain"
 }
-
-type TableVariantMap = {
-  [key in keyof TableVariant]: Array<TableVariant[key]>
-}
-
-type TableSlot = "root" | "body" | "cell" | "footer" | "head" | "header" | "row" | "caption"
 
 export type TableVariantProps = {
-  [key in keyof TableVariant]?: ConditionalValue<TableVariant[key]> | undefined
+  [K in keyof TableVariant]?: ConditionalValue<TableVariant[K]>
 }
 
-export interface TableRecipe {
-  __slot: TableSlot
-  __type: TableVariantProps
-  (props?: TableVariantProps): Pretty<Record<TableSlot, string>>
-  raw: (props?: TableVariantProps) => TableVariantProps
-  variantMap: TableVariantMap
-  variantKeys: Array<keyof TableVariant>
-  splitVariantProps<Props extends TableVariantProps>(props: Props): [TableVariantProps, Pretty<DistributiveOmit<Props, keyof TableVariantProps>>]
-  getVariantProps: (props?: TableVariantProps) => TableVariantProps
-}
+export type TableVariantMap = RecipeVariantMap<TableVariant>
 
+export type TableSlot = "root" | "body" | "cell" | "footer" | "head" | "header" | "row" | "caption"
 
-export declare const table: TableRecipe
+export type TableRecipe = SlotRecipeRuntimeFn<TableSlot, TableVariantProps, TableVariantMap>
+
+export declare const table: TableRecipe;

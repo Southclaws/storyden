@@ -1,31 +1,16 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface CardGridVariant {
-  
-}
-
-type CardGridVariantMap = {
-  [key in keyof CardGridVariant]: Array<CardGridVariant[key]>
-}
-
-type CardGridSlot = "container" | "grid"
+export type CardGridVariant = {}
 
 export type CardGridVariantProps = {
-  [key in keyof CardGridVariant]?: ConditionalValue<CardGridVariant[key]> | undefined
+  [K in keyof CardGridVariant]?: ConditionalValue<CardGridVariant[K]>
 }
 
-export interface CardGridRecipe {
-  __slot: CardGridSlot
-  __type: CardGridVariantProps
-  (props?: CardGridVariantProps): Pretty<Record<CardGridSlot, string>>
-  raw: (props?: CardGridVariantProps) => CardGridVariantProps
-  variantMap: CardGridVariantMap
-  variantKeys: Array<keyof CardGridVariant>
-  splitVariantProps<Props extends CardGridVariantProps>(props: Props): [CardGridVariantProps, Pretty<DistributiveOmit<Props, keyof CardGridVariantProps>>]
-  getVariantProps: (props?: CardGridVariantProps) => CardGridVariantProps
-}
+export type CardGridVariantMap = RecipeVariantMap<CardGridVariant>
 
+export type CardGridSlot = "container" | "grid"
 
-export declare const cardGrid: CardGridRecipe
+export type CardGridRecipe = SlotRecipeRuntimeFn<CardGridSlot, CardGridVariantProps, CardGridVariantMap>
+
+export declare const cardGrid: CardGridRecipe;

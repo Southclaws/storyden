@@ -1,31 +1,16 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface ReactListVariant {
-  
-}
-
-type ReactListVariantMap = {
-  [key in keyof ReactListVariant]: Array<ReactListVariant[key]>
-}
-
-type ReactListSlot = "root" | "reaction" | "count" | "picker"
+export type ReactListVariant = {}
 
 export type ReactListVariantProps = {
-  [key in keyof ReactListVariant]?: ConditionalValue<ReactListVariant[key]> | undefined
+  [K in keyof ReactListVariant]?: ConditionalValue<ReactListVariant[K]>
 }
 
-export interface ReactListRecipe {
-  __slot: ReactListSlot
-  __type: ReactListVariantProps
-  (props?: ReactListVariantProps): Pretty<Record<ReactListSlot, string>>
-  raw: (props?: ReactListVariantProps) => ReactListVariantProps
-  variantMap: ReactListVariantMap
-  variantKeys: Array<keyof ReactListVariant>
-  splitVariantProps<Props extends ReactListVariantProps>(props: Props): [ReactListVariantProps, Pretty<DistributiveOmit<Props, keyof ReactListVariantProps>>]
-  getVariantProps: (props?: ReactListVariantProps) => ReactListVariantProps
-}
+export type ReactListVariantMap = RecipeVariantMap<ReactListVariant>
 
+export type ReactListSlot = "root" | "reaction" | "count" | "picker"
 
-export declare const reactList: ReactListRecipe
+export type ReactListRecipe = SlotRecipeRuntimeFn<ReactListSlot, ReactListVariantProps, ReactListVariantMap>
+
+export declare const reactList: ReactListRecipe;

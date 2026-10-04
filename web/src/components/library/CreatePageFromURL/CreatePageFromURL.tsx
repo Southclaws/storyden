@@ -15,7 +15,7 @@ import * as Popover from "@/components/ui/popover";
 import { Spinner } from "@/components/ui/spinner";
 import { useCapability } from "@/lib/settings/capabilities";
 import { HStack, styled } from "@/styled-system/jsx";
-import { UtilityValues } from "@/styled-system/types/prop-type";
+import type { SystemProperties } from "@/styled-system/types";
 import { deriveError } from "@/utils/error";
 
 import {
@@ -231,7 +231,7 @@ export function CreatePageFromURLMenuItem({ hideLabel }: Props) {
   );
 }
 
-function getImportStateColor(state: ImportStep): UtilityValues["color"] {
+function getImportStateColor(state: ImportStep): SystemProperties["color"] {
   switch (state) {
     case "failed":
       return "status.warning.content";

@@ -1,34 +1,18 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface CheckboxVariant {
-  /**
- * @default "sm"
- */
-size: "sm" | "md" | "lg"
+export type CheckboxVariant = {
+  size?: "lg" | "md" | "sm"
 }
-
-type CheckboxVariantMap = {
-  [key in keyof CheckboxVariant]: Array<CheckboxVariant[key]>
-}
-
-type CheckboxSlot = "root" | "label" | "control" | "indicator" | "group"
 
 export type CheckboxVariantProps = {
-  [key in keyof CheckboxVariant]?: ConditionalValue<CheckboxVariant[key]> | undefined
+  [K in keyof CheckboxVariant]?: ConditionalValue<CheckboxVariant[K]>
 }
 
-export interface CheckboxRecipe {
-  __slot: CheckboxSlot
-  __type: CheckboxVariantProps
-  (props?: CheckboxVariantProps): Pretty<Record<CheckboxSlot, string>>
-  raw: (props?: CheckboxVariantProps) => CheckboxVariantProps
-  variantMap: CheckboxVariantMap
-  variantKeys: Array<keyof CheckboxVariant>
-  splitVariantProps<Props extends CheckboxVariantProps>(props: Props): [CheckboxVariantProps, Pretty<DistributiveOmit<Props, keyof CheckboxVariantProps>>]
-  getVariantProps: (props?: CheckboxVariantProps) => CheckboxVariantProps
-}
+export type CheckboxVariantMap = RecipeVariantMap<CheckboxVariant>
 
+export type CheckboxSlot = "root" | "label" | "control" | "indicator" | "group"
 
-export declare const checkbox: CheckboxRecipe
+export type CheckboxRecipe = SlotRecipeRuntimeFn<CheckboxSlot, CheckboxVariantProps, CheckboxVariantMap>
+
+export declare const checkbox: CheckboxRecipe;

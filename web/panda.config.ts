@@ -47,7 +47,6 @@ import { semanticTokens, textStyles } from "@/theme/semantic";
 export default defineConfig({
   presets: ["@pandacss/preset-base"],
   preflight: true,
-  lightningcss: true,
   strictTokens: true,
   strictPropertyValues: true,
   validation: "error",
@@ -201,7 +200,6 @@ export default defineConfig({
       },
       recipes: {
         badge: badge,
-        checkbox: checkbox,
         button: button,
         cardBox: cardBox,
         cardRows: cardRows,
@@ -212,9 +210,10 @@ export default defineConfig({
         textarea: textarea,
         admonition: admonition,
         headingInput: headingInput,
-        richCard: richCard,
       },
       slotRecipes: {
+        checkbox: checkbox,
+        richCard: richCard,
         alert: alert,
         blockEditor: blockEditor,
         cardGrid: cardGrid,

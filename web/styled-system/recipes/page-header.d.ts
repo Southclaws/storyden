@@ -1,31 +1,16 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface PageHeaderVariant {
-  
-}
-
-type PageHeaderVariantMap = {
-  [key in keyof PageHeaderVariant]: Array<PageHeaderVariant[key]>
-}
-
-type PageHeaderSlot = "root" | "navigation" | "row" | "heading" | "back" | "titleGroup" | "titleRow" | "actions"
+export type PageHeaderVariant = {}
 
 export type PageHeaderVariantProps = {
-  [key in keyof PageHeaderVariant]?: ConditionalValue<PageHeaderVariant[key]> | undefined
+  [K in keyof PageHeaderVariant]?: ConditionalValue<PageHeaderVariant[K]>
 }
 
-export interface PageHeaderRecipe {
-  __slot: PageHeaderSlot
-  __type: PageHeaderVariantProps
-  (props?: PageHeaderVariantProps): Pretty<Record<PageHeaderSlot, string>>
-  raw: (props?: PageHeaderVariantProps) => PageHeaderVariantProps
-  variantMap: PageHeaderVariantMap
-  variantKeys: Array<keyof PageHeaderVariant>
-  splitVariantProps<Props extends PageHeaderVariantProps>(props: Props): [PageHeaderVariantProps, Pretty<DistributiveOmit<Props, keyof PageHeaderVariantProps>>]
-  getVariantProps: (props?: PageHeaderVariantProps) => PageHeaderVariantProps
-}
+export type PageHeaderVariantMap = RecipeVariantMap<PageHeaderVariant>
 
+export type PageHeaderSlot = "root" | "navigation" | "row" | "heading" | "back" | "titleGroup" | "titleRow" | "actions"
 
-export declare const pageHeader: PageHeaderRecipe
+export type PageHeaderRecipe = SlotRecipeRuntimeFn<PageHeaderSlot, PageHeaderVariantProps, PageHeaderVariantMap>
+
+export declare const pageHeader: PageHeaderRecipe;

@@ -1,34 +1,16 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface MultiSelectPickerVariant {
-  /**
- * @default "sm"
- */
-size: "sm" | "md" | "lg"
+export type MultiSelectPickerVariant = {
+  size?: "lg" | "md" | "sm"
 }
-
-type MultiSelectPickerVariantMap = {
-  [key in keyof MultiSelectPickerVariant]: Array<MultiSelectPickerVariant[key]>
-}
-
-
 
 export type MultiSelectPickerVariantProps = {
-  [key in keyof MultiSelectPickerVariant]?: ConditionalValue<MultiSelectPickerVariant[key]> | undefined
+  [K in keyof MultiSelectPickerVariant]?: ConditionalValue<MultiSelectPickerVariant[K]>
 }
 
-export interface MultiSelectPickerRecipe {
-  
-  __type: MultiSelectPickerVariantProps
-  (props?: MultiSelectPickerVariantProps): string
-  raw: (props?: MultiSelectPickerVariantProps) => MultiSelectPickerVariantProps
-  variantMap: MultiSelectPickerVariantMap
-  variantKeys: Array<keyof MultiSelectPickerVariant>
-  splitVariantProps<Props extends MultiSelectPickerVariantProps>(props: Props): [MultiSelectPickerVariantProps, Pretty<DistributiveOmit<Props, keyof MultiSelectPickerVariantProps>>]
-  getVariantProps: (props?: MultiSelectPickerVariantProps) => MultiSelectPickerVariantProps
-}
+export type MultiSelectPickerVariantMap = RecipeVariantMap<MultiSelectPickerVariant>
 
+export type MultiSelectPickerRecipe = RecipeRuntimeFn<MultiSelectPickerVariantProps, MultiSelectPickerVariantMap>
 
-export declare const multiSelectPicker: MultiSelectPickerRecipe
+export declare const multiSelectPicker: MultiSelectPickerRecipe;

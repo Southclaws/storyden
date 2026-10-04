@@ -1,35 +1,17 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface GroupVariant {
-  /**
- * @default "horizontal"
- */
-orientation: "horizontal" | "vertical"
-attached: boolean
+export type GroupVariant = {
+  attached?: boolean
+  orientation?: "horizontal" | "vertical"
 }
-
-type GroupVariantMap = {
-  [key in keyof GroupVariant]: Array<GroupVariant[key]>
-}
-
-
 
 export type GroupVariantProps = {
-  [key in keyof GroupVariant]?: GroupVariant[key] | undefined
+  [K in keyof GroupVariant]?: GroupVariant[K] | undefined
 }
 
-export interface GroupRecipe {
-  
-  __type: GroupVariantProps
-  (props?: GroupVariantProps): string
-  raw: (props?: GroupVariantProps) => GroupVariantProps
-  variantMap: GroupVariantMap
-  variantKeys: Array<keyof GroupVariant>
-  splitVariantProps<Props extends GroupVariantProps>(props: Props): [GroupVariantProps, Pretty<DistributiveOmit<Props, keyof GroupVariantProps>>]
-  getVariantProps: (props?: GroupVariantProps) => GroupVariantProps
-}
+export type GroupVariantMap = RecipeVariantMap<GroupVariant>
 
+export type GroupRecipe = RecipeRuntimeFn<GroupVariantProps, GroupVariantMap>
 
-export declare const group: GroupRecipe
+export declare const group: GroupRecipe;
