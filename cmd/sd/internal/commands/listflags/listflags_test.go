@@ -12,8 +12,8 @@ func TestValidateRejectsBadFlags(t *testing.T) {
 
 	r.ErrorContains((&Flags{Page: 0, Format: FormatAuto, Output: OutputDefault}).Validate(), "--page")
 	r.ErrorContains((&Flags{Page: 1, Limit: -1, Format: FormatAuto, Output: OutputDefault}).Validate(), "--limit")
-	r.ErrorContains((&Flags{Page: 1, Format: "yaml", Output: OutputDefault}).Validate(), "--format")
-	r.ErrorContains((&Flags{Page: 1, Format: FormatAuto, Output: "tall"}).Validate(), "--output")
+	r.ErrorContains((&Flags{Page: 1, Format: "yaml", Output: OutputDefault}).Validate(), "--output")
+	r.ErrorContains((&Flags{Page: 1, Format: FormatAuto, Output: "tall"}).Validate(), "--columns")
 }
 
 func TestValidateAcceptsAllSupportedFormats(t *testing.T) {

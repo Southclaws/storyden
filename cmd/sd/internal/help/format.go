@@ -3,6 +3,7 @@ package help
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -15,7 +16,7 @@ func IsTerminal(w io.Writer) bool {
 }
 
 // FormatMarkdown renders markdown with glamour if output is a terminal,
-// otherwise returns plain text.
+// otherwise preserves raw Markdown.
 func FormatMarkdown(markdown string, out io.Writer) string {
 	if !IsTerminal(out) {
 		return markdown
@@ -44,45 +45,42 @@ func getTerminalWidth(w io.Writer) int {
 	return width
 }
 
-// SetupMarkdownHelp configures a cobra command to render its Long description
-// with beautiful markdown formatting in the terminal.
+// SetupMarkdownHelp renders the whole help document as Markdown in a terminal,
+// preserving the same Markdown document for agents reading a pipe.
+// Install on each child too: Fang replaces the root help function at execution
+// time, so inherited help would otherwise differ for bare command groups.
 func SetupMarkdownHelp(cmd *cobra.Command) {
 	cmd.SetHelpFunc(func(c *cobra.Command, args []string) {
-		// Render the Long description with glamour
+		var doc strings.Builder
 		if c.Long != "" {
-			formatted := FormatHelpMarkdown(c.Long, c.OutOrStdout())
-			fmt.Fprint(c.OutOrStdout(), formatted)
+			doc.WriteString(c.Long)
+		} else {
+			fmt.Fprintf(&doc, "# %s\n\n%s\n", c.CommandPath(), c.Short)
 		}
-
-		// Show usage
-		fmt.Fprintf(c.OutOrStdout(), "\nUsage:\n  %s\n", c.UseLine())
-
-		// Show available subcommands
+		if c.Example != "" && !strings.Contains(c.Long, "## Examples") {
+			fmt.Fprintf(&doc, "\n## Examples\n\n~~~sh\n%s\n~~~\n", strings.TrimSpace(c.Example))
+		}
+		fmt.Fprintf(&doc, "\n## Usage\n\n~~~text\n%s\n~~~\n", c.UseLine())
 		if c.HasAvailableSubCommands() {
-			fmt.Fprint(c.OutOrStdout(), "\nAvailable Commands:\n")
+			doc.WriteString("\n## Commands\n\n")
 			for _, subcmd := range c.Commands() {
-				if !subcmd.IsAvailableCommand() {
-					continue
+				if subcmd.IsAvailableCommand() {
+					fmt.Fprintf(&doc, "- `%s`: %s\n", subcmd.Name(), subcmd.Short)
 				}
-				fmt.Fprintf(c.OutOrStdout(), "  %-15s %s\n", subcmd.Name(), subcmd.Short)
 			}
 		}
-
-		// Show flags
-		if c.HasAvailableFlags() {
-			fmt.Fprint(c.OutOrStdout(), "\nFlags:\n")
-			fmt.Fprint(c.OutOrStdout(), c.Flags().FlagUsages())
+		if flags := c.LocalFlags(); flags.HasAvailableFlags() {
+			fmt.Fprintf(&doc, "\n## Flags\n\n~~~text\n%s~~~\n", flags.FlagUsages())
 		}
-
-		// Show global flags if any
 		if c.HasAvailableInheritedFlags() {
-			fmt.Fprint(c.OutOrStdout(), "\nGlobal Flags:\n")
-			fmt.Fprint(c.OutOrStdout(), c.InheritedFlags().FlagUsages())
+			fmt.Fprintf(&doc, "\n## Global flags\n\n~~~text\n%s~~~\n", c.InheritedFlags().FlagUsages())
 		}
-
-		// Show additional help
-		if c.HasHelpSubCommands() {
-			fmt.Fprintf(c.OutOrStdout(), "\nUse \"%s [command] --help\" for more information about a command.\n", c.CommandPath())
+		if c.HasAvailableSubCommands() {
+			fmt.Fprintf(&doc, "\nUse `%s COMMAND --help` for command details.\n", c.CommandPath())
 		}
+		fmt.Fprint(c.OutOrStdout(), FormatHelpMarkdown(doc.String(), c.OutOrStdout()))
 	})
+	for _, child := range cmd.Commands() {
+		SetupMarkdownHelp(child)
+	}
 }

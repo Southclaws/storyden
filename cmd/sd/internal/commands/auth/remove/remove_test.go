@@ -2,12 +2,14 @@ package remove
 
 import (
 	"bytes"
+	"context"
 	"path/filepath"
 	"testing"
 
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
 
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 )
 
@@ -30,12 +32,9 @@ func TestRemoveCommandRemovesContextByName(t *testing.T) {
 	cfg.SetCurrentContext("localhost-8000")
 	r.NoError(store.Save(cfg))
 
-	var out bytes.Buffer
-	command := (*cobra.Command)(New(store))
-	command.SetOut(&out)
-	command.SetArgs([]string{"localhost-8000"})
-
-	r.NoError(command.Execute())
+	var out, errOut bytes.Buffer
+	handler := New(store)
+	r.NoError(handler(context.Background(), &cobra.Command{}, cligen.IO{Out: &out, Err: &errOut}, cligen.AuthRemoveParams{ContextName: "localhost-8000"}))
 
 	loaded, err := store.Load()
 	r.NoError(err)
@@ -43,6 +42,8 @@ func TestRemoveCommandRemovesContextByName(t *testing.T) {
 	r.Contains(loaded.Contexts, "makeroom-club")
 	r.Equal("makeroom-club", loaded.CurrentContext)
 	r.Contains(out.String(), "Removed context:")
+	r.Contains(errOut.String(), "Warning: removed context was current")
+	r.Contains(errOut.String(), "makeroom-club")
 	_, ok, err := credentials.GetAuth("localhost-8000")
 	r.NoError(err)
 	r.False(ok)
@@ -56,10 +57,8 @@ func TestRemoveCommandRejectsUnknownContext(t *testing.T) {
 	cfg.UpsertContext("localhost-8000", config.Context{APIURL: "http://localhost:8000"})
 	r.NoError(store.Save(cfg))
 
-	command := (*cobra.Command)(New(store))
-	command.SetArgs([]string{"missing"})
-
-	err := command.Execute()
+	handler := New(store)
+	err := handler(context.Background(), &cobra.Command{}, cligen.IO{Out: &bytes.Buffer{}}, cligen.AuthRemoveParams{ContextName: "missing"})
 
 	r.ErrorContains(err, "unknown context")
 }

@@ -5,23 +5,21 @@ import (
 	"fmt"
 	"io"
 	"net/url"
-	"runtime"
 	"strings"
 	"time"
 	"unicode"
 
 	"charm.land/huh/v2"
+
 	"github.com/spf13/cobra"
 
 	"github.com/Southclaws/storyden/app/services/authentication/oauth"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 	"github.com/Southclaws/storyden/cmd/sd/internal/tui"
 )
-
-type LoginCommand *cobra.Command
 
 const (
 	deviceAuthScope     = "openid profile offline_access"
@@ -30,139 +28,70 @@ const (
 
 func New(
 	store *config.Store,
-) LoginCommand {
-	authStorage := "auto"
-	accessKey := false
-	accessKeyStdin := false
+) cligen.AuthLoginHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.AuthLoginParams) error {
+		var args []string
+		if p.StorydenApiUrl != "" {
+			args = []string{p.StorydenApiUrl}
+		}
 
-	command := &cobra.Command{
-		Use:   "login [storyden-api-url]",
-		Short: "Log in to a Storyden instance",
-		Long:  loginLongHelp(runtime.GOOS),
-		Args:  cobra.MaximumNArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			endpoint, err := endpointFromArgs(cmd, args, store)
+		endpoint, err := endpointFromArgs(ctx, io, args, store)
+		if err != nil {
+			return err
+		}
+
+		storage, err := resolveAuthStorage(string(p.AuthStorage), store)
+		if err != nil {
+			return err
+		}
+
+		if p.AccessKey || p.AccessKeyStdin {
+			auth, err := authenticateAccessKey(ctx, io, p.AccessKeyStdin)
 			if err != nil {
 				return err
 			}
 
-			storage, err := resolveAuthStorage(authStorage, store)
+			endpoint, err = api.CanonicalEndpoint(endpoint)
 			if err != nil {
 				return err
 			}
 
-			if accessKey || accessKeyStdin {
-				auth, err := authenticateAccessKey(cmd, accessKeyStdin)
-				if err != nil {
-					return err
-				}
-
-				endpoint, err = api.CanonicalEndpoint(endpoint)
-				if err != nil {
-					return err
-				}
-
-				name, err := saveLogin(cmd.Context(), store, endpoint, storage, auth)
-				if err != nil {
-					return err
-				}
-
-				if storage == config.AuthStorageFile {
-					warnFileAuthStorage(cmd, store)
-				}
-
-				fmt.Fprintf(cmd.OutOrStdout(), "%s %s as context %q\n", tui.Accent.Render("Authenticated with"), endpoint, name)
-
-				return nil
-			}
-
-			client, err := api.NewClient(cmd.Context(), endpoint)
-			if err != nil {
-				return err
-			}
-
-			auth, err := authenticate(cmd.Context(), cmd, client)
-			if err != nil {
-				return err
-			}
-
-			name, err := saveLogin(cmd.Context(), store, client.Endpoint, storage, auth)
+			name, err := saveLogin(ctx, store, endpoint, storage, auth)
 			if err != nil {
 				return err
 			}
 
 			if storage == config.AuthStorageFile {
-				warnFileAuthStorage(cmd, store)
+				warnFileAuthStorage(io, store)
 			}
 
-			fmt.Fprintf(cmd.OutOrStdout(), "%s %s as context %q\n", tui.Accent.Render("Authenticated with"), client.Endpoint, name)
+			fmt.Fprintf(io.Out, "%s %s as context %q\n", tui.Accent.Render("Authenticated with"), endpoint, name)
 
 			return nil
-		},
-	}
+		}
 
-	command.Flags().StringVar(&authStorage, "auth-storage", "auto", "Where to store credentials: auto, credential-store, or file")
-	command.Flags().BoolVar(&accessKey, "access-key", false, "Authenticate with a Storyden access key instead of OAuth device auth")
-	command.Flags().BoolVar(&accessKeyStdin, "access-key-stdin", false, "Read the access key from stdin")
+		client, err := api.NewClient(ctx, endpoint)
+		if err != nil {
+			return err
+		}
 
-	help.SetupMarkdownHelp(command)
+		auth, err := authenticate(ctx, io, client)
+		if err != nil {
+			return err
+		}
 
-	return command
-}
+		name, err := saveLogin(ctx, store, client.Endpoint, storage, auth)
+		if err != nil {
+			return err
+		}
 
-func loginLongHelp(goos string) string {
-	shell, stdinExample := accessKeyStdinExample(goos)
+		if storage == config.AuthStorageFile {
+			warnFileAuthStorage(io, store)
+		}
 
-	return fmt.Sprintf(`# Authenticate with Storyden
+		fmt.Fprintf(io.Out, "%s %s as context %q\n", tui.Accent.Render("Authenticated with"), client.Endpoint, name)
 
-Log in using OAuth2/OIDC device flow - secure browser-based authentication with no password input needed.
-
-Each authenticated instance is saved as a "context" that you can switch between.
-
-## Examples
-
-Login with URL:
-~~~bash
-sd auth login https://my-community.com
-~~~
-
-Login interactively (prompts for URL):
-~~~bash
-sd auth login
-~~~
-
-Login to localhost:
-~~~bash
-sd auth login http://localhost:8000
-~~~
-
-Login with an access key:
-~~~bash
-sd auth login http://localhost:8000 --access-key --auth-storage file
-~~~
-
-Read an access key from stdin:
-~~~%s
-%s
-~~~
-
-Manage multiple instances:
-~~~bash
-sd auth login https://community1.com
-sd auth login https://community2.com
-sd auth switch  # Choose which to use
-~~~
-`, shell, stdinExample)
-}
-
-func accessKeyStdinExample(goos string) (string, string) {
-	switch goos {
-	case "windows":
-		return "powershell", `$env:STORYDEN_ACCESS_KEY | sd auth login http://localhost:8000 --access-key-stdin --auth-storage file`
-	case "darwin":
-		return "zsh", `printf '%s' "$STORYDEN_ACCESS_KEY" | sd auth login http://localhost:8000 --access-key-stdin --auth-storage file`
-	default:
-		return "bash", `printf '%s' "$STORYDEN_ACCESS_KEY" | sd auth login http://localhost:8000 --access-key-stdin --auth-storage file`
+		return nil
 	}
 }
 
@@ -186,15 +115,15 @@ func resolveAuthStorage(value string, store *config.Store) (config.AuthStorage, 
 	}
 }
 
-func warnFileAuthStorage(cmd *cobra.Command, store *config.Store) {
+func warnFileAuthStorage(io cligen.IO, store *config.Store) {
 	fmt.Fprintf(
-		cmd.ErrOrStderr(),
+		io.Err,
 		"Warning: credentials will be stored in the config file at %s. Use --auth-storage credential-store on a supported desktop OS to store them securely.\n",
 		store.Path(),
 	)
 }
 
-func endpointFromArgs(cmd *cobra.Command, args []string, store *config.Store) (string, error) {
+func endpointFromArgs(ctx context.Context, io cligen.IO, args []string, store *config.Store) (string, error) {
 	if len(args) == 1 {
 		return args[0], nil
 	}
@@ -205,8 +134,8 @@ func endpointFromArgs(cmd *cobra.Command, args []string, store *config.Store) (s
 	}
 
 	form := tui.NewForm(
-		cmd.InOrStdin(),
-		cmd.ErrOrStderr(),
+		io.In,
+		io.Err,
 		huh.NewGroup(
 			huh.NewInput().
 				Title(tui.Title.Render("Storyden instance")).
@@ -215,7 +144,7 @@ func endpointFromArgs(cmd *cobra.Command, args []string, store *config.Store) (s
 				Value(&endpoint),
 		),
 	)
-	if err := form.RunWithContext(cmd.Context()); err != nil {
+	if err := form.RunWithContext(ctx); err != nil {
 		return "", err
 	}
 
@@ -236,7 +165,7 @@ func currentContextEndpoint(store *config.Store) string {
 	return ctx.APIURL
 }
 
-func authenticate(ctx context.Context, cmd *cobra.Command, client *api.Client) (*config.Auth, error) {
+func authenticate(ctx context.Context, io cligen.IO, client *api.Client) (*config.Auth, error) {
 	start, err := client.OpenAPI.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(ctx, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 		ClientId: oauth.StorydenCLIClientID,
 		Scope:    ptr(deviceAuthScope),
@@ -253,7 +182,7 @@ func authenticate(ctx context.Context, cmd *cobra.Command, client *api.Client) (
 		return nil, fmt.Errorf("OAuth device authorization response was missing required fields")
 	}
 
-	writeDeviceInstructions(cmd.OutOrStdout(), device)
+	writeDeviceInstructions(io.Out, device)
 
 	token, err := pollToken(ctx, client.OpenAPI, *device.DeviceCode, pollInterval(device.Interval), expiresAt(device.ExpiresIn))
 	if err != nil {
@@ -285,10 +214,10 @@ func authenticate(ctx context.Context, cmd *cobra.Command, client *api.Client) (
 	return auth, nil
 }
 
-func authenticateAccessKey(cmd *cobra.Command, stdin bool) (*config.Auth, error) {
+func authenticateAccessKey(ctx context.Context, cio cligen.IO, stdin bool) (*config.Auth, error) {
 	key := ""
 	if stdin {
-		data, err := io.ReadAll(cmd.InOrStdin())
+		data, err := io.ReadAll(cio.In)
 		if err != nil {
 			return nil, err
 		}
@@ -298,8 +227,8 @@ func authenticateAccessKey(cmd *cobra.Command, stdin bool) (*config.Auth, error)
 	key = strings.TrimSpace(key)
 	if key == "" && !stdin {
 		form := tui.NewForm(
-			cmd.InOrStdin(),
-			cmd.ErrOrStderr(),
+			cio.In,
+			cio.Err,
 			huh.NewGroup(
 				huh.NewInput().
 					Title(tui.Title.Render("Storyden access key")).
@@ -308,7 +237,7 @@ func authenticateAccessKey(cmd *cobra.Command, stdin bool) (*config.Auth, error)
 					Value(&key),
 			),
 		)
-		if err := form.RunWithContext(cmd.Context()); err != nil {
+		if err := form.RunWithContext(ctx); err != nil {
 			return nil, err
 		}
 		key = strings.TrimSpace(key)

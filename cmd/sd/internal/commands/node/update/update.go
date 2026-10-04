@@ -1,6 +1,7 @@
 package update
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,220 +13,116 @@ import (
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 	commandcontent "github.com/Southclaws/storyden/cmd/sd/internal/content"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 	"github.com/Southclaws/storyden/cmd/sd/internal/nodeapi"
+	"github.com/Southclaws/storyden/cmd/sd/internal/output"
 )
 
-type UpdateCommand *cobra.Command
+func New(store *config.Store) cligen.NodeUpdateHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.NodeUpdateParams) error {
+		props, err := buildMutableProps(io, p)
+		if err != nil {
+			return err
+		}
 
-func New(store *config.Store) UpdateCommand {
-	var name string
-	var slug string
-	var description string
-	var content string
-	var contentFile string
-	var markdown bool
-	var url string
-	var clearURL bool
-	var hideChildTree bool
-	var jsonInput string
-	var tags []string
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-	command := &cobra.Command{
-		Use:   "update <slug>",
-		Short: "Update an existing node",
-		Long: `# Update a Node
+		node, err := nodeapi.Update(ctx, client.OpenAPI, p.NodeSlug, props)
+		if err != nil {
+			return err
+		}
 
-Update an existing node's properties. Only the fields you specify will be changed - everything else stays the same.
+		if p.Output == "json" {
+			return output.JSON(io.Out, node)
+		}
 
-Content is stored as HTML. By default ` + "`--content`" + ` and ` + "`--content-file`" + ` are treated as HTML; pass ` + "`--markdown`" + ` to author them as Markdown, which is converted to HTML before sending.
+		fmt.Fprintf(io.Out, "Updated node: %s (slug: %s)\n", node.Name, node.Slug)
 
-## Examples
-
-Update just the name:
-~~~bash
-sd node update my-page --name "New Title"
-~~~
-
-Update content from a file (HTML):
-~~~bash
-sd node update my-page --content-file updated.html
-~~~
-
-Update content from stdin (HTML):
-~~~bash
-echo "<p>New Content</p>" | sd node update my-page --content-file -
-~~~
-
-Update content authored as Markdown (converted to HTML):
-~~~bash
-sd node update my-page --markdown --content-file updated.md
-~~~
-
-Update multiple fields:
-~~~bash
-sd node update my-page --name "Better Title" --description "Improved description"
-~~~
-
-Change the slug (careful - breaks existing URLs):
-~~~bash
-sd node update old-slug --slug new-slug
-~~~
-
-Set an external URL:
-~~~bash
-sd node update my-page --url https://example.com
-~~~
-
-Hide a node's children from tree views:
-~~~bash
-sd node update my-page --hide-child-tree
-~~~
-
-Update with a raw JSON body from stdin:
-~~~bash
-jq '.node_data' file.json | sd node update my-page --json -
-~~~
-
-The positional slug chooses the node to update. In JSON mode, the input object is sent as the update body and can include API fields such as "name", "description", "content", "url", "hide_child_tree", "meta", "asset_ids", or "primary_image_asset_id".
-`,
-		Args: cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			nodeSlug := args[0]
-
-			props, err := buildMutableProps(cmd, mutablePropsInput{
-				name:          name,
-				slug:          slug,
-				description:   description,
-				content:       content,
-				contentFile:   contentFile,
-				markdown:      markdown,
-				url:           url,
-				clearURL:      clearURL,
-				hideChildTree: hideChildTree,
-				jsonInput:     jsonInput,
-				tags:          tags,
-			})
-			if err != nil {
-				return err
-			}
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			node, err := nodeapi.Update(cmd.Context(), client.OpenAPI, nodeSlug, props)
-			if err != nil {
-				return err
-			}
-
-			fmt.Fprintf(cmd.OutOrStdout(), "Updated node: %s (slug: %s)\n", node.Name, node.Slug)
-
-			return nil
-		},
+		return nil
 	}
-
-	command.Flags().StringVar(&name, "name", "", "New node name")
-	command.Flags().StringVar(&slug, "slug", "", "New node slug")
-	command.Flags().StringVar(&description, "description", "", "New node description")
-	command.Flags().StringVar(&content, "content", "", "New node content as HTML (or Markdown with --markdown)")
-	command.Flags().StringVar(&contentFile, "content-file", "", "Read content from file (use - for stdin)")
-	command.Flags().BoolVar(&markdown, "markdown", false, "Treat content as Markdown and convert it to HTML")
-	command.Flags().StringVar(&url, "url", "", "External URL for the node")
-	command.Flags().BoolVar(&clearURL, "clear-url", false, "Clear the node's external URL")
-	command.Flags().BoolVar(&hideChildTree, "hide-child-tree", false, "Hide this node's children from tree views")
-	command.Flags().StringVar(&jsonInput, "json", "", "Read raw node update JSON from file (use - for stdin)")
-	command.Flags().StringSliceVar(&tags, "tags", nil, "New tags (comma-separated)")
-
-	help.SetupMarkdownHelp(command)
-
-	return UpdateCommand(command)
 }
 
-type mutablePropsInput struct {
-	name          string
-	slug          string
-	description   string
-	content       string
-	contentFile   string
-	markdown      bool
-	url           string
-	clearURL      bool
-	hideChildTree bool
-	jsonInput     string
-	tags          []string
+func changedFields(p cligen.NodeUpdateParams) []string {
+	var changed []string
+	if p.NameSet {
+		changed = append(changed, "--name")
+	}
+	if p.SlugSet {
+		changed = append(changed, "--slug")
+	}
+	if p.DescriptionSet {
+		changed = append(changed, "--description")
+	}
+	if p.ContentSet {
+		changed = append(changed, "--content")
+	}
+	if p.ContentFileSet {
+		changed = append(changed, "--content-file")
+	}
+	if p.UrlSet {
+		changed = append(changed, "--url")
+	}
+	if p.ClearUrlSet {
+		changed = append(changed, "--clear-url")
+	}
+	if p.HideChildTreeSet {
+		changed = append(changed, "--hide-child-tree")
+	}
+	if p.TagsSet {
+		changed = append(changed, "--tags")
+	}
+	return changed
 }
 
-func buildMutableProps(cmd *cobra.Command, input mutablePropsInput) (openapi.NodeMutableProps, error) {
-	if input.jsonInput != "" {
-		if changed := changedFieldFlags(cmd); len(changed) > 0 {
+func buildMutableProps(io cligen.IO, p cligen.NodeUpdateParams) (openapi.NodeMutableProps, error) {
+	if p.Json != "" {
+		if changed := changedFields(p); len(changed) > 0 {
 			return openapi.NodeMutableProps{}, fmt.Errorf("cannot combine --json with %s", strings.Join(changed, ", "))
 		}
 
-		return readJSONProps(input.jsonInput, cmd.InOrStdin())
+		return readJSONProps(p.Json, io.In)
 	}
 
-	if input.url != "" && input.clearURL {
+	if p.UrlSet && p.ClearUrl {
 		return openapi.NodeMutableProps{}, fmt.Errorf("cannot specify both --url and --clear-url")
 	}
 
-	finalContent, err := commandcontent.Read(input.content, input.contentFile, cmd.InOrStdin())
+	finalContent, err := commandcontent.Read(p.Content, p.ContentFile, io.In)
 	if err != nil {
 		return openapi.NodeMutableProps{}, err
 	}
 
-	finalContent, err = commandcontent.ToHTML(finalContent, input.markdown)
+	finalContent, err = commandcontent.ToHTML(finalContent, p.Markdown)
 	if err != nil {
 		return openapi.NodeMutableProps{}, err
 	}
 
 	props := openapi.NodeMutableProps{
-		Name:        stringPtr(input.name),
-		Slug:        stringPtr(input.slug),
-		Description: stringPtr(input.description),
+		Name:        stringPtr(p.Name),
+		Slug:        stringPtr(p.Slug),
+		Description: stringPtr(p.Description),
 		Content:     stringPtr(finalContent),
 	}
 
-	if len(input.tags) > 0 {
-		props.Tags = &input.tags
+	if p.TagsSet {
+		props.Tags = &p.Tags
 	}
-	if cmd.Flags().Changed("url") {
-		props.Url = nullable.NewNullableWithValue(input.url)
+	if p.UrlSet {
+		props.Url = nullable.NewNullableWithValue(p.Url)
 	}
-	if input.clearURL {
+	if p.ClearUrl {
 		props.Url = nullable.NewNullNullable[string]()
 	}
-	if cmd.Flags().Changed("hide-child-tree") {
-		props.HideChildTree = &input.hideChildTree
+	if p.HideChildTreeSet {
+		props.HideChildTree = &p.HideChildTree
 	}
 
 	return props, nil
-}
-
-func changedFieldFlags(cmd *cobra.Command) []string {
-	names := []string{
-		"name",
-		"slug",
-		"description",
-		"content",
-		"content-file",
-		"url",
-		"clear-url",
-		"hide-child-tree",
-		"tags",
-	}
-
-	var changed []string
-	for _, name := range names {
-		if cmd.Flags().Changed(name) {
-			changed = append(changed, "--"+name)
-		}
-	}
-
-	return changed
 }
 
 func readJSONProps(source string, stdin io.Reader) (openapi.NodeMutableProps, error) {

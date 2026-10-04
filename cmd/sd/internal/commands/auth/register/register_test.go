@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
+
 	"github.com/Southclaws/storyden/cmd/sd/internal/cli"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 	"github.com/spf13/cobra"
@@ -44,12 +46,12 @@ func TestRegistrationCommands(t *testing.T) {
 	endpoint = server.URL
 	store := config.NewFileStoreAt(filepath.Join(t.TempDir(), "config.yaml"))
 	run := func(args ...string) (map[string]any, error) {
-		cmd := (*cobra.Command)(New(store))
+		cmd := (*cobra.Command)(cligen.NewAuthCommand(nil, nil, nil, New(store), NewCheck(store), NewWait(store), NewCancel(store), nil, nil, nil))
 		var stdout, stderr bytes.Buffer
 		cmd.SetOut(&stdout)
 		cmd.SetErr(&stderr)
 		cmd.SetIn(bytes.NewBufferString("initial-secret\n"))
-		cmd.SetArgs(args)
+		cmd.SetArgs(append([]string{"register"}, args...))
 		cmd.SilenceUsage = true
 		cmd.SilenceErrors = true
 		err := cmd.Execute()
@@ -60,23 +62,23 @@ func TestRegistrationCommands(t *testing.T) {
 		require.NotContains(t, stdout.String(), "PRIVATE KEY")
 		return result, err
 	}
-	result, err := run(endpoint, "--name", "bot", "--handle", "test-agent", "--auth-storage", "file", "--registration-token-stdin", "--format", "json")
+	result, err := run(endpoint, "--name", "bot", "--handle", "test-agent", "--auth-storage", "file", "--registration-token-stdin", "--output", "json")
 	require.NoError(t, err)
 	require.Equal(t, "pending", result["state"])
 	saved, err := os.ReadFile(store.Path())
 	require.NoError(t, err)
 	require.NotContains(t, string(saved), "initial-secret")
 	store.SelectedContext = "bot"
-	result, err = run("check", "--format", "json")
+	result, err = run("check", "--output", "json")
 	require.NoError(t, err)
 	require.Equal(t, "pending", result["state"])
 	require.Zero(t, polls)
-	result, err = run("wait", "--timeout", "10ms", "--format", "json")
+	result, err = run("wait", "--timeout", "10ms", "--output", "json")
 	require.Error(t, err)
 	require.Equal(t, 2, cli.ExitCode(err))
 	require.Equal(t, "pending", result["state"])
 	require.Zero(t, polls)
-	result, err = run("cancel", "--format", "json")
+	result, err = run("cancel", "--output", "json")
 	require.NoError(t, err)
 	require.Equal(t, "cancelled", result["state"])
 	require.Equal(t, 1, polls)

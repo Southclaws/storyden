@@ -10,7 +10,7 @@ import (
 
 // ReadIdentifiers reads one identifier per line from r. Lines may be plain
 // slugs/xids or JSON objects with a `.slug` or `.id` field (matching the
-// shape `sd node list --format jsonl` emits). Blank lines and JSON objects
+// shape `sd node list --output jsonl` emits). Blank lines and JSON objects
 // with neither field are skipped without erroring so users can pipe lossy
 // streams.
 func ReadIdentifiers(r io.Reader) ([]string, error) {

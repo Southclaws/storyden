@@ -91,6 +91,7 @@ Storyden backend is a Go application using Uber Fx dependency injection and a 3-
 - Prefer targeted generation while iterating; run broader generation when cross-surface contracts change.
 
 - Common source-of-truth -> command mapping:
+  - `cmd/sd/opencli.yaml` -> `task generate:cli` or `go generate ./cmd/sd`; validate with `task check:cli`
   - `internal/ent/schema/**` -> `task generate:db` or `go generate ./internal/ent`
   - `api/openapi.yaml`, `api/common/**`, `api/plugin.yaml`, `api/rpc/**` -> `task generate:openapi` or `task generate:mcp`
   - OpenAPI frontend client only -> `task generate:openapi:frontend` (runs `pnpm openapi` in `web`)

@@ -8,6 +8,7 @@ tool (
 	github.com/Southclaws/schemancer
 	github.com/atombender/go-jsonschema
 	github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen
+	github.com/opencli-dev/opencli/tools/opencli
 )
 
 require (
@@ -143,7 +144,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
 	github.com/Masterminds/sprig/v3 v3.3.0 // indirect
 	github.com/RoaringBitmap/roaring/v2 v2.4.5 // indirect
-	github.com/Southclaws/schemancer v1.2.0 // indirect
+	github.com/Southclaws/schemancer v1.2.1-0.20260728191127-dce16f80a18f // indirect
 	github.com/alecthomas/chroma/v2 v2.14.0 // indirect
 	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
@@ -270,6 +271,7 @@ require (
 	github.com/olekukonko/errors v1.1.0 // indirect
 	github.com/olekukonko/ll v0.1.4-0.20260115111900-9e59c2286df0 // indirect
 	github.com/olekukonko/tablewriter v1.1.3 // indirect
+	github.com/opencli-dev/opencli/tools/opencli v0.0.0-20260817233917-c932fedb238e // indirect
 	github.com/pb33f/jsonpath v0.1.2 // indirect
 	github.com/pb33f/ordered-map/v2 v2.3.1 // indirect
 	github.com/philhofer/fwd v1.2.0 // indirect

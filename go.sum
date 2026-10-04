@@ -67,6 +67,8 @@ github.com/Southclaws/roboticon v1.0.0 h1:Gxd+6BbwuPXACiifW1WvktKvn4Gp3RCG4UDxxG
 github.com/Southclaws/roboticon v1.0.0/go.mod h1:aW5QFPHr3C6nf3pcDzyX59MToUs2p3XFQ2rUgJMjaF4=
 github.com/Southclaws/schemancer v1.2.0 h1:ayUpub2EquL3dvMpb3WQU8md8N+wIUPSsKYmCKSeR3k=
 github.com/Southclaws/schemancer v1.2.0/go.mod h1:1ZWtqHRSD/xjO0qudDEkLxcnbHph8GqxRqA9Znf5t04=
+github.com/Southclaws/schemancer v1.2.1-0.20260728191127-dce16f80a18f h1:lDULKBg7ZMH+l+2TLvQU258jY+VzbEezYQycGFq7Cm4=
+github.com/Southclaws/schemancer v1.2.1-0.20260728191127-dce16f80a18f/go.mod h1:1ZWtqHRSD/xjO0qudDEkLxcnbHph8GqxRqA9Znf5t04=
 github.com/Southclaws/swirl v1.0.1 h1:xQdYBQ2VURjRNYq7MkjWIRDe9tpEKLJGG0AMnEAkAdo=
 github.com/Southclaws/swirl v1.0.1/go.mod h1:g+5GElHV4itp5HKktH8tiDhNxEUU6TW1uAnxrPzexyI=
 github.com/ThreeDotsLabs/watermill v1.5.1 h1:t5xMivyf9tpmU3iozPqyrCZXHvoV1XQDfihas4sV0fY=
@@ -523,6 +525,8 @@ github.com/onsi/gomega v1.38.2 h1:eZCjf2xjZAqe+LeWvKb5weQ+NcPwX84kqJ0cZNxok2A=
 github.com/onsi/gomega v1.38.2/go.mod h1:W2MJcYxRGV63b418Ai34Ud0hEdTVXq9NW9+Sx6uXf3k=
 github.com/openai/openai-go/v3 v3.49.0 h1:/BObwLKdgHJ3AbJ7AXK8BRDfjuTAV+eTmEQFbG86wnQ=
 github.com/openai/openai-go/v3 v3.49.0/go.mod h1:nCqcbgPr2jYDV8wiCWPA2tRL56mWXdb6QavBmBwzSis=
+github.com/opencli-dev/opencli/tools/opencli v0.0.0-20260817233917-c932fedb238e h1:2cvsaCodMd5R5OR10u8Gzroht7ijd1rDgDrsDv/8bsE=
+github.com/opencli-dev/opencli/tools/opencli v0.0.0-20260817233917-c932fedb238e/go.mod h1:WyZ7pF8rYOf+LYSB8ObgdrP5J8+iEbUbics+XcVOMjI=
 github.com/pb33f/jsonpath v0.1.2 h1:PlqXjEyecMqoYJupLxYeClCGWEpAFnh4pmzgspbXDPI=
 github.com/pb33f/jsonpath v0.1.2/go.mod h1:TtKnUnfqZm48q7a56DxB3WtL3ipkVtukMKGKxaR/uXU=
 github.com/pb33f/libopenapi v0.28.0 h1:j8o3Tttxo1AvX/QknIVXvmF1ixiR8Bl93FOgB+OQPt0=

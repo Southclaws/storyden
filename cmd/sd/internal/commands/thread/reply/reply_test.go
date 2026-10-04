@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
+
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
@@ -31,10 +33,10 @@ func TestReplyUsesContentAndReplyTarget(t *testing.T) {
 	cfg.UpsertContext("bot", config.Context{APIURL: server.URL, AuthType: config.AuthStorageFile, Auth: &config.Auth{Method: config.AuthMethodAccessKey, AccessToken: "bot-credential"}})
 	require.NoError(t, store.Save(cfg))
 	store.SelectedContext = "bot"
-	cmd := (*cobra.Command)(New(store))
+	cmd := (*cobra.Command)(cligen.NewThreadCommand(nil, nil, nil, New(store)))
 	var out bytes.Buffer
 	cmd.SetOut(&out)
-	cmd.SetArgs([]string{"thread-id", "--content", "<p>Reply</p>", "--reply-to", "post-id", "--format", "json"})
+	cmd.SetArgs([]string{"reply", "thread-id", "--content", "<p>Reply</p>", "--reply-to", "post-id", "--output", "json"})
 	require.NoError(t, cmd.Execute())
 	var result map[string]any
 	require.NoError(t, json.Unmarshal(out.Bytes(), &result))

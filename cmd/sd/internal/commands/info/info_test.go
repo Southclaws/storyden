@@ -19,7 +19,7 @@ func TestValidateFormat(t *testing.T) {
 
 	r.NoError(validateFormat("plain"))
 	r.NoError(validateFormat("json"))
-	r.ErrorContains(validateFormat("xml"), "--format must be one of: plain, json")
+	r.ErrorContains(validateFormat("xml"), "--output must be one of: plain, json")
 }
 
 func TestRenderPlain(t *testing.T) {

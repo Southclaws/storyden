@@ -9,90 +9,42 @@ import (
 	"strconv"
 	"strings"
 
+	outputfmt "github.com/Southclaws/storyden/cmd/sd/internal/output"
+
 	"github.com/spf13/cobra"
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/listflags"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
-	outputfmt "github.com/Southclaws/storyden/cmd/sd/internal/output"
 	"github.com/Southclaws/storyden/cmd/sd/internal/render"
 )
 
-type ListCommand *cobra.Command
+func New(store *config.Store) cligen.ThreadListHandler {
+	return func(ctx context.Context, cmd *cobra.Command, cio cligen.IO, p cligen.ThreadListParams) error {
+		flags := &listflags.Flags{
+			Page:   p.Page,
+			Limit:  p.Limit,
+			All:    p.All,
+			Format: string(p.Output),
+			Output: string(p.Columns),
+		}
+		if err := flags.Validate(); err != nil {
+			return err
+		}
 
-func New(store *config.Store) ListCommand {
-	flags := &listflags.Flags{}
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-	command := &cobra.Command{
-		Use:   "list",
-		Short: "List recent Storyden threads",
-		Long: `# List Discussion Threads
+		fetch := func(page int) (*openapi.ThreadListResult, error) {
+			return fetchThreads(ctx, client.OpenAPI, page)
+		}
 
-Browse recent discussion threads with plain output or JSON. Use ` + "`sd tui`" + ` for the interactive explorer.
-
-## Examples
-
-List recent threads:
-~~~bash
-sd thread list
-~~~
-
-Plain format for scripting:
-~~~bash
-sd thread list --format plain
-~~~
-
-Wide output with extra columns:
-~~~bash
-sd thread list --output wide
-~~~
-
-Stream every page as JSONL:
-~~~bash
-sd thread list --all --format jsonl
-~~~
-
-Stop after the first 20 threads:
-~~~bash
-sd thread list --limit 20
-~~~
-
-Export to JSON:
-~~~bash
-sd thread list --format json > threads.json
-~~~
-
-Navigate pages:
-~~~bash
-sd thread list --page 2
-~~~
-
-`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := flags.Validate(); err != nil {
-				return err
-			}
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			fetch := func(page int) (*openapi.ThreadListResult, error) {
-				return fetchThreads(cmd.Context(), client.OpenAPI, page)
-			}
-
-			return run(cmd.OutOrStdout(), flags, fetch)
-		},
+		return run(cio.Out, flags, fetch)
 	}
-
-	flags.Bind(command)
-
-	help.SetupMarkdownHelp(command)
-
-	return ListCommand(command)
 }
 
 func run(out io.Writer, flags *listflags.Flags, fetch func(int) (*openapi.ThreadListResult, error)) error {
@@ -106,6 +58,9 @@ func run(out io.Writer, flags *listflags.Flags, fetch func(int) (*openapi.Thread
 		result, err := fetch(flags.Page)
 		if err != nil {
 			return err
+		}
+		if flags.Limit > 0 && len(result.Threads) > flags.Limit {
+			result.Threads = result.Threads[:flags.Limit]
 		}
 		return outputfmt.JSON(out, result)
 

@@ -10,7 +10,7 @@ import (
 )
 
 // Column describes a single column in a Profile. Wide columns are only
-// included when the user passes --output wide.
+// included when the user passes --columns wide.
 type Column[T any] struct {
 	Header string
 	Render func(T) string

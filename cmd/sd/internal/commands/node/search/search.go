@@ -13,74 +13,47 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/spf13/cobra"
+	outputfmt "github.com/Southclaws/storyden/cmd/sd/internal/output"
 
 	"github.com/Southclaws/opt"
+	"github.com/spf13/cobra"
+
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/listflags"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
-	outputfmt "github.com/Southclaws/storyden/cmd/sd/internal/output"
 	"github.com/Southclaws/storyden/cmd/sd/internal/render"
 )
 
-type SearchCommand *cobra.Command
+func New(store *config.Store) cligen.NodeSearchHandler {
+	return func(ctx context.Context, cmd *cobra.Command, cio cligen.IO, p cligen.NodeSearchParams) error {
+		if strings.TrimSpace(p.Query) == "" {
+			return fmt.Errorf("search query must not be empty")
+		}
 
-func New(store *config.Store) SearchCommand {
-	flags := &listflags.Flags{}
+		flags := &listflags.Flags{
+			Page:   p.Page,
+			Limit:  p.Limit,
+			All:    p.All,
+			Format: string(p.Output),
+			Output: string(p.Columns),
+		}
+		if err := flags.Validate(); err != nil {
+			return err
+		}
 
-	command := &cobra.Command{
-		Use:   "search <query>",
-		Short: "Full-text search for nodes",
-		Long: `# Search Nodes
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-Run a full-text query against the datagraph and return matching nodes. Posts, threads, and other kinds are filtered out so the output shape matches the rest of the node list commands.
+		fetch := func(page int) (*openapi.DatagraphSearchResult, error) {
+			return fetchSearch(ctx, client.OpenAPI, p.Query, page)
+		}
 
-## Examples
-
-Search for nodes containing a phrase:
-~~~bash
-sd node search "design system"
-~~~
-
-Stream every match across all pages as JSONL:
-~~~bash
-sd node search "agents" --all --format jsonl
-~~~
-
-Stop after the first 10 matches:
-~~~bash
-sd node search "go" --limit 10
-~~~
-`,
-		Args: cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			query := args[0]
-			if strings.TrimSpace(query) == "" {
-				return fmt.Errorf("search query must not be empty")
-			}
-			if err := flags.Validate(); err != nil {
-				return err
-			}
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			fetch := func(page int) (*openapi.DatagraphSearchResult, error) {
-				return fetchSearch(cmd.Context(), client.OpenAPI, query, page)
-			}
-
-			return run(cmd.OutOrStdout(), flags, fetch)
-		},
+		return run(cio.Out, flags, fetch)
 	}
-
-	flags.Bind(command)
-	help.SetupMarkdownHelp(command)
-
-	return SearchCommand(command)
 }
 
 func run(out io.Writer, flags *listflags.Flags, fetch func(int) (*openapi.DatagraphSearchResult, error)) error {

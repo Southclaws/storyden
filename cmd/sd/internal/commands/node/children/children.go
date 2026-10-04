@@ -9,92 +9,54 @@ import (
 	"strconv"
 	"strings"
 
+	outputfmt "github.com/Southclaws/storyden/cmd/sd/internal/output"
+
 	"github.com/spf13/cobra"
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/listflags"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 	"github.com/Southclaws/storyden/cmd/sd/internal/filter"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
-	outputfmt "github.com/Southclaws/storyden/cmd/sd/internal/output"
 	"github.com/Southclaws/storyden/cmd/sd/internal/render"
 )
 
-type ChildrenCommand *cobra.Command
+func New(store *config.Store) cligen.NodeChildrenHandler {
+	return func(ctx context.Context, cmd *cobra.Command, cio cligen.IO, p cligen.NodeChildrenParams) error {
+		flags := &listflags.Flags{
+			Page:   p.Page,
+			Limit:  p.Limit,
+			All:    p.All,
+			Format: string(p.Output),
+			Output: string(p.Columns),
+		}
+		opts := filter.NodeOptions{
+			LinkDomains:     p.LinkDomain,
+			LinkURLContains: p.LinkUrlContains,
+			LinkScheme:      string(p.LinkScheme),
+			NoLink:          p.NoLink,
+			HasLink:         p.HasLink,
+			RootOnly:        p.RootOnly,
+			OwnerHandle:     p.OwnerHandle,
+			NameContains:    p.NameContains,
+		}
 
-func New(store *config.Store) ChildrenCommand {
-	flags := &listflags.Flags{}
-	filterFlags := &filter.NodeFlags{}
-	var sort string
+		if err := flags.Validate(); err != nil {
+			return err
+		}
 
-	command := &cobra.Command{
-		Use:   "children <slug>",
-		Short: "List children of a node",
-		Long: `# List Node Children
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-List all direct children of a node. This shows only immediate children, not grandchildren.
+		fetch := func(page int) (*openapi.NodeListResult, error) {
+			return fetchChildren(ctx, client.OpenAPI, p.Slug, page, p.Sort)
+		}
 
-## Examples
-
-List children:
-~~~bash
-sd node children docs
-~~~
-
-Wide columns:
-~~~bash
-sd node children docs -o wide
-~~~
-
-Stream every page as JSONL:
-~~~bash
-sd node children docs --all --format jsonl
-~~~
-
-Get as JSON:
-~~~bash
-sd node children docs --format json
-~~~
-
-Sort children:
-~~~bash
-sd node children docs --sort name
-~~~
-
-Use ` + "`sd node tree`" + ` to see the full hierarchy including grandchildren.
-`,
-		Args: cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			slug := args[0]
-
-			if err := flags.Validate(); err != nil {
-				return err
-			}
-			if err := filterFlags.Validate(); err != nil {
-				return err
-			}
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			fetch := func(page int) (*openapi.NodeListResult, error) {
-				return fetchChildren(cmd.Context(), client.OpenAPI, slug, page, sort)
-			}
-
-			return run(cmd.OutOrStdout(), flags, filterFlags.Build(), fetch)
-		},
+		return run(cio.Out, flags, opts, fetch)
 	}
-
-	flags.Bind(command)
-	filterFlags.Bind(command)
-	command.Flags().StringVar(&sort, "sort", "", "Sort order")
-
-	help.SetupMarkdownHelp(command)
-
-	return ChildrenCommand(command)
 }
 
 func run(out io.Writer, flags *listflags.Flags, opts filter.NodeOptions, fetch func(int) (*openapi.NodeListResult, error)) error {

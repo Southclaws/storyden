@@ -11,25 +11,22 @@ import (
 	"strings"
 
 	"charm.land/lipgloss/v2"
+
 	"github.com/spf13/cobra"
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 	"github.com/Southclaws/storyden/cmd/sd/internal/output"
 	"github.com/Southclaws/storyden/cmd/sd/internal/render"
 	"github.com/Southclaws/storyden/cmd/sd/internal/tui"
 )
 
-type InfoCommand *cobra.Command
-
 const (
 	formatPlain = "plain"
 	formatJSON  = "json"
 )
-
-var hslPattern = regexp.MustCompile(`(?i)^hsla?\(\s*([0-9.]+)\s*,\s*([0-9.]+)%\s*,\s*([0-9.]+)%`)
 
 type instanceInfo struct {
 	Context  string       `json:"context,omitempty"`
@@ -38,115 +35,57 @@ type instanceInfo struct {
 	Info     openapi.Info `json:"info"`
 }
 
-func New(store *config.Store) InfoCommand {
-	var format string
+var hslPattern = regexp.MustCompile(`(?i)^hsla?\(\s*([0-9.]+)\s*,\s*([0-9.]+)%\s*,\s*([0-9.]+)%`)
 
-	command := &cobra.Command{
-		Use:   "info",
-		Short: "Show basic information about the current Storyden instance",
-		Long: `# Instance Information
+func New(store *config.Store) cligen.InfoHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.InfoParams) error {
+		contextName, configuredEndpoint, err := currentContext(store)
+		if err != nil {
+			return err
+		}
 
-Show top-line information about the Storyden instance for the current auth context.
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-This is the quickest way for agents and scripts to confirm which instance they are authenticated into and what public capabilities/settings it exposes.
+		info, err := fetchInfo(ctx, client.OpenAPI)
+		if err != nil {
+			return err
+		}
 
-## Examples
+		result := instanceInfo{
+			Context:  contextName,
+			Endpoint: configuredEndpoint,
+			BaseURL:  client.BaseURL,
+			Info:     *info,
+		}
+		if result.Endpoint == "" {
+			result.Endpoint = client.Endpoint
+		}
 
-Show human-readable instance information:
-~~~bash
-sd info
-~~~
-
-Get the full payload as JSON:
-~~~bash
-sd info --format json
-~~~
-
-Get raw instance metadata:
-~~~bash
-sd info metadata
-~~~
-`,
-		Args: cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := validateFormat(format); err != nil {
-				return err
-			}
-
-			contextName, configuredEndpoint, err := currentContext(store)
-			if err != nil {
-				return err
-			}
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			info, err := fetchInfo(cmd.Context(), client.OpenAPI)
-			if err != nil {
-				return err
-			}
-
-			result := instanceInfo{
-				Context:  contextName,
-				Endpoint: configuredEndpoint,
-				BaseURL:  client.BaseURL,
-				Info:     *info,
-			}
-			if result.Endpoint == "" {
-				result.Endpoint = client.Endpoint
-			}
-
-			return renderOutput(cmd.OutOrStdout(), format, result)
-		},
+		return renderOutput(io.Out, string(p.Output), result)
 	}
-
-	command.Flags().StringVar(&format, "format", formatPlain, "Output format: plain or json")
-	command.AddCommand(newMetadataCommand(store))
-	help.SetupMarkdownHelp(command)
-
-	return InfoCommand(command)
 }
 
-func newMetadataCommand(store *config.Store) *cobra.Command {
-	command := &cobra.Command{
-		Use:   "metadata",
-		Short: "Show raw instance metadata as JSON",
-		Long: `# Instance Metadata
+func NewMetadata(store *config.Store) cligen.InfoMetadataHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.InfoMetadataParams) error {
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-Show the raw metadata object from the current Storyden instance's public info payload.
+		info, err := fetchInfo(ctx, client.OpenAPI)
+		if err != nil {
+			return err
+		}
 
-## Examples
+		if info.Metadata == nil {
+			return output.JSON(io.Out, openapi.Metadata{})
+		}
 
-~~~bash
-sd info metadata
-~~~
-`,
-		Args: cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			info, err := fetchInfo(cmd.Context(), client.OpenAPI)
-			if err != nil {
-				return err
-			}
-
-			metadata := openapi.Metadata{}
-			if info.Metadata != nil {
-				metadata = openapi.Metadata(*info.Metadata)
-			}
-
-			return output.JSON(cmd.OutOrStdout(), metadata)
-		},
+		return output.JSON(io.Out, *info.Metadata)
 	}
-
-	help.SetupMarkdownHelp(command)
-
-	return command
 }
 
 func currentContext(store *config.Store) (string, string, error) {
@@ -390,6 +329,6 @@ func validateFormat(format string) error {
 	case formatPlain, formatJSON:
 		return nil
 	default:
-		return fmt.Errorf("--format must be one of: plain, json")
+		return fmt.Errorf("--output must be one of: plain, json")
 	}
 }

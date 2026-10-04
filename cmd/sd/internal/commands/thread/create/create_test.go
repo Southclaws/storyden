@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
+
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
@@ -35,11 +37,11 @@ func TestCreateUsesSelectedIdentityAndMarkdown(t *testing.T) {
 	}
 	require.NoError(t, store.Save(cfg))
 	store.SelectedContext = "bot"
-	cmd := (*cobra.Command)(New(store))
+	cmd := (*cobra.Command)(cligen.NewThreadCommand(nil, nil, New(store), nil))
 	var out bytes.Buffer
 	cmd.SetIn(bytes.NewBufferString("# Heading"))
 	cmd.SetOut(&out)
-	cmd.SetArgs([]string{"--title", "Hello", "--content-file", "-", "--markdown", "--visibility", "draft", "--format", "json"})
+	cmd.SetArgs([]string{"create", "--title", "Hello", "--content-file", "-", "--markdown", "--visibility", "draft", "--output", "json"})
 	require.NoError(t, cmd.Execute())
 	var result map[string]any
 	require.NoError(t, json.Unmarshal(out.Bytes(), &result))

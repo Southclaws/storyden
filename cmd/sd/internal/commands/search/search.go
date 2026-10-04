@@ -11,20 +11,18 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Southclaws/opt"
 	"github.com/carapace-sh/carapace"
 	"github.com/spf13/cobra"
 
-	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/listflags"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 	outputfmt "github.com/Southclaws/storyden/cmd/sd/internal/output"
 	"github.com/Southclaws/storyden/cmd/sd/internal/render"
 )
-
-type SearchCommand *cobra.Command
 
 type options struct {
 	Query      string
@@ -34,73 +32,47 @@ type options struct {
 	Tags       []string
 }
 
-func New(store *config.Store) SearchCommand {
-	flags := &listflags.Flags{}
-	opts := &options{}
+func New(store *config.Store) cligen.SearchHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.SearchParams) error {
+		flags := &listflags.Flags{
+			Page:   p.Page,
+			Limit:  p.Limit,
+			All:    p.All,
+			Format: string(p.Output),
+			Output: string(p.Columns),
+		}
+		opts := &options{
+			Query:      p.Query,
+			Kinds:      p.Kind,
+			Authors:    p.Authors,
+			Categories: p.Categories,
+			Tags:       p.Tags,
+		}
 
-	command := &cobra.Command{
-		Use:   "search <query>",
-		Short: "Search all Storyden content",
-		Long: `# Search
+		if err := opts.validate(); err != nil {
+			return err
+		}
+		if err := flags.Validate(); err != nil {
+			return err
+		}
 
-Search the Storyden datagraph across nodes, threads, replies, posts, and profiles.
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-## Examples
+		fetch := func(page int) (*openapi.DatagraphSearchResult, error) {
+			return fetchSearch(ctx, client.OpenAPI, opts, page)
+		}
 
-Search all content:
-~~~bash
-sd search "design system"
-~~~
-
-Search only nodes and threads:
-~~~bash
-sd search "release notes" --kind node --kind thread
-~~~
-
-Filter by author, category, and tag:
-~~~bash
-sd search "triage" --authors southclaws --categories docs --tags review
-~~~
-
-Stream all matches as JSONL:
-~~~bash
-sd search "agents" --all --format jsonl
-~~~
-`,
-		Args: cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			opts.Query = args[0]
-			if err := opts.validate(); err != nil {
-				return err
-			}
-			if err := flags.Validate(); err != nil {
-				return err
-			}
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			fetch := func(page int) (*openapi.DatagraphSearchResult, error) {
-				return fetchSearch(cmd.Context(), client.OpenAPI, opts, page)
-			}
-
-			return run(cmd.OutOrStdout(), flags, fetch)
-		},
+		return run(io.Out, flags, fetch)
 	}
+}
 
-	command.Flags().StringSliceVar(&opts.Kinds, "kind", nil, "Filter by datagraph item kind: "+strings.Join(searchKinds, ", "))
-	command.Flags().StringSliceVar(&opts.Authors, "authors", nil, "Filter by author account IDs or handles; repeat or comma-separate")
-	command.Flags().StringSliceVar(&opts.Categories, "categories", nil, "Filter by category slugs; repeat or comma-separate")
-	command.Flags().StringSliceVar(&opts.Tags, "tags", nil, "Filter by tag names; repeat or comma-separate")
-	flags.Bind(command)
-	carapace.Gen(command).FlagCompletion(carapace.ActionMap{
+func Complete(command cligen.SearchCommand) {
+	carapace.Gen((*cobra.Command)(command)).FlagCompletion(carapace.ActionMap{
 		"kind": carapace.ActionValues(searchKinds...),
 	})
-	help.SetupMarkdownHelp(command)
-
-	return SearchCommand(command)
 }
 
 func (o *options) validate() error {

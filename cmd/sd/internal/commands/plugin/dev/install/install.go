@@ -1,61 +1,39 @@
 package install
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/spf13/cobra"
 
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 	plugindev "github.com/Southclaws/storyden/lib/plugin/dev"
 )
 
-type InstallCommand *cobra.Command
+func New(store *config.Store) cligen.PluginDevInstallHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.PluginDevInstallParams) error {
+		pkg, err := plugindev.BuildPackage(ctx, p.Dir, p.Manifest)
+		if err != nil {
+			return err
+		}
 
-func New(store *config.Store) InstallCommand {
-	var dir string
-	var manifestPath string
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-	command := &cobra.Command{
-		Use:   "install",
-		Short: "Install or update a local plugin as supervised",
-		Long: `# Install Plugin
+		plugin, updated, err := plugindev.InstallSupervisedPackage(ctx, client.OpenAPI, pkg)
+		if err != nil {
+			return err
+		}
 
-Package the local plugin project and install it as a supervised plugin on the current Storyden instance.
-
-If a supervised plugin with the same manifest ID already exists, its package is replaced.
-`,
-		Args: cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			pkg, err := plugindev.BuildPackage(cmd.Context(), dir, manifestPath)
-			if err != nil {
-				return err
-			}
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			plugin, updated, err := plugindev.InstallSupervisedPackage(cmd.Context(), client.OpenAPI, pkg)
-			if err != nil {
-				return err
-			}
-
-			action := "Installed"
-			if updated {
-				action = "Updated"
-			}
-			fmt.Fprintf(cmd.OutOrStdout(), "%s supervised plugin %s (%s)\n", action, plugin.Name, plugin.Id)
-			return nil
-		},
+		action := "Installed"
+		if updated {
+			action = "Updated"
+		}
+		fmt.Fprintf(io.Out, "%s supervised plugin %s (%s)\n", action, plugin.Name, plugin.Id)
+		return nil
 	}
-
-	command.Flags().StringVar(&dir, "dir", ".", "Plugin project directory")
-	command.Flags().StringVarP(&manifestPath, "manifest", "m", plugindev.ManifestFilename, "Path to plugin manifest YAML")
-
-	help.SetupMarkdownHelp(command)
-
-	return InstallCommand(command)
 }

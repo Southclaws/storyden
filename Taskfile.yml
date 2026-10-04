@@ -105,7 +105,15 @@ tasks:
   # -
 
   generate:
-    deps: [generate:db, generate:openapi, generate:mcp, generate:webmcp]
+    deps: [generate:db, generate:openapi, generate:mcp, generate:webmcp, generate:cli]
+
+  generate:cli:
+    cmds: [go generate ./cmd/sd]
+
+  check:cli:
+    cmds:
+      - go tool opencli generate go-cobra cmd/sd/opencli.yaml --package cligen --output cmd/sd/internal/cligen --check
+      - go test ./cmd/sd/...
 
   generate:db:
     cmds: [go generate ./internal/ent]

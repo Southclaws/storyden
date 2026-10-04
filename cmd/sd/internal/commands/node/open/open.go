@@ -5,6 +5,7 @@
 package open
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
 	"runtime"
@@ -12,85 +13,41 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 	"github.com/Southclaws/storyden/cmd/sd/internal/nodeapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/output"
 )
 
-type OpenCommand *cobra.Command
+func New(store *config.Store) cligen.NodeOpenHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.NodeOpenParams) error {
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-func New(store *config.Store) OpenCommand {
-	var launch bool
-	var force bool
+		node, err := nodeapi.Fetch(ctx, client.OpenAPI, p.Slug)
+		if err != nil {
+			return err
+		}
 
-	command := &cobra.Command{
-		Use:   "open <slug>",
-		Short: "Print or launch a node's attached link URL",
-		Long: `# Open a Node
+		if node.Link == nil {
+			return fmt.Errorf("node %s has no attached link", p.Slug)
+		}
 
-Fetch a node and print the URL of its attached link. Pass ` + "`--launch`" + ` to actually open the URL in your default browser; the default just prints it so agents in non-TTY pipelines stay quiet and predictable.
+		url := string(node.Link.Url)
+		fmt.Fprintln(io.Out, url)
 
-Use this during triage to quickly inspect what a link points to before deciding where it belongs.
+		if !p.Launch {
+			return nil
+		}
 
-## Examples
+		if !output.IsTerminal(io.Out) && !p.Force {
+			return fmt.Errorf("refusing to launch browser from non-tty; pass --force to override")
+		}
 
-Print a node's link URL:
-~~~bash
-sd node open my-page
-~~~
-
-Launch in the browser (only if a terminal is attached):
-~~~bash
-sd node open my-page --launch
-~~~
-
-Launch even from a non-TTY environment:
-~~~bash
-sd node open my-page --launch --force
-~~~
-
-If the node has no attached link, the command errors with a clear message.
-`,
-		Args: cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			slug := args[0]
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			node, err := nodeapi.Fetch(cmd.Context(), client.OpenAPI, slug)
-			if err != nil {
-				return err
-			}
-
-			if node.Link == nil {
-				return fmt.Errorf("node %s has no attached link", slug)
-			}
-
-			url := string(node.Link.Url)
-			fmt.Fprintln(cmd.OutOrStdout(), url)
-
-			if !launch {
-				return nil
-			}
-
-			if !output.IsTerminal(cmd.OutOrStdout()) && !force {
-				return fmt.Errorf("refusing to launch browser from non-tty; pass --force to override")
-			}
-
-			return launchURL(url)
-		},
+		return launchURL(url)
 	}
-
-	command.Flags().BoolVar(&launch, "launch", false, "Open the URL in the system browser")
-	command.Flags().BoolVar(&force, "force", false, "Launch even when stdout is not a TTY")
-
-	help.SetupMarkdownHelp(command)
-
-	return OpenCommand(command)
 }
 
 func launchURL(url string) error {
