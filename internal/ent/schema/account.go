@@ -100,6 +100,9 @@ func (Account) Edges() []ent.Edge {
 		edge.To("authentication", Authentication.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
+		edge.To("oauth_registration_approvals", OAuthRegistrationApproval.Type),
+		edge.To("approved_oauth_clients", OAuthClient.Type),
+		edge.To("oauth_dcr_iats", OAuthDynamicRegistrationAccessTokens.Type),
 		edge.To("oauth_clients", OAuthClient.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 

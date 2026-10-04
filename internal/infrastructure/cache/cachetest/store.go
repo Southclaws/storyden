@@ -45,6 +45,25 @@ func (s *Store) Set(ctx context.Context, key string, object string, ttl time.Dur
 	return nil
 }
 
+func (s *Store) SetIfAbsent(ctx context.Context, key string, value string, ttl time.Duration) (bool, error) {
+	if ttl <= 0 {
+		return false, errors.New("cache TTL must be positive")
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, exists := s.values[key]; exists {
+		return false, nil
+	}
+	if _, exists := s.hashes[key]; exists {
+		return false, nil
+	}
+
+	s.values[key] = value
+	return true, nil
+}
+
 func (s *Store) SetMany(ctx context.Context, values map[string]string, ttl time.Duration) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()

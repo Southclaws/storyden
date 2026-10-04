@@ -72,7 +72,7 @@ func TestOAuthMemberClientManagement(t *testing.T) {
 					GrantType:    oauthGrantClientCredentials,
 					ClientId:     created.JSON200.Client.ClientId,
 					ClientSecret: created.JSON200.ClientSecret,
-					Scope:        ptr("READ_PUBLISHED_THREADS"),
+					Scope:        new("READ_PUBLISHED_THREADS"),
 				}))(t, http.StatusOK)
 				r.NotNil(token.JSON200)
 				r.NotNil(token.JSON200.AccessToken)
@@ -84,7 +84,7 @@ func TestOAuthMemberClientManagement(t *testing.T) {
 					GrantType:    oauthGrantClientCredentials,
 					ClientId:     created.JSON200.Client.ClientId,
 					ClientSecret: created.JSON200.ClientSecret,
-					Scope:        ptr("MANAGE_REPORTS"),
+					Scope:        new("MANAGE_REPORTS"),
 				}))(t, http.StatusBadRequest)
 				r.NotNil(overscoped.JSON400)
 				a.Equal("invalid_scope", overscoped.JSON400.Error)
@@ -103,7 +103,7 @@ func TestOAuthMemberClientManagement(t *testing.T) {
 				a.Equal("invalid_request", getOther.JSON400.Error)
 
 				updated := tests.AssertRequest(cl.OAuthClientUpdateWithResponse(root, created.JSON200.Client.Id, openapi.OAuthClientUpdateJSONRequestBody{
-					Name:          ptr("Reports Sync"),
+					Name:          new("Reports Sync"),
 					AllowedScopes: &[]string{"READ_PUBLISHED_THREADS", "MANAGE_REPORTS"},
 				}, firstSession))(t, http.StatusOK)
 				r.NotNil(updated.JSON200)
@@ -274,7 +274,7 @@ func TestOAuthMemberClientManagement(t *testing.T) {
 					ClientId:      clientID,
 					Name:          "Non-Admin Device Client",
 					Type:          openapi.OAuthClientTypePublic,
-					ScopePolicy:   ptr(openapi.Inherit),
+					ScopePolicy:   new(openapi.Inherit),
 					AllowedScopes: []string{"openid", "profile"},
 					AllowedGrants: []string{oauthGrantDeviceCode},
 					RedirectUris:  []string{},
@@ -283,7 +283,7 @@ func TestOAuthMemberClientManagement(t *testing.T) {
 
 				start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 					ClientId: clientID,
-					Scope:    ptr("openid profile"),
+					Scope:    new("openid profile"),
 				}))(t, http.StatusOK)
 				r.NotNil(start.JSON200)
 				r.NotNil(start.JSON200.DeviceCode)

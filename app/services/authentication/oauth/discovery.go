@@ -1,61 +1,85 @@
 package oauth
 
-import "strings"
+import (
+	"context"
+	"net/url"
+	"strings"
+
+	"github.com/Southclaws/storyden/app/resources/settings"
+)
+
+var clientAssertionSigningAlgorithms = []string{"RS256", "RS384", "RS512", "PS256", "PS384", "PS512", "ES256", "ES384", "ES512", "EdDSA"}
 
 type Discovery struct {
-	Issuer                            string
-	AuthorizationEndpoint             string
-	DeviceAuthorizationEndpoint       string
-	TokenEndpoint                     string
-	UserinfoEndpoint                  string
-	RegistrationEndpoint              string
-	JWKSURI                           string
-	ResponseTypesSupported            []string
-	GrantTypesSupported               []string
-	CodeChallengeMethodsSupported     []string
-	ScopesSupported                   []string
-	SubjectTypesSupported             []string
-	IDTokenSigningAlgValuesSupported  []string
-	TokenEndpointAuthMethodsSupported []string
-	ClientIDMetadataDocumentSupported bool
+	TokenEndpointAuthSigningAlgValuesSupported []string
+	Issuer                                     string
+	AuthorizationEndpoint                      string
+	DeviceAuthorizationEndpoint                string
+	TokenEndpoint                              string
+	UserinfoEndpoint                           string
+	RegistrationEndpoint                       string
+	RegistrationModesSupported                 []string
+	JWKSURI                                    string
+	ResponseTypesSupported                     []string
+	GrantTypesSupported                        []string
+	CodeChallengeMethodsSupported              []string
+	ScopesSupported                            []string
+	SubjectTypesSupported                      []string
+	IDTokenSigningAlgValuesSupported           []string
+	TokenEndpointAuthMethodsSupported          []string
+	ClientIDMetadataDocumentSupported          bool
 }
 
-func (s *Service) Discovery() Discovery {
-	endpointBase := strings.TrimSuffix(s.apiEndpointBase(), "/")
+func (s *Service) Discovery(ctx context.Context) (Discovery, error) {
+	configuration, err := s.registrationSettings(ctx)
+	if err != nil {
+		return Discovery{}, err
+	}
+
+	endpointBase := s.apiEndpointBase()
 
 	registrationEndpoint := ""
-	if s.cfg.OAuthDynamicRegistrationEnabled {
-		registrationEndpoint = endpointBase + "/oauth/register"
+	if configuration.DynamicRegistrationEnabled.OrZero() {
+		registrationEndpoint = endpointBase.JoinPath("oauth", "register").String()
+	}
+
+	var registrationModes []string
+	if configuration.DynamicRegistrationEnabled.OrZero() {
+		registrationModes = []string{"immediate"}
+		if configuration.AutonomousRegistrationMode.OrZero() == settings.OAuthAutonomousRegistrationModeApproval {
+			registrationModes = append(registrationModes, "approval")
+		}
 	}
 
 	return Discovery{
+		TokenEndpointAuthSigningAlgValuesSupported: clientAssertionSigningAlgorithms,
 		Issuer:                            s.issuer,
-		AuthorizationEndpoint:             endpointBase + "/oauth/authorize",
-		DeviceAuthorizationEndpoint:       endpointBase + "/oauth/device_authorization",
-		TokenEndpoint:                     endpointBase + "/oauth/token",
-		UserinfoEndpoint:                  endpointBase + "/oauth/userinfo",
+		AuthorizationEndpoint:             endpointBase.JoinPath("oauth", "authorize").String(),
+		DeviceAuthorizationEndpoint:       endpointBase.JoinPath("oauth", "device_authorization").String(),
+		TokenEndpoint:                     endpointBase.JoinPath("oauth", "token").String(),
+		UserinfoEndpoint:                  endpointBase.JoinPath("oauth", "userinfo").String(),
 		RegistrationEndpoint:              registrationEndpoint,
-		JWKSURI:                           endpointBase + "/oauth/jwks",
+		RegistrationModesSupported:        registrationModes,
+		JWKSURI:                           endpointBase.JoinPath("oauth", "jwks").String(),
 		ResponseTypesSupported:            []string{"code"},
 		GrantTypesSupported:               []string{GrantTypeAuthorizationCode, GrantTypeRefreshToken, GrantTypeClientCredentials, GrantTypeDeviceCode},
 		CodeChallengeMethodsSupported:     []string{CodeChallengeMethodS256},
 		ScopesSupported:                   supportedScopes(),
 		SubjectTypesSupported:             []string{"public"},
 		IDTokenSigningAlgValuesSupported:  []string{"RS256"},
-		TokenEndpointAuthMethodsSupported: []string{TokenEndpointAuthMethodNone, TokenEndpointAuthMethodClientSecretBasic, TokenEndpointAuthMethodClientSecretPost},
+		TokenEndpointAuthMethodsSupported: []string{TokenEndpointAuthMethodNone, TokenEndpointAuthMethodClientSecretBasic, TokenEndpointAuthMethodClientSecretPost, TokenEndpointAuthMethodPrivateKeyJWT},
 		ClientIDMetadataDocumentSupported: s.cimdEnabled(),
-	}
+	}, nil
 }
 
-func (s *Service) apiEndpointBase() string {
+func (s *Service) apiEndpointBase() *url.URL {
 	u := s.cfg.PublicAPIAddress
 	path := strings.TrimRight(u.Path, "/")
 	if !strings.HasSuffix(path, "/api") {
-		path += "/api"
+		return u.JoinPath("api")
 	}
-	u.Path = path
 
-	return u.String()
+	return &u
 }
 
 // Issuer returns the OAuth issuer identifier (the authorization server base URL).
@@ -93,5 +117,6 @@ func bigEndian(v int) []byte {
 	for len(out) > 1 && out[0] == 0 {
 		out = out[1:]
 	}
+
 	return out
 }

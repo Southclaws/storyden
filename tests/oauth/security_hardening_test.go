@@ -48,7 +48,7 @@ func TestOAuthSecurityHardeningDeviceClientImpersonationMitigations(t *testing.T
 
 				resp := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 					ClientId: "storyden-cli",
-					Scope:    ptr("openid profile offline_access ADMINISTRATOR"),
+					Scope:    new("openid profile offline_access ADMINISTRATOR"),
 				}))(t, http.StatusBadRequest)
 				r.NotNil(resp.JSON400)
 				a.Equal("invalid_scope", resp.JSON400.Error)
@@ -60,7 +60,7 @@ func TestOAuthSecurityHardeningDeviceClientImpersonationMitigations(t *testing.T
 
 				start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 					ClientId: "storyden-cli",
-					Scope:    ptr("openid profile offline_access"),
+					Scope:    new("openid profile offline_access"),
 				}))(t, http.StatusOK)
 				r.NotNil(start.JSON200)
 				r.NotNil(start.JSON200.UserCode)
@@ -101,7 +101,7 @@ func TestOAuthSecurityHardeningGrantAllowListEnforcement(t *testing.T) {
 
 				resp := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 					ClientId: clientID,
-					Scope:    ptr("openid profile offline_access"),
+					Scope:    new("openid profile offline_access"),
 				}))(t, http.StatusBadRequest)
 				r.NotNil(resp.JSON400)
 				a.Equal("unauthorized_client", resp.JSON400.Error)
@@ -116,7 +116,7 @@ func TestOAuthSecurityHardeningGrantAllowListEnforcement(t *testing.T) {
 
 				start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 					ClientId: clientID,
-					Scope:    ptr("openid profile offline_access"),
+					Scope:    new("openid profile offline_access"),
 				}))(t, http.StatusOK)
 				r.NotNil(start.JSON200)
 				r.NotNil(start.JSON200.DeviceCode)
@@ -167,15 +167,16 @@ func TestOAuthSecurityHardeningDiscoveryURLs(t *testing.T) {
 			r.NoError(err)
 			defer resp.Body.Close()
 			r.Equal(http.StatusOK, resp.StatusCode)
-			a.Equal("public, max-age=3600", resp.Header.Get("Cache-Control"))
+			a.Equal("no-cache", resp.Header.Get("Cache-Control"))
 
 			var discovery struct {
-				Issuer                            string   `json:"issuer"`
-				DeviceAuthorizationEndpoint       string   `json:"device_authorization_endpoint"`
-				TokenEndpoint                     string   `json:"token_endpoint"`
-				UserinfoEndpoint                  string   `json:"userinfo_endpoint"`
-				JWKSURI                           string   `json:"jwks_uri"`
-				TokenEndpointAuthMethodsSupported []string `json:"token_endpoint_auth_methods_supported"`
+				Issuer                                     string   `json:"issuer"`
+				DeviceAuthorizationEndpoint                string   `json:"device_authorization_endpoint"`
+				TokenEndpoint                              string   `json:"token_endpoint"`
+				UserinfoEndpoint                           string   `json:"userinfo_endpoint"`
+				JWKSURI                                    string   `json:"jwks_uri"`
+				TokenEndpointAuthMethodsSupported          []string `json:"token_endpoint_auth_methods_supported"`
+				TokenEndpointAuthSigningAlgValuesSupported []string `json:"token_endpoint_auth_signing_alg_values_supported"`
 			}
 			r.NoError(json.NewDecoder(resp.Body).Decode(&discovery))
 			a.Equal("http://localhost:8000", discovery.Issuer)
@@ -183,7 +184,8 @@ func TestOAuthSecurityHardeningDiscoveryURLs(t *testing.T) {
 			a.Equal("http://localhost:8000/api/oauth/token", discovery.TokenEndpoint)
 			a.Equal("http://localhost:8000/api/oauth/userinfo", discovery.UserinfoEndpoint)
 			a.Equal("http://localhost:8000/api/oauth/jwks", discovery.JWKSURI)
-			a.ElementsMatch([]string{"none", "client_secret_basic", "client_secret_post"}, discovery.TokenEndpointAuthMethodsSupported)
+			a.ElementsMatch([]string{"none", "client_secret_basic", "client_secret_post", "private_key_jwt"}, discovery.TokenEndpointAuthMethodsSupported)
+			a.ElementsMatch([]string{"RS256", "RS384", "RS512", "PS256", "PS384", "PS512", "ES256", "ES384", "ES512", "EdDSA"}, discovery.TokenEndpointAuthSigningAlgValuesSupported)
 
 			req2, err := http.NewRequestWithContext(root, http.MethodGet, ts.URL+"/.well-known/oauth-authorization-server", nil)
 			r.NoError(err)
@@ -191,15 +193,16 @@ func TestOAuthSecurityHardeningDiscoveryURLs(t *testing.T) {
 			r.NoError(err)
 			defer resp2.Body.Close()
 			r.Equal(http.StatusOK, resp2.StatusCode)
-			a.Equal("public, max-age=3600", resp2.Header.Get("Cache-Control"))
+			a.Equal("no-cache", resp2.Header.Get("Cache-Control"))
 
 			var metadata struct {
-				Issuer                            string   `json:"issuer"`
-				AuthorizationEndpoint             string   `json:"authorization_endpoint"`
-				TokenEndpoint                     string   `json:"token_endpoint"`
-				JWKSURI                           string   `json:"jwks_uri"`
-				DeviceAuthorizationEndpoint       string   `json:"device_authorization_endpoint"`
-				TokenEndpointAuthMethodsSupported []string `json:"token_endpoint_auth_methods_supported"`
+				Issuer                                     string   `json:"issuer"`
+				AuthorizationEndpoint                      string   `json:"authorization_endpoint"`
+				TokenEndpoint                              string   `json:"token_endpoint"`
+				JWKSURI                                    string   `json:"jwks_uri"`
+				DeviceAuthorizationEndpoint                string   `json:"device_authorization_endpoint"`
+				TokenEndpointAuthMethodsSupported          []string `json:"token_endpoint_auth_methods_supported"`
+				TokenEndpointAuthSigningAlgValuesSupported []string `json:"token_endpoint_auth_signing_alg_values_supported"`
 			}
 			body2, err := io.ReadAll(resp2.Body)
 			r.NoError(err)
@@ -207,7 +210,8 @@ func TestOAuthSecurityHardeningDiscoveryURLs(t *testing.T) {
 			a.Equal("http://localhost:8000", metadata.Issuer)
 			a.Equal("http://localhost:8000/api/oauth/authorize", metadata.AuthorizationEndpoint)
 			a.Equal("http://localhost:8000/api/oauth/token", metadata.TokenEndpoint)
-			a.ElementsMatch([]string{"none", "client_secret_basic", "client_secret_post"}, metadata.TokenEndpointAuthMethodsSupported)
+			a.ElementsMatch([]string{"none", "client_secret_basic", "client_secret_post", "private_key_jwt"}, metadata.TokenEndpointAuthMethodsSupported)
+			a.ElementsMatch([]string{"RS256", "RS384", "RS512", "PS256", "PS384", "PS512", "ES256", "ES384", "ES512", "EdDSA"}, metadata.TokenEndpointAuthSigningAlgValuesSupported)
 			a.Equal("http://localhost:8000/api/oauth/jwks", metadata.JWKSURI)
 			a.Equal("http://localhost:8000/api/oauth/device_authorization", metadata.DeviceAuthorizationEndpoint)
 
@@ -422,7 +426,7 @@ func issueDeviceToken(
 
 	start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(ctx, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 		ClientId: clientID,
-		Scope:    ptr(scope),
+		Scope:    new(scope),
 	}))(t, http.StatusOK)
 	require.NotNil(t, start.JSON200)
 	require.NotNil(t, start.JSON200.DeviceCode)
@@ -479,7 +483,7 @@ func TestOAuthSecurityHardeningDeviceFlowCrossAccountClaim(t *testing.T) {
 
 				start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 					ClientId: clientID,
-					Scope:    ptr("openid profile offline_access"),
+					Scope:    new("openid profile offline_access"),
 				}))(t, http.StatusOK)
 				r.NotNil(start.JSON200)
 				r.NotNil(start.JSON200.UserCode)
@@ -513,7 +517,7 @@ func TestOAuthSecurityHardeningDeviceFlowCrossAccountClaim(t *testing.T) {
 
 				start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 					ClientId: clientID,
-					Scope:    ptr("openid profile offline_access"),
+					Scope:    new("openid profile offline_access"),
 				}))(t, http.StatusOK)
 				r.NotNil(start.JSON200)
 				r.NotNil(start.JSON200.UserCode)
@@ -560,7 +564,7 @@ func TestOAuthSecurityHardeningScopeCapOnRefresh(t *testing.T) {
 
 				start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 					ClientId: clientID,
-					Scope:    ptr("openid profile offline_access"),
+					Scope:    new("openid profile offline_access"),
 				}))(t, http.StatusOK)
 				r.NotNil(start.JSON200)
 				r.NotNil(start.JSON200.DeviceCode)

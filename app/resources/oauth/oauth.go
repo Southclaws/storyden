@@ -41,19 +41,22 @@ const (
 )
 
 type Client struct {
-	ID                      ClientID
-	CreatedAt               time.Time
-	UpdatedAt               time.Time
-	AccountID               opt.Optional[account.AccountID]
-	ClientID                string
-	ClientSecretHash        opt.Optional[string]
-	Name                    string
-	Type                    ClientType
-	ScopePolicy             ScopePolicy
-	TokenEndpointAuthMethod string
-	RedirectURIs            []string
-	AllowedScopes           []string
-	AllowedGrants           []string
+	ID                              ClientID
+	CreatedAt                       time.Time
+	UpdatedAt                       time.Time
+	AccountID                       opt.Optional[account.AccountID]
+	RegistrationApprovedByAccountID opt.Optional[account.AccountID]
+	RegistrationAccessTokenID       opt.Optional[DynamicRegistrationAccessTokenID]
+	ClientID                        string
+	ClientSecretHash                opt.Optional[string]
+	Name                            string
+	Type                            ClientType
+	ScopePolicy                     ScopePolicy
+	TokenEndpointAuthMethod         string
+	JWKs                            map[string]any
+	RedirectURIs                    []string
+	AllowedScopes                   []string
+	AllowedGrants                   []string
 }
 
 type AuthorisationCode struct {
@@ -126,19 +129,22 @@ func MapClient(in *ent.OAuthClient) *Client {
 	scopePolicy, _ := NewScopePolicy(in.ScopePolicy.String())
 
 	return &Client{
-		ID:                      ClientID(in.ID),
-		CreatedAt:               in.CreatedAt,
-		UpdatedAt:               in.UpdatedAt,
-		AccountID:               opt.NewPtrMap(in.AccountID, func(id xid.ID) account.AccountID { return account.AccountID(id) }),
-		ClientID:                in.ClientID,
-		ClientSecretHash:        opt.NewPtr(in.ClientSecretHash),
-		Name:                    in.Name,
-		Type:                    clientType,
-		ScopePolicy:             scopePolicy,
-		TokenEndpointAuthMethod: in.TokenEndpointAuthMethod,
-		RedirectURIs:            in.RedirectUris,
-		AllowedScopes:           in.AllowedScopes,
-		AllowedGrants:           in.AllowedGrants,
+		ID:                              ClientID(in.ID),
+		CreatedAt:                       in.CreatedAt,
+		UpdatedAt:                       in.UpdatedAt,
+		AccountID:                       opt.NewPtrMap(in.AccountID, func(id xid.ID) account.AccountID { return account.AccountID(id) }),
+		RegistrationApprovedByAccountID: opt.NewPtrMap(in.RegistrationApprovedByAccountID, func(id xid.ID) account.AccountID { return account.AccountID(id) }),
+		RegistrationAccessTokenID:       opt.NewPtrMap(in.DcrIatID, func(id xid.ID) DynamicRegistrationAccessTokenID { return DynamicRegistrationAccessTokenID(id) }),
+		ClientID:                        in.ClientID,
+		ClientSecretHash:                opt.NewPtr(in.ClientSecretHash),
+		Name:                            in.Name,
+		Type:                            clientType,
+		ScopePolicy:                     scopePolicy,
+		TokenEndpointAuthMethod:         in.TokenEndpointAuthMethod,
+		JWKs:                            in.Jwks,
+		RedirectURIs:                    in.RedirectUris,
+		AllowedScopes:                   in.AllowedScopes,
+		AllowedGrants:                   in.AllowedGrants,
 	}
 }
 

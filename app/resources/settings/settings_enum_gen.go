@@ -65,6 +65,67 @@ func NewClientIPMode(__iNpUt__ string) (ClientIPMode, error) {
 	}
 }
 
+type OAuthAutonomousRegistrationMode struct {
+	v oAuthAutonomousRegistrationModeEnum
+}
+
+var (
+	OAuthAutonomousRegistrationModeDisabled  = OAuthAutonomousRegistrationMode{oAuthAutonomousRegistrationModeDisabled}
+	OAuthAutonomousRegistrationModeProtected = OAuthAutonomousRegistrationMode{oAuthAutonomousRegistrationModeProtected}
+	OAuthAutonomousRegistrationModeApproval  = OAuthAutonomousRegistrationMode{oAuthAutonomousRegistrationModeApproval}
+	OAuthAutonomousRegistrationModeOpen      = OAuthAutonomousRegistrationMode{oAuthAutonomousRegistrationModeOpen}
+)
+
+func (r OAuthAutonomousRegistrationMode) Format(f fmt.State, verb rune) {
+	switch verb {
+	case 's':
+		fmt.Fprint(f, r.v)
+	case 'q':
+		fmt.Fprintf(f, "%q", r.String())
+	default:
+		fmt.Fprint(f, r.v)
+	}
+}
+func (r OAuthAutonomousRegistrationMode) String() string {
+	return string(r.v)
+}
+func (r OAuthAutonomousRegistrationMode) MarshalText() ([]byte, error) {
+	return []byte(r.v), nil
+}
+func (r *OAuthAutonomousRegistrationMode) UnmarshalText(__iNpUt__ []byte) error {
+	s, err := NewOAuthAutonomousRegistrationMode(string(__iNpUt__))
+	if err != nil {
+		return err
+	}
+	*r = s
+	return nil
+}
+func (r OAuthAutonomousRegistrationMode) Value() (driver.Value, error) {
+	return r.v, nil
+}
+func (r *OAuthAutonomousRegistrationMode) Scan(__iNpUt__ any) error {
+	s, err := NewOAuthAutonomousRegistrationMode(fmt.Sprint(__iNpUt__))
+	if err != nil {
+		return err
+	}
+	*r = s
+	return nil
+}
+func NewOAuthAutonomousRegistrationMode(__iNpUt__ string) (OAuthAutonomousRegistrationMode, error) {
+	switch __iNpUt__ {
+	case string(oAuthAutonomousRegistrationModeDisabled):
+		return OAuthAutonomousRegistrationModeDisabled, nil
+	case string(oAuthAutonomousRegistrationModeProtected):
+		return OAuthAutonomousRegistrationModeProtected, nil
+	case string(oAuthAutonomousRegistrationModeApproval):
+		return OAuthAutonomousRegistrationModeApproval, nil
+	case string(oAuthAutonomousRegistrationModeOpen):
+		return OAuthAutonomousRegistrationModeOpen, nil
+	default:
+		return OAuthAutonomousRegistrationMode{}, fmt.Errorf("invalid value for type 'OAuthAutonomousRegistrationMode': '%s'", __iNpUt__)
+	}
+}
+
 type RegistrationMode struct {
 	v registrationModeEnum
 }

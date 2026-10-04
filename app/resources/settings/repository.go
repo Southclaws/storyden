@@ -34,6 +34,10 @@ type SettingsRepository struct {
 	// settings not immediately updating so it's advised to always go via API.
 	cachedSettings *xsync.Map[string, any]
 
+	// updateMu serialises writes and cache refreshes so an older database read
+	// cannot replace the cache after a settings update.
+	updateMu sync.Mutex
+
 	// mutex protects access to cacheLastFetch
 	cacheMu        sync.RWMutex
 	cacheLastFetch time.Time
@@ -81,6 +85,12 @@ func (d *SettingsRepository) Get(ctx context.Context) (*Settings, error) {
 		return s, nil
 	}
 
+	d.updateMu.Lock()
+	defer d.updateMu.Unlock()
+	if s, ok := d.tryCached(); ok {
+		return s, nil
+	}
+
 	settings, err := d.get(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -93,7 +103,11 @@ func (d *SettingsRepository) Get(ctx context.Context) (*Settings, error) {
 
 // Set will merge a partial update into the current settings and save new data.
 func (d *SettingsRepository) Set(ctx context.Context, s Settings) (*Settings, error) {
-	current, err := d.Get(ctx)
+	d.updateMu.Lock()
+	defer d.updateMu.Unlock()
+
+	// Merge into a private database snapshot, never the object shared by readers.
+	current, err := d.get(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -185,6 +199,9 @@ func (d *SettingsRepository) cache(s *Settings) {
 }
 
 func (d *SettingsRepository) recache(ctx context.Context) {
+	d.updateMu.Lock()
+	defer d.updateMu.Unlock()
+
 	d.cacheMu.RLock()
 	timeSinceLastFetch := time.Since(d.cacheLastFetch)
 	d.cacheMu.RUnlock()
@@ -202,10 +219,6 @@ func (d *SettingsRepository) recache(ctx context.Context) {
 		d.logger.Error("failed to recache settings", slog.String("error", err.Error()))
 		return
 	}
-
-	// NOTE: There's a small chance of stale data here if an update occurs since
-	// recache was called (via goroutine) but before the cache is updated. This
-	// should be resolved at some point via a database key staleness timestamp.
 
 	d.cache(settings)
 }

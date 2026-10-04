@@ -74,3 +74,7 @@ func (*batchRecordingStore) HGetAll(context.Context, string) (map[string]string,
 }
 func (*batchRecordingStore) HDel(context.Context, string, string) error          { return nil }
 func (*batchRecordingStore) Expire(context.Context, string, time.Duration) error { return nil }
+
+func (*batchRecordingStore) SetIfAbsent(context.Context, string, string, time.Duration) (bool, error) {
+	return false, errors.New("unexpected SetIfAbsent")
+}

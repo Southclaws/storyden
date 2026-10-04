@@ -1,6 +1,7 @@
 package create
 
 import (
+	commandcontent "github.com/Southclaws/storyden/cmd/sd/internal/content"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -22,17 +23,17 @@ func TestContentToHTML(t *testing.T) {
 
 	// Without the flag, HTML passes through untouched.
 	html := "<h1>Title</h1><p>Body</p>"
-	out, err := contentToHTML(html, false)
+	out, err := commandcontent.ToHTML(html, false)
 	r.NoError(err)
 	r.Equal(html, out)
 
 	// Empty content is a no-op even with the flag set.
-	out, err = contentToHTML("", true)
+	out, err = commandcontent.ToHTML("", true)
 	r.NoError(err)
 	r.Empty(out)
 
 	// Markdown is converted to HTML when the flag is set.
-	out, err = contentToHTML("# Title\n\nA paragraph with **bold**.", true)
+	out, err = commandcontent.ToHTML("# Title\n\nA paragraph with **bold**.", true)
 	r.NoError(err)
 	r.Contains(out, `<h1>Title</h1>`)
 	r.Contains(out, "Title")

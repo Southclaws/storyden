@@ -15,6 +15,10 @@ export type Props = {
 
 function resolvePath(kind: string, mark: string): string | undefined {
   switch (kind) {
+    case "admin":
+      return mark === "oauth-dcr-approval"
+        ? "/admin/authentication/agents?tab=reviews"
+        : undefined;
     case DatagraphItemKind.post:
       return `/t/locate/${mark}`;
     case DatagraphItemKind.thread:

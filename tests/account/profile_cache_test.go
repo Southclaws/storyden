@@ -257,3 +257,7 @@ func (s *failingProfileCacheStore) HDel(ctx context.Context, key string, field s
 func (s *failingProfileCacheStore) Expire(ctx context.Context, key string, expiration time.Duration) error {
 	return s.base.Expire(ctx, key, expiration)
 }
+
+func (s *failingProfileCacheStore) SetIfAbsent(ctx context.Context, key string, value string, ttl time.Duration) (bool, error) {
+	return s.base.SetIfAbsent(ctx, key, value, ttl)
+}

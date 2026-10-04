@@ -20,7 +20,10 @@ import (
 	"github.com/Southclaws/storyden/app/resources/oauth/oauth_querier"
 	"github.com/Southclaws/storyden/app/resources/oauth/oauth_writer"
 	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/resources/settings"
+	"github.com/Southclaws/storyden/app/services/avatar"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/infrastructure/cache"
 )
 
 const (
@@ -49,13 +52,16 @@ type Error struct {
 
 type Service struct {
 	cfg       config.Config
+	settings  *settings.SettingsRepository
 	clients   *oauth_querier.Querier
 	tokens    *oauth_writer.Writer
 	account   *account_querier.Querier
+	avatars   avatar.Service
 	signer    *rsa.PrivateKey
 	kid       string
 	issuer    string
 	cimdCache *cimdCache
+	cache     cache.Store
 }
 
 func (s *Service) Enabled() bool {
@@ -73,17 +79,23 @@ func New(
 	clients *oauth_querier.Querier,
 	tokens *oauth_writer.Writer,
 	account *account_querier.Querier,
+	settings *settings.SettingsRepository,
+	avatars avatar.Service,
+	cache cache.Store,
 ) (*Service, error) {
 	issuer := strings.TrimSuffix(cfg.PublicAPIAddress.String(), "/")
 
 	if !cfg.OAuthEnabled {
 		service := &Service{
 			cfg:       cfg,
+			settings:  settings,
+			avatars:   avatars,
 			clients:   clients,
 			tokens:    tokens,
 			account:   account,
 			issuer:    issuer,
 			cimdCache: newCIMDCache(),
+			cache:     cache,
 		}
 		service.registerCleanupJob(lc, logger)
 
@@ -122,6 +134,8 @@ func New(
 
 	service := &Service{
 		cfg:       cfg,
+		settings:  settings,
+		avatars:   avatars,
 		clients:   clients,
 		tokens:    tokens,
 		account:   account,
@@ -129,6 +143,7 @@ func New(
 		kid:       kid,
 		issuer:    issuer,
 		cimdCache: newCIMDCache(),
+		cache:     cache,
 	}
 	service.registerCleanupJob(lc, logger)
 
@@ -176,6 +191,11 @@ func (s *Service) cleanupExpiredRecordsLoop(ctx context.Context, logger *slog.Lo
 func (s *Service) cleanupExpiredRecords(ctx context.Context, logger *slog.Logger) {
 	now := time.Now()
 
+	registrationApprovals, err := s.tokens.DeleteExpiredRegistrationApprovals(ctx, now)
+	if err != nil {
+		logger.Error("failed to clean expired oauth registration approvals", slog.Any("error", err))
+		return
+	}
 	deviceAuthorisations, err := s.tokens.DeleteExpiredDeviceAuthorisations(ctx, now)
 	if err != nil {
 		logger.Error("failed to clean expired oauth device authorizations", slog.Any("error", err))
@@ -200,9 +220,10 @@ func (s *Service) cleanupExpiredRecords(ctx context.Context, logger *slog.Logger
 		return
 	}
 
-	if deviceAuthorisations > 0 || authorizationRequests > 0 || unusedDCRClients > 0 || refreshTokens > 0 {
+	if registrationApprovals > 0 || deviceAuthorisations > 0 || authorizationRequests > 0 || unusedDCRClients > 0 || refreshTokens > 0 {
 		logger.Debug(
 			"cleaned expired oauth records",
+			slog.Int("registration_approvals", registrationApprovals),
 			slog.Int("device_authorizations", deviceAuthorisations),
 			slog.Int("authorization_requests", authorizationRequests),
 			slog.Int("unused_dcr_clients", unusedDCRClients),

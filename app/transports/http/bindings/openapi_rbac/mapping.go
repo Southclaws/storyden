@@ -118,6 +118,34 @@ func (m *Mapping) AdminOAuthClientList() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionAdministrator
 }
 
+func (m *Mapping) AdminOAuthRegistrationApprovalList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) AdminOAuthRegistrationApprovalGet() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) AdminOAuthRegistrationApprovalSubmit() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) AdminOAuthDynamicRegistrationAccessTokenList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) AdminOAuthDynamicRegistrationAccessTokenCreate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) AdminOAuthDynamicRegistrationAccessTokenGet() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) AdminOAuthDynamicRegistrationAccessTokenRevoke() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
 func (m *Mapping) AdminOAuthClientCreate() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionAdministrator
 }
@@ -1058,4 +1086,8 @@ func (m *Mapping) RobotSessionsList() (bool, *rbac.Permission) {
 
 func (m *Mapping) RobotSessionGet() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionUseRobots
+}
+
+func (m *Mapping) AdminOAuthRegistrationApprovalBulkSubmit() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
 }

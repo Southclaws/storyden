@@ -32,7 +32,9 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
 	"github.com/Southclaws/storyden/internal/ent/oauthclient"
 	"github.com/Southclaws/storyden/internal/ent/oauthdeviceauthorisation"
+	"github.com/Southclaws/storyden/internal/ent/oauthdynamicregistrationaccesstokens"
 	"github.com/Southclaws/storyden/internal/ent/oauthrefreshtoken"
+	"github.com/Southclaws/storyden/internal/ent/oauthregistrationapproval"
 	"github.com/Southclaws/storyden/internal/ent/oauthremoteconnection"
 	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -493,6 +495,51 @@ func (_u *AccountUpdate) AddAuthentication(v ...*Authentication) *AccountUpdate 
 		ids[i] = v[i].ID
 	}
 	return _u.AddAuthenticationIDs(ids...)
+}
+
+// AddOauthRegistrationApprovalIDs adds the "oauth_registration_approvals" edge to the OAuthRegistrationApproval entity by IDs.
+func (_u *AccountUpdate) AddOauthRegistrationApprovalIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddOauthRegistrationApprovalIDs(ids...)
+	return _u
+}
+
+// AddOauthRegistrationApprovals adds the "oauth_registration_approvals" edges to the OAuthRegistrationApproval entity.
+func (_u *AccountUpdate) AddOauthRegistrationApprovals(v ...*OAuthRegistrationApproval) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddOauthRegistrationApprovalIDs(ids...)
+}
+
+// AddApprovedOauthClientIDs adds the "approved_oauth_clients" edge to the OAuthClient entity by IDs.
+func (_u *AccountUpdate) AddApprovedOauthClientIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddApprovedOauthClientIDs(ids...)
+	return _u
+}
+
+// AddApprovedOauthClients adds the "approved_oauth_clients" edges to the OAuthClient entity.
+func (_u *AccountUpdate) AddApprovedOauthClients(v ...*OAuthClient) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddApprovedOauthClientIDs(ids...)
+}
+
+// AddOauthDcrIatIDs adds the "oauth_dcr_iats" edge to the OAuthDynamicRegistrationAccessTokens entity by IDs.
+func (_u *AccountUpdate) AddOauthDcrIatIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddOauthDcrIatIDs(ids...)
+	return _u
+}
+
+// AddOauthDcrIats adds the "oauth_dcr_iats" edges to the OAuthDynamicRegistrationAccessTokens entity.
+func (_u *AccountUpdate) AddOauthDcrIats(v ...*OAuthDynamicRegistrationAccessTokens) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddOauthDcrIatIDs(ids...)
 }
 
 // AddOauthClientIDs adds the "oauth_clients" edge to the OAuthClient entity by IDs.
@@ -1308,6 +1355,69 @@ func (_u *AccountUpdate) RemoveAuthentication(v ...*Authentication) *AccountUpda
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveAuthenticationIDs(ids...)
+}
+
+// ClearOauthRegistrationApprovals clears all "oauth_registration_approvals" edges to the OAuthRegistrationApproval entity.
+func (_u *AccountUpdate) ClearOauthRegistrationApprovals() *AccountUpdate {
+	_u.mutation.ClearOauthRegistrationApprovals()
+	return _u
+}
+
+// RemoveOauthRegistrationApprovalIDs removes the "oauth_registration_approvals" edge to OAuthRegistrationApproval entities by IDs.
+func (_u *AccountUpdate) RemoveOauthRegistrationApprovalIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveOauthRegistrationApprovalIDs(ids...)
+	return _u
+}
+
+// RemoveOauthRegistrationApprovals removes "oauth_registration_approvals" edges to OAuthRegistrationApproval entities.
+func (_u *AccountUpdate) RemoveOauthRegistrationApprovals(v ...*OAuthRegistrationApproval) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveOauthRegistrationApprovalIDs(ids...)
+}
+
+// ClearApprovedOauthClients clears all "approved_oauth_clients" edges to the OAuthClient entity.
+func (_u *AccountUpdate) ClearApprovedOauthClients() *AccountUpdate {
+	_u.mutation.ClearApprovedOauthClients()
+	return _u
+}
+
+// RemoveApprovedOauthClientIDs removes the "approved_oauth_clients" edge to OAuthClient entities by IDs.
+func (_u *AccountUpdate) RemoveApprovedOauthClientIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveApprovedOauthClientIDs(ids...)
+	return _u
+}
+
+// RemoveApprovedOauthClients removes "approved_oauth_clients" edges to OAuthClient entities.
+func (_u *AccountUpdate) RemoveApprovedOauthClients(v ...*OAuthClient) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveApprovedOauthClientIDs(ids...)
+}
+
+// ClearOauthDcrIats clears all "oauth_dcr_iats" edges to the OAuthDynamicRegistrationAccessTokens entity.
+func (_u *AccountUpdate) ClearOauthDcrIats() *AccountUpdate {
+	_u.mutation.ClearOauthDcrIats()
+	return _u
+}
+
+// RemoveOauthDcrIatIDs removes the "oauth_dcr_iats" edge to OAuthDynamicRegistrationAccessTokens entities by IDs.
+func (_u *AccountUpdate) RemoveOauthDcrIatIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveOauthDcrIatIDs(ids...)
+	return _u
+}
+
+// RemoveOauthDcrIats removes "oauth_dcr_iats" edges to OAuthDynamicRegistrationAccessTokens entities.
+func (_u *AccountUpdate) RemoveOauthDcrIats(v ...*OAuthDynamicRegistrationAccessTokens) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveOauthDcrIatIDs(ids...)
 }
 
 // ClearOauthClients clears all "oauth_clients" edges to the OAuthClient entity.
@@ -2835,6 +2945,141 @@ func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.OauthRegistrationApprovalsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthRegistrationApprovalsTable,
+			Columns: []string{account.OauthRegistrationApprovalsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthregistrationapproval.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedOauthRegistrationApprovalsIDs(); len(nodes) > 0 && !_u.mutation.OauthRegistrationApprovalsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthRegistrationApprovalsTable,
+			Columns: []string{account.OauthRegistrationApprovalsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthregistrationapproval.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.OauthRegistrationApprovalsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthRegistrationApprovalsTable,
+			Columns: []string{account.OauthRegistrationApprovalsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthregistrationapproval.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ApprovedOauthClientsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ApprovedOauthClientsTable,
+			Columns: []string{account.ApprovedOauthClientsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedApprovedOauthClientsIDs(); len(nodes) > 0 && !_u.mutation.ApprovedOauthClientsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ApprovedOauthClientsTable,
+			Columns: []string{account.ApprovedOauthClientsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ApprovedOauthClientsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ApprovedOauthClientsTable,
+			Columns: []string{account.ApprovedOauthClientsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.OauthDcrIatsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthDcrIatsTable,
+			Columns: []string{account.OauthDcrIatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdynamicregistrationaccesstokens.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedOauthDcrIatsIDs(); len(nodes) > 0 && !_u.mutation.OauthDcrIatsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthDcrIatsTable,
+			Columns: []string{account.OauthDcrIatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdynamicregistrationaccesstokens.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.OauthDcrIatsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthDcrIatsTable,
+			Columns: []string{account.OauthDcrIatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdynamicregistrationaccesstokens.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -4815,6 +5060,51 @@ func (_u *AccountUpdateOne) AddAuthentication(v ...*Authentication) *AccountUpda
 	return _u.AddAuthenticationIDs(ids...)
 }
 
+// AddOauthRegistrationApprovalIDs adds the "oauth_registration_approvals" edge to the OAuthRegistrationApproval entity by IDs.
+func (_u *AccountUpdateOne) AddOauthRegistrationApprovalIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddOauthRegistrationApprovalIDs(ids...)
+	return _u
+}
+
+// AddOauthRegistrationApprovals adds the "oauth_registration_approvals" edges to the OAuthRegistrationApproval entity.
+func (_u *AccountUpdateOne) AddOauthRegistrationApprovals(v ...*OAuthRegistrationApproval) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddOauthRegistrationApprovalIDs(ids...)
+}
+
+// AddApprovedOauthClientIDs adds the "approved_oauth_clients" edge to the OAuthClient entity by IDs.
+func (_u *AccountUpdateOne) AddApprovedOauthClientIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddApprovedOauthClientIDs(ids...)
+	return _u
+}
+
+// AddApprovedOauthClients adds the "approved_oauth_clients" edges to the OAuthClient entity.
+func (_u *AccountUpdateOne) AddApprovedOauthClients(v ...*OAuthClient) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddApprovedOauthClientIDs(ids...)
+}
+
+// AddOauthDcrIatIDs adds the "oauth_dcr_iats" edge to the OAuthDynamicRegistrationAccessTokens entity by IDs.
+func (_u *AccountUpdateOne) AddOauthDcrIatIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddOauthDcrIatIDs(ids...)
+	return _u
+}
+
+// AddOauthDcrIats adds the "oauth_dcr_iats" edges to the OAuthDynamicRegistrationAccessTokens entity.
+func (_u *AccountUpdateOne) AddOauthDcrIats(v ...*OAuthDynamicRegistrationAccessTokens) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddOauthDcrIatIDs(ids...)
+}
+
 // AddOauthClientIDs adds the "oauth_clients" edge to the OAuthClient entity by IDs.
 func (_u *AccountUpdateOne) AddOauthClientIDs(ids ...xid.ID) *AccountUpdateOne {
 	_u.mutation.AddOauthClientIDs(ids...)
@@ -5628,6 +5918,69 @@ func (_u *AccountUpdateOne) RemoveAuthentication(v ...*Authentication) *AccountU
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveAuthenticationIDs(ids...)
+}
+
+// ClearOauthRegistrationApprovals clears all "oauth_registration_approvals" edges to the OAuthRegistrationApproval entity.
+func (_u *AccountUpdateOne) ClearOauthRegistrationApprovals() *AccountUpdateOne {
+	_u.mutation.ClearOauthRegistrationApprovals()
+	return _u
+}
+
+// RemoveOauthRegistrationApprovalIDs removes the "oauth_registration_approvals" edge to OAuthRegistrationApproval entities by IDs.
+func (_u *AccountUpdateOne) RemoveOauthRegistrationApprovalIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveOauthRegistrationApprovalIDs(ids...)
+	return _u
+}
+
+// RemoveOauthRegistrationApprovals removes "oauth_registration_approvals" edges to OAuthRegistrationApproval entities.
+func (_u *AccountUpdateOne) RemoveOauthRegistrationApprovals(v ...*OAuthRegistrationApproval) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveOauthRegistrationApprovalIDs(ids...)
+}
+
+// ClearApprovedOauthClients clears all "approved_oauth_clients" edges to the OAuthClient entity.
+func (_u *AccountUpdateOne) ClearApprovedOauthClients() *AccountUpdateOne {
+	_u.mutation.ClearApprovedOauthClients()
+	return _u
+}
+
+// RemoveApprovedOauthClientIDs removes the "approved_oauth_clients" edge to OAuthClient entities by IDs.
+func (_u *AccountUpdateOne) RemoveApprovedOauthClientIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveApprovedOauthClientIDs(ids...)
+	return _u
+}
+
+// RemoveApprovedOauthClients removes "approved_oauth_clients" edges to OAuthClient entities.
+func (_u *AccountUpdateOne) RemoveApprovedOauthClients(v ...*OAuthClient) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveApprovedOauthClientIDs(ids...)
+}
+
+// ClearOauthDcrIats clears all "oauth_dcr_iats" edges to the OAuthDynamicRegistrationAccessTokens entity.
+func (_u *AccountUpdateOne) ClearOauthDcrIats() *AccountUpdateOne {
+	_u.mutation.ClearOauthDcrIats()
+	return _u
+}
+
+// RemoveOauthDcrIatIDs removes the "oauth_dcr_iats" edge to OAuthDynamicRegistrationAccessTokens entities by IDs.
+func (_u *AccountUpdateOne) RemoveOauthDcrIatIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveOauthDcrIatIDs(ids...)
+	return _u
+}
+
+// RemoveOauthDcrIats removes "oauth_dcr_iats" edges to OAuthDynamicRegistrationAccessTokens entities.
+func (_u *AccountUpdateOne) RemoveOauthDcrIats(v ...*OAuthDynamicRegistrationAccessTokens) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveOauthDcrIatIDs(ids...)
 }
 
 // ClearOauthClients clears all "oauth_clients" edges to the OAuthClient entity.
@@ -7185,6 +7538,141 @@ func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.OauthRegistrationApprovalsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthRegistrationApprovalsTable,
+			Columns: []string{account.OauthRegistrationApprovalsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthregistrationapproval.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedOauthRegistrationApprovalsIDs(); len(nodes) > 0 && !_u.mutation.OauthRegistrationApprovalsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthRegistrationApprovalsTable,
+			Columns: []string{account.OauthRegistrationApprovalsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthregistrationapproval.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.OauthRegistrationApprovalsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthRegistrationApprovalsTable,
+			Columns: []string{account.OauthRegistrationApprovalsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthregistrationapproval.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ApprovedOauthClientsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ApprovedOauthClientsTable,
+			Columns: []string{account.ApprovedOauthClientsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedApprovedOauthClientsIDs(); len(nodes) > 0 && !_u.mutation.ApprovedOauthClientsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ApprovedOauthClientsTable,
+			Columns: []string{account.ApprovedOauthClientsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ApprovedOauthClientsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ApprovedOauthClientsTable,
+			Columns: []string{account.ApprovedOauthClientsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.OauthDcrIatsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthDcrIatsTable,
+			Columns: []string{account.OauthDcrIatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdynamicregistrationaccesstokens.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedOauthDcrIatsIDs(); len(nodes) > 0 && !_u.mutation.OauthDcrIatsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthDcrIatsTable,
+			Columns: []string{account.OauthDcrIatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdynamicregistrationaccesstokens.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.OauthDcrIatsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthDcrIatsTable,
+			Columns: []string{account.OauthDcrIatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdynamicregistrationaccesstokens.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

@@ -11,6 +11,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/oauth"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationcode"
@@ -29,17 +30,21 @@ func New(db *ent.Client) *Writer {
 }
 
 type ClientCreate struct {
-	AccountID               opt.Optional[account.AccountID]
-	ClientID                string
-	ClientSecretHash        opt.Optional[string]
-	Name                    string
-	Type                    oauth.ClientType
-	ScopePolicy             opt.Optional[oauth.ScopePolicy]
-	TokenEndpointAuthMethod opt.Optional[string]
-	PKCERequired            opt.Optional[bool]
-	RedirectURIs            []string
-	AllowedScopes           []string
-	AllowedGrants           []string
+	RegistrationRoleID        opt.Optional[role.RoleID]
+	RegistrationApproval      *oauth.RegistrationApproval
+	AccountID                 opt.Optional[account.AccountID]
+	RegistrationAccessTokenID opt.Optional[oauth.DynamicRegistrationAccessTokenID]
+	ClientID                  string
+	ClientSecretHash          opt.Optional[string]
+	Name                      string
+	Type                      oauth.ClientType
+	ScopePolicy               opt.Optional[oauth.ScopePolicy]
+	TokenEndpointAuthMethod   opt.Optional[string]
+	JWKs                      opt.Optional[map[string]any]
+	PKCERequired              opt.Optional[bool]
+	RedirectURIs              []string
+	AllowedScopes             []string
+	AllowedGrants             []string
 }
 
 type ClientUpdate struct {
@@ -115,6 +120,9 @@ func (w *Writer) CreateClient(ctx context.Context, input ClientCreate) (*oauth.C
 	input.TokenEndpointAuthMethod.Call(func(method string) {
 		create.SetTokenEndpointAuthMethod(method)
 	})
+	input.JWKs.Call(func(jwks map[string]any) {
+		create.SetJwks(jwks)
+	})
 	input.PKCERequired.Call(func(required bool) {
 		create.SetPkceRequired(required)
 	})
@@ -125,6 +133,85 @@ func (w *Writer) CreateClient(ctx context.Context, input ClientCreate) (*oauth.C
 	}
 
 	return oauth.MapClient(row), nil
+}
+
+// CreateAgentClient creates the bot principal and its OAuth credential in one
+// transaction. Keeping their identifiers distinct allows credentials to be
+// replaced later without changing the account which owns existing content.
+func (w *Writer) CreateAgentClient(ctx context.Context, handle string, input ClientCreate) (*oauth.Client, error) {
+	var client *oauth.Client
+	err := ent.WithTx(ctx, w.db, func(tx *ent.Tx) error {
+		if id, ok := input.RegistrationAccessTokenID.Get(); ok {
+			if err := consumeDynamicRegistrationAccessToken(ctx, tx, id); err != nil {
+				return err
+			}
+		}
+
+		if input.RegistrationApproval != nil {
+			if err := consumeRegistrationApproval(ctx, tx, input.RegistrationApproval); err != nil {
+				return err
+			}
+		}
+
+		createAccount := tx.Account.Create().SetHandle(handle).SetName(handle).SetKind("bot")
+		input.AccountID.Call(func(id account.AccountID) { createAccount.SetID(xid.ID(id)) })
+		if id, ok := input.RegistrationRoleID.Get(); ok && xid.ID(id) != xid.NilID() {
+			switch id {
+			case role.DefaultRoleMemberID:
+			case role.DefaultRoleAdminID:
+				createAccount.SetAdmin(true)
+			default:
+				configured, err := tx.Role.Get(ctx, xid.ID(id))
+				if err != nil && !ent.IsNotFound(err) {
+					return err
+				}
+
+				if configured != nil {
+					createAccount.AddRoleIDs(configured.ID)
+				}
+			}
+		}
+
+		acc, err := createAccount.Save(ctx)
+		if err != nil {
+			return err
+		}
+
+		create := tx.OAuthClient.Create().
+			SetAccountID(acc.ID).
+			SetClientID(input.ClientID).
+			SetName(input.Name).
+			SetType(oauthclient.Type(input.Type.String())).
+			SetRedirectUris(input.RedirectURIs).
+			SetAllowedScopes(input.AllowedScopes).
+			SetAllowedGrants(input.AllowedGrants)
+		input.ScopePolicy.Call(func(policy oauth.ScopePolicy) { create.SetScopePolicy(oauthclient.ScopePolicy(policy.String())) })
+		input.TokenEndpointAuthMethod.Call(func(method string) { create.SetTokenEndpointAuthMethod(method) })
+		input.JWKs.Call(func(jwks map[string]any) { create.SetJwks(jwks) })
+		input.PKCERequired.Call(func(required bool) { create.SetPkceRequired(required) })
+		input.RegistrationAccessTokenID.Call(func(id oauth.DynamicRegistrationAccessTokenID) { create.SetDcrIatID(id.XID()) })
+
+		if input.RegistrationApproval != nil {
+			create.SetRegistrationApprovedByAccountID(xid.ID(input.RegistrationApproval.ApprovedByAccountID.OrZero()))
+		}
+
+		row, err := create.Save(ctx)
+		if err != nil {
+			return err
+		}
+
+		client = oauth.MapClient(row)
+		return nil
+	})
+	if ent.IsConstraintError(err) {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
+	}
+
+	if err != nil {
+		return nil, wrapWriteError(ctx, err)
+	}
+
+	return client, nil
 }
 
 func (w *Writer) UpdateClient(ctx context.Context, id oauth.ClientID, input ClientUpdate) (*oauth.Client, error) {

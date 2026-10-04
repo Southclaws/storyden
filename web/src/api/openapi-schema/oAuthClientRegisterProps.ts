@@ -7,6 +7,7 @@
  *
  * OpenAPI spec version: v1.26.15-post
  */
+import type { OAuthClientRegisterPropsJwks } from "./oAuthClientRegisterPropsJwks";
 
 /**
  * RFC 7591 client metadata supplied by a dynamically registering client.
@@ -15,12 +16,20 @@
  * or scopes.
  */
 export interface OAuthClientRegisterProps {
+  /** Include approval to accept deferred autonomous registration. Unknown modes are ignored. */
+  registration_mode?: string[];
+  /** Opaque bearer credential for polling or cancellation. Its presence selects polling; client metadata cannot replace the original request. */
+  registration_code?: string;
+  /** With registration_code, cancel an unapproved pending registration. */
+  cancel_registration?: boolean;
   client_name?: string;
   redirect_uris?: string[];
   grant_types?: string[];
   response_types?: string[];
   scope?: string;
   token_endpoint_auth_method?: string;
+  /** Public JSON Web Key Set used for private_key_jwt client authentication. */
+  jwks?: OAuthClientRegisterPropsJwks;
   application_type?: string;
   logo_uri?: string;
   client_uri?: string;

@@ -15,6 +15,8 @@ import (
 type Service interface {
 	Exists(ctx context.Context, accountID account.AccountID) bool
 	Set(ctx context.Context, accountID account.AccountID, stream io.Reader, size int64) error
+	SetRobot(ctx context.Context, accountID account.AccountID) error
+	Delete(ctx context.Context, accountID account.AccountID) error
 	Get(ctx context.Context, accountID account.AccountID) (io.Reader, int64, error)
 }
 

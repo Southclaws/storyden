@@ -36,14 +36,14 @@ type keyringCredentialStore struct {
 	keyring keyring.Keyring
 }
 
-func newKeyringStore() CredentialStore {
+func newKeyringStore(serviceName string) CredentialStore {
 	backends := nativeKeyringBackends()
 	if len(backends) == 0 {
 		return unavailableCredentialStore{}
 	}
 
 	kr, err := keyring.Open(keyring.Config{
-		ServiceName:     keyringServiceName,
+		ServiceName:     serviceName,
 		AllowedBackends: backends,
 	})
 	if err != nil {

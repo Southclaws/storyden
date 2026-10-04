@@ -20,6 +20,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_ref"
@@ -29,8 +30,10 @@ import (
 	oauthresource "github.com/Southclaws/storyden/app/resources/oauth"
 	"github.com/Southclaws/storyden/app/resources/oauth/oauth_writer"
 	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/tests"
 )
 
 const (
@@ -97,16 +100,16 @@ func oauthConfigWithAccessTTL(t *testing.T, accessTTL time.Duration) *config.Con
 	require.NoError(t, err)
 
 	return &config.Config{
-		PublicWebAddress:                *publicWebAddress,
-		PublicAPIAddress:                *publicAPIAddress,
-		OAuthEnabled:                    true,
-		OAuthDynamicRegistrationEnabled: true,
-		OAuthSigningKeyBase64:           base64.StdEncoding.EncodeToString(pemBytes),
-		OAuthSigningKeyID:               "test-key",
-		OAuthAccessTokenTTL:             accessTTL,
-		OAuthRefreshTokenTTL:            24 * time.Hour,
-		OAuthDeviceCodeTTL:              10 * time.Minute,
-		OAuthDevicePollEvery:            5 * time.Second,
+		AssetStorageLocalPath: t.TempDir(),
+		PublicWebAddress:      *publicWebAddress,
+		PublicAPIAddress:      *publicAPIAddress,
+		OAuthEnabled:          true,
+		OAuthSigningKeyBase64: base64.StdEncoding.EncodeToString(pemBytes),
+		OAuthSigningKeyID:     "test-key",
+		OAuthAccessTokenTTL:   accessTTL,
+		OAuthRefreshTokenTTL:  24 * time.Hour,
+		OAuthDeviceCodeTTL:    10 * time.Minute,
+		OAuthDevicePollEvery:  5 * time.Second,
 	}
 }
 
@@ -295,6 +298,31 @@ func differentDeviceUserCode(t *testing.T, code string) string {
 	return string(replacement) + code[1:]
 }
 
-func ptr[T any](v T) *T {
-	return &v
+func withOAuthRegistration(t *testing.T, mode string) fx.Option {
+	t.Helper()
+	if tests.IsSharedPostgresDatabase() {
+		t.Skip("skipping global OAuth registration settings on shared postgres database")
+	}
+
+	return fx.Invoke(func(lc fx.Lifecycle, root context.Context, repo *settings.SettingsRepository) {
+		lc.Append(fx.StartHook(func() {
+			var policy opt.Optional[settings.OAuthAutonomousRegistrationMode]
+			if mode != "" {
+				parsed, err := settings.NewOAuthAutonomousRegistrationMode(mode)
+				require.NoError(t, err)
+				policy = opt.New(parsed)
+			}
+
+			_, err := repo.Set(root, settings.Settings{
+				Services: opt.New(settings.ServiceSettings{
+					OAuth: opt.New(settings.OAuthServiceSettings{
+						DynamicRegistrationEnabled: opt.New(true),
+						AutonomousRegistrationMode: policy,
+					}),
+				}),
+			})
+
+			require.NoError(t, err)
+		}))
+	})
 }

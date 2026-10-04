@@ -6,9 +6,11 @@ import (
 	"encoding/gob"
 	"fmt"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/dgraph-io/ristretto/v2"
+	"github.com/dgraph-io/ristretto/v2/z"
 	"github.com/shirou/gopsutil/v4/mem"
 )
 
@@ -17,7 +19,11 @@ var (
 	errWriteRejected = fmt.Errorf("cache write rejected")
 )
 
+const cacheLockCount = 256
+
 type LocalCache struct {
+	// stripes for CAS/SIA
+	locks [cacheLockCount]sync.Mutex
 	cache *ristretto.Cache[string, []byte]
 }
 
@@ -62,6 +68,10 @@ func (c *LocalCache) Get(ctx context.Context, key string) (string, error) {
 }
 
 func (c *LocalCache) Set(ctx context.Context, key string, value string, ttl time.Duration) error {
+	lock := &c.locks[c.lockIndex(key)]
+	lock.Lock()
+	defer lock.Unlock()
+
 	if err := c.setWithTTL(key, []byte(value), ttl); err != nil {
 		return err
 	}
@@ -69,7 +79,48 @@ func (c *LocalCache) Set(ctx context.Context, key string, value string, ttl time
 	return nil
 }
 
+func (c *LocalCache) SetIfAbsent(ctx context.Context, key string, value string, ttl time.Duration) (bool, error) {
+	if ttl <= 0 {
+		return false, fmt.Errorf("cache TTL must be positive")
+	}
+
+	lock := &c.locks[c.lockIndex(key)]
+	lock.Lock()
+	defer lock.Unlock()
+
+	if err := ctx.Err(); err != nil {
+		return false, err
+	}
+
+	if _, exists := c.cache.Get(key); exists {
+		return false, nil
+	}
+
+	if err := c.setWithTTL(key, []byte(value), ttl); err != nil {
+		return false, err
+	}
+	c.cache.Wait()
+
+	if _, exists := c.cache.Get(key); !exists {
+		return false, errWriteRejected
+	}
+
+	return true, nil
+}
+
 func (c *LocalCache) SetMany(ctx context.Context, values map[string]string, ttl time.Duration) error {
+	var needed [cacheLockCount]bool
+	for key := range values {
+		needed[c.lockIndex(key)] = true
+	}
+
+	for i, used := range needed {
+		if used {
+			c.locks[i].Lock()
+			defer c.locks[i].Unlock()
+		}
+	}
+
 	for key, value := range values {
 		if err := c.setWithTTL(key, []byte(value), ttl); err != nil {
 			c.cache.Wait()
@@ -96,11 +147,20 @@ func (c *LocalCache) setWithTTL(key string, value []byte, ttl time.Duration) err
 }
 
 func (c *LocalCache) Delete(ctx context.Context, key string) error {
+	lock := &c.locks[c.lockIndex(key)]
+	lock.Lock()
+	defer lock.Unlock()
+
 	c.cache.Del(key)
+	c.cache.Wait()
 	return nil
 }
 
 func (c *LocalCache) HIncrBy(ctx context.Context, key string, field string, incr int64) (int, error) {
+	lock := &c.locks[c.lockIndex(key)]
+	lock.Lock()
+	defer lock.Unlock()
+
 	hash, exists, err := c.getHSET(key)
 	if err != nil {
 		return 0, err
@@ -176,6 +236,10 @@ func (c *LocalCache) HGetAll(ctx context.Context, key string) (map[string]string
 }
 
 func (c *LocalCache) HDel(ctx context.Context, key string, field string) error {
+	lock := &c.locks[c.lockIndex(key)]
+	lock.Lock()
+	defer lock.Unlock()
+
 	hash, exists, err := c.getHSET(key)
 	if err != nil {
 		return err
@@ -200,6 +264,10 @@ func (c *LocalCache) HDel(ctx context.Context, key string, field string) error {
 }
 
 func (c *LocalCache) Expire(ctx context.Context, key string, expiration time.Duration) error {
+	lock := &c.locks[c.lockIndex(key)]
+	lock.Lock()
+	defer lock.Unlock()
+
 	v, exists := c.cache.Get(key)
 	if exists {
 		if err := c.setWithTTL(key, v, expiration); err != nil {
@@ -209,4 +277,9 @@ func (c *LocalCache) Expire(ctx context.Context, key string, expiration time.Dur
 	}
 
 	return nil
+}
+
+func (c *LocalCache) lockIndex(key string) uint64 {
+	hash, _ := z.KeyToHash(key)
+	return hash % cacheLockCount
 }

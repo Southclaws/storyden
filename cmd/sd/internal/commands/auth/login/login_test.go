@@ -313,3 +313,9 @@ func (m *memoryCredentialStore) DeleteAuth(contextName string) error {
 }
 
 func (m *memoryCredentialStore) Available() bool { return true }
+
+func TestHumanLoginPreservesBotContext(t *testing.T) {
+	cfg := config.New()
+	cfg.UpsertContext("community-example", config.Context{APIURL: "https://community.example", Auth: &config.Auth{Method: config.AuthMethodOAuthClient}})
+	require.Equal(t, "community-example-2", contextName(cfg, "https://community.example"))
+}

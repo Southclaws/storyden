@@ -66,6 +66,28 @@ func (c *RedisCache) SetMany(ctx context.Context, values map[string]string, ttl 
 	return nil
 }
 
+func (c *RedisCache) SetIfAbsent(ctx context.Context, key string, value string, ttl time.Duration) (bool, error) {
+	if ttl <= 0 {
+		return false, fmt.Errorf("cache TTL must be positive")
+	}
+
+	milliseconds := ttl.Milliseconds()
+	if ttl%time.Millisecond != 0 {
+		milliseconds++
+	}
+
+	cmd := c.client.B().Set().Key(key).Value(value).Nx().PxMilliseconds(milliseconds).Build()
+	err := c.client.Do(ctx, cmd).Error()
+	if rueidis.IsRedisNil(err) {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 func (c *RedisCache) Delete(ctx context.Context, key string) error {
 	cmd := c.client.B().
 		Del().

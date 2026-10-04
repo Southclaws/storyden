@@ -150,21 +150,8 @@ sd info metadata
 }
 
 func currentContext(store *config.Store) (string, string, error) {
-	cfg, err := store.Load()
-	if err != nil {
-		return "", "", err
-	}
-
-	if cfg.CurrentContext == "" {
-		return "", "", nil
-	}
-
-	ctx, ok := cfg.Contexts[cfg.CurrentContext]
-	if !ok {
-		return cfg.CurrentContext, "", nil
-	}
-
-	return cfg.CurrentContext, ctx.APIURL, nil
+	name, current, err := store.Current()
+	return name, current.APIURL, err
 }
 
 func fetchInfo(ctx context.Context, client *openapi.ClientWithResponses) (*openapi.Info, error) {

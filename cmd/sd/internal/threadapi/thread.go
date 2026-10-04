@@ -29,3 +29,25 @@ func GetError(response *openapi.ThreadGetResponse) error {
 
 	return output.RequestErrorWithMessages("thread get request", response, response.Body, output.UnauthorizedMessage("thread get request"))
 }
+
+func Create(ctx context.Context, client *openapi.ClientWithResponses, props openapi.ThreadInitialProps) (*openapi.Thread, error) {
+	response, err := client.ThreadCreateWithResponse(ctx, props)
+	if err != nil {
+		return nil, err
+	}
+	if response.StatusCode() != http.StatusOK || response.JSON200 == nil {
+		return nil, output.RequestError("thread create request", response, response.Body)
+	}
+	return response.JSON200, nil
+}
+
+func Reply(ctx context.Context, client *openapi.ClientWithResponses, mark string, props openapi.ReplyInitialProps) (*openapi.Reply, error) {
+	response, err := client.ReplyCreateWithResponse(ctx, mark, props)
+	if err != nil {
+		return nil, err
+	}
+	if response.StatusCode() != http.StatusOK || response.JSON200 == nil {
+		return nil, output.RequestError("reply create request", response, response.Body)
+	}
+	return response.JSON200, nil
+}

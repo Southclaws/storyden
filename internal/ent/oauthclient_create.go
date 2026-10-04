@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
 	"github.com/Southclaws/storyden/internal/ent/oauthclient"
 	"github.com/Southclaws/storyden/internal/ent/oauthdeviceauthorisation"
+	"github.com/Southclaws/storyden/internal/ent/oauthdynamicregistrationaccesstokens"
 	"github.com/Southclaws/storyden/internal/ent/oauthrefreshtoken"
 	"github.com/rs/xid"
 )
@@ -67,6 +68,34 @@ func (_c *OAuthClientCreate) SetAccountID(v xid.ID) *OAuthClientCreate {
 func (_c *OAuthClientCreate) SetNillableAccountID(v *xid.ID) *OAuthClientCreate {
 	if v != nil {
 		_c.SetAccountID(*v)
+	}
+	return _c
+}
+
+// SetRegistrationApprovedByAccountID sets the "registration_approved_by_account_id" field.
+func (_c *OAuthClientCreate) SetRegistrationApprovedByAccountID(v xid.ID) *OAuthClientCreate {
+	_c.mutation.SetRegistrationApprovedByAccountID(v)
+	return _c
+}
+
+// SetNillableRegistrationApprovedByAccountID sets the "registration_approved_by_account_id" field if the given value is not nil.
+func (_c *OAuthClientCreate) SetNillableRegistrationApprovedByAccountID(v *xid.ID) *OAuthClientCreate {
+	if v != nil {
+		_c.SetRegistrationApprovedByAccountID(*v)
+	}
+	return _c
+}
+
+// SetDcrIatID sets the "dcr_iat_id" field.
+func (_c *OAuthClientCreate) SetDcrIatID(v xid.ID) *OAuthClientCreate {
+	_c.mutation.SetDcrIatID(v)
+	return _c
+}
+
+// SetNillableDcrIatID sets the "dcr_iat_id" field if the given value is not nil.
+func (_c *OAuthClientCreate) SetNillableDcrIatID(v *xid.ID) *OAuthClientCreate {
+	if v != nil {
+		_c.SetDcrIatID(*v)
 	}
 	return _c
 }
@@ -139,6 +168,12 @@ func (_c *OAuthClientCreate) SetNillableTokenEndpointAuthMethod(v *string) *OAut
 	return _c
 }
 
+// SetJwks sets the "jwks" field.
+func (_c *OAuthClientCreate) SetJwks(v map[string]interface{}) *OAuthClientCreate {
+	_c.mutation.SetJwks(v)
+	return _c
+}
+
 // SetPkceRequired sets the "pkce_required" field.
 func (_c *OAuthClientCreate) SetPkceRequired(v bool) *OAuthClientCreate {
 	_c.mutation.SetPkceRequired(v)
@@ -183,6 +218,30 @@ func (_c *OAuthClientCreate) SetNillableID(v *xid.ID) *OAuthClientCreate {
 		_c.SetID(*v)
 	}
 	return _c
+}
+
+// SetRegistrationApprovedByID sets the "registration_approved_by" edge to the Account entity by ID.
+func (_c *OAuthClientCreate) SetRegistrationApprovedByID(id xid.ID) *OAuthClientCreate {
+	_c.mutation.SetRegistrationApprovedByID(id)
+	return _c
+}
+
+// SetNillableRegistrationApprovedByID sets the "registration_approved_by" edge to the Account entity by ID if the given value is not nil.
+func (_c *OAuthClientCreate) SetNillableRegistrationApprovedByID(id *xid.ID) *OAuthClientCreate {
+	if id != nil {
+		_c = _c.SetRegistrationApprovedByID(*id)
+	}
+	return _c
+}
+
+// SetRegistrationApprovedBy sets the "registration_approved_by" edge to the Account entity.
+func (_c *OAuthClientCreate) SetRegistrationApprovedBy(v *Account) *OAuthClientCreate {
+	return _c.SetRegistrationApprovedByID(v.ID)
+}
+
+// SetDcrIat sets the "dcr_iat" edge to the OAuthDynamicRegistrationAccessTokens entity.
+func (_c *OAuthClientCreate) SetDcrIat(v *OAuthDynamicRegistrationAccessTokens) *OAuthClientCreate {
+	return _c.SetDcrIatID(v.ID)
 }
 
 // SetAccount sets the "account" edge to the Account entity.
@@ -440,6 +499,10 @@ func (_c *OAuthClientCreate) createSpec() (*OAuthClient, *sqlgraph.CreateSpec) {
 		_spec.SetField(oauthclient.FieldTokenEndpointAuthMethod, field.TypeString, value)
 		_node.TokenEndpointAuthMethod = value
 	}
+	if value, ok := _c.mutation.Jwks(); ok {
+		_spec.SetField(oauthclient.FieldJwks, field.TypeJSON, value)
+		_node.Jwks = value
+	}
 	if value, ok := _c.mutation.PkceRequired(); ok {
 		_spec.SetField(oauthclient.FieldPkceRequired, field.TypeBool, value)
 		_node.PkceRequired = value
@@ -455,6 +518,40 @@ func (_c *OAuthClientCreate) createSpec() (*OAuthClient, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.AllowedGrants(); ok {
 		_spec.SetField(oauthclient.FieldAllowedGrants, field.TypeJSON, value)
 		_node.AllowedGrants = value
+	}
+	if nodes := _c.mutation.RegistrationApprovedByIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   oauthclient.RegistrationApprovedByTable,
+			Columns: []string{oauthclient.RegistrationApprovedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.RegistrationApprovedByAccountID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.DcrIatIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   oauthclient.DcrIatTable,
+			Columns: []string{oauthclient.DcrIatColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdynamicregistrationaccesstokens.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.DcrIatID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -685,6 +782,24 @@ func (u *OAuthClientUpsert) ClearTokenEndpointAuthMethod() *OAuthClientUpsert {
 	return u
 }
 
+// SetJwks sets the "jwks" field.
+func (u *OAuthClientUpsert) SetJwks(v map[string]interface{}) *OAuthClientUpsert {
+	u.Set(oauthclient.FieldJwks, v)
+	return u
+}
+
+// UpdateJwks sets the "jwks" field to the value that was provided on create.
+func (u *OAuthClientUpsert) UpdateJwks() *OAuthClientUpsert {
+	u.SetExcluded(oauthclient.FieldJwks)
+	return u
+}
+
+// ClearJwks clears the value of the "jwks" field.
+func (u *OAuthClientUpsert) ClearJwks() *OAuthClientUpsert {
+	u.SetNull(oauthclient.FieldJwks)
+	return u
+}
+
 // SetPkceRequired sets the "pkce_required" field.
 func (u *OAuthClientUpsert) SetPkceRequired(v bool) *OAuthClientUpsert {
 	u.Set(oauthclient.FieldPkceRequired, v)
@@ -755,6 +870,12 @@ func (u *OAuthClientUpsertOne) UpdateNewValues() *OAuthClientUpsertOne {
 		}
 		if _, exists := u.create.mutation.AccountID(); exists {
 			s.SetIgnore(oauthclient.FieldAccountID)
+		}
+		if _, exists := u.create.mutation.RegistrationApprovedByAccountID(); exists {
+			s.SetIgnore(oauthclient.FieldRegistrationApprovedByAccountID)
+		}
+		if _, exists := u.create.mutation.DcrIatID(); exists {
+			s.SetIgnore(oauthclient.FieldDcrIatID)
 		}
 	}))
 	return u
@@ -896,6 +1017,27 @@ func (u *OAuthClientUpsertOne) UpdateTokenEndpointAuthMethod() *OAuthClientUpser
 func (u *OAuthClientUpsertOne) ClearTokenEndpointAuthMethod() *OAuthClientUpsertOne {
 	return u.Update(func(s *OAuthClientUpsert) {
 		s.ClearTokenEndpointAuthMethod()
+	})
+}
+
+// SetJwks sets the "jwks" field.
+func (u *OAuthClientUpsertOne) SetJwks(v map[string]interface{}) *OAuthClientUpsertOne {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.SetJwks(v)
+	})
+}
+
+// UpdateJwks sets the "jwks" field to the value that was provided on create.
+func (u *OAuthClientUpsertOne) UpdateJwks() *OAuthClientUpsertOne {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.UpdateJwks()
+	})
+}
+
+// ClearJwks clears the value of the "jwks" field.
+func (u *OAuthClientUpsertOne) ClearJwks() *OAuthClientUpsertOne {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.ClearJwks()
 	})
 }
 
@@ -1144,6 +1286,12 @@ func (u *OAuthClientUpsertBulk) UpdateNewValues() *OAuthClientUpsertBulk {
 			if _, exists := b.mutation.AccountID(); exists {
 				s.SetIgnore(oauthclient.FieldAccountID)
 			}
+			if _, exists := b.mutation.RegistrationApprovedByAccountID(); exists {
+				s.SetIgnore(oauthclient.FieldRegistrationApprovedByAccountID)
+			}
+			if _, exists := b.mutation.DcrIatID(); exists {
+				s.SetIgnore(oauthclient.FieldDcrIatID)
+			}
 		}
 	}))
 	return u
@@ -1285,6 +1433,27 @@ func (u *OAuthClientUpsertBulk) UpdateTokenEndpointAuthMethod() *OAuthClientUpse
 func (u *OAuthClientUpsertBulk) ClearTokenEndpointAuthMethod() *OAuthClientUpsertBulk {
 	return u.Update(func(s *OAuthClientUpsert) {
 		s.ClearTokenEndpointAuthMethod()
+	})
+}
+
+// SetJwks sets the "jwks" field.
+func (u *OAuthClientUpsertBulk) SetJwks(v map[string]interface{}) *OAuthClientUpsertBulk {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.SetJwks(v)
+	})
+}
+
+// UpdateJwks sets the "jwks" field to the value that was provided on create.
+func (u *OAuthClientUpsertBulk) UpdateJwks() *OAuthClientUpsertBulk {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.UpdateJwks()
+	})
+}
+
+// ClearJwks clears the value of the "jwks" field.
+func (u *OAuthClientUpsertBulk) ClearJwks() *OAuthClientUpsertBulk {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.ClearJwks()
 	})
 }
 

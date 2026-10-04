@@ -1,6 +1,7 @@
 package remove
 
 import (
+	"context"
 	"fmt"
 	"sort"
 
@@ -77,17 +78,19 @@ sd auth remove localhost-8000
 }
 
 func removeContext(store *config.Store, cfg *config.Config, name string) error {
-	delete(cfg.Contexts, name)
-
-	if cfg.CurrentContext == name {
-		cfg.CurrentContext = nextCurrentContext(cfg)
-	}
-
-	if err := store.DeleteAuth(name); err != nil {
-		return err
-	}
-
-	return store.Save(cfg)
+	return store.WithContextLock(context.Background(), name, func() error {
+		return store.Update(context.Background(), func(current *config.Config) error {
+			delete(current.Contexts, name)
+			if current.CurrentContext == name {
+				current.CurrentContext = nextCurrentContext(current)
+			}
+			if err := store.DeleteAuth(name); err != nil {
+				return err
+			}
+			*cfg = *current
+			return nil
+		})
+	})
 }
 
 func nextCurrentContext(cfg *config.Config) string {

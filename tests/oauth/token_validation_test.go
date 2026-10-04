@@ -46,7 +46,7 @@ func TestOAuthBearerTokenValidation(t *testing.T) {
 
 			start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 				ClientId: clientID,
-				Scope:    ptr("openid profile offline_access"),
+				Scope:    new("openid profile offline_access"),
 			}))(t, http.StatusOK)
 			r.NotNil(start.JSON200)
 			r.NotNil(start.JSON200.DeviceCode)
@@ -123,7 +123,7 @@ func TestOAuthExpiredBearerTokenIsRejected(t *testing.T) {
 
 			start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 				ClientId: clientID,
-				Scope:    ptr("openid profile offline_access"),
+				Scope:    new("openid profile offline_access"),
 			}))(t, http.StatusOK)
 			r.NotNil(start.JSON200)
 			r.NotNil(start.JSON200.DeviceCode)
