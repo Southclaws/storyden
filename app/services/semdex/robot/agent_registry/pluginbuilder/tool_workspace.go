@@ -176,7 +176,7 @@ func yamlQuote(s string) string {
 func renderGoMod(id string) string {
 	return fmt.Sprintf(`module storyden.local/plugins/%s
 
-go 1.26.4
+go 1.27.1
 `, id)
 }
 
