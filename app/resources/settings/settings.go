@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
+	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -81,6 +82,7 @@ type ServiceSettings struct {
 	RateLimit  opt.Optional[RateLimitServiceSettings]
 	Moderation opt.Optional[ModerationServiceSettings]
 	Robots     opt.Optional[RobotServiceSettings]
+	OAuth      opt.Optional[OAuthServiceSettings]
 }
 
 type ClientIPServiceSettings struct {
@@ -114,6 +116,15 @@ type RobotServiceSettings struct {
 type RobotProviderSettings struct {
 	Enabled opt.Optional[bool]
 	APIKey  opt.Optional[string]
+}
+
+type OAuthServiceSettings struct {
+	DynamicRegistrationEnabled opt.Optional[bool]
+
+	AutonomousRegistrationMode   opt.Optional[OAuthAutonomousRegistrationMode]
+	AutonomousRegistrationRoleID opt.Optional[role.RoleID]
+	RegistrationApprovalTTL      opt.Optional[time.Duration]
+	RegistrationApprovalURL      opt.Optional[string]
 }
 
 // Merge will combine "updated" into "s" while overwriting any new values.

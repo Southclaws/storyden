@@ -49,7 +49,7 @@ func TestOAuthTokenLosesPermissionWhenRoleIsRevoked(t *testing.T) {
 
 			start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 				ClientId: clientID,
-				Scope:    ptr("openid profile " + rbac.PermissionManageCategories.String()),
+				Scope:    new("openid profile " + rbac.PermissionManageCategories.String()),
 			}))(t, http.StatusOK)
 			r.NotNil(start.JSON200)
 

@@ -50,7 +50,7 @@ func TestOAuthDeviceFlowConsentURLConfiguration(t *testing.T) {
 
 			start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 				ClientId: clientID,
-				Scope:    ptr("openid profile offline_access"),
+				Scope:    new("openid profile offline_access"),
 			}))(t, http.StatusOK)
 			r.NotNil(start.JSON200)
 			r.NotNil(start.JSON200.VerificationUri)
@@ -87,7 +87,7 @@ func TestOAuthDeviceFlowPermissionPolicies(t *testing.T) {
 
 				start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 					ClientId: "storyden-cli",
-					Scope:    ptr("openid profile offline_access"),
+					Scope:    new("openid profile offline_access"),
 				}))(t, http.StatusOK)
 				r.NotNil(start.JSON200)
 				r.NotNil(start.JSON200.DeviceCode)
@@ -105,7 +105,7 @@ func TestOAuthDeviceFlowPermissionPolicies(t *testing.T) {
 
 				start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 					ClientId: clientID,
-					Scope:    ptr("openid profile CREATE_POST"),
+					Scope:    new("openid profile CREATE_POST"),
 				}))(t, http.StatusOK)
 				r.NotNil(start.JSON200)
 				r.NotNil(start.JSON200.DeviceCode)
@@ -177,7 +177,7 @@ func TestOAuthDeviceFlowPermissionPolicies(t *testing.T) {
 
 				start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 					ClientId: clientID,
-					Scope:    ptr("openid profile offline_access"),
+					Scope:    new("openid profile offline_access"),
 				}))(t, http.StatusOK)
 				r.NotNil(start.JSON200)
 				r.NotNil(start.JSON200.DeviceCode)
@@ -243,7 +243,7 @@ func TestOAuthDeviceFlowPermissionPolicies(t *testing.T) {
 
 				start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 					ClientId: clientID,
-					Scope:    ptr("openid profile offline_access CREATE_POST MANAGE_REPORTS"),
+					Scope:    new("openid profile offline_access CREATE_POST MANAGE_REPORTS"),
 				}))(t, http.StatusOK)
 
 				tests.AssertRequest(cl.OAuthDeviceConsentWithResponse(root, &openapi.OAuthDeviceConsentParams{
@@ -276,9 +276,9 @@ func TestOAuthDeviceFlowPermissionPolicies(t *testing.T) {
 
 				thread := tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      "oauth explicit thread " + uuid.NewString(),
-					Body:       ptr("<p>created with an oauth token</p>"),
+					Body:       new("<p>created with an oauth token</p>"),
 					Category:   &category.JSON200.Id,
-					Visibility: ptr(openapi.VisibilityPublished),
+					Visibility: new(openapi.VisibilityPublished),
 				}, bearer(*token.JSON200.AccessToken)))(t, http.StatusOK)
 				r.NotNil(thread.JSON200)
 			})
@@ -313,7 +313,7 @@ func TestOAuthDeviceFlowRequiresOAuthClientPermission(t *testing.T) {
 
 				start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 					ClientId: clientID,
-					Scope:    ptr("openid profile CREATE_POST"),
+					Scope:    new("openid profile CREATE_POST"),
 				}))(t, http.StatusOK)
 				r.NotNil(start.JSON200)
 				r.NotNil(start.JSON200.DeviceCode)
@@ -368,7 +368,7 @@ func TestOAuthDeviceFlowRequiresOAuthClientPermission(t *testing.T) {
 
 				start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 					ClientId: clientID,
-					Scope:    ptr("openid profile CREATE_POST"),
+					Scope:    new("openid profile CREATE_POST"),
 				}))(t, http.StatusOK)
 				r.NotNil(start.JSON200)
 				r.NotNil(start.JSON200.DeviceCode)
@@ -429,7 +429,7 @@ func TestOAuthDeviceFlowDefensiveBehaviour(t *testing.T) {
 
 				start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 					ClientId: clientID,
-					Scope:    ptr("openid profile offline_access"),
+					Scope:    new("openid profile offline_access"),
 				}))(t, http.StatusOK)
 				r.NotNil(start.JSON200)
 				r.NotNil(start.JSON200.DeviceCode)
@@ -460,7 +460,7 @@ func TestOAuthDeviceFlowDefensiveBehaviour(t *testing.T) {
 
 				start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 					ClientId: clientID,
-					Scope:    ptr("openid profile offline_access"),
+					Scope:    new("openid profile offline_access"),
 				}))(t, http.StatusOK)
 				r.NotNil(start.JSON200)
 				r.NotNil(start.JSON200.DeviceCode)
@@ -502,7 +502,7 @@ func TestOAuthDeviceFlowDefensiveBehaviour(t *testing.T) {
 
 				denied := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 					ClientId: clientID,
-					Scope:    ptr("openid MANAGE_REPORTS"),
+					Scope:    new("openid MANAGE_REPORTS"),
 				}))(t, http.StatusBadRequest)
 				r.NotNil(denied.JSON400)
 				a.Equal("invalid_scope", denied.JSON400.Error)

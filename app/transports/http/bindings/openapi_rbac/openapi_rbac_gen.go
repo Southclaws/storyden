@@ -43,6 +43,14 @@ type OperationPermissions interface {
 	OAuthRemoteConnectionList() (bool, *rbac.Permission)
 	OAuthRemoteConnectionCreate() (bool, *rbac.Permission)
 	OAuthRemoteConnectionAuthorize() (bool, *rbac.Permission)
+	AdminOAuthRegistrationApprovalList() (bool, *rbac.Permission)
+	AdminOAuthRegistrationApprovalBulkSubmit() (bool, *rbac.Permission)
+	AdminOAuthRegistrationApprovalGet() (bool, *rbac.Permission)
+	AdminOAuthRegistrationApprovalSubmit() (bool, *rbac.Permission)
+	AdminOAuthDynamicRegistrationAccessTokenList() (bool, *rbac.Permission)
+	AdminOAuthDynamicRegistrationAccessTokenCreate() (bool, *rbac.Permission)
+	AdminOAuthDynamicRegistrationAccessTokenGet() (bool, *rbac.Permission)
+	AdminOAuthDynamicRegistrationAccessTokenRevoke() (bool, *rbac.Permission)
 	PluginList() (bool, *rbac.Permission)
 	PluginAdd() (bool, *rbac.Permission)
 	PluginGet() (bool, *rbac.Permission)
@@ -349,6 +357,22 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.OAuthRemoteConnectionCreate()
 	case "OAuthRemoteConnectionAuthorize":
 		return optable.OAuthRemoteConnectionAuthorize()
+	case "AdminOAuthRegistrationApprovalList":
+		return optable.AdminOAuthRegistrationApprovalList()
+	case "AdminOAuthRegistrationApprovalBulkSubmit":
+		return optable.AdminOAuthRegistrationApprovalBulkSubmit()
+	case "AdminOAuthRegistrationApprovalGet":
+		return optable.AdminOAuthRegistrationApprovalGet()
+	case "AdminOAuthRegistrationApprovalSubmit":
+		return optable.AdminOAuthRegistrationApprovalSubmit()
+	case "AdminOAuthDynamicRegistrationAccessTokenList":
+		return optable.AdminOAuthDynamicRegistrationAccessTokenList()
+	case "AdminOAuthDynamicRegistrationAccessTokenCreate":
+		return optable.AdminOAuthDynamicRegistrationAccessTokenCreate()
+	case "AdminOAuthDynamicRegistrationAccessTokenGet":
+		return optable.AdminOAuthDynamicRegistrationAccessTokenGet()
+	case "AdminOAuthDynamicRegistrationAccessTokenRevoke":
+		return optable.AdminOAuthDynamicRegistrationAccessTokenRevoke()
 	case "PluginList":
 		return optable.PluginList()
 	case "PluginAdd":

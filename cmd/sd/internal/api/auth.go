@@ -85,37 +85,29 @@ func NewAuthenticatedClient(ctx context.Context, store *config.Store, options ..
 	}
 
 	client.OpenAPI = authenticated
+	client.session = session
 
 	return client, nil
 }
 
 func loadCurrentContext(store *config.Store) (string, config.Context, error) {
-	cfg, err := store.Load()
+	name, currentContext, err := store.Current()
 	if err != nil {
 		return "", config.Context{}, err
 	}
 
-	if cfg.CurrentContext == "" {
-		return "", config.Context{}, fmt.Errorf("no current Storyden context; run sd auth login first")
-	}
-
-	currentContext, ok := cfg.Contexts[cfg.CurrentContext]
-	if !ok {
-		return "", config.Context{}, fmt.Errorf("current Storyden context %q was not found", cfg.CurrentContext)
-	}
-
 	if currentContext.Auth == nil {
 		if currentContext.AuthType == config.AuthStorageCredentialStore {
-			return "", config.Context{}, reauthenticateError("context %q credentials are stored in the credential store, but they could not be loaded", cfg.CurrentContext)
+			return "", config.Context{}, reauthenticateError("context %q credentials are stored in the credential store, but they could not be loaded", name)
 		}
 
-		return "", config.Context{}, reauthenticateError("context %q is not authenticated", cfg.CurrentContext)
+		return "", config.Context{}, reauthenticateError("context %q is not authenticated", name)
 	}
-	if currentContext.Auth.AccessToken == "" {
-		return "", config.Context{}, reauthenticateError("context %q is not authenticated", cfg.CurrentContext)
+	if currentContext.Auth.AccessToken == "" && currentContext.Auth.Method != config.AuthMethodOAuthClient {
+		return "", config.Context{}, reauthenticateError("context %q is not authenticated", name)
 	}
 
-	return cfg.CurrentContext, currentContext, nil
+	return name, currentContext, nil
 }
 
 func (s *AuthSession) RequestEditor(ctx context.Context, req *http.Request) error {
@@ -147,6 +139,9 @@ func (s *AuthSession) auth(ctx context.Context) (*config.Auth, error) {
 		return auth, nil
 	}
 
+	if auth.Method == config.AuthMethodOAuthClient {
+		return s.clientCredentials(ctx, false)
+	}
 	if auth.RefreshToken == "" || auth.ExpiresAt.IsZero() || time.Now().Before(auth.ExpiresAt.Add(-refreshLeeway)) {
 		return auth, nil
 	}
@@ -163,6 +158,9 @@ func (s *AuthSession) forceRefresh(ctx context.Context) (*config.Auth, error) {
 
 func (s *AuthSession) refresh(ctx context.Context) (*config.Auth, error) {
 	auth := s.context.Auth
+	if auth != nil && auth.Method == config.AuthMethodOAuthClient {
+		return s.clientCredentials(ctx, true)
+	}
 	if auth != nil && auth.MethodOrDefault() == config.AuthMethodAccessKey {
 		return nil, reauthenticateError("context %q uses an access key and cannot be refreshed", s.contextName)
 	}
@@ -209,20 +207,15 @@ func (s *AuthSession) refresh(ctx context.Context) (*config.Auth, error) {
 }
 
 func (s *AuthSession) save(auth config.Auth) error {
-	cfg, err := s.store.Load()
-	if err != nil {
-		return err
-	}
-
-	currentContext, ok := cfg.Contexts[s.contextName]
-	if !ok {
-		return fmt.Errorf("current Storyden context %q was not found", s.contextName)
-	}
-
-	currentContext.Auth = &auth
-	cfg.UpsertContext(s.contextName, currentContext)
-
-	return s.store.Save(cfg)
+	return s.store.Update(context.Background(), func(cfg *config.Config) error {
+		currentContext, ok := cfg.Contexts[s.contextName]
+		if !ok {
+			return fmt.Errorf("Storyden context %q was removed", s.contextName)
+		}
+		currentContext.Auth = &auth
+		cfg.UpsertContext(s.contextName, currentContext)
+		return nil
+	})
 }
 
 func refreshError(contextName string, apiURL string, token *openapi.OAuthTokenResponse) error {
@@ -320,7 +313,7 @@ func (s *AuthSession) canRefresh() bool {
 	defer s.mu.Unlock()
 
 	auth := s.context.Auth
-	return auth != nil && auth.MethodOrDefault() != config.AuthMethodAccessKey && auth.RefreshToken != ""
+	return auth != nil && auth.MethodOrDefault() != config.AuthMethodAccessKey && (auth.RefreshToken != "" || auth.Method == config.AuthMethodOAuthClient)
 }
 
 func cloneRequest(req *http.Request) (*http.Request, bool, error) {

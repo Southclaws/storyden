@@ -16,6 +16,7 @@ import (
 type Store interface {
 	Get(ctx context.Context, key string) (string, error)
 	Set(ctx context.Context, key string, object string, ttl time.Duration) error
+	SetIfAbsent(ctx context.Context, key string, object string, ttl time.Duration) (bool, error)
 	SetMany(ctx context.Context, values map[string]string, ttl time.Duration) error
 	Delete(ctx context.Context, key string) error
 

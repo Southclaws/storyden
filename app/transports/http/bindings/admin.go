@@ -254,8 +254,20 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 			robots = opt.New(robotSettings)
 		}
 
-		if clientIP.Ok() || rateLimit.Ok() || moderation.Ok() || robots.Ok() {
+		if request.Body.Services.Oauth != nil {
+			if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx), fmsg.WithDesc("insufficient permissions", "You can only modify OAuth settings with the Administrator permission."))
+			}
+		}
+
+		oauth, err := opt.MapErr(opt.NewPtr(request.Body.Services.Oauth), deserialiseOAuthServiceSettings)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		if clientIP.Ok() || rateLimit.Ok() || moderation.Ok() || robots.Ok() || oauth.Ok() {
 			services = opt.New(settings.ServiceSettings{
+				OAuth:      oauth,
 				ClientIP:   clientIP,
 				RateLimit:  rateLimit,
 				Moderation: moderation,
@@ -933,6 +945,7 @@ func serialiseMOTD(in settings.MessageOfTheDay) openapi.MessageOfTheDay {
 
 func serialiseServiceSettings(in settings.ServiceSettings) openapi.AdminSettingsServiceProps {
 	return openapi.AdminSettingsServiceProps{
+		Oauth:        opt.Map(in.OAuth, serialiseOAuthServiceSettings).Ptr(),
 		ClientIp:     opt.Map(in.ClientIP, serialiseClientIPSettings).Ptr(),
 		RateLimiting: opt.Map(in.RateLimit, serialiseRateLimitSettings).Ptr(),
 		Moderation:   opt.Map(in.Moderation, serialiseModerationSettings).Ptr(),

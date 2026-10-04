@@ -227,9 +227,12 @@ func mount(
 			return oauthDisabledError(c.Request().Context())
 		}
 
-		c.Response().Header().Set("Cache-Control", "public, max-age=3600")
-
-		return c.JSON(http.StatusOK, oauthBinding.OAuthDiscovery(c.Request().Context()))
+		metadata, err := oauthBinding.OAuthDiscovery(c.Request().Context())
+		if err != nil {
+			return err
+		}
+		c.Response().Header().Set("Cache-Control", "no-cache")
+		return c.JSON(http.StatusOK, metadata)
 	})
 
 	router.GET("/.well-known/oauth-authorization-server", func(c echo.Context) error {
@@ -237,9 +240,12 @@ func mount(
 			return oauthDisabledError(c.Request().Context())
 		}
 
-		c.Response().Header().Set("Cache-Control", "public, max-age=3600")
-
-		return c.JSON(http.StatusOK, oauthBinding.OAuthAuthorizationServerMetadata(c.Request().Context()))
+		metadata, err := oauthBinding.OAuthAuthorizationServerMetadata(c.Request().Context())
+		if err != nil {
+			return err
+		}
+		c.Response().Header().Set("Cache-Control", "no-cache")
+		return c.JSON(http.StatusOK, metadata)
 	})
 
 	router.GET("/.well-known/oauth-protected-resource", func(c echo.Context) error {

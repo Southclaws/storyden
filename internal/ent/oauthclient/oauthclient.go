@@ -22,6 +22,10 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldAccountID holds the string denoting the account_id field in the database.
 	FieldAccountID = "account_id"
+	// FieldRegistrationApprovedByAccountID holds the string denoting the registration_approved_by_account_id field in the database.
+	FieldRegistrationApprovedByAccountID = "registration_approved_by_account_id"
+	// FieldDcrIatID holds the string denoting the dcr_iat_id field in the database.
+	FieldDcrIatID = "dcr_iat_id"
 	// FieldClientID holds the string denoting the client_id field in the database.
 	FieldClientID = "client_id"
 	// FieldClientSecretHash holds the string denoting the client_secret_hash field in the database.
@@ -34,6 +38,8 @@ const (
 	FieldScopePolicy = "scope_policy"
 	// FieldTokenEndpointAuthMethod holds the string denoting the token_endpoint_auth_method field in the database.
 	FieldTokenEndpointAuthMethod = "token_endpoint_auth_method"
+	// FieldJwks holds the string denoting the jwks field in the database.
+	FieldJwks = "jwks"
 	// FieldPkceRequired holds the string denoting the pkce_required field in the database.
 	FieldPkceRequired = "pkce_required"
 	// FieldRedirectUris holds the string denoting the redirect_uris field in the database.
@@ -42,6 +48,10 @@ const (
 	FieldAllowedScopes = "allowed_scopes"
 	// FieldAllowedGrants holds the string denoting the allowed_grants field in the database.
 	FieldAllowedGrants = "allowed_grants"
+	// EdgeRegistrationApprovedBy holds the string denoting the registration_approved_by edge name in mutations.
+	EdgeRegistrationApprovedBy = "registration_approved_by"
+	// EdgeDcrIat holds the string denoting the dcr_iat edge name in mutations.
+	EdgeDcrIat = "dcr_iat"
 	// EdgeAccount holds the string denoting the account edge name in mutations.
 	EdgeAccount = "account"
 	// EdgeAuthorisationCodes holds the string denoting the authorisation_codes edge name in mutations.
@@ -54,6 +64,20 @@ const (
 	EdgeRefreshTokens = "refresh_tokens"
 	// Table holds the table name of the oauthclient in the database.
 	Table = "oauth_clients"
+	// RegistrationApprovedByTable is the table that holds the registration_approved_by relation/edge.
+	RegistrationApprovedByTable = "oauth_clients"
+	// RegistrationApprovedByInverseTable is the table name for the Account entity.
+	// It exists in this package in order to avoid circular dependency with the "account" package.
+	RegistrationApprovedByInverseTable = "accounts"
+	// RegistrationApprovedByColumn is the table column denoting the registration_approved_by relation/edge.
+	RegistrationApprovedByColumn = "registration_approved_by_account_id"
+	// DcrIatTable is the table that holds the dcr_iat relation/edge.
+	DcrIatTable = "oauth_clients"
+	// DcrIatInverseTable is the table name for the OAuthDynamicRegistrationAccessTokens entity.
+	// It exists in this package in order to avoid circular dependency with the "oauthdynamicregistrationaccesstokens" package.
+	DcrIatInverseTable = "oauth_dcr_iats"
+	// DcrIatColumn is the table column denoting the dcr_iat relation/edge.
+	DcrIatColumn = "dcr_iat_id"
 	// AccountTable is the table that holds the account relation/edge.
 	AccountTable = "oauth_clients"
 	// AccountInverseTable is the table name for the Account entity.
@@ -97,12 +121,15 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldAccountID,
+	FieldRegistrationApprovedByAccountID,
+	FieldDcrIatID,
 	FieldClientID,
 	FieldClientSecretHash,
 	FieldName,
 	FieldType,
 	FieldScopePolicy,
 	FieldTokenEndpointAuthMethod,
+	FieldJwks,
 	FieldPkceRequired,
 	FieldRedirectUris,
 	FieldAllowedScopes,
@@ -215,6 +242,16 @@ func ByAccountID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAccountID, opts...).ToFunc()
 }
 
+// ByRegistrationApprovedByAccountID orders the results by the registration_approved_by_account_id field.
+func ByRegistrationApprovedByAccountID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRegistrationApprovedByAccountID, opts...).ToFunc()
+}
+
+// ByDcrIatID orders the results by the dcr_iat_id field.
+func ByDcrIatID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDcrIatID, opts...).ToFunc()
+}
+
 // ByClientID orders the results by the client_id field.
 func ByClientID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldClientID, opts...).ToFunc()
@@ -248,6 +285,20 @@ func ByTokenEndpointAuthMethod(opts ...sql.OrderTermOption) OrderOption {
 // ByPkceRequired orders the results by the pkce_required field.
 func ByPkceRequired(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPkceRequired, opts...).ToFunc()
+}
+
+// ByRegistrationApprovedByField orders the results by registration_approved_by field.
+func ByRegistrationApprovedByField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRegistrationApprovedByStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByDcrIatField orders the results by dcr_iat field.
+func ByDcrIatField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDcrIatStep(), sql.OrderByField(field, opts...))
+	}
 }
 
 // ByAccountField orders the results by account field.
@@ -311,6 +362,20 @@ func ByRefreshTokens(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newRefreshTokensStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
+}
+func newRegistrationApprovedByStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RegistrationApprovedByInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, RegistrationApprovedByTable, RegistrationApprovedByColumn),
+	)
+}
+func newDcrIatStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DcrIatInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, DcrIatTable, DcrIatColumn),
+	)
 }
 func newAccountStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(

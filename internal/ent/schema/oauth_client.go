@@ -19,12 +19,15 @@ func (OAuthClient) Mixin() []ent.Mixin {
 func (OAuthClient) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("account_id").GoType(xid.ID{}).Optional().Nillable().Immutable(),
+		field.String("registration_approved_by_account_id").GoType(xid.ID{}).Optional().Nillable().Immutable(),
+		field.String("dcr_iat_id").GoType(xid.ID{}).Optional().Nillable().Immutable(),
 		field.String("client_id").Unique().NotEmpty(),
 		field.String("client_secret_hash").Optional().Nillable(),
 		field.String("name").NotEmpty(),
 		field.Enum("type").Values("public", "confidential").Default("public"),
 		field.Enum("scope_policy").Values("explicit", "inherit").Default("explicit"),
 		field.String("token_endpoint_auth_method").Default("client_secret_basic").Optional(),
+		field.JSON("jwks", map[string]any{}).Optional(),
 		field.Bool("pkce_required").Default(false),
 		field.JSON("redirect_uris", []string{}),
 		field.JSON("allowed_scopes", []string{}),
@@ -34,6 +37,8 @@ func (OAuthClient) Fields() []ent.Field {
 
 func (OAuthClient) Edges() []ent.Edge {
 	return []ent.Edge{
+		edge.From("registration_approved_by", Account.Type).Ref("approved_oauth_clients").Field("registration_approved_by_account_id").Immutable().Unique(),
+		edge.From("dcr_iat", OAuthDynamicRegistrationAccessTokens.Type).Ref("clients").Field("dcr_iat_id").Immutable().Unique(),
 		edge.From("account", Account.Type).
 			Ref("oauth_clients").
 			Field("account_id").

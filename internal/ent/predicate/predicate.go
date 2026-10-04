@@ -84,8 +84,14 @@ type OAuthClient func(*sql.Selector)
 // OAuthDeviceAuthorisation is the predicate function for oauthdeviceauthorisation builders.
 type OAuthDeviceAuthorisation func(*sql.Selector)
 
+// OAuthDynamicRegistrationAccessTokens is the predicate function for oauthdynamicregistrationaccesstokens builders.
+type OAuthDynamicRegistrationAccessTokens func(*sql.Selector)
+
 // OAuthRefreshToken is the predicate function for oauthrefreshtoken builders.
 type OAuthRefreshToken func(*sql.Selector)
+
+// OAuthRegistrationApproval is the predicate function for oauthregistrationapproval builders.
+type OAuthRegistrationApproval func(*sql.Selector)
 
 // OAuthRemoteAuthorisationFlow is the predicate function for oauthremoteauthorisationflow builders.
 type OAuthRemoteAuthorisationFlow func(*sql.Selector)

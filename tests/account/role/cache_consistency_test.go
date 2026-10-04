@@ -268,3 +268,7 @@ func hasPrefix(key string, prefixes []string) bool {
 
 	return false
 }
+
+func (s *failingCacheStore) SetIfAbsent(ctx context.Context, key string, value string, ttl time.Duration) (bool, error) {
+	return s.base.SetIfAbsent(ctx, key, value, ttl)
+}

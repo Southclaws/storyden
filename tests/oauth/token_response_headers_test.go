@@ -27,7 +27,7 @@ import (
 func TestOAuthTokenEndpointResponseSemantics(t *testing.T) {
 	t.Parallel()
 
-	integration.Test(t, oauthConfig(t), e2e.Setup(), fx.Invoke(func(
+	integration.Test(t, oauthConfig(t), e2e.Setup(), withOAuthRegistration(t, "disabled"), fx.Invoke(func(
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
@@ -43,9 +43,9 @@ func TestOAuthTokenEndpointResponseSemantics(t *testing.T) {
 			memberSession := sh.WithSession(memberCtx)
 
 			registered := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-				ClientName:              ptr("Token Semantics Client"),
+				ClientName:              new("Token Semantics Client"),
 				RedirectUris:            &[]string{"https://semantics.example/cb"},
-				TokenEndpointAuthMethod: ptr("client_secret_basic"),
+				TokenEndpointAuthMethod: new("client_secret_basic"),
 			}, memberSession))(t, http.StatusCreated)
 			require.NotNil(t, registered.JSON201)
 			clientID := registered.JSON201.ClientId
@@ -109,7 +109,7 @@ func TestOAuthTokenEndpointResponseSemantics(t *testing.T) {
 func TestOAuthRegistrationResponseIsNotCacheable(t *testing.T) {
 	t.Parallel()
 
-	integration.Test(t, oauthConfig(t), e2e.Setup(), fx.Invoke(func(
+	integration.Test(t, oauthConfig(t), e2e.Setup(), withOAuthRegistration(t, "disabled"), fx.Invoke(func(
 		lc fx.Lifecycle,
 		root context.Context,
 		ts *httptest.Server,
@@ -119,9 +119,9 @@ func TestOAuthRegistrationResponseIsNotCacheable(t *testing.T) {
 			r := require.New(t)
 
 			body, err := json.Marshal(openapi.OAuthClientRegisterJSONRequestBody{
-				ClientName:              ptr("Cacheability Client"),
+				ClientName:              new("Cacheability Client"),
 				RedirectUris:            &[]string{"https://cache.example/cb"},
-				TokenEndpointAuthMethod: ptr("client_secret_basic"),
+				TokenEndpointAuthMethod: new("client_secret_basic"),
 			})
 			r.NoError(err)
 

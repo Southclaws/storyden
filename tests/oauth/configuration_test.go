@@ -139,7 +139,7 @@ func TestOAuthDisabledConfiguration(t *testing.T) {
 
 				resp := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(root, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 					ClientId: "storyden-cli",
-					Scope:    ptr("openid profile offline_access"),
+					Scope:    new("openid profile offline_access"),
 				}))(t, http.StatusBadRequest)
 				r.NotNil(resp.JSON400)
 				a.Equal("temporarily_unavailable", resp.JSON400.Error)

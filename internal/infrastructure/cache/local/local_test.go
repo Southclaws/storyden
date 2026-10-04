@@ -2,6 +2,8 @@ package local_test
 
 import (
 	"context"
+	"fmt"
+	"sync"
 	"testing"
 	"time"
 
@@ -78,6 +80,105 @@ func TestLocalCache(t *testing.T) {
 			got, err := c.Get(ctx, key)
 			r.NoError(err)
 			r.Equal(want, got)
+		}
+	})
+
+	t.Run("set_if_absent_concurrent_claims", func(t *testing.T) {
+		r := require.New(t)
+		ctx := context.Background()
+
+		c, err := local.New()
+		r.NoError(err)
+
+		key := "key"
+		const count = 32
+		inserted := make([]bool, count)
+		errors := make([]error, count)
+		start := make(chan struct{})
+		var wg sync.WaitGroup
+		for i := range count {
+			wg.Go(func() {
+				<-start
+				inserted[i], errors[i] = c.SetIfAbsent(ctx, key, fmt.Sprint(i), time.Minute)
+			})
+		}
+		close(start)
+		wg.Wait()
+
+		winners := 0
+		for i, won := range inserted {
+			r.NoError(errors[i])
+			if won {
+				winners++
+				value, err := c.Get(ctx, key)
+				r.NoError(err)
+				r.Equal(fmt.Sprint(i), value)
+			}
+		}
+		r.Equal(1, winners)
+	})
+
+	t.Run("set_if_absent_expiry_is_not_extended_by_duplicates", func(t *testing.T) {
+		r := require.New(t)
+		ctx := context.Background()
+
+		c, err := local.New()
+		r.NoError(err)
+
+		key := "key"
+		inserted, err := c.SetIfAbsent(ctx, key, "first", 250*time.Millisecond)
+		r.NoError(err)
+		r.True(inserted)
+		inserted, err = c.SetIfAbsent(ctx, key, "second", time.Hour)
+		r.NoError(err)
+		r.False(inserted)
+
+		r.Eventually(func() bool {
+			_, err := c.Get(ctx, key)
+			return err != nil
+		}, 3*time.Second, 10*time.Millisecond)
+
+		inserted, err = c.SetIfAbsent(ctx, key, "third", time.Minute)
+		r.NoError(err)
+		r.True(inserted)
+		value, err := c.Get(ctx, key)
+		r.NoError(err)
+		r.Equal("third", value)
+	})
+
+	t.Run("set_if_absent_existing_keys_and_delete", func(t *testing.T) {
+		r := require.New(t)
+		ctx := context.Background()
+
+		c, err := local.New()
+		r.NoError(err)
+
+		key := "key"
+		r.NoError(c.Set(ctx, key, "existing", time.Minute))
+		inserted, err := c.SetIfAbsent(ctx, key, "replacement", time.Minute)
+		r.NoError(err)
+		r.False(inserted)
+		value, err := c.Get(ctx, key)
+		r.NoError(err)
+		r.Equal("existing", value)
+
+		r.NoError(c.Delete(ctx, key))
+		inserted, err = c.SetIfAbsent(ctx, key, "replacement", time.Minute)
+		r.NoError(err)
+		r.True(inserted)
+	})
+
+	t.Run("set_if_absent_invalid_ttl", func(t *testing.T) {
+		r := require.New(t)
+		ctx := context.Background()
+
+		c, err := local.New()
+		r.NoError(err)
+
+		for _, ttl := range []time.Duration{0, -time.Second} {
+			inserted, err := c.SetIfAbsent(ctx, "key", "value", ttl)
+			r.Error(err)
+			r.False(inserted)
 		}
 	})
 }

@@ -3,6 +3,7 @@ package settings_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/Southclaws/opt"
 	"github.com/stretchr/testify/assert"
@@ -12,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/internal/integration"
+	"github.com/Southclaws/storyden/tests"
 )
 
 func TestSettingsRepository(t *testing.T) {
@@ -41,6 +43,50 @@ func TestSettingsRepository(t *testing.T) {
 				a.Equal(content.HTML(), got.Content.OrZero().HTML())
 				a.Equal(settings.DefaultDescription, got.Description.OrZero())
 			})
+		}))
+	}))
+}
+
+func TestOAuthSettingsSnapshot(t *testing.T) {
+	if tests.IsSharedPostgresDatabase() {
+		t.Skip("skipping concurrent global settings mutations on shared postgres database")
+	}
+
+	t.Parallel()
+	integration.Test(t, nil, fx.Invoke(func(lc fx.Lifecycle, sr *settings.SettingsRepository) {
+		lc.Append(fx.StartHook(func(ctx context.Context) {
+			snapshot, err := sr.Get(ctx)
+			require.NoError(t, err)
+			originalMode := snapshot.Services.OrZero().OAuth.OrZero().AutonomousRegistrationMode.OrZero()
+			originalTTL := snapshot.Services.OrZero().OAuth.OrZero().RegistrationApprovalTTL.OrZero()
+
+			// Independent concurrent patches must both survive, without changing a
+			// settings snapshot already held by an in-flight request.
+			start := make(chan struct{})
+			results := make(chan error, 2)
+			for _, patch := range []settings.OAuthServiceSettings{
+				{AutonomousRegistrationMode: opt.New(settings.OAuthAutonomousRegistrationModeApproval)},
+				{RegistrationApprovalTTL: opt.New(7 * time.Minute)},
+			} {
+				go func() {
+					<-start
+					_, err := sr.Set(ctx, settings.Settings{Services: opt.New(settings.ServiceSettings{OAuth: opt.New(patch)})})
+					results <- err
+				}()
+			}
+			close(start)
+			for range 2 {
+				require.NoError(t, <-results)
+			}
+
+			old := snapshot.Services.OrZero().OAuth.OrZero()
+			require.Equal(t, originalMode, old.AutonomousRegistrationMode.OrZero())
+			require.Equal(t, originalTTL, old.RegistrationApprovalTTL.OrZero())
+			current, err := sr.Get(ctx)
+			require.NoError(t, err)
+			updated := current.Services.OrZero().OAuth.OrZero()
+			require.Equal(t, "approval", updated.AutonomousRegistrationMode.OrZero().String())
+			require.Equal(t, 7*time.Minute, updated.RegistrationApprovalTTL.OrZero())
 		}))
 	}))
 }

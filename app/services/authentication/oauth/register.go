@@ -2,6 +2,8 @@ package oauth
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"net"
 	"net/url"
 	"strings"
@@ -9,19 +11,24 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/alexedwards/argon2id"
+	"github.com/go-jose/go-jose/v4"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	oauthresource "github.com/Southclaws/storyden/app/resources/oauth"
 	"github.com/Southclaws/storyden/app/resources/oauth/oauth_writer"
 	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/resources/settings"
 )
 
 const (
 	TokenEndpointAuthMethodNone              = "none"
 	TokenEndpointAuthMethodClientSecretBasic = "client_secret_basic"
 	TokenEndpointAuthMethodClientSecretPost  = "client_secret_post"
+	TokenEndpointAuthMethodPrivateKeyJWT     = "private_key_jwt"
 )
 
 var dcrDefaultScopes = []string{
@@ -34,6 +41,8 @@ var dcrDefaultScopes = []string{
 // DynamicClientRegistration carries RFC 7591 client metadata supplied by a
 // dynamically registering client.
 type DynamicClientRegistration struct {
+	RegistrationModes       []string
+	InitialAccessToken      opt.Optional[string]
 	ClientName              string
 	RedirectURIs            []string
 	GrantTypes              []string
@@ -45,6 +54,7 @@ type DynamicClientRegistration struct {
 	ClientURI               string
 	TOSURI                  string
 	PolicyURI               string
+	JWKs                    map[string]any
 }
 
 // DynamicClientRegistrationResult is the resolved RFC 7591 client information
@@ -56,6 +66,8 @@ type DynamicClientRegistration struct {
 // remain valid until the client is deleted or manually rotated via the
 // management API.
 type DynamicClientRegistrationResult struct {
+	Approval                *RegistrationApprovalChallenge
+	RetryAfter              int
 	Client                  *oauthresource.Client
 	ClientSecret            opt.Optional[string]
 	ClientIDIssuedAt        int64
@@ -87,94 +99,127 @@ type DynamicClientRegistrationResult struct {
 // here: the authorize and token endpoints already enforce PKCE (S256) for every
 // client unconditionally.
 func (s *Service) RegisterClient(ctx context.Context, input DynamicClientRegistration) (*DynamicClientRegistrationResult, *Error, error) {
-	if !s.Enabled() || !s.cfg.OAuthDynamicRegistrationEnabled {
+	if !s.Enabled() {
 		return nil, oauthError("temporarily_unavailable", "Dynamic client registration is not enabled"), nil
 	}
 
-	authMethod, clientType, oauthErr := resolveTokenEndpointAuthMethod(input.TokenEndpointAuthMethod)
+	configuration, err := s.registrationSettings(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if !configuration.DynamicRegistrationEnabled.OrZero() {
+		return nil, oauthError("temporarily_unavailable", "Dynamic client registration is not enabled"), nil
+	}
+
+	prepared, oauthErr := prepareClientRegistration(ctx, input)
 	if oauthErr != nil {
 		return nil, oauthErr, nil
 	}
 
-	grantTypes, oauthErr := s.resolveDCRGrantTypes(input.GrantTypes)
-	if oauthErr != nil {
-		return nil, oauthErr, nil
+	autonomousAgent := contains(prepared.GrantTypes, GrantTypeClientCredentials)
+	iatID, oauthErr, err := s.authoriseAgentRegistration(ctx, configuration.AutonomousRegistrationMode.OrZero(), autonomousAgent, input.InitialAccessToken)
+	if oauthErr != nil || err != nil {
+		return nil, oauthErr, err
 	}
 
-	// OAuth security invariant: client_credentials requires a confidential client.
-	// A public client has no client authentication, so it must not receive
-	// app-level tokens via client_credentials.
-	if contains(grantTypes, GrantTypeClientCredentials) && clientType == oauthresource.ClientTypePublic {
-		return nil, oauthError("invalid_client_metadata", "client_credentials grant requires a confidential client"), nil
+	if autonomousAgent && configuration.AutonomousRegistrationMode.OrZero() == settings.OAuthAutonomousRegistrationModeApproval && !iatID.Ok() {
+		if !contains(input.RegistrationModes, "approval") {
+			return nil, oauthError("invalid_client_metadata", "Autonomous registration requires approval; include approval in registration_mode"), nil
+		}
+
+		return s.startRegistrationApproval(ctx, configuration, *prepared)
+	}
+
+	return s.provisionClientRegistration(ctx, configuration, *prepared, iatID, nil)
+}
+
+func prepareClientRegistration(ctx context.Context, input DynamicClientRegistration) (*DynamicClientRegistration, *Error) {
+	authMethod, _, oauthErr := resolveTokenEndpointAuthMethod(input.TokenEndpointAuthMethod)
+	if oauthErr != nil {
+		return nil, oauthErr
+	}
+
+	input.TokenEndpointAuthMethod = authMethod
+	grantTypes, oauthErr := resolveDCRGrantTypes(input.GrantTypes)
+	if oauthErr != nil {
+		return nil, oauthErr
+	}
+
+	autonomousAgent := contains(grantTypes, GrantTypeClientCredentials)
+	if autonomousAgent && (len(grantTypes) != 1 || authMethod != TokenEndpointAuthMethodPrivateKeyJWT) {
+		return nil, oauthError("invalid_client_metadata", "Autonomous registration requires only client_credentials and private_key_jwt")
+	}
+
+	if oauthErr := validateDCRClientMetadata(ctx, input, autonomousAgent); oauthErr != nil {
+		return nil, oauthErr
 	}
 
 	// refresh_token grant should only be allowed with authorization_code
 	if contains(grantTypes, GrantTypeRefreshToken) && !contains(grantTypes, GrantTypeAuthorizationCode) {
-		return nil, oauthError("invalid_client_metadata", "refresh_token grant requires authorization_code grant"), nil
+		return nil, oauthError("invalid_client_metadata", "refresh_token grant requires authorization_code grant")
 	}
 
 	// Resolve response types (with defaults)
 	responseTypes, oauthErr := resolveDCRResponseTypes(input.ResponseTypes, grantTypes)
 	if oauthErr != nil {
-		return nil, oauthErr, nil
+		return nil, oauthErr
 	}
 
 	// RFC 7591 Section 2.1: Validate grant_types and response_types consistency
 	// authorization_code grant requires "code" response type
 	if contains(grantTypes, GrantTypeAuthorizationCode) && !contains(responseTypes, "code") {
-		return nil, oauthError("invalid_client_metadata", "authorization_code grant requires 'code' response type"), nil
+		return nil, oauthError("invalid_client_metadata", "authorization_code grant requires 'code' response type")
 	}
 
 	// "code" response type requires authorization_code grant
 	if contains(responseTypes, "code") && !contains(grantTypes, GrantTypeAuthorizationCode) {
-		return nil, oauthError("invalid_client_metadata", "'code' response type requires authorization_code grant"), nil
+		return nil, oauthError("invalid_client_metadata", "'code' response type requires authorization_code grant")
 	}
 
 	redirectURIs, oauthErr := validateDCRRedirectURIs(input.RedirectURIs, grantTypes)
 	if oauthErr != nil {
-		return nil, oauthErr, nil
-	}
-
-	// Validate metadata URIs if provided
-	if input.LogoURI != "" {
-		if err := validateMetadataURI(input.LogoURI); err != nil {
-			return nil, oauthError("invalid_client_metadata", "logo_uri must be a valid HTTPS URL"), nil
-		}
-	}
-	if input.ClientURI != "" {
-		if err := validateMetadataURI(input.ClientURI); err != nil {
-			return nil, oauthError("invalid_client_metadata", "client_uri must be a valid HTTPS URL"), nil
-		}
-	}
-	if input.TOSURI != "" {
-		if err := validateMetadataURI(input.TOSURI); err != nil {
-			return nil, oauthError("invalid_client_metadata", "tos_uri must be a valid HTTPS URL"), nil
-		}
-	}
-	if input.PolicyURI != "" {
-		if err := validateMetadataURI(input.PolicyURI); err != nil {
-			return nil, oauthError("invalid_client_metadata", "policy_uri must be a valid HTTPS URL"), nil
-		}
+		return nil, oauthErr
 	}
 
 	scopes, oauthErr := resolveDCRScopes(input.Scope)
 	if oauthErr != nil {
-		return nil, oauthErr, nil
+		return nil, oauthErr
 	}
 
+	input.GrantTypes = grantTypes
+	input.ResponseTypes = responseTypes
+	input.RedirectURIs = redirectURIs
+	if input.Scope == "" && contains(grantTypes, GrantTypeClientCredentials) {
+		scopes = nil
+	}
+
+	input.Scope = strings.Join(scopes, " ")
+	input.ClientName = strings.TrimSpace(input.ClientName)
+	input.InitialAccessToken = opt.NewEmpty[string]()
+	return &input, nil
+}
+
+func (s *Service) provisionClientRegistration(ctx context.Context, configuration settings.OAuthServiceSettings, input DynamicClientRegistration, iatID opt.Optional[oauthresource.DynamicRegistrationAccessTokenID], approval *oauthresource.RegistrationApproval) (*DynamicClientRegistrationResult, *Error, error) {
+	authMethod, clientType, _ := resolveTokenEndpointAuthMethod(input.TokenEndpointAuthMethod)
+	grantTypes, responseTypes, redirectURIs := input.GrantTypes, input.ResponseTypes, input.RedirectURIs
+	scopes := strings.Fields(input.Scope)
+	autonomousAgent := contains(grantTypes, GrantTypeClientCredentials)
 	clientIDToken, err := randomToken(18)
 	if err != nil {
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
+
 	clientID := oauthresource.OAuthAccessKeyPrefix + clientIDToken
 
 	clientSecret := opt.NewEmpty[string]()
 	clientSecretHash := opt.NewEmpty[string]()
-	if clientType == oauthresource.ClientTypeConfidential {
+	if clientType == oauthresource.ClientTypeConfidential && authMethod != TokenEndpointAuthMethodPrivateKeyJWT {
 		secretToken, err := randomToken(32)
 		if err != nil {
 			return nil, nil, fault.Wrap(err, fctx.With(ctx))
 		}
+
 		secret := oauthresource.OAuthAccessSecretPrefix + secretToken
 
 		hash, err := argon2id.CreateHash(secret, argon2id.DefaultParams)
@@ -196,20 +241,45 @@ func (s *Service) RegisterClient(ctx context.Context, input DynamicClientRegistr
 	// OAuth 2.1 and RFC 7636 recommend PKCE for all authorization_code flows.
 	pkceRequired := contains(grantTypes, GrantTypeAuthorizationCode)
 
-	client, err := s.tokens.CreateClient(ctx, oauth_writer.ClientCreate{
-		AccountID:               opt.NewEmpty[account.AccountID](),
-		ClientID:                clientID,
-		ClientSecretHash:        clientSecretHash,
-		Name:                    name,
-		Type:                    clientType,
-		ScopePolicy:             opt.New(oauthresource.ScopePolicyExplicit),
-		TokenEndpointAuthMethod: opt.New(authMethod),
-		PKCERequired:            opt.New(pkceRequired),
-		RedirectURIs:            redirectURIs,
-		AllowedScopes:           scopes,
-		AllowedGrants:           grantTypes,
-	})
+	createInput := oauth_writer.ClientCreate{
+		RegistrationAccessTokenID: iatID,
+		RegistrationApproval:      approval,
+		AccountID:                 opt.NewEmpty[account.AccountID](),
+		ClientID:                  clientID,
+		ClientSecretHash:          clientSecretHash,
+		Name:                      name,
+		Type:                      clientType,
+		ScopePolicy:               opt.New(oauthresource.ScopePolicyExplicit),
+		TokenEndpointAuthMethod:   opt.New(authMethod),
+		JWKs:                      opt.New(input.JWKs),
+		PKCERequired:              opt.New(pkceRequired),
+		RedirectURIs:              redirectURIs,
+		AllowedScopes:             scopes,
+		AllowedGrants:             grantTypes,
+	}
+
+	var client *oauthresource.Client
+	if autonomousAgent {
+		createInput.ScopePolicy = opt.New(oauthresource.ScopePolicyInheritUserPermissions)
+		createInput.RegistrationRoleID = configuration.AutonomousRegistrationRoleID
+		client, err = s.provisionAgentClient(ctx, name, createInput)
+	} else {
+		client, err = s.tokens.CreateClient(ctx, createInput)
+	}
+
 	if err != nil {
+		if errors.Is(err, oauth_writer.ErrRegistrationApprovalUnavailable) {
+			return nil, invalidRegistrationError(), nil
+		}
+
+		if errors.Is(err, oauth_writer.ErrDynamicRegistrationAccessTokenUnavailable) {
+			return nil, oauthError("invalid_token", "Initial Access Token is expired, revoked, or exhausted"), nil
+		}
+
+		if autonomousAgent && ftag.Get(err) == ftag.AlreadyExists {
+			return nil, oauthError("invalid_client_metadata", "client_name is already in use"), nil
+		}
+
 		return nil, nil, err
 	}
 
@@ -232,6 +302,56 @@ func (s *Service) RegisterClient(ctx context.Context, input DynamicClientRegistr
 	}, nil, nil
 }
 
+func (s *Service) provisionAgentClient(ctx context.Context, handle string, input oauth_writer.ClientCreate) (*oauthresource.Client, error) {
+	id := account.AccountID(xid.New())
+	if err := s.avatars.SetRobot(ctx, id); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	input.AccountID = opt.New(id)
+	client, err := s.tokens.CreateAgentClient(ctx, handle, input)
+	if err != nil {
+		cleanupCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 10*time.Second)
+		defer cancel()
+		if cleanupErr := s.avatars.Delete(cleanupCtx, id); cleanupErr != nil {
+			return nil, fault.Wrap(errors.Join(err, cleanupErr), fctx.With(ctx))
+		}
+
+		return nil, err
+	}
+
+	return client, nil
+}
+
+func validateDCRClientMetadata(ctx context.Context, input DynamicClientRegistration, autonomousAgent bool) *Error {
+	if autonomousAgent {
+		if err := account.ValidateHandle(ctx, strings.TrimSpace(input.ClientName)); err != nil {
+			return oauthError("invalid_client_metadata", "client_name must be a valid, available Storyden handle")
+		}
+	}
+
+	if input.TokenEndpointAuthMethod == TokenEndpointAuthMethodPrivateKeyJWT && !validPublicJWKSet(input.JWKs) {
+		return oauthError("invalid_client_metadata", "jwks must contain valid public signing keys")
+	}
+
+	for _, metadata := range []struct{ name, value string }{
+		{"logo_uri", input.LogoURI},
+		{"client_uri", input.ClientURI},
+		{"tos_uri", input.TOSURI},
+		{"policy_uri", input.PolicyURI},
+	} {
+		if metadata.value == "" {
+			continue
+		}
+
+		if err := validateMetadataURI(metadata.value); err != nil {
+			return oauthError("invalid_client_metadata", metadata.name+" must be a valid HTTPS URL")
+		}
+	}
+
+	return nil
+}
+
 func resolveTokenEndpointAuthMethod(method string) (string, oauthresource.ClientType, *Error) {
 	method = strings.TrimSpace(method)
 	if method == "" {
@@ -245,22 +365,22 @@ func resolveTokenEndpointAuthMethod(method string) (string, oauthresource.Client
 		return method, oauthresource.ClientTypeConfidential, nil
 	case TokenEndpointAuthMethodClientSecretBasic:
 		return method, oauthresource.ClientTypeConfidential, nil
+	case TokenEndpointAuthMethodPrivateKeyJWT:
+		return method, oauthresource.ClientTypeConfidential, nil
 	default:
 		return "", oauthresource.ClientType{}, oauthError("invalid_client_metadata", "Unsupported token_endpoint_auth_method")
 	}
 }
 
-func (s *Service) resolveDCRGrantTypes(requested []string) ([]string, *Error) {
+func resolveDCRGrantTypes(requested []string) ([]string, *Error) {
 	if len(requested) == 0 {
 		return []string{GrantTypeAuthorizationCode, GrantTypeRefreshToken}, nil
 	}
 
-	// Only authorization_code and refresh_token are allowed for DCR.
-	// client_credentials doesn't make sense for dynamically registered clients
-	// since DCR is for user-facing OAuth flows, not machine-to-machine auth.
 	allowed := map[string]struct{}{
 		GrantTypeAuthorizationCode: {},
 		GrantTypeRefreshToken:      {},
+		GrantTypeClientCredentials: {},
 	}
 
 	seen := map[string]struct{}{}
@@ -270,12 +390,15 @@ func (s *Service) resolveDCRGrantTypes(requested []string) ([]string, *Error) {
 		if grant == "" {
 			continue
 		}
+
 		if _, ok := allowed[grant]; !ok {
-			return nil, oauthError("invalid_client_metadata", "Unsupported grant type; only authorization_code and refresh_token are allowed")
+			return nil, oauthError("invalid_client_metadata", "Unsupported grant type")
 		}
+
 		if _, ok := seen[grant]; ok {
 			continue
 		}
+
 		seen[grant] = struct{}{}
 		out = append(out, grant)
 	}
@@ -287,6 +410,29 @@ func (s *Service) resolveDCRGrantTypes(requested []string) ([]string, *Error) {
 	return out, nil
 }
 
+func validPublicJWKSet(jwks map[string]any) bool {
+	raw, err := json.Marshal(jwks)
+	if err != nil {
+		return false
+	}
+
+	var keys jose.JSONWebKeySet
+	if err := json.Unmarshal(raw, &keys); err != nil || len(keys.Keys) == 0 {
+		return false
+	}
+
+	seen := map[string]bool{}
+	for _, key := range keys.Keys {
+		if !key.Valid() || !key.IsPublic() || (key.Use != "" && key.Use != "sig") || seen[key.KeyID] {
+			return false
+		}
+
+		seen[key.KeyID] = true
+	}
+
+	return true
+}
+
 func resolveDCRResponseTypes(requested []string, grantTypes []string) ([]string, *Error) {
 	usesAuthCode := contains(grantTypes, GrantTypeAuthorizationCode)
 
@@ -294,6 +440,7 @@ func resolveDCRResponseTypes(requested []string, grantTypes []string) ([]string,
 		if usesAuthCode {
 			return []string{"code"}, nil
 		}
+
 		return []string{}, nil
 	}
 
@@ -303,9 +450,11 @@ func resolveDCRResponseTypes(requested []string, grantTypes []string) ([]string,
 		if responseType == "" {
 			continue
 		}
+
 		if responseType != "code" {
 			return nil, oauthError("invalid_client_metadata", "Only 'code' response type is supported")
 		}
+
 		out = append(out, responseType)
 	}
 
@@ -323,6 +472,7 @@ func validateDCRRedirectURIs(redirectURIs []string, grantTypes []string) ([]stri
 		if usesAuthCode {
 			return nil, oauthError("invalid_redirect_uri", "At least one redirect_uri is required for authorization_code clients")
 		}
+
 		return []string{}, nil
 	}
 
@@ -334,13 +484,16 @@ func validateDCRRedirectURIs(redirectURIs []string, grantTypes []string) ([]stri
 		if raw == "" {
 			continue
 		}
+
 		if err := validateDCRRedirectURI(raw); err != nil {
 			return nil, oauthError("invalid_redirect_uri", "Invalid redirect_uri: must be an absolute HTTPS URI (or HTTP for loopback)")
 		}
+
 		// Deduplicate
 		if _, exists := seen[raw]; exists {
 			continue
 		}
+
 		seen[raw] = struct{}{}
 		out = append(out, raw)
 	}
@@ -357,6 +510,7 @@ func validateDCRRedirectURI(raw string) error {
 	if raw == "" {
 		return fault.New("empty redirect uri")
 	}
+
 	if strings.Contains(raw, "*") {
 		return fault.New("wildcard redirect uri")
 	}
@@ -365,6 +519,7 @@ func validateDCRRedirectURI(raw string) error {
 	if err != nil {
 		return err
 	}
+
 	if !u.IsAbs() {
 		return fault.New("redirect uri must be absolute")
 	}
@@ -387,6 +542,7 @@ func validateDCRRedirectURI(raw string) error {
 		if isLoopbackHost(u.Hostname()) {
 			return nil
 		}
+
 		return fault.New("http redirect uri only allowed for loopback hosts")
 	default:
 		return fault.New("redirect uri must use https")
@@ -405,6 +561,7 @@ func isLoopbackHost(host string) bool {
 	if ip == nil {
 		return false
 	}
+
 	return ip.IsLoopback()
 }
 
@@ -430,9 +587,11 @@ func resolveDCRScopes(scope string) ([]string, *Error) {
 			}
 
 		}
+
 		if _, ok := seen[sc]; ok {
 			continue
 		}
+
 		seen[sc] = struct{}{}
 		out = append(out, sc)
 	}

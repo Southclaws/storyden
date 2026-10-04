@@ -18,6 +18,10 @@ export interface OAuthClient {
   createdAt: CreatedAt;
   updatedAt: UpdatedAt;
   account_id?: Identifier;
+  /** Administrator who approved autonomous registration, for audit provenance only. */
+  registration_approved_by_account_id?: Identifier;
+  /** Initial Access Token that authorized creation, when applicable. */
+  dcr_iat_id?: Identifier;
   client_id: string;
   name: string;
   type: OAuthClientType;

@@ -48,7 +48,7 @@ sd auth switch community2-com
 sd node list  # From community2
 ~~~
 `,
-		Args:  cobra.MaximumNArgs(1),
+		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := store.Load()
 			if err != nil {
@@ -73,8 +73,13 @@ sd node list  # From community2
 				}
 			}
 
-			cfg.SetCurrentContext(selected)
-			if err := store.Save(cfg); err != nil {
+			if err := store.Update(cmd.Context(), func(current *config.Config) error {
+				if _, ok := current.Contexts[selected]; !ok {
+					return fmt.Errorf("unknown context %q", selected)
+				}
+				current.SetCurrentContext(selected)
+				return nil
+			}); err != nil {
 				return err
 			}
 

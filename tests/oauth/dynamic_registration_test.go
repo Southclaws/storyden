@@ -29,7 +29,7 @@ import (
 func TestOAuthDynamicClientRegistration(t *testing.T) {
 	t.Parallel()
 
-	integration.Test(t, oauthConfig(t), e2e.Setup(), fx.Invoke(func(
+	integration.Test(t, oauthConfig(t), e2e.Setup(), withOAuthRegistration(t, "disabled"), fx.Invoke(func(
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
@@ -50,10 +50,10 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 
 				redirectURI := "https://chatgpt.com/connector_platform_oauth_redirect"
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("ChatGPT MCP Connector"),
+					ClientName:              new("ChatGPT MCP Connector"),
 					RedirectUris:            &[]string{redirectURI},
-					TokenEndpointAuthMethod: ptr("none"),
-					Scope:                   ptr("openid profile email offline_access"),
+					TokenEndpointAuthMethod: new("none"),
+					Scope:                   new("openid profile email offline_access"),
 				}, memberSession))(t, http.StatusCreated)
 				r.NotNil(resp.JSON201)
 
@@ -78,10 +78,10 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 				// This test verifies registration works without a session/auth token
 				redirectURI := "https://example.com/oauth/callback"
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Unauthenticated Public Client"),
+					ClientName:              new("Unauthenticated Public Client"),
 					RedirectUris:            &[]string{redirectURI},
-					TokenEndpointAuthMethod: ptr("none"),
-					Scope:                   ptr("openid profile"),
+					TokenEndpointAuthMethod: new("none"),
+					Scope:                   new("openid profile"),
 				}))(t, http.StatusCreated) // No session passed - unauthenticated
 				r.NotNil(resp.JSON201)
 
@@ -103,9 +103,9 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 				r := require.New(t)
 
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Confidential App"),
+					ClientName:              new("Confidential App"),
 					RedirectUris:            &[]string{"https://app.example/callback"},
-					TokenEndpointAuthMethod: ptr("client_secret_post"),
+					TokenEndpointAuthMethod: new("client_secret_post"),
 				}, memberSession))(t, http.StatusCreated)
 				r.NotNil(resp.JSON201)
 
@@ -120,9 +120,9 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 				r := require.New(t)
 
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Basic Auth Client"),
+					ClientName:              new("Basic Auth Client"),
 					RedirectUris:            &[]string{"https://app.example/callback"},
-					TokenEndpointAuthMethod: ptr("client_secret_basic"),
+					TokenEndpointAuthMethod: new("client_secret_basic"),
 				}, memberSession))(t, http.StatusCreated)
 				r.NotNil(resp.JSON201)
 				r.NotNil(resp.JSON201.ClientSecret)
@@ -137,10 +137,10 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 
 				redirectURI := "https://basic-client.example/callback"
 				registered := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Basic Confidential"),
+					ClientName:              new("Basic Confidential"),
 					RedirectUris:            &[]string{redirectURI},
-					TokenEndpointAuthMethod: ptr("client_secret_basic"),
-					Scope:                   ptr("openid profile"),
+					TokenEndpointAuthMethod: new("client_secret_basic"),
+					Scope:                   new("openid profile"),
 				}, memberSession))(t, http.StatusCreated)
 				r.NotNil(registered.JSON201)
 				clientID := registered.JSON201.ClientId
@@ -212,9 +212,9 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 
 				// Register another basic client
 				registered := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Mixed Auth Client"),
+					ClientName:              new("Mixed Auth Client"),
 					RedirectUris:            &[]string{"https://mixed.example/cb"},
-					TokenEndpointAuthMethod: ptr("client_secret_basic"),
+					TokenEndpointAuthMethod: new("client_secret_basic"),
 				}, memberSession))(t, http.StatusCreated)
 				r.NotNil(registered.JSON201)
 				clientID := registered.JSON201.ClientId
@@ -260,9 +260,9 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 					"/relative/path",
 				} {
 					resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-						ClientName:              ptr("Bad Redirect"),
+						ClientName:              new("Bad Redirect"),
 						RedirectUris:            &[]string{bad},
-						TokenEndpointAuthMethod: ptr("none"),
+						TokenEndpointAuthMethod: new("none"),
 					}, memberSession))(t, http.StatusBadRequest)
 					r.NotNil(resp.JSON400, "expected rejection for %q", bad)
 					a.Equal("invalid_redirect_uri", resp.JSON400.Error, "redirect uri %q", bad)
@@ -273,9 +273,9 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 				r := require.New(t)
 
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Native Loopback"),
+					ClientName:              new("Native Loopback"),
 					RedirectUris:            &[]string{"http://127.0.0.1:51000/callback"},
-					TokenEndpointAuthMethod: ptr("none"),
+					TokenEndpointAuthMethod: new("none"),
 				}, memberSession))(t, http.StatusCreated)
 				r.NotNil(resp.JSON201)
 			})
@@ -284,10 +284,10 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 				r := require.New(t)
 
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Post reader writer"),
+					ClientName:              new("Post reader writer"),
 					RedirectUris:            &[]string{"https://app.example/callback"},
-					TokenEndpointAuthMethod: ptr("none"),
-					Scope:                   ptr("openid CREATE_POST READ_PUBLISHED_THREADS"),
+					TokenEndpointAuthMethod: new("none"),
+					Scope:                   new("openid CREATE_POST READ_PUBLISHED_THREADS"),
 				}, memberSession))(t, http.StatusCreated)
 				r.NotNil(resp.JSON201)
 			})
@@ -297,10 +297,10 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 				r := require.New(t)
 
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Invalid Scope"),
+					ClientName:              new("Invalid Scope"),
 					RedirectUris:            &[]string{"https://app.example/callback"},
-					TokenEndpointAuthMethod: ptr("none"),
-					Scope:                   ptr("openid TOTALLY_INVALID_SCOPE_12345"),
+					TokenEndpointAuthMethod: new("none"),
+					Scope:                   new("openid TOTALLY_INVALID_SCOPE_12345"),
 				}, memberSession))(t, http.StatusBadRequest)
 				r.NotNil(resp.JSON400)
 				a.Equal("invalid_client_metadata", resp.JSON400.Error)
@@ -323,10 +323,10 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 
 			// 	// ADMINISTRATOR scope is too powerful for DCR clients
 			// 	resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-			// 		ClientName:              ptr("Admin Seeking Client"),
+			// 		ClientName:              new("Admin Seeking Client"),
 			// 		RedirectUris:            &[]string{"https://app.example/callback"},
-			// 		TokenEndpointAuthMethod: ptr("none"),
-			// 		Scope:                   ptr("openid ADMINISTRATOR"),
+			// 		TokenEndpointAuthMethod: new("none"),
+			// 		Scope:                   new("openid ADMINISTRATOR"),
 			// 	}, memberSession))(t, http.StatusBadRequest)
 			// 	r.NotNil(resp.JSON400)
 			// 	a.Equal("invalid_client_metadata", resp.JSON400.Error, "must reject ADMINISTRATOR scope for DCR")
@@ -337,9 +337,9 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 				r := require.New(t)
 
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Service"),
+					ClientName:              new("Service"),
 					RedirectUris:            &[]string{"https://app.example/callback"},
-					TokenEndpointAuthMethod: ptr("client_secret_post"),
+					TokenEndpointAuthMethod: new("client_secret_post"),
 					GrantTypes:              &[]string{oauthGrantClientCredentials},
 				}, memberSession))(t, http.StatusBadRequest)
 				r.NotNil(resp.JSON400)
@@ -377,10 +377,10 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 
 				redirectURI := "https://client.example/callback"
 				registered := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Authorize Flow Client"),
+					ClientName:              new("Authorize Flow Client"),
 					RedirectUris:            &[]string{redirectURI},
-					TokenEndpointAuthMethod: ptr("none"),
-					Scope:                   ptr("openid profile"),
+					TokenEndpointAuthMethod: new("none"),
+					Scope:                   new("openid profile"),
 				}, memberSession))(t, http.StatusCreated)
 				r.NotNil(registered.JSON201)
 
@@ -407,8 +407,8 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 
 				// Attempt to register public client with client_credentials grant
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Malicious Public Client"),
-					TokenEndpointAuthMethod: ptr("none"),
+					ClientName:              new("Malicious Public Client"),
+					TokenEndpointAuthMethod: new("none"),
 					GrantTypes:              &[]string{oauthGrantClientCredentials},
 				}, memberSession))(t, http.StatusBadRequest)
 				r.NotNil(resp.JSON400)
@@ -421,8 +421,8 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 
 				// Attempt to register with refresh_token but no authorization_code
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Refresh Only Client"),
-					TokenEndpointAuthMethod: ptr("client_secret_post"),
+					ClientName:              new("Refresh Only Client"),
+					TokenEndpointAuthMethod: new("client_secret_post"),
 					GrantTypes:              &[]string{oauthGrantRefreshToken},
 				}, memberSession))(t, http.StatusBadRequest)
 				r.NotNil(resp.JSON400)
@@ -435,9 +435,9 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 
 				// Attempt to register with "code" response type but no authorization_code grant
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Inconsistent Client"),
+					ClientName:              new("Inconsistent Client"),
 					RedirectUris:            &[]string{"https://app.example/callback"},
-					TokenEndpointAuthMethod: ptr("client_secret_post"),
+					TokenEndpointAuthMethod: new("client_secret_post"),
 					GrantTypes:              &[]string{oauthGrantClientCredentials},
 					ResponseTypes:           &[]string{"code"},
 				}, memberSession))(t, http.StatusBadRequest)
@@ -451,9 +451,9 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 
 				// Attempt to register with authorization_code grant but "token" response type (invalid combo)
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Invalid Response Type"),
+					ClientName:              new("Invalid Response Type"),
 					RedirectUris:            &[]string{"https://app.example/callback"},
-					TokenEndpointAuthMethod: ptr("none"),
+					TokenEndpointAuthMethod: new("none"),
 					GrantTypes:              &[]string{oauthGrantAuthorizationCode},
 					ResponseTypes:           &[]string{"token"}, // invalid: token is for implicit grant
 				}, memberSession))(t, http.StatusBadRequest)
@@ -467,9 +467,9 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 
 				// Attempt plain HTTP for non-loopback
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Insecure Client"),
+					ClientName:              new("Insecure Client"),
 					RedirectUris:            &[]string{"http://evil.example.com/callback"},
-					TokenEndpointAuthMethod: ptr("none"),
+					TokenEndpointAuthMethod: new("none"),
 				}, memberSession))(t, http.StatusBadRequest)
 				r.NotNil(resp.JSON400)
 				a.Equal("invalid_redirect_uri", resp.JSON400.Error, "must reject non-HTTPS redirect URI")
@@ -481,9 +481,9 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 
 				// Attempt wildcard redirect URI
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Wildcard Client"),
+					ClientName:              new("Wildcard Client"),
 					RedirectUris:            &[]string{"https://*.evil.com/callback"},
-					TokenEndpointAuthMethod: ptr("none"),
+					TokenEndpointAuthMethod: new("none"),
 				}, memberSession))(t, http.StatusBadRequest)
 				r.NotNil(resp.JSON400)
 				a.Equal("invalid_redirect_uri", resp.JSON400.Error, "must reject wildcard redirect URI")
@@ -495,9 +495,9 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 
 				// Attempt redirect URI with fragment
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Fragment Client"),
+					ClientName:              new("Fragment Client"),
 					RedirectUris:            &[]string{"https://app.example/callback#evil"},
-					TokenEndpointAuthMethod: ptr("none"),
+					TokenEndpointAuthMethod: new("none"),
 				}, memberSession))(t, http.StatusBadRequest)
 				r.NotNil(resp.JSON400)
 				a.Equal("invalid_redirect_uri", resp.JSON400.Error, "must reject redirect URI with fragment")
@@ -509,10 +509,10 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 
 				// Attempt HTTP logo_uri (should be rejected)
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("HTTP Logo"),
+					ClientName:              new("HTTP Logo"),
 					RedirectUris:            &[]string{"https://app.example/callback"},
-					TokenEndpointAuthMethod: ptr("none"),
-					LogoUri:                 ptr("http://evil.example/malware.png"),
+					TokenEndpointAuthMethod: new("none"),
+					LogoUri:                 new("http://evil.example/malware.png"),
 				}, memberSession))(t, http.StatusBadRequest)
 				r.NotNil(resp.JSON400)
 				a.Equal("invalid_client_metadata", resp.JSON400.Error, "must reject HTTP metadata URI")
@@ -524,10 +524,10 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 
 				// Attempt relative client_uri
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Relative URI"),
+					ClientName:              new("Relative URI"),
 					RedirectUris:            &[]string{"https://app.example/callback"},
-					TokenEndpointAuthMethod: ptr("none"),
-					ClientUri:               ptr("/relative/path"),
+					TokenEndpointAuthMethod: new("none"),
+					ClientUri:               new("/relative/path"),
 				}, memberSession))(t, http.StatusBadRequest)
 				r.NotNil(resp.JSON400)
 				a.Equal("invalid_client_metadata", resp.JSON400.Error, "must reject relative metadata URI")
@@ -539,13 +539,13 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 
 				// Register with duplicate redirect URIs
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName: ptr("Dedupe Test"),
+					ClientName: new("Dedupe Test"),
 					RedirectUris: &[]string{
 						"https://app.example/callback",
 						"https://app.example/callback2",
 						"https://app.example/callback", // duplicate
 					},
-					TokenEndpointAuthMethod: ptr("none"),
+					TokenEndpointAuthMethod: new("none"),
 				}, memberSession))(t, http.StatusCreated)
 				r.NotNil(resp.JSON201)
 
@@ -561,9 +561,9 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 
 				// Attempt opaque URI like "https:callback" which has no hostname
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Opaque URI Attack"),
+					ClientName:              new("Opaque URI Attack"),
 					RedirectUris:            &[]string{"https:callback"},
-					TokenEndpointAuthMethod: ptr("none"),
+					TokenEndpointAuthMethod: new("none"),
 				}, memberSession))(t, http.StatusBadRequest)
 				r.NotNil(resp.JSON400)
 				a.Equal("invalid_redirect_uri", resp.JSON400.Error, "must reject opaque URI with no hostname")
@@ -574,9 +574,9 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 
 				// Test 127.0.0.2 (should be allowed as loopback)
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("IPv4 Loopback"),
+					ClientName:              new("IPv4 Loopback"),
 					RedirectUris:            &[]string{"http://127.0.0.2:8080/callback"},
-					TokenEndpointAuthMethod: ptr("none"),
+					TokenEndpointAuthMethod: new("none"),
 				}, memberSession))(t, http.StatusCreated)
 				r.NotNil(resp.JSON201, "should allow 127.0.0.2 as loopback")
 			})
@@ -586,9 +586,9 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 
 				// Test ::1 with brackets (standard IPv6 URL format)
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("IPv6 Loopback"),
+					ClientName:              new("IPv6 Loopback"),
 					RedirectUris:            &[]string{"http://[::1]:8080/callback"},
-					TokenEndpointAuthMethod: ptr("none"),
+					TokenEndpointAuthMethod: new("none"),
 				}, memberSession))(t, http.StatusCreated)
 				r.NotNil(resp.JSON201, "should allow ::1 as loopback")
 			})
@@ -599,9 +599,9 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 
 				// Register client with client_secret_post
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
-					ClientName:              ptr("Auth Method Test"),
+					ClientName:              new("Auth Method Test"),
 					RedirectUris:            &[]string{"https://app.example/callback"},
-					TokenEndpointAuthMethod: ptr("client_secret_post"),
+					TokenEndpointAuthMethod: new("client_secret_post"),
 				}, memberSession))(t, http.StatusCreated)
 				r.NotNil(resp.JSON201)
 

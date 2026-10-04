@@ -87,6 +87,12 @@ type AccountEdges struct {
 	Roles []*Role `json:"roles,omitempty"`
 	// Authentication holds the value of the authentication edge.
 	Authentication []*Authentication `json:"authentication,omitempty"`
+	// OauthRegistrationApprovals holds the value of the oauth_registration_approvals edge.
+	OauthRegistrationApprovals []*OAuthRegistrationApproval `json:"oauth_registration_approvals,omitempty"`
+	// ApprovedOauthClients holds the value of the approved_oauth_clients edge.
+	ApprovedOauthClients []*OAuthClient `json:"approved_oauth_clients,omitempty"`
+	// OauthDcrIats holds the value of the oauth_dcr_iats edge.
+	OauthDcrIats []*OAuthDynamicRegistrationAccessTokens `json:"oauth_dcr_iats,omitempty"`
 	// OauthClients holds the value of the oauth_clients edge.
 	OauthClients []*OAuthClient `json:"oauth_clients,omitempty"`
 	// OauthAuthorisationCodes holds the value of the oauth_authorisation_codes edge.
@@ -157,7 +163,7 @@ type AccountEdges struct {
 	AccountRoles []*AccountRoles `json:"account_roles,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [49]bool
+	loadedTypes [52]bool
 }
 
 // SessionsOrErr returns the Sessions value or an error if the edge
@@ -297,10 +303,37 @@ func (e AccountEdges) AuthenticationOrErr() ([]*Authentication, error) {
 	return nil, &NotLoadedError{edge: "authentication"}
 }
 
+// OauthRegistrationApprovalsOrErr returns the OauthRegistrationApprovals value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) OauthRegistrationApprovalsOrErr() ([]*OAuthRegistrationApproval, error) {
+	if e.loadedTypes[15] {
+		return e.OauthRegistrationApprovals, nil
+	}
+	return nil, &NotLoadedError{edge: "oauth_registration_approvals"}
+}
+
+// ApprovedOauthClientsOrErr returns the ApprovedOauthClients value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) ApprovedOauthClientsOrErr() ([]*OAuthClient, error) {
+	if e.loadedTypes[16] {
+		return e.ApprovedOauthClients, nil
+	}
+	return nil, &NotLoadedError{edge: "approved_oauth_clients"}
+}
+
+// OauthDcrIatsOrErr returns the OauthDcrIats value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) OauthDcrIatsOrErr() ([]*OAuthDynamicRegistrationAccessTokens, error) {
+	if e.loadedTypes[17] {
+		return e.OauthDcrIats, nil
+	}
+	return nil, &NotLoadedError{edge: "oauth_dcr_iats"}
+}
+
 // OauthClientsOrErr returns the OauthClients value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) OauthClientsOrErr() ([]*OAuthClient, error) {
-	if e.loadedTypes[15] {
+	if e.loadedTypes[18] {
 		return e.OauthClients, nil
 	}
 	return nil, &NotLoadedError{edge: "oauth_clients"}
@@ -309,7 +342,7 @@ func (e AccountEdges) OauthClientsOrErr() ([]*OAuthClient, error) {
 // OauthAuthorisationCodesOrErr returns the OauthAuthorisationCodes value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) OauthAuthorisationCodesOrErr() ([]*OAuthAuthorisationCode, error) {
-	if e.loadedTypes[16] {
+	if e.loadedTypes[19] {
 		return e.OauthAuthorisationCodes, nil
 	}
 	return nil, &NotLoadedError{edge: "oauth_authorisation_codes"}
@@ -318,7 +351,7 @@ func (e AccountEdges) OauthAuthorisationCodesOrErr() ([]*OAuthAuthorisationCode,
 // OauthAuthorisationRequestsOrErr returns the OauthAuthorisationRequests value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) OauthAuthorisationRequestsOrErr() ([]*OAuthAuthorisationRequest, error) {
-	if e.loadedTypes[17] {
+	if e.loadedTypes[20] {
 		return e.OauthAuthorisationRequests, nil
 	}
 	return nil, &NotLoadedError{edge: "oauth_authorisation_requests"}
@@ -327,7 +360,7 @@ func (e AccountEdges) OauthAuthorisationRequestsOrErr() ([]*OAuthAuthorisationRe
 // OauthRefreshTokensOrErr returns the OauthRefreshTokens value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) OauthRefreshTokensOrErr() ([]*OAuthRefreshToken, error) {
-	if e.loadedTypes[18] {
+	if e.loadedTypes[21] {
 		return e.OauthRefreshTokens, nil
 	}
 	return nil, &NotLoadedError{edge: "oauth_refresh_tokens"}
@@ -336,7 +369,7 @@ func (e AccountEdges) OauthRefreshTokensOrErr() ([]*OAuthRefreshToken, error) {
 // OauthRemoteConnectionsOrErr returns the OauthRemoteConnections value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) OauthRemoteConnectionsOrErr() ([]*OAuthRemoteConnection, error) {
-	if e.loadedTypes[19] {
+	if e.loadedTypes[22] {
 		return e.OauthRemoteConnections, nil
 	}
 	return nil, &NotLoadedError{edge: "oauth_remote_connections"}
@@ -345,7 +378,7 @@ func (e AccountEdges) OauthRemoteConnectionsOrErr() ([]*OAuthRemoteConnection, e
 // ClaimedOauthDeviceAuthorisationsOrErr returns the ClaimedOauthDeviceAuthorisations value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) ClaimedOauthDeviceAuthorisationsOrErr() ([]*OAuthDeviceAuthorisation, error) {
-	if e.loadedTypes[20] {
+	if e.loadedTypes[23] {
 		return e.ClaimedOauthDeviceAuthorisations, nil
 	}
 	return nil, &NotLoadedError{edge: "claimed_oauth_device_authorisations"}
@@ -354,7 +387,7 @@ func (e AccountEdges) ClaimedOauthDeviceAuthorisationsOrErr() ([]*OAuthDeviceAut
 // ApprovedOauthDeviceAuthorisationsOrErr returns the ApprovedOauthDeviceAuthorisations value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) ApprovedOauthDeviceAuthorisationsOrErr() ([]*OAuthDeviceAuthorisation, error) {
-	if e.loadedTypes[21] {
+	if e.loadedTypes[24] {
 		return e.ApprovedOauthDeviceAuthorisations, nil
 	}
 	return nil, &NotLoadedError{edge: "approved_oauth_device_authorisations"}
@@ -363,7 +396,7 @@ func (e AccountEdges) ApprovedOauthDeviceAuthorisationsOrErr() ([]*OAuthDeviceAu
 // TagsOrErr returns the Tags value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) TagsOrErr() ([]*Tag, error) {
-	if e.loadedTypes[22] {
+	if e.loadedTypes[25] {
 		return e.Tags, nil
 	}
 	return nil, &NotLoadedError{edge: "tags"}
@@ -372,7 +405,7 @@ func (e AccountEdges) TagsOrErr() ([]*Tag, error) {
 // CollectionsOrErr returns the Collections value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) CollectionsOrErr() ([]*Collection, error) {
-	if e.loadedTypes[23] {
+	if e.loadedTypes[26] {
 		return e.Collections, nil
 	}
 	return nil, &NotLoadedError{edge: "collections"}
@@ -381,7 +414,7 @@ func (e AccountEdges) CollectionsOrErr() ([]*Collection, error) {
 // NodesOrErr returns the Nodes value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) NodesOrErr() ([]*Node, error) {
-	if e.loadedTypes[24] {
+	if e.loadedTypes[27] {
 		return e.Nodes, nil
 	}
 	return nil, &NotLoadedError{edge: "nodes"}
@@ -390,7 +423,7 @@ func (e AccountEdges) NodesOrErr() ([]*Node, error) {
 // NodeVersionsOrErr returns the NodeVersions value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) NodeVersionsOrErr() ([]*NodeVersion, error) {
-	if e.loadedTypes[25] {
+	if e.loadedTypes[28] {
 		return e.NodeVersions, nil
 	}
 	return nil, &NotLoadedError{edge: "node_versions"}
@@ -399,7 +432,7 @@ func (e AccountEdges) NodeVersionsOrErr() ([]*NodeVersion, error) {
 // AssetsOrErr returns the Assets value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AssetsOrErr() ([]*Asset, error) {
-	if e.loadedTypes[26] {
+	if e.loadedTypes[29] {
 		return e.Assets, nil
 	}
 	return nil, &NotLoadedError{edge: "assets"}
@@ -408,7 +441,7 @@ func (e AccountEdges) AssetsOrErr() ([]*Asset, error) {
 // EventsOrErr returns the Events value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) EventsOrErr() ([]*EventParticipant, error) {
-	if e.loadedTypes[27] {
+	if e.loadedTypes[30] {
 		return e.Events, nil
 	}
 	return nil, &NotLoadedError{edge: "events"}
@@ -417,7 +450,7 @@ func (e AccountEdges) EventsOrErr() ([]*EventParticipant, error) {
 // PostReadsOrErr returns the PostReads value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) PostReadsOrErr() ([]*PostRead, error) {
-	if e.loadedTypes[28] {
+	if e.loadedTypes[31] {
 		return e.PostReads, nil
 	}
 	return nil, &NotLoadedError{edge: "post_reads"}
@@ -426,7 +459,7 @@ func (e AccountEdges) PostReadsOrErr() ([]*PostRead, error) {
 // ReportsOrErr returns the Reports value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) ReportsOrErr() ([]*Report, error) {
-	if e.loadedTypes[29] {
+	if e.loadedTypes[32] {
 		return e.Reports, nil
 	}
 	return nil, &NotLoadedError{edge: "reports"}
@@ -435,7 +468,7 @@ func (e AccountEdges) ReportsOrErr() ([]*Report, error) {
 // HandledReportsOrErr returns the HandledReports value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) HandledReportsOrErr() ([]*Report, error) {
-	if e.loadedTypes[30] {
+	if e.loadedTypes[33] {
 		return e.HandledReports, nil
 	}
 	return nil, &NotLoadedError{edge: "handled_reports"}
@@ -444,7 +477,7 @@ func (e AccountEdges) HandledReportsOrErr() ([]*Report, error) {
 // AuditLogsOrErr returns the AuditLogs value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AuditLogsOrErr() ([]*AuditLog, error) {
-	if e.loadedTypes[31] {
+	if e.loadedTypes[34] {
 		return e.AuditLogs, nil
 	}
 	return nil, &NotLoadedError{edge: "audit_logs"}
@@ -453,7 +486,7 @@ func (e AccountEdges) AuditLogsOrErr() ([]*AuditLog, error) {
 // ModerationNotesOrErr returns the ModerationNotes value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) ModerationNotesOrErr() ([]*ModerationNote, error) {
-	if e.loadedTypes[32] {
+	if e.loadedTypes[35] {
 		return e.ModerationNotes, nil
 	}
 	return nil, &NotLoadedError{edge: "moderation_notes"}
@@ -462,7 +495,7 @@ func (e AccountEdges) ModerationNotesOrErr() ([]*ModerationNote, error) {
 // AuthoredModerationNotesOrErr returns the AuthoredModerationNotes value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AuthoredModerationNotesOrErr() ([]*ModerationNote, error) {
-	if e.loadedTypes[33] {
+	if e.loadedTypes[36] {
 		return e.AuthoredModerationNotes, nil
 	}
 	return nil, &NotLoadedError{edge: "authored_moderation_notes"}
@@ -471,7 +504,7 @@ func (e AccountEdges) AuthoredModerationNotesOrErr() ([]*ModerationNote, error) 
 // WarningsOrErr returns the Warnings value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) WarningsOrErr() ([]*Warning, error) {
-	if e.loadedTypes[34] {
+	if e.loadedTypes[37] {
 		return e.Warnings, nil
 	}
 	return nil, &NotLoadedError{edge: "warnings"}
@@ -480,7 +513,7 @@ func (e AccountEdges) WarningsOrErr() ([]*Warning, error) {
 // AuthoredWarningsOrErr returns the AuthoredWarnings value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AuthoredWarningsOrErr() ([]*Warning, error) {
-	if e.loadedTypes[35] {
+	if e.loadedTypes[38] {
 		return e.AuthoredWarnings, nil
 	}
 	return nil, &NotLoadedError{edge: "authored_warnings"}
@@ -489,7 +522,7 @@ func (e AccountEdges) AuthoredWarningsOrErr() ([]*Warning, error) {
 // RobotsOrErr returns the Robots value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) RobotsOrErr() ([]*Robot, error) {
-	if e.loadedTypes[36] {
+	if e.loadedTypes[39] {
 		return e.Robots, nil
 	}
 	return nil, &NotLoadedError{edge: "robots"}
@@ -498,7 +531,7 @@ func (e AccountEdges) RobotsOrErr() ([]*Robot, error) {
 // RobotToolsetsOrErr returns the RobotToolsets value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) RobotToolsetsOrErr() ([]*RobotToolset, error) {
-	if e.loadedTypes[37] {
+	if e.loadedTypes[40] {
 		return e.RobotToolsets, nil
 	}
 	return nil, &NotLoadedError{edge: "robot_toolsets"}
@@ -507,7 +540,7 @@ func (e AccountEdges) RobotToolsetsOrErr() ([]*RobotToolset, error) {
 // RobotWorkspacesOrErr returns the RobotWorkspaces value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) RobotWorkspacesOrErr() ([]*RobotWorkspace, error) {
-	if e.loadedTypes[38] {
+	if e.loadedTypes[41] {
 		return e.RobotWorkspaces, nil
 	}
 	return nil, &NotLoadedError{edge: "robot_workspaces"}
@@ -516,7 +549,7 @@ func (e AccountEdges) RobotWorkspacesOrErr() ([]*RobotWorkspace, error) {
 // RobotWorkspaceInstancesOrErr returns the RobotWorkspaceInstances value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) RobotWorkspaceInstancesOrErr() ([]*RobotWorkspaceInstance, error) {
-	if e.loadedTypes[39] {
+	if e.loadedTypes[42] {
 		return e.RobotWorkspaceInstances, nil
 	}
 	return nil, &NotLoadedError{edge: "robot_workspace_instances"}
@@ -525,7 +558,7 @@ func (e AccountEdges) RobotWorkspaceInstancesOrErr() ([]*RobotWorkspaceInstance,
 // RobotMcpServersOrErr returns the RobotMcpServers value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) RobotMcpServersOrErr() ([]*RobotMCPServer, error) {
-	if e.loadedTypes[40] {
+	if e.loadedTypes[43] {
 		return e.RobotMcpServers, nil
 	}
 	return nil, &NotLoadedError{edge: "robot_mcp_servers"}
@@ -534,7 +567,7 @@ func (e AccountEdges) RobotMcpServersOrErr() ([]*RobotMCPServer, error) {
 // CreatedRobotSessionsOrErr returns the CreatedRobotSessions value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) CreatedRobotSessionsOrErr() ([]*RobotSession, error) {
-	if e.loadedTypes[41] {
+	if e.loadedTypes[44] {
 		return e.CreatedRobotSessions, nil
 	}
 	return nil, &NotLoadedError{edge: "created_robot_sessions"}
@@ -543,7 +576,7 @@ func (e AccountEdges) CreatedRobotSessionsOrErr() ([]*RobotSession, error) {
 // RobotSessionViewsOrErr returns the RobotSessionViews value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) RobotSessionViewsOrErr() ([]*RobotSessionView, error) {
-	if e.loadedTypes[42] {
+	if e.loadedTypes[45] {
 		return e.RobotSessionViews, nil
 	}
 	return nil, &NotLoadedError{edge: "robot_session_views"}
@@ -552,7 +585,7 @@ func (e AccountEdges) RobotSessionViewsOrErr() ([]*RobotSessionView, error) {
 // RobotMessagesOrErr returns the RobotMessages value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) RobotMessagesOrErr() ([]*RobotSessionMessage, error) {
-	if e.loadedTypes[43] {
+	if e.loadedTypes[46] {
 		return e.RobotMessages, nil
 	}
 	return nil, &NotLoadedError{edge: "robot_messages"}
@@ -561,7 +594,7 @@ func (e AccountEdges) RobotMessagesOrErr() ([]*RobotSessionMessage, error) {
 // RobotSessionInputsOrErr returns the RobotSessionInputs value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) RobotSessionInputsOrErr() ([]*RobotSessionInput, error) {
-	if e.loadedTypes[44] {
+	if e.loadedTypes[47] {
 		return e.RobotSessionInputs, nil
 	}
 	return nil, &NotLoadedError{edge: "robot_session_inputs"}
@@ -570,7 +603,7 @@ func (e AccountEdges) RobotSessionInputsOrErr() ([]*RobotSessionInput, error) {
 // InitiatedRobotTurnsOrErr returns the InitiatedRobotTurns value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) InitiatedRobotTurnsOrErr() ([]*RobotSessionTurn, error) {
-	if e.loadedTypes[45] {
+	if e.loadedTypes[48] {
 		return e.InitiatedRobotTurns, nil
 	}
 	return nil, &NotLoadedError{edge: "initiated_robot_turns"}
@@ -579,7 +612,7 @@ func (e AccountEdges) InitiatedRobotTurnsOrErr() ([]*RobotSessionTurn, error) {
 // CreatedTrailsOrErr returns the CreatedTrails value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) CreatedTrailsOrErr() ([]*Trail, error) {
-	if e.loadedTypes[46] {
+	if e.loadedTypes[49] {
 		return e.CreatedTrails, nil
 	}
 	return nil, &NotLoadedError{edge: "created_trails"}
@@ -588,7 +621,7 @@ func (e AccountEdges) CreatedTrailsOrErr() ([]*Trail, error) {
 // InitiatedTrailRunsOrErr returns the InitiatedTrailRuns value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) InitiatedTrailRunsOrErr() ([]*TrailRun, error) {
-	if e.loadedTypes[47] {
+	if e.loadedTypes[50] {
 		return e.InitiatedTrailRuns, nil
 	}
 	return nil, &NotLoadedError{edge: "initiated_trail_runs"}
@@ -597,7 +630,7 @@ func (e AccountEdges) InitiatedTrailRunsOrErr() ([]*TrailRun, error) {
 // AccountRolesOrErr returns the AccountRoles value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AccountRolesOrErr() ([]*AccountRoles, error) {
-	if e.loadedTypes[48] {
+	if e.loadedTypes[51] {
 		return e.AccountRoles, nil
 	}
 	return nil, &NotLoadedError{edge: "account_roles"}
@@ -819,6 +852,21 @@ func (_m *Account) QueryRoles() *RoleQuery {
 // QueryAuthentication queries the "authentication" edge of the Account entity.
 func (_m *Account) QueryAuthentication() *AuthenticationQuery {
 	return NewAccountClient(_m.config).QueryAuthentication(_m)
+}
+
+// QueryOauthRegistrationApprovals queries the "oauth_registration_approvals" edge of the Account entity.
+func (_m *Account) QueryOauthRegistrationApprovals() *OAuthRegistrationApprovalQuery {
+	return NewAccountClient(_m.config).QueryOauthRegistrationApprovals(_m)
+}
+
+// QueryApprovedOauthClients queries the "approved_oauth_clients" edge of the Account entity.
+func (_m *Account) QueryApprovedOauthClients() *OAuthClientQuery {
+	return NewAccountClient(_m.config).QueryApprovedOauthClients(_m)
+}
+
+// QueryOauthDcrIats queries the "oauth_dcr_iats" edge of the Account entity.
+func (_m *Account) QueryOauthDcrIats() *OAuthDynamicRegistrationAccessTokensQuery {
+	return NewAccountClient(_m.config).QueryOauthDcrIats(_m)
 }
 
 // QueryOauthClients queries the "oauth_clients" edge of the Account entity.

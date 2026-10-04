@@ -32,7 +32,9 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
 	"github.com/Southclaws/storyden/internal/ent/oauthclient"
 	"github.com/Southclaws/storyden/internal/ent/oauthdeviceauthorisation"
+	"github.com/Southclaws/storyden/internal/ent/oauthdynamicregistrationaccesstokens"
 	"github.com/Southclaws/storyden/internal/ent/oauthrefreshtoken"
+	"github.com/Southclaws/storyden/internal/ent/oauthregistrationapproval"
 	"github.com/Southclaws/storyden/internal/ent/oauthremoteauthorisationflow"
 	"github.com/Southclaws/storyden/internal/ent/oauthremoteconnection"
 	"github.com/Southclaws/storyden/internal/ent/plugin"
@@ -1096,19 +1098,19 @@ func init() {
 	// oauthclient.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	oauthclient.UpdateDefaultUpdatedAt = oauthclientDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// oauthclientDescClientID is the schema descriptor for client_id field.
-	oauthclientDescClientID := oauthclientFields[1].Descriptor()
+	oauthclientDescClientID := oauthclientFields[3].Descriptor()
 	// oauthclient.ClientIDValidator is a validator for the "client_id" field. It is called by the builders before save.
 	oauthclient.ClientIDValidator = oauthclientDescClientID.Validators[0].(func(string) error)
 	// oauthclientDescName is the schema descriptor for name field.
-	oauthclientDescName := oauthclientFields[3].Descriptor()
+	oauthclientDescName := oauthclientFields[5].Descriptor()
 	// oauthclient.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	oauthclient.NameValidator = oauthclientDescName.Validators[0].(func(string) error)
 	// oauthclientDescTokenEndpointAuthMethod is the schema descriptor for token_endpoint_auth_method field.
-	oauthclientDescTokenEndpointAuthMethod := oauthclientFields[6].Descriptor()
+	oauthclientDescTokenEndpointAuthMethod := oauthclientFields[8].Descriptor()
 	// oauthclient.DefaultTokenEndpointAuthMethod holds the default value on creation for the token_endpoint_auth_method field.
 	oauthclient.DefaultTokenEndpointAuthMethod = oauthclientDescTokenEndpointAuthMethod.Default.(string)
 	// oauthclientDescPkceRequired is the schema descriptor for pkce_required field.
-	oauthclientDescPkceRequired := oauthclientFields[7].Descriptor()
+	oauthclientDescPkceRequired := oauthclientFields[10].Descriptor()
 	// oauthclient.DefaultPkceRequired holds the default value on creation for the pkce_required field.
 	oauthclient.DefaultPkceRequired = oauthclientDescPkceRequired.Default.(bool)
 	// oauthclientDescID is the schema descriptor for id field.
@@ -1178,6 +1180,69 @@ func init() {
 			return nil
 		}
 	}()
+	oauthdynamicregistrationaccesstokensMixin := schema.OAuthDynamicRegistrationAccessTokens{}.Mixin()
+	oauthdynamicregistrationaccesstokensMixinFields0 := oauthdynamicregistrationaccesstokensMixin[0].Fields()
+	_ = oauthdynamicregistrationaccesstokensMixinFields0
+	oauthdynamicregistrationaccesstokensMixinFields1 := oauthdynamicregistrationaccesstokensMixin[1].Fields()
+	_ = oauthdynamicregistrationaccesstokensMixinFields1
+	oauthdynamicregistrationaccesstokensFields := schema.OAuthDynamicRegistrationAccessTokens{}.Fields()
+	_ = oauthdynamicregistrationaccesstokensFields
+	// oauthdynamicregistrationaccesstokensDescCreatedAt is the schema descriptor for created_at field.
+	oauthdynamicregistrationaccesstokensDescCreatedAt := oauthdynamicregistrationaccesstokensMixinFields1[0].Descriptor()
+	// oauthdynamicregistrationaccesstokens.DefaultCreatedAt holds the default value on creation for the created_at field.
+	oauthdynamicregistrationaccesstokens.DefaultCreatedAt = oauthdynamicregistrationaccesstokensDescCreatedAt.Default.(func() time.Time)
+	// oauthdynamicregistrationaccesstokensDescLabel is the schema descriptor for label field.
+	oauthdynamicregistrationaccesstokensDescLabel := oauthdynamicregistrationaccesstokensFields[0].Descriptor()
+	// oauthdynamicregistrationaccesstokens.LabelValidator is a validator for the "label" field. It is called by the builders before save.
+	oauthdynamicregistrationaccesstokens.LabelValidator = func() func(string) error {
+		validators := oauthdynamicregistrationaccesstokensDescLabel.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(label string) error {
+			for _, fn := range fns {
+				if err := fn(label); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// oauthdynamicregistrationaccesstokensDescTokenHash is the schema descriptor for token_hash field.
+	oauthdynamicregistrationaccesstokensDescTokenHash := oauthdynamicregistrationaccesstokensFields[1].Descriptor()
+	// oauthdynamicregistrationaccesstokens.TokenHashValidator is a validator for the "token_hash" field. It is called by the builders before save.
+	oauthdynamicregistrationaccesstokens.TokenHashValidator = oauthdynamicregistrationaccesstokensDescTokenHash.Validators[0].(func(string) error)
+	// oauthdynamicregistrationaccesstokensDescMaxRegistrations is the schema descriptor for max_registrations field.
+	oauthdynamicregistrationaccesstokensDescMaxRegistrations := oauthdynamicregistrationaccesstokensFields[4].Descriptor()
+	// oauthdynamicregistrationaccesstokens.MaxRegistrationsValidator is a validator for the "max_registrations" field. It is called by the builders before save.
+	oauthdynamicregistrationaccesstokens.MaxRegistrationsValidator = oauthdynamicregistrationaccesstokensDescMaxRegistrations.Validators[0].(func(int) error)
+	// oauthdynamicregistrationaccesstokensDescRegistrationCount is the schema descriptor for registration_count field.
+	oauthdynamicregistrationaccesstokensDescRegistrationCount := oauthdynamicregistrationaccesstokensFields[5].Descriptor()
+	// oauthdynamicregistrationaccesstokens.DefaultRegistrationCount holds the default value on creation for the registration_count field.
+	oauthdynamicregistrationaccesstokens.DefaultRegistrationCount = oauthdynamicregistrationaccesstokensDescRegistrationCount.Default.(int)
+	// oauthdynamicregistrationaccesstokens.RegistrationCountValidator is a validator for the "registration_count" field. It is called by the builders before save.
+	oauthdynamicregistrationaccesstokens.RegistrationCountValidator = oauthdynamicregistrationaccesstokensDescRegistrationCount.Validators[0].(func(int) error)
+	// oauthdynamicregistrationaccesstokensDescID is the schema descriptor for id field.
+	oauthdynamicregistrationaccesstokensDescID := oauthdynamicregistrationaccesstokensMixinFields0[0].Descriptor()
+	// oauthdynamicregistrationaccesstokens.DefaultID holds the default value on creation for the id field.
+	oauthdynamicregistrationaccesstokens.DefaultID = oauthdynamicregistrationaccesstokensDescID.Default.(func() xid.ID)
+	// oauthdynamicregistrationaccesstokens.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	oauthdynamicregistrationaccesstokens.IDValidator = func() func(string) error {
+		validators := oauthdynamicregistrationaccesstokensDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	oauthrefreshtokenMixin := schema.OAuthRefreshToken{}.Mixin()
 	oauthrefreshtokenMixinFields0 := oauthrefreshtokenMixin[0].Fields()
 	_ = oauthrefreshtokenMixinFields0
@@ -1200,6 +1265,55 @@ func init() {
 	// oauthrefreshtoken.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	oauthrefreshtoken.IDValidator = func() func(string) error {
 		validators := oauthrefreshtokenDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	oauthregistrationapprovalMixin := schema.OAuthRegistrationApproval{}.Mixin()
+	oauthregistrationapprovalMixinFields0 := oauthregistrationapprovalMixin[0].Fields()
+	_ = oauthregistrationapprovalMixinFields0
+	oauthregistrationapprovalMixinFields1 := oauthregistrationapprovalMixin[1].Fields()
+	_ = oauthregistrationapprovalMixinFields1
+	oauthregistrationapprovalFields := schema.OAuthRegistrationApproval{}.Fields()
+	_ = oauthregistrationapprovalFields
+	// oauthregistrationapprovalDescCreatedAt is the schema descriptor for created_at field.
+	oauthregistrationapprovalDescCreatedAt := oauthregistrationapprovalMixinFields1[0].Descriptor()
+	// oauthregistrationapproval.DefaultCreatedAt holds the default value on creation for the created_at field.
+	oauthregistrationapproval.DefaultCreatedAt = oauthregistrationapprovalDescCreatedAt.Default.(func() time.Time)
+	// oauthregistrationapprovalDescRegistrationCodeHash is the schema descriptor for registration_code_hash field.
+	oauthregistrationapprovalDescRegistrationCodeHash := oauthregistrationapprovalFields[0].Descriptor()
+	// oauthregistrationapproval.RegistrationCodeHashValidator is a validator for the "registration_code_hash" field. It is called by the builders before save.
+	oauthregistrationapproval.RegistrationCodeHashValidator = oauthregistrationapprovalDescRegistrationCodeHash.Validators[0].(func(string) error)
+	// oauthregistrationapprovalDescVerificationCodeHash is the schema descriptor for verification_code_hash field.
+	oauthregistrationapprovalDescVerificationCodeHash := oauthregistrationapprovalFields[1].Descriptor()
+	// oauthregistrationapproval.VerificationCodeHashValidator is a validator for the "verification_code_hash" field. It is called by the builders before save.
+	oauthregistrationapproval.VerificationCodeHashValidator = oauthregistrationapprovalDescVerificationCodeHash.Validators[0].(func(string) error)
+	// oauthregistrationapprovalDescVerificationCodeDisplay is the schema descriptor for verification_code_display field.
+	oauthregistrationapprovalDescVerificationCodeDisplay := oauthregistrationapprovalFields[2].Descriptor()
+	// oauthregistrationapproval.VerificationCodeDisplayValidator is a validator for the "verification_code_display" field. It is called by the builders before save.
+	oauthregistrationapproval.VerificationCodeDisplayValidator = oauthregistrationapprovalDescVerificationCodeDisplay.Validators[0].(func(string) error)
+	// oauthregistrationapprovalDescPollIntervalSeconds is the schema descriptor for poll_interval_seconds field.
+	oauthregistrationapprovalDescPollIntervalSeconds := oauthregistrationapprovalFields[6].Descriptor()
+	// oauthregistrationapproval.DefaultPollIntervalSeconds holds the default value on creation for the poll_interval_seconds field.
+	oauthregistrationapproval.DefaultPollIntervalSeconds = oauthregistrationapprovalDescPollIntervalSeconds.Default.(int)
+	// oauthregistrationapproval.PollIntervalSecondsValidator is a validator for the "poll_interval_seconds" field. It is called by the builders before save.
+	oauthregistrationapproval.PollIntervalSecondsValidator = oauthregistrationapprovalDescPollIntervalSeconds.Validators[0].(func(int) error)
+	// oauthregistrationapprovalDescID is the schema descriptor for id field.
+	oauthregistrationapprovalDescID := oauthregistrationapprovalMixinFields0[0].Descriptor()
+	// oauthregistrationapproval.DefaultID holds the default value on creation for the id field.
+	oauthregistrationapproval.DefaultID = oauthregistrationapprovalDescID.Default.(func() xid.ID)
+	// oauthregistrationapproval.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	oauthregistrationapproval.IDValidator = func() func(string) error {
+		validators := oauthregistrationapprovalDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

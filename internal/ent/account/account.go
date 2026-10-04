@@ -74,6 +74,12 @@ const (
 	EdgeRoles = "roles"
 	// EdgeAuthentication holds the string denoting the authentication edge name in mutations.
 	EdgeAuthentication = "authentication"
+	// EdgeOauthRegistrationApprovals holds the string denoting the oauth_registration_approvals edge name in mutations.
+	EdgeOauthRegistrationApprovals = "oauth_registration_approvals"
+	// EdgeApprovedOauthClients holds the string denoting the approved_oauth_clients edge name in mutations.
+	EdgeApprovedOauthClients = "approved_oauth_clients"
+	// EdgeOauthDcrIats holds the string denoting the oauth_dcr_iats edge name in mutations.
+	EdgeOauthDcrIats = "oauth_dcr_iats"
 	// EdgeOauthClients holds the string denoting the oauth_clients edge name in mutations.
 	EdgeOauthClients = "oauth_clients"
 	// EdgeOauthAuthorisationCodes holds the string denoting the oauth_authorisation_codes edge name in mutations.
@@ -247,6 +253,27 @@ const (
 	AuthenticationInverseTable = "authentications"
 	// AuthenticationColumn is the table column denoting the authentication relation/edge.
 	AuthenticationColumn = "account_authentication"
+	// OauthRegistrationApprovalsTable is the table that holds the oauth_registration_approvals relation/edge.
+	OauthRegistrationApprovalsTable = "oauth_registration_approvals"
+	// OauthRegistrationApprovalsInverseTable is the table name for the OAuthRegistrationApproval entity.
+	// It exists in this package in order to avoid circular dependency with the "oauthregistrationapproval" package.
+	OauthRegistrationApprovalsInverseTable = "oauth_registration_approvals"
+	// OauthRegistrationApprovalsColumn is the table column denoting the oauth_registration_approvals relation/edge.
+	OauthRegistrationApprovalsColumn = "approved_by_account_id"
+	// ApprovedOauthClientsTable is the table that holds the approved_oauth_clients relation/edge.
+	ApprovedOauthClientsTable = "oauth_clients"
+	// ApprovedOauthClientsInverseTable is the table name for the OAuthClient entity.
+	// It exists in this package in order to avoid circular dependency with the "oauthclient" package.
+	ApprovedOauthClientsInverseTable = "oauth_clients"
+	// ApprovedOauthClientsColumn is the table column denoting the approved_oauth_clients relation/edge.
+	ApprovedOauthClientsColumn = "registration_approved_by_account_id"
+	// OauthDcrIatsTable is the table that holds the oauth_dcr_iats relation/edge.
+	OauthDcrIatsTable = "oauth_dcr_iats"
+	// OauthDcrIatsInverseTable is the table name for the OAuthDynamicRegistrationAccessTokens entity.
+	// It exists in this package in order to avoid circular dependency with the "oauthdynamicregistrationaccesstokens" package.
+	OauthDcrIatsInverseTable = "oauth_dcr_iats"
+	// OauthDcrIatsColumn is the table column denoting the oauth_dcr_iats relation/edge.
+	OauthDcrIatsColumn = "creator_account_id"
 	// OauthClientsTable is the table that holds the oauth_clients relation/edge.
 	OauthClientsTable = "oauth_clients"
 	// OauthClientsInverseTable is the table name for the OAuthClient entity.
@@ -866,6 +893,48 @@ func ByAuthentication(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByOauthRegistrationApprovalsCount orders the results by oauth_registration_approvals count.
+func ByOauthRegistrationApprovalsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newOauthRegistrationApprovalsStep(), opts...)
+	}
+}
+
+// ByOauthRegistrationApprovals orders the results by oauth_registration_approvals terms.
+func ByOauthRegistrationApprovals(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOauthRegistrationApprovalsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByApprovedOauthClientsCount orders the results by approved_oauth_clients count.
+func ByApprovedOauthClientsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newApprovedOauthClientsStep(), opts...)
+	}
+}
+
+// ByApprovedOauthClients orders the results by approved_oauth_clients terms.
+func ByApprovedOauthClients(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newApprovedOauthClientsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByOauthDcrIatsCount orders the results by oauth_dcr_iats count.
+func ByOauthDcrIatsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newOauthDcrIatsStep(), opts...)
+	}
+}
+
+// ByOauthDcrIats orders the results by oauth_dcr_iats terms.
+func ByOauthDcrIats(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOauthDcrIatsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByOauthClientsCount orders the results by oauth_clients count.
 func ByOauthClientsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -1444,6 +1513,27 @@ func newAuthenticationStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AuthenticationInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, AuthenticationTable, AuthenticationColumn),
+	)
+}
+func newOauthRegistrationApprovalsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OauthRegistrationApprovalsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, OauthRegistrationApprovalsTable, OauthRegistrationApprovalsColumn),
+	)
+}
+func newApprovedOauthClientsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ApprovedOauthClientsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ApprovedOauthClientsTable, ApprovedOauthClientsColumn),
+	)
+}
+func newOauthDcrIatsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OauthDcrIatsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, OauthDcrIatsTable, OauthDcrIatsColumn),
 	)
 }
 func newOauthClientsStep() *sqlgraph.Step {

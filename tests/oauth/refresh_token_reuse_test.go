@@ -81,7 +81,7 @@ func mintRefreshTokenViaDeviceFlow(t *testing.T, ctx context.Context, cl *openap
 
 	start := tests.AssertRequest(cl.OAuthDeviceAuthorisationWithFormdataBodyWithResponse(ctx, openapi.OAuthDeviceAuthorisationFormdataRequestBody{
 		ClientId: clientID,
-		Scope:    ptr("openid profile offline_access"),
+		Scope:    new("openid profile offline_access"),
 	}))(t, http.StatusOK)
 	r.NotNil(start.JSON200)
 

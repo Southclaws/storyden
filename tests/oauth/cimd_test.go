@@ -292,7 +292,7 @@ func TestOAuthCIMDAuthorizationFlow(t *testing.T) {
 					GrantType:    "authorization_code",
 					ClientId:     queriedID,
 					Code:         &code,
-					RedirectUri:  ptr("https://client.example/callback"),
+					RedirectUri:  new("https://client.example/callback"),
 					CodeVerifier: &verifier,
 				})
 				r.NoError(err)

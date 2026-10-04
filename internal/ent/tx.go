@@ -66,8 +66,12 @@ type Tx struct {
 	OAuthClient *OAuthClientClient
 	// OAuthDeviceAuthorisation is the client for interacting with the OAuthDeviceAuthorisation builders.
 	OAuthDeviceAuthorisation *OAuthDeviceAuthorisationClient
+	// OAuthDynamicRegistrationAccessTokens is the client for interacting with the OAuthDynamicRegistrationAccessTokens builders.
+	OAuthDynamicRegistrationAccessTokens *OAuthDynamicRegistrationAccessTokensClient
 	// OAuthRefreshToken is the client for interacting with the OAuthRefreshToken builders.
 	OAuthRefreshToken *OAuthRefreshTokenClient
+	// OAuthRegistrationApproval is the client for interacting with the OAuthRegistrationApproval builders.
+	OAuthRegistrationApproval *OAuthRegistrationApprovalClient
 	// OAuthRemoteAuthorisationFlow is the client for interacting with the OAuthRemoteAuthorisationFlow builders.
 	OAuthRemoteAuthorisationFlow *OAuthRemoteAuthorisationFlowClient
 	// OAuthRemoteConnection is the client for interacting with the OAuthRemoteConnection builders.
@@ -291,7 +295,9 @@ func (tx *Tx) init() {
 	tx.OAuthAuthorisationRequest = NewOAuthAuthorisationRequestClient(tx.config)
 	tx.OAuthClient = NewOAuthClientClient(tx.config)
 	tx.OAuthDeviceAuthorisation = NewOAuthDeviceAuthorisationClient(tx.config)
+	tx.OAuthDynamicRegistrationAccessTokens = NewOAuthDynamicRegistrationAccessTokensClient(tx.config)
 	tx.OAuthRefreshToken = NewOAuthRefreshTokenClient(tx.config)
+	tx.OAuthRegistrationApproval = NewOAuthRegistrationApprovalClient(tx.config)
 	tx.OAuthRemoteAuthorisationFlow = NewOAuthRemoteAuthorisationFlowClient(tx.config)
 	tx.OAuthRemoteConnection = NewOAuthRemoteConnectionClient(tx.config)
 	tx.Plugin = NewPluginClient(tx.config)

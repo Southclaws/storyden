@@ -2,7 +2,9 @@
 
 import { formatDate } from "date-fns";
 import type { ReactNode } from "react";
+import { useForm } from "react-hook-form";
 
+import { handle } from "@/api/client";
 import {
   OAuthClientList,
   OAuthDeviceAuthorisationList,
@@ -14,11 +16,15 @@ import { PaginationControls } from "@/components/site/PaginationControls/Paginat
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CheckboxField } from "@/components/ui/checkbox";
+import { FormControl } from "@/components/ui/form-control";
 import { MetaGrid, MetaItem } from "@/components/ui/meta-grid";
 import { PageHeading } from "@/components/ui/page-heading";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Text } from "@/components/ui/text";
 import { formatOAuthGrant } from "@/lib/auth/oauth";
+import { useSettingsMutation } from "@/lib/settings/mutation";
+import { AdminSettings } from "@/lib/settings/settings";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { cardBox } from "@/styled-system/recipes";
@@ -32,6 +38,7 @@ type TokenPage = {
 };
 
 type Props = {
+  settings: AdminSettings;
   clients: OAuthClientList;
   deviceAuthorisations: OAuthDeviceAuthorisationList;
   tokens: OAuthRefreshTokenList;
@@ -39,11 +46,34 @@ type Props = {
 };
 
 export function OAuthSettings({
+  settings,
   clients,
   deviceAuthorisations,
   tokens,
   tokenPage,
 }: Props) {
+  const { updateSettings } = useSettingsMutation();
+  const oauthEnabled = settings.capabilities?.includes("oauth") ?? false;
+  const form = useForm({
+    defaultValues: {
+      dynamic_registration_enabled:
+        settings.services?.oauth?.dynamic_registration_enabled ?? false,
+    },
+  });
+  const handleSubmit = form.handleSubmit(async (data) => {
+    await handle(
+      async () => {
+        await updateSettings({ services: { oauth: data } });
+        form.reset(data);
+      },
+      {
+        promiseToast: {
+          loading: "Saving...",
+          success: "OAuth settings updated",
+        },
+      },
+    );
+  });
   const activeTokens = tokens.filter((token) => !token.revoked_at).length;
 
   return (
@@ -51,9 +81,42 @@ export function OAuthSettings({
       <LStack gap="1">
         <PageHeading>OAuth</PageHeading>
         <Text variant="supporting">
-          Manage OAuth clients, device authorisations and refresh tokens.
+          Configure client registration and manage OAuth clients, device
+          authorisations and refresh tokens.
         </Text>
       </LStack>
+
+      <styled.form className={lstack({ gap: "3" })} onSubmit={handleSubmit}>
+        <SectionHeading>Client registration</SectionHeading>
+        <FormControl>
+          <CheckboxField
+            control={form.control}
+            name="dynamic_registration_enabled"
+            disabled={!oauthEnabled}
+          >
+            Enable dynamic client registration
+          </CheckboxField>
+          <Text variant="supporting">
+            Allows OAuth applications, including MCP clients, to register
+            themselves. New bot accounts also require an agent registration
+            policy in Authentication settings.
+          </Text>
+        </FormControl>
+        {!oauthEnabled && (
+          <Text variant="supporting">
+            Enable OAuth on the server to configure client registration.
+          </Text>
+        )}
+        <WStack justifyContent="end">
+          <Button
+            type="submit"
+            disabled={!oauthEnabled}
+            loading={form.formState.isSubmitting}
+          >
+            Save
+          </Button>
+        </WStack>
+      </styled.form>
 
       <OAuthClientListView clients={clients} />
       <OAuthRefreshTokenListView

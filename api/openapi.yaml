@@ -731,6 +731,181 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "200": { $ref: "#/components/responses/OAuthRemoteAuthorizeOK" }
 
+  /admin/oauth/registration-approvals:
+    get:
+      operationId: AdminOAuthRegistrationApprovalList
+      description: |
+        List pending, unexpired autonomous registrations awaiting administrator
+        approval. Completed, denied, cancelled & expired requests are excluded.
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/PaginationQuery" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200":
+          description: Pending registrations, oldest first.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuthRegistrationApprovalListResult"
+
+  /admin/oauth/registration-approvals/decision:
+    post:
+      operationId: AdminOAuthRegistrationApprovalBulkSubmit
+      description: |
+        Approve or deny all pending, unexpired registrations created on or
+        before the queue snapshot time, across all pages. Already decided,
+        cancelled, consumed and expired requests are excluded. Returns the
+        number of requests changed; approval creates only when clients poll.
+      tags: [admin]
+      x-storyden:
+        rate-limit-cost: 10
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OAuthRegistrationApprovalBulkDecision"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200":
+          description: Number of pending requests changed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuthRegistrationApprovalBulkResult"
+
+  /admin/oauth/registration-approvals/verification:
+    get:
+      operationId: AdminOAuthRegistrationApprovalGet
+      description: |
+        Review a pending autonomous registration by its verification code. This
+        does not approve it or create an account.
+      tags: [admin]
+      x-storyden:
+        rate-limit-cost: 10
+      parameters:
+        - name: verification_code
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400":
+          description: Verification code is invalid or unavailable.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OAuthError" }
+        "200":
+          description: Effective registration data for explicit admin review.
+          content:
+            application/json:
+              schema:
+                { $ref: "#/components/schemas/OAuthRegistrationApprovalReview" }
+    post:
+      operationId: AdminOAuthRegistrationApprovalSubmit
+      description: |
+        Approve or deny a pending autonomous registration. Approval authorizes
+        creation of a bot on the next client poll and does not grant the
+        administrator's permissions.
+      tags: [admin]
+      x-storyden:
+        rate-limit-cost: 10
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              { $ref: "#/components/schemas/OAuthRegistrationApprovalDecision" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400":
+          description: Verification code is invalid or unavailable.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OAuthError" }
+        "204": { $ref: "#/components/responses/NoContent" }
+
+  /admin/oauth/dcr-iats:
+    get:
+      operationId: AdminOAuthDynamicRegistrationAccessTokenList
+      parameters: [{ $ref: "#/components/parameters/PaginationQuery" }]
+      description: |
+        List agent registration tokens, including expired and revoked tokens.
+        Secret values and hashes are never returned.
+      tags: [admin]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200":
+          description: Registration tokens.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuthDynamicRegistrationAccessTokenListResult"
+    post:
+      operationId: AdminOAuthDynamicRegistrationAccessTokenCreate
+      description: |
+        Issue an Initial Access Token authorizing autonomous agent registration.
+        The opaque bearer token is returned once. It grants no account or API
+        permissions. Expiry is required; max_registrations defaults to one.
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OAuthDynamicRegistrationAccessTokenCreateProps"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "201":
+          description: Registration token issued.
+          headers:
+            Cache-Control: { schema: { type: string } }
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuthDynamicRegistrationAccessTokenIssued"
+
+  /admin/oauth/dcr-iats/{oauth_dcr_iat_id}:
+    parameters:
+      - name: oauth_dcr_iat_id
+        in: path
+        required: true
+        schema: { $ref: "#/components/schemas/Identifier" }
+    get:
+      operationId: AdminOAuthDynamicRegistrationAccessTokenGet
+      description: |
+        Read agent registration token metadata without its secret or hash.
+      tags: [admin]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200":
+          description: Registration token metadata.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuthDynamicRegistrationAccessToken"
+    delete:
+      operationId: AdminOAuthDynamicRegistrationAccessTokenRevoke
+      description: |
+        Revoke an agent registration token, retaining its metadata and usage
+        history. Repeated revocation succeeds. Existing clients are unaffected.
+      tags: [admin]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "204": { $ref: "#/components/responses/NoContent" }
+
   #
   #          888                   d8b
   #          888                   Y8P
@@ -1518,23 +1693,34 @@ paths:
       description: |
         RFC 7591 OAuth 2.0 Dynamic Client Registration.
 
-        Allows clients such as MCP connectors to register themselves without
-        prior administrator configuration. Dynamically registered clients are
-        tenant-owned (they have no account owner), use the explicit scope
-        policy, and are restricted to a conservative grant and scope allowlist.
+        Ordinary Authorization Code clients are tenant-owned and must use PKCE.
+        Only an explicit grant_types: [client_credentials] request provisions a bot
+        account and a separate OAuth client atomically, with client_name as its handle.
+        It requires private_key_jwt and public JWKS. Mixed autonomous and delegated
+        grants are rejected. Delegated private_key_jwt clients create no account.
+        Autonomous clients inherit the bot account's current role permissions.
+        Client credentials token requests without scope receive those permissions;
+        explicit token scopes may narrow them. The optional runtime setting
+        services.oauth.autonomous_registration_role_id assigns an additional role
+        atomically at provisioning; deleted role references are skipped.
 
-        Authorization Code clients must use PKCE; Storyden enforces PKCE (S256)
-        at the authorize and token endpoints for all clients.
+        Autonomous registration is controlled by the runtime setting services.oauth.autonomous_registration_mode:
+        disabled rejects it, protected requires an Initial Access Token in
+        Authorization: Bearer, and open permits it without a token. Supplied tokens
+        must always be valid and authorize autonomous registration only. One use is
+        consumed atomically with successful account and client creation. Invalid
+        metadata or handle collisions do not consume a use. Ordinary DCR does not
+        require an IAT. This endpoint is rate limited.
 
-        Public clients register with `token_endpoint_auth_method: none` and
-        receive no client secret. Confidential clients register with
-        `client_secret_basic` or `client_secret_post` and receive a one-time
-        `client_secret` in the response. The registration endpoint is advertised
-        as `registration_endpoint` by the authorization server metadata
-        documents.
-
-        This is an unauthenticated endpoint that creates server state, so it
-        is heavily rate limited to prevent abuse.
+        In approval mode, a valid IAT permits immediate registration. Otherwise,
+        autonomous clients must opt in with registration_mode: [approval] and
+        receive 202 with a registration_code and verification challenge. Poll this
+        endpoint with registration_code; metadata supplied on a poll is ignored.
+        Approval returns 201 on a subsequent poll. Early polls return 429 with
+        Retry-After. Denial, expiry, and unknown or consumed codes return 400.
+        Send registration_code and cancel_registration: true to cancel a pending
+        request (204). No account or client exists while approval is pending.
+        Implements draft-dellaert-oauth-approval-based-dcr-00 (experimental).
       x-storyden:
         rate-limit-cost: 10
       tags: [auth]
@@ -1543,7 +1729,33 @@ paths:
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "201": { $ref: "#/components/responses/OAuthClientRegisterOK" }
+        "202":
+          description: Registration is awaiting approval. Initial responses include the challenge; subsequent polls may return an empty object.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OAuthRegistrationPending" }
+        "204": { $ref: "#/components/responses/NoContent" }
+        "429":
+          description: Polling too frequently. Retain the increased interval for all subsequent polls.
+          headers:
+            Retry-After: { schema: { type: integer } }
         "400": { $ref: "#/components/responses/OAuthClientRegisterError" }
+        "401":
+          description: Missing or invalid Initial Access Token.
+          headers:
+            WWW-Authenticate: { schema: { type: string } }
+            Cache-Control: { schema: { type: string } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OAuthError" }
+        "403":
+          description: The Initial Access Token cannot authorize this registration type.
+          headers:
+            WWW-Authenticate: { schema: { type: string } }
+            Cache-Control: { schema: { type: string } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OAuthError" }
 
   /auth/webauthn/make/{account_handle}:
     get:
@@ -7948,6 +8160,8 @@ components:
     AdminSettingsServiceProps:
       type: object
       properties:
+        oauth:
+          $ref: "#/components/schemas/OAuthServiceSettings"
         client_ip:
           $ref: "#/components/schemas/ClientIPServiceSettings"
         rate_limiting:
@@ -7956,6 +8170,43 @@ components:
           $ref: "#/components/schemas/ModerationServiceSettings"
         robots:
           $ref: "#/components/schemas/RobotServiceSettings"
+
+    OAuthServiceSettings:
+      type: object
+      description: Runtime OAuth registration policy. The OAuth server must also be enabled in server configuration.
+      properties:
+        dynamic_registration_enabled:
+          type: boolean
+          description: Enable RFC 7591 dynamic client registration. Defaults to false.
+        autonomous_registration_mode:
+          $ref: "#/components/schemas/OAuthAutonomousRegistrationMode"
+        autonomous_registration_role_id:
+          allOf:
+            - $ref: "#/components/schemas/NullableIdentifier"
+          description: |
+            Optional role assigned to new autonomous DCR accounts in addition to
+            implicit membership. Null clears the setting. Omitted fields retain
+            their value. A deleted role is skipped during provisioning; its stored
+            ID remains readable in settings. Changes affect future provisioning,
+            including pending registrations approved afterwards.
+        registration_approval_ttl:
+          type: integer
+          minimum: 1
+          maximum: 9223372036
+          description: Lifetime in seconds of new pending registrations. Defaults to 600. Existing requests retain their expiry.
+        registration_approval_url:
+          type: string
+          description: Absolute HTTP or HTTPS approval URL. Empty uses the frontend resolver at /_/resolve/admin/oauth-dcr-approval. The complete URL includes a verification_code query parameter.
+
+    OAuthAutonomousRegistrationMode:
+      type: string
+      enum: [disabled, protected, open, approval]
+      description: |
+        Admission policy for DCR requests using only client_credentials, which create
+        a bot account and its client together. Defaults to disabled. Protected requires
+        an Initial Access Token; approval requires administrator approval or an Initial
+        Access Token; open permits unknown workloads. Ordinary delegated client
+        registration does not create an account and is unaffected by this policy.
 
     RobotServiceSettings:
       type: object
@@ -9306,6 +9557,10 @@ components:
           type: string
         refresh_token:
           type: string
+        client_assertion_type:
+          type: string
+        client_assertion:
+          type: string
 
     OAuthToken:
       type: object
@@ -9349,6 +9604,62 @@ components:
       type: string
       enum: [explicit, inherit]
 
+    OAuthDynamicRegistrationAccessTokenCreateProps:
+      type: object
+      required: [label, expires_at]
+      properties:
+        label: { type: string, minLength: 1, maxLength: 200 }
+        expires_at:
+          type: string
+          format: date-time
+          description: Must be in the future.
+        max_registrations:
+          type: integer
+          minimum: 1
+          maximum: 2147483647
+          default: 1
+
+    OAuthDynamicRegistrationAccessToken:
+      type: object
+      required:
+        - id
+        - createdAt
+        - label
+        - creator_account_id
+        - expires_at
+        - max_registrations
+        - registration_count
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        createdAt: { $ref: "#/components/schemas/CreatedAt" }
+        label: { type: string }
+        creator_account_id: { $ref: "#/components/schemas/Identifier" }
+        expires_at: { type: string, format: date-time }
+        max_registrations: { type: integer }
+        registration_count: { type: integer }
+        revoked_at: { type: string, format: date-time }
+
+    OAuthDynamicRegistrationAccessTokenIssued:
+      type: object
+      required: [iat, token]
+      properties:
+        iat:
+          $ref: "#/components/schemas/OAuthDynamicRegistrationAccessToken"
+        token:
+          type: string
+          description: Opaque bearer credential shown only once.
+
+    OAuthDynamicRegistrationAccessTokenListResult:
+      allOf:
+        - $ref: "#/components/schemas/PaginatedResult"
+        - type: object
+          required: [iats]
+          properties:
+            iats:
+              type: array
+              items:
+                $ref: "#/components/schemas/OAuthDynamicRegistrationAccessToken"
+
     OAuthClient:
       type: object
       required:
@@ -9367,6 +9678,12 @@ components:
         createdAt: { $ref: "#/components/schemas/CreatedAt" }
         updatedAt: { $ref: "#/components/schemas/UpdatedAt" }
         account_id: { $ref: "#/components/schemas/Identifier" }
+        registration_approved_by_account_id:
+          description: Administrator who approved autonomous registration, for audit provenance only.
+          $ref: "#/components/schemas/Identifier"
+        dcr_iat_id:
+          description: Initial Access Token that authorized creation, when applicable.
+          $ref: "#/components/schemas/Identifier"
         client_id: { type: string }
         name: { type: string }
         type: { $ref: "#/components/schemas/OAuthClientType" }
@@ -9460,6 +9777,63 @@ components:
         client_secret:
           type: string
 
+    OAuthRegistrationPending:
+      type: object
+      properties:
+        registration_code: { type: string }
+        verification_code: { type: string }
+        verification_uri: { type: string, format: uri }
+        verification_uri_complete: { type: string, format: uri }
+        expires_in: { type: integer }
+        interval: { type: integer }
+
+    OAuthRegistrationApprovalListResult:
+      allOf:
+        - $ref: "#/components/schemas/PaginatedResult"
+        - type: object
+          required: [registrations, snapshot_at]
+          properties:
+            snapshot_at:
+              type: string
+              format: date-time
+              description: Server time at the start of this queue read. Use as created_before for a bulk decision.
+            registrations:
+              type: array
+              items:
+                { $ref: "#/components/schemas/OAuthRegistrationApprovalReview" }
+
+    OAuthRegistrationApprovalReview:
+      type: object
+      required: [verification_code, created_at, expires_at, metadata]
+      properties:
+        verification_code: { type: string }
+        created_at: { $ref: "#/components/schemas/CreatedAt" }
+        expires_at: { type: string, format: date-time }
+        metadata: { $ref: "#/components/schemas/OAuthClientRegisterProps" }
+
+    OAuthRegistrationApprovalBulkDecision:
+      type: object
+      required: [approved, created_before]
+      properties:
+        approved: { type: boolean }
+        created_before:
+          type: string
+          format: date-time
+          description: Queue snapshot_at timestamp. Only pending requests created on or before this time are included.
+
+    OAuthRegistrationApprovalBulkResult:
+      type: object
+      required: [updated]
+      properties:
+        updated: { type: integer, minimum: 0 }
+
+    OAuthRegistrationApprovalDecision:
+      type: object
+      required: [verification_code, approved]
+      properties:
+        verification_code: { type: string }
+        approved: { type: boolean }
+
     OAuthClientRegisterProps:
       description: |
         RFC 7591 client metadata supplied by a dynamically registering client.
@@ -9468,6 +9842,16 @@ components:
         or scopes.
       type: object
       properties:
+        registration_mode:
+          type: array
+          items: { type: string }
+          description: Include approval to accept deferred autonomous registration. Unknown modes are ignored.
+        registration_code:
+          type: string
+          description: Opaque bearer credential for polling or cancellation. Its presence selects polling; client metadata cannot replace the original request.
+        cancel_registration:
+          type: boolean
+          description: With registration_code, cancel an unapproved pending registration.
         client_name: { type: string }
         redirect_uris:
           type: array
@@ -9480,6 +9864,10 @@ components:
           items: { type: string }
         scope: { type: string }
         token_endpoint_auth_method: { type: string }
+        jwks:
+          type: object
+          additionalProperties: true
+          description: Public JSON Web Key Set used for private_key_jwt client authentication.
         application_type: { type: string }
         logo_uri: { type: string, format: uri }
         client_uri: { type: string, format: uri }
@@ -9490,7 +9878,7 @@ components:
       description: |
         RFC 7591 client information response containing issued credentials and
         the registered client metadata. `client_secret` is only present for
-        confidential clients. `client_secret_expires_at` is always `0`,
+        shared-secret clients. `client_secret_expires_at` is always `0`,
         indicating the secret does not expire.
       type: object
       required:

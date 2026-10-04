@@ -3,18 +3,16 @@ package create
 import (
 	"context"
 	"fmt"
-	"io"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
 
-	"github.com/Southclaws/storyden/app/resources/datagraph"
 	domainvisibility "github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
+	commandcontent "github.com/Southclaws/storyden/cmd/sd/internal/content"
 	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 )
 
@@ -123,12 +121,12 @@ Choose visibility based on your workflow:
 				return err
 			}
 
-			finalContent, err := readContent(content, contentFile, cmd.InOrStdin())
+			finalContent, err := commandcontent.Read(content, contentFile, cmd.InOrStdin())
 			if err != nil {
 				return err
 			}
 
-			finalContent, err = contentToHTML(finalContent, markdown)
+			finalContent, err = commandcontent.ToHTML(finalContent, markdown)
 			if err != nil {
 				return err
 			}
@@ -199,53 +197,6 @@ func nodeCreateError(response *openapi.NodeCreateResponse) error {
 	}
 
 	return fmt.Errorf("node create request failed: %s", response.Status())
-}
-
-// contentToHTML converts Markdown content to HTML when the --markdown flag is
-// set, reusing the same converter the backend uses so output matches what the
-// server would produce. Without the flag, content passes through unchanged
-// because the API already expects HTML.
-func contentToHTML(content string, markdown bool) (string, error) {
-	if !markdown || content == "" {
-		return content, nil
-	}
-
-	rt, err := datagraph.NewRichTextFromMarkdown(content)
-	if err != nil {
-		return "", fmt.Errorf("failed to convert markdown content: %w", err)
-	}
-
-	return rt.HTML(), nil
-}
-
-func readContent(content string, contentFile string, stdin io.Reader) (string, error) {
-	if content != "" && contentFile != "" {
-		return "", fmt.Errorf("cannot specify both --content and --content-file")
-	}
-
-	if content != "" {
-		return content, nil
-	}
-
-	if contentFile == "" {
-		return "", nil
-	}
-
-	if contentFile == "-" {
-		bytes, err := io.ReadAll(stdin)
-		if err != nil {
-			return "", fmt.Errorf("failed to read from stdin: %w", err)
-		}
-
-		return string(bytes), nil
-	}
-
-	bytes, err := os.ReadFile(contentFile)
-	if err != nil {
-		return "", fmt.Errorf("failed to read content file: %w", err)
-	}
-
-	return string(bytes), nil
 }
 
 func stringPtr(s string) *string {
