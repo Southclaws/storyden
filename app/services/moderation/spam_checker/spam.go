@@ -17,9 +17,7 @@ type Detector interface {
 
 func New() Detector {
 	return &repeatedContentDetector{
-		// a compression ratio of 0.0003 is very leniant and only blocks spammy
-		// sequences of characters repeated hundreds or thousands of times.
-		threshold: 0.0003,
+		threshold: 0.03,
 	}
 }
 
@@ -46,11 +44,16 @@ func (d *repeatedContentDetector) getRatio(r io.Reader) (float64, error) {
 	writer := countWriter{}
 
 	compressor := gzip.NewWriter(&writer)
-	defer compressor.Close()
 
 	originalSize, err := io.Copy(compressor, treader)
 	if err != nil {
 		return 0, err
+	}
+	if err := compressor.Close(); err != nil {
+		return 0, err
+	}
+	if originalSize == 0 {
+		return 1, nil
 	}
 
 	compressedSize := writer.count
