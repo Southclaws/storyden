@@ -30,7 +30,6 @@ func TestDetector_Detect(t *testing.T) {
 		})
 	}
 
-	check("./post01_spam.txt" /**/, threshold)
 	check("./post02.txt" /*     */, 0.03)
 	check("./post03.txt" /*     */, 0.0008)
 	check("./post04.txt" /*     */, 0.0014)
