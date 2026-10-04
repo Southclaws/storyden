@@ -63,6 +63,7 @@ export function IconEditor(props: Props) {
             scale={1}
             position={position}
             onPositionChange={saving ? undefined : setPosition}
+            onImageReady={onImageChange}
             onImageChange={onImageChange}
           />
         </Box>
