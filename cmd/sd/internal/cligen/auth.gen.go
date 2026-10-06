@@ -22,7 +22,7 @@ func newAuthLoginCommand(authLogin AuthLoginHandler) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "login [storyden-api-url]",
 		Short: "Log in to a Storyden instance.",
-		Long:  "# Log in to an existing identity\n\nAuthenticate to the instance's public web/API URL and save a local context.\nThe default OAuth device flow requires a person to approve access in a browser.\nOmitting the URL prompts interactively; supply it in scripts.\n\nFor unattended access with an existing key, use `--access-key-stdin`. `--access-key`\nprompts for a key. Use `auth register` instead when creating a new bot account.\n`--auth-storage file` stores credentials in the config file; `auto` chooses the\navailable storage. Successful login saves/selects the context and prints a summary.\nThen use `auth status --output json` to inspect it.\n",
+		Long:  "# Log in to an existing identity\n\nAuthenticate to the instance's public web/API URL and save a local\ncontext. The default OAuth device flow requires a person to approve access\nin a browser. Omitting the URL reuses the saved default context’s endpoint\n(not `--context`); only when no default endpoint exists does it prompt.\nSupply the URL in scripts.\n\nFor unattended access with an existing key, use `--access-key-stdin`.\n`--access-key` prompts for a key. Use `auth register` instead when\ncreating a new bot account. `--auth-storage file` stores credentials in\nthe config file; `auto` chooses the available storage. Successful login\nsaves/selects the context and prints a summary. Then use `auth status\n--output json` to inspect it.\n",
 		Example: `  sd auth login https://community.example.com
   printf '%s' "$STORYDEN_ACCESS_KEY" | sd auth login https://community.example.com --access-key-stdin --auth-storage file`,
 		Args: rangeArgs(0, 1),
@@ -101,7 +101,7 @@ func newAuthSwitchCommand(authSwitch AuthSwitchHandler) *cobra.Command {
 		Short: "Switch the active Storyden auth context.",
 		Long:  "# Change the default identity\n\nPersist a context as the default for subsequent commands. Supply its name to\navoid the interactive picker. Output confirms the selected context.\n\nFor concurrent agents and scripts, prefer `--context NAME` on each operation;\nthat selects an identity without changing the shared default.\n",
 		Example: `  sd auth switch community-example-com
-  sd --context my-bot node list --output json`,
+  sd --context my-bot page list --output json`,
 		Args: rangeArgs(0, 1),
 	}
 
@@ -140,7 +140,7 @@ func newAuthRegisterCheckCommand(authRegisterCheck AuthRegisterCheckHandler) *co
 	cmd := &cobra.Command{
 		Use:     "check",
 		Short:   "Check registration once without waiting.",
-		Long:    "# Check bot registration\n\nCheck the selected context's saved registration once, respecting its polling\nschedule. This may contact the server, update local registration state, and save\ncredentials when approved. It does not create a new registration.\n\nUse `--context NAME` to select the pending bot. Read JSON `state`; `pending` is not\nready, while `registered` means credentials were acquired. Use `wait` to poll with\na deadline or `cancel` to abandon the request.\n",
+		Long:    "# Check bot registration\n\nCheck the selected context's saved registration once, respecting its\npolling schedule. This may contact the server, update local registration\nstate, and save credentials when approved. It does not create a new\nregistration.\n\nUse `--context NAME` to select the bot. Read JSON `state`: `pending`\nawaits approval, `ready` means a token was acquired, and `registered`\nmeans the client exists but token acquisition has not succeeded. Use\n`check` to retry token acquisition, `wait` to poll with a deadline, or\n`cancel` to abandon a pending request.\n",
 		Example: `  sd --context my-bot auth register check --output json`,
 		Args:    rangeArgs(0, 0),
 	}
@@ -191,7 +191,7 @@ func newAuthRegisterWaitCommand(authRegisterWait AuthRegisterWaitHandler) *cobra
 	cmd := &cobra.Command{
 		Use:     "wait",
 		Short:   "Wait for registration approval and acquire a token.",
-		Long:    "# Wait for bot approval\n\nPoll the selected bot registration according to the server's schedule, saving\ncredentials after approval. Use a finite `--timeout` in automation; `0s` waits\nuntil completion or registration expiry.\n\nJSON reports the last registration result when available. Exit 2 means the wait\nstopped while still pending; inspect `state` and resume later with the same\ncontext. Exit 1 signals other failures. After `registered`, use `auth status` and\n`info` to inspect the identity and instance.\n",
+		Long:    "# Wait for bot approval\n\nPoll the selected bot registration according to the server's schedule,\nsaving credentials after approval. Use a finite `--timeout` in\nautomation; `0s` waits until completion or registration expiry.\n\nJSON reports the last registration result when available. Exit 2 means\nthe wait stopped while still pending; inspect `state` and resume later\nwith the same context. Exit 1 signals other failures. After `ready`, use\n`auth status` and `info` to inspect the identity and instance.\n",
 		Example: `  sd --context my-bot auth register wait --timeout 5m --output json`,
 		Args:    rangeArgs(0, 0),
 	}
@@ -313,7 +313,7 @@ func newAuthRegisterCommand(
 	cmd := &cobra.Command{
 		Use:   "register <storyden-api-url>",
 		Short: "Register an autonomous bot account.",
-		Long:  "# Register a bot identity\n\nCreate a separate autonomous bot account request, saving its state under `--name`.\nUse a new local name and the desired server `--handle`; the instance must support\nbot registration. `--scope` restricts permissions; omitted scope inherits account\nroles. If the server requires an initial registration token, provide it on stdin.\n\n## Approval workflow\n\nRequest registration once. JSON contains `context` and `state`, plus verification\nand polling details while pending. Give the administrator the returned verification\nURL/code. A successful command can still report `pending`; it does not mean the bot\ncan act yet. Use `--context NAME auth register wait --timeout 5m --output json` to\nwait for approval and acquire credentials, or `check` for a single check.\n\nUse `cancel` to abandon a pending request. If submission has an unknown outcome,\ninspect saved status before retrying; do not create duplicate identities blindly.\n",
+		Long:  "# Register a bot identity\n\nCreate a separate autonomous bot account request, saving its state under\n`--name`. Use a new local name and the desired server `--handle`; the\ninstance must support bot registration. `--scope` restricts permissions;\nomitted scope inherits account roles. If the server requires an initial\nregistration token, provide it on stdin.\n\n## Registration workflow\n\nOpen policy or a valid registration token can complete immediately with\n`ready`. Under approval policy without a token, the request remains\n`pending`. `registered` means the client was created but token acquisition\nfailed; use `check` to retry credential acquisition without submitting\nanother registration.\n\nRequest registration once. JSON contains `context` and `state`, plus\nverification and polling details while pending. Give the administrator the\nreturned verification URL/code. A successful command can still report\n`pending`; it does not mean the bot can act yet. Use `--context NAME auth\nregister wait --timeout 5m --output json` to wait for approval and acquire\ncredentials, or `check` for a single check.\n\nUse `cancel` to abandon a pending request. If submission has an unknown\noutcome, inspect saved status before retrying; do not create duplicate\nidentities blindly.\n",
 		Example: `  sd auth register https://community.example.com --name my-bot --handle library-helper --auth-storage file --output json
   sd --context my-bot auth register wait --timeout 5m --output json`,
 		Args: rangeArgs(1, 1),
@@ -504,7 +504,7 @@ func NewAuthCommand(
 	cmd := &cobra.Command{
 		Use:   "auth",
 		Short: "Authenticate with Storyden instances.",
-		Long:  "# Authentication and identities\n\nAuthentication connects the CLI to a Storyden community as a member or bot.\nAn instance is a particular Storyden site; the selected identity determines whose\npermissions apply and who is credited for content you create.\n\nA saved **context** pairs an instance's address with an identity's credentials.\nYou can keep several contexts for different communities or accounts. OAuth login\nasks the member to approve access in a browser; an access key provides an existing\naccount's API access for scripts. Bot registration requests a separate identity.\n\n## Commands and workflows\n\nChoose `login` to act as an existing user or with a static access key. Choose\n`register` to create a separate bot identity requiring administrator approval.\n\nA context stores an instance endpoint and identity locally. For automation, pass\n`--context NAME` per command. `switch` changes the shared default; `remove` deletes\nlocal credentials. `status` inspects local state without checking the server.\n\n`token` and `headers` emit credentials for other clients; keep their output out of\nlogs and user-facing reports.\n",
+		Long:  "# Authentication and identities\n\nAuthentication connects the CLI to a Storyden community as a member or bot.\nAn instance is a particular Storyden site; the selected identity determines\nwhose permissions apply and who is credited for content you create.\n\nA saved **context** pairs an instance's address with an identity's\ncredentials. You can keep several contexts for different communities or\naccounts. OAuth login asks the member to approve access in a browser; an\naccess key provides an existing account's API access for scripts. Bot\nregistration requests a separate identity.\n\n## Commands and workflows\n\nChoose `login` to act as an existing user or with a static access key.\nChoose `register` to request a separate bot identity. Depending on instance\npolicy and a valid registration token, it may complete immediately or await\nadministrator approval.\n\nA context stores an instance endpoint and identity locally. For automation,\npass `--context NAME` per command. `switch` changes the shared default;\n`remove` deletes local credentials. `status` inspects local state without\nchecking the server.\n\n`token` and `headers` emit credentials for other clients; keep their output\nout of logs and user-facing reports.\n\n## Examples\n\n~~~sh\nsd auth status --output json\nsd --context my-bot info --output json\n~~~\n",
 		Args:  groupArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Help()

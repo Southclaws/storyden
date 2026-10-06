@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Southclaws/storyden/cmd/sd/internal/apiexec"
 	"github.com/Southclaws/storyden/cmd/sd/internal/cli"
 	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/auth/credentials"
@@ -48,12 +49,20 @@ import (
 	threadlist "github.com/Southclaws/storyden/cmd/sd/internal/commands/thread/list"
 	threadreply "github.com/Southclaws/storyden/cmd/sd/internal/commands/thread/reply"
 	tuicmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/tui"
+	"github.com/Southclaws/storyden/cmd/sd/internal/completion"
 	storeconfig "github.com/Southclaws/storyden/cmd/sd/internal/config"
 	"go.uber.org/fx"
 )
 
 func Build() fx.Option {
-	return fx.Provide(
+	return fx.Options(apiexec.Build(), fx.Provide(
+		apiexec.New,
+		completion.New,
+		cligen.NewCompletionCommand,
+		apiexec.NewOperations,
+		apiexec.NewSchema,
+		apiexec.NewRequest,
+		apiexec.NewChat,
 		storeconfig.NewStore,
 		cli.NewStreams,
 		newLogger,
@@ -110,7 +119,7 @@ func Build() fx.Option {
 		schemaget.New,
 		schemaset.New,
 		schemachildren.New,
-		cligen.NewNodeCommand,
+		cligen.NewPageCommand,
 
 		// plugin
 		plugindevnew.New,
@@ -143,6 +152,23 @@ func Build() fx.Option {
 		tuicmd.New,
 		cligen.NewTuiCommand,
 
+		cligen.NewAdminCommand,
+		cligen.NewAccountCommand,
+		cligen.NewRoleCommand,
+		cligen.NewInvitationCommand,
+		cligen.NewNotificationCommand,
+		cligen.NewReportCommand,
+		cligen.NewProfileCommand,
+		cligen.NewCategoryCommand,
+		cligen.NewTagCommand,
+		cligen.NewPostCommand,
+		cligen.NewCollectionCommand,
+		cligen.NewLinkCommand,
+		cligen.NewEventCommand,
+		cligen.NewRobotCommand,
+		cligen.NewTrailCommand,
+		cligen.NewAssetCommand,
+		cligen.NewApiCommand,
 		newRootCommand,
-	)
+	))
 }

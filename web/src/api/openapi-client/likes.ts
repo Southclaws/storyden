@@ -29,7 +29,7 @@ export const getLikePostGetUrl = (postId: string) => {
 };
 
 /**
- * Retreives all likes for the given post. Not paginated (yet.)
+ * Retrieve all likes for the given post. Not paginated.
  */
 export const likePostGet = async (
   postId: string,
@@ -86,10 +86,10 @@ export const getLikePostAddUrl = (postId: string) => {
 };
 
 /**
- * Add a like/vote to a post. A "like" is pretty much what you'd expect for
- * any modern social platform, it will inform the feed algorithm and the
- * account's recommendations as well as listing the post on their profile.
- * Idempotent operation where repeated use will do nothing.
+ * Add a like/vote to a post from the authenticated account. A like records
+ * that account's appreciation of the post and makes it available through
+ * the account's liked-post list. Repeating the operation does not create
+ * another like.
  */
 export const likePostAdd = async (
   postId: string,
@@ -149,9 +149,9 @@ export const getLikePostRemoveUrl = (postId: string) => {
 };
 
 /**
- * Removes a like/vote from the authenticated account for the post. It will
- * perform the inverse of any changes to the account's algorithm. Also is
- * idempotent, so repeated use will do nothing after being actioned once.
+ * Removes a like/vote from the authenticated account for the post. It also
+ * removes the post from that account's liked-post list. Repeating the
+ * operation leaves the like absent.
  */
 export const likePostRemove = async (
   postId: string,

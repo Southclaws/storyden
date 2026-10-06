@@ -113,6 +113,7 @@ tasks:
   check:cli:
     cmds:
       - go tool opencli generate go-cobra cmd/sd/opencli.yaml --package cligen --output cmd/sd/internal/cligen --check
+      - go -C cmd/sd run ./internal/apigen --check
       - go test ./cmd/sd/...
 
   generate:db:

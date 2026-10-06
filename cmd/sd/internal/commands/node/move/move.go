@@ -24,10 +24,10 @@ func New(store *config.Store) cligen.NodeMoveHandler {
 			return err
 		}
 		if len(ids) == 0 {
-			return fmt.Errorf("no nodes specified; pass slugs as arguments or use --from-stdin")
+			return fmt.Errorf("no pages specified; pass slugs as arguments or use --from-stdin")
 		}
 		if (p.Before != "" || p.After != "") && len(ids) > 1 {
-			return fmt.Errorf("--before/--after only make sense with a single node, not %d", len(ids))
+			return fmt.Errorf("--before/--after only make sense with a single page, not %d", len(ids))
 		}
 
 		client, err := api.NewAuthenticatedClient(ctx, store)
@@ -110,11 +110,11 @@ func moveNode(
 
 func nodeMoveError(response *openapi.NodeUpdatePositionResponse) error {
 	if response.StatusCode() == http.StatusNotFound {
-		return fmt.Errorf("node not found")
+		return fmt.Errorf("page not found")
 	}
 
 	if response.StatusCode() == http.StatusUnauthorized {
-		return fmt.Errorf("node move request was not authorised; run sd auth login again")
+		return fmt.Errorf("page move request was not authorised; run sd auth login again")
 	}
 
 	if response.StatusCode() == http.StatusBadRequest {
@@ -128,8 +128,8 @@ func nodeMoveError(response *openapi.NodeUpdatePositionResponse) error {
 
 	body := strings.TrimSpace(string(response.Body))
 	if body != "" {
-		return fmt.Errorf("node move request failed: %s: %s", response.Status(), body)
+		return fmt.Errorf("page move request failed: %s: %s", response.Status(), body)
 	}
 
-	return fmt.Errorf("node move request failed: %s", response.Status())
+	return fmt.Errorf("page move request failed: %s", response.Status())
 }

@@ -27,7 +27,7 @@ func newThreadGetCommand(threadGet ThreadGetHandler) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "get <thread-mark>",
 		Short:   "Get a thread by its mark.",
-		Long:    "# Read a discussion\n\nFetch a thread by its mark (URL slug) from a list/search result. Read the thread\nbefore drafting a reply; JSON contains the API thread object and HTML post bodies.\nUse its thread ID for `thread reply` and a post ID for `--reply-to` when needed.\n\nDefault output is a readable Markdown view. Use `--output json` for full fields;\nYAML is a readable projection. This command does not post or edit content.\n",
+		Long:    "# Read a discussion\n\nFetch a thread by its ID or full `ID-slug` mark from a list/search result.\nA bare readable slug is not accepted. Read the thread before drafting a\nreply; JSON contains the API thread object and HTML post bodies. Use its\nthread ID for `thread reply` and a post ID for `--reply-to` when needed.\n\nDefault output is a readable Markdown view. Use `--output json` for full\nfields; YAML is a readable projection. Only the first reply page (up to 50\nreplies) is fetched; inspect `.replies.next_page` in JSON. This command\nhas no reply-page flag. For later pages, use the HTTP API `GET\n/api/threads/{mark}?page=N` with credentials from `auth headers`. This\ncommand does not post or edit content.\n",
 		Example: `  sd thread get THREAD_MARK --output json`,
 		Args:    rangeArgs(1, 1),
 	}
@@ -276,7 +276,7 @@ func newThreadReplyCommand(threadReply ThreadReplyHandler) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "reply THREAD_ID",
 		Short: "Reply to a thread as the selected account.",
-		Long:  "# Post to an existing discussion\n\nPost a reply as the selected identity using a thread ID (not its mark/slug).\nRead the thread first. `--reply-to POST_ID` targets a particular post within it;\nomit that flag for a general reply. A non-empty content body is required.\n\nContent is HTML by default. Pass `--markdown` to convert Markdown before sending.\nUse either `--content TEXT` or `--content-file PATH`; `--content-file -` reads stdin.\n\n`--output json` returns the created reply. Posting takes effect immediately;\nafter an uncertain failure, read the thread before retrying to avoid duplicates.\n",
+		Long:  "# Post to an existing discussion\n\nPost a reply as the selected identity using a thread ID or full `ID-slug`\nmark. A bare readable slug is not accepted. Read the thread first.\n`--reply-to POST_ID` targets a particular post within it; omit that flag\nfor a general reply. A non-empty content body is required.\n\nContent is HTML by default. Pass `--markdown` to convert Markdown before\nsending. Use either `--content TEXT` or `--content-file PATH`;\n`--content-file -` reads stdin.\n\n`--output json` returns the created reply. Posting takes effect\nimmediately; after an uncertain failure, read the thread before retrying\nto avoid duplicates.\n",
 		Example: `  sd thread reply THREAD_ID --markdown --content-file reply.md --output json
   sd thread reply THREAD_ID --reply-to POST_ID --content "<p>Thanks for the details.</p>" --output json`,
 		Args: rangeArgs(1, 1),
@@ -324,16 +324,221 @@ func newThreadReplyCommand(threadReply ThreadReplyHandler) *cobra.Command {
 	return cmd
 }
 
+type ApiThreadUpdateOutput string
+
+const (
+	ApiThreadUpdateOutputJson ApiThreadUpdateOutput = "json"
+	ApiThreadUpdateOutputRaw  ApiThreadUpdateOutput = "raw"
+)
+
+type ApiThreadUpdateParams struct {
+	Context     string
+	Data        string
+	File        string
+	ContentType string
+	Output      ApiThreadUpdateOutput
+	OutputFile  string
+	Timeout     string
+	ThreadMark  string
+}
+type ApiThreadUpdateHandler func(ctx context.Context, cmd *cobra.Command, io IO, p ApiThreadUpdateParams) error
+
+func newApiThreadUpdateCommand(apiThreadUpdate ApiThreadUpdateHandler) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "update <thread-mark>",
+		Short:   "Publish changes to a thread.",
+		Long:    "# Publish changes to a thread\n\nPublish changes to a thread.\n\n## Request body\n\nSend JSON using `--file payload.json`, `--file -`, or `--data`. Top-level\nfields:\n\n- `title` (string).\n- `pinned` (integer).\n- `body` (string).\n- `tags` (array).\n- `meta` (object).\n- `category` (string).\n- `visibility` (string): `draft`, `unlisted`, `review`, `published`.\n- `url` (string).\n\nInspect the local request and response contract with `sd api schema\nThreadUpdate`. This calls `PATCH /threads/{thread_mark}` using the\nselected account. The server enforces permissions. The request executes\nimmediately; this is not a dry run. After an uncertain network failure,\ninspect current state before retrying a mutation.\n\n## Output and automation\n\nThe default `--output json` preserves the complete server response,\nincluding nested fields and pagination metadata. Empty responses print\n`null`; HEAD responses contain `status` and `headers`. Errors go to stderr\nand return a nonzero exit status. This command sends one request; it does\nnot automatically traverse pages or cursors.\n",
+		Example: `  sd thread update THREAD_ID --file payload.json`,
+		Args:    rangeArgs(1, 1),
+	}
+
+	var rawData string
+	cmd.Flags().StringVar(&rawData, "data", "", "Inline request JSON. Prefer --file for large documents or secrets.")
+	var rawFile string
+	cmd.Flags().StringVar(&rawFile, "file", "", "Request body file; - reads stdin. Required when --data is omitted.")
+	var rawContentType string
+	cmd.Flags().StringVar(&rawContentType, "content-type", "", "Request media type; defaults to application/json for JSON operations, otherwise application/octet-stream.")
+	var rawOutput string
+	cmd.Flags().StringVarP(&rawOutput, "output", "o", "json", "Response format: json (default) or raw bytes. Empty JSON responses print null; HEAD prints status and headers.")
+	var rawOutputFile string
+	cmd.Flags().StringVar(&rawOutputFile, "output-file", "", "Write successful response bytes to this path instead of stdout; overwrites the file.")
+	var rawTimeout string
+	cmd.Flags().StringVar(&rawTimeout, "timeout", "60s", "Request timeout including response reads, such as 60s. Use 0s for no deadline.")
+
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		rawContext, _ := cmd.Flags().GetString("context")
+		var output ApiThreadUpdateOutput
+		if rawOutput != "" {
+			switch rawOutput {
+			case "json":
+				output = ApiThreadUpdateOutputJson
+			case "raw":
+				output = ApiThreadUpdateOutputRaw
+			default:
+				return fmt.Errorf("invalid --output %q: must be one of json, raw", rawOutput)
+			}
+		}
+		rawThreadMark := args[0]
+
+		p := ApiThreadUpdateParams{
+			Context:     rawContext,
+			Data:        rawData,
+			File:        rawFile,
+			ContentType: rawContentType,
+			Output:      output,
+			OutputFile:  rawOutputFile,
+			Timeout:     rawTimeout,
+			ThreadMark:  rawThreadMark,
+		}
+
+		return apiThreadUpdate(cmd.Context(), cmd, newIO(cmd), p)
+	}
+
+	return cmd
+}
+
+type ApiThreadDeleteOutput string
+
+const (
+	ApiThreadDeleteOutputJson ApiThreadDeleteOutput = "json"
+	ApiThreadDeleteOutputRaw  ApiThreadDeleteOutput = "raw"
+)
+
+type ApiThreadDeleteParams struct {
+	Context    string
+	Output     ApiThreadDeleteOutput
+	OutputFile string
+	Timeout    string
+	ThreadMark string
+}
+type ApiThreadDeleteHandler func(ctx context.Context, cmd *cobra.Command, io IO, p ApiThreadDeleteParams) error
+
+func newApiThreadDeleteCommand(apiThreadDelete ApiThreadDeleteHandler) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "delete <thread-mark>",
+		Short:   "Archive a thread using soft-delete.",
+		Long:    "# Archive a thread using soft-delete\n\nArchive a thread using soft-delete.\n\n\nInspect the local request and response contract with `sd api schema\nThreadDelete`. This calls `DELETE /threads/{thread_mark}` using the\nselected account. The server enforces permissions. The request executes\nimmediately; this is not a dry run. After an uncertain network failure,\ninspect current state before retrying a mutation.\n\n## Output and automation\n\nThe default `--output json` preserves the complete server response,\nincluding nested fields and pagination metadata. Empty responses print\n`null`; HEAD responses contain `status` and `headers`. Errors go to stderr\nand return a nonzero exit status. This command sends one request; it does\nnot automatically traverse pages or cursors.\n",
+		Example: `  sd thread delete THREAD_ID`,
+		Args:    rangeArgs(1, 1),
+	}
+
+	var rawOutput string
+	cmd.Flags().StringVarP(&rawOutput, "output", "o", "json", "Response format: json (default) or raw bytes. Empty JSON responses print null; HEAD prints status and headers.")
+	var rawOutputFile string
+	cmd.Flags().StringVar(&rawOutputFile, "output-file", "", "Write successful response bytes to this path instead of stdout; overwrites the file.")
+	var rawTimeout string
+	cmd.Flags().StringVar(&rawTimeout, "timeout", "60s", "Request timeout including response reads, such as 60s. Use 0s for no deadline.")
+
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		rawContext, _ := cmd.Flags().GetString("context")
+		var output ApiThreadDeleteOutput
+		if rawOutput != "" {
+			switch rawOutput {
+			case "json":
+				output = ApiThreadDeleteOutputJson
+			case "raw":
+				output = ApiThreadDeleteOutputRaw
+			default:
+				return fmt.Errorf("invalid --output %q: must be one of json, raw", rawOutput)
+			}
+		}
+		rawThreadMark := args[0]
+
+		p := ApiThreadDeleteParams{
+			Context:    rawContext,
+			Output:     output,
+			OutputFile: rawOutputFile,
+			Timeout:    rawTimeout,
+			ThreadMark: rawThreadMark,
+		}
+
+		return apiThreadDelete(cmd.Context(), cmd, newIO(cmd), p)
+	}
+
+	return cmd
+}
+
+type ApiThreadGetOutput string
+
+const (
+	ApiThreadGetOutputJson ApiThreadGetOutput = "json"
+	ApiThreadGetOutputRaw  ApiThreadGetOutput = "raw"
+)
+
+type ApiThreadGetParams struct {
+	Context    string
+	Page       string
+	PageSet    bool
+	Output     ApiThreadGetOutput
+	OutputFile string
+	Timeout    string
+	ThreadMark string
+}
+type ApiThreadGetHandler func(ctx context.Context, cmd *cobra.Command, io IO, p ApiThreadGetParams) error
+
+func newApiThreadGetCommand(apiThreadGet ApiThreadGetHandler) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "page <thread-mark>",
+		Short:   "Get information about a thread and the posts within the thread.",
+		Long:    "# Get information about a thread and the posts within the thread\n\nGet information about a thread such as its title, author, when it was\ncreated as well as a list of the posts within the thread.\n\n\nInspect the local request and response contract with `sd api schema\nThreadGet`. This calls `GET /threads/{thread_mark}` using the selected\naccount. The server enforces permissions.\n\n## Output and automation\n\nThe default `--output json` preserves the complete server response,\nincluding nested fields and pagination metadata. Empty responses print\n`null`; HEAD responses contain `status` and `headers`. Errors go to stderr\nand return a nonzero exit status. This command fetches one page; pass\n`--page` explicitly to continue according to response pagination metadata.\n",
+		Example: `  sd thread page THREAD_ID`,
+		Args:    rangeArgs(1, 1),
+	}
+
+	var rawPage string
+	cmd.Flags().StringVar(&rawPage, "page", "", "Pagination query parameters.")
+	var rawOutput string
+	cmd.Flags().StringVarP(&rawOutput, "output", "o", "json", "Response format: json (default) or raw bytes. Empty JSON responses print null; HEAD prints status and headers.")
+	var rawOutputFile string
+	cmd.Flags().StringVar(&rawOutputFile, "output-file", "", "Write successful response bytes to this path instead of stdout; overwrites the file.")
+	var rawTimeout string
+	cmd.Flags().StringVar(&rawTimeout, "timeout", "60s", "Request timeout including response reads, such as 60s. Use 0s for no deadline.")
+
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		pageSet := cmd.Flags().Changed("page")
+		rawContext, _ := cmd.Flags().GetString("context")
+		var output ApiThreadGetOutput
+		if rawOutput != "" {
+			switch rawOutput {
+			case "json":
+				output = ApiThreadGetOutputJson
+			case "raw":
+				output = ApiThreadGetOutputRaw
+			default:
+				return fmt.Errorf("invalid --output %q: must be one of json, raw", rawOutput)
+			}
+		}
+		rawThreadMark := args[0]
+
+		p := ApiThreadGetParams{
+			Context:    rawContext,
+			Page:       rawPage,
+			PageSet:    pageSet,
+			Output:     output,
+			OutputFile: rawOutputFile,
+			Timeout:    rawTimeout,
+			ThreadMark: rawThreadMark,
+		}
+
+		return apiThreadGet(cmd.Context(), cmd, newIO(cmd), p)
+	}
+
+	return cmd
+}
+
 func NewThreadCommand(
 	threadGet ThreadGetHandler,
 	threadList ThreadListHandler,
 	threadCreate ThreadCreateHandler,
 	threadReply ThreadReplyHandler,
+	apiThreadUpdate ApiThreadUpdateHandler,
+	apiThreadDelete ApiThreadDeleteHandler,
+	apiThreadGet ApiThreadGetHandler,
 ) ThreadCommand {
 	cmd := &cobra.Command{
 		Use:   "thread",
-		Short: "Work with Storyden threads.",
-		Long:  "# Read and participate in discussions\n\nA **thread** starts a discussion: a titled opening post followed by replies from\ncommunity members. Categories organise threads, while tags connect related topics.\nReplies can address the thread or a particular post within it; they have bodies\nbut no separate title, category, or tags.\n\nUse threads to ask questions, share announcements, and join ongoing conversations.\nUse `node` for curated Library pages that should remain useful as shared knowledge.\nA thread's **mark** is its URL identifier (an ID with a readable slug); reads also\naccept the ID alone. Library pages use their own editable slugs instead.\n\n## Commands and workflows\n\nUse `list` or `search --kind thread` to discover discussions, then `get` to read\none before posting. `create` starts a new thread; `reply` posts as the selected\nidentity in an existing one. Mutations post immediately, so match the user's\nrequested audience and content.\n\nUse JSON to obtain identifiers. `get` accepts a thread mark or ID, while\n`reply` takes the thread ID. Content input is HTML unless `--markdown` is set.\n",
+		Short: "Read, start, and participate in discussions.",
+		Long:  "# Read and participate in discussions\n\nA **thread** starts a discussion: a titled opening post followed by replies\nfrom community members. Categories organise threads, while tags connect\nrelated topics. Replies can address the thread or a particular post within\nit; they have bodies but no separate title, category, or tags.\n\nUse threads to ask questions, share announcements, and join ongoing\nconversations. Use `page` for curated Library pages that should remain\nuseful as shared knowledge. A thread's **mark** is its URL identifier (an ID\nwith a readable slug); reads also accept the ID alone. Library pages use\ntheir own editable slugs instead.\n\n## Commands and workflows\n\nUse `list` or `search --kind thread` to discover discussions, then `get` to\nread one before posting. `create` starts a new thread; `reply` posts as the\nselected identity in an existing one. Mutations post immediately, so match\nthe user's requested audience and content.\n\nUse JSON to obtain identifiers. `get` accepts a thread mark or ID, while\n`reply` also accepts either form. A bare readable slug is not accepted.\nContent input is HTML unless `--markdown` is set.\n\n## Examples\n\n~~~sh\nsd thread list --output json\nsd thread get THREAD_MARK --output json\n~~~\n",
 		Args:  groupArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Help()
@@ -344,6 +549,9 @@ func NewThreadCommand(
 		newThreadListCommand(threadList),
 		newThreadCreateCommand(threadCreate),
 		newThreadReplyCommand(threadReply),
+		newApiThreadUpdateCommand(apiThreadUpdate),
+		newApiThreadDeleteCommand(apiThreadDelete),
+		newApiThreadGetCommand(apiThreadGet),
 	)
 	return ThreadCommand(cmd)
 }

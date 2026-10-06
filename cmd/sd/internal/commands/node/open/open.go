@@ -1,4 +1,4 @@
-// Package open implements `sd node open <slug>`. It fetches a node and emits
+// Package open implements `sd page open <slug>`. It fetches a node and emits
 // its attached link URL. The default is print-only so agents in a non-TTY
 // pipeline don't accidentally launch a browser; pass --launch to actually
 // open the URL.
@@ -32,7 +32,7 @@ func New(store *config.Store) cligen.NodeOpenHandler {
 		}
 
 		if node.Link == nil {
-			return fmt.Errorf("node %s has no attached link", p.Slug)
+			return fmt.Errorf("page %s has no attached link", p.Slug)
 		}
 
 		url := string(node.Link.Url)

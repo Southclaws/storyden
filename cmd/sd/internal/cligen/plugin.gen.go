@@ -256,7 +256,7 @@ func newPluginTokenCommand(
 	cmd := &cobra.Command{
 		Use:   "token",
 		Short: "Manage external plugin RPC tokens.",
-		Long:  "# Manage external plugin credentials\n\nAn external plugin uses an **RPC token** to authenticate its connection to the\nStoryden instance. This credential identifies the installed plugin; it is separate\nfrom the member credentials used by `sd auth` to administer that installation.\n\n## Commands and workflows\n\nUse `rotate` to replace an external plugin's RPC connection token. Discover its\ninstance ID and mode with `plugin list`/`get` first. Rotation changes credentials;\nuse `dev run` to connect a local project through the CLI-managed workflow.\n",
+		Long:  "# Manage external plugin credentials\n\nAn external plugin uses an **RPC token** to authenticate its connection to\nthe Storyden instance. This credential identifies the installed plugin; it\nis separate from the member credentials used by `sd auth` to administer\nthat installation.\n\n## Commands and workflows\n\nUse `rotate` to replace an external plugin's RPC connection token.\nDiscover its instance ID and mode with `plugin list`/`get` first. Rotation\nchanges credentials; use `dev run` to connect a local project through the\nCLI-managed workflow.\n\n## Examples\n\n~~~sh\nsd plugin get PLUGIN_INSTANCE_ID\n~~~\n",
 		Args:  groupArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Help()
@@ -450,7 +450,7 @@ func newPluginDevInstallCommand(pluginDevInstall PluginDevInstallHandler) *cobra
 	cmd := &cobra.Command{
 		Use:   "install",
 		Short: "Install or update a local plugin as supervised.",
-		Long:  "# Install or update a supervised plugin\n\nBuild the local project package and upload it to the selected instance. An\nexisting installation matching the manifest is updated; otherwise one is created.\nThis changes server-side plugin code/configuration, so inspect the target context\nand run `dev validate` first.\n\nPrints a text summary including the instance ID. Use `plugin list --output json`\nto discover installations, then `plugin get` and `logs` to check runtime state.\nFor running the code locally as an external process, use `dev run`.\n",
+		Long:  "# Install or update a supervised plugin\n\nBuild the local project package and upload it to the selected instance.\nAn existing supervised installation matching the manifest ID is updated;\notherwise one is created. A matching external installation causes an\nerror: this command does not convert an installation from external to\nsupervised mode. This changes server-side plugin code/configuration, so\ninspect the target context and run `dev validate` first.\n\nPrints a text summary including the instance ID. Use `plugin list\n--output json` to discover installations, then `plugin get` and `logs`\nto check runtime state. For running the code locally as an external\nprocess, use `dev run`.\n",
 		Example: `  sd plugin dev validate --dir ./my-plugin
   sd --context my-bot plugin dev install --dir ./my-plugin`,
 		Args: rangeArgs(0, 0),
@@ -705,7 +705,7 @@ func newPluginDevSymbolsCommand(
 	cmd := &cobra.Command{
 		Use:   "symbols",
 		Short: "Discover Go packages and symbols in a plugin project.",
-		Long:  "# Discover Go APIs for plugin development\n\nGo plugins use packages and exported symbols (types, functions, and methods) to\ninteract with the Storyden SDK. These commands let you discover those APIs from\nthe local project's Go modules before writing integration code.\n\n## Commands and workflows\n\nInspect a local Go project without executing the plugin. Use `packages` to find\nimport paths, `package` to list a package's symbols, `search` for a name/topic, and\n`detail` for a known symbol. All leaf commands return JSON; no format flag is needed.\n\nThe project must be loadable by the Go toolchain; module resolution may access the\nnetwork. Narrow `--pattern` and `--max` for bounded agent context before requesting\nindividual details.\n",
+		Long:  "# Discover Go APIs for plugin development\n\nGo plugins use packages and exported symbols (types, functions, and\nmethods) to interact with the Storyden SDK. These commands let you\ndiscover those APIs from the local project's Go modules before writing\nintegration code.\n\n## Commands and workflows\n\nInspect a local Go project without executing the plugin. Use `packages`\nto find import paths, `package` to list a package's symbols, `search`\nfor a name/topic, and `detail` for a known symbol. All leaf commands\nreturn JSON; no format flag is needed.\n\nThe project must be loadable by the Go toolchain; module resolution may\naccess the network. Narrow `--pattern` and `--max` for bounded agent\ncontext before requesting individual details.\n\n## Examples\n\n~~~sh\nsd plugin dev symbols packages --dir ./my-plugin --max 20\nsd plugin dev symbols search Client --dir ./my-plugin --max 10\n~~~\n",
 		Args:  groupArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Help()
@@ -734,7 +734,7 @@ func newPluginDevCommand(
 	cmd := &cobra.Command{
 		Use:   "dev",
 		Short: "Create, run, package, validate, and install plugin projects.",
-		Long:  "# Develop and install a plugin\n\nPlugin development starts with a local program and a **manifest** describing its\nidentity, event subscriptions, permissions, and configuration. A supervised plugin\nalso declares the command that Storyden runs. The CLI connects this local project\nto an installed plugin on a selected Storyden instance.\n\n## Commands and workflows\n\nStart a local project with `new`, inspect available Go APIs with `symbols`, and\ncheck the manifest/package with `validate`. `package` writes a distribution ZIP.\n`install` uploads or updates a supervised plugin on the selected instance.\n\nFor a local external process use `run`, which registers/updates the plugin and\nprovides its RPC connection URL to the child process. `download` retrieves an\ninstalled supervised package. Local project commands use `--dir` where offered;\nserver operations use the selected auth context.\n",
+		Long:  "# Develop and install a plugin\n\nPlugin development starts with a local program and a **manifest**\ndescribing its identity, event subscriptions, permissions, and\nconfiguration. A supervised plugin also declares the command that Storyden\nruns. The CLI connects this local project to an installed plugin on a\nselected Storyden instance.\n\n## Commands and workflows\n\nStart a local project with `new`, inspect available Go APIs with\n`symbols`, and check the manifest/package with `validate`. `package`\nwrites a distribution ZIP. `install` uploads or updates a supervised\nplugin on the selected instance.\n\nFor a local external process use `run`, which registers/updates the plugin\nand provides its RPC connection URL to the child process. `download`\nretrieves an installed supervised package. Local project commands use\n`--dir` where offered; server operations use the selected auth context.\n\n## Examples\n\n~~~sh\nsd plugin dev validate --dir ./my-plugin\nsd plugin dev install --dir ./my-plugin\n~~~\n",
 		Args:  groupArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Help()
@@ -756,6 +756,314 @@ func newPluginDevCommand(
 	)
 	return cmd
 }
+
+type ApiPluginGetConfigurationOutput string
+
+const (
+	ApiPluginGetConfigurationOutputJson ApiPluginGetConfigurationOutput = "json"
+	ApiPluginGetConfigurationOutputRaw  ApiPluginGetConfigurationOutput = "raw"
+)
+
+type ApiPluginGetConfigurationParams struct {
+	Context          string
+	Output           ApiPluginGetConfigurationOutput
+	OutputFile       string
+	Timeout          string
+	PluginInstanceId string
+}
+type ApiPluginGetConfigurationHandler func(ctx context.Context, cmd *cobra.Command, io IO, p ApiPluginGetConfigurationParams) error
+
+func newApiPluginGetConfigurationCommand(apiPluginGetConfiguration ApiPluginGetConfigurationHandler) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "get <plugin-instance-id>",
+		Short:   "Get the current configuration values for a plugin.",
+		Long:    "# Get the current configuration values for a plugin\n\nGet the current configuration values for a plugin. The shape of the\nobject is defined by the plugin's manifest and should be used to render\nthe current configuration state in the client, using the layout driven\nby the result of `PluginGetConfigurationSchema` to build a form-like UI.\n\n\nInspect the local request and response contract with `sd api schema\nPluginGetConfiguration`. This calls `GET\n/plugins/{plugin_instance_id}/configuration` using the selected account.\nThe server enforces permissions.\n\n## Output and automation\n\nThe default `--output json` preserves the complete server response,\nincluding nested fields and pagination metadata. Empty responses print\n`null`; HEAD responses contain `status` and `headers`. Errors go to\nstderr and return a nonzero exit status. This command sends one request;\nit does not automatically traverse pages or cursors.\n",
+		Example: `  sd plugin configuration get PLUGIN_INSTANCE_ID`,
+		Args:    rangeArgs(1, 1),
+	}
+
+	var rawOutput string
+	cmd.Flags().StringVarP(&rawOutput, "output", "o", "json", "Response format: json (default) or raw bytes. Empty JSON responses print null; HEAD prints status and headers.")
+	var rawOutputFile string
+	cmd.Flags().StringVar(&rawOutputFile, "output-file", "", "Write successful response bytes to this path instead of stdout; overwrites the file.")
+	var rawTimeout string
+	cmd.Flags().StringVar(&rawTimeout, "timeout", "60s", "Request timeout including response reads, such as 60s. Use 0s for no deadline.")
+
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		rawContext, _ := cmd.Flags().GetString("context")
+		var output ApiPluginGetConfigurationOutput
+		if rawOutput != "" {
+			switch rawOutput {
+			case "json":
+				output = ApiPluginGetConfigurationOutputJson
+			case "raw":
+				output = ApiPluginGetConfigurationOutputRaw
+			default:
+				return fmt.Errorf("invalid --output %q: must be one of json, raw", rawOutput)
+			}
+		}
+		rawPluginInstanceId := args[0]
+
+		p := ApiPluginGetConfigurationParams{
+			Context:          rawContext,
+			Output:           output,
+			OutputFile:       rawOutputFile,
+			Timeout:          rawTimeout,
+			PluginInstanceId: rawPluginInstanceId,
+		}
+
+		return apiPluginGetConfiguration(cmd.Context(), cmd, newIO(cmd), p)
+	}
+
+	return cmd
+}
+
+type ApiPluginUpdateConfigurationOutput string
+
+const (
+	ApiPluginUpdateConfigurationOutputJson ApiPluginUpdateConfigurationOutput = "json"
+	ApiPluginUpdateConfigurationOutputRaw  ApiPluginUpdateConfigurationOutput = "raw"
+)
+
+type ApiPluginUpdateConfigurationParams struct {
+	Context          string
+	Data             string
+	File             string
+	ContentType      string
+	Output           ApiPluginUpdateConfigurationOutput
+	OutputFile       string
+	Timeout          string
+	PluginInstanceId string
+}
+type ApiPluginUpdateConfigurationHandler func(ctx context.Context, cmd *cobra.Command, io IO, p ApiPluginUpdateConfigurationParams) error
+
+func newApiPluginUpdateConfigurationCommand(apiPluginUpdateConfiguration ApiPluginUpdateConfigurationHandler) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "set <plugin-instance-id>",
+		Short:   "Update the configuration for a plugin.",
+		Long:    "# Update the configuration for a plugin\n\nUpdate the configuration for a plugin. Each plugin defines its own set\nof configuration parameters in its manifest and this endpoint accepts\nany object validated against that schema. When a valid configuration is\nreceived, it is sent to the plugin via RPC and the plugin is expected to\napply the new configuration to itself internally.\n\n## Request body\n\nSend JSON using `--file payload.json`, `--file -`, or `--data`. The body\nmay be an array or composed type; inspect the schema before constructing\nit.\n\nInspect the local request and response contract with `sd api schema\nPluginUpdateConfiguration`. This calls `PATCH\n/plugins/{plugin_instance_id}/configuration` using the selected account.\nThe server enforces permissions. The request executes immediately; this\nis not a dry run. After an uncertain network failure, inspect current\nstate before retrying a mutation.\n\n## Output and automation\n\nThe default `--output json` preserves the complete server response,\nincluding nested fields and pagination metadata. Empty responses print\n`null`; HEAD responses contain `status` and `headers`. Errors go to\nstderr and return a nonzero exit status. This command sends one request;\nit does not automatically traverse pages or cursors.\n",
+		Example: `  sd plugin configuration set PLUGIN_INSTANCE_ID --file payload.json`,
+		Args:    rangeArgs(1, 1),
+	}
+
+	var rawData string
+	cmd.Flags().StringVar(&rawData, "data", "", "Inline request JSON. Prefer --file for large documents or secrets.")
+	var rawFile string
+	cmd.Flags().StringVar(&rawFile, "file", "", "Request body file; - reads stdin. Required when --data is omitted.")
+	var rawContentType string
+	cmd.Flags().StringVar(&rawContentType, "content-type", "", "Request media type; defaults to application/json for JSON operations, otherwise application/octet-stream.")
+	var rawOutput string
+	cmd.Flags().StringVarP(&rawOutput, "output", "o", "json", "Response format: json (default) or raw bytes. Empty JSON responses print null; HEAD prints status and headers.")
+	var rawOutputFile string
+	cmd.Flags().StringVar(&rawOutputFile, "output-file", "", "Write successful response bytes to this path instead of stdout; overwrites the file.")
+	var rawTimeout string
+	cmd.Flags().StringVar(&rawTimeout, "timeout", "60s", "Request timeout including response reads, such as 60s. Use 0s for no deadline.")
+
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		rawContext, _ := cmd.Flags().GetString("context")
+		var output ApiPluginUpdateConfigurationOutput
+		if rawOutput != "" {
+			switch rawOutput {
+			case "json":
+				output = ApiPluginUpdateConfigurationOutputJson
+			case "raw":
+				output = ApiPluginUpdateConfigurationOutputRaw
+			default:
+				return fmt.Errorf("invalid --output %q: must be one of json, raw", rawOutput)
+			}
+		}
+		rawPluginInstanceId := args[0]
+
+		p := ApiPluginUpdateConfigurationParams{
+			Context:          rawContext,
+			Data:             rawData,
+			File:             rawFile,
+			ContentType:      rawContentType,
+			Output:           output,
+			OutputFile:       rawOutputFile,
+			Timeout:          rawTimeout,
+			PluginInstanceId: rawPluginInstanceId,
+		}
+
+		return apiPluginUpdateConfiguration(cmd.Context(), cmd, newIO(cmd), p)
+	}
+
+	return cmd
+}
+
+type ApiPluginGetConfigurationSchemaOutput string
+
+const (
+	ApiPluginGetConfigurationSchemaOutputJson ApiPluginGetConfigurationSchemaOutput = "json"
+	ApiPluginGetConfigurationSchemaOutputRaw  ApiPluginGetConfigurationSchemaOutput = "raw"
+)
+
+type ApiPluginGetConfigurationSchemaParams struct {
+	Context          string
+	Output           ApiPluginGetConfigurationSchemaOutput
+	OutputFile       string
+	Timeout          string
+	PluginInstanceId string
+}
+type ApiPluginGetConfigurationSchemaHandler func(ctx context.Context, cmd *cobra.Command, io IO, p ApiPluginGetConfigurationSchemaParams) error
+
+func newApiPluginGetConfigurationSchemaCommand(apiPluginGetConfigurationSchema ApiPluginGetConfigurationSchemaHandler) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "schema <plugin-instance-id>",
+		Short:   "Returns the configuration schema for a plugin as defined in its manifest file.",
+		Long:    "# Read the plugin configuration schema\n\nReturns the configuration schema for a plugin as defined in its manifest\nfile. The schema should be used to render a configuration form for the\nplugin in the client so that administrators can configure the plugin.\n\n\nInspect the local request and response contract with `sd api schema\nPluginGetConfigurationSchema`. This calls `GET\n/plugins/{plugin_instance_id}/configuration-schema` using the selected\naccount. The server enforces permissions.\n\n## Output and automation\n\nThe default `--output json` preserves the complete server response,\nincluding nested fields and pagination metadata. Empty responses print\n`null`; HEAD responses contain `status` and `headers`. Errors go to\nstderr and return a nonzero exit status. This command sends one request;\nit does not automatically traverse pages or cursors.\n",
+		Example: `  sd plugin configuration schema PLUGIN_INSTANCE_ID`,
+		Args:    rangeArgs(1, 1),
+	}
+
+	var rawOutput string
+	cmd.Flags().StringVarP(&rawOutput, "output", "o", "json", "Response format: json (default) or raw bytes. Empty JSON responses print null; HEAD prints status and headers.")
+	var rawOutputFile string
+	cmd.Flags().StringVar(&rawOutputFile, "output-file", "", "Write successful response bytes to this path instead of stdout; overwrites the file.")
+	var rawTimeout string
+	cmd.Flags().StringVar(&rawTimeout, "timeout", "60s", "Request timeout including response reads, such as 60s. Use 0s for no deadline.")
+
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		rawContext, _ := cmd.Flags().GetString("context")
+		var output ApiPluginGetConfigurationSchemaOutput
+		if rawOutput != "" {
+			switch rawOutput {
+			case "json":
+				output = ApiPluginGetConfigurationSchemaOutputJson
+			case "raw":
+				output = ApiPluginGetConfigurationSchemaOutputRaw
+			default:
+				return fmt.Errorf("invalid --output %q: must be one of json, raw", rawOutput)
+			}
+		}
+		rawPluginInstanceId := args[0]
+
+		p := ApiPluginGetConfigurationSchemaParams{
+			Context:          rawContext,
+			Output:           output,
+			OutputFile:       rawOutputFile,
+			Timeout:          rawTimeout,
+			PluginInstanceId: rawPluginInstanceId,
+		}
+
+		return apiPluginGetConfigurationSchema(cmd.Context(), cmd, newIO(cmd), p)
+	}
+
+	return cmd
+}
+
+func newPluginConfigurationCommand(
+	apiPluginGetConfiguration ApiPluginGetConfigurationHandler,
+	apiPluginUpdateConfiguration ApiPluginUpdateConfigurationHandler,
+	apiPluginGetConfigurationSchema ApiPluginGetConfigurationSchemaHandler,
+) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "configuration",
+		Short: "Inspect a plugin’s settings schema and configure its values.",
+		Long:  "# Plugin Configuration\n\nRead a plugin’s configuration schema and current configuration, then\nsubmit updated values. Consult schema before constructing a settings\ndocument; plugin-specific fields vary.\n\nCommands send one request and return the full JSON response by default.\nUse explicit IDs from list/get output and `--context NAME` for automation.\nMutations apply immediately; check current state before retrying after a\nnetwork failure.\n\n## Examples\n\n~~~sh\nsd plugin configuration get --help\n~~~\n",
+		Args:  groupArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return cmd.Help()
+		},
+	}
+	cmd.AddCommand(
+		newApiPluginGetConfigurationCommand(apiPluginGetConfiguration),
+		newApiPluginUpdateConfigurationCommand(apiPluginUpdateConfiguration),
+		newApiPluginGetConfigurationSchemaCommand(apiPluginGetConfigurationSchema),
+	)
+	return cmd
+}
+
+type ApiPluginUpdateManifestOutput string
+
+const (
+	ApiPluginUpdateManifestOutputJson ApiPluginUpdateManifestOutput = "json"
+	ApiPluginUpdateManifestOutputRaw  ApiPluginUpdateManifestOutput = "raw"
+)
+
+type ApiPluginUpdateManifestParams struct {
+	Context          string
+	Data             string
+	File             string
+	ContentType      string
+	Output           ApiPluginUpdateManifestOutput
+	OutputFile       string
+	Timeout          string
+	PluginInstanceId string
+}
+type ApiPluginUpdateManifestHandler func(ctx context.Context, cmd *cobra.Command, io IO, p ApiPluginUpdateManifestParams) error
+
+func newApiPluginUpdateManifestCommand(apiPluginUpdateManifest ApiPluginUpdateManifestHandler) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "update <plugin-instance-id>",
+		Short:   "Update the manifest for a plugin.",
+		Long:    "# Update the manifest for a plugin\n\nUpdate the manifest for a plugin. This is used for development of\nplugins where the manifest may change frequently and it's useful to be\nable to update it without re-uploading the entire plugin bundle.\n\nThis only works for External plugins that were created by uploading a\nmanifest directly. It does not work for Supervised plugins.\n\n## Request body\n\nSend JSON using `--file payload.json`, `--file -`, or `--data`. The body\nmay be an array or composed type; inspect the schema before constructing\nit.\n\nInspect the local request and response contract with `sd api schema\nPluginUpdateManifest`. This calls `PATCH\n/plugins/{plugin_instance_id}/manifest` using the selected account. The\nserver enforces permissions. The request executes immediately; this is\nnot a dry run. After an uncertain network failure, inspect current state\nbefore retrying a mutation.\n\n## Output and automation\n\nThe default `--output json` preserves the complete server response,\nincluding nested fields and pagination metadata. Empty responses print\n`null`; HEAD responses contain `status` and `headers`. Errors go to\nstderr and return a nonzero exit status. This command sends one request;\nit does not automatically traverse pages or cursors. \\ or cursors.\\n\"\n",
+		Example: `  sd plugin manifest update PLUGIN_INSTANCE_ID --file payload.json`,
+		Args:    rangeArgs(1, 1),
+	}
+
+	var rawData string
+	cmd.Flags().StringVar(&rawData, "data", "", "Inline request JSON. Prefer --file for large documents or secrets.")
+	var rawFile string
+	cmd.Flags().StringVar(&rawFile, "file", "", "Request body file; - reads stdin. Required when --data is omitted.")
+	var rawContentType string
+	cmd.Flags().StringVar(&rawContentType, "content-type", "", "Request media type; defaults to application/json for JSON operations, otherwise application/octet-stream.")
+	var rawOutput string
+	cmd.Flags().StringVarP(&rawOutput, "output", "o", "json", "Response format: json (default) or raw bytes. Empty JSON responses print null; HEAD prints status and headers.")
+	var rawOutputFile string
+	cmd.Flags().StringVar(&rawOutputFile, "output-file", "", "Write successful response bytes to this path instead of stdout; overwrites the file.")
+	var rawTimeout string
+	cmd.Flags().StringVar(&rawTimeout, "timeout", "60s", "Request timeout including response reads, such as 60s. Use 0s for no deadline.")
+
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		rawContext, _ := cmd.Flags().GetString("context")
+		var output ApiPluginUpdateManifestOutput
+		if rawOutput != "" {
+			switch rawOutput {
+			case "json":
+				output = ApiPluginUpdateManifestOutputJson
+			case "raw":
+				output = ApiPluginUpdateManifestOutputRaw
+			default:
+				return fmt.Errorf("invalid --output %q: must be one of json, raw", rawOutput)
+			}
+		}
+		rawPluginInstanceId := args[0]
+
+		p := ApiPluginUpdateManifestParams{
+			Context:          rawContext,
+			Data:             rawData,
+			File:             rawFile,
+			ContentType:      rawContentType,
+			Output:           output,
+			OutputFile:       rawOutputFile,
+			Timeout:          rawTimeout,
+			PluginInstanceId: rawPluginInstanceId,
+		}
+
+		return apiPluginUpdateManifest(cmd.Context(), cmd, newIO(cmd), p)
+	}
+
+	return cmd
+}
+
+func newPluginManifestCommand(
+	apiPluginUpdateManifest ApiPluginUpdateManifestHandler,
+) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "manifest",
+		Short: "Update an external plugin’s declared capabilities.",
+		Long:  "# Plugin Manifest\n\nUpdate the manifest of an external plugin installation. Inspect the\ninstalled plugin and operation requirements before changing its declared\ncapabilities.\n\nCommands send one request and return the full JSON response by default.\nUse explicit IDs from list/get output and `--context NAME` for automation.\nMutations apply immediately; check current state before retrying after a\nnetwork failure.\n\n## Examples\n\n~~~sh\nsd plugin manifest update --help\n~~~\n",
+		Args:  groupArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return cmd.Help()
+		},
+	}
+	cmd.AddCommand(
+		newApiPluginUpdateManifestCommand(apiPluginUpdateManifest),
+	)
+	return cmd
+}
 func NewPluginCommand(
 	pluginGet PluginGetHandler,
 	pluginList PluginListHandler,
@@ -774,11 +1082,15 @@ func NewPluginCommand(
 	pluginDevSymbolsPackage PluginDevSymbolsPackageHandler,
 	pluginDevSymbolsDetail PluginDevSymbolsDetailHandler,
 	pluginDevSymbolsSearch PluginDevSymbolsSearchHandler,
+	apiPluginGetConfiguration ApiPluginGetConfigurationHandler,
+	apiPluginUpdateConfiguration ApiPluginUpdateConfigurationHandler,
+	apiPluginGetConfigurationSchema ApiPluginGetConfigurationSchemaHandler,
+	apiPluginUpdateManifest ApiPluginUpdateManifestHandler,
 ) PluginCommand {
 	cmd := &cobra.Command{
 		Use:   "plugin",
 		Short: "Build, develop, and manage Storyden plugins.",
-		Long:  "# Operate and develop plugins\n\nA **plugin** is a regular program that extends a Storyden community without\nchanging the server's core code. Plugins communicate through authenticated RPC\nand can subscribe to events, integrate other services, and use permitted API\noperations. A manifest describes the plugin's identity, capabilities, and settings.\n\n**Supervised** plugins are packaged and run by Storyden; the instance manages\nstarting, stopping, and collecting their logs. **External** plugins run in a\nprocess you host and connect to Storyden using an RPC token. Choose external\nmode for local development or separately hosted integrations.\n\n## Commands and workflows\n\nUse `list` to discover installed plugin instance IDs, `get` to inspect a manifest\nand state, and `activate`/`deactivate` for supervised processes. `logs` streams\nruntime output. `delete` removes an installed plugin; `token rotate` changes an\nexternal plugin's connection credential.\n\nUse `dev` for local project work: inspect Go APIs with `symbols`, build/validate a\npackage, install it on the selected instance, or run an external plugin locally.\nInstance IDs come from server responses and differ from manifest identifiers.\n",
+		Long:  "# Operate and develop plugins\n\nA **plugin** is a regular program that extends a Storyden community without\nchanging the server's core code. Plugins communicate through authenticated\nRPC and can subscribe to events, integrate other services, and use permitted\nAPI operations. A manifest describes the plugin's identity, capabilities,\nand settings.\n\n**Supervised** plugins are packaged and run by Storyden; the instance\nmanages starting, stopping, and collecting their logs. **External** plugins\nrun in a process you host and connect to Storyden using an RPC token. Choose\nexternal mode for local development or separately hosted integrations.\n\n## Commands and workflows\n\nUse `list` to discover installed plugin instance IDs, `get` to inspect a\nmanifest and state, and `activate`/`deactivate` for supervised processes.\n`logs` streams runtime output. `delete` removes an installed plugin; `token\nrotate` changes an external plugin's connection credential.\n\nUse `dev` for local project work: inspect Go APIs with `symbols`,\nbuild/validate a package, install it on the selected instance, or run an\nexternal plugin locally. Instance IDs come from server responses and differ\nfrom manifest identifiers.\n\n## Examples\n\n~~~sh\nsd plugin list --output json\nsd plugin get PLUGIN_INSTANCE_ID\n~~~\n",
 		Args:  groupArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Help()
@@ -805,6 +1117,14 @@ func NewPluginCommand(
 			pluginDevSymbolsPackage,
 			pluginDevSymbolsDetail,
 			pluginDevSymbolsSearch,
+		),
+		newPluginConfigurationCommand(
+			apiPluginGetConfiguration,
+			apiPluginUpdateConfiguration,
+			apiPluginGetConfigurationSchema,
+		),
+		newPluginManifestCommand(
+			apiPluginUpdateManifest,
 		),
 	)
 	return PluginCommand(cmd)

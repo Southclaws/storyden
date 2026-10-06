@@ -73,10 +73,10 @@ func fetchNodes(ctx context.Context, client *openapi.ClientWithResponses, page i
 	}
 	if response.StatusCode() != http.StatusOK || response.JSON200 == nil {
 		return nil, outputfmt.RequestErrorWithMessages(
-			"node list request",
+			"page list request",
 			response,
 			response.Body,
-			outputfmt.UnauthorizedMessage("node list request"),
+			outputfmt.UnauthorizedMessage("page list request"),
 		)
 	}
 	return response.JSON200, nil

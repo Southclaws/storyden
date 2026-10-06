@@ -43,18 +43,18 @@ func NewSearchCommand(search SearchHandler) SearchCommand {
 	cmd := &cobra.Command{
 		Use:   "search <query>",
 		Short: "Search all Storyden content.",
-		Long:  "# Find content across the community\n\nSearch the datagraph when the user does not know where information lives. Filter\nwith repeatable `--kind`, `--authors`, `--categories`, or `--tags`. Use `node search`\nwhen only Library pages are relevant. Results are references: inspect their kind\nand identifier, then fetch the full node/thread before editing or quoting content.\n\n## Output and pagination\n\nSelect `--output json` for a single JSON object or `--output jsonl` for one item per\nline. Defaults are plain tables, including when piped. One page is fetched unless\n`--all` is set; `--limit N` caps returned matches, not the server's page size.\nJSONL can emit partial results before a later page fails; check the exit status.\n\nJSON contains an `items` array of typed search results. With `--all`, `items`\ncontains all fetched matches; pagination fields are not an aggregate count.\n",
-		Example: `  sd search "design system" --kind node,thread --output json
+		Long:  "# Find content across the community\n\nSearch the datagraph when the user does not know where information lives.\nFilter with repeatable `--kind`, `--authors`, `--categories`, or `--tags`.\nUse `page search` when only Library pages are relevant. Results are\nreferences: inspect their kind and identifier, then fetch the full\npage/thread before editing or quoting content.\n\n## Output and pagination\n\nSelect `--output json` for a single JSON object or `--output jsonl` for one\nitem per line. Defaults are plain tables, including when piped. One page is\nfetched unless `--all` is set; `--limit N` caps returned matches, not the\nserver's page size. JSONL can emit partial results before a later page\nfails; check the exit status.\n\nJSON contains an `items` array of typed search results. With `--all`,\n`items` contains all fetched matches; pagination fields are not an aggregate\ncount.\n",
+		Example: `  sd search "design system" --kind page,thread --output json
   sd search "release notes" --kind thread --all --output jsonl`,
 		Args: rangeArgs(1, 1),
 	}
 
 	var rawKind []string
-	cmd.Flags().StringSliceVar(&rawKind, "kind", nil, "Filter kinds (repeatable/comma-separated). Choices: post, thread, reply, node, collection, profile, event.")
+	cmd.Flags().StringSliceVar(&rawKind, "kind", nil, "Filter kinds (repeatable/comma-separated). Choices: post, thread, reply, node (pages), collection, profile, event.")
 	var rawAuthors []string
 	cmd.Flags().StringSliceVar(&rawAuthors, "authors", nil, "Filter by author account IDs or handles (repeatable, comma-separated).")
 	var rawCategories []string
-	cmd.Flags().StringSliceVar(&rawCategories, "categories", nil, "Filter by category slugs (repeatable, comma-separated).")
+	cmd.Flags().StringSliceVar(&rawCategories, "categories", nil, "Filter by category IDs, not slugs (repeatable, comma-separated).")
 	var rawTags []string
 	cmd.Flags().StringSliceVar(&rawTags, "tags", nil, "Filter by tag names (repeatable, comma-separated).")
 	var rawPage int

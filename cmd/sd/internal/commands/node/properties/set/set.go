@@ -42,7 +42,7 @@ func New(store *config.Store) cligen.NodePropertiesSetHandler {
 			return output.JSON(io.Out, result)
 		}
 
-		fmt.Fprintf(io.Out, "Updated properties for node: %s\n", p.Slug)
+		fmt.Fprintf(io.Out, "Updated properties for page: %s\n", p.Slug)
 		for _, prop := range result.Properties {
 			fmt.Fprintf(io.Out, "  %s (%s): %v\n", prop.Name, prop.Type, prop.Value)
 		}
@@ -74,7 +74,7 @@ func setProperties(
 
 func propertiesSetError(response *openapi.NodeUpdatePropertiesResponse) error {
 	if response.StatusCode() == http.StatusNotFound {
-		return fmt.Errorf("node not found")
+		return fmt.Errorf("page not found")
 	}
 
 	if response.StatusCode() == http.StatusUnauthorized {
@@ -89,10 +89,10 @@ func propertiesSetError(response *openapi.NodeUpdatePropertiesResponse) error {
 			return fmt.Errorf(`property type required for new properties
 
 When creating a new property, you must specify its type:
-  sd node properties set <slug> name:type=value
+  sd page properties set <slug> name:type=value
 
 Example:
-  sd node properties set my-node status:text=draft priority:number=1
+  sd page properties set my-node status:text=draft priority:number=1
 
 Available types: text, number, boolean, timestamp
 
@@ -143,10 +143,10 @@ func fetchNodeProperties(
 func propertiesFetchError(response *openapi.NodeGetResponse) error {
 	body := strings.TrimSpace(string(response.Body))
 	if body != "" {
-		return fmt.Errorf("failed to fetch node properties: %s: %s", response.Status(), body)
+		return fmt.Errorf("failed to fetch page properties: %s: %s", response.Status(), body)
 	}
 
-	return fmt.Errorf("failed to fetch node properties: %s", response.Status())
+	return fmt.Errorf("failed to fetch page properties: %s", response.Status())
 }
 
 func parseProperties(properties []string, existing []openapi.Property) ([]openapi.PropertyMutation, error) {

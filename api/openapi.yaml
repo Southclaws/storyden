@@ -2667,7 +2667,7 @@ paths:
   /profiles/{account_handle}:
     get:
       operationId: ProfileGet
-      description: Get a public profile by ID.
+      description: Get a public profile by account handle or ID.
       tags: [profiles]
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
@@ -3081,7 +3081,7 @@ paths:
   /assets/{asset_filename}:
     get:
       operationId: AssetGet
-      description: Download an asset by its ID.
+      description: Download an asset by its filename.
       tags: [assets]
       parameters: [$ref: "#/components/parameters/AssetPathParam"]
       responses:
@@ -3104,7 +3104,7 @@ paths:
   /likes/posts/{post_id}:
     get:
       operationId: LikePostGet
-      description: Retreives all likes for the given post. Not paginated (yet.)
+      description: Retrieve all likes for the given post. Not paginated.
       tags: [likes]
       parameters:
         - $ref: "#/components/parameters/PostIDParam"
@@ -3116,10 +3116,10 @@ paths:
     put:
       operationId: LikePostAdd
       description: |
-        Add a like/vote to a post. A "like" is pretty much what you'd expect for
-        any modern social platform, it will inform the feed algorithm and the
-        account's recommendations as well as listing the post on their profile.
-        Idempotent operation where repeated use will do nothing.
+        Add a like/vote to a post from the authenticated account. A like records
+        that account's appreciation of the post and makes it available through
+        the account's liked-post list. Repeating the operation does not create
+        another like.
       tags: [likes]
       parameters:
         - $ref: "#/components/parameters/PostIDParam"
@@ -3131,9 +3131,9 @@ paths:
     delete:
       operationId: LikePostRemove
       description: |
-        Removes a like/vote from the authenticated account for the post. It will
-        perform the inverse of any changes to the account's algorithm. Also is
-        idempotent, so repeated use will do nothing after being actioned once.
+        Removes a like/vote from the authenticated account for the post. It also
+        removes the post from that account's liked-post list. Repeating the
+        operation leaves the like absent.
       tags: [likes]
       parameters:
         - $ref: "#/components/parameters/PostIDParam"
@@ -3344,19 +3344,20 @@ paths:
     get:
       operationId: NodeDraftList
       description: |
-        List all draft versions across all nodes visible to the caller.
+        List a page of draft versions across nodes visible to the caller.
 
-        This endpoint is designed for moderation and queue screens where you need
-        to see all pending draft proposals in one request. Each draft includes a
-        reference to its target node for context.
+        This endpoint is designed for moderation and queue screens where you
+        need to review pending draft proposals across nodes. Each draft includes
+        a reference to its target node for context.
 
         Drafts are visible based on the caller's permissions:
         - Draft authors can see their own drafts
         - Members with `MANAGE_LIBRARY` can see all drafts
         - Unauthenticated requests receive 401 Unauthorized
 
-        Results are ordered by `updated_at` descending so recently updated drafts
-        appear first.
+        Results are ordered by `updated_at` descending so recently updated
+        drafts appear first. Use the `page` parameter and response pagination
+        metadata to continue through the results.
       tags: [nodes]
       parameters:
         - $ref: "#/components/parameters/PaginationQuery"
@@ -3403,7 +3404,9 @@ paths:
         "200": { $ref: "#/components/responses/NodeUpdateOK" }
     delete:
       operationId: NodeDelete
-      description: Delete a node and move all children to its parent or root.
+      description: |
+        Delete a node and move its direct children to the root, or to the parent
+        specified by `target_node`.
       tags: [nodes]
       parameters:
         - $ref: "#/components/parameters/NodeSlugParam"
@@ -3845,15 +3848,16 @@ paths:
       operationId: LinkCreate
       description: |
         Add a link to the community bookmarks. This will also scrape the content
-        at the site the link points to, if possible. If the submitted link is an
-        invalid link for whatever reason (invalid URL structure or page is dead)
-        then the API will fail. The metadata for the link is indexed on success.
+        at the site the link points to, if possible. If scraping fails, the link
+        is stored with basic information instead of scraped metadata.
 
-        If the submitted link already exists it will be an idempotent operation,
-        unless the body contains additional metadata. In these cases, the link's
-        metadata will be updated with the new metadata and the URL is unchanged.
+        If the submitted URL already exists, the existing link is returned and a
+        background scrape is queued to refresh its metadata. The handler
+        consumes only the `url` field; submitted `title` and `description` are
+        not applied.
 
-        When a link is submitted, it is first "cleaned" to remove any fragments.
+        The submitted URL is used for lookup and storage without removing its
+        fragment. Use the returned link resource to inspect the stored metadata.
       tags: [links]
       requestBody: { $ref: "#/components/requestBodies/LinkCreate" }
       responses:
@@ -3876,8 +3880,8 @@ paths:
     get:
       operationId: LinkGet
       description: |
-        Get the details for a specific link. Such as where it's been posted,
-        which resources it's linked to and how many times it's been opened.
+        Get the details for a specific link by its slug, including scraped
+        metadata and the assets, nodes, and posts associated with it.
       tags: [links]
       parameters: [{ $ref: "#/components/parameters/LinkSlugParam" }]
       responses:
@@ -4577,15 +4581,23 @@ paths:
       operationId: RobotSessionGet
       summary: Get a robot session
       description: |
-        Retrieve a specific robot session with all of its messages. Sessions can
-        involve interactions with multiple Robots so the Robot is specified on
-        each message. Messages may not be representative of exactly what is sent
-        into a language model, as certain optimisations may be performed before
-        this such as compaction, summarisation or removal of irrelevant context.
+        Retrieve a specific robot session with a page of its messages. Sessions
+        can involve interactions with multiple Robots, so Robot-authored
+        messages identify the Robot. Messages may not be representative of
+        exactly what is sent into a language model, as certain optimisations may
+        be performed before this such as compaction, summarisation or removal of
+        irrelevant context.
 
-        Any member with "USE_ROBOTS" can see any other members' sessions and
+        Any member with `USE_ROBOTS` can see other members' sessions and
         messages with a Robot. Robots are not considered private assistants, but
         rather shared tools for the team to use for managing their community.
+
+        The default page contains up to 50 messages. The `limit` parameter is
+        clamped to 1–100; use `before` with the returned message cursor to load
+        older history.
+
+        Reading a session records the requesting account's view and acknowledges
+        session events through the returned stream offset.
       tags: [robots]
       parameters:
         - $ref: "#/components/parameters/RobotSessionIDParam"
@@ -4788,7 +4800,7 @@ paths:
         "200": { $ref: "#/components/responses/TrailGetOK" }
     patch:
       operationId: TrailUpdate
-      summary: Update a Trail, including pause, resume, finish, or archive
+      summary: Update a Trail, including pause, resume, or archive
       description: |
         Replace the mutable Trail definition. The server validates the trigger
         and action bindings before it saves the update. The creator is immutable.

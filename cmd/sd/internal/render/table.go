@@ -77,7 +77,7 @@ func Render[T any](out io.Writer, items []T, p Profile[T], wide bool, page PageI
 
 	if page.TotalPages > 0 {
 		fmt.Fprintf(out, "\nPage %d of %d (showing %d of %d)\n",
-			page.CurrentPage, page.TotalPages, page.PageSize, page.Results)
+			page.CurrentPage, page.TotalPages, min(len(items), max(page.Results, 0)), page.Results)
 	}
 
 	return nil

@@ -173,7 +173,7 @@ export const getProfileGetUrl = (accountHandle: string) => {
 };
 
 /**
- * Get a public profile by ID.
+ * Get a public profile by account handle or ID.
  */
 export const profileGet = async (
   accountHandle: string,

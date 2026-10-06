@@ -45,10 +45,10 @@ func TestReadJSONPropsRequiresObject(t *testing.T) {
 	r := require.New(t)
 
 	_, err := readJSONProps("-", strings.NewReader(`null`))
-	r.ErrorContains(err, "node update JSON must be an object")
+	r.ErrorContains(err, "page update JSON must be an object")
 
 	_, err = readJSONProps("-", strings.NewReader(`[]`))
-	r.ErrorContains(err, "invalid node update JSON")
+	r.ErrorContains(err, "invalid page update JSON")
 }
 
 func TestBuildMutablePropsRejectsJSONWithFieldFlags(t *testing.T) {

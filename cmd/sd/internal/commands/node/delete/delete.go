@@ -23,7 +23,7 @@ func New(store *config.Store) cligen.NodeDeleteHandler {
 			return err
 		}
 		if len(ids) == 0 {
-			return fmt.Errorf("no nodes specified; pass slugs as arguments or use --from-stdin")
+			return fmt.Errorf("no pages specified; pass slugs as arguments or use --from-stdin")
 		}
 
 		client, err := api.NewAuthenticatedClient(ctx, store)
@@ -95,17 +95,17 @@ func deleteNode(
 
 func nodeDeleteError(response *openapi.NodeDeleteResponse) error {
 	if response.StatusCode() == http.StatusNotFound {
-		return fmt.Errorf("node not found")
+		return fmt.Errorf("page not found")
 	}
 
 	if response.StatusCode() == http.StatusUnauthorized {
-		return fmt.Errorf("node delete request was not authorised; run sd auth login again")
+		return fmt.Errorf("page delete request was not authorised; run sd auth login again")
 	}
 
 	body := strings.TrimSpace(string(response.Body))
 	if body != "" {
-		return fmt.Errorf("node delete request failed: %s: %s", response.Status(), body)
+		return fmt.Errorf("page delete request failed: %s: %s", response.Status(), body)
 	}
 
-	return fmt.Errorf("node delete request failed: %s", response.Status())
+	return fmt.Errorf("page delete request failed: %s", response.Status())
 }

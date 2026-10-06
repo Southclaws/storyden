@@ -27,7 +27,7 @@ func New(store *config.Store) cligen.NodeVisibilityHandler {
 			return err
 		}
 		if len(ids) == 0 {
-			return fmt.Errorf("no nodes specified; pass slugs as positional args or use --from-stdin")
+			return fmt.Errorf("no pages specified; pass slugs as positional args or use --from-stdin")
 		}
 
 		client, err := api.NewAuthenticatedClient(ctx, store)
@@ -98,7 +98,7 @@ func updateVisibility(
 
 func visibilityUpdateError(response *openapi.NodeUpdateVisibilityResponse) error {
 	if response.StatusCode() == http.StatusNotFound {
-		return fmt.Errorf("node not found")
+		return fmt.Errorf("page not found")
 	}
 
 	if response.StatusCode() == http.StatusUnauthorized {

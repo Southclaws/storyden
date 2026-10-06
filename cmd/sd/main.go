@@ -9,14 +9,13 @@ import (
 	"time"
 
 	charmLog "charm.land/log/v2"
-	"github.com/carapace-sh/carapace"
 	"github.com/spf13/cobra"
 	"go.uber.org/dig"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/cmd/sd/internal/cli"
 	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
-	searchcmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/search"
+	"github.com/Southclaws/storyden/cmd/sd/internal/completion"
 	storeconfig "github.com/Southclaws/storyden/cmd/sd/internal/config"
 	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 )
@@ -28,20 +27,57 @@ func newRootCommand(
 	configCommand cligen.ConfigCommand,
 	infoCommand cligen.InfoCommand,
 	searchCommand cligen.SearchCommand,
-	nodeCommand cligen.NodeCommand,
+	pageCommand cligen.PageCommand,
 	pluginCommand cligen.PluginCommand,
 	threadCommand cligen.ThreadCommand,
 	tuiCommand cligen.TuiCommand,
+	adminCommand cligen.AdminCommand,
+	accountCommand cligen.AccountCommand,
+	roleCommand cligen.RoleCommand,
+	invitationCommand cligen.InvitationCommand,
+	notificationCommand cligen.NotificationCommand,
+	reportCommand cligen.ReportCommand,
+	profileCommand cligen.ProfileCommand,
+	categoryCommand cligen.CategoryCommand,
+	tagCommand cligen.TagCommand,
+	postCommand cligen.PostCommand,
+	collectionCommand cligen.CollectionCommand,
+	linkCommand cligen.LinkCommand,
+	eventCommand cligen.EventCommand,
+	robotCommand cligen.RobotCommand,
+	trailCommand cligen.TrailCommand,
+	assetCommand cligen.AssetCommand,
+	apiCommand cligen.ApiCommand,
+	completionCommand cligen.CompletionCommand,
+
 ) *cobra.Command {
 	root := cligen.NewRootCommand(
 		authCommand,
 		configCommand,
 		infoCommand,
 		searchCommand,
-		nodeCommand,
+		pageCommand,
 		pluginCommand,
 		threadCommand,
 		tuiCommand,
+		adminCommand,
+		accountCommand,
+		roleCommand,
+		invitationCommand,
+		notificationCommand,
+		reportCommand,
+		profileCommand,
+		categoryCommand,
+		tagCommand,
+		postCommand,
+		collectionCommand,
+		linkCommand,
+		eventCommand,
+		robotCommand,
+		trailCommand,
+		assetCommand,
+		apiCommand,
+		completionCommand,
 	)
 
 	root.SilenceUsage = true
@@ -60,8 +96,7 @@ func newRootCommand(
 	root.SetErr(streams.Err)
 
 	help.SetupMarkdownHelp(root)
-	carapace.Gen(root)
-	searchcmd.Complete(searchCommand)
+	completion.Setup(root, store)
 
 	return root
 }

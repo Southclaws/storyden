@@ -39,7 +39,7 @@ func TestFindAssetMissing(t *testing.T) {
 	r := require.New(t)
 
 	_, err := findAsset(nil, "missing")
-	r.ErrorContains(err, "asset not attached to node: missing")
+	r.ErrorContains(err, "asset not attached to page: missing")
 }
 
 func TestAssetFilename(t *testing.T) {

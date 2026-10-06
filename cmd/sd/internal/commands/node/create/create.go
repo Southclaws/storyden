@@ -55,7 +55,7 @@ func New(store *config.Store) cligen.NodeCreateHandler {
 			return output.JSON(cio.Out, node)
 		}
 
-		fmt.Fprintf(cio.Out, "Created node: %s (slug: %s)\n", node.Name, node.Slug)
+		fmt.Fprintf(cio.Out, "Created page: %s (slug: %s)\n", node.Name, node.Slug)
 
 		return nil
 	}
@@ -80,15 +80,15 @@ func createNode(
 
 func nodeCreateError(response *openapi.NodeCreateResponse) error {
 	if response.StatusCode() == http.StatusUnauthorized {
-		return fmt.Errorf("node create request was not authorised; run sd auth login again")
+		return fmt.Errorf("page create request was not authorised; run sd auth login again")
 	}
 
 	body := strings.TrimSpace(string(response.Body))
 	if body != "" {
-		return fmt.Errorf("node create request failed: %s: %s", response.Status(), body)
+		return fmt.Errorf("page create request failed: %s: %s", response.Status(), body)
 	}
 
-	return fmt.Errorf("node create request failed: %s", response.Status())
+	return fmt.Errorf("page create request failed: %s", response.Status())
 }
 
 func stringPtr(s string) *string {

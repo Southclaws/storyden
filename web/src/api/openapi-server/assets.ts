@@ -153,7 +153,7 @@ export const getAssetGetUrl = (assetFilename: string) => {
 };
 
 /**
- * Download an asset by its ID.
+ * Download an asset by its filename.
  */
 export const assetGet = async (
   assetFilename: string,

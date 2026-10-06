@@ -41,7 +41,7 @@ func New(store *config.Store) cligen.NodeUpdateHandler {
 			return output.JSON(io.Out, node)
 		}
 
-		fmt.Fprintf(io.Out, "Updated node: %s (slug: %s)\n", node.Name, node.Slug)
+		fmt.Fprintf(io.Out, "Updated page: %s (slug: %s)\n", node.Name, node.Slug)
 
 		return nil
 	}
@@ -144,15 +144,15 @@ func readJSONProps(source string, stdin io.Reader) (openapi.NodeMutableProps, er
 
 	var object map[string]json.RawMessage
 	if err := json.Unmarshal(data, &object); err != nil {
-		return openapi.NodeMutableProps{}, fmt.Errorf("invalid node update JSON: %w", err)
+		return openapi.NodeMutableProps{}, fmt.Errorf("invalid page update JSON: %w", err)
 	}
 	if object == nil {
-		return openapi.NodeMutableProps{}, fmt.Errorf("node update JSON must be an object")
+		return openapi.NodeMutableProps{}, fmt.Errorf("page update JSON must be an object")
 	}
 
 	var props openapi.NodeMutableProps
 	if err := json.Unmarshal(data, &props); err != nil {
-		return openapi.NodeMutableProps{}, fmt.Errorf("invalid node update JSON: %w", err)
+		return openapi.NodeMutableProps{}, fmt.Errorf("invalid page update JSON: %w", err)
 	}
 
 	return props, nil

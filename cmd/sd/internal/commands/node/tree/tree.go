@@ -50,7 +50,7 @@ func New(store *config.Store) cligen.NodeTreeHandler {
 		if p.Slug != "" {
 			root, err := nodeapi.Fetch(ctx, client.OpenAPI, p.Slug)
 			if err != nil {
-				return fmt.Errorf("could not find node %q: %w", p.Slug, err)
+				return fmt.Errorf("could not find page %q: %w", p.Slug, err)
 			}
 			rootLabel = string(root.Name) + " [slug=" + p.Slug + "]"
 			nodeID = string(root.Id)
@@ -111,15 +111,15 @@ func fetchTree(
 
 func nodeTreeError(response *openapi.NodeListResponse) error {
 	if response.StatusCode() == http.StatusUnauthorized {
-		return fmt.Errorf("node tree request was not authorised; run sd auth login again")
+		return fmt.Errorf("page tree request was not authorised; run sd auth login again")
 	}
 
 	body := strings.TrimSpace(string(response.Body))
 	if body != "" {
-		return fmt.Errorf("node tree request failed: %s: %s", response.Status(), body)
+		return fmt.Errorf("page tree request failed: %s: %s", response.Status(), body)
 	}
 
-	return fmt.Errorf("node tree request failed: %s", response.Status())
+	return fmt.Errorf("page tree request failed: %s", response.Status())
 }
 
 func validateVisibilities(values []string) error {

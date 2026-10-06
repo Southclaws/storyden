@@ -30,35 +30,57 @@ const (
 
 type instanceInfo struct {
 	Context  string       `json:"context,omitempty"`
+	Auth     authInfo     `json:"auth"`
 	Endpoint string       `json:"endpoint"`
 	BaseURL  string       `json:"base_url"`
 	Info     openapi.Info `json:"info"`
+}
+
+type authInfo struct {
+	Status    string            `json:"status"`
+	Method    config.AuthMethod `json:"method,omitempty"`
+	AccountID string            `json:"account_id,omitempty"`
+	Handle    string            `json:"handle,omitempty"`
 }
 
 var hslPattern = regexp.MustCompile(`(?i)^hsla?\(\s*([0-9.]+)\s*,\s*([0-9.]+)%\s*,\s*([0-9.]+)%`)
 
 func New(store *config.Store) cligen.InfoHandler {
 	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.InfoParams) error {
-		contextName, configuredEndpoint, err := currentContext(store)
+		contextName, current, err := store.Current()
 		if err != nil {
 			return err
 		}
 
-		client, err := api.NewAuthenticatedClient(ctx, store)
+		var client *api.Client
+		if current.Auth == nil {
+			client, err = api.NewStaticClient(current.APIURL)
+		} else {
+			client, err = api.NewAuthenticatedClient(ctx, store)
+		}
 		if err != nil {
 			return err
 		}
 
-		info, err := fetchInfo(ctx, client.OpenAPI)
+		session, err := fetchSession(ctx, client.OpenAPI)
 		if err != nil {
 			return err
 		}
 
 		result := instanceInfo{
 			Context:  contextName,
-			Endpoint: configuredEndpoint,
+			Auth:     authInfo{Status: "unauthenticated"},
+			Endpoint: current.APIURL,
 			BaseURL:  client.BaseURL,
-			Info:     *info,
+			Info:     session.Info,
+		}
+		if current.Auth != nil {
+			result.Auth.Method = current.Auth.MethodOrDefault()
+		}
+		if session.Account != nil {
+			result.Auth.Status = "authenticated"
+			result.Auth.AccountID = string(session.Account.Id)
+			result.Auth.Handle = session.Account.Handle
 		}
 		if result.Endpoint == "" {
 			result.Endpoint = client.Endpoint
@@ -88,9 +110,15 @@ func NewMetadata(store *config.Store) cligen.InfoMetadataHandler {
 	}
 }
 
-func currentContext(store *config.Store) (string, string, error) {
-	name, current, err := store.Current()
-	return name, current.APIURL, err
+func fetchSession(ctx context.Context, client *openapi.ClientWithResponses) (*openapi.SessionInfo, error) {
+	response, err := client.GetSessionWithResponse(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if response.JSON200 == nil {
+		return nil, fmt.Errorf("get session info failed: %s: %s", response.Status(), string(response.Body))
+	}
+	return response.JSON200, nil
 }
 
 func fetchInfo(ctx context.Context, client *openapi.ClientWithResponses) (*openapi.Info, error) {
@@ -128,11 +156,14 @@ func renderPlain(out io.Writer, result instanceInfo) error {
 
 	fields := [][2]string{
 		{"Context", result.Context},
+		{"Auth status", result.Auth.Status},
+		{"Auth method", string(result.Auth.Method)},
+		{"Signed in as", result.Auth.Handle},
 		{"Endpoint", result.Endpoint},
 		{"Web address", result.Info.WebAddress},
 		{"API address", result.Info.ApiAddress},
 		{"API client base", result.BaseURL},
-		{"Authentication", string(result.Info.AuthenticationMode)},
+		{"Instance auth mode", string(result.Info.AuthenticationMode)},
 		{"Registration", string(result.Info.RegistrationMode)},
 		{"Accent colour", accentColour(result.Info.AccentColour, terminal)},
 	}

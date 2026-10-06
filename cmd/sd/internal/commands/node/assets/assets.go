@@ -49,7 +49,7 @@ func NewUpload(store *config.Store) cligen.NodeAssetsUploadHandler {
 		}
 
 		fmt.Fprintf(io.Out, "Uploaded asset: %s (id: %s)\n", asset.Filename, asset.Id)
-		fmt.Fprintf(io.Out, "Attached to node: %s (slug: %s)\n", node.Name, node.Slug)
+		fmt.Fprintf(io.Out, "Attached to page: %s (slug: %s)\n", node.Name, node.Slug)
 		return nil
 	}
 }
@@ -70,7 +70,7 @@ func NewPrimarySet(store *config.Store) cligen.NodeAssetsPrimarySetHandler {
 			return output.JSON(io.Out, node)
 		}
 
-		fmt.Fprintf(io.Out, "Set primary image for node: %s (slug: %s)\n", node.Name, node.Slug)
+		fmt.Fprintf(io.Out, "Set primary image for page: %s (slug: %s)\n", node.Name, node.Slug)
 		return nil
 	}
 }
@@ -91,7 +91,7 @@ func NewPrimaryClear(store *config.Store) cligen.NodeAssetsPrimaryClearHandler {
 			return output.JSON(io.Out, node)
 		}
 
-		fmt.Fprintf(io.Out, "Cleared primary image for node: %s (slug: %s)\n", node.Name, node.Slug)
+		fmt.Fprintf(io.Out, "Cleared primary image for page: %s (slug: %s)\n", node.Name, node.Slug)
 		return nil
 	}
 }
@@ -108,7 +108,7 @@ func NewPrimaryDownload(store *config.Store) cligen.NodeAssetsPrimaryDownloadHan
 			return err
 		}
 		if node.PrimaryImage == nil {
-			return fmt.Errorf("node has no primary image")
+			return fmt.Errorf("page has no primary image")
 		}
 
 		asset := *node.PrimaryImage
@@ -149,7 +149,7 @@ func NewAdd(store *config.Store) cligen.NodeAssetsAddHandler {
 			return output.JSON(io.Out, node)
 		}
 
-		fmt.Fprintf(io.Out, "Attached asset %s to node: %s (slug: %s)\n", p.AssetId, node.Name, node.Slug)
+		fmt.Fprintf(io.Out, "Attached asset %s to page: %s (slug: %s)\n", p.AssetId, node.Name, node.Slug)
 		return nil
 	}
 }
@@ -170,7 +170,7 @@ func NewRemove(store *config.Store) cligen.NodeAssetsRemoveHandler {
 			return output.JSON(io.Out, node)
 		}
 
-		fmt.Fprintf(io.Out, "Removed asset %s from node: %s (slug: %s)\n", p.AssetId, node.Name, node.Slug)
+		fmt.Fprintf(io.Out, "Removed asset %s from page: %s (slug: %s)\n", p.AssetId, node.Name, node.Slug)
 		return nil
 	}
 }
@@ -381,7 +381,7 @@ func findAsset(assets openapi.AssetList, selector string) (openapi.Asset, error)
 		}
 	}
 
-	return openapi.Asset{}, fmt.Errorf("asset not attached to node: %s", selector)
+	return openapi.Asset{}, fmt.Errorf("asset not attached to page: %s", selector)
 }
 
 func assetMatches(asset openapi.Asset, selector string) bool {
@@ -419,32 +419,32 @@ func assetGetError(response *openapi.AssetGetResponse) error {
 
 func nodeAddAssetError(response *openapi.NodeAddAssetResponse) error {
 	if response.StatusCode() == http.StatusNotFound {
-		return fmt.Errorf("node or asset not found")
+		return fmt.Errorf("page or asset not found")
 	}
 	if response.StatusCode() == http.StatusUnauthorized {
-		return fmt.Errorf("node asset request was not authorised; run sd auth login again")
+		return fmt.Errorf("page asset request was not authorised; run sd auth login again")
 	}
 
 	body := strings.TrimSpace(string(response.Body))
 	if body != "" {
-		return fmt.Errorf("node asset request failed: %s: %s", response.Status(), body)
+		return fmt.Errorf("page asset request failed: %s: %s", response.Status(), body)
 	}
 
-	return fmt.Errorf("node asset request failed: %s", response.Status())
+	return fmt.Errorf("page asset request failed: %s", response.Status())
 }
 
 func nodeRemoveAssetError(response *openapi.NodeRemoveAssetResponse) error {
 	if response.StatusCode() == http.StatusNotFound {
-		return fmt.Errorf("node or asset not found")
+		return fmt.Errorf("page or asset not found")
 	}
 	if response.StatusCode() == http.StatusUnauthorized {
-		return fmt.Errorf("node asset request was not authorised; run sd auth login again")
+		return fmt.Errorf("page asset request was not authorised; run sd auth login again")
 	}
 
 	body := strings.TrimSpace(string(response.Body))
 	if body != "" {
-		return fmt.Errorf("node asset request failed: %s: %s", response.Status(), body)
+		return fmt.Errorf("page asset request failed: %s: %s", response.Status(), body)
 	}
 
-	return fmt.Errorf("node asset request failed: %s", response.Status())
+	return fmt.Errorf("page asset request failed: %s", response.Status())
 }

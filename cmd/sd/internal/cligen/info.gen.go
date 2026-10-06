@@ -54,8 +54,8 @@ func NewInfoCommand(
 ) InfoCommand {
 	cmd := &cobra.Command{
 		Use:   "info",
-		Short: "Show basic information about the current Storyden instance.",
-		Long:  "# Inspect the selected instance\n\nFetch public instance information using the selected context's endpoint. Use\nthis before acting to inspect community settings and capabilities; it does not\nprove permission to perform a particular mutation.\n\nDefault output is a summary. `--output json` returns the full instance info object;\n`info metadata` returns only its metadata. Use `auth status` to inspect which\nlocal identity is selected.\n",
+		Short: "Show instance details, the selected context, and authentication status.",
+		Long:  "# Inspect the selected instance\n\nFetch instance information and the server-reported session for the selected\ncontext. Show its name, authentication status, credential method, and\nsigned-in handle alongside community settings. A saved context without\ncredentials can read public session information and is reported as\nunauthenticated. Request failures remain errors; successful authentication\ndoes not prove permission to perform a particular mutation.\n\nDefault output is a summary. `--output json` returns an object with\n`context`, `auth`, `endpoint`, `base_url`, and `info`. The `.auth` object\ncontains `status`, the configured `method` when present, and\n`account_id`/`handle` when the server returns an authenticated account.\nCredentials are never included. Public instance fields remain inside\n`.info`; `info metadata` returns only its metadata. Use `auth status` to\ninspect locally saved credentials without a server request.\n",
 		Example: `  sd --context my-bot info --output json
   sd info metadata`,
 		Args: rangeArgs(0, 0),

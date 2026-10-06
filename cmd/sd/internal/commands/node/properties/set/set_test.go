@@ -20,7 +20,7 @@ func TestPropertiesFetchErrorIncludesHTTPContext(t *testing.T) {
 		},
 	})
 
-	r.ErrorContains(err, "failed to fetch node properties: 404 Not Found: missing node")
+	r.ErrorContains(err, "failed to fetch page properties: 404 Not Found: missing node")
 }
 
 func TestParsePropertiesRejectsEmptyExplicitType(t *testing.T) {

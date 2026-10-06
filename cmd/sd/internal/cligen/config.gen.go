@@ -39,8 +39,8 @@ func NewConfigCommand(
 ) ConfigCommand {
 	cmd := &cobra.Command{
 		Use:   "config",
-		Short: "Inspect and manage sd configuration.",
-		Long:  "# Local configuration\n\nThe CLI keeps local configuration for connecting to Storyden instances. It\nrecords saved auth contexts and the default identity; credentials may live in\nthat file or the operating system's credential store. This is configuration for\n`sd` on this computer, not the community's server settings.\n\n## Commands and workflows\n\nUse `config path` to locate the configuration file. Manage identities through\n`auth` and select one operation's identity with `--context NAME`. The config may\ncontain credentials; use `auth status --output json` for routine inspection.\n",
+		Short: "Locate local CLI configuration and saved connection settings.",
+		Long:  "# Local configuration\n\nThe CLI keeps local configuration for connecting to Storyden instances. It\nrecords saved auth contexts and the default identity; credentials may live\nin that file or the operating system's credential store. This is\nconfiguration for `sd` on this computer, not the community's server\nsettings.\n\n## Commands and workflows\n\nUse `config path` to locate the configuration file. Manage identities\nthrough `auth` and select one operation's identity with `--context NAME`.\nThe config may contain credentials; use `auth status --output json` for\nroutine inspection.\n\n## Examples\n\n~~~sh\nsd config path\n~~~\n",
 		Args:  groupArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Help()

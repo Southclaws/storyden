@@ -1,6 +1,6 @@
-// Package search implements `sd node search <query>` — a thin wrapper around
+// Package search implements `sd page search <query>` — a thin wrapper around
 // the datagraph search endpoint, filtered to node items. It uses the same
-// shared list rendering as `sd node list` so column profiles and format flags
+// shared list rendering as `sd page list` so column profiles and format flags
 // are consistent.
 package search
 

@@ -65,7 +65,7 @@ func NewSet(store *config.Store) cligen.NodeMetaSetHandler {
 			return output.JSON(cio.Out, node)
 		}
 
-		fmt.Fprintf(cio.Out, "Updated metadata for node: %s (slug: %s)\n", node.Name, node.Slug)
+		fmt.Fprintf(cio.Out, "Updated metadata for page: %s (slug: %s)\n", node.Name, node.Slug)
 		return nil
 	}
 }

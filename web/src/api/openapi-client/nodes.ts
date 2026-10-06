@@ -209,19 +209,20 @@ export const getNodeDraftListUrl = (params?: NodeDraftListParams) => {
 };
 
 /**
- * List all draft versions across all nodes visible to the caller.
+ * List a page of draft versions across nodes visible to the caller.
  *
- * This endpoint is designed for moderation and queue screens where you need
- * to see all pending draft proposals in one request. Each draft includes a
- * reference to its target node for context.
+ * This endpoint is designed for moderation and queue screens where you
+ * need to review pending draft proposals across nodes. Each draft includes
+ * a reference to its target node for context.
  *
  * Drafts are visible based on the caller's permissions:
  * - Draft authors can see their own drafts
  * - Members with `MANAGE_LIBRARY` can see all drafts
  * - Unauthenticated requests receive 401 Unauthorized
  *
- * Results are ordered by `updated_at` descending so recently updated drafts
- * appear first.
+ * Results are ordered by `updated_at` descending so recently updated
+ * drafts appear first. Use the `page` parameter and response pagination
+ * metadata to continue through the results.
  */
 export const nodeDraftList = async (
   params?: NodeDraftListParams,
@@ -438,7 +439,8 @@ export const getNodeDeleteUrl = (
 };
 
 /**
- * Delete a node and move all children to its parent or root.
+ * Delete a node and move its direct children to the root, or to the parent
+ * specified by `target_node`.
  */
 export const nodeDelete = async (
   nodeSlug: string,

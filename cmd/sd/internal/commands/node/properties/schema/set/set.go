@@ -12,6 +12,7 @@ import (
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
 	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
+	"github.com/Southclaws/storyden/cmd/sd/internal/nodeapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/output"
 )
 
@@ -36,7 +37,7 @@ func New(store *config.Store) cligen.NodePropertiesSchemaSetHandler {
 			return output.JSON(io.Out, result)
 		}
 
-		fmt.Fprintf(io.Out, "Updated property schema for node: %s\n", p.Slug)
+		fmt.Fprintf(io.Out, "Updated property schema for page: %s\n", p.Slug)
 		for _, field := range result.Properties {
 			fmt.Fprintf(io.Out, "  %s (%s) [%s]\n", field.Name, field.Type, field.Sort)
 		}
@@ -51,6 +52,18 @@ func setSchema(
 	slug string,
 	schema []openapi.PropertySchemaMutableProps,
 ) (*openapi.NodeUpdatePropertySchemaOK, error) {
+	node, err := nodeapi.Fetch(ctx, client, slug)
+	if err != nil {
+		return nil, err
+	}
+	if node.Parent == nil {
+		return nil, fmt.Errorf("page %q is a root; schema set requires a page with a parent", slug)
+	}
+	schema, err = nodeapi.PreparePropertySchema(ctx, client, node.Parent.Slug, schema)
+	if err != nil {
+		return nil, err
+	}
+
 	response, err := client.NodeUpdatePropertySchemaWithResponse(ctx, slug, schema)
 	if err != nil {
 		return nil, err
@@ -65,7 +78,7 @@ func setSchema(
 
 func schemaSetError(response *openapi.NodeUpdatePropertySchemaResponse) error {
 	if response.StatusCode() == http.StatusNotFound {
-		return fmt.Errorf("node not found")
+		return fmt.Errorf("page not found")
 	}
 
 	if response.StatusCode() == http.StatusUnauthorized {

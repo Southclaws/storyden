@@ -2371,15 +2371,23 @@ export const getRobotSessionGetUrl = (
 };
 
 /**
- * Retrieve a specific robot session with all of its messages. Sessions can
- * involve interactions with multiple Robots so the Robot is specified on
- * each message. Messages may not be representative of exactly what is sent
- * into a language model, as certain optimisations may be performed before
- * this such as compaction, summarisation or removal of irrelevant context.
+ * Retrieve a specific robot session with a page of its messages. Sessions
+ * can involve interactions with multiple Robots, so Robot-authored
+ * messages identify the Robot. Messages may not be representative of
+ * exactly what is sent into a language model, as certain optimisations may
+ * be performed before this such as compaction, summarisation or removal of
+ * irrelevant context.
  *
- * Any member with "USE_ROBOTS" can see any other members' sessions and
+ * Any member with `USE_ROBOTS` can see other members' sessions and
  * messages with a Robot. Robots are not considered private assistants, but
  * rather shared tools for the team to use for managing their community.
+ *
+ * The default page contains up to 50 messages. The `limit` parameter is
+ * clamped to 1–100; use `before` with the returned message cursor to load
+ * older history.
+ *
+ * Reading a session records the requesting account's view and acknowledges
+ * session events through the returned stream offset.
  * @summary Get a robot session
  */
 export const robotSessionGet = async (

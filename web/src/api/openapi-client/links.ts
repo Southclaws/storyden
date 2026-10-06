@@ -32,15 +32,16 @@ export const getLinkCreateUrl = () => {
 
 /**
  * Add a link to the community bookmarks. This will also scrape the content
- * at the site the link points to, if possible. If the submitted link is an
- * invalid link for whatever reason (invalid URL structure or page is dead)
- * then the API will fail. The metadata for the link is indexed on success.
+ * at the site the link points to, if possible. If scraping fails, the link
+ * is stored with basic information instead of scraped metadata.
  *
- * If the submitted link already exists it will be an idempotent operation,
- * unless the body contains additional metadata. In these cases, the link's
- * metadata will be updated with the new metadata and the URL is unchanged.
+ * If the submitted URL already exists, the existing link is returned and a
+ * background scrape is queued to refresh its metadata. The handler
+ * consumes only the `url` field; submitted `title` and `description` are
+ * not applied.
  *
- * When a link is submitted, it is first "cleaned" to remove any fragments.
+ * The submitted URL is used for lookup and storage without removing its
+ * fragment. Use the returned link resource to inspect the stored metadata.
  */
 export const linkCreate = async (
   linkCreateBody?: LinkCreateBody,
@@ -162,8 +163,8 @@ export const getLinkGetUrl = (linkSlug: string) => {
 };
 
 /**
- * Get the details for a specific link. Such as where it's been posted,
- * which resources it's linked to and how many times it's been opened.
+ * Get the details for a specific link by its slug, including scraped
+ * metadata and the assets, nodes, and posts associated with it.
  */
 export const linkGet = async (
   linkSlug: string,

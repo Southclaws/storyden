@@ -103,7 +103,7 @@ func (m model) renderSidebar(width int, height int) string {
 	lines := []string{
 		sharedtui.Title.Render("Resources"),
 		"",
-		item("Nodes", m.active == viewNodes),
+		item("Pages", m.active == viewNodes),
 		item("Threads", m.active == viewThreads),
 	}
 

@@ -33,7 +33,7 @@ func TestReplyUsesContentAndReplyTarget(t *testing.T) {
 	cfg.UpsertContext("bot", config.Context{APIURL: server.URL, AuthType: config.AuthStorageFile, Auth: &config.Auth{Method: config.AuthMethodAccessKey, AccessToken: "bot-credential"}})
 	require.NoError(t, store.Save(cfg))
 	store.SelectedContext = "bot"
-	cmd := (*cobra.Command)(cligen.NewThreadCommand(nil, nil, nil, New(store)))
+	cmd := (*cobra.Command)(cligen.NewThreadCommand(nil, nil, nil, New(store), nil, nil, nil))
 	var out bytes.Buffer
 	cmd.SetOut(&out)
 	cmd.SetArgs([]string{"reply", "thread-id", "--content", "<p>Reply</p>", "--reply-to", "post-id", "--output", "json"})

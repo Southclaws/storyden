@@ -27,9 +27,7 @@ import (
 // serverQuery groups every server-side query parameter the user can set via
 // flags, so the fetch closure stays tidy.
 type serverQuery struct {
-	author     string
 	visibility []string
-	search     string
 	nodeID     string
 	depth      *int
 	nodeFormat string // tree or flat
@@ -37,6 +35,12 @@ type serverQuery struct {
 
 func New(store *config.Store) cligen.NodeListHandler {
 	return func(ctx context.Context, cmd *cobra.Command, cio cligen.IO, p cligen.NodeListParams) error {
+		if p.SearchSet || p.Search != "" {
+			return fmt.Errorf("page list does not support --search; use sd page search QUERY")
+		}
+		if p.Page != 1 {
+			return fmt.Errorf("page list does not support pagination; --page must be 1")
+		}
 		flags := &listflags.Flags{
 			Page:   p.Page,
 			Limit:  p.Limit,
@@ -65,9 +69,9 @@ func New(store *config.Store) cligen.NodeListHandler {
 			return err
 		}
 
-		nodeID := p.NodeId
+		nodeID := p.PageId
 		if p.Parent != "" && nodeID != "" {
-			return fmt.Errorf("--parent and --node-id are mutually exclusive")
+			return fmt.Errorf("--parent and --page-id are mutually exclusive")
 		}
 
 		client, err := api.NewAuthenticatedClient(ctx, store)
@@ -80,17 +84,15 @@ func New(store *config.Store) cligen.NodeListHandler {
 		if p.Parent != "" {
 			parentNode, err := nodeapi.Fetch(ctx, client.OpenAPI, p.Parent)
 			if err != nil {
-				return fmt.Errorf("could not find parent node %q: %w", p.Parent, err)
+				return fmt.Errorf("could not find parent page %q: %w", p.Parent, err)
 			}
 			nodeID = string(parentNode.Id)
 		}
 
 		query := serverQuery{
-			author:     p.Author,
 			visibility: p.Visibility,
-			search:     p.Search,
 			nodeID:     nodeID,
-			nodeFormat: string(p.NodeFormat),
+			nodeFormat: string(p.PageFormat),
 		}
 		if p.DepthSet {
 			depth := p.Depth
@@ -277,22 +279,12 @@ func fetchNodes(
 		Page: &pageQuery,
 	}
 
-	if q.author != "" {
-		handle := openapi.AccountHandle(q.author)
-		params.Author = &handle
-	}
-
 	if len(q.visibility) > 0 {
 		vp := make(openapi.VisibilityParam, 0, len(q.visibility))
 		for _, v := range q.visibility {
 			vp = append(vp, openapi.Visibility(v))
 		}
 		params.Visibility = &vp
-	}
-
-	if q.search != "" {
-		s := openapi.SearchQuery(q.search)
-		params.Q = &s
 	}
 
 	if q.nodeID != "" {
@@ -314,7 +306,7 @@ func fetchNodes(
 
 		// Default to a deep traversal when no explicit depth is set.
 		// For flat format this surfaces all descendants as a flat list.
-		// For tree format scoped via --parent/--node-id this ensures children
+		// For tree format scoped via --parent/--page-id this ensures children
 		// are returned (without depth the server defaults to depth=0 and
 		// returns only the root node itself).
 		if q.depth == nil {
@@ -337,15 +329,15 @@ func fetchNodes(
 
 func nodeListError(response *openapi.NodeListResponse) error {
 	if response.StatusCode() == http.StatusUnauthorized {
-		return fmt.Errorf("node list request was not authorised; run sd auth login again")
+		return fmt.Errorf("page list request was not authorised; run sd auth login again")
 	}
 
 	body := strings.TrimSpace(string(response.Body))
 	if body != "" {
-		return fmt.Errorf("node list request failed: %s: %s", response.Status(), body)
+		return fmt.Errorf("page list request failed: %s: %s", response.Status(), body)
 	}
 
-	return fmt.Errorf("node list request failed: %s", response.Status())
+	return fmt.Errorf("page list request failed: %s", response.Status())
 }
 
 func validateVisibilities(values []string) error {

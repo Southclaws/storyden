@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -38,6 +39,25 @@ type Discovery struct {
 	ScopesSupported                   []string `json:"scopes_supported"`
 	SubjectTypesSupported             []string `json:"subject_types_supported"`
 	IDTokenSigningAlgValuesSupported  []string `json:"id_token_signing_alg_values_supported"`
+}
+
+// Do sends a same-instance request using the CLI's authentication and refresh
+// policy. Redirects are returned to the caller rather than replaying mutations.
+func (c *Client) Do(req *http.Request, warnings io.Writer) (*http.Response, error) {
+	if err := validateOAuthEndpoint(c.BaseURL, req.URL.String()); err != nil {
+		return nil, err
+	}
+	if c.session == nil {
+		return nil, fmt.Errorf("client is not authenticated")
+	}
+	if err := c.session.RequestEditor(req.Context(), req); err != nil {
+		return nil, err
+	}
+	return (authenticatedDoer{
+		base:              &http.Client{CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }},
+		session:           c.session,
+		rateLimitWarnings: warnings,
+	}).Do(req)
 }
 
 func NewClient(ctx context.Context, rawEndpoint string) (*Client, error) {

@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	"github.com/Southclaws/opt"
-	"github.com/carapace-sh/carapace"
 	"github.com/spf13/cobra"
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -67,12 +66,6 @@ func New(store *config.Store) cligen.SearchHandler {
 
 		return run(io.Out, flags, fetch)
 	}
-}
-
-func Complete(command cligen.SearchCommand) {
-	carapace.Gen((*cobra.Command)(command)).FlagCompletion(carapace.ActionMap{
-		"kind": carapace.ActionValues(searchKinds...),
-	})
 }
 
 func (o *options) validate() error {

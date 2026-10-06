@@ -16,7 +16,7 @@ func NewTuiCommand(tui TuiHandler) TuiCommand {
 	cmd := &cobra.Command{
 		Use:     "tui",
 		Short:   "Explore Storyden content in an interactive TUI.",
-		Long:    "# Browse interactively\n\nOpen a full-screen explorer for a person using a terminal. For agents and scripts,\nuse `node list`, `thread list`, or `search` with explicit JSON/JSONL output instead.\n\n## Navigation\n\n- `n` / `t`: switch between nodes and threads.\n- Arrow keys or `j` / `k`: move selection; `h` / `l`: change pages.\n- Enter: open the selected resource. `c`: browse a node's children.\n- Backspace: return to the previous view/level. `r`: refresh.\n- `q` or Escape: quit.\n",
+		Long:    "# Browse interactively\n\nOpen a full-screen explorer for a person using a terminal. For agents and\nscripts, use `page list`, `thread list`, or `search` with explicit\nJSON/JSONL output instead.\n\n## Navigation\n\n- `n` / `t`: switch between pages and threads.\n- Arrow keys or `j` / `k`: move selection; `h` / `l`: change pages.\n- Enter: open the selected resource. `c`: browse a page's children.\n- Backspace: return to the previous view/level. `r`: refresh.\n- `q` or Ctrl+C: quit. Escape quits from the list and returns to the list\n  from a document.\n",
 		Example: `  sd tui`,
 		Args:    rangeArgs(0, 0),
 	}

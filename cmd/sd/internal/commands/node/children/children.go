@@ -243,7 +243,7 @@ func fetchChildren(
 
 func childrenListError(response *openapi.NodeListChildrenResponse) error {
 	if response.StatusCode() == http.StatusNotFound {
-		return fmt.Errorf("node not found")
+		return fmt.Errorf("page not found")
 	}
 
 	if response.StatusCode() == http.StatusUnauthorized {

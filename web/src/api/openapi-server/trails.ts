@@ -353,7 +353,7 @@ export const getTrailUpdateUrl = (trailId: Identifier) => {
  * A status change can pause, resume, or archive the Trail. Archive keeps
  * existing run history and does not cancel action runs that already
  * started.
- * @summary Update a Trail, including pause, resume, finish, or archive
+ * @summary Update a Trail, including pause, resume, or archive
  */
 export const trailUpdate = async (
   trailId: Identifier,

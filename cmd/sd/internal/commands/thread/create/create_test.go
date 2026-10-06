@@ -37,7 +37,7 @@ func TestCreateUsesSelectedIdentityAndMarkdown(t *testing.T) {
 	}
 	require.NoError(t, store.Save(cfg))
 	store.SelectedContext = "bot"
-	cmd := (*cobra.Command)(cligen.NewThreadCommand(nil, nil, New(store), nil))
+	cmd := (*cobra.Command)(cligen.NewThreadCommand(nil, nil, New(store), nil, nil, nil, nil))
 	var out bytes.Buffer
 	cmd.SetIn(bytes.NewBufferString("# Heading"))
 	cmd.SetOut(&out)

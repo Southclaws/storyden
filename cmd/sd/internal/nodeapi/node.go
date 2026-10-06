@@ -42,7 +42,7 @@ func Update(
 
 func GetError(response *openapi.NodeGetResponse) error {
 	if response.StatusCode() == http.StatusNotFound {
-		return fmt.Errorf("node not found")
+		return fmt.Errorf("page not found")
 	}
 
 	return output.RequestErrorWithMessages("node get request", response, response.Body, output.UnauthorizedMessage("node get request"))
@@ -50,7 +50,7 @@ func GetError(response *openapi.NodeGetResponse) error {
 
 func UpdateError(response *openapi.NodeUpdateResponse) error {
 	if response.StatusCode() == http.StatusNotFound {
-		return fmt.Errorf("node not found")
+		return fmt.Errorf("page not found")
 	}
 
 	return output.RequestErrorWithMessages("node update request", response, response.Body, output.UnauthorizedMessage("node update request"))
