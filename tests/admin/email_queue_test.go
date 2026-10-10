@@ -361,7 +361,7 @@ func requestPasswordReset(t *testing.T, ctx context.Context, cl *openapi.ClientW
 			Query string `json:"query"`
 			Url   string `json:"url"`
 		}{
-			Url:   "http://localhost:3000/reset",
+			Url:   "http://localhost/reset",
 			Query: "token",
 		},
 	})
