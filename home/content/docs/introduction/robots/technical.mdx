@@ -1,0 +1,24 @@
+---
+title: Technical details and troubleshooting
+description: Understand sessions, tool execution and common Robot problems.
+---
+
+Robots run on the backend using Google ADK. A session stores the conversation and its tool activity. The root Robot is selected when the session is created; it does not switch partway through the conversation. Denbot can delegate tasks to specialists without changing that root.
+
+Tool discovery and tool execution are separate. A Robot can inspect available capabilities before loading them into the conversation. Loading a tool does not bypass permissions, confirmation requirements or workspace checks.
+
+Interactive chats can request confirmation for tools that require it. Unattended runs, including [Trail actions](/docs/introduction/trails), disable interactive confirmation prompts and block tools that need live client input. Authorised server-side tools can still make changes. Use tool selection and account permissions to limit those changes; a task that needs missing human input should report that it is blocked.
+
+Sessions and their ordered events are persisted. The session stream can catch up from an offset and remain attached for later updates, including delegated work. This lets the UI reconnect to an existing conversation instead of depending on one browser connection for its history.
+
+For integrations, see the [Robots API](/docs/api/robots/RobotCreate), [session creation API](/docs/api/robots/RobotSessionCreate), and [session event stream](/docs/api/robots/RobotSessionStream). Plugins can also invoke Robots through [`robot_run`](/docs/extending/api/plugin-to-host/robot_run).
+
+## Troubleshooting
+
+| What you see                     | What to check                                                                                                                                              |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Robots are unavailable           | Enable a provider and save a default model in Robot settings. Check your role has the **Use robots** [permission](/docs/introduction/members/permissions). |
+| No models to choose from         | Check the provider's key and enabled state, then refresh its model list. The provider panel shows refresh errors.                                          |
+| A tool cannot run                | Check the account's permissions, whether the tool is assigned or loaded, and any workspace requirement.                                                    |
+| A Robot cannot find a page       | Try a direct page reference, check its visibility, or use Library browsing tools. Search results are not a complete inventory of the Library.              |
+| An answer is incomplete or wrong | Inspect the tool results and source content, then narrow the request or revise the playbook. A completed response is not a guarantee of correctness.       |

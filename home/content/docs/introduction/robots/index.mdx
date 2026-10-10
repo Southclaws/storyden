@@ -1,0 +1,56 @@
+---
+title: Robots
+description: Optional AI tools for the people looking after your community.
+---
+
+import { ImageZoom } from "fumadocs-ui/components/image-zoom";
+
+Robots are Storyden's optional AI assistants. They can help your team find information, curate the Library and work with community content. You can chat with Denbot, create a specialist for a particular job, or use [Trails](/docs/introduction/trails) to run a task automatically.
+
+The forum, Library and ordinary moderation tools work without Robots. On a fresh installation, start with [Set up Robots](/docs/introduction/robots/setup) to connect a model provider and choose who can use it.
+
+## For the people looking after the community
+
+Robots are generally intended for administrators, moderators and other trusted members with elevated privileges. They use the operator's model-provider credits and can act on community content, so making them available to everyone can introduce cost and abuse problems. Access is controlled through roles; start with your team and extend it deliberately.
+
+Robot conversations are shared with members who have the **Use robots** [permission](/docs/introduction/members/permissions). Multiple members can participate in the same session at the same time: a group chat with one Robot. They are a shared working area, not private personal chats.
+
+## Find, understand and work with your content
+
+A Robot can find useful Library pages, read a discussion and help prepare a summary, or use the tools you assign to carry out a more specific task. Tool calls and linked sources stay with the conversation so you can inspect how it reached an answer.
+
+<ImageZoom
+  src="/docs/introduction/robots/chat.png"
+  alt="A Community librarian conversation with Library search results, a page-reading tool call and a linked Environment art field guide"
+  width={2130}
+  height={1964}
+  unoptimized
+/>
+
+**Denbot** is the built-in starting point for conversations. It can discover tools and delegate focused tasks to specialist Robots. You can reach it from anywhere in Storyden with **Ctrl+K** (**Cmd+K** on macOS), then choose **Robot Chat** from the [command palette](/docs/introduction/command-palette).
+
+A **custom Robot** keeps a playbook, model and tool selection together for a repeatable job. **Toolsets** bundle capabilities and instructions that several Robots can reuse.
+
+Robots can also use tools supplied by plugins, and plugins can call Robots. See [Connections and plugins](/docs/introduction/robots/connections) for how these directions fit together.
+
+## Get started
+
+<Cards>
+  <Card title="1. Set up Robots" href="/docs/introduction/robots/setup">
+    Configure a provider, choose a model and assign access to your team.
+  </Card>
+  <Card title="2. Chats and Denbot" href="/docs/introduction/robots/chats">
+    Try a conversation and inspect its tools and sources.
+  </Card>
+  <Card
+    title="3. Create a Robot"
+    href="/docs/introduction/robots/creating-robots"
+  >
+    Give a specialist a focused playbook and the tools it needs.
+  </Card>
+  <Card title="Tools and Toolsets" href="/docs/introduction/robots/tools">
+    Choose capabilities and reuse them across Robots.
+  </Card>
+</Cards>
+
+For a complete workflow, try the Cookbook's [weekly reading list](/docs/cookbook/weekly-reading-list), [Library page review](/docs/cookbook/library-page-review), or [discussion digest](/docs/cookbook/discussion-digest). Each combines a Robot with a Trail using Storyden's built-in tools.

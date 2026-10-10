@@ -27,6 +27,10 @@ export const baseOptions: BaseLayoutProps = {
   },
   links: [
     {
+      text: "Why Storyden",
+      url: "/#conversations",
+    },
+    {
       type: "menu",
       text: "Documentation",
       url: "/docs/introduction",
@@ -83,7 +87,7 @@ export const baseOptions: BaseLayoutProps = {
         {
           icon: <MessageCircleHeartIcon />,
           text: "For discussion",
-          description: "How does Storyden replace forums?",
+          description: "Conversations worth coming back to.",
           url: "/docs/introduction/discussion",
           menu: {
             className: css({
@@ -95,8 +99,7 @@ export const baseOptions: BaseLayoutProps = {
         {
           icon: <LibraryBigIcon />,
           text: "Library",
-          description:
-            "An intelligent community knowledgebase, spend less time organising and more time sharing.",
+          description: "A shared home for the things your community knows.",
           url: "/docs/introduction/library",
           menu: {
             className: css({

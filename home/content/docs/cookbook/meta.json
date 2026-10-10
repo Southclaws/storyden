@@ -5,6 +5,11 @@
   "defaultOpen": false,
   "pages": [
     "index",
+    "---Robots and Trails---",
+    "weekly-reading-list",
+    "library-page-review",
+    "discussion-digest",
+    "---Integrations---",
     "discord-integration-plugin"
   ]
 }

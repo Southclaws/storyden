@@ -134,3 +134,30 @@ details[open] summary::before {
   color: var(--colors--primary-saddle);
   text-decoration: underline;
 }
+
+#nd-page {
+  --color-fd-muted-foreground: #666666;
+}
+
+/* Fumadocs hides the zoom button; keep it available to keyboard readers. */
+#nd-page [data-rmiz-btn-zoom] {
+  display: grid;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--color-fd-background);
+  color: var(--color-fd-foreground);
+  pointer-events: auto;
+  opacity: 0;
+}
+
+#nd-page [data-rmiz-btn-zoom]:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--color-fd-primary);
+  outline-offset: 2px;
+}

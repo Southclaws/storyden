@@ -178,8 +178,9 @@ must continue to respect the workspace's `allow_untrusted_commands` policy.
   account session.
 - Confirmation-required tools block their turn and resume from a later
   client-supplied approval input.
-- Unattended runs disable confirmation-only side effects and block tools that
-  need live client input.
+- Unattended runs disable interactive confirmation prompts and block tools that
+  need live client input. Authorised server-side tools can still perform writes;
+  tool selection and account permissions remain the execution boundaries.
 - Specialist construction failures are logged and skipped so one unavailable
   model or Toolset does not take down Denbot.
 - Plugin Toolsets are validated against the tools registered by that plugin

@@ -39,6 +39,8 @@ These tools work well for obvious spam and repeated low-effort abuse, but they a
 
 More advanced content moderation can be implemented via [plugins](/docs/extending).
 
+[Robots](/docs/introduction/robots) can also use moderation tools, subject to the account's permissions. [Trails](/docs/introduction/trails) can run a Robot on a schedule or when an event such as a new report occurs, with results kept in run history for review.
+
 ## Rate limiting
 
 Storyden includes IP-based rate limiting to reduce scraping, brute-force attempts and other bursty abuse. It uses a sliding-window counter, can apply a higher cost to guests than signed-in members, and supports per-operation cost overrides in the System settings screen.

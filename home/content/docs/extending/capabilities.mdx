@@ -76,3 +76,9 @@ Manifest is the contract. Runtime configuration is separate and does not replace
 ### No bypass of permission model
 
 Plugins do not get silent elevated API powers. If a plugin needs API access, it must request explicit permissions via manifest `access.permissions` and operate through a provisioned key.
+
+## Robots and plugins
+
+Plugins can provide Robot tools and Toolsets, and can invoke Robots through `robot_run`. A Robot calling a plugin tool and a plugin starting a Robot task are separate directions of integration; an individual plugin may support one or both. Plugins may also provide language models.
+
+See [Robots: Connections and plugins](/docs/introduction/robots/connections#robots-and-plugins-work-in-both-directions) for the operator-facing overview, and the [`robot_tool_call`](/docs/extending/api/host-to-plugin/robot_tool_call) and [`robot_run`](/docs/extending/api/plugin-to-host/robot_run) references for the RPC contracts.

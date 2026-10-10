@@ -1,0 +1,33 @@
+---
+title: Technical details and API
+description: Understand persisted runs, action execution and integration contracts.
+---
+
+A Trail definition stores its trigger and action bindings. When triggered, Storyden creates a **run** and separate **action runs** in the database. Each Robot action gets a fresh session linked to its action run. Multiple actions share the triggering context but do not share a conversation.
+
+The scheduler and action workers use database leases to coordinate execution. Run history is persisted, rather than being reconstructed from browser state. When the scheduler comes back after downtime, it records missed scheduled work as skipped and advances to the next future occurrence instead of starting a backlog of old tasks.
+
+Event Trails subscribe to Storyden's event bus. Once an event is received, its run and payload are persisted. Do not treat this as a historical event query: creating or resuming a Trail does not review earlier community activity.
+
+## Results
+
+Unattended Robots finish through `robot_run_finish`, reporting `completed`, `blocked` or `failed`, a summary, and attention details when needed. The runtime supplies this finishing tool; it does not need to be added to the Robot's individual tools. A run with blocked or failed actions is surfaced as **Needs attention**.
+
+## API and CLI
+
+The [Trails API](/docs/api/trails/TrailCreate) exposes definitions, schedule previews, manual runs and run history. Schedules use structured recurrence rules with a local start time and an IANA timezone, rather than a cron string.
+
+With an authenticated [Storyden CLI](https://github.com/Southclaws/storyden/tree/main/cmd/sd) context, you can inspect a Trail and its results:
+
+```sh
+sd --context my-community trail get TRAIL_ID
+sd --context my-community trail runs list TRAIL_ID
+```
+
+To start a manual run:
+
+```sh
+sd --context my-community trail runs start TRAIL_ID
+```
+
+See the [schedule preview API](/docs/api/trails/TrailSchedulePreview), [run detail API](/docs/api/trails/TrailRunGet), and [action cancellation API](/docs/api/trails/TrailActionRunCancel) for the request and response contracts.

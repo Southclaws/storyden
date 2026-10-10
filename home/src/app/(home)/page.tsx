@@ -1,77 +1,66 @@
-import { Box } from "@/styled-system/jsx";
-
-import { CollectiveMemorySection } from "./sections/CollectiveMemorySection";
+import {
+  CareChapter,
+  CommunityInvitation,
+  ConversationChapter,
+  KnowledgeChapter,
+  OwnershipChapter,
+  StoryIntroduction,
+} from "./sections/CommunityStory";
 import { HeroSection } from "./sections/HeroSection";
 import { type HomeStats, MilspecSection } from "./sections/MilspecSection";
 import { ScreenshotSection } from "./sections/ScreenshotSection";
 
 export default async function Home() {
   const stats = await getStats();
-
   return (
-    <Box>
+    <div>
       <HeroSection />
-      <ScreenshotSection />
-      <CollectiveMemorySection />
-      <MilspecSection stats={stats} />
-    </Box>
+      <div className="marketing-story">
+        <ScreenshotSection />
+        <StoryIntroduction />
+        <ConversationChapter />
+        <KnowledgeChapter />
+        <CareChapter />
+        <OwnershipChapter />
+        <MilspecSection stats={stats} />
+        <CommunityInvitation />
+      </div>
+    </div>
   );
 }
 
 async function getStats(): Promise<HomeStats> {
-  const defaults: HomeStats = {
-    // 2025-07-05
-    stars: 279,
-    commits: 2702,
-    contributors: 17,
-    loc: 314217, // tokei --output json | jq .Total.code
-    apis: 140, // rg operationId ./api/openapi.yaml -c
+  // Unavailable figures stay explicitly unavailable; no historical guesses.
+  const stats: HomeStats = {
+    stars: null,
+    commits: null,
+    contributors: null,
+    loc: null,
+    apis: null,
   };
-
   try {
-    const repo = "Southclaws/storyden";
-
-    const headers = {
-      Accept: "application/vnd.github+json",
-      // Uncomment below and add a token if you hit rate limits:
-      // Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
-    };
-
-    const [repoRes, contributorsRes, commitsRes] = await Promise.all([
-      fetch(`https://api.github.com/repos/${repo}`, { headers }),
-      fetch(`https://api.github.com/repos/${repo}/contributors?per_page=100`, {
-        headers,
-      }),
-      fetch(`https://api.github.com/repos/${repo}/commits?per_page=1`, {
-        headers,
-      }),
-    ]);
-
-    if (!repoRes.ok || !contributorsRes.ok || !commitsRes.ok) {
-      return defaults;
-    }
-
-    const repoData = (await repoRes.json()) as {
-      stargazers_count?: number;
-      open_issues_count?: number;
-    };
-    const contributors = (await contributorsRes.json()) as Array<{
-      contributions?: number;
-    }>;
-
-    const openIssues = Number(repoData.open_issues_count ?? 0);
-    const contributorCommits = contributors.reduce(
-      (acc, contributor) => acc + Number(contributor.contributions ?? 0),
-      0,
+    const response = await fetch(
+      "https://api.github.com/repos/Southclaws/storyden",
+      {
+        headers: { Accept: "application/vnd.github+json" },
+        next: { revalidate: 86400 },
+        signal: AbortSignal.timeout(2500),
+      },
     );
-
-    return {
-      ...defaults,
-      stars: Number(repoData.stargazers_count ?? defaults.stars),
-      commits: openIssues + contributorCommits,
-      contributors: contributors.length,
-    };
-  } catch {
-    return defaults;
+    if (response.ok) {
+      const data = await response.json();
+      if (
+        typeof data.stargazers_count === "number" &&
+        Number.isFinite(data.stargazers_count)
+      ) {
+        stats.stars = data.stargazers_count;
+      }
+    }
+  } catch (error) {
+    console.warn(
+      "Homepage repository statistics unavailable:",
+      error instanceof Error ? error.message : "request failed",
+    );
   }
+  return stats;
 }

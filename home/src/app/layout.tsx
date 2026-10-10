@@ -3,10 +3,11 @@ import { Metadata, Viewport } from "next";
 import Script from "next/script";
 import type { ReactNode } from "react";
 
-import { gorton, hedvig, intelone, joie, worksans } from "@/fonts";
+import { gorton, hedvig, intelone, joie, product, worksans } from "@/fonts";
 import { cx } from "@/styled-system/css";
 
 import "./globals.css";
+import "./marketing.css";
 import "fumadocs-ui/style.css";
 
 export default function Layout({ children }: { children: ReactNode }) {
@@ -19,6 +20,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         hedvig.variable,
         intelone.variable,
         gorton.variable,
+        product.variable,
       )}
       suppressHydrationWarning
     >
@@ -70,9 +72,9 @@ export default function Layout({ children }: { children: ReactNode }) {
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.storyden.org"),
-  title: "Storyden: A forum for the modern age.",
+  title: "Storyden — A home for your people and what they know.",
   description:
-    "Storyden is a platform for building communities. A modern take on oldschool bulletin board forums. Designed to be the community platform for the next era of internet culture.",
+    "An open-source forum and shared Library for communities that want their conversations, discoveries, and knowledge to last. Self-hosted, extensible, with optional AI assistance.",
   openGraph: {
     type: "website",
     locale: "en_GB",

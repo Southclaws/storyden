@@ -1,0 +1,58 @@
+---
+title: Prepare a discussion digest
+description: Give your team a weekly summary of recent discussions, ready to review and share.
+---
+
+This recipe finds the five most recently created published discussions from the past week and prepares a digest. A weekly Trail runs the Robot and keeps the result in run history. Your team can review it before sharing anything with the community.
+
+## Before you begin
+
+Complete [Robot setup](/docs/introduction/robots/setup).
+
+You need the following [permissions](/docs/introduction/members/permissions): **Manage robots**, **Use robots**, **Read published threads**, and **Manage Trails**.
+
+Have some published discussions available to test with. The recipe selects threads by their original creation time. Replies to older threads do not bring those threads into the digest, and publishing an older draft does not change its creation time.
+
+## Create the digest Robot
+
+Open **Robots → New Robot** and enter:
+
+- **Name**: `Discussion digest`
+- **Description**: `Find recent published discussions and prepare a source-based digest.`
+- **Model**: use the configured default.
+- **Toolsets**: **Document exploration**.
+- **Individual tools**: **List Threads**, **Get Thread**, and **Open Thread**.
+
+Use this **Playbook**:
+
+```text
+Prepare a digest of recent published discussions. Use the current date and time supplied in your runtime context as the end of the requested time window, unless the request specifies an end time. Calculate the start of the window, then call thread_list with visibility published, sort newest, page_size 5, page 1, created_since set to the start and created_before set to the end. Supply both bounds as RFC 3339 timestamps. Let the tool filter and order the threads; do not select dates from an unfiltered feed.
+
+Read every returned thread with thread_get and thread_open. Use document tools to read replies and any sections beyond the initial preview. Summarise the topic, any concrete outcome and any unresolved question. Distinguish a proposal from a decision. Include each thread's title and browser URL. State the time window and how many matching threads there were in total. If more than five matched, explain that the digest covers the five newest. If none matched, say so without including older threads. If a thread or any part of it cannot be read, identify that limitation rather than guessing. Do not post or edit anything.
+```
+
+Choose **Create**, then **Test Robot**. Ask for a digest of the last seven days. Inspect the **List Threads** call: it should specify `published`, `newest`, a page size of `5`, and the two date bounds. Check the result against the returned threads, particularly any claimed decisions or unanswered questions.
+
+## Add the weekly Trail
+
+Create a Trail named **Weekly discussion digest**. Select **Schedule → Selected weekdays**, choose your preferred day, a future starting date and local time, and check **Preview next five**.
+
+Select **Discussion digest** as its Robot. Use this instruction:
+
+```text
+Prepare a digest of up to five published threads created in the last seven days. Use the current time from your runtime context as the exclusive end of the window and exactly seven days earlier as its inclusive start. Find the newest matching threads with thread_list, then read them and their replies. Return each title, browser URL, a short summary, any concrete outcome and any unresolved question. State the window and disclose if more than five threads matched. If none matched, say there were no new discussions in that window. Do not publish or edit anything.
+```
+
+Choose **Create Trail**, then **Pause → Run now**. Under **Run history**, open **View Robot session** and check the date bounds, selected threads and source reading. If there are no recent discussions, an empty digest is the expected result; the Robot should not substitute older content.
+
+## Review and share
+
+Compare the result with its linked threads. Copy the useful parts into a thread yourself when you are ready to share them. No publishing tool is assigned to this Robot, so the recipe stops at preparing the digest.
+
+Choose **Resume** when you want the weekly run to continue, or leave it paused if you were only testing. Each run uses its own current time. Running it manually between scheduled runs can cover an overlapping window; it does not track which threads appeared in a previous digest.
+
+## How the selection works
+
+**List Threads** applies creation-time bounds and visibility before sorting and pagination. `created_since` is inclusive and `created_before` is exclusive. `newest` orders by creation time, ignoring pinned positions and recent replies. Each result includes `created_at` and `updated_at`, and `total_results` counts all matching threads, not just the current page.
+
+These filters also support other periods, such as a calendar month or the dates of an event. For a larger digest that needs multiple pages, keep the same date bounds and sort order while following `next_page`.

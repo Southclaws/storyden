@@ -6,11 +6,11 @@ import { css } from "@/styled-system/css";
 import { Center, VStack, styled } from "@/styled-system/jsx";
 
 export type HomeStats = {
-  stars: number;
-  commits: number;
-  contributors: number;
-  loc: number;
-  apis: number;
+  stars: number | null;
+  commits: number | null;
+  contributors: number | null;
+  loc: number | null;
+  apis: number | null;
 };
 
 const cellStyle = { border: "1px solid currentColor", padding: "4px" };
@@ -31,6 +31,7 @@ type Props = {
 export function MilspecSection({ stats }: Props) {
   return (
     <VStack
+      className="milspec-section"
       bgColor="Mono.ink"
       py={{
         base: "4",
@@ -62,7 +63,7 @@ export function MilspecSection({ stats }: Props) {
       >
         <tbody>
           <styled.tr>
-            <td colSpan={6}>
+            <td colSpan={7}>
               <styled.p
                 aria-hidden
                 fontFamily="gorton"
@@ -76,7 +77,7 @@ export function MilspecSection({ stats }: Props) {
           </styled.tr>
 
           <styled.tr>
-            <td colSpan={6} aria-labelledby="knowledge-system-title">
+            <td colSpan={7} aria-labelledby="knowledge-system-title">
               <Center w="full" py="8">
                 <styled.h2
                   id="knowledge-system-title"
@@ -93,7 +94,7 @@ export function MilspecSection({ stats }: Props) {
           </styled.tr>
 
           <styled.tr>
-            <td colSpan={6}>
+            <td colSpan={7}>
               <StorydenComputer />
             </td>
           </styled.tr>
@@ -102,7 +103,9 @@ export function MilspecSection({ stats }: Props) {
             <td style={cellStyle} colSpan={2}>
               GITHUB STARS
             </td>
-            <td style={cellStyle}>{stats.stars}</td>
+            <td style={cellStyle}>
+              {stats.stars?.toLocaleString("en-GB") ?? "—"}
+            </td>
             <td style={cellStyle} rowSpan={3} colSpan={2}>
               SUPPORTED
               <br />
@@ -123,36 +126,48 @@ export function MilspecSection({ stats }: Props) {
             <td style={cellStyle} colSpan={2}>
               GIT COMMITS
             </td>
-            <td style={cellStyle}>{stats.commits}</td>
+            <td style={cellStyle}>
+              {stats.commits?.toLocaleString("en-GB") ?? "—"}
+            </td>
           </styled.tr>
 
           <styled.tr className={cellFonts}>
             <td style={cellStyle} colSpan={2}>
               API ENDPOINTS
             </td>
-            <td style={cellStyle}>89</td>
+            <td style={cellStyle}>
+              {stats.apis?.toLocaleString("en-GB") ?? "—"}
+            </td>
           </styled.tr>
 
           <styled.tr className={cellFonts}>
             <td style={cellStyle} colSpan={2}>
               CONTRIBUTORS
             </td>
-            <td style={cellStyle}>{stats.contributors}</td>
+            <td style={cellStyle}>
+              {stats.contributors?.toLocaleString("en-GB") ?? "—"}
+            </td>
             <td style={cellStyle} colSpan={2}>
               MIN MEMORY
             </td>
-            <td style={cellStyle}>100 MB</td>
+            <td style={cellStyle} colSpan={2}>
+              NOT BENCHMARKED
+            </td>
           </styled.tr>
 
           <styled.tr className={cellFonts}>
             <td style={cellStyle} colSpan={2}>
               LINES OF CODE
             </td>
-            <td style={cellStyle}>{stats.loc}</td>
+            <td style={cellStyle}>
+              {stats.loc?.toLocaleString("en-GB") ?? "—"}
+            </td>
             <td style={cellStyle} colSpan={2}>
               MIN CORES
             </td>
-            <td style={cellStyle}>1 CPU</td>
+            <td style={cellStyle} colSpan={2}>
+              WORKLOAD DEPENDENT
+            </td>
           </styled.tr>
         </tbody>
       </styled.table>
@@ -198,12 +213,7 @@ export function MilspecSection({ stats }: Props) {
             </td>
           </styled.tr>
 
-          <styled.tr
-            display={{
-              base: "none",
-              md: "table-row",
-            }}
-          >
+          <styled.tr display="table-row">
             <td colSpan={5}>
               <Center pb="8">
                 <DockerCopyButton />
@@ -225,8 +235,7 @@ export function MilspecSection({ stats }: Props) {
                 target="_blank"
               >
                 <styled.p p="2" textAlign="center">
-                  OPEN SOURCE SOFTWARE RELEASED TO THE PUBLIC UNDER THE MIT
-                  LICENSE
+                  OPEN SOURCE SOFTWARE
                 </styled.p>
               </Link>
             </styled.td>

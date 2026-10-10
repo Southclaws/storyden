@@ -1,0 +1,49 @@
+---
+title: Connections and plugins
+description: Connect external tools, workspaces and plugins to Robots.
+---
+
+Once [Robots are configured](/docs/introduction/robots/setup), you can extend their capabilities with installed plugins or external MCP servers. Ordinary Library and discussion tasks work with Storyden's built-in tools.
+
+## Connecting an MCP server
+
+In **Robot settings → MCP servers**, choose **Connect** and enter the server's URL. The connection flow supports bearer-token and OAuth authentication. Complete the authentication flow offered by the server, then review the connection and its tools.
+
+Each enabled MCP server appears as a Toolset. Denbot can discover it, and you can assign it to a specialist Robot. **Refresh** updates the cached tool list when the server changes.
+
+This connects an external service _to Storyden's Robots_. Storyden also exposes its own [MCP interface](/docs/introduction/mcp) for assistants running elsewhere; that is the opposite direction of connection.
+
+## Workspaces
+
+Some tools need a workspace for files or command execution. Ordinary Library and discussion tasks do not need one.
+
+Create a template under **Robot settings → Workspace templates**, then select it using the workspace picker in a chat. A template describes how to create a workspace; a live instance holds the session's working environment. Denbot and any delegated specialists use the same mounted workspace.
+
+Workspace-dependent tools cannot be loaded when no workspace is mounted. Execution policy belongs to the workspace provider, including whether untrusted commands are allowed. Only enable that capability for workspaces where you intend to allow command execution.
+
+## Robots and plugins work in both directions
+
+A plugin can provide tools for a Robot to call, or call a Robot to help with its own work. These are separate capabilities: installing a plugin does not necessarily enable both.
+
+### A Robot calls a plugin
+
+A plugin can declare Robot tools and reusable Toolsets. When that plugin is running, its registered capabilities become available to Storyden's Robots. Denbot can discover its Toolsets, and you can assign available plugin tools or Toolsets to a specialist through the usual configuration screen.
+
+Open **Robots → Toolsets** to inspect what the installed plugin supplies. Plugin Toolsets are managed by the plugin rather than edited in Storyden. Check the plugin's configuration and running state if an expected capability is missing.
+
+At the protocol level, Storyden sends a [`robot_tool_call`](/docs/extending/api/host-to-plugin/robot_tool_call) request with the tool's arguments and execution context. The plugin returns a structured result for the Robot to use in its task.
+
+### A plugin calls a Robot
+
+A plugin can invoke a selected Robot through [`robot_run`](/docs/extending/api/plugin-to-host/robot_run). This executes as the plugin's provisioned account, which needs the **Use robots** [permission](/docs/introduction/members/permissions) and any permissions required by the tools the Robot calls.
+
+The RPC supports two modes:
+
+- **Conversation** appends messages and returns response events and final text. A plugin can continue its own session with the same root Robot.
+- **Automation** runs a one-shot task and returns a structured completion, blocked or failure result.
+
+The plugin decides what to do with that result. Calling a Robot does not by itself publish the answer anywhere. Whether an installed plugin exposes this behaviour, and how you select its Robot, depends on that plugin's documented configuration.
+
+Plugins may also supply model providers. These appear alongside the built-in providers when configuring Robots; they are separate from plugin tools.
+
+For the developer contracts, see the [plugin manifest](/docs/extending/manifest#capabilities), [plugin security model](/docs/extending/security), and the RPC references above. The [Cookbook](/docs/cookbook) recipes for Robots and Trails use built-in tools and do not require writing or installing a plugin.

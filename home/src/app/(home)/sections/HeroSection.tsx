@@ -85,6 +85,10 @@ export function HeroSection() {
               Live Demo
             </Link>
           </HStack>
+          <p className="hero-description">
+            An open-source forum and shared Library for communities that want
+            their conversations, discoveries, and knowledge to last.
+          </p>
         </VStack>
       </GridItem>
     </Grid>

@@ -47,8 +47,7 @@ export function ScreenshotSection() {
           {/* oxlint-disable-next-line next/no-img-element -- Pre-optimized picture sources provide separate mobile and desktop crops. */}
           <img
             src="/2026_app_screenshot.png"
-            alt=""
-            role="presentation"
+            alt="Storyden community homepage with discussion categories, shared links, and a Library of community resources"
             width={1469}
             height={961}
             decoding="async"

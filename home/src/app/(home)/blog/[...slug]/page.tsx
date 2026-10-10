@@ -1,10 +1,10 @@
+import { formatDate } from "date-fns";
 import { createRelativeLink } from "fumadocs-ui/mdx";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { blog } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
-import { VStack, styled } from "@/styled-system/jsx";
-import { linkButton } from "@/styled-system/patterns";
 
 export default async function Page(props: {
   params: Promise<{ slug?: string[] }>;
@@ -13,48 +13,34 @@ export default async function Page(props: {
   const page = blog.getPage(params.slug);
   if (!page) notFound();
 
-  const { body: MDXContent, toc } = await page.data.load();
+  const { body: MDXContent } = await page.data.load();
 
   return (
-    <VStack>
-      <styled.article
-        className="prose"
-        w="full"
-        px="2"
-        maxW="prose"
-        pt="20"
-        alignItems="start"
-      >
-        <h1 className="mb-2 text-3xl font-bold text-white">
-          {page.data.title}
-        </h1>
-
-        {/* <InlineTOC items={toc} /> */}
-
+    <article className="blog-article">
+      <header>
+        <Link className="story-text-link" href="/blog">
+          ← From the workshop
+        </Link>
+        <h1>{page.data.title}</h1>
+        <p>{page.data.description}</p>
+        <time dateTime={formatDate(page.data.date, "yyyy-MM-dd")}>
+          {formatDate(page.data.date, "d MMMM yyyy")}
+        </time>
+      </header>
+      <div className="prose">
         <MDXContent
           components={{
             a: createRelativeLink(blog, page),
             ...getMDXComponents(),
           }}
         />
-
-        <styled.hr w="full" />
-
-        <styled.a
-          href="/blog"
-          className={linkButton({
-            backgroundColor: "Shades.newspaper",
-            color: "Shades.iron",
-            p: "2",
-            height: "auto",
-            lineHeight: "tight",
-            fontWeight: "medium",
-          })}
-        >
-          Back to index
-        </styled.a>
-      </styled.article>
-    </VStack>
+      </div>
+      <footer>
+        <Link className="story-text-link" href="/blog">
+          Back to the workshop →
+        </Link>
+      </footer>
+    </article>
   );
 }
 

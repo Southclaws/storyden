@@ -1,0 +1,46 @@
+---
+title: Trails
+description: Run community tasks on a schedule or when something happens, with results you can follow.
+---
+
+import { ImageZoom } from "fumadocs-ui/components/image-zoom";
+
+Trails run tasks without needing to start a conversation each time. A Trail connects a **trigger** to one or more **Robot actions**. When the trigger fires, each Robot receives its instruction and the results appear in run history.
+
+On a fresh installation, [set up Robots](/docs/introduction/robots/setup) first. Then [create your first Trail](/docs/introduction/trails/getting-started). Trails are intended for trusted members looking after the community; managing them requires the **Manage Trails** [permission](/docs/introduction/members/permissions), and their Robot actions use the creator's current permissions and the community's configured model provider.
+
+## A regular task, or a response to an event
+
+A schedule can prepare a weekly Library reading list or a discussion digest for your team. An event trigger can ask a Robot to review a newly published Library page. The task's instructions determine the outcome: producing a review does not automatically publish it or change the source content.
+
+<ImageZoom
+  src="/docs/introduction/trails/run-history.png"
+  alt="A paused weekly Library Trail with a completed manual run, its reading-list result and a link to inspect the Robot session"
+  width={2130}
+  height={1218}
+  unoptimized
+/>
+
+Each action starts a fresh Robot session. Multiple actions can respond to the same trigger independently; they do not form a sequence of steps. Results remain available in **Run history**, with a link to the Robot session behind each action. Blocked or failed actions notify the creator that attention is needed.
+
+## Get started
+
+<Cards>
+  <Card
+    title="1. Your first Trail"
+    href="/docs/introduction/trails/getting-started"
+  >
+    Prepare a Robot, create a Trail and test it before leaving it active.
+  </Card>
+  <Card title="Schedules" href="/docs/introduction/trails/schedules">
+    Choose a cadence and timezone, then preview upcoming occurrences.
+  </Card>
+  <Card title="Event triggers" href="/docs/introduction/trails/events">
+    Respond to new content and other community events.
+  </Card>
+  <Card title="Runs and results" href="/docs/introduction/trails/runs">
+    Inspect outcomes, handle failures, pause or archive a Trail.
+  </Card>
+</Cards>
+
+The Cookbook has complete recipes for a [weekly reading list](/docs/cookbook/weekly-reading-list), [Library page review](/docs/cookbook/library-page-review), and [discussion digest](/docs/cookbook/discussion-digest). Start there if you want a concrete task to put together with your own community's content.

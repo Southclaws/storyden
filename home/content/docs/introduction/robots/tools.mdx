@@ -1,0 +1,38 @@
+---
+title: Tools and Toolsets
+description: Choose individual operations or reuse a bundle of tools and instructions.
+---
+
+import { ImageZoom } from "fumadocs-ui/components/image-zoom";
+
+A **tool** is an operation a Robot can call: reading a page, searching threads, or creating a report, for example. A **Toolset** groups related tools with an optional instruction explaining how to use them together.
+
+Storyden includes Toolsets for content search, Library and discussion management, moderation, web research, and other tasks. Open **Robots → Toolsets** to inspect their descriptions, instructions and tools.
+
+<ImageZoom
+  src="/docs/introduction/robots/toolset.png"
+  alt="The Content search Toolset, with its discovery description, usage instruction and included search tools"
+  width={2130}
+  height={1498}
+  unoptimized
+/>
+
+Assign a Toolset when a Robot needs the whole capability. Use **Individual tools** when it only needs a few operations. Tools already supplied by a selected Toolset are omitted from the individual picker to avoid duplicates.
+
+Denbot can discover and load Toolsets during a conversation, so you do not need to create a custom Robot for every task. Custom Robots are useful when you want to keep a particular playbook, model and tool selection together.
+
+## Create your own Toolset
+
+Choose **New Toolset**, give it a name and description, write any shared instructions, and select its tools. Other Robots can then reuse it. A description such as “Read Library pages and prepare a source-linked reading list” is more useful for discovery than “My tools”.
+
+Custom Toolsets are shared, with editing controlled by their author and Robot management permissions. Built-in and plugin Toolsets are managed at their source; connected MCP Toolsets are managed in Robot settings. A custom Toolset cannot be deleted while a Robot still references it.
+
+## Reading full documents
+
+To find recent discussions, **List Threads** can order threads newest-first or oldest-first and filter by a creation-time range. It returns timestamps, source links and pagination details. This also works without date bounds when you just want the latest threads. See [Prepare a discussion digest](/docs/cookbook/discussion-digest) for a scheduled example.
+
+Resource tools such as **Get Library Page** and **Get Thread** identify a resource and its metadata. **Open Library Page** and **Open Thread** open its content as a document snapshot. The **Document exploration** Toolset supplies operations for searching and reading within those snapshots.
+
+Include these tools when a specialist must inspect the full content rather than summarise a title or description. The cookbook recipes list the required selection explicitly.
+
+[Connections](/docs/introduction/robots/connections) explains tools supplied by MCP servers and plugins, and when a workspace is needed.

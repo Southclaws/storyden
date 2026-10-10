@@ -66,3 +66,13 @@ export const gorton = localFont({
   preload: false,
   variable: "--font-gorton",
 });
+
+// The product typeface is confined to faithful UI demonstrations.
+export const product = localFont({
+  src: [
+    { path: "./static/Inter-Regular.woff2", weight: "400" },
+    { path: "./static/Inter-SemiBold.woff2", weight: "600" },
+  ],
+  preload: false,
+  variable: "--font-product",
+});
