@@ -6,7 +6,7 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/pinecone-io/go-pinecone/v4/pinecone"
+	"github.com/pinecone-io/go-pinecone/v7/pinecone"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/internal/config"
@@ -68,7 +68,7 @@ func (c *Client) GetOrCreateIndex(ctx context.Context, name string) (*Index, err
 			return nil, err
 		}
 
-		cosine := pinecone.Cosine
+		cosine := pinecone.IndexMetricCosine
 
 		index, err = c.CreateServerlessIndex(ctx, &pinecone.CreateServerlessIndexRequest{
 			Name:      name,

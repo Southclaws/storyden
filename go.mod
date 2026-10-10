@@ -89,7 +89,7 @@ require (
 	github.com/openai/openai-go/v3 v3.76.0
 	github.com/pb33f/libopenapi v0.41.5
 	github.com/philippgille/chromem-go v0.7.0
-	github.com/pinecone-io/go-pinecone/v4 v4.1.4
+	github.com/pinecone-io/go-pinecone/v7 v7.0.0
 	github.com/puzpuzpuz/xsync/v4 v4.5.0
 	github.com/redis/rueidis v1.0.78
 	github.com/rs/cors v1.11.1
