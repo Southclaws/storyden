@@ -2867,13 +2867,21 @@ paths:
   /threads:
     post:
       operationId: ThreadCreate
-      description: Create a new thread within the specified category.
+      description: |
+        Create a new thread within the specified category. Optional Idempotency-Key
+        protection lasts 24 hours per account and operation. Identical retries replay
+        the successful response. Changed requests, active requests, and uncertain
+        failures return 409. Reconcile uncertain outcomes by reading the collection;
+        retrying with a new key may create another resource. A key can create a new
+        resource after its 24-hour retention expires.
       tags: [threads]
+      parameters: [$ref: "#/components/parameters/IdempotencyKey"]
       requestBody: { $ref: "#/components/requestBodies/ThreadCreate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
+        "409": { $ref: "#/components/responses/Conflict" }
         "200": { $ref: "#/components/responses/ThreadCreateOK" }
 
     get:
@@ -2958,14 +2966,19 @@ paths:
   /threads/{thread_mark}/replies:
     post:
       operationId: ReplyCreate
-      description: Create a new post within a thread.
+      description: |
+        Create a new post within a thread. Optional Idempotency-Key protection
+        follows the 24-hour replay and uncertain-outcome rules of ThreadCreate.
       tags: [replies]
-      parameters: [$ref: "#/components/parameters/ThreadMarkParam"]
+      parameters:
+        - $ref: "#/components/parameters/ThreadMarkParam"
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody: { $ref: "#/components/requestBodies/ReplyCreate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
+        "409": { $ref: "#/components/responses/Conflict" }
         "200": { $ref: "#/components/responses/ReplyCreateOK" }
 
   #
@@ -3308,11 +3321,15 @@ paths:
       operationId: NodeCreate
       description: |
         Create a node for curating structured knowledge together.
+        Optional Idempotency-Key protection follows the 24-hour replay and
+        uncertain-outcome rules of ThreadCreate.
       tags: [nodes]
+      parameters: [$ref: "#/components/parameters/IdempotencyKey"]
       requestBody: { $ref: "#/components/requestBodies/NodeCreate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "401": { $ref: "#/components/responses/Unauthorised" }
+        "409": { $ref: "#/components/responses/Conflict" }
         "200": { $ref: "#/components/responses/NodeCreateOK" }
     get:
       operationId: NodeList
@@ -4922,6 +4939,16 @@ components:
   #
 
   parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: Printable ASCII key, 1 to 128 characters, for an identical create request.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
+        pattern: '^[!-~]+$'
     IconSize:
       description: Icon sizes.
       example: "512x512"

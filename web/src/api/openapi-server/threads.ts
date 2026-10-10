@@ -8,6 +8,7 @@
  * OpenAPI spec version: v1.26.15-post
  */
 import type {
+  ConflictResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
   NotModifiedResponse,
@@ -80,9 +81,14 @@ export type threadCreateResponse404 = {
   status: 404;
 };
 
+export type threadCreateResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
 export type threadCreateResponseDefault = {
   data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 401 | 404>;
+  status: Exclude<HTTPStatusCodes, 200 | 401 | 404 | 409>;
 };
 
 export type threadCreateResponseSuccess = threadCreateResponse200 & {
@@ -91,6 +97,7 @@ export type threadCreateResponseSuccess = threadCreateResponse200 & {
 export type threadCreateResponseError = (
   | threadCreateResponse401
   | threadCreateResponse404
+  | threadCreateResponse409
   | threadCreateResponseDefault
 ) & {
   headers: Headers;
@@ -101,7 +108,12 @@ export const getThreadCreateUrl = () => {
 };
 
 /**
- * Create a new thread within the specified category.
+ * Create a new thread within the specified category. Optional Idempotency-Key
+ * protection lasts 24 hours per account and operation. Identical retries replay
+ * the successful response. Changed requests, active requests, and uncertain
+ * failures return 409. Reconcile uncertain outcomes by reading the collection;
+ * retrying with a new key may create another resource. A key can create a new
+ * resource after its 24-hour retention expires.
  */
 export const threadCreate = async (
   threadCreateBody?: ThreadCreateBody,

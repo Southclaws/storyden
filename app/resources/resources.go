@@ -33,6 +33,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph/hydrate"
 	"github.com/Southclaws/storyden/app/resources/email_queue/email_queue_querier"
 	"github.com/Southclaws/storyden/app/resources/email_queue/email_queue_repo"
+	"github.com/Southclaws/storyden/app/resources/idempotency"
 	"github.com/Southclaws/storyden/app/resources/event/event_querier"
 	"github.com/Southclaws/storyden/app/resources/event/event_writer"
 	"github.com/Southclaws/storyden/app/resources/event/participation/participant_querier"
@@ -94,6 +95,7 @@ func Build() fx.Option {
 		fx.Provide(
 			settings.New,
 			trail.NewRepository,
+			idempotency.New,
 			role_assign.New,
 			role_repo.New,
 			role_hydrate.New,
