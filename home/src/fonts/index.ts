@@ -3,7 +3,6 @@ import localFont from "next/font/local";
 // prettier-ignore
 export const joie = localFont({
   src: [
-    { path: "./static/JoieGrotesk-Bold.woff", weight: "700" },
     { path: "./static/JoieGrotesk-Bold.woff2", weight: "700" },
   ],
   preload: true,
@@ -32,14 +31,14 @@ export const worksans = localFont({
     { path: "./static/WorkSans-Thin.woff2", weight: "100" },
     { path: "./static/WorkSans-ThinItalic.woff2", weight: "100", style: "italic" },
   ],
-  preload: true,
+  preload: false,
   variable: "--font-worksans",
 });
 
 // prettier-ignore
 export const hedvig = localFont({
   src: "./static/hedvig-letters-serif-v2-latin-regular.woff2",
-  preload: true,
+  preload: false,
   variable: "--font-hedvig",
 });
 
@@ -55,7 +54,7 @@ export const intelone = localFont({
     { path: "./static/IntelOneMono-MediumItalic.woff2", weight: "500", style: "italic" },
     { path: "./static/IntelOneMono-Regular.woff2", weight: "400" },
   ],
-  preload: true,
+  preload: false,
   variable: "--font-intelone",
 });
 
@@ -64,6 +63,6 @@ export const gorton = localFont({
   src: [
     { path: "./static/Gorton-Normal-120.otf", weight: "400" },
   ],
-  preload: true,
+  preload: false,
   variable: "--font-gorton",
 });
