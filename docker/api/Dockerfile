@@ -2,7 +2,7 @@
 # BACKEND API LAYER
 #
 
-FROM golang:1.27.1-alpine AS api-builder
+FROM golang:1.27.2-alpine AS api-builder
 
 WORKDIR /build
 

@@ -27,7 +27,7 @@ func TestRenderGoModLetsGoTidyResolveStorydenVersion(t *testing.T) {
 	source := renderGoMod("example-plugin")
 
 	require.Contains(t, source, "module storyden.local/plugins/example-plugin")
-	require.Contains(t, source, "go 1.27.1")
+	require.Contains(t, source, "go 1.27.2")
 	require.NotContains(t, source, "github.com/Southclaws/storyden latest")
 	require.NotContains(t, source, "github.com/Southclaws/storyden v0.0.0")
 }
