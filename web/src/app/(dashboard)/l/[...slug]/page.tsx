@@ -8,6 +8,13 @@ import {
   LibraryPageBlockTypeDirectory,
   parseNodeMetadata,
 } from "@/lib/library/metadata";
+import {
+  getPublicNode,
+  hiddenMetadata,
+  jsonLD,
+  libraryPageSchema,
+  publicURL,
+} from "@/lib/metadata/public";
 import { getSettings } from "@/lib/settings/settings-server";
 import { LibraryPageScreen } from "@/screens/library/LibraryPageScreen/LibraryPageScreen";
 import { Params, ParamsSchema } from "@/screens/library/library-path";
@@ -38,8 +45,24 @@ export default async function Page(props: Props) {
   // subtree. However subtrees do not currently support property filtering or
   // sorting so this may need a new API endpoint or a parameter for nodeGet.
   const children = await maybeGetChildren(data);
+  const publicNode =
+    data.visibility === "published"
+      ? await getPublicNode(targetSlug)
+      : undefined;
 
-  return <LibraryPageScreen node={data} childNodes={children} />;
+  return (
+    <>
+      {publicNode && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: jsonLD(libraryPageSchema(publicNode)),
+          }}
+        />
+      )}
+      <LibraryPageScreen node={data} childNodes={children} />
+    </>
+  );
 }
 
 export async function generateMetadata(props: Props) {
@@ -55,21 +78,44 @@ export async function generateMetadata(props: Props) {
 
     const settings = await getSettings();
 
-    const { data } = await nodeGet(targetSlug);
+    const data = await getPublicNode(targetSlug);
+
+    if (!data) {
+      return {
+        title: "Page not found",
+        description: "The page you are looking for does not exist.",
+        ...hiddenMetadata,
+      } satisfies Metadata;
+    }
+
+    const url = publicURL(`/l/${encodeURIComponent(data.slug)}`);
 
     return {
       title: `${data.name} | ${settings.title}`,
       description: data.description,
+      alternates: {
+        canonical: url,
+        types: {
+          "text/markdown": publicURL(`/l/${encodeURIComponent(data.slug)}.md`),
+        },
+      },
       openGraph: {
+        type: data.content ? "article" : "website",
+        title: data.name,
+        description: data.description,
+        url,
         // NOTE: Massive hack because Next.js still hasn't fixed a bug with
         // catch-all routes and opengraph-image route handlers.
-        images: [`${WEB_ADDRESS}/l/og?slug=${targetSlug}&t=${data.updatedAt}`],
+        images: [
+          `${WEB_ADDRESS}/l/og?slug=${encodeURIComponent(targetSlug)}&t=${encodeURIComponent(data.updatedAt)}`,
+        ],
       },
     } satisfies Metadata;
   } catch (e) {
     return {
       title: "Page not found",
       description: "The page you are looking for does not exist.",
+      ...hiddenMetadata,
     };
   }
 }
