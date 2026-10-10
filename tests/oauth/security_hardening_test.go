@@ -661,3 +661,21 @@ func TestOAuthSecurityHardeningScopeCapOnRefresh(t *testing.T) {
 		}))
 	}))
 }
+
+func TestMCPChallengeWhenOAuthDisabled(t *testing.T) {
+	t.Parallel()
+	cfg := oauthConfig(t)
+	cfg.MCPEnabled = true
+	cfg.OAuthEnabled = false
+	integration.Test(t, cfg, e2e.Setup(), mcptransport.Build(), fx.Invoke(func(lc fx.Lifecycle, root context.Context, ts *httptest.Server) {
+		lc.Append(fx.StartHook(func() {
+			req, err := http.NewRequestWithContext(root, http.MethodPost, ts.URL+"/mcp", nil)
+			require.NoError(t, err)
+			resp, err := http.DefaultClient.Do(req)
+			require.NoError(t, err)
+			defer resp.Body.Close()
+			require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
+			require.Equal(t, "Bearer", resp.Header.Get("WWW-Authenticate"))
+		}))
+	}))
+}
