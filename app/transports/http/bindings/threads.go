@@ -16,10 +16,14 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/idempotency"
+	"github.com/Southclaws/storyden/app/resources/pagination"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
 	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -35,6 +39,7 @@ type Threads struct {
 	thread_mark_svc thread_mark.Service
 	accountQuery    *account_querier.Querier
 	profileQuery    *profile_querier.Querier
+	receipts        *idempotency.Repository
 }
 
 func NewThreads(
@@ -43,8 +48,9 @@ func NewThreads(
 	thread_mark_svc thread_mark.Service,
 	accountQuery *account_querier.Querier,
 	profileQuery *profile_querier.Querier,
+	receipts *idempotency.Repository,
 ) Threads {
-	return Threads{thread_cache, thread_svc, thread_mark_svc, accountQuery, profileQuery}
+	return Threads{thread_cache, thread_svc, thread_mark_svc, accountQuery, profileQuery, receipts}
 }
 
 func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreateRequestObject) (openapi.ThreadCreateResponseObject, error) {
@@ -91,26 +97,41 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		return int(p)
 	})
 
-	thread, err := i.thread_svc.Create(ctx,
-		request.Body.Title,
-		accountID,
-		meta,
-		thread_service.Partial{
-			Content:    richContent,
-			Category:   category,
-			Tags:       tags,
-			Visibility: status,
-			URL:        url,
-			Pinned:     pinned,
-		},
-	)
+	if err := session.Authorise(ctx, nil, rbac.PermissionCreatePost); err != nil {
+		return nil, err
+	}
+	if request.Body.Pinned != nil {
+		if err := session.Authorise(ctx, nil, rbac.PermissionManagePosts); err != nil {
+			return nil, err
+		}
+	}
+	response, err := idempotentCreate(ctx, i.receipts, accountID.String(), "ThreadCreate", request.Params.IdempotencyKey, request.Body,
+		func() (openapi.ThreadCreate200JSONResponse, error) {
+			thread, err := i.thread_svc.Create(ctx,
+				request.Body.Title,
+				accountID,
+				meta,
+				thread_service.Partial{
+					Content:    richContent,
+					Category:   category,
+					Tags:       tags,
+					Visibility: status,
+					URL:        url,
+					Pinned:     pinned,
+				},
+			)
+			if err != nil {
+				return openapi.ThreadCreate200JSONResponse{}, err
+			}
+			return openapi.ThreadCreate200JSONResponse{ThreadCreateOKJSONResponse: openapi.ThreadCreateOKJSONResponse(serialiseThread(thread))}, nil
+		}, func(response openapi.ThreadCreate200JSONResponse) error {
+			_, err := i.thread_svc.Get(ctx, post.ID(openapi.ParseID(response.Id)), pagination.NewPageParams(1, 1))
+			return err
+		})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	return openapi.ThreadCreate200JSONResponse{
-		ThreadCreateOKJSONResponse: openapi.ThreadCreateOKJSONResponse(serialiseThread(thread)),
-	}, nil
+	return response, nil
 }
 
 func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdateRequestObject) (openapi.ThreadUpdateResponseObject, error) {

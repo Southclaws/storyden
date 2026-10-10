@@ -31,7 +31,7 @@ func GetError(response *openapi.ThreadGetResponse) error {
 }
 
 func Create(ctx context.Context, client *openapi.ClientWithResponses, props openapi.ThreadInitialProps) (*openapi.Thread, error) {
-	response, err := client.ThreadCreateWithResponse(ctx, props)
+	response, err := client.ThreadCreateWithResponse(ctx, nil, props)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func Create(ctx context.Context, client *openapi.ClientWithResponses, props open
 }
 
 func Reply(ctx context.Context, client *openapi.ClientWithResponses, mark string, props openapi.ReplyInitialProps) (*openapi.Reply, error) {
-	response, err := client.ReplyCreateWithResponse(ctx, mark, props)
+	response, err := client.ReplyCreateWithResponse(ctx, mark, nil, props)
 	if err != nil {
 		return nil, err
 	}

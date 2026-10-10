@@ -20,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/emailqueue"
 	"github.com/Southclaws/storyden/internal/ent/event"
 	"github.com/Southclaws/storyden/internal/ent/eventparticipant"
+	"github.com/Southclaws/storyden/internal/ent/idempotencyreceipt"
 	"github.com/Southclaws/storyden/internal/ent/invitation"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
@@ -694,6 +695,36 @@ func init() {
 			return nil
 		}
 	}()
+	idempotencyreceiptFields := schema.IdempotencyReceipt{}.Fields()
+	_ = idempotencyreceiptFields
+	// idempotencyreceiptDescPrincipalID is the schema descriptor for principal_id field.
+	idempotencyreceiptDescPrincipalID := idempotencyreceiptFields[1].Descriptor()
+	// idempotencyreceipt.PrincipalIDValidator is a validator for the "principal_id" field. It is called by the builders before save.
+	idempotencyreceipt.PrincipalIDValidator = idempotencyreceiptDescPrincipalID.Validators[0].(func(string) error)
+	// idempotencyreceiptDescOperation is the schema descriptor for operation field.
+	idempotencyreceiptDescOperation := idempotencyreceiptFields[2].Descriptor()
+	// idempotencyreceipt.OperationValidator is a validator for the "operation" field. It is called by the builders before save.
+	idempotencyreceipt.OperationValidator = idempotencyreceiptDescOperation.Validators[0].(func(string) error)
+	// idempotencyreceiptDescKeyHash is the schema descriptor for key_hash field.
+	idempotencyreceiptDescKeyHash := idempotencyreceiptFields[3].Descriptor()
+	// idempotencyreceipt.KeyHashValidator is a validator for the "key_hash" field. It is called by the builders before save.
+	idempotencyreceipt.KeyHashValidator = idempotencyreceiptDescKeyHash.Validators[0].(func(string) error)
+	// idempotencyreceiptDescClaimToken is the schema descriptor for claim_token field.
+	idempotencyreceiptDescClaimToken := idempotencyreceiptFields[4].Descriptor()
+	// idempotencyreceipt.ClaimTokenValidator is a validator for the "claim_token" field. It is called by the builders before save.
+	idempotencyreceipt.ClaimTokenValidator = idempotencyreceiptDescClaimToken.Validators[0].(func(string) error)
+	// idempotencyreceiptDescFingerprint is the schema descriptor for fingerprint field.
+	idempotencyreceiptDescFingerprint := idempotencyreceiptFields[5].Descriptor()
+	// idempotencyreceipt.FingerprintValidator is a validator for the "fingerprint" field. It is called by the builders before save.
+	idempotencyreceipt.FingerprintValidator = idempotencyreceiptDescFingerprint.Validators[0].(func(string) error)
+	// idempotencyreceiptDescCreatedAt is the schema descriptor for created_at field.
+	idempotencyreceiptDescCreatedAt := idempotencyreceiptFields[8].Descriptor()
+	// idempotencyreceipt.DefaultCreatedAt holds the default value on creation for the created_at field.
+	idempotencyreceipt.DefaultCreatedAt = idempotencyreceiptDescCreatedAt.Default.(func() time.Time)
+	// idempotencyreceiptDescID is the schema descriptor for id field.
+	idempotencyreceiptDescID := idempotencyreceiptFields[0].Descriptor()
+	// idempotencyreceipt.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	idempotencyreceipt.IDValidator = idempotencyreceiptDescID.Validators[0].(func(string) error)
 	invitationMixin := schema.Invitation{}.Mixin()
 	invitationMixinFields0 := invitationMixin[0].Fields()
 	_ = invitationMixinFields0

@@ -26,6 +26,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/emailqueue"
 	"github.com/Southclaws/storyden/internal/ent/event"
 	"github.com/Southclaws/storyden/internal/ent/eventparticipant"
+	"github.com/Southclaws/storyden/internal/ent/idempotencyreceipt"
 	"github.com/Southclaws/storyden/internal/ent/invitation"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
@@ -148,6 +149,7 @@ func checkColumn(t, c string) error {
 			emailqueue.Table:                emailqueue.ValidColumn,
 			event.Table:                     event.ValidColumn,
 			eventparticipant.Table:          eventparticipant.ValidColumn,
+			idempotencyreceipt.Table:        idempotencyreceipt.ValidColumn,
 			invitation.Table:                invitation.ValidColumn,
 			likepost.Table:                  likepost.ValidColumn,
 			link.Table:                      link.ValidColumn,

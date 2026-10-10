@@ -13,6 +13,7 @@ import type { SWRMutationConfiguration } from "swr/mutation";
 
 import { fetcher } from "../client";
 import type {
+  ConflictResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
   ReplyCreateBody,
@@ -27,7 +28,8 @@ export const getReplyCreateUrl = (threadMark: string) => {
 };
 
 /**
- * Create a new post within a thread.
+ * Create a new post within a thread. Optional Idempotency-Key protection
+ * follows the 24-hour replay and uncertain-outcome rules of ThreadCreate.
  */
 export const replyCreate = async (
   threadMark: string,
@@ -85,6 +87,7 @@ export const useReplyCreate = <
   TError =
     | UnauthorisedResponse
     | NotFoundResponse
+    | ConflictResponse
     | InternalServerErrorResponse,
 >(
   threadMark: string,

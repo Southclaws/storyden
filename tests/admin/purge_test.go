@@ -43,14 +43,14 @@ func TestPurgeAccountContent(t *testing.T) {
 				memberSession := sh.WithSession(memberCtx)
 
 				vis := openapi.VisibilityPublished
-				thread1, err := cl.ThreadCreateWithResponse(memberCtx, openapi.ThreadInitialProps{
+				thread1, err := cl.ThreadCreateWithResponse(memberCtx, nil, openapi.ThreadInitialProps{
 					Title:      "Test Thread 1",
 					Body:       opt.New("<p>Content 1</p>").Ptr(),
 					Visibility: &vis,
 				}, memberSession)
 				tests.Ok(t, err, thread1)
 
-				thread2, err := cl.ThreadCreateWithResponse(memberCtx, openapi.ThreadInitialProps{
+				thread2, err := cl.ThreadCreateWithResponse(memberCtx, nil, openapi.ThreadInitialProps{
 					Title:      "Test Thread 2",
 					Body:       opt.New("<p>Content 2</p>").Ptr(),
 					Visibility: &vis,
@@ -104,19 +104,19 @@ func TestPurgeAccountContent(t *testing.T) {
 				otherMemberSession := sh.WithSession(otherMemberCtx)
 
 				vis := openapi.VisibilityPublished
-				createdThread, err := cl.ThreadCreateWithResponse(otherMemberCtx, openapi.ThreadInitialProps{
+				createdThread, err := cl.ThreadCreateWithResponse(otherMemberCtx, nil, openapi.ThreadInitialProps{
 					Title:      "Test Thread",
 					Body:       opt.New("<p>Thread content</p>").Ptr(),
 					Visibility: &vis,
 				}, otherMemberSession)
 				tests.Ok(t, err, createdThread)
 
-				reply1, err := cl.ReplyCreateWithResponse(memberCtx, createdThread.JSON200.Slug, openapi.ReplyInitialProps{
+				reply1, err := cl.ReplyCreateWithResponse(memberCtx, createdThread.JSON200.Slug, nil, openapi.ReplyInitialProps{
 					Body: "Test reply 1",
 				}, memberSession)
 				tests.Ok(t, err, reply1)
 
-				reply2, err := cl.ReplyCreateWithResponse(memberCtx, createdThread.JSON200.Slug, openapi.ReplyInitialProps{
+				reply2, err := cl.ReplyCreateWithResponse(memberCtx, createdThread.JSON200.Slug, nil, openapi.ReplyInitialProps{
 					Body: "Test reply 2",
 				}, memberSession)
 				tests.Ok(t, err, reply2)
@@ -171,7 +171,7 @@ func TestPurgeAccountContent(t *testing.T) {
 				// Create a thread
 				vis := openapi.VisibilityPublished
 				threadResp := tests.AssertRequest(
-					cl.ThreadCreateWithResponse(threadAuthorCtx, openapi.ThreadInitialProps{
+					cl.ThreadCreateWithResponse(threadAuthorCtx, nil, openapi.ThreadInitialProps{
 						Title:      "Thread for Nested Replies",
 						Body:       opt.New("<p>Thread content</p>").Ptr(),
 						Visibility: &vis,
@@ -180,14 +180,14 @@ func TestPurgeAccountContent(t *testing.T) {
 
 				// Member creates a reply to the thread
 				parentReplyResp := tests.AssertRequest(
-					cl.ReplyCreateWithResponse(memberCtx, threadResp.JSON200.Slug, openapi.ReplyInitialProps{
+					cl.ReplyCreateWithResponse(memberCtx, threadResp.JSON200.Slug, nil, openapi.ReplyInitialProps{
 						Body: "Parent reply from member",
 					}, memberSession),
 				)(t, http.StatusOK)
 
 				// Another user creates a nested reply to the member's reply
 				nestedReplyResp := tests.AssertRequest(
-					cl.ReplyCreateWithResponse(nestedReplyAuthorCtx, threadResp.JSON200.Slug, openapi.ReplyInitialProps{
+					cl.ReplyCreateWithResponse(nestedReplyAuthorCtx, threadResp.JSON200.Slug, nil, openapi.ReplyInitialProps{
 						Body:    "Nested reply to parent",
 						ReplyTo: &parentReplyResp.JSON200.Id,
 					}, nestedReplyAuthorSession),
@@ -268,21 +268,21 @@ func TestPurgeAccountContent(t *testing.T) {
 				otherMemberSession := sh.WithSession(otherMemberCtx)
 
 				vis := openapi.VisibilityPublished
-				memberThread, err := cl.ThreadCreateWithResponse(memberCtx, openapi.ThreadInitialProps{
+				memberThread, err := cl.ThreadCreateWithResponse(memberCtx, nil, openapi.ThreadInitialProps{
 					Title:      "Member Thread",
 					Body:       opt.New("<p>Member content</p>").Ptr(),
 					Visibility: &vis,
 				}, memberSession)
 				tests.Ok(t, err, memberThread)
 
-				otherThread, err := cl.ThreadCreateWithResponse(otherMemberCtx, openapi.ThreadInitialProps{
+				otherThread, err := cl.ThreadCreateWithResponse(otherMemberCtx, nil, openapi.ThreadInitialProps{
 					Title:      "Other Thread",
 					Body:       opt.New("<p>Other content</p>").Ptr(),
 					Visibility: &vis,
 				}, otherMemberSession)
 				tests.Ok(t, err, otherThread)
 
-				reply, err := cl.ReplyCreateWithResponse(memberCtx, otherThread.JSON200.Slug, openapi.ReplyInitialProps{
+				reply, err := cl.ReplyCreateWithResponse(memberCtx, otherThread.JSON200.Slug, nil, openapi.ReplyInitialProps{
 					Body: "Test reply",
 				}, memberSession)
 				tests.Ok(t, err, reply)
@@ -439,7 +439,7 @@ func TestPurgeAccountContent(t *testing.T) {
 				// Create a thread to add to collection
 				vis := openapi.VisibilityPublished
 				threadResp := tests.AssertRequest(
-					cl.ThreadCreateWithResponse(memberCtx, openapi.ThreadInitialProps{
+					cl.ThreadCreateWithResponse(memberCtx, nil, openapi.ThreadInitialProps{
 						Title:      "Thread for Collection",
 						Body:       opt.New("<p>Content</p>").Ptr(),
 						Visibility: &vis,

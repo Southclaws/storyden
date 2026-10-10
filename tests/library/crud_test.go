@@ -42,7 +42,7 @@ func TestNodesHappyPath(t *testing.T) {
 			slug1 := name1 + uuid.NewString()
 			content1 := "<h1>Nodes</h1><p>Rich text content.</p>"
 			url1 := "https://southcla.ws"
-			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node1, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:       name1,
 				Slug:       &slug1,
 				Content:    &content1,
@@ -99,7 +99,7 @@ func TestNodesHappyPath(t *testing.T) {
 			t.Run("empty_slug", func(t *testing.T) {
 				name2 := "Testing Node Number Two" + uuid.NewString()
 				slug2 := ""
-				node2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				node2, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 					Name:       name2,
 					Slug:       &slug2,
 					Visibility: &visibility,
@@ -118,7 +118,7 @@ func TestNodesHappyPath(t *testing.T) {
 				name3 := "test-node-with-link" + uuid.NewString()
 				slug3 := name3
 				url3 := "https://example.com"
-				node3, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				node3, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 					Name:       name3,
 					Slug:       &slug3,
 					Url:        &url3,
@@ -145,7 +145,7 @@ func TestNodesHappyPath(t *testing.T) {
 			t.Run("with_russian_slug", func(t *testing.T) {
 				a := assert.New(t)
 
-				nodeCreate, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				nodeCreate, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 					Slug: opt.New("бабочки").Ptr(),
 					Name: "Бабочки",
 				}, sh.WithSession(ctx))
@@ -161,7 +161,7 @@ func TestNodesHappyPath(t *testing.T) {
 			t.Run("with_russian_title_slugified", func(t *testing.T) {
 				a := assert.New(t)
 
-				nodeCreate, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				nodeCreate, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 					Name: "БАБОЧКИ Example",
 				}, sh.WithSession(ctx))
 				tests.Ok(t, err, nodeCreate)
@@ -209,7 +209,7 @@ func TestNodesErrors(t *testing.T) {
 			t.Run("invalid_slug", func(t *testing.T) {
 				name := "Testing Node Bad Slug" + uuid.NewString()
 				slug := "not@a/good'slug]"
-				create, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				create, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 					Name: name,
 					Slug: &slug,
 				}, sh.WithSession(ctx))

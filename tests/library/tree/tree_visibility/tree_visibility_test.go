@@ -46,16 +46,16 @@ func TestNodesTreeQueryingVisibilityFilters(t *testing.T) {
 			// |- node3    <- child of node1     has 1 child: node4
 			//    |- node4 <- child of node3     has no children
 
-			node1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: un("n1"), Visibility: &published}, adminSession)
+			node1, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{Name: un("n1"), Visibility: &published}, adminSession)
 			tests.Ok(t, err, node1)
 
-			node2, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: un("n2"), Visibility: &published, Parent: &node1.JSON200.Slug}, adminSession)
+			node2, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{Name: un("n2"), Visibility: &published, Parent: &node1.JSON200.Slug}, adminSession)
 			tests.Ok(t, err, node2)
 
-			node3, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: un("n3"), Visibility: &published, Parent: &node1.JSON200.Slug}, adminSession)
+			node3, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{Name: un("n3"), Visibility: &published, Parent: &node1.JSON200.Slug}, adminSession)
 			tests.Ok(t, err, node3)
 
-			node4, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: un("n4"), Visibility: &published, Parent: &node3.JSON200.Slug}, adminSession)
+			node4, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{Name: un("n4"), Visibility: &published, Parent: &node3.JSON200.Slug}, adminSession)
 			tests.Ok(t, err, node4)
 
 			rootNodeIDs := []string{node1.JSON200.Id}
@@ -65,7 +65,7 @@ func TestNodesTreeQueryingVisibilityFilters(t *testing.T) {
 				a := assert.New(t)
 
 				// member 1 creates a draft under node3
-				draft1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: un("m1draft"), Visibility: &draft, Parent: &node3.JSON200.Slug}, member1Session)
+				draft1, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{Name: un("m1draft"), Visibility: &draft, Parent: &node3.JSON200.Slug}, member1Session)
 				tests.Ok(t, err, draft1)
 
 				draftIDs := []string{draft1.JSON200.Id}
@@ -91,7 +91,7 @@ func TestNodesTreeQueryingVisibilityFilters(t *testing.T) {
 				a := assert.New(t)
 
 				// member 1 creates a draft under node3
-				draft1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: un("m1draft"), Visibility: &draft, Parent: &node3.JSON200.Slug}, member1Session)
+				draft1, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{Name: un("m1draft"), Visibility: &draft, Parent: &node3.JSON200.Slug}, member1Session)
 				tests.Ok(t, err, draft1)
 
 				draftIDs := []string{draft1.JSON200.Id}

@@ -106,9 +106,14 @@ export type nodeCreateResponse401 = {
   status: 401;
 };
 
+export type nodeCreateResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
 export type nodeCreateResponseDefault = {
   data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 401>;
+  status: Exclude<HTTPStatusCodes, 200 | 401 | 409>;
 };
 
 export type nodeCreateResponseSuccess = nodeCreateResponse200 & {
@@ -116,6 +121,7 @@ export type nodeCreateResponseSuccess = nodeCreateResponse200 & {
 };
 export type nodeCreateResponseError = (
   | nodeCreateResponse401
+  | nodeCreateResponse409
   | nodeCreateResponseDefault
 ) & {
   headers: Headers;
@@ -127,6 +133,8 @@ export const getNodeCreateUrl = () => {
 
 /**
  * Create a node for curating structured knowledge together.
+ * Optional Idempotency-Key protection follows the 24-hour replay and
+ * uncertain-outcome rules of ThreadCreate.
  */
 export const nodeCreate = async (
   nodeCreateBody?: NodeCreateBody,

@@ -40,11 +40,11 @@ func TestLibraryNodeDeletion(t *testing.T) {
 			t.Run("delete_leaf_node", func(t *testing.T) {
 				a := assert.New(t)
 
-				node1, err := cl.NodeCreateWithResponse(ctx, library.UniqueNode("node1"), session)
+				node1, err := cl.NodeCreateWithResponse(ctx, nil, library.UniqueNode("node1"), session)
 				tests.Ok(t, err, node1)
-				node2, err := cl.NodeCreateWithResponse(ctx, library.UniqueNode("node2"), session)
+				node2, err := cl.NodeCreateWithResponse(ctx, nil, library.UniqueNode("node2"), session)
 				tests.Ok(t, err, node2)
-				node3, err := cl.NodeCreateWithResponse(ctx, library.UniqueNode("node3-deleteme"), session)
+				node3, err := cl.NodeCreateWithResponse(ctx, nil, library.UniqueNode("node3-deleteme"), session)
 				tests.Ok(t, err, node3)
 				cadd, err := cl.NodeAddNodeWithResponse(ctx, node1.JSON200.Slug, node2.JSON200.Slug, session)
 				tests.Ok(t, err, cadd)
@@ -66,11 +66,11 @@ func TestLibraryNodeDeletion(t *testing.T) {
 			t.Run("delete_parent_node_with_target", func(t *testing.T) {
 				a := assert.New(t)
 
-				node1, err := cl.NodeCreateWithResponse(ctx, library.UniqueNode("node1"), session)
+				node1, err := cl.NodeCreateWithResponse(ctx, nil, library.UniqueNode("node1"), session)
 				tests.Ok(t, err, node1)
-				node2, err := cl.NodeCreateWithResponse(ctx, library.UniqueNode("node2-deleteme"), session)
+				node2, err := cl.NodeCreateWithResponse(ctx, nil, library.UniqueNode("node2-deleteme"), session)
 				tests.Ok(t, err, node2)
-				node3, err := cl.NodeCreateWithResponse(ctx, library.UniqueNode("node3"), session)
+				node3, err := cl.NodeCreateWithResponse(ctx, nil, library.UniqueNode("node3"), session)
 				tests.Ok(t, err, node3)
 				cadd, err := cl.NodeAddNodeWithResponse(ctx, node1.JSON200.Slug, node2.JSON200.Slug, session)
 				tests.Ok(t, err, cadd)
@@ -92,11 +92,11 @@ func TestLibraryNodeDeletion(t *testing.T) {
 			t.Run("delete_parent_node_without_target", func(t *testing.T) {
 				a := assert.New(t)
 
-				node1, err := cl.NodeCreateWithResponse(ctx, library.UniqueNode("node1"), session)
+				node1, err := cl.NodeCreateWithResponse(ctx, nil, library.UniqueNode("node1"), session)
 				tests.Ok(t, err, node1)
-				node2, err := cl.NodeCreateWithResponse(ctx, library.UniqueNode("node2-deleteme"), session)
+				node2, err := cl.NodeCreateWithResponse(ctx, nil, library.UniqueNode("node2-deleteme"), session)
 				tests.Ok(t, err, node2)
-				node3, err := cl.NodeCreateWithResponse(ctx, library.UniqueNode("node3"), session)
+				node3, err := cl.NodeCreateWithResponse(ctx, nil, library.UniqueNode("node3"), session)
 				tests.Ok(t, err, node3)
 				cadd, err := cl.NodeAddNodeWithResponse(ctx, node1.JSON200.Slug, node2.JSON200.Slug, session)
 				tests.Ok(t, err, cadd)

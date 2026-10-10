@@ -107,7 +107,7 @@ func TestPluginErrorStates(t *testing.T) {
 
 			threadTitle := "Crash Test Thread " + xid.New().String()
 			threadCreate := tests.AssertRequest(
-				cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Body:       opt.New("<p>test plugin crash handling</p>").Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Title:      threadTitle,

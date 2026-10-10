@@ -64,7 +64,7 @@ func TestUsernamePasswordAuthMemberPermissions(t *testing.T) {
 				r.Len(userAccount.JSON200.EmailAddresses, 0)
 
 				threadCreate := tests.AssertRequest(
-					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+					cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>test thread from username user</p>").Ptr(),
 						Category:   opt.New(cat.JSON200.Id).Ptr(),
 						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),

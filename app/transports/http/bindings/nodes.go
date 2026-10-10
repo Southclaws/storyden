@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/idempotency"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_cache"
 	"github.com/Southclaws/storyden/app/resources/library/node_properties"
@@ -54,6 +55,7 @@ type Nodes struct {
 	ntr           node_traversal.Repository
 	schemaUpdater *node_property_schema.Updater
 	node_cache    *node_cache.Cache
+	receipts      *idempotency.Repository
 }
 
 func NewNodes(
@@ -70,6 +72,7 @@ func NewNodes(
 	ntr node_traversal.Repository,
 	schemaUpdater *node_property_schema.Updater,
 	node_cache *node_cache.Cache,
+	receipts *idempotency.Repository,
 ) Nodes {
 	return Nodes{
 		accountQuery:  accountQuery,
@@ -85,6 +88,7 @@ func NewNodes(
 		ntr:           ntr,
 		schemaUpdater: schemaUpdater,
 		node_cache:    node_cache,
+		receipts:      receipts,
 	}
 }
 
@@ -135,31 +139,43 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 
 	primaryImage := opt.Map(opt.NewPtr(request.Body.PrimaryImageAssetId), deserialiseAssetID)
 
-	node, err := c.nodeMutator.Create(ctx,
-		accountID,
-		request.Body.Name,
-		node_mutate.Partial{
-			Slug:         slug,
-			PrimaryImage: deletable.Skip(primaryImage),
-			Content:      richContent,
-			Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
-			URL:          deletable.Skip(url),
-			Description:  opt.NewPtr(request.Body.Description),
-			AssetsAdd:    opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
-			AssetSources: opt.NewPtrMap(request.Body.AssetSources, deserialiseAssetSources),
-			Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeMark),
-			HideChildren: opt.NewPtr(request.Body.HideChildTree), Tags: tags,
-			Visibility: vis,
-			Properties: pml,
-		},
-	)
+	if vis.OrZero() == visibility.VisibilityPublished {
+		if err := session.Authorise(ctx, nil, rbac.PermissionManageLibrary); err != nil {
+			return nil, err
+		}
+	}
+	response, err := idempotentCreate(ctx, c.receipts, accountID.String(), "NodeCreate", request.Params.IdempotencyKey, request.Body,
+		func() (openapi.NodeCreate200JSONResponse, error) {
+			node, err := c.nodeMutator.Create(ctx,
+				accountID,
+				request.Body.Name,
+				node_mutate.Partial{
+					Slug:         slug,
+					PrimaryImage: deletable.Skip(primaryImage),
+					Content:      richContent,
+					Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
+					URL:          deletable.Skip(url),
+					Description:  opt.NewPtr(request.Body.Description),
+					AssetsAdd:    opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
+					AssetSources: opt.NewPtrMap(request.Body.AssetSources, deserialiseAssetSources),
+					Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeMark),
+					HideChildren: opt.NewPtr(request.Body.HideChildTree), Tags: tags,
+					Visibility: vis,
+					Properties: pml,
+				},
+			)
+			if err != nil {
+				return openapi.NodeCreate200JSONResponse{}, err
+			}
+			return openapi.NodeCreate200JSONResponse{NodeCreateOKJSONResponse: openapi.NodeCreateOKJSONResponse(serialiseNode(node))}, nil
+		}, func(response openapi.NodeCreate200JSONResponse) error {
+			_, err := c.nodeReader.GetBySlug(ctx, library.NewID(openapi.ParseID(response.Id)), opt.NewEmpty[node_querier.ChildSortRule]())
+			return err
+		})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	return openapi.NodeCreate200JSONResponse{
-		NodeCreateOKJSONResponse: openapi.NodeCreateOKJSONResponse(serialiseNode(node)),
-	}, nil
+	return response, nil
 }
 
 func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObject) (openapi.NodeListResponseObject, error) {

@@ -82,7 +82,7 @@ func TestUnverifiedUserPermissions(t *testing.T) {
 				r.Equal(openapi.AccountVerifiedStatusNone, unverifiedAccount.JSON200.VerifiedStatus)
 
 				// Try to create a thread - should fail with 403 (guest permissions)
-				threadCreate, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				threadCreate, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Body:       opt.New("<p>test thread from unverified user</p>").Ptr(),
 					Category:   opt.New(cat.JSON200.Id).Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -107,7 +107,7 @@ func TestUnverifiedUserPermissions(t *testing.T) {
 
 				// Now creating a thread should succeed
 				threadCreateAfterVerify := tests.AssertRequest(
-					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+					cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>test thread from verified user</p>").Ptr(),
 						Category:   opt.New(cat.JSON200.Id).Ptr(),
 						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -134,7 +134,7 @@ func TestUnverifiedUserPermissions(t *testing.T) {
 				)(t, http.StatusOK)
 
 				thread := tests.AssertRequest(
-					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+					cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>public thread content</p>").Ptr(),
 						Category:   opt.New(cat.JSON200.Id).Ptr(),
 						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -185,7 +185,7 @@ func TestUnverifiedUserPermissions(t *testing.T) {
 				)(t, http.StatusOK)
 
 				thread := tests.AssertRequest(
-					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+					cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>thread for reaction test</p>").Ptr(),
 						Category:   opt.New(cat.JSON200.Id).Ptr(),
 						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),

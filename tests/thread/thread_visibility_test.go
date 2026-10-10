@@ -35,19 +35,19 @@ func TestThreadVisibilityWithReviewReplies(t *testing.T) {
 			sessionMember := sh.WithSession(memberCtx)
 			sessionAdmin := sh.WithSession(adminCtx)
 
-			threadCreate, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadCreate, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>This is a test thread</p>").Ptr(),
 				Title:      "Test Thread for Visibility",
 				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, sessionMember)
 			tests.Ok(t, err, threadCreate)
 
-			reply1Create, err := cl.ReplyCreateWithResponse(root, threadCreate.JSON200.Slug, openapi.ReplyInitialProps{
+			reply1Create, err := cl.ReplyCreateWithResponse(root, threadCreate.JSON200.Slug, nil, openapi.ReplyInitialProps{
 				Body: "This is a published reply",
 			}, sessionMember)
 			tests.Ok(t, err, reply1Create)
 
-			reply2Create, err := cl.ReplyCreateWithResponse(root, threadCreate.JSON200.Slug, openapi.ReplyInitialProps{
+			reply2Create, err := cl.ReplyCreateWithResponse(root, threadCreate.JSON200.Slug, nil, openapi.ReplyInitialProps{
 				Body: "This is another reply",
 			}, sessionMember)
 			tests.Ok(t, err, reply2Create)

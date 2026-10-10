@@ -30,6 +30,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/emailqueue"
 	"github.com/Southclaws/storyden/internal/ent/event"
 	"github.com/Southclaws/storyden/internal/ent/eventparticipant"
+	"github.com/Southclaws/storyden/internal/ent/idempotencyreceipt"
 	"github.com/Southclaws/storyden/internal/ent/invitation"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
@@ -115,6 +116,8 @@ type Client struct {
 	Event *EventClient
 	// EventParticipant is the client for interacting with the EventParticipant builders.
 	EventParticipant *EventParticipantClient
+	// IdempotencyReceipt is the client for interacting with the IdempotencyReceipt builders.
+	IdempotencyReceipt *IdempotencyReceiptClient
 	// Invitation is the client for interacting with the Invitation builders.
 	Invitation *InvitationClient
 	// LikePost is the client for interacting with the LikePost builders.
@@ -236,6 +239,7 @@ func (c *Client) init() {
 	c.EmailQueue = NewEmailQueueClient(c.config)
 	c.Event = NewEventClient(c.config)
 	c.EventParticipant = NewEventParticipantClient(c.config)
+	c.IdempotencyReceipt = NewIdempotencyReceiptClient(c.config)
 	c.Invitation = NewInvitationClient(c.config)
 	c.LikePost = NewLikePostClient(c.config)
 	c.Link = NewLinkClient(c.config)
@@ -390,6 +394,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		EmailQueue:                           NewEmailQueueClient(cfg),
 		Event:                                NewEventClient(cfg),
 		EventParticipant:                     NewEventParticipantClient(cfg),
+		IdempotencyReceipt:                   NewIdempotencyReceiptClient(cfg),
 		Invitation:                           NewInvitationClient(cfg),
 		LikePost:                             NewLikePostClient(cfg),
 		Link:                                 NewLinkClient(cfg),
@@ -471,6 +476,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		EmailQueue:                           NewEmailQueueClient(cfg),
 		Event:                                NewEventClient(cfg),
 		EventParticipant:                     NewEventParticipantClient(cfg),
+		IdempotencyReceipt:                   NewIdempotencyReceiptClient(cfg),
 		Invitation:                           NewInvitationClient(cfg),
 		LikePost:                             NewLikePostClient(cfg),
 		Link:                                 NewLinkClient(cfg),
@@ -550,10 +556,10 @@ func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.AuditLog,
 		c.Authentication, c.Category, c.Collection, c.CollectionNode, c.CollectionPost,
-		c.Email, c.EmailQueue, c.Event, c.EventParticipant, c.Invitation, c.LikePost,
-		c.Link, c.MentionProfile, c.ModerationNote, c.Node, c.NodeVersion,
-		c.Notification, c.OAuthAuthorisationCode, c.OAuthAuthorisationRequest,
-		c.OAuthClient, c.OAuthDeviceAuthorisation,
+		c.Email, c.EmailQueue, c.Event, c.EventParticipant, c.IdempotencyReceipt,
+		c.Invitation, c.LikePost, c.Link, c.MentionProfile, c.ModerationNote, c.Node,
+		c.NodeVersion, c.Notification, c.OAuthAuthorisationCode,
+		c.OAuthAuthorisationRequest, c.OAuthClient, c.OAuthDeviceAuthorisation,
 		c.OAuthDynamicRegistrationAccessTokens, c.OAuthRefreshToken,
 		c.OAuthRegistrationApproval, c.OAuthRemoteAuthorisationFlow,
 		c.OAuthRemoteConnection, c.Plugin, c.Post, c.PostRead, c.Property,
@@ -574,10 +580,10 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.AuditLog,
 		c.Authentication, c.Category, c.Collection, c.CollectionNode, c.CollectionPost,
-		c.Email, c.EmailQueue, c.Event, c.EventParticipant, c.Invitation, c.LikePost,
-		c.Link, c.MentionProfile, c.ModerationNote, c.Node, c.NodeVersion,
-		c.Notification, c.OAuthAuthorisationCode, c.OAuthAuthorisationRequest,
-		c.OAuthClient, c.OAuthDeviceAuthorisation,
+		c.Email, c.EmailQueue, c.Event, c.EventParticipant, c.IdempotencyReceipt,
+		c.Invitation, c.LikePost, c.Link, c.MentionProfile, c.ModerationNote, c.Node,
+		c.NodeVersion, c.Notification, c.OAuthAuthorisationCode,
+		c.OAuthAuthorisationRequest, c.OAuthClient, c.OAuthDeviceAuthorisation,
 		c.OAuthDynamicRegistrationAccessTokens, c.OAuthRefreshToken,
 		c.OAuthRegistrationApproval, c.OAuthRemoteAuthorisationFlow,
 		c.OAuthRemoteConnection, c.Plugin, c.Post, c.PostRead, c.Property,
@@ -623,6 +629,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Event.mutate(ctx, m)
 	case *EventParticipantMutation:
 		return c.EventParticipant.mutate(ctx, m)
+	case *IdempotencyReceiptMutation:
+		return c.IdempotencyReceipt.mutate(ctx, m)
 	case *InvitationMutation:
 		return c.Invitation.mutate(ctx, m)
 	case *LikePostMutation:
@@ -3861,6 +3869,139 @@ func (c *EventParticipantClient) mutate(ctx context.Context, m *EventParticipant
 		return (&EventParticipantDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown EventParticipant mutation op: %q", m.Op())
+	}
+}
+
+// IdempotencyReceiptClient is a client for the IdempotencyReceipt schema.
+type IdempotencyReceiptClient struct {
+	config
+}
+
+// NewIdempotencyReceiptClient returns a client for the IdempotencyReceipt from the given config.
+func NewIdempotencyReceiptClient(c config) *IdempotencyReceiptClient {
+	return &IdempotencyReceiptClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `idempotencyreceipt.Hooks(f(g(h())))`.
+func (c *IdempotencyReceiptClient) Use(hooks ...Hook) {
+	c.hooks.IdempotencyReceipt = append(c.hooks.IdempotencyReceipt, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `idempotencyreceipt.Intercept(f(g(h())))`.
+func (c *IdempotencyReceiptClient) Intercept(interceptors ...Interceptor) {
+	c.inters.IdempotencyReceipt = append(c.inters.IdempotencyReceipt, interceptors...)
+}
+
+// Create returns a builder for creating a IdempotencyReceipt entity.
+func (c *IdempotencyReceiptClient) Create() *IdempotencyReceiptCreate {
+	mutation := newIdempotencyReceiptMutation(c.config, OpCreate)
+	return &IdempotencyReceiptCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of IdempotencyReceipt entities.
+func (c *IdempotencyReceiptClient) CreateBulk(builders ...*IdempotencyReceiptCreate) *IdempotencyReceiptCreateBulk {
+	return &IdempotencyReceiptCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *IdempotencyReceiptClient) MapCreateBulk(slice any, setFunc func(*IdempotencyReceiptCreate, int)) *IdempotencyReceiptCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &IdempotencyReceiptCreateBulk{err: fmt.Errorf("calling to IdempotencyReceiptClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*IdempotencyReceiptCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &IdempotencyReceiptCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for IdempotencyReceipt.
+func (c *IdempotencyReceiptClient) Update() *IdempotencyReceiptUpdate {
+	mutation := newIdempotencyReceiptMutation(c.config, OpUpdate)
+	return &IdempotencyReceiptUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *IdempotencyReceiptClient) UpdateOne(_m *IdempotencyReceipt) *IdempotencyReceiptUpdateOne {
+	mutation := newIdempotencyReceiptMutation(c.config, OpUpdateOne, withIdempotencyReceipt(_m))
+	return &IdempotencyReceiptUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *IdempotencyReceiptClient) UpdateOneID(id string) *IdempotencyReceiptUpdateOne {
+	mutation := newIdempotencyReceiptMutation(c.config, OpUpdateOne, withIdempotencyReceiptID(id))
+	return &IdempotencyReceiptUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for IdempotencyReceipt.
+func (c *IdempotencyReceiptClient) Delete() *IdempotencyReceiptDelete {
+	mutation := newIdempotencyReceiptMutation(c.config, OpDelete)
+	return &IdempotencyReceiptDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *IdempotencyReceiptClient) DeleteOne(_m *IdempotencyReceipt) *IdempotencyReceiptDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *IdempotencyReceiptClient) DeleteOneID(id string) *IdempotencyReceiptDeleteOne {
+	builder := c.Delete().Where(idempotencyreceipt.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &IdempotencyReceiptDeleteOne{builder}
+}
+
+// Query returns a query builder for IdempotencyReceipt.
+func (c *IdempotencyReceiptClient) Query() *IdempotencyReceiptQuery {
+	return &IdempotencyReceiptQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeIdempotencyReceipt},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a IdempotencyReceipt entity by its id.
+func (c *IdempotencyReceiptClient) Get(ctx context.Context, id string) (*IdempotencyReceipt, error) {
+	return c.Query().Where(idempotencyreceipt.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *IdempotencyReceiptClient) GetX(ctx context.Context, id string) *IdempotencyReceipt {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *IdempotencyReceiptClient) Hooks() []Hook {
+	return c.hooks.IdempotencyReceipt
+}
+
+// Interceptors returns the client interceptors.
+func (c *IdempotencyReceiptClient) Interceptors() []Interceptor {
+	return c.inters.IdempotencyReceipt
+}
+
+func (c *IdempotencyReceiptClient) mutate(ctx context.Context, m *IdempotencyReceiptMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&IdempotencyReceiptCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&IdempotencyReceiptUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&IdempotencyReceiptUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&IdempotencyReceiptDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown IdempotencyReceipt mutation op: %q", m.Op())
 	}
 }
 
@@ -12461,32 +12602,33 @@ type (
 	hooks struct {
 		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, EmailQueue, Event,
-		EventParticipant, Invitation, LikePost, Link, MentionProfile, ModerationNote,
-		Node, NodeVersion, Notification, OAuthAuthorisationCode,
-		OAuthAuthorisationRequest, OAuthClient, OAuthDeviceAuthorisation,
-		OAuthDynamicRegistrationAccessTokens, OAuthRefreshToken,
-		OAuthRegistrationApproval, OAuthRemoteAuthorisationFlow, OAuthRemoteConnection,
-		Plugin, Post, PostRead, Property, PropertySchema, PropertySchemaField, React,
-		Report, Robot, RobotMCPServer, RobotMCPTool, RobotMemory, RobotProviderModel,
-		RobotSession, RobotSessionInput, RobotSessionMessage, RobotSessionTurn,
-		RobotSessionView, RobotToolset, RobotWorkspace, RobotWorkspaceInstance, Role,
-		Session, Setting, Tag, Trail, TrailAction, TrailActionRun, TrailRun,
-		TrailSchedulerLease, Warning []ent.Hook
+		EventParticipant, IdempotencyReceipt, Invitation, LikePost, Link,
+		MentionProfile, ModerationNote, Node, NodeVersion, Notification,
+		OAuthAuthorisationCode, OAuthAuthorisationRequest, OAuthClient,
+		OAuthDeviceAuthorisation, OAuthDynamicRegistrationAccessTokens,
+		OAuthRefreshToken, OAuthRegistrationApproval, OAuthRemoteAuthorisationFlow,
+		OAuthRemoteConnection, Plugin, Post, PostRead, Property, PropertySchema,
+		PropertySchemaField, React, Report, Robot, RobotMCPServer, RobotMCPTool,
+		RobotMemory, RobotProviderModel, RobotSession, RobotSessionInput,
+		RobotSessionMessage, RobotSessionTurn, RobotSessionView, RobotToolset,
+		RobotWorkspace, RobotWorkspaceInstance, Role, Session, Setting, Tag, Trail,
+		TrailAction, TrailActionRun, TrailRun, TrailSchedulerLease, Warning []ent.Hook
 	}
 	inters struct {
 		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, EmailQueue, Event,
-		EventParticipant, Invitation, LikePost, Link, MentionProfile, ModerationNote,
-		Node, NodeVersion, Notification, OAuthAuthorisationCode,
-		OAuthAuthorisationRequest, OAuthClient, OAuthDeviceAuthorisation,
-		OAuthDynamicRegistrationAccessTokens, OAuthRefreshToken,
-		OAuthRegistrationApproval, OAuthRemoteAuthorisationFlow, OAuthRemoteConnection,
-		Plugin, Post, PostRead, Property, PropertySchema, PropertySchemaField, React,
-		Report, Robot, RobotMCPServer, RobotMCPTool, RobotMemory, RobotProviderModel,
-		RobotSession, RobotSessionInput, RobotSessionMessage, RobotSessionTurn,
-		RobotSessionView, RobotToolset, RobotWorkspace, RobotWorkspaceInstance, Role,
-		Session, Setting, Tag, Trail, TrailAction, TrailActionRun, TrailRun,
-		TrailSchedulerLease, Warning []ent.Interceptor
+		EventParticipant, IdempotencyReceipt, Invitation, LikePost, Link,
+		MentionProfile, ModerationNote, Node, NodeVersion, Notification,
+		OAuthAuthorisationCode, OAuthAuthorisationRequest, OAuthClient,
+		OAuthDeviceAuthorisation, OAuthDynamicRegistrationAccessTokens,
+		OAuthRefreshToken, OAuthRegistrationApproval, OAuthRemoteAuthorisationFlow,
+		OAuthRemoteConnection, Plugin, Post, PostRead, Property, PropertySchema,
+		PropertySchemaField, React, Report, Robot, RobotMCPServer, RobotMCPTool,
+		RobotMemory, RobotProviderModel, RobotSession, RobotSessionInput,
+		RobotSessionMessage, RobotSessionTurn, RobotSessionView, RobotToolset,
+		RobotWorkspace, RobotWorkspaceInstance, Role, Session, Setting, Tag, Trail,
+		TrailAction, TrailActionRun, TrailRun, TrailSchedulerLease,
+		Warning []ent.Interceptor
 	}
 )
 
