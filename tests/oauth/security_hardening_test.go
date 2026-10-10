@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/Southclaws/opt"
@@ -23,6 +24,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/oauth/oauth_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	mcptransport "github.com/Southclaws/storyden/app/transports/mcp"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
 	"github.com/Southclaws/storyden/tests"
@@ -152,7 +154,7 @@ func TestOAuthSecurityHardeningDiscoveryURLs(t *testing.T) {
 	require.NoError(t, err)
 	cfg.PublicAPIAddress = *publicAPIAddress
 
-	integration.Test(t, cfg, e2e.Setup(), fx.Invoke(func(
+	integration.Test(t, cfg, e2e.Setup(), mcptransport.Build(), fx.Invoke(func(
 		lc fx.Lifecycle,
 		root context.Context,
 		ts *httptest.Server,
@@ -266,9 +268,8 @@ func TestOAuthSecurityHardeningDiscoveryURLs(t *testing.T) {
 			r.Contains(prmAPI.ScopesSupported, "email")
 			r.Contains(prmAPI.ScopesSupported, "offline_access")
 
-			// MCP SSE resource. MCP is disabled in this config, so the resource
-			// must not advertise scopes (it is not a live protected resource).
-			req5, err := http.NewRequestWithContext(root, http.MethodGet, ts.URL+"/.well-known/oauth-protected-resource/mcp/sse", nil)
+			// MCP is disabled in this config, so its resource must not advertise scopes.
+			req5, err := http.NewRequestWithContext(root, http.MethodGet, ts.URL+"/.well-known/oauth-protected-resource/mcp", nil)
 			r.NoError(err)
 			resp5, err := http.DefaultClient.Do(req5)
 			r.NoError(err)
@@ -283,10 +284,17 @@ func TestOAuthSecurityHardeningDiscoveryURLs(t *testing.T) {
 			body5, err := io.ReadAll(resp5.Body)
 			r.NoError(err)
 			r.NoError(json.Unmarshal(body5, &prmMCP))
-			a.Equal("http://localhost:8000/mcp/sse", prmMCP.Resource)
+			a.Equal("http://localhost:8000/mcp", prmMCP.Resource)
 			r.Len(prmMCP.AuthorizationServers, 1)
 			a.Equal("http://localhost:8000", prmMCP.AuthorizationServers[0])
 			a.Empty(prmMCP.ScopesSupported)
+
+			mcpRequest, err := http.NewRequestWithContext(root, http.MethodPost, ts.URL+"/mcp", nil)
+			r.NoError(err)
+			mcpResponse, err := http.DefaultClient.Do(mcpRequest)
+			r.NoError(err)
+			defer mcpResponse.Body.Close()
+			a.Equal(http.StatusNotFound, mcpResponse.StatusCode)
 		}))
 	}))
 }
@@ -294,34 +302,85 @@ func TestOAuthSecurityHardeningDiscoveryURLs(t *testing.T) {
 func TestOAuthProtectedResourceMCPScopesWhenMCPEnabled(t *testing.T) {
 	t.Parallel()
 
-	cfg := oauthConfig(t)
-	cfg.MCPEnabled = true
+	for _, tc := range []struct {
+		name       string
+		webAddress string
+		apiAddress string
+	}{
+		{"same_origin", "https://community.example.com", "https://community.example.com"},
+		{"split_origin", "https://community.example.com", "https://api.example.com"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := oauthConfig(t)
+			cfg.MCPEnabled = true
+			webAddress, err := url.Parse(tc.webAddress)
+			require.NoError(t, err)
+			apiAddress, err := url.Parse(tc.apiAddress)
+			require.NoError(t, err)
+			cfg.PublicWebAddress = *webAddress
+			cfg.PublicAPIAddress = *apiAddress
 
-	integration.Test(t, cfg, e2e.Setup(), fx.Invoke(func(
-		lc fx.Lifecycle,
-		root context.Context,
-		ts *httptest.Server,
-	) {
-		lc.Append(fx.StartHook(func() {
-			a := assert.New(t)
-			r := require.New(t)
+			integration.Test(t, cfg, e2e.Setup(), mcptransport.Build(), fx.Invoke(func(
+				lc fx.Lifecycle,
+				root context.Context,
+				ts *httptest.Server,
+				cl *openapi.ClientWithResponses,
+				sh *e2e.SessionHelper,
+				aw *account_writer.Writer,
+				ow *oauth_writer.Writer,
+			) {
+				lc.Append(fx.StartHook(func() {
+					a := assert.New(t)
+					r := require.New(t)
 
-			req, err := http.NewRequestWithContext(root, http.MethodGet, ts.URL+"/.well-known/oauth-protected-resource/mcp/sse", nil)
-			r.NoError(err)
-			resp, err := http.DefaultClient.Do(req)
-			r.NoError(err)
-			defer resp.Body.Close()
-			r.Equal(http.StatusOK, resp.StatusCode)
+					req, err := http.NewRequestWithContext(root, http.MethodGet, ts.URL+"/.well-known/oauth-protected-resource/mcp", nil)
+					r.NoError(err)
+					resp, err := http.DefaultClient.Do(req)
+					r.NoError(err)
+					defer resp.Body.Close()
+					r.Equal(http.StatusOK, resp.StatusCode)
 
-			var prmMCP struct {
-				Resource        string   `json:"resource"`
-				ScopesSupported []string `json:"scopes_supported"`
-			}
-			r.NoError(json.NewDecoder(resp.Body).Decode(&prmMCP))
-			a.Equal("http://localhost:8000/mcp/sse", prmMCP.Resource)
-			r.Contains(prmMCP.ScopesSupported, "openid")
-		}))
-	}))
+					var prmMCP struct {
+						Resource        string   `json:"resource"`
+						ScopesSupported []string `json:"scopes_supported"`
+					}
+					r.NoError(json.NewDecoder(resp.Body).Decode(&prmMCP))
+					a.Equal(tc.apiAddress+"/mcp", prmMCP.Resource)
+					r.Contains(prmMCP.ScopesSupported, "openid")
+
+					for _, token := range []string{"", "Bearer invalid-token"} {
+						request, err := http.NewRequestWithContext(root, http.MethodPost, ts.URL+"/mcp", nil)
+						r.NoError(err)
+						if token != "" {
+							request.Header.Set("Authorization", token)
+						}
+						response, err := http.DefaultClient.Do(request)
+						r.NoError(err)
+						response.Body.Close()
+						a.Equal(http.StatusUnauthorized, response.StatusCode)
+						a.Equal(`Bearer resource_metadata="`+tc.apiAddress+`/.well-known/oauth-protected-resource/mcp"`, response.Header.Get("WWW-Authenticate"))
+					}
+
+					adminCtx, admin := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+					adminSession := sh.WithSession(adminCtx)
+					token := issueDeviceToken(t, root, cl, ow, admin.ID, adminSession, "openid")
+					request, err := http.NewRequestWithContext(root, http.MethodPost, ts.URL+"/mcp", strings.NewReader(`{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}`))
+					r.NoError(err)
+					request.Header.Set("Authorization", "Bearer "+*token.JSON200.AccessToken)
+					request.Header.Set("Content-Type", "application/json")
+					request.Header.Set("Accept", "application/json, text/event-stream")
+					response, err := http.DefaultClient.Do(request)
+					r.NoError(err)
+					defer response.Body.Close()
+					a.Equal(http.StatusOK, response.StatusCode)
+					body, err := io.ReadAll(response.Body)
+					r.NoError(err)
+					a.Contains(string(body), `"protocolVersion":"2025-11-25"`)
+					a.Contains(string(body), `"serverInfo"`)
+				}))
+			}))
+		})
+	}
 }
 
 func TestOAuthUserInfoUnauthorisedChallenge(t *testing.T) {
@@ -599,6 +658,24 @@ func TestOAuthSecurityHardeningScopeCapOnRefresh(t *testing.T) {
 				r.NotNil(refreshed.JSON200.AccessToken)
 				a.NotContains(*refreshed.JSON200.Scope, "ADMINISTRATOR")
 			})
+		}))
+	}))
+}
+
+func TestMCPChallengeWhenOAuthDisabled(t *testing.T) {
+	t.Parallel()
+	cfg := oauthConfig(t)
+	cfg.MCPEnabled = true
+	cfg.OAuthEnabled = false
+	integration.Test(t, cfg, e2e.Setup(), mcptransport.Build(), fx.Invoke(func(lc fx.Lifecycle, root context.Context, ts *httptest.Server) {
+		lc.Append(fx.StartHook(func() {
+			req, err := http.NewRequestWithContext(root, http.MethodPost, ts.URL+"/mcp", nil)
+			require.NoError(t, err)
+			resp, err := http.DefaultClient.Do(req)
+			require.NoError(t, err)
+			defer resp.Body.Close()
+			require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
+			require.Equal(t, "Bearer", resp.Header.Get("WWW-Authenticate"))
 		}))
 	}))
 }
