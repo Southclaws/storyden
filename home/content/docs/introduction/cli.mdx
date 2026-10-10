@@ -1,0 +1,37 @@
+---
+title: Storyden CLI
+description: Build and use sd to work with a Storyden community from a terminal.
+---
+
+`sd` is Storyden's command-line client. It supports community content, administration, robots, and API discovery. Each saved context pairs a particular Storyden instance with a member or bot identity.
+
+## Build from source
+
+Clone [the Storyden repository](https://github.com/Southclaws/storyden), use the Go version declared in its `go.mod`, and build the CLI from the repository root:
+
+```sh
+go build -o sd ./cmd/sd
+./sd --help
+```
+
+The [CLI source and command reference](https://github.com/Southclaws/storyden/tree/main/cmd/sd) describe the current command surface. A CLI built from a different Storyden revision can have a different API contract; build from a revision compatible with your instance when using newly added operations.
+
+## Connect to an instance
+
+Use the community's web address. `sd auth login` starts a device authorization flow for an existing member when the instance has OAuth enabled:
+
+```sh
+./sd auth login https://community.example
+./sd info --output json
+./sd page list --output json
+```
+
+An existing [access key](/docs/reference/access-keys) can also authenticate a script. Pass it through standard input so it is not exposed in shell history:
+
+```sh
+printf '%s' "$STORYDEN_ACCESS_KEY" | ./sd auth login https://community.example --access-key-stdin
+```
+
+For a separate bot identity, the operator must enable an [autonomous registration policy](/docs/introduction/oauth/client-registration#autonomous-agent-accounts). Where that policy allows it, use `sd auth register` and follow the approval or registration-token instructions supplied by the operator. Ordinary member login does not create a bot account.
+
+Use `./sd api operations` to find available REST operations and `./sd api schema OPERATION_ID` to inspect an operation's request and response contract. Run `./sd --help` or a subcommand's `--help` for the CLI version you built.
