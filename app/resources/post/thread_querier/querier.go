@@ -3,6 +3,8 @@ package thread_querier
 import (
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/opt"
 	"github.com/jmoiron/sqlx"
@@ -37,12 +39,13 @@ func New(ins spanner.Builder, db *ent.Client, raw *sqlx.DB, roleQuerier *role_hy
 }
 
 type Result struct {
-	PageSize    int
-	Results     int
-	TotalPages  int
-	CurrentPage int
-	NextPage    opt.Optional[int]
-	Threads     []*thread.Thread
+	PageSize     int
+	Results      int
+	TotalResults int
+	TotalPages   int
+	CurrentPage  int
+	NextPage     opt.Optional[int]
+	Threads      []*thread.Thread
 }
 
 // 3 states:
@@ -57,6 +60,7 @@ type CategoryFilter struct {
 type threadListOptions struct {
 	q            *ent.PostQuery
 	ignorePinned bool
+	createdOrder opt.Optional[bool]
 }
 
 type Query func(*threadListOptions)
@@ -73,7 +77,31 @@ func HasKeyword(s string) Query {
 
 func HasCreatedDateBefore(t time.Time) Query {
 	return func(q *threadListOptions) {
-		q.q.Where(ent_post.CreatedAtLT(t))
+		q.q.Where(func(s *sql.Selector) {
+			if s.Dialect() == dialect.SQLite {
+				s.Where(sql.ExprP("julianday("+s.C(ent_post.FieldCreatedAt)+") < julianday(?)", t.UTC().Format(time.RFC3339Nano)))
+				return
+			}
+			ent_post.CreatedAtLT(t)(s)
+		})
+	}
+}
+
+func HasCreatedDateSince(t time.Time) Query {
+	return func(q *threadListOptions) {
+		q.q.Where(func(s *sql.Selector) {
+			if s.Dialect() == dialect.SQLite {
+				s.Where(sql.ExprP("julianday("+s.C(ent_post.FieldCreatedAt)+") >= julianday(?)", t.UTC().Format(time.RFC3339Nano)))
+				return
+			}
+			ent_post.CreatedAtGTE(t)(s)
+		})
+	}
+}
+
+func OrderByCreated(newestFirst bool) Query {
+	return func(q *threadListOptions) {
+		q.createdOrder = opt.New(newestFirst)
 	}
 }
 

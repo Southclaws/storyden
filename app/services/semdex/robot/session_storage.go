@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/puzpuzpuz/xsync/v4"
 	"github.com/rs/xid"
 	adksession "google.golang.org/adk/v2/session"
 
@@ -51,29 +52,25 @@ func (s *adkSession) Events() adksession.Events { return s.events }
 func (s *adkSession) LastUpdateTime() time.Time { return s.lastUpdateTime }
 
 // adkState implements the session.State interface
-type adkState map[string]any
+type adkState struct {
+	values *xsync.Map[string, any]
+}
 
-func (s adkState) Get(key string) (any, error) {
-	val, ok := s[key]
+func (s *adkState) Get(key string) (any, error) {
+	val, ok := s.values.Load(key)
 	if !ok {
 		return nil, adksession.ErrStateKeyNotExist
 	}
 	return val, nil
 }
 
-func (s adkState) Set(key string, value any) error {
-	s[key] = value
+func (s *adkState) Set(key string, value any) error {
+	s.values.Store(key, value)
 	return nil
 }
 
-func (s adkState) All() iter.Seq2[string, any] {
-	return func(yield func(string, any) bool) {
-		for k, v := range s {
-			if !yield(k, v) {
-				return
-			}
-		}
-	}
+func (s *adkState) All() iter.Seq2[string, any] {
+	return s.values.All()
 }
 
 // adkEvents implements the session.Events interface
@@ -324,9 +321,9 @@ func (s *sessionStorage) mapToADKSessionForUser(sess *robot.Session, events adks
 		events = adkEvents{}
 	}
 
-	state := adkState(sess.State)
-	if state == nil {
-		state = make(adkState)
+	state := &adkState{values: xsync.NewMap[string, any]()}
+	for key, value := range sess.State {
+		state.values.Store(key, value)
 	}
 
 	return &adkSession{

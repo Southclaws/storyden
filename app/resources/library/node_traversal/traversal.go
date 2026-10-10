@@ -6,20 +6,23 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 )
 
 type Repository interface {
 	Root(ctx context.Context, opts ...Filter) ([]*library.Node, error)
 	Subtree(ctx context.Context, id opt.Optional[library.NodeID], flatten bool, opts ...Filter) ([]*library.Node, error)
+	List(ctx context.Context, page pagination.Parameters, params ListParams, opts ...Filter) (*ListResult, error)
 }
 
 type filters struct {
 	rootAccountHandleFilter *string
 	// NOTE: This should really just be the roles list, not a full account obj.
-	requestingAccount opt.Optional[account.AccountWithEdges]
-	visibility        []visibility.Visibility
-	depth             *uint
+	requestingAccount     opt.Optional[account.AccountWithEdges]
+	visibility            []visibility.Visibility
+	depth                 *uint
+	includeHiddenChildren bool
 }
 
 type Filter func(*filters)

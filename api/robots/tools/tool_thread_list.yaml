@@ -11,7 +11,7 @@ x-storyden-tool:
     idempotentHint: false
     openWorldHint: false
 title: thread_list
-description: List and search discussion threads with filtering and pagination.
+description: List and search discussion threads with filtering and pagination. Use sort newest to retrieve the most recently created discussions, and created_since/created_before for a specific time range. Dates are filtered by the server before pagination; pinned threads do not override explicit chronological sorting.
 type: object
 required:
   - input
@@ -38,6 +38,23 @@ definitions:
         type: integer
         minimum: 1
         description: "Page number (default: 1)"
+      page_size:
+        type: integer
+        minimum: 1
+        maximum: 100
+        description: "Threads per page (default: 10)."
+      sort:
+        type: string
+        enum: [activity, newest, oldest]
+        description: "activity preserves the normal feed order with pinned threads first (default). newest and oldest order by creation time, ignoring pins and replies."
+      created_since:
+        type: string
+        format: date-time
+        description: "Inclusive lower bound on thread creation time (RFC 3339). Filters original thread creation, not edits, replies or publication time."
+      created_before:
+        type: string
+        format: date-time
+        description: "Exclusive upper bound on thread creation time (RFC 3339). Keep the same bounds when fetching subsequent pages."
     additionalProperties: false
   ToolThreadListOutput:
     type: object
@@ -57,6 +74,15 @@ definitions:
         type: integer
       total_results:
         type: integer
+        description: Total matching threads across all pages.
+      created_since:
+        type: string
+        format: date-time
+        description: Effective inclusive creation-time lower bound, when filtering by date.
+      created_before:
+        type: string
+        format: date-time
+        description: Effective exclusive creation-time upper bound, when filtering by date.
       next_page:
         type: integer
         description: Next page number if available
@@ -71,6 +97,8 @@ definitions:
       - author
       - category
       - browser_url
+      - created_at
+      - updated_at
     properties:
       browser_url:
         type: string
@@ -91,4 +119,12 @@ definitions:
       category:
         type: string
         description: Category name
+      created_at:
+        type: string
+        format: date-time
+        description: Original thread creation time, not publication or last reply time.
+      updated_at:
+        type: string
+        format: date-time
+        description: Last update time of the thread.
     additionalProperties: false

@@ -4,6 +4,7 @@ import (
 	"context"
 	"math"
 
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -75,7 +76,19 @@ func (d *Querier) List(
 			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
 		})
 
-	if queryOptions.ignorePinned {
+	if newestFirst, ok := queryOptions.createdOrder.Get(); ok {
+		query.Order(func(s *sql.Selector) {
+			order := sql.Asc
+			if newestFirst {
+				order = sql.Desc
+			}
+			created := s.C(ent_post.FieldCreatedAt)
+			if s.Dialect() == dialect.SQLite {
+				created = "julianday(" + created + ")"
+			}
+			s.OrderExpr(sql.Expr(order(created)), sql.Expr(order(s.C(ent_post.FieldID))))
+		})
+	} else if queryOptions.ignorePinned {
 		query.Order(
 			ent.Desc(ent_post.FieldLastReplyAt),
 			ent.Desc(ent_post.FieldID),
@@ -108,12 +121,13 @@ func (d *Querier) List(
 
 	if len(result) == 0 {
 		return &Result{
-			PageSize:    size,
-			Results:     0,
-			TotalPages:  totalPages,
-			CurrentPage: page,
-			NextPage:    nextPage,
-			Threads:     []*thread.Thread{},
+			PageSize:     size,
+			Results:      0,
+			TotalResults: total,
+			TotalPages:   totalPages,
+			CurrentPage:  page,
+			NextPage:     nextPage,
+			Threads:      []*thread.Thread{},
 		}, nil
 	}
 
@@ -218,12 +232,13 @@ func (d *Querier) List(
 	}
 
 	return &Result{
-		PageSize:    size,
-		Results:     len(threads),
-		TotalPages:  totalPages,
-		CurrentPage: page,
-		NextPage:    nextPage,
-		Threads:     threads,
+		PageSize:     size,
+		Results:      len(threads),
+		TotalResults: total,
+		TotalPages:   totalPages,
+		CurrentPage:  page,
+		NextPage:     nextPage,
+		Threads:      threads,
 	}, nil
 }
 

@@ -27,12 +27,23 @@ Choose **New Toolset**, give it a name and description, write any shared instruc
 
 Custom Toolsets are shared, with editing controlled by their author and Robot management permissions. Built-in and plugin Toolsets are managed at their source; connected MCP Toolsets are managed in Robot settings. A custom Toolset cannot be deleted while a Robot still references it.
 
-## Reading full documents
+## Choosing tools for reading and summarising
 
-To find recent discussions, **List Threads** can order threads newest-first or oldest-first and filter by a creation-time range. It returns timestamps, source links and pagination details. This also works without date bounds when you just want the latest threads. See [Prepare a discussion digest](/docs/cookbook/discussion-digest) for a scheduled example.
+A reading list or discussion digest needs more than a list of titles. The Robot needs tools to find relevant content, open it, and read the parts needed to answer your request.
 
-Resource tools such as **Get Library Page** and **Get Thread** identify a resource and its metadata. **Open Library Page** and **Open Thread** open its content as a document snapshot. The **Document exploration** Toolset supplies operations for searching and reading within those snapshots.
+For a Robot that only needs to read, select these **Individual tools** for its sources:
 
-Include these tools when a specialist must inspect the full content rather than summarise a title or description. The cookbook recipes list the required selection explicitly.
+| Source        | Individual tools                                                    |
+| ------------- | ------------------------------------------------------------------- |
+| Library pages | **List Library Pages**, **Get Library Page**, **Open Library Page** |
+| Discussions   | **List Threads**, **Get Thread**, **Open Thread**                   |
+
+Also assign the **Document exploration** Toolset. The **List** and **Get** tools help the Robot find sources and inspect their details. The **Open** tools make their content available to read. **Document exploration** lets it read beyond the opening preview, inspect replies, and search within a source. This selection gives it reading capabilities without adding editing or publishing tools.
+
+Both listing tools support requests for the latest content or content created within a particular period. You can describe that period in your playbook or chat request; the Robot supplies the date filters. These requests use the original creation date, so editing an older page or replying to an older discussion does not make it new.
+
+When testing your Robot, ask something whose answer is in a page's body or a discussion's replies. Open the tool activity to check which sources it read, then compare its answer with those sources. If it relies only on titles or descriptions, check that the **Open** tool and **Document exploration** are assigned, and that its playbook asks it to read the sources before summarising them.
+
+The [weekly Library reading list](/docs/cookbook/weekly-reading-list) and [discussion digest](/docs/cookbook/discussion-digest) recipes provide complete setups to try. For help checking date filters and pagination in a tool call, see [listing recent content](/docs/introduction/robots/technical#listing-recent-content).
 
 [Connections](/docs/introduction/robots/connections) explains tools supplied by MCP servers and plugins, and when a workspace is needed.

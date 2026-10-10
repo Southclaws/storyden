@@ -206,12 +206,69 @@ func (tt *threadTools) newThreadListTool() *Tool {
 }
 
 func (tt *threadTools) ExecuteThreadList(ctx context.Context, args mcp.ToolThreadListInput) (*mcp.ToolThreadListOutput, error) {
+	params, err := threadListParams(args)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
 	page := 1
 	if args.Page != nil {
 		page = *args.Page
 	}
 
 	pageSize := 10
+	if args.PageSize != nil {
+		pageSize = *args.PageSize
+	}
+	if page < 1 || pageSize < 1 || pageSize > 100 {
+		return nil, fault.New("page must be positive and page_size must be between 1 and 100", ftag.With(ftag.InvalidArgument))
+	}
+
+	result, err := tt.thread_svc.List(ctx, page-1, pageSize, params)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	var nextPage *int
+	if np, ok := result.NextPage.Get(); ok {
+		nextPage = func() *int { i := int(np) + 1; return &i }()
+	}
+
+	output := mcp.ToolThreadListOutput{
+		Threads:       dt.Map(result.Threads, tt.mapThreadSummary),
+		CurrentPage:   page,
+		TotalPages:    int(result.TotalPages),
+		TotalResults:  result.TotalResults,
+		NextPage:      nextPage,
+		CreatedSince:  params.CreatedSince.Ptr(),
+		CreatedBefore: params.CreatedBefore.Ptr(),
+	}
+
+	return &output, nil
+}
+
+func threadListParams(args mcp.ToolThreadListInput) (thread_service.Params, error) {
+	params := thread_service.Params{
+		CreatedSince:  opt.NewPtr(args.CreatedSince),
+		CreatedBefore: opt.NewPtr(args.CreatedBefore),
+		Query:         opt.NewPtr(args.Query),
+	}
+	if since, ok := params.CreatedSince.Get(); ok {
+		if before, ok := params.CreatedBefore.Get(); ok && !since.Before(before) {
+			return params, fmt.Errorf("created_since must be before created_before")
+		}
+	}
+	if args.Sort != nil {
+		switch *args.Sort {
+		case mcp.ToolThreadListInputSortNewest:
+			params.NewestFirst = opt.New(true)
+		case mcp.ToolThreadListInputSortOldest:
+			params.NewestFirst = opt.New(false)
+		case mcp.ToolThreadListInputSortActivity:
+		default:
+			return params, fmt.Errorf("sort must be activity, newest or oldest")
+		}
+	}
 
 	var visibilities opt.Optional[[]visibility.Visibility]
 	if args.Visibility != nil {
@@ -223,33 +280,8 @@ func (tt *threadTools) ExecuteThreadList(ctx context.Context, args mcp.ToolThrea
 		}
 	}
 
-	var queryOpt opt.Optional[string]
-	if args.Query != nil {
-		queryOpt = opt.New(*args.Query)
-	}
-
-	result, err := tt.thread_svc.List(ctx, max(0, page-1), pageSize, thread_service.Params{
-		Query:      queryOpt,
-		Visibility: visibilities,
-	})
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	var nextPage *int
-	if np, ok := result.NextPage.Get(); ok {
-		nextPage = func() *int { i := int(np) + 1; return &i }()
-	}
-
-	output := mcp.ToolThreadListOutput{
-		Threads:      dt.Map(result.Threads, tt.mapThreadSummary),
-		CurrentPage:  page,
-		TotalPages:   int(result.TotalPages),
-		TotalResults: int(result.Results),
-		NextPage:     nextPage,
-	}
-
-	return &output, nil
+	params.Visibility = visibilities
+	return params, nil
 }
 
 func (tt *threadTools) newThreadGetTool() *Tool {
@@ -434,6 +466,8 @@ func (tt *threadTools) mapThreadSummary(t *thread.Thread) mcp.ThreadSummary {
 		Excerpt:    t.Short,
 		Author:     t.Author.Handle,
 		Category:   t.Category.OrZero().Name,
+		CreatedAt:  t.CreatedAt,
+		UpdatedAt:  t.UpdatedAt,
 	}
 }
 

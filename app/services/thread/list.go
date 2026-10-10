@@ -21,6 +21,8 @@ import (
 type Params struct {
 	Query         opt.Optional[string]
 	CreatedBefore opt.Optional[time.Time]
+	CreatedSince  opt.Optional[time.Time]
+	NewestFirst   opt.Optional[bool]
 	UpdatedBefore opt.Optional[time.Time]
 	AccountID     opt.Optional[account.AccountID]
 	Visibility    opt.Optional[[]visibility.Visibility]
@@ -49,6 +51,8 @@ func (s *service) List(ctx context.Context,
 
 	opts.Query.Call(func(value string) { q = append(q, thread_querier.HasKeyword(value)) })
 	opts.CreatedBefore.Call(func(value time.Time) { q = append(q, thread_querier.HasCreatedDateBefore(value)) })
+	opts.CreatedSince.Call(func(value time.Time) { q = append(q, thread_querier.HasCreatedDateSince(value)) })
+	opts.NewestFirst.Call(func(value bool) { q = append(q, thread_querier.OrderByCreated(value)) })
 	opts.UpdatedBefore.Call(func(value time.Time) { q = append(q, thread_querier.HasUpdatedDateBefore(value)) })
 	opts.AccountID.Call(func(a account.AccountID) { q = append(q, thread_querier.HasAuthor(a)) })
 	opts.Tags.Call(func(a []xid.ID) { q = append(q, thread_querier.HasTags(a)) })

@@ -1683,7 +1683,7 @@ export interface ToolToolsetDeleteOutput {
   deleted: boolean;
 }
 /**
- * List library pages by hierarchy and workflow visibility.
+ * List Library pages with hierarchy, visibility, creation-time filters and pagination. Use sort newest for the most recently created pages. Filters apply before pagination; chronological sorting ignores the manual tree order.
  */
 export interface LibraryPageList {
   input: ToolLibraryPageTreeInput;
@@ -1691,6 +1691,26 @@ export interface LibraryPageList {
   [k: string]: unknown;
 }
 export interface ToolLibraryPageTreeInput {
+  /**
+   * Page number (default: 1).
+   */
+  page?: number;
+  /**
+   * Pages per result (default: 10).
+   */
+  page_size?: number;
+  /**
+   * hierarchy preserves the Library tree order (default). newest and oldest order by original creation time, ignoring manual positions and edits.
+   */
+  sort?: "hierarchy" | "newest" | "oldest";
+  /**
+   * Inclusive lower bound on original page creation time (RFC 3339), not edits or publication time.
+   */
+  created_since?: string;
+  /**
+   * Exclusive upper bound on page creation time (RFC 3339). Keep the same bounds when fetching subsequent pages.
+   */
+  created_before?: string;
   /**
    * Maximum depth to traverse (-1 for unlimited, 0 for root only, 1 for root + children, etc.)
    */
@@ -1702,15 +1722,41 @@ export interface ToolLibraryPageTreeInput {
 }
 export interface ToolLibraryPageTreeOutput {
   /**
-   * Pages in hierarchical order for selecting a page to inspect.
+   * Matching pages in the requested order for selecting a page to inspect.
    */
   pages: LibraryPageTreeNode[];
+  current_page: number;
+  total_pages: number;
+  /**
+   * Total matching pages across all result pages.
+   */
+  total_results: number;
+  /**
+   * Next result page number if available.
+   */
+  next_page?: number;
+  /**
+   * Effective inclusive creation-time lower bound, when filtering by date.
+   */
+  created_since?: string;
+  /**
+   * Effective exclusive creation-time upper bound, when filtering by date.
+   */
+  created_before?: string;
   /**
    * Number of pages returned.
    */
   results: number;
 }
 export interface LibraryPageTreeNode {
+  /**
+   * Original page creation time, not publication time.
+   */
+  created_at: string;
+  /**
+   * Last update time of the page.
+   */
+  updated_at: string;
   /**
    * Browser URL for this resource. Always present this as a Markdown link when showing results to the user.
    */
@@ -2359,7 +2405,7 @@ export interface ToolThreadCreateOutput {
   url?: string;
 }
 /**
- * List and search discussion threads with filtering and pagination.
+ * List and search discussion threads with filtering and pagination. Use sort newest to retrieve the most recently created discussions, and created_since/created_before for a specific time range. Dates are filtered by the server before pagination; pinned threads do not override explicit chronological sorting.
  */
 export interface ThreadList {
   input: ToolThreadListInput;
@@ -2379,12 +2425,39 @@ export interface ToolThreadListInput {
    * Page number (default: 1)
    */
   page?: number;
+  /**
+   * Threads per page (default: 10).
+   */
+  page_size?: number;
+  /**
+   * activity preserves the normal feed order with pinned threads first (default). newest and oldest order by creation time, ignoring pins and replies.
+   */
+  sort?: "activity" | "newest" | "oldest";
+  /**
+   * Inclusive lower bound on thread creation time (RFC 3339). Filters original thread creation, not edits, replies or publication time.
+   */
+  created_since?: string;
+  /**
+   * Exclusive upper bound on thread creation time (RFC 3339). Keep the same bounds when fetching subsequent pages.
+   */
+  created_before?: string;
 }
 export interface ToolThreadListOutput {
   threads: ThreadSummary[];
   current_page: number;
   total_pages: number;
+  /**
+   * Total matching threads across all pages.
+   */
   total_results: number;
+  /**
+   * Effective inclusive creation-time lower bound, when filtering by date.
+   */
+  created_since?: string;
+  /**
+   * Effective exclusive creation-time upper bound, when filtering by date.
+   */
+  created_before?: string;
   /**
    * Next page number if available
    */
@@ -2413,6 +2486,14 @@ export interface ThreadSummary {
    * Category name
    */
   category: string;
+  /**
+   * Original thread creation time, not publication or last reply time.
+   */
+  created_at: string;
+  /**
+   * Last update time of the thread.
+   */
+  updated_at: string;
 }
 /**
  * Retrieve discussion thread metadata by ID and indicate how to inspect its document when needed.

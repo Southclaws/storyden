@@ -103,7 +103,8 @@ union
         join nodes parent_node on parent_node.id = d.id
         join nodes s on d.id = s.parent_node_id
     where
-        parent_node.hide_child_tree = false
+        (%s OR parent_node.hide_child_tree = false)
+        AND s.deleted_at IS NULL
 )
 select
     distinct n.id       node_id,
@@ -153,12 +154,17 @@ func buildSubtreeQuery(id opt.Optional[library.NodeID], f filters, rebind func(s
 		args = append(args, *f.depth)
 	}
 
+	rootPredicate += " AND deleted_at IS NULL"
+	includeHiddenChildren := "false"
+	if f.includeHiddenChildren {
+		includeHiddenChildren = "true"
+	}
 	additional := ""
 	if len(predicates) > 0 {
 		additional = "where " + strings.Join(predicates, " AND ")
 	}
 
-	return rebind(fmt.Sprintf(ddl, rootPredicate, additional)), args
+	return rebind(fmt.Sprintf(ddl, rootPredicate, includeHiddenChildren, additional)), args
 }
 
 func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID], flatten bool, fs ...Filter) ([]*library.Node, error) {

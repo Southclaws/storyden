@@ -94,6 +94,11 @@
           "description": "Browser URL for this resource. Always present this as a Markdown link when showing results to the user.",
           "type": "string"
         },
+        "created_at": {
+          "description": "Original page creation time, not publication time.",
+          "format": "date-time",
+          "type": "string"
+        },
         "description": {
           "description": "Brief description of the page",
           "type": "string"
@@ -121,6 +126,11 @@
           },
           "type": "array"
         },
+        "updated_at": {
+          "description": "Last update time of the page.",
+          "format": "date-time",
+          "type": "string"
+        },
         "visibility": {
           "description": "Current publishing workflow state.",
           "enum": [
@@ -137,7 +147,9 @@
         "name",
         "description",
         "browser_url",
-        "visibility"
+        "visibility",
+        "created_at",
+        "updated_at"
       ],
       "type": "object"
     },
@@ -603,6 +615,11 @@
           "description": "Category name",
           "type": "string"
         },
+        "created_at": {
+          "description": "Original thread creation time, not publication or last reply time.",
+          "format": "date-time",
+          "type": "string"
+        },
         "excerpt": {
           "description": "Short excerpt of the thread",
           "type": "string"
@@ -616,6 +633,11 @@
         },
         "title": {
           "type": "string"
+        },
+        "updated_at": {
+          "description": "Last update time of the thread.",
+          "format": "date-time",
+          "type": "string"
         }
       },
       "required": [
@@ -625,7 +647,9 @@
         "excerpt",
         "author",
         "category",
-        "browser_url"
+        "browser_url",
+        "created_at",
+        "updated_at"
       ],
       "type": "object"
     },
@@ -1717,7 +1741,7 @@
     },
     "ToolLibraryPageTree": {
       "$id": "ToolLibraryPageTree",
-      "description": "List library pages by hierarchy and workflow visibility.",
+      "description": "List Library pages with hierarchy, visibility, creation-time filters and pagination. Use sort newest for the most recently created pages. Filters apply before pagination; chronological sorting ignores the manual tree order.",
       "properties": {
         "input": {
           "$ref": "#/definitions/ToolLibraryPageTreeInput"
@@ -1735,7 +1759,7 @@
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
-          "idempotentHint": true,
+          "idempotentHint": false,
           "openWorldHint": false,
           "readOnlyHint": true
         },
@@ -1749,10 +1773,40 @@
     "ToolLibraryPageTreeInput": {
       "additionalProperties": false,
       "properties": {
+        "created_before": {
+          "description": "Exclusive upper bound on page creation time (RFC 3339). Keep the same bounds when fetching subsequent pages.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "created_since": {
+          "description": "Inclusive lower bound on original page creation time (RFC 3339), not edits or publication time.",
+          "format": "date-time",
+          "type": "string"
+        },
         "depth": {
           "description": "Maximum depth to traverse (-1 for unlimited, 0 for root only, 1 for root + children, etc.)",
           "minimum": -1,
           "type": "integer"
+        },
+        "page": {
+          "description": "Page number (default: 1).",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "page_size": {
+          "description": "Pages per result (default: 10).",
+          "maximum": 100,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "sort": {
+          "description": "hierarchy preserves the Library tree order (default). newest and oldest order by original creation time, ignoring manual positions and edits.",
+          "enum": [
+            "hierarchy",
+            "newest",
+            "oldest"
+          ],
+          "type": "string"
         },
         "visibility": {
           "description": "Limit pages to one workflow visibility.",
@@ -1769,8 +1823,25 @@
     "ToolLibraryPageTreeOutput": {
       "additionalProperties": false,
       "properties": {
+        "created_before": {
+          "description": "Effective exclusive creation-time upper bound, when filtering by date.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "created_since": {
+          "description": "Effective inclusive creation-time lower bound, when filtering by date.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "current_page": {
+          "type": "integer"
+        },
+        "next_page": {
+          "description": "Next result page number if available.",
+          "type": "integer"
+        },
         "pages": {
-          "description": "Pages in hierarchical order for selecting a page to inspect.",
+          "description": "Matching pages in the requested order for selecting a page to inspect.",
           "items": {
             "$ref": "#/definitions/LibraryPageTreeNode"
           },
@@ -1779,11 +1850,21 @@
         "results": {
           "description": "Number of pages returned.",
           "type": "integer"
+        },
+        "total_pages": {
+          "type": "integer"
+        },
+        "total_results": {
+          "description": "Total matching pages across all result pages.",
+          "type": "integer"
         }
       },
       "required": [
         "pages",
-        "results"
+        "results",
+        "current_page",
+        "total_pages",
+        "total_results"
       ],
       "type": "object"
     },
@@ -4979,7 +5060,7 @@
     },
     "ToolThreadList": {
       "$id": "ToolThreadList",
-      "description": "List and search discussion threads with filtering and pagination.",
+      "description": "List and search discussion threads with filtering and pagination. Use sort newest to retrieve the most recently created discussions, and created_since/created_before for a specific time range. Dates are filtered by the server before pagination; pinned threads do not override explicit chronological sorting.",
       "properties": {
         "input": {
           "$ref": "#/definitions/ToolThreadListInput"
@@ -5011,13 +5092,38 @@
     "ToolThreadListInput": {
       "additionalProperties": false,
       "properties": {
+        "created_before": {
+          "description": "Exclusive upper bound on thread creation time (RFC 3339). Keep the same bounds when fetching subsequent pages.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "created_since": {
+          "description": "Inclusive lower bound on thread creation time (RFC 3339). Filters original thread creation, not edits, replies or publication time.",
+          "format": "date-time",
+          "type": "string"
+        },
         "page": {
           "description": "Page number (default: 1)",
           "minimum": 1,
           "type": "integer"
         },
+        "page_size": {
+          "description": "Threads per page (default: 10).",
+          "maximum": 100,
+          "minimum": 1,
+          "type": "integer"
+        },
         "query": {
           "description": "Search query to filter threads",
+          "type": "string"
+        },
+        "sort": {
+          "description": "activity preserves the normal feed order with pinned threads first (default). newest and oldest order by creation time, ignoring pins and replies.",
+          "enum": [
+            "activity",
+            "newest",
+            "oldest"
+          ],
           "type": "string"
         },
         "visibility": {
@@ -5034,6 +5140,16 @@
     "ToolThreadListOutput": {
       "additionalProperties": false,
       "properties": {
+        "created_before": {
+          "description": "Effective exclusive creation-time upper bound, when filtering by date.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "created_since": {
+          "description": "Effective inclusive creation-time lower bound, when filtering by date.",
+          "format": "date-time",
+          "type": "string"
+        },
         "current_page": {
           "type": "integer"
         },
@@ -5051,6 +5167,7 @@
           "type": "integer"
         },
         "total_results": {
+          "description": "Total matching threads across all pages.",
           "type": "integer"
         }
       },

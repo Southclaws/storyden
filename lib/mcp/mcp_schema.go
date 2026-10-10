@@ -258,6 +258,9 @@ type LibraryPageTreeNode struct {
 	// showing results to the user.
 	BrowserUrl string `json:"browser_url" yaml:"browser_url" mapstructure:"browser_url"`
 
+	// Original page creation time, not publication time.
+	CreatedAt time.Time `json:"created_at" yaml:"created_at" mapstructure:"created_at"`
+
 	// Brief description of the page
 	Description string `json:"description" yaml:"description" mapstructure:"description"`
 
@@ -275,6 +278,9 @@ type LibraryPageTreeNode struct {
 
 	// Tags associated with this page
 	Tags []string `json:"tags,omitempty,omitzero" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
+
+	// Last update time of the page.
+	UpdatedAt time.Time `json:"updated_at" yaml:"updated_at" mapstructure:"updated_at"`
 
 	// Current publishing workflow state.
 	Visibility LibraryPageTreeNodeVisibility `json:"visibility" yaml:"visibility" mapstructure:"visibility"`
@@ -321,6 +327,9 @@ func (j *LibraryPageTreeNode) UnmarshalJSON(value []byte) error {
 	if _, ok := raw["browser_url"]; raw != nil && !ok {
 		return fmt.Errorf("field browser_url in LibraryPageTreeNode: required")
 	}
+	if _, ok := raw["created_at"]; raw != nil && !ok {
+		return fmt.Errorf("field created_at in LibraryPageTreeNode: required")
+	}
 	if _, ok := raw["description"]; raw != nil && !ok {
 		return fmt.Errorf("field description in LibraryPageTreeNode: required")
 	}
@@ -332,6 +341,9 @@ func (j *LibraryPageTreeNode) UnmarshalJSON(value []byte) error {
 	}
 	if _, ok := raw["slug"]; raw != nil && !ok {
 		return fmt.Errorf("field slug in LibraryPageTreeNode: required")
+	}
+	if _, ok := raw["updated_at"]; raw != nil && !ok {
+		return fmt.Errorf("field updated_at in LibraryPageTreeNode: required")
 	}
 	if _, ok := raw["visibility"]; raw != nil && !ok {
 		return fmt.Errorf("field visibility in LibraryPageTreeNode: required")
@@ -1801,6 +1813,9 @@ type ThreadSummary struct {
 	// Category name
 	Category string `json:"category" yaml:"category" mapstructure:"category"`
 
+	// Original thread creation time, not publication or last reply time.
+	CreatedAt time.Time `json:"created_at" yaml:"created_at" mapstructure:"created_at"`
+
 	// Short excerpt of the thread
 	Excerpt string `json:"excerpt" yaml:"excerpt" mapstructure:"excerpt"`
 
@@ -1812,6 +1827,9 @@ type ThreadSummary struct {
 
 	// Title corresponds to the JSON schema field "title".
 	Title string `json:"title" yaml:"title" mapstructure:"title"`
+
+	// Last update time of the thread.
+	UpdatedAt time.Time `json:"updated_at" yaml:"updated_at" mapstructure:"updated_at"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -1829,6 +1847,9 @@ func (j *ThreadSummary) UnmarshalJSON(value []byte) error {
 	if _, ok := raw["category"]; raw != nil && !ok {
 		return fmt.Errorf("field category in ThreadSummary: required")
 	}
+	if _, ok := raw["created_at"]; raw != nil && !ok {
+		return fmt.Errorf("field created_at in ThreadSummary: required")
+	}
 	if _, ok := raw["excerpt"]; raw != nil && !ok {
 		return fmt.Errorf("field excerpt in ThreadSummary: required")
 	}
@@ -1840,6 +1861,9 @@ func (j *ThreadSummary) UnmarshalJSON(value []byte) error {
 	}
 	if _, ok := raw["title"]; raw != nil && !ok {
 		return fmt.Errorf("field title in ThreadSummary: required")
+	}
+	if _, ok := raw["updated_at"]; raw != nil && !ok {
+		return fmt.Errorf("field updated_at in ThreadSummary: required")
 	}
 	type Plain ThreadSummary
 	var plain Plain
@@ -2643,7 +2667,9 @@ func (j *ToolLibraryPageGetYaml) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
-// List library pages by hierarchy and workflow visibility.
+// List Library pages with hierarchy, visibility, creation-time filters and
+// pagination. Use sort newest for the most recently created pages. Filters apply
+// before pagination; chronological sorting ignores the manual tree order.
 type ToolLibraryPageListYaml struct {
 	// Input corresponds to the JSON schema field "input".
 	Input ToolLibraryPageTreeInput `json:"input" yaml:"input" mapstructure:"input"`
@@ -2989,12 +3015,62 @@ func (j *ToolLibraryPagePropertySchemaUpdateYaml) UnmarshalJSON(value []byte) er
 }
 
 type ToolLibraryPageTreeInput struct {
+	// Exclusive upper bound on page creation time (RFC 3339). Keep the same bounds
+	// when fetching subsequent pages.
+	CreatedBefore *time.Time `json:"created_before,omitempty,omitzero" yaml:"created_before,omitempty" mapstructure:"created_before,omitempty"`
+
+	// Inclusive lower bound on original page creation time (RFC 3339), not edits or
+	// publication time.
+	CreatedSince *time.Time `json:"created_since,omitempty,omitzero" yaml:"created_since,omitempty" mapstructure:"created_since,omitempty"`
+
 	// Maximum depth to traverse (-1 for unlimited, 0 for root only, 1 for root +
 	// children, etc.)
 	Depth *int `json:"depth,omitempty,omitzero" yaml:"depth,omitempty" mapstructure:"depth,omitempty"`
 
+	// Page number (default: 1).
+	Page *int `json:"page,omitempty,omitzero" yaml:"page,omitempty" mapstructure:"page,omitempty"`
+
+	// Pages per result (default: 10).
+	PageSize *int `json:"page_size,omitempty,omitzero" yaml:"page_size,omitempty" mapstructure:"page_size,omitempty"`
+
+	// hierarchy preserves the Library tree order (default). newest and oldest order
+	// by original creation time, ignoring manual positions and edits.
+	Sort *ToolLibraryPageTreeInputSort `json:"sort,omitempty,omitzero" yaml:"sort,omitempty" mapstructure:"sort,omitempty"`
+
 	// Limit pages to one workflow visibility.
 	Visibility *ToolLibraryPageTreeInputVisibility `json:"visibility,omitempty,omitzero" yaml:"visibility,omitempty" mapstructure:"visibility,omitempty"`
+}
+
+type ToolLibraryPageTreeInputSort string
+
+const ToolLibraryPageTreeInputSortHierarchy ToolLibraryPageTreeInputSort = "hierarchy"
+const ToolLibraryPageTreeInputSortNewest ToolLibraryPageTreeInputSort = "newest"
+const ToolLibraryPageTreeInputSortOldest ToolLibraryPageTreeInputSort = "oldest"
+
+var enumValues_ToolLibraryPageTreeInputSort = []interface{}{
+	"hierarchy",
+	"newest",
+	"oldest",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolLibraryPageTreeInputSort) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_ToolLibraryPageTreeInputSort {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_ToolLibraryPageTreeInputSort, v)
+	}
+	*j = ToolLibraryPageTreeInputSort(v)
+	return nil
 }
 
 type ToolLibraryPageTreeInputVisibility string
@@ -3039,16 +3115,43 @@ func (j *ToolLibraryPageTreeInput) UnmarshalJSON(value []byte) error {
 	if plain.Depth != nil && -1 > *plain.Depth {
 		return fmt.Errorf("field %s: must be >= %v", "depth", -1)
 	}
+	if plain.Page != nil && 1 > *plain.Page {
+		return fmt.Errorf("field %s: must be >= %v", "page", 1)
+	}
+	if plain.PageSize != nil && 100 < *plain.PageSize {
+		return fmt.Errorf("field %s: must be <= %v", "page_size", 100)
+	}
+	if plain.PageSize != nil && 1 > *plain.PageSize {
+		return fmt.Errorf("field %s: must be >= %v", "page_size", 1)
+	}
 	*j = ToolLibraryPageTreeInput(plain)
 	return nil
 }
 
 type ToolLibraryPageTreeOutput struct {
-	// Pages in hierarchical order for selecting a page to inspect.
+	// Effective exclusive creation-time upper bound, when filtering by date.
+	CreatedBefore *time.Time `json:"created_before,omitempty,omitzero" yaml:"created_before,omitempty" mapstructure:"created_before,omitempty"`
+
+	// Effective inclusive creation-time lower bound, when filtering by date.
+	CreatedSince *time.Time `json:"created_since,omitempty,omitzero" yaml:"created_since,omitempty" mapstructure:"created_since,omitempty"`
+
+	// CurrentPage corresponds to the JSON schema field "current_page".
+	CurrentPage int `json:"current_page" yaml:"current_page" mapstructure:"current_page"`
+
+	// Next result page number if available.
+	NextPage *int `json:"next_page,omitempty,omitzero" yaml:"next_page,omitempty" mapstructure:"next_page,omitempty"`
+
+	// Matching pages in the requested order for selecting a page to inspect.
 	Pages []LibraryPageTreeNode `json:"pages" yaml:"pages" mapstructure:"pages"`
 
 	// Number of pages returned.
 	Results int `json:"results" yaml:"results" mapstructure:"results"`
+
+	// TotalPages corresponds to the JSON schema field "total_pages".
+	TotalPages int `json:"total_pages" yaml:"total_pages" mapstructure:"total_pages"`
+
+	// Total matching pages across all result pages.
+	TotalResults int `json:"total_results" yaml:"total_results" mapstructure:"total_results"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -3057,11 +3160,20 @@ func (j *ToolLibraryPageTreeOutput) UnmarshalJSON(value []byte) error {
 	if err := json.Unmarshal(value, &raw); err != nil {
 		return err
 	}
+	if _, ok := raw["current_page"]; raw != nil && !ok {
+		return fmt.Errorf("field current_page in ToolLibraryPageTreeOutput: required")
+	}
 	if _, ok := raw["pages"]; raw != nil && !ok {
 		return fmt.Errorf("field pages in ToolLibraryPageTreeOutput: required")
 	}
 	if _, ok := raw["results"]; raw != nil && !ok {
 		return fmt.Errorf("field results in ToolLibraryPageTreeOutput: required")
+	}
+	if _, ok := raw["total_pages"]; raw != nil && !ok {
+		return fmt.Errorf("field total_pages in ToolLibraryPageTreeOutput: required")
+	}
+	if _, ok := raw["total_results"]; raw != nil && !ok {
+		return fmt.Errorf("field total_results in ToolLibraryPageTreeOutput: required")
 	}
 	type Plain ToolLibraryPageTreeOutput
 	var plain Plain
@@ -6543,14 +6655,61 @@ func (j *ToolThreadGetYaml) UnmarshalJSON(value []byte) error {
 }
 
 type ToolThreadListInput struct {
+	// Exclusive upper bound on thread creation time (RFC 3339). Keep the same bounds
+	// when fetching subsequent pages.
+	CreatedBefore *time.Time `json:"created_before,omitempty,omitzero" yaml:"created_before,omitempty" mapstructure:"created_before,omitempty"`
+
+	// Inclusive lower bound on thread creation time (RFC 3339). Filters original
+	// thread creation, not edits, replies or publication time.
+	CreatedSince *time.Time `json:"created_since,omitempty,omitzero" yaml:"created_since,omitempty" mapstructure:"created_since,omitempty"`
+
 	// Page number (default: 1)
 	Page *int `json:"page,omitempty,omitzero" yaml:"page,omitempty" mapstructure:"page,omitempty"`
+
+	// Threads per page (default: 10).
+	PageSize *int `json:"page_size,omitempty,omitzero" yaml:"page_size,omitempty" mapstructure:"page_size,omitempty"`
 
 	// Search query to filter threads
 	Query *string `json:"query,omitempty,omitzero" yaml:"query,omitempty" mapstructure:"query,omitempty"`
 
+	// activity preserves the normal feed order with pinned threads first (default).
+	// newest and oldest order by creation time, ignoring pins and replies.
+	Sort *ToolThreadListInputSort `json:"sort,omitempty,omitzero" yaml:"sort,omitempty" mapstructure:"sort,omitempty"`
+
 	// Filter by visibility
 	Visibility *ToolThreadListInputVisibility `json:"visibility,omitempty,omitzero" yaml:"visibility,omitempty" mapstructure:"visibility,omitempty"`
+}
+
+type ToolThreadListInputSort string
+
+const ToolThreadListInputSortActivity ToolThreadListInputSort = "activity"
+const ToolThreadListInputSortNewest ToolThreadListInputSort = "newest"
+const ToolThreadListInputSortOldest ToolThreadListInputSort = "oldest"
+
+var enumValues_ToolThreadListInputSort = []interface{}{
+	"activity",
+	"newest",
+	"oldest",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ToolThreadListInputSort) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_ToolThreadListInputSort {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_ToolThreadListInputSort, v)
+	}
+	*j = ToolThreadListInputSort(v)
+	return nil
 }
 
 type ToolThreadListInputVisibility string
@@ -6593,11 +6752,23 @@ func (j *ToolThreadListInput) UnmarshalJSON(value []byte) error {
 	if plain.Page != nil && 1 > *plain.Page {
 		return fmt.Errorf("field %s: must be >= %v", "page", 1)
 	}
+	if plain.PageSize != nil && 100 < *plain.PageSize {
+		return fmt.Errorf("field %s: must be <= %v", "page_size", 100)
+	}
+	if plain.PageSize != nil && 1 > *plain.PageSize {
+		return fmt.Errorf("field %s: must be >= %v", "page_size", 1)
+	}
 	*j = ToolThreadListInput(plain)
 	return nil
 }
 
 type ToolThreadListOutput struct {
+	// Effective exclusive creation-time upper bound, when filtering by date.
+	CreatedBefore *time.Time `json:"created_before,omitempty,omitzero" yaml:"created_before,omitempty" mapstructure:"created_before,omitempty"`
+
+	// Effective inclusive creation-time lower bound, when filtering by date.
+	CreatedSince *time.Time `json:"created_since,omitempty,omitzero" yaml:"created_since,omitempty" mapstructure:"created_since,omitempty"`
+
 	// CurrentPage corresponds to the JSON schema field "current_page".
 	CurrentPage int `json:"current_page" yaml:"current_page" mapstructure:"current_page"`
 
@@ -6610,7 +6781,7 @@ type ToolThreadListOutput struct {
 	// TotalPages corresponds to the JSON schema field "total_pages".
 	TotalPages int `json:"total_pages" yaml:"total_pages" mapstructure:"total_pages"`
 
-	// TotalResults corresponds to the JSON schema field "total_results".
+	// Total matching threads across all pages.
 	TotalResults int `json:"total_results" yaml:"total_results" mapstructure:"total_results"`
 }
 
@@ -6641,7 +6812,11 @@ func (j *ToolThreadListOutput) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
-// List and search discussion threads with filtering and pagination.
+// List and search discussion threads with filtering and pagination. Use sort
+// newest to retrieve the most recently created discussions, and
+// created_since/created_before for a specific time range. Dates are filtered by
+// the server before pagination; pinned threads do not override explicit
+// chronological sorting.
 type ToolThreadListYaml struct {
 	// Input corresponds to the JSON schema field "input".
 	Input ToolThreadListInput `json:"input" yaml:"input" mapstructure:"input"`

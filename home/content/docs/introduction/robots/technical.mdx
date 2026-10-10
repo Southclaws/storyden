@@ -13,6 +13,16 @@ Sessions and their ordered events are persisted. The session stream can catch up
 
 For integrations, see the [Robots API](/docs/api/robots/RobotCreate), [session creation API](/docs/api/robots/RobotSessionCreate), and [session event stream](/docs/api/robots/RobotSessionStream). Plugins can also invoke Robots through [`robot_run`](/docs/extending/api/plugin-to-host/robot_run).
 
+## Listing recent content
+
+These details are useful when checking a Robot's tool calls or writing a playbook that needs a precise time window.
+
+**List Threads** (`thread_list`) and **List Library Pages** (`library_page_list`) accept `sort: newest` or `sort: oldest` to order results by original creation time. Without an explicit sort, threads use the normal activity feed order, including pins, and Library pages use hierarchy order. Chronological sorting ignores pins, manual positions, edits and replies.
+
+Both tools accept `created_since` as an inclusive lower bound and `created_before` as an exclusive upper bound, using RFC 3339 timestamps. Either bound can be omitted. These filters apply to original creation time, not publication time. A Library page can match even when its parent is older than the requested window. Pages hidden from the navigation tree are included if the account can access them. `visibility: published` limits the selection to published content.
+
+Results include `created_at`, `updated_at`, `total_results` and, when more results are available, `next_page`. The default `page_size` is 10, with a maximum of 100; `page` starts at 1. Visibility and date filters apply before pagination, and `total_results` counts all matching items. Subsequent calls should keep the same date bounds and sort order while following `next_page`.
+
 ## Troubleshooting
 
 | What you see                     | What to check                                                                                                                                              |

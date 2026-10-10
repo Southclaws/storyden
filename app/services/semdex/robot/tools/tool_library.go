@@ -151,6 +151,11 @@ func (lt *libraryTools) newLibraryPageTreeTool() *Tool {
 }
 
 func (lt *libraryTools) ExecuteLibraryPageTree(ctx context.Context, args mcp.ToolLibraryPageTreeInput) (*mcp.ToolLibraryPageTreeOutput, error) {
+	params, page, err := libraryPageListParams(args)
+	if err != nil {
+		return nil, err
+	}
+
 	account, err := session.GetAccount(ctx)
 	if err != nil {
 		return nil, err
@@ -185,16 +190,22 @@ func (lt *libraryTools) ExecuteLibraryPageTree(ctx context.Context, args mcp.Too
 		}
 	}
 
-	tree, err := lt.ntr.Subtree(ctx, opt.NewEmpty[library.NodeID](), true, opts...)
+	result, err := lt.ntr.List(ctx, page, params, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	pages := dt.Map(tree, lt.mapNodeToTreeNode)
+	pages := dt.Map(result.Items, lt.mapNodeToTreeNode)
 
 	output := mcp.ToolLibraryPageTreeOutput{
-		Pages:   pages,
-		Results: len(pages),
+		Pages:         pages,
+		Results:       len(pages),
+		CurrentPage:   result.CurrentPage,
+		TotalPages:    result.TotalPages,
+		TotalResults:  result.TotalResults,
+		NextPage:      result.NextPage.Ptr(),
+		CreatedSince:  args.CreatedSince,
+		CreatedBefore: args.CreatedBefore,
 	}
 
 	return &output, nil
@@ -209,6 +220,8 @@ func (lt *libraryTools) mapNodeToTreeNode(n *library.Node) mcp.LibraryPageTreeNo
 		Description: n.Description.OrZero(),
 		Tags:        dt.Map(n.Tags, func(t *tag_ref.Tag) string { return t.Name.String() }),
 		Visibility:  mcp.LibraryPageTreeNodeVisibility(n.Visibility.String()),
+		CreatedAt:   n.CreatedAt,
+		UpdatedAt:   n.UpdatedAt,
 	}
 
 	if parent, ok := n.Parent.Get(); ok {
