@@ -1,7 +1,7 @@
 import { Portal, Presence, UsePresenceProps } from "@ark-ui/react";
-import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { useQueryState } from "nuqs";
+import { useEffect } from "react";
 
 import { Asset } from "@/api/openapi-schema";
 import { css, cx } from "@/styled-system/css";
@@ -69,12 +69,25 @@ export function AssetLightbox({
 }: Props) {
   const url = getAssetURL(asset.path)!;
 
-  const [view, setView] = useQueryState<string | null>("view", {
+  const [, setView] = useQueryState<string | null>("view", {
     defaultValue: null,
     clearOnDefault: true,
     parse: (value) => (value === "" ? null : value),
   });
   const ref = useClickAway<HTMLImageElement>(handleClose);
+
+  useEffect(() => {
+    if (!presenceProps.present) return;
+
+    const listener = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", listener);
+    return () => document.removeEventListener("keydown", listener);
+  }, [presenceProps.present, onClose]);
 
   function handleClose() {
     onClose();
