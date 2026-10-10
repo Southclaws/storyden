@@ -61,7 +61,7 @@ func TestRoleCRUD(t *testing.T) {
 					Description: "d",
 					Colour:      "c",
 				}, guest1Session))(t, http.StatusOK)
-				tests.AssertRequest(cl.NodeCreateWithResponse(guestCtx, openapi.NodeCreateJSONRequestBody{
+				tests.AssertRequest(cl.NodeCreateWithResponse(guestCtx, nil, openapi.NodeCreateJSONRequestBody{
 					Name:       xid.New().String(),
 					Visibility: &vis,
 				}, guest1Session))(t, http.StatusForbidden)
@@ -87,7 +87,7 @@ func TestRoleCRUD(t *testing.T) {
 					Colour:      "c",
 				}, guest1Session))(t, http.StatusForbidden)
 
-				page2 := tests.AssertRequest(cl.NodeCreateWithResponse(guestCtx, openapi.NodeCreateJSONRequestBody{
+				page2 := tests.AssertRequest(cl.NodeCreateWithResponse(guestCtx, nil, openapi.NodeCreateJSONRequestBody{
 					Name:       xid.New().String(),
 					Visibility: &vis,
 				}, guest1Session))(t, http.StatusOK)

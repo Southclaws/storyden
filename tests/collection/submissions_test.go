@@ -62,16 +62,16 @@ func TestCollectionSubmissions(t *testing.T) {
 
 			published := openapi.VisibilityPublished
 
-			thread1create, err := cl.ThreadCreateWithResponse(root, threadCreateProps, session1)
+			thread1create, err := cl.ThreadCreateWithResponse(root, nil, threadCreateProps, session1)
 			tests.Ok(t, err, thread1create)
 
-			thread2create, err := cl.ThreadCreateWithResponse(root, threadCreateProps, session2)
+			thread2create, err := cl.ThreadCreateWithResponse(root, nil, threadCreateProps, session2)
 			tests.Ok(t, err, thread2create)
 
-			node1create, err := cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &published}, adminSession)
+			node1create, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &published}, adminSession)
 			tests.Ok(t, err, node1create)
 
-			node2create, err := cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &published}, adminSession)
+			node2create, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &published}, adminSession)
 			tests.Ok(t, err, node2create)
 
 			t.Run("submit_published_to_someone_elses_collection", func(t *testing.T) {
@@ -140,7 +140,7 @@ func TestCollectionSubmissions(t *testing.T) {
 				}, session1)
 				tests.Ok(t, err, col)
 
-				unlistedNode, err := cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &unlisted}, session2)
+				unlistedNode, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &unlisted}, session2)
 				tests.Ok(t, err, unlistedNode)
 
 				submitnode, err := cl.CollectionAddNodeWithResponse(root, col.JSON200.Id, unlistedNode.JSON200.Id, session2)
@@ -183,7 +183,7 @@ func TestCollectionSubmissions(t *testing.T) {
 				}, session1)
 				tests.Ok(t, err, col)
 
-				unlistedNode, err := cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &unlisted}, session2)
+				unlistedNode, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &unlisted}, session2)
 				tests.Ok(t, err, unlistedNode)
 
 				submitnode, err := cl.CollectionAddNodeWithResponse(root, col.JSON200.Id, unlistedNode.JSON200.Id, session2)

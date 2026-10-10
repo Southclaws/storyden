@@ -44,7 +44,7 @@ func TestPostLocation(t *testing.T) {
 
 			createThread := func(currentT *testing.T, title string) *openapi.Thread {
 				currentT.Helper()
-				resp, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				resp, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Title:      title,
 					Body:       opt.New(fmt.Sprintf("<p>%s</p>", title)).Ptr(),
 					Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -56,7 +56,7 @@ func TestPostLocation(t *testing.T) {
 
 			createReply := func(currentT *testing.T, slug string, index int) openapi.Identifier {
 				currentT.Helper()
-				resp, err := cl.ReplyCreateWithResponse(root, slug, openapi.ReplyInitialProps{
+				resp, err := cl.ReplyCreateWithResponse(root, slug, nil, openapi.ReplyInitialProps{
 					Body: fmt.Sprintf("reply-%d", index),
 				}, session)
 				tests.Ok(currentT, err, resp)

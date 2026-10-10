@@ -42,7 +42,7 @@ func TestLikeThreads(t *testing.T) {
 			cat1create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Colour: "#fe4efd", Description: "category testing", Name: "Category " + uuid.NewString()}, adminSession)
 			tests.Ok(t, err, cat1create)
 
-			thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			thread1create, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>this is a thread</p>").Ptr(),
 				Category:   opt.New(cat1create.JSON200.Id).Ptr(),
 				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -137,7 +137,7 @@ func TestLikeReplies(t *testing.T) {
 			cat1create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Colour: "#fe4efd", Description: "category testing", Name: "Category " + uuid.NewString()}, adminSession)
 			tests.Ok(t, err, cat1create)
 
-			thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			thread1create, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>this is a thread</p>").Ptr(),
 				Category:   opt.New(cat1create.JSON200.Id).Ptr(),
 				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -145,7 +145,7 @@ func TestLikeReplies(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, thread1create)
 
-			reply1, err := cl.ReplyCreateWithResponse(root, thread1create.JSON200.Slug, openapi.ReplyInitialProps{Body: "<p>this is a reply</p>"}, user1Session)
+			reply1, err := cl.ReplyCreateWithResponse(root, thread1create.JSON200.Slug, nil, openapi.ReplyInitialProps{Body: "<p>this is a reply</p>"}, user1Session)
 			tests.Ok(t, err, reply1)
 
 			like1, err := cl.LikePostAddWithResponse(root, reply1.JSON200.Id, user1Session)

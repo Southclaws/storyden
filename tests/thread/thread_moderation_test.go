@@ -44,7 +44,7 @@ func TestThreadModerationWordLists(t *testing.T) {
 				WordReportList: opt.New([]string{}),
 			})
 
-			blockedThread, err := cl.ThreadCreateWithResponse(userCtx, openapi.ThreadInitialProps{
+			blockedThread, err := cl.ThreadCreateWithResponse(userCtx, nil, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>This contains a banned topic</p>").Ptr(),
 				Title:      "Banned content",
 				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -61,7 +61,7 @@ func TestThreadModerationWordLists(t *testing.T) {
 				WordReportList: opt.New([]string{"flagged"}),
 			})
 
-			reviewThread, err := cl.ThreadCreateWithResponse(userCtx, openapi.ThreadInitialProps{
+			reviewThread, err := cl.ThreadCreateWithResponse(userCtx, nil, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>This should be flagged for review</p>").Ptr(),
 				Title:      "Flagged thread",
 				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -93,7 +93,7 @@ func TestReplyModerationWordLists(t *testing.T) {
 			sessionThreadAuthor := sh.WithSession(threadCtx)
 			sessionReplier := sh.WithSession(replierCtx)
 
-			threadCreate, err := cl.ThreadCreateWithResponse(threadCtx, openapi.ThreadInitialProps{
+			threadCreate, err := cl.ThreadCreateWithResponse(threadCtx, nil, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>Safe thread content</p>").Ptr(),
 				Title:      "Reply moderation",
 				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -106,7 +106,7 @@ func TestReplyModerationWordLists(t *testing.T) {
 				WordReportList: opt.New([]string{}),
 			})
 
-			blockedReply, err := cl.ReplyCreateWithResponse(root, threadCreate.JSON200.Slug, openapi.ReplyInitialProps{
+			blockedReply, err := cl.ReplyCreateWithResponse(root, threadCreate.JSON200.Slug, nil, openapi.ReplyInitialProps{
 				Body: "this reply mentions a banned topic",
 			}, sessionReplier)
 			tests.Status(t, err, blockedReply, http.StatusBadRequest)
@@ -121,7 +121,7 @@ func TestReplyModerationWordLists(t *testing.T) {
 				WordReportList: opt.New([]string{"flagged"}),
 			})
 
-			reviewReply, err := cl.ReplyCreateWithResponse(root, threadCreate.JSON200.Slug, openapi.ReplyInitialProps{
+			reviewReply, err := cl.ReplyCreateWithResponse(root, threadCreate.JSON200.Slug, nil, openapi.ReplyInitialProps{
 				Body: "this reply contains flagged content",
 			}, sessionReplier)
 			tests.Ok(t, err, reviewReply)

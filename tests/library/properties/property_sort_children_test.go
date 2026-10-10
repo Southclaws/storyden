@@ -36,7 +36,7 @@ func TestNodesPropertySorting(t *testing.T) {
 
 			parentname := "parent"
 			parentslug := parentname + uuid.NewString()
-			parent, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+			parent, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 				Name: parentname,
 				Slug: &parentslug,
 			}, session)
@@ -47,7 +47,7 @@ func TestNodesPropertySorting(t *testing.T) {
 			name1 := "child-1"
 			slug1 := name1 + uuid.NewString()
 			node1 := tests.AssertRequest(
-				cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 					Name:   name1,
 					Slug:   &slug1,
 					Parent: &parent.JSON200.Slug,
@@ -78,7 +78,7 @@ func TestNodesPropertySorting(t *testing.T) {
 			name2 := "child-2"
 			slug2 := name2 + uuid.NewString()
 			node2 := tests.AssertRequest(
-				cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 					Name:   name2,
 					Slug:   &slug2,
 					Parent: &parent.JSON200.Slug,
@@ -98,7 +98,7 @@ func TestNodesPropertySorting(t *testing.T) {
 			name3 := "child-3"
 			slug3 := name3 + uuid.NewString()
 			node3 := tests.AssertRequest(
-				cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 					Name:   name3,
 					Slug:   &slug3,
 					Parent: &parent.JSON200.Slug,
@@ -176,7 +176,7 @@ func TestNodesPropertySorting_WithEmptyValues(t *testing.T) {
 
 			parentname := "parent"
 			parentslug := parentname + uuid.NewString()
-			parent, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+			parent, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 				Name: parentname,
 				Slug: &parentslug,
 			}, session)
@@ -187,7 +187,7 @@ func TestNodesPropertySorting_WithEmptyValues(t *testing.T) {
 			name1 := "child-1"
 			slug1 := name1 + uuid.NewString()
 			node1 := tests.AssertRequest(
-				cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 					Name:   name1,
 					Slug:   &slug1,
 					Parent: &parent.JSON200.Slug,
@@ -218,7 +218,7 @@ func TestNodesPropertySorting_WithEmptyValues(t *testing.T) {
 			name2 := "child-2"
 			slug2 := name2 + uuid.NewString()
 			node2 := tests.AssertRequest(
-				cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 					Name:   name2,
 					Slug:   &slug2,
 					Parent: &parent.JSON200.Slug,
@@ -238,7 +238,7 @@ func TestNodesPropertySorting_WithEmptyValues(t *testing.T) {
 			name3 := "child-3"
 			slug3 := name3 + uuid.NewString()
 			tests.AssertRequest(
-				cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 					Name:   name3,
 					Slug:   &slug3,
 					Parent: &parent.JSON200.Slug,

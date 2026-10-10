@@ -57,13 +57,13 @@ func TestNodeDraftList(t *testing.T) {
 
 				// Create test nodes for this test
 				node1Name := "Test Node 1 " + xid.New().String()
-				node1, err := cl.NodeCreateWithResponse(adminCtx, openapi.NodeInitialProps{
+				node1, err := cl.NodeCreateWithResponse(adminCtx, nil, openapi.NodeInitialProps{
 					Name: node1Name,
 				}, sh.WithSession(adminCtx))
 				tests.Ok(t, err, node1)
 
 				node2Name := "Test Node 2 " + xid.New().String()
-				node2, err := cl.NodeCreateWithResponse(adminCtx, openapi.NodeInitialProps{
+				node2, err := cl.NodeCreateWithResponse(adminCtx, nil, openapi.NodeInitialProps{
 					Name: node2Name,
 				}, sh.WithSession(adminCtx))
 				tests.Ok(t, err, node2)
@@ -98,7 +98,7 @@ func TestNodeDraftList(t *testing.T) {
 
 				// Create a fresh node for this test
 				testNodeName := "Manager Test Node " + xid.New().String()
-				testNode, err := cl.NodeCreateWithResponse(adminCtx, openapi.NodeInitialProps{
+				testNode, err := cl.NodeCreateWithResponse(adminCtx, nil, openapi.NodeInitialProps{
 					Name: testNodeName,
 				}, sh.WithSession(adminCtx))
 				tests.Ok(t, err, testNode)
@@ -138,7 +138,7 @@ func TestNodeDraftList(t *testing.T) {
 				// Create a node with specific properties we can verify
 				nodeName := "Node with Reference " + xid.New().String()
 				nodeDesc := "Test description for draft reference"
-				node, err := cl.NodeCreateWithResponse(adminCtx, openapi.NodeInitialProps{
+				node, err := cl.NodeCreateWithResponse(adminCtx, nil, openapi.NodeInitialProps{
 					Name:        nodeName,
 					Description: &nodeDesc,
 				}, sh.WithSession(adminCtx))
@@ -178,7 +178,7 @@ func TestNodeDraftList(t *testing.T) {
 				// Create multiple drafts on different nodes
 				for i := 0; i < 3; i++ {
 					nodeName := "Pagination Test Node " + xid.New().String()
-					node, err := cl.NodeCreateWithResponse(adminCtx, openapi.NodeInitialProps{
+					node, err := cl.NodeCreateWithResponse(adminCtx, nil, openapi.NodeInitialProps{
 						Name: nodeName,
 					}, sh.WithSession(adminCtx))
 					tests.Ok(t, err, node)

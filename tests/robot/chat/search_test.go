@@ -52,7 +52,7 @@ func TestRobotChatContentSearch(t *testing.T) {
 				robotID := string(rob.JSON200.Id)
 
 				vis := openapi.VisibilityPublished
-				tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{
+				tests.AssertRequest(cl.NodeCreateWithResponse(root, nil, openapi.NodeCreateJSONRequestBody{
 					Name:       "Magnolia Library Page",
 					Visibility: &vis,
 				}, adminSession))(t, http.StatusOK)
@@ -63,7 +63,7 @@ func TestRobotChatContentSearch(t *testing.T) {
 					Name:        "Category " + uuid.NewString(),
 				}, adminSession))(t, http.StatusOK)
 
-				tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				tests.AssertRequest(cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Title:      "Magnolia Forum Thread",
 					Body:       opt.New("<p>discussion about magnolia</p>").Ptr(),
 					Category:   opt.New(cat.JSON200.Id).Ptr(),
@@ -124,7 +124,7 @@ func TestRobotChatThreadSearch(t *testing.T) {
 					Name:        "Category " + uuid.NewString(),
 				}, adminSession))(t, http.StatusOK)
 
-				tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				tests.AssertRequest(cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Title:      "Magnolia Thread Discussion",
 					Body:       opt.New("<p>talk about magnolia trees</p>").Ptr(),
 					Category:   opt.New(cat.JSON200.Id).Ptr(),
@@ -182,14 +182,14 @@ func TestRobotChatReplySearch(t *testing.T) {
 					Name:        "Category " + uuid.NewString(),
 				}, adminSession))(t, http.StatusOK)
 
-				thread := tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				thread := tests.AssertRequest(cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Title:      "Reply Search Test Thread",
 					Body:       opt.New("<p>base thread for reply tests</p>").Ptr(),
 					Category:   opt.New(cat.JSON200.Id).Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				}, adminSession))(t, http.StatusOK)
 
-				tests.AssertRequest(cl.ReplyCreateWithResponse(root, thread.JSON200.Slug, openapi.ReplyInitialProps{
+				tests.AssertRequest(cl.ReplyCreateWithResponse(root, thread.JSON200.Slug, nil, openapi.ReplyInitialProps{
 					Body: "<p>magnolia blossom reply content</p>",
 				}, adminSession))(t, http.StatusOK)
 
@@ -244,7 +244,7 @@ func TestRobotChatPostSearch(t *testing.T) {
 					Name:        "Category " + uuid.NewString(),
 				}, adminSession))(t, http.StatusOK)
 
-				tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				tests.AssertRequest(cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Title:      "Magnolia Post Thread",
 					Body:       opt.New("<p>magnolia post content</p>").Ptr(),
 					Category:   opt.New(cat.JSON200.Id).Ptr(),

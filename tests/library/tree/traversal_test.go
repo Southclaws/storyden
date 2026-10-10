@@ -45,7 +45,7 @@ func TestNodesTreeQuerying(t *testing.T) {
 
 			name1 := "test-node-1"
 			slug1 := name1 + uuid.NewString()
-			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node1, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:       name1,
 				Slug:       &slug1,
 				Visibility: &visibility,
@@ -54,7 +54,7 @@ func TestNodesTreeQuerying(t *testing.T) {
 
 			name2 := "test-node-2"
 			slug2 := name2 + uuid.NewString()
-			node2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node2, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:       name2,
 				Slug:       &slug2,
 				Parent:     &slug1,
@@ -64,7 +64,7 @@ func TestNodesTreeQuerying(t *testing.T) {
 
 			name3 := "test-node-3"
 			slug3 := name3 + uuid.NewString()
-			node3, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node3, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:       name3,
 				Slug:       &slug3,
 				Parent:     &slug1,
@@ -74,7 +74,7 @@ func TestNodesTreeQuerying(t *testing.T) {
 
 			name4 := "test-node-4"
 			slug4 := name4 + uuid.NewString()
-			node4, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node4, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:       name4,
 				Slug:       &slug4,
 				Parent:     &slug3,
@@ -305,14 +305,14 @@ func TestNodeAncestryRespectsViewerVisibility(t *testing.T) {
 			review := openapi.VisibilityReview
 
 			parentSlug := "ancestry-private-parent-" + uuid.NewString()
-			parent := tests.AssertRequest(cl.NodeCreateWithResponse(ctxParentOwner, openapi.NodeInitialProps{
+			parent := tests.AssertRequest(cl.NodeCreateWithResponse(ctxParentOwner, nil, openapi.NodeInitialProps{
 				Name:       "Private parent",
 				Slug:       &parentSlug,
 				Visibility: &review,
 			}, sh.WithSession(ctxParentOwner)))(t, http.StatusOK).JSON200
 
 			childSlug := "ancestry-private-child-" + uuid.NewString()
-			child := tests.AssertRequest(cl.NodeCreateWithResponse(ctxChildOwner, openapi.NodeInitialProps{
+			child := tests.AssertRequest(cl.NodeCreateWithResponse(ctxChildOwner, nil, openapi.NodeInitialProps{
 				Name:       "Visible child",
 				Slug:       &childSlug,
 				Visibility: &review,
@@ -366,7 +366,7 @@ func TestNodesTreeQuerying_WithHiddenChildNodes(t *testing.T) {
 
 			name1 := "test-node-1"
 			slug1 := name1 + uuid.NewString()
-			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node1, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:       name1,
 				Slug:       &slug1,
 				Visibility: &visibility,
@@ -375,7 +375,7 @@ func TestNodesTreeQuerying_WithHiddenChildNodes(t *testing.T) {
 
 			name2 := "test-node-2"
 			slug2 := name2 + uuid.NewString()
-			node2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node2, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:       name2,
 				Slug:       &slug2,
 				Parent:     &slug1,
@@ -385,7 +385,7 @@ func TestNodesTreeQuerying_WithHiddenChildNodes(t *testing.T) {
 
 			name3 := "test-node-3"
 			slug3 := name3 + uuid.NewString()
-			node3, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node3, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:       name3,
 				Slug:       &slug3,
 				Parent:     &slug1,
@@ -395,7 +395,7 @@ func TestNodesTreeQuerying_WithHiddenChildNodes(t *testing.T) {
 
 			name4 := "test-node-4"
 			slug4 := name4 + uuid.NewString()
-			node4, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node4, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:       name4,
 				Slug:       &slug4,
 				Parent:     &slug3,
@@ -405,7 +405,7 @@ func TestNodesTreeQuerying_WithHiddenChildNodes(t *testing.T) {
 
 			name5 := "test-node-5"
 			slug5 := name5 + uuid.NewString()
-			node5, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node5, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:       name5,
 				Slug:       &slug5,
 				Parent:     &slug3,

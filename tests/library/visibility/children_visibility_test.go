@@ -48,14 +48,14 @@ func TestChildrenEndpointVisibilityFiltering(t *testing.T) {
 				a := assert.New(t)
 
 				// Create a published parent node
-				parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 					Name:       "Published Parent",
 					Slug:       opt.New(uuid.NewString()).Ptr(),
 					Visibility: &published,
 				}, adminSession))(t, http.StatusOK)
 
 				// Author creates draft child
-				draftChild := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				draftChild := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 					Name:       "Draft Child",
 					Slug:       opt.New(uuid.NewString()).Ptr(),
 					Visibility: &draft,
@@ -63,7 +63,7 @@ func TestChildrenEndpointVisibilityFiltering(t *testing.T) {
 				}, authorSession))(t, http.StatusOK)
 
 				// Author creates unlisted child
-				unlistedChild := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				unlistedChild := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 					Name:       "Unlisted Child",
 					Slug:       opt.New(uuid.NewString()).Ptr(),
 					Visibility: &unlisted,
@@ -71,7 +71,7 @@ func TestChildrenEndpointVisibilityFiltering(t *testing.T) {
 				}, authorSession))(t, http.StatusOK)
 
 				// Admin creates review child
-				reviewChild := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				reviewChild := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 					Name:       "Review Child",
 					Slug:       opt.New(uuid.NewString()).Ptr(),
 					Visibility: &review,
@@ -79,7 +79,7 @@ func TestChildrenEndpointVisibilityFiltering(t *testing.T) {
 				}, adminSession))(t, http.StatusOK)
 
 				// Admin creates published child
-				publishedChild := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				publishedChild := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 					Name:       "Published Child",
 					Slug:       opt.New(uuid.NewString()).Ptr(),
 					Visibility: &published,
@@ -153,14 +153,14 @@ func TestChildrenEndpointVsTreeConsistency(t *testing.T) {
 				r := require.New(t)
 
 				// Create a published parent node
-				parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 					Name:       "Tree Parent",
 					Slug:       opt.New(uuid.NewString()).Ptr(),
 					Visibility: &published,
 				}, adminSession))(t, http.StatusOK)
 
 				// Author creates a draft child
-				draftChild := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				draftChild := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 					Name:       "Draft Child",
 					Slug:       opt.New(uuid.NewString()).Ptr(),
 					Visibility: &draft,
@@ -168,7 +168,7 @@ func TestChildrenEndpointVsTreeConsistency(t *testing.T) {
 				}, authorSession))(t, http.StatusOK)
 
 				// Admin creates a published child
-				publishedChild := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				publishedChild := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 					Name:       "Published Child",
 					Slug:       opt.New(uuid.NewString()).Ptr(),
 					Visibility: &published,
@@ -223,21 +223,21 @@ func TestChildrenEndpointVsTreeConsistency(t *testing.T) {
 				// exposed if visibility rules were not properly applied.
 
 				// Create a published parent
-				parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 					Name:       "Security Test Parent",
 					Slug:       opt.New(uuid.NewString()).Ptr(),
 					Visibility: &published,
 				}, adminSession))(t, http.StatusOK)
 
 				// Different authors create draft children
-				author1DraftChild := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				author1DraftChild := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 					Name:       "Author1 Draft",
 					Slug:       opt.New(uuid.NewString()).Ptr(),
 					Visibility: &draft,
 					Parent:     &parentNode.JSON200.Slug,
 				}, authorSession))(t, http.StatusOK)
 
-				author2DraftChild := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				author2DraftChild := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 					Name:       "Author2 Draft",
 					Slug:       opt.New(uuid.NewString()).Ptr(),
 					Visibility: &draft,

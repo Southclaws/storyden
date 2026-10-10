@@ -50,7 +50,7 @@ func TestThreadTags(t *testing.T) {
 				t3 := xid.New().String()
 
 				tags := []string{t1, t2, t3}
-				create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				create, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Title:      un("n1"),
 					Category:   opt.New(catID).Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -75,7 +75,7 @@ func TestThreadTags(t *testing.T) {
 				t3 := xid.New().String()
 
 				n1tags := []string{t1, t2, t3}
-				create1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				create1, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Title:      un("n1"),
 					Category:   opt.New(catID).Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -85,7 +85,7 @@ func TestThreadTags(t *testing.T) {
 
 				t4 := xid.New().String()
 				n2tags := []string{t2, t3, t4}
-				create2, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				create2, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Title:      un("n1"),
 					Category:   opt.New(catID).Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -111,7 +111,7 @@ func TestThreadTags(t *testing.T) {
 				t3 := xid.New().String()
 
 				tags := []string{t1, t2}
-				create1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				create1, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Title:      un("n1"),
 					Category:   opt.New(catID).Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -147,7 +147,7 @@ func TestThreadTags(t *testing.T) {
 				t3 := xid.New().String()
 
 				tags := []string{t1, t2, t3}
-				create1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				create1, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Title:      un("n1"),
 					Category:   opt.New(catID).Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),

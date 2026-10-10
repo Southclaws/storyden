@@ -49,7 +49,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, catResp)
 
-			threadFox, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadFox, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "The Quick Brown Fox",
 				Body:       opt.New("<p>A thread about a quick brown fox jumping over lazy dogs</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -57,7 +57,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadFox)
 
-			threadQuantum, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadQuantum, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Understanding Quantum Computing",
 				Body:       opt.New("<p>A deep dive into quantum mechanics and computing principles</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -65,7 +65,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadQuantum)
 
-			threadPancakes, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadPancakes, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Recipe for Perfect Pancakes",
 				Body:       opt.New("<p>Learn how to make fluffy pancakes with this simple recipe</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -73,7 +73,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadPancakes)
 
-			threadJavaScript, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadJavaScript, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "JavaScript Tutorial",
 				Body:       opt.New("<p>Learn JavaScript basics</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -81,7 +81,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadJavaScript)
 
-			threadJava, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadJava, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Java Programming Guide",
 				Body:       opt.New("<p>Java programming fundamentals</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -89,7 +89,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadJava)
 
-			threadMatlab, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadMatlab, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Matlab Data Science",
 				Body:       opt.New("<p>Data science with Matlab</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -97,7 +97,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadMatlab)
 
-			threadChinese, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadChinese, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "机器学习入门指南",
 				Body:       opt.New("<p>这是一个关于机器学习的基础教程</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -105,7 +105,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadChinese)
 
-			threadChineseDeepLearning, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadChineseDeepLearning, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "深度学习与神经网络",
 				Body:       opt.New("<p>深入探讨深度学习和神经网络的原理与应用</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -113,7 +113,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadChineseDeepLearning)
 
-			threadRussian, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadRussian, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Программирование на Python",
 				Body:       opt.New("<p>Изучение основ программирования на языке Python</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -121,7 +121,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadRussian)
 
-			threadRussianWeb, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadRussianWeb, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Основы веб-разработки",
 				Body:       opt.New("<p>Полное руководство по современной веб-разработке</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -129,7 +129,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadRussianWeb)
 
-			threadArabic, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadArabic, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "تطوير تطبيقات الويب",
 				Body:       opt.New("<p>دورة كاملة في تطوير تطبيقات الويب الحديثة</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -137,7 +137,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadArabic)
 
-			threadSpanish, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadSpanish, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Recetas de Cocina Mediterránea",
 				Body:       opt.New("<p>Descubre los secretos de la cocina mediterránea tradicional</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -145,7 +145,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadSpanish)
 
-			threadFrench, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadFrench, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Histoire de l'Architecture Gothique",
 				Body:       opt.New("<p>Exploration des cathédrales gothiques européennes et leur influence</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -153,7 +153,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadFrench)
 
-			threadGerman, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadGerman, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Wandern in den Alpen",
 				Body:       opt.New("<p>Die besten Wanderwege und Bergtouren in den Alpen</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -161,7 +161,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadGerman)
 
-			threadPortuguese, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadPortuguese, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Música Tradicional Brasileira",
 				Body:       opt.New("<p>Explorando os ritmos e melodias da música brasileira</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -169,7 +169,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadPortuguese)
 
-			threadGreek, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadGreek, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Αρχαία Ελληνική Φιλοσοφία",
 				Body:       opt.New("<p>Μελέτη των έργων των αρχαίων Ελλήνων φιλοσόφων</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -177,7 +177,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadGreek)
 
-			threadTurkish, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadTurkish, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Geleneksel Türk Mutfağı",
 				Body:       opt.New("<p>Türk mutfağının zengin lezzetlerini keşfedin</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -185,7 +185,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadTurkish)
 
-			threadGeorgian, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadGeorgian, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "ქართული ხალხური სიმღერები",
 				Body:       opt.New("<p>ქართული პოლიფონიური სიმღერების ისტორია და მნიშვნელობა</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -193,7 +193,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadGeorgian)
 
-			threadHindi, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadHindi, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "भारतीय शास्त्रीय संगीत",
 				Body:       opt.New("<p>भारतीय शास्त्रीय संगीत की परंपराओं का अन्वेषण</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -201,7 +201,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadHindi)
 
-			threadSwahili, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadSwahili, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Hadithi za Kiswahili",
 				Body:       opt.New("<p>Hadithi na masimulizi ya kitamaduni kutoka Afrika Mashariki</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -209,7 +209,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadSwahili)
 
-			threadArmenian, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadArmenian, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Հայկական Ավանդական Խոհանոց",
 				Body:       opt.New("<p>Հայկական խոհանոցի պատմությունը և ավանդական բաղադրատոմսերը</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -217,7 +217,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadArmenian)
 
-			threadHebrew, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadHebrew, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "ספרות עברית מודרנית",
 				Body:       opt.New("<p>סקירה של הספרות העברית המודרנית והסופרים המשפיעים</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -225,7 +225,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadHebrew)
 
-			threadPersian, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadPersian, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "شعر کلاسیک فارسی",
 				Body:       opt.New("<p>بررسی شاعران بزرگ فارسی و آثار ماندگار آنها</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -233,7 +233,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadPersian)
 
-			threadUrdu, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadUrdu, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "اردو شاعری کی روایت",
 				Body:       opt.New("<p>اردو شاعری کی تاریخ اور مشہور شعراء کا تعارف</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -241,7 +241,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadUrdu)
 
-			threadPunjabi, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadPunjabi, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "ਪੰਜਾਬੀ ਲੋਕ ਗੀਤ",
 				Body:       opt.New("<p>ਪੰਜਾਬੀ ਸੱਭਿਆਚਾਰ ਵਿੱਚ ਲੋਕ ਗੀਤਾਂ ਦਾ ਮਹੱਤਵ</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -249,7 +249,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadPunjabi)
 
-			threadNepali, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadNepali, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "नेपाली पर्वतारोहण",
 				Body:       opt.New("<p>नेपालको हिमाल र पर्वतारोहणको इतिहास</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -257,7 +257,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadNepali)
 
-			threadYoruba, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadYoruba, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Àṣà Yorùbá",
 				Body:       opt.New("<p>Ìtàn àti àṣà àwọn ènìyàn Yorùbá ní Nàìjíríà</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -265,7 +265,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadYoruba)
 
-			threadIgbo, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadIgbo, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Omenala Igbo",
 				Body:       opt.New("<p>Akụkọ ọdịnala na omenala ndị Igbo</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -273,7 +273,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadIgbo)
 
-			threadHausa, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadHausa, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Tarihin Hausawa",
 				Body:       opt.New("<p>Tarihi da al'adun Hausawa a Arewacin Najeriya</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -281,7 +281,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadHausa)
 
-			threadAkan, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadAkan, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Akanfo Atetesɛm",
 				Body:       opt.New("<p>Akanman mu atetesɛm ne amammerɛ</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -308,7 +308,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 			hot := "<p>searchable keyword content</p>"
 
-			t1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			t1, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Thread by Baldur in Tech with sharing",
 				Body:       opt.New(hot).Ptr(),
 				Category:   opt.New(cat1.JSON200.Id).Ptr(),
@@ -317,7 +317,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, session1)
 			tests.Ok(t, err, t1)
 
-			t2, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			t2, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Thread by Loki in Food with tips",
 				Body:       opt.New(hot).Ptr(),
 				Category:   opt.New(cat2.JSON200.Id).Ptr(),
@@ -326,7 +326,7 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, session2)
 			tests.Ok(t, err, t2)
 
-			t3, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			t3, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Thread by Baldur in Tech with sharing and tips",
 				Body:       opt.New(hot).Ptr(),
 				Category:   opt.New(cat1.JSON200.Id).Ptr(),

@@ -36,7 +36,7 @@ func TestLibraryNodeChildren(t *testing.T) {
 
 			name1 := "test-node-1"
 			slug1 := name1 + uuid.NewString()
-			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node1, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name: name1,
 				Slug: &slug1,
 			}, session)
@@ -46,7 +46,7 @@ func TestLibraryNodeChildren(t *testing.T) {
 
 			name2 := "test-node-2"
 			slug2 := name2 + uuid.NewString()
-			node2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node2, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name: name2,
 				Slug: &slug2,
 			}, session)
@@ -64,7 +64,7 @@ func TestLibraryNodeChildren(t *testing.T) {
 
 			name3 := "test-node-3"
 			slug3 := name3 + uuid.NewString()
-			node3, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node3, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name: name3,
 				Slug: &slug3,
 			}, session)
