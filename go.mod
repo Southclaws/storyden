@@ -66,7 +66,6 @@ require (
 	github.com/gofrs/flock v0.13.1
 	github.com/golang-cz/devslog v0.0.17
 	github.com/golang-jwt/jwt/v5 v5.3.1
-	github.com/google/go-github/v75 v75.0.0
 	github.com/google/jsonschema-go v0.4.3
 	github.com/google/uuid v1.6.0
 	github.com/iancoleman/strcase v0.3.0
@@ -218,7 +217,6 @@ require (
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/snappy v1.0.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/go-querystring v1.2.0 // indirect
 	github.com/google/go-tpm v0.9.8 // indirect
 	github.com/google/s2a-go v0.1.11 // indirect
 	github.com/google/safehtml v0.1.0 // indirect

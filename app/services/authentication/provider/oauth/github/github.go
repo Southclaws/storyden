@@ -3,6 +3,7 @@ package github
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"net/mail"
 	"strconv"
 	"strings"
@@ -13,7 +14,6 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	"github.com/google/go-github/v75/github"
 	"golang.org/x/oauth2"
 	oauth2_github "golang.org/x/oauth2/github"
 
@@ -35,6 +35,7 @@ type Provider struct {
 	config   oauth.Configuration
 	register *register.Registrar
 	ed       endec.EncrypterDecrypter
+	client   *http.Client
 }
 
 func New(
@@ -54,6 +55,7 @@ func New(
 		},
 		register: register,
 		ed:       ed,
+		client:   &http.Client{Timeout: 10 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }},
 	}, nil
 }
 
@@ -119,20 +121,11 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 		)
 	}
 
-	client := github.NewClient(nil).WithAuthToken(token.AccessToken)
-
-	u, _, err := client.Users.Get(ctx, "")
+	u, err := fetchProfile(ctx, p.client, token.AccessToken)
 	if err != nil {
 		return nil, fault.Wrap(err,
 			fctx.With(ctx),
 			fmsg.WithDesc("failed to fetch GitHub user profile", "Unable to retrieve your GitHub profile. This might be due to privacy settings."))
-	}
-
-	if u.Login == nil {
-		return nil, fault.New("missing login",
-			ftag.With(ftag.InvalidArgument),
-			fmsg.WithDesc("no username", "The GitHub API did not return a username for this account."),
-		)
 	}
 
 	handle := strings.ToLower(*u.Login)
@@ -144,7 +137,7 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 		return p.register.GetOrCreateViaHandle(ctx,
 			service,
 			authName,
-			strconv.Itoa(int(*u.ID)),
+			strconv.FormatInt(u.ID, 10),
 			token.AccessToken,
 			handle,
 			name,
@@ -161,7 +154,7 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 	return p.register.GetOrCreateViaEmail(ctx,
 		service,
 		authName,
-		strconv.Itoa(int(*u.ID)),
+		strconv.FormatInt(u.ID, 10),
 		token.AccessToken,
 		handle,
 		name,
