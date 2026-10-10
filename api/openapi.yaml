@@ -3340,6 +3340,20 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "200": { $ref: "#/components/responses/NodeListOK" }
 
+  /nodes/index:
+    get:
+      operationId: NodeIndexList
+      description: List published library node URLs for public indexing, in stable pages.
+      tags: [nodes]
+      parameters:
+        - $ref: "#/components/parameters/PaginationQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/NodeIndexListOK" }
+
   /nodes/drafts:
     get:
       operationId: NodeDraftList
@@ -7107,6 +7121,12 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/NodeListResult" }
+
+    NodeIndexListOK:
+      description: Published library URLs for public indexing.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/NodeIndexListResult" }
 
     NodeGetOK:
       description: Node information and content.
@@ -12131,6 +12151,22 @@ components:
           required: [nodes]
           properties:
             nodes: { $ref: "#/components/schemas/NodeTree" }
+
+    NodeIndexListResult:
+      type: object
+      required: [nodes, current_page, total_pages, page_size]
+      properties:
+        nodes:
+          type: array
+          items:
+            type: object
+            required: [slug, updated_at]
+            properties:
+              slug: { type: string }
+              updated_at: { type: string, format: date-time }
+        current_page: { type: integer }
+        total_pages: { type: integer }
+        page_size: { type: integer }
 
     NodeInitialProps:
       type: object

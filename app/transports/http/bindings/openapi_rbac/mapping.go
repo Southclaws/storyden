@@ -746,6 +746,10 @@ func (m *Mapping) NodeList() (bool, *rbac.Permission) {
 	return false, &rbac.PermissionReadPublishedLibrary
 }
 
+func (m *Mapping) NodeIndexList() (bool, *rbac.Permission) {
+	return false, &rbac.PermissionReadPublishedLibrary
+}
+
 func (m *Mapping) NodeGet() (bool, *rbac.Permission) {
 	return false, &rbac.PermissionReadPublishedLibrary
 }

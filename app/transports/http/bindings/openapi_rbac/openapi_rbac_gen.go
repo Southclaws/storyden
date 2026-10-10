@@ -188,6 +188,7 @@ type OperationPermissions interface {
 	CollectionRemoveNode() (bool, *rbac.Permission)
 	NodeCreate() (bool, *rbac.Permission)
 	NodeList() (bool, *rbac.Permission)
+	NodeIndexList() (bool, *rbac.Permission)
 	NodeDraftList() (bool, *rbac.Permission)
 	NodeGet() (bool, *rbac.Permission)
 	NodeUpdate() (bool, *rbac.Permission)
@@ -647,6 +648,8 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.NodeCreate()
 	case "NodeList":
 		return optable.NodeList()
+	case "NodeIndexList":
+		return optable.NodeIndexList()
 	case "NodeDraftList":
 		return optable.NodeDraftList()
 	case "NodeGet":

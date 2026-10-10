@@ -10,6 +10,7 @@
 import type {
   BadRequestResponse,
   ConflictResponse,
+  ForbiddenResponse,
   InternalServerErrorResponse,
   NodeAddChildOKResponse,
   NodeCreateBody,
@@ -26,6 +27,8 @@ import type {
   NodeGenerateTitleOKResponse,
   NodeGetOKResponse,
   NodeGetParams,
+  NodeIndexListOKResponse,
+  NodeIndexListParams,
   NodeListChildrenParams,
   NodeListOKResponse,
   NodeListParams,
@@ -222,6 +225,72 @@ export const nodeList = async (
   options?: Parameters<typeof fetcher>[1],
 ): Promise<nodeListResponseSuccess> => {
   return fetcher<nodeListResponseSuccess>(getNodeListUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export type nodeIndexListResponse200 = {
+  data: NodeIndexListOKResponse;
+  status: 200;
+};
+
+export type nodeIndexListResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type nodeIndexListResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type nodeIndexListResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type nodeIndexListResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 403>;
+};
+
+export type nodeIndexListResponseSuccess = nodeIndexListResponse200 & {
+  headers: Headers;
+};
+export type nodeIndexListResponseError = (
+  | nodeIndexListResponse400
+  | nodeIndexListResponse401
+  | nodeIndexListResponse403
+  | nodeIndexListResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getNodeIndexListUrl = (params?: NodeIndexListParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/nodes/index?${stringifiedParams}`
+    : `/nodes/index`;
+};
+
+/**
+ * List published library node URLs for public indexing, in stable pages.
+ */
+export const nodeIndexList = async (
+  params?: NodeIndexListParams,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<nodeIndexListResponseSuccess> => {
+  return fetcher<nodeIndexListResponseSuccess>(getNodeIndexListUrl(params), {
     ...options,
     method: "GET",
   });

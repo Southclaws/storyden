@@ -100,6 +100,9 @@ func TestGuestRolePermissions(t *testing.T) {
 					cl.NodeListWithResponse(root, &openapi.NodeListParams{}),
 				)(t, http.StatusForbidden)
 				AssertRequest(
+					cl.NodeIndexListWithResponse(root, &openapi.NodeIndexListParams{}),
+				)(t, http.StatusForbidden)
+				AssertRequest(
 					cl.NodeGetWithResponse(root, node.JSON200.Slug, &openapi.NodeGetParams{}),
 				)(t, http.StatusForbidden)
 			})

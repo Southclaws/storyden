@@ -197,6 +197,7 @@ var (
 	OperationIDCollectionRemoveNode                           = OperationID{`CollectionRemoveNode`}
 	OperationIDNodeCreate                                     = OperationID{`NodeCreate`}
 	OperationIDNodeList                                       = OperationID{`NodeList`}
+	OperationIDNodeIndexList                                  = OperationID{`NodeIndexList`}
 	OperationIDNodeDraftList                                  = OperationID{`NodeDraftList`}
 	OperationIDNodeGet                                        = OperationID{`NodeGet`}
 	OperationIDNodeUpdate                                     = OperationID{`NodeUpdate`}
@@ -691,6 +692,8 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDNodeCreate, nil
 	case string(`NodeList`):
 		return OperationIDNodeList, nil
+	case string(`NodeIndexList`):
+		return OperationIDNodeIndexList, nil
 	case string(`NodeDraftList`):
 		return OperationIDNodeDraftList, nil
 	case string(`NodeGet`):
