@@ -59,18 +59,20 @@ func (s *service) Get(ctx context.Context, accountID account.AccountID) (io.Read
 		r, w := io.Pipe()
 
 		go func() {
-			defer r.Close()
-
+			// close the writer, not the reader: that is what signals EOF (or the
+			// error) to whoever is consuming r
 			i, err := s.generator.Generate(ctx, accountID.String())
 			if err != nil {
-				r.CloseWithError(err)
+				w.CloseWithError(err)
 				return
 			}
 
 			if err := png.Encode(w, i); err != nil {
-				r.CloseWithError(err)
+				w.CloseWithError(err)
 				return
 			}
+
+			w.Close()
 		}()
 
 		return r, 0, nil
