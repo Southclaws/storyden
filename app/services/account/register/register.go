@@ -11,7 +11,6 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
 
@@ -27,6 +26,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/onboarding"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/internal/namegen"
 	"github.com/Southclaws/storyden/internal/otp"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
@@ -205,8 +205,8 @@ func (s *Registrar) ensureOAuthRegistrationAllowed(ctx context.Context) error {
 }
 
 func (s *Registrar) create(ctx context.Context, handle opt.Optional[string], opts ...account_writer.Option) (*account.Account, error) {
-	// If no handle was given, generate one using adjective-animal.
-	handleOrGenerated := strings.ToLower(handle.Or(petname.Generate(2, "-")))
+	// Generate a storybook handle when none was provided.
+	handleOrGenerated := strings.ToLower(handle.Or(namegen.Generate()))
 
 	if err := account.ValidateHandle(ctx, handleOrGenerated); err != nil {
 		return nil, err
@@ -535,7 +535,7 @@ func (s *Registrar) ProvisionWithRandomHandle(
 		)
 	}
 
-	randomHandle := petname.Generate(3, "-")
+	randomHandle := namegen.Generate()
 
 	newAccount, err := s.Provision(ctx, opt.New(randomHandle),
 		account_writer.WithName(name))

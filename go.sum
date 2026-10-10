@@ -241,8 +241,6 @@ github.com/durable-streams/durable-streams/packages/client-go v0.2.0 h1:s5QL0QEu
 github.com/durable-streams/durable-streams/packages/client-go v0.2.0/go.mod h1:G9l/FuZz1LWA1IhuCg6epPrMKU7Yd9805L4yC+0iuHc=
 github.com/dustin/go-humanize v1.1.0 h1:dbKTrvD0klcbBV/h4AWJdMuZogJACoMlvWIWZ5b2xWg=
 github.com/dustin/go-humanize v1.1.0/go.mod h1:hc1CvRkJMsgxqjmjMQF3QNRAZBwY8AXBAzKYoSX9sFI=
-github.com/dustinkirkland/golang-petname v0.0.0-20260929120758-6e3915f1a6a8 h1:DC9MUnvV69DbAVUiRYQg+9x+Vq2xlhf8zhjiE/76Tes=
-github.com/dustinkirkland/golang-petname v0.0.0-20260929120758-6e3915f1a6a8/go.mod h1:8AuBTZBRSFqEYBPYULd+NN474/zZBLP+6WeT5S9xlAc=
 github.com/dvsekhvalnov/jose2go v1.11.0 h1:9pnsV1/CLWFYSxMilqtiY1Fb4JZOxfDk/q0/CQiUMYw=
 github.com/dvsekhvalnov/jose2go v1.11.0/go.mod h1:QsHjhyTlD/lAVqn/NSbVZmSCGeDehTB/mPZadG+mhXU=
 github.com/ebitengine/purego v0.11.1 h1:2zpWRSQNVKN4eKsKO9eM1ILDgWfYMY9GwqRmK6XeQ/0=

@@ -11,7 +11,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
-	petname "github.com/dustinkirkland/golang-petname"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	ga "google.golang.org/api/oauth2/v2"
@@ -19,11 +18,11 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
-	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/services/account/register"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/endec"
+	"github.com/Southclaws/storyden/internal/namegen"
 )
 
 var (
@@ -133,7 +132,7 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 			fmsg.WithDesc("failed to fetch Google user info", "Unable to retrieve your Google profile. Please try again."))
 	}
 
-	handle := mark.Slugify(fmt.Sprintf("%s %s", u.GivenName, petname.Generate(2, "-")))
+	handle := namegen.Generate()
 
 	name := fmt.Sprint(u.GivenName, " ", u.FamilyName)
 

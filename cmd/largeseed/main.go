@@ -7,13 +7,11 @@ import (
 	"log"
 	"math/rand"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_repo"
@@ -29,6 +27,7 @@ import (
 
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
+	"github.com/Southclaws/storyden/internal/namegen"
 	_ "github.com/glebarez/go-sqlite"
 )
 
@@ -201,8 +200,7 @@ func newSeeder(db *ent.Client) (*seeder, error) {
 }
 
 func (s *seeder) createRandomAccount(ctx context.Context) (*ent.Account, error) {
-	// Generate random handle using petname
-	handle := petname.Generate(2, "-") + "-" + strconv.Itoa(rand.Intn(1000))
+	handle := namegen.Generate()
 
 	bioContent, err := datagraph.NewRichText("<body><p>Random user generated for testing</p></body>")
 	if err != nil {

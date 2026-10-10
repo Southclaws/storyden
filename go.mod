@@ -51,7 +51,6 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/durable-streams/durable-streams/packages/client-go v0.2.0
 	github.com/dustin/go-humanize v1.1.0
-	github.com/dustinkirkland/golang-petname v0.0.0-20260929120758-6e3915f1a6a8
 	github.com/forPelevin/gomoji v1.4.1
 	github.com/gabriel-vasile/mimetype v1.4.15
 	github.com/getkin/kin-openapi v0.149.0
