@@ -85,7 +85,7 @@ func MountMCP(
 			cj.WithAuth(),
 			rl.WithRequestSizeLimiter(),
 			rl.WithRateLimit(),
-			withStrictAuthMCP(),
+			withStrictAuthMCP(strings.TrimSuffix(cfg.PublicAPIAddress.String(), "/")+"/.well-known/oauth-protected-resource/mcp"),
 		)
 
 		mux.Handle("/mcp", applied)
@@ -187,11 +187,12 @@ func defaultObjectSchema() json.RawMessage {
 // withStrictAuthMCP is middleware for MCP-specific authentication checks. MCP
 // is fully behind auth so any requests require either a session cookie or an
 // access key.
-func withStrictAuthMCP() func(next http.Handler) http.Handler {
+func withStrictAuthMCP(resourceMetadataURL string) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			_, err := session.GetAccountID(r.Context())
 			if err != nil {
+				w.Header().Set("WWW-Authenticate", `Bearer resource_metadata="`+resourceMetadataURL+`"`)
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}

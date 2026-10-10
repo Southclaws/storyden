@@ -273,7 +273,7 @@ func mount(
 
 		c.Response().Header().Set("Cache-Control", "public, max-age=3600")
 
-		if suffix == "/api" || (suffix == "/mcp/sse" && cfg.MCPEnabled) {
+		if suffix == "/api" || (suffix == "/mcp" && cfg.MCPEnabled) {
 			return c.JSON(http.StatusOK, oauthBinding.OAuthProtectedResourceMetadataWithScopes(resource))
 		}
 
