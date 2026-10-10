@@ -1,7 +1,8 @@
-import { generateFiles } from "fumadocs-openapi";
-import { openapi } from "@/lib/openapi";
 import { readFileSync, writeFileSync } from "fs";
+import { generateFiles } from "fumadocs-openapi";
 import { parse } from "yaml";
+
+import { openapi } from "@/lib/openapi";
 
 // Generate the API documentation files
 void generateFiles({
@@ -31,5 +32,5 @@ const meta = {
 
 writeFileSync(
   "./content/docs/api/meta.json",
-  JSON.stringify(meta, null, 2) + "\n"
+  JSON.stringify(meta, null, 2) + "\n",
 );

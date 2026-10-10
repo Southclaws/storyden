@@ -2,7 +2,7 @@ import { Box } from "@/styled-system/jsx";
 
 import { CollectiveMemorySection } from "./sections/CollectiveMemorySection";
 import { HeroSection } from "./sections/HeroSection";
-import { MilspecSection, type HomeStats } from "./sections/MilspecSection";
+import { type HomeStats, MilspecSection } from "./sections/MilspecSection";
 import { ScreenshotSection } from "./sections/ScreenshotSection";
 
 export default async function Home() {
@@ -62,7 +62,7 @@ async function getStats(): Promise<HomeStats> {
     const openIssues = Number(repoData.open_issues_count ?? 0);
     const contributorCommits = contributors.reduce(
       (acc, contributor) => acc + Number(contributor.contributions ?? 0),
-      0
+      0,
     );
 
     return {

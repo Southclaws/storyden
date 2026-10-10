@@ -1,6 +1,3 @@
-import { Logo } from "@/components/Logo";
-import { css } from "@/styled-system/css";
-import { Box } from "@/styled-system/jsx";
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 import {
   BracesIcon,
@@ -9,6 +6,10 @@ import {
   MessageCircleHeartIcon,
 } from "lucide-react";
 import Image from "next/image";
+
+import { Logo } from "@/components/Logo";
+import { css } from "@/styled-system/css";
+import { Box } from "@/styled-system/jsx";
 
 export const baseOptions: BaseLayoutProps = {
   themeSwitch: {

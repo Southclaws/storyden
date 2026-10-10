@@ -7,7 +7,7 @@ export const joeiBold = async () => {
     "src",
     "fonts",
     "static",
-    "JoieGrotesk-Bold.otf"
+    "JoieGrotesk-Bold.otf",
   );
 
   const f = await readFile(full);
@@ -21,7 +21,7 @@ export const workSans = async () => {
     "src",
     "fonts",
     "static",
-    "WorkSans-Medium.otf"
+    "WorkSans-Medium.otf",
   );
 
   const f = await readFile(full);

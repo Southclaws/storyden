@@ -1,6 +1,7 @@
+import Image from "next/image";
+
 import { Divider, HStack, VStack, styled } from "@/styled-system/jsx";
 import { token } from "@/styled-system/tokens";
-import Image from "next/image";
 
 export function Footer() {
   return (

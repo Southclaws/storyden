@@ -1,6 +1,6 @@
 import localFont from "next/font/local";
 
-// prettier-ignore
+// oxfmt-ignore
 export const joie = localFont({
   src: [
     { path: "./static/JoieGrotesk-Bold.woff2", weight: "700" },
@@ -9,7 +9,7 @@ export const joie = localFont({
   variable: "--font-joie",
 });
 
-// prettier-ignore
+// oxfmt-ignore
 export const worksans = localFont({
   src: [
     { path: "./static/WorkSans-Black.woff2", weight: "900" },
@@ -35,14 +35,14 @@ export const worksans = localFont({
   variable: "--font-worksans",
 });
 
-// prettier-ignore
+// oxfmt-ignore
 export const hedvig = localFont({
   src: "./static/hedvig-letters-serif-v2-latin-regular.woff2",
   preload: false,
   variable: "--font-hedvig",
 });
 
-// prettier-ignore
+// oxfmt-ignore
 export const intelone = localFont({
   src: [
     { path: "./static/IntelOneMono-Bold.woff2", weight: "700" },
@@ -58,7 +58,7 @@ export const intelone = localFont({
   variable: "--font-intelone",
 });
 
-// prettier-ignore
+// oxfmt-ignore
 export const gorton = localFont({
   src: [
     { path: "./static/Gorton-Normal-120.otf", weight: "400" },

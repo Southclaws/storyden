@@ -1,10 +1,10 @@
 {
-    "pages": [
-        "configure",
-        "event",
-        "ping",
-        "robot_model_provider_generate",
-        "robot_model_provider_list_models",
-        "robot_tool_call"
-    ]
+  "pages": [
+    "configure",
+    "event",
+    "ping",
+    "robot_model_provider_generate",
+    "robot_model_provider_list_models",
+    "robot_tool_call"
+  ]
 }

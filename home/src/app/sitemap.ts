@@ -1,8 +1,7 @@
+import { Dirent } from "fs";
 import { readdir } from "fs/promises";
 import { filter, flow, map } from "lodash/fp";
 import { MetadataRoute } from "next";
-
-import { Dirent } from "fs";
 import path from "path";
 
 const BLOG_PATH = `content/blog/`;
@@ -71,7 +70,7 @@ const processDocsPaths = flow(
     sub: "docs",
     changeFrequency: "monthly",
     priority: 0.5,
-  })
+  }),
 );
 
 export default async function SiteMap(): Promise<MetadataRoute.Sitemap> {

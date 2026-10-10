@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [],
+  "categories": {
+    "correctness": "off"
+  },
+  "rules": {
+    "sort-imports": [
+      "error",
+      {
+        "ignoreCase": false,
+        "ignoreDeclarationSort": true
+      }
+    ]
+  },
+  "ignorePatterns": [
+    ".next/**",
+    ".source/**",
+    "out/**",
+    "build/**",
+    "coverage/**",
+    "src/styled-system/**",
+    "content/docs/api/**"
+  ]
+}

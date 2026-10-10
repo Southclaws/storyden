@@ -10,6 +10,7 @@ This page is generated from `api/common/events.yaml`.
 </Callout>
 
 Related pages:
+
 - [Manifest](/docs/extending/manifest#events_consumed)
 - [API](/docs/extending/api)
 - [Host to Plugin -> event](/docs/extending/api/host-to-plugin/event)
@@ -22,10 +23,10 @@ Emitted when a thread is visible as published, either on create or after a visib
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventThreadPublished` | Yes | - |
-| `id` | `string (postID)` | Yes | Thread post ID |
+| Field   | Type                                 | Required | Description    |
+| ------- | ------------------------------------ | -------- | -------------- |
+| `event` | `string, const EventThreadPublished` | Yes      | -              |
+| `id`    | `string (postID)`                    | Yes      | Thread post ID |
 
 ### EventThreadUnpublished
 
@@ -33,10 +34,10 @@ Emitted when a previously published thread transitions to a non-published visibi
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventThreadUnpublished` | Yes | - |
-| `id` | `string (postID)` | Yes | Thread post ID |
+| Field   | Type                                   | Required | Description    |
+| ------- | -------------------------------------- | -------- | -------------- |
+| `event` | `string, const EventThreadUnpublished` | Yes      | -              |
+| `id`    | `string (postID)`                      | Yes      | Thread post ID |
 
 ### EventThreadUpdated
 
@@ -44,10 +45,10 @@ Emitted after a thread update succeeds, regardless of which fields changed.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventThreadUpdated` | Yes | - |
-| `id` | `string (postID)` | Yes | Thread post ID |
+| Field   | Type                               | Required | Description    |
+| ------- | ---------------------------------- | -------- | -------------- |
+| `event` | `string, const EventThreadUpdated` | Yes      | -              |
+| `id`    | `string (postID)`                  | Yes      | Thread post ID |
 
 ### EventThreadDeleted
 
@@ -55,10 +56,10 @@ Emitted after a thread is deleted.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventThreadDeleted` | Yes | - |
-| `id` | `string (postID)` | Yes | Thread post ID |
+| Field   | Type                               | Required | Description    |
+| ------- | ---------------------------------- | -------- | -------------- |
+| `event` | `string, const EventThreadDeleted` | Yes      | -              |
+| `id`    | `string (postID)`                  | Yes      | Thread post ID |
 
 ### EventThreadReplyCreated
 
@@ -66,15 +67,15 @@ Emitted when a new reply is created and remains published (not moved to review b
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventThreadReplyCreated` | Yes | - |
-| `reply_author_id` | `string (accountID)` | Yes | Reply author account ID |
-| `reply_id` | `string (postID)` | Yes | Reply post ID |
-| `reply_to_author_id` | `string (accountID)` | No | Optional ID of the author being replied to |
-| `reply_to_target_id` | `string (postID)` | No | Optional ID of the post being replied to |
-| `thread_author_id` | `string (accountID)` | Yes | Thread author account ID |
-| `thread_id` | `string (postID)` | Yes | Thread post ID |
+| Field                | Type                                    | Required | Description                                |
+| -------------------- | --------------------------------------- | -------- | ------------------------------------------ |
+| `event`              | `string, const EventThreadReplyCreated` | Yes      | -                                          |
+| `reply_author_id`    | `string (accountID)`                    | Yes      | Reply author account ID                    |
+| `reply_id`           | `string (postID)`                       | Yes      | Reply post ID                              |
+| `reply_to_author_id` | `string (accountID)`                    | No       | Optional ID of the author being replied to |
+| `reply_to_target_id` | `string (postID)`                       | No       | Optional ID of the post being replied to   |
+| `thread_author_id`   | `string (accountID)`                    | Yes      | Thread author account ID                   |
+| `thread_id`          | `string (postID)`                       | Yes      | Thread post ID                             |
 
 ### EventThreadReplyDeleted
 
@@ -82,11 +83,11 @@ Emitted after a reply is deleted from a thread.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventThreadReplyDeleted` | Yes | - |
-| `reply_id` | `string (postID)` | Yes | Reply post ID |
-| `thread_id` | `string (postID)` | Yes | Thread post ID |
+| Field       | Type                                    | Required | Description    |
+| ----------- | --------------------------------------- | -------- | -------------- |
+| `event`     | `string, const EventThreadReplyDeleted` | Yes      | -              |
+| `reply_id`  | `string (postID)`                       | Yes      | Reply post ID  |
+| `thread_id` | `string (postID)`                       | Yes      | Thread post ID |
 
 ### EventThreadReplyUpdated
 
@@ -94,11 +95,11 @@ Emitted after a reply update succeeds.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventThreadReplyUpdated` | Yes | - |
-| `reply_id` | `string (postID)` | Yes | Reply post ID |
-| `thread_id` | `string (postID)` | Yes | Thread post ID |
+| Field       | Type                                    | Required | Description    |
+| ----------- | --------------------------------------- | -------- | -------------- |
+| `event`     | `string, const EventThreadReplyUpdated` | Yes      | -              |
+| `reply_id`  | `string (postID)`                       | Yes      | Reply post ID  |
+| `thread_id` | `string (postID)`                       | Yes      | Thread post ID |
 
 ### EventThreadReplyPublished
 
@@ -106,11 +107,11 @@ Emitted when a reply visibility transitions to published.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventThreadReplyPublished` | Yes | - |
-| `reply_id` | `string (postID)` | Yes | Reply post ID |
-| `thread_id` | `string (postID)` | Yes | Thread post ID |
+| Field       | Type                                      | Required | Description    |
+| ----------- | ----------------------------------------- | -------- | -------------- |
+| `event`     | `string, const EventThreadReplyPublished` | Yes      | -              |
+| `reply_id`  | `string (postID)`                         | Yes      | Reply post ID  |
+| `thread_id` | `string (postID)`                         | Yes      | Thread post ID |
 
 ### EventThreadReplyUnpublished
 
@@ -118,11 +119,11 @@ Emitted when a previously published reply transitions to a non-published visibil
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventThreadReplyUnpublished` | Yes | - |
-| `reply_id` | `string (postID)` | Yes | Reply post ID |
-| `thread_id` | `string (postID)` | Yes | Thread post ID |
+| Field       | Type                                        | Required | Description    |
+| ----------- | ------------------------------------------- | -------- | -------------- |
+| `event`     | `string, const EventThreadReplyUnpublished` | Yes      | -              |
+| `reply_id`  | `string (postID)`                           | Yes      | Reply post ID  |
+| `thread_id` | `string (postID)`                           | Yes      | Thread post ID |
 
 ### EventPostLiked
 
@@ -130,11 +131,11 @@ Emitted when a member adds a like to a post.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventPostLiked` | Yes | - |
-| `post_id` | `string (postID)` | Yes | Post ID that was liked |
-| `root_post_id` | `string (postID)` | Yes | Root thread post ID |
+| Field          | Type                           | Required | Description            |
+| -------------- | ------------------------------ | -------- | ---------------------- |
+| `event`        | `string, const EventPostLiked` | Yes      | -                      |
+| `post_id`      | `string (postID)`              | Yes      | Post ID that was liked |
+| `root_post_id` | `string (postID)`              | Yes      | Root thread post ID    |
 
 ### EventPostUnliked
 
@@ -142,11 +143,11 @@ Emitted when a member removes a like from a post.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventPostUnliked` | Yes | - |
-| `post_id` | `string (postID)` | Yes | Post ID that was unliked |
-| `root_post_id` | `string (postID)` | Yes | Root thread post ID |
+| Field          | Type                             | Required | Description              |
+| -------------- | -------------------------------- | -------- | ------------------------ |
+| `event`        | `string, const EventPostUnliked` | Yes      | -                        |
+| `post_id`      | `string (postID)`                | Yes      | Post ID that was unliked |
+| `root_post_id` | `string (postID)`                | Yes      | Root thread post ID      |
 
 ### EventPostReacted
 
@@ -154,11 +155,11 @@ Emitted when a member adds an emoji reaction to a post.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventPostReacted` | Yes | - |
-| `post_id` | `string (postID)` | Yes | Post ID that was reacted to |
-| `root_post_id` | `string (postID)` | Yes | Root thread post ID |
+| Field          | Type                             | Required | Description                 |
+| -------------- | -------------------------------- | -------- | --------------------------- |
+| `event`        | `string, const EventPostReacted` | Yes      | -                           |
+| `post_id`      | `string (postID)`                | Yes      | Post ID that was reacted to |
+| `root_post_id` | `string (postID)`                | Yes      | Root thread post ID         |
 
 ### EventPostUnreacted
 
@@ -166,11 +167,11 @@ Emitted when a member removes an emoji reaction from a post.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventPostUnreacted` | Yes | - |
-| `post_id` | `string (postID)` | Yes | Post ID that was unreacted |
-| `root_post_id` | `string (postID)` | Yes | Root thread post ID |
+| Field          | Type                               | Required | Description                |
+| -------------- | ---------------------------------- | -------- | -------------------------- |
+| `event`        | `string, const EventPostUnreacted` | Yes      | -                          |
+| `post_id`      | `string (postID)`                  | Yes      | Post ID that was unreacted |
+| `root_post_id` | `string (postID)`                  | Yes      | Root thread post ID        |
 
 ### EventCategoryUpdated
 
@@ -178,11 +179,11 @@ Emitted when a category is created, updated, or moved.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventCategoryUpdated` | Yes | - |
-| `id` | `string (xid)` | Yes | Category ID |
-| `slug` | `string` | Yes | Category slug |
+| Field   | Type                                 | Required | Description   |
+| ------- | ------------------------------------ | -------- | ------------- |
+| `event` | `string, const EventCategoryUpdated` | Yes      | -             |
+| `id`    | `string (xid)`                       | Yes      | Category ID   |
+| `slug`  | `string`                             | Yes      | Category slug |
 
 ### EventCategoryDeleted
 
@@ -190,11 +191,11 @@ Emitted after a category is deleted.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventCategoryDeleted` | Yes | - |
-| `id` | `string (xid)` | Yes | Category ID |
-| `slug` | `string` | Yes | Category slug |
+| Field   | Type                                 | Required | Description   |
+| ------- | ------------------------------------ | -------- | ------------- |
+| `event` | `string, const EventCategoryDeleted` | Yes      | -             |
+| `id`    | `string (xid)`                       | Yes      | Category ID   |
+| `slug`  | `string`                             | Yes      | Category slug |
 
 ### EventMemberMentioned
 
@@ -202,12 +203,12 @@ Emitted once per mention target when a member mention is detected (self-mentions
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventMemberMentioned` | Yes | - |
-| `by` | `string (accountID)` | Yes | Account ID of the member who mentioned |
-| `item` | `DatagraphRef` | Yes | Reference to the mentioned item. |
-| `source` | `DatagraphRef` | Yes | Reference to the content item where the mention was found. |
+| Field    | Type                                 | Required | Description                                                |
+| -------- | ------------------------------------ | -------- | ---------------------------------------------------------- |
+| `event`  | `string, const EventMemberMentioned` | Yes      | -                                                          |
+| `by`     | `string (accountID)`                 | Yes      | Account ID of the member who mentioned                     |
+| `item`   | `DatagraphRef`                       | Yes      | Reference to the mentioned item.                           |
+| `source` | `DatagraphRef`                       | Yes      | Reference to the content item where the mention was found. |
 
 ### EventNodeCreated
 
@@ -215,11 +216,11 @@ Emitted after a library node is created.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventNodeCreated` | Yes | - |
-| `id` | `string (nodeID)` | Yes | Library node ID |
-| `slug` | `string` | Yes | Node slug |
+| Field   | Type                             | Required | Description     |
+| ------- | -------------------------------- | -------- | --------------- |
+| `event` | `string, const EventNodeCreated` | Yes      | -               |
+| `id`    | `string (nodeID)`                | Yes      | Library node ID |
+| `slug`  | `string`                         | Yes      | Node slug       |
 
 ### EventNodeUpdated
 
@@ -227,11 +228,11 @@ Emitted after a library node is updated, moved, re-ordered, or affected by prope
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventNodeUpdated` | Yes | - |
-| `id` | `string (nodeID)` | Yes | Library node ID |
-| `slug` | `string` | Yes | Node slug |
+| Field   | Type                             | Required | Description     |
+| ------- | -------------------------------- | -------- | --------------- |
+| `event` | `string, const EventNodeUpdated` | Yes      | -               |
+| `id`    | `string (nodeID)`                | Yes      | Library node ID |
+| `slug`  | `string`                         | Yes      | Node slug       |
 
 ### EventNodeDeleted
 
@@ -239,11 +240,11 @@ Emitted after a library node is deleted.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventNodeDeleted` | Yes | - |
-| `id` | `string (nodeID)` | Yes | Library node ID |
-| `slug` | `string` | Yes | Node slug |
+| Field   | Type                             | Required | Description     |
+| ------- | -------------------------------- | -------- | --------------- |
+| `event` | `string, const EventNodeDeleted` | Yes      | -               |
+| `id`    | `string (nodeID)`                | Yes      | Library node ID |
+| `slug`  | `string`                         | Yes      | Node slug       |
 
 ### EventNodePublished
 
@@ -251,11 +252,11 @@ Emitted when a library node becomes published, either on create or after a visib
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventNodePublished` | Yes | - |
-| `id` | `string (nodeID)` | Yes | Library node ID |
-| `slug` | `string` | Yes | Node slug |
+| Field   | Type                               | Required | Description     |
+| ------- | ---------------------------------- | -------- | --------------- |
+| `event` | `string, const EventNodePublished` | Yes      | -               |
+| `id`    | `string (nodeID)`                  | Yes      | Library node ID |
+| `slug`  | `string`                           | Yes      | Node slug       |
 
 ### EventNodeSubmittedForReview
 
@@ -263,11 +264,11 @@ Emitted when a library node transitions to review visibility.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventNodeSubmittedForReview` | Yes | - |
-| `id` | `string (nodeID)` | Yes | Library node ID |
-| `slug` | `string` | Yes | Node slug |
+| Field   | Type                                        | Required | Description     |
+| ------- | ------------------------------------------- | -------- | --------------- |
+| `event` | `string, const EventNodeSubmittedForReview` | Yes      | -               |
+| `id`    | `string (nodeID)`                           | Yes      | Library node ID |
+| `slug`  | `string`                                    | Yes      | Node slug       |
 
 ### EventNodeUnpublished
 
@@ -275,11 +276,11 @@ Emitted when a previously published library node transitions to draft, unlisted,
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventNodeUnpublished` | Yes | - |
-| `id` | `string (nodeID)` | Yes | Library node ID |
-| `slug` | `string` | Yes | Node slug |
+| Field   | Type                                 | Required | Description     |
+| ------- | ------------------------------------ | -------- | --------------- |
+| `event` | `string, const EventNodeUnpublished` | Yes      | -               |
+| `id`    | `string (nodeID)`                    | Yes      | Library node ID |
+| `slug`  | `string`                             | Yes      | Node slug       |
 
 ### EventNodeVersionDraftCreated
 
@@ -287,13 +288,13 @@ Emitted when a draft version is created for a library node.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventNodeVersionDraftCreated` | Yes | - |
-| `author_id` | `string (accountID)` | Yes | Draft author account ID |
-| `node_id` | `string (nodeID)` | Yes | Library node ID |
-| `node_slug` | `string` | Yes | Node slug |
-| `version_id` | `string (versionID)` | Yes | Draft version ID |
+| Field        | Type                                         | Required | Description             |
+| ------------ | -------------------------------------------- | -------- | ----------------------- |
+| `event`      | `string, const EventNodeVersionDraftCreated` | Yes      | -                       |
+| `author_id`  | `string (accountID)`                         | Yes      | Draft author account ID |
+| `node_id`    | `string (nodeID)`                            | Yes      | Library node ID         |
+| `node_slug`  | `string`                                     | Yes      | Node slug               |
+| `version_id` | `string (versionID)`                         | Yes      | Draft version ID        |
 
 ### EventNodeVersionDraftUpdated
 
@@ -301,13 +302,13 @@ Emitted when a draft version is updated.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventNodeVersionDraftUpdated` | Yes | - |
-| `author_id` | `string (accountID)` | Yes | Draft author account ID |
-| `node_id` | `string (nodeID)` | Yes | Library node ID |
-| `node_slug` | `string` | Yes | Node slug |
-| `version_id` | `string (versionID)` | Yes | Draft version ID |
+| Field        | Type                                         | Required | Description             |
+| ------------ | -------------------------------------------- | -------- | ----------------------- |
+| `event`      | `string, const EventNodeVersionDraftUpdated` | Yes      | -                       |
+| `author_id`  | `string (accountID)`                         | Yes      | Draft author account ID |
+| `node_id`    | `string (nodeID)`                            | Yes      | Library node ID         |
+| `node_slug`  | `string`                                     | Yes      | Node slug               |
+| `version_id` | `string (versionID)`                         | Yes      | Draft version ID        |
 
 ### EventNodeVersionDraftDeleted
 
@@ -315,13 +316,13 @@ Emitted when a draft version is discarded.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventNodeVersionDraftDeleted` | Yes | - |
-| `author_id` | `string (accountID)` | Yes | Draft author account ID |
-| `node_id` | `string (nodeID)` | Yes | Library node ID |
-| `node_slug` | `string` | Yes | Node slug |
-| `version_id` | `string (versionID)` | Yes | Draft version ID |
+| Field        | Type                                         | Required | Description             |
+| ------------ | -------------------------------------------- | -------- | ----------------------- |
+| `event`      | `string, const EventNodeVersionDraftDeleted` | Yes      | -                       |
+| `author_id`  | `string (accountID)`                         | Yes      | Draft author account ID |
+| `node_id`    | `string (nodeID)`                            | Yes      | Library node ID         |
+| `node_slug`  | `string`                                     | Yes      | Node slug               |
+| `version_id` | `string (versionID)`                         | Yes      | Draft version ID        |
 
 ### EventNodeVersionDraftApplied
 
@@ -329,13 +330,13 @@ Emitted when a draft version is applied to a library node.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventNodeVersionDraftApplied` | Yes | - |
-| `author_id` | `string (accountID)` | Yes | Draft author account ID |
-| `node_id` | `string (nodeID)` | Yes | Library node ID |
-| `node_slug` | `string` | Yes | Node slug |
-| `version_id` | `string (versionID)` | Yes | Draft version ID |
+| Field        | Type                                         | Required | Description             |
+| ------------ | -------------------------------------------- | -------- | ----------------------- |
+| `event`      | `string, const EventNodeVersionDraftApplied` | Yes      | -                       |
+| `author_id`  | `string (accountID)`                         | Yes      | Draft author account ID |
+| `node_id`    | `string (nodeID)`                            | Yes      | Library node ID         |
+| `node_slug`  | `string`                                     | Yes      | Node slug               |
+| `version_id` | `string (versionID)`                         | Yes      | Draft version ID        |
 
 ### EventAccountCreated
 
@@ -343,10 +344,10 @@ Emitted after a new account is created.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventAccountCreated` | Yes | - |
-| `id` | `string (accountID)` | Yes | Account ID |
+| Field   | Type                                | Required | Description |
+| ------- | ----------------------------------- | -------- | ----------- |
+| `event` | `string, const EventAccountCreated` | Yes      | -           |
+| `id`    | `string (accountID)`                | Yes      | Account ID  |
 
 ### EventAccountUpdated
 
@@ -354,10 +355,10 @@ Emitted after account profile, email, or role assignment changes.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventAccountUpdated` | Yes | - |
-| `id` | `string (accountID)` | Yes | Account ID |
+| Field   | Type                                | Required | Description |
+| ------- | ----------------------------------- | -------- | ----------- |
+| `event` | `string, const EventAccountUpdated` | Yes      | -           |
+| `id`    | `string (accountID)`                | Yes      | Account ID  |
 
 ### EventAccountSuspended
 
@@ -365,10 +366,10 @@ Emitted when an account is suspended.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventAccountSuspended` | Yes | - |
-| `id` | `string (accountID)` | Yes | Account ID |
+| Field   | Type                                  | Required | Description |
+| ------- | ------------------------------------- | -------- | ----------- |
+| `event` | `string, const EventAccountSuspended` | Yes      | -           |
+| `id`    | `string (accountID)`                  | Yes      | Account ID  |
 
 ### EventAccountUnsuspended
 
@@ -376,10 +377,10 @@ Emitted when a suspended account is reinstated.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventAccountUnsuspended` | Yes | - |
-| `id` | `string (accountID)` | Yes | Account ID |
+| Field   | Type                                    | Required | Description |
+| ------- | --------------------------------------- | -------- | ----------- |
+| `event` | `string, const EventAccountUnsuspended` | Yes      | -           |
+| `id`    | `string (accountID)`                    | Yes      | Account ID  |
 
 ### EventModerationNoteCreated
 
@@ -387,11 +388,11 @@ Emitted when a moderator creates an internal account moderation note.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventModerationNoteCreated` | Yes | - |
-| `account_id` | `string (accountID)` | Yes | Target account ID |
-| `note_id` | `string (xid)` | Yes | Moderation note ID |
+| Field        | Type                                       | Required | Description        |
+| ------------ | ------------------------------------------ | -------- | ------------------ |
+| `event`      | `string, const EventModerationNoteCreated` | Yes      | -                  |
+| `account_id` | `string (accountID)`                       | Yes      | Target account ID  |
+| `note_id`    | `string (xid)`                             | Yes      | Moderation note ID |
 
 ### EventModerationNoteDeleted
 
@@ -399,11 +400,11 @@ Emitted when a moderator deletes an internal account moderation note.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventModerationNoteDeleted` | Yes | - |
-| `account_id` | `string (accountID)` | Yes | Target account ID |
-| `note_id` | `string (xid)` | Yes | Moderation note ID |
+| Field        | Type                                       | Required | Description        |
+| ------------ | ------------------------------------------ | -------- | ------------------ |
+| `event`      | `string, const EventModerationNoteDeleted` | Yes      | -                  |
+| `account_id` | `string (accountID)`                       | Yes      | Target account ID  |
+| `note_id`    | `string (xid)`                             | Yes      | Moderation note ID |
 
 ### EventAccountWarned
 
@@ -411,12 +412,12 @@ Emitted when a moderation warning is issued to an account.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventAccountWarned` | Yes | - |
-| `account_id` | `string (accountID)` | Yes | Account ID that received the warning. |
-| `author_id` | `string (accountID)` | Yes | Account ID that issued the warning. |
-| `warning_id` | `string (identifier)` | Yes | Warning record ID. |
+| Field        | Type                               | Required | Description                           |
+| ------------ | ---------------------------------- | -------- | ------------------------------------- |
+| `event`      | `string, const EventAccountWarned` | Yes      | -                                     |
+| `account_id` | `string (accountID)`               | Yes      | Account ID that received the warning. |
+| `author_id`  | `string (accountID)`               | Yes      | Account ID that issued the warning.   |
+| `warning_id` | `string (identifier)`              | Yes      | Warning record ID.                    |
 
 ### EventAccountWarningUpdated
 
@@ -424,14 +425,14 @@ Emitted when a moderation warning is edited.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventAccountWarningUpdated` | Yes | - |
-| `account_id` | `string (accountID)` | Yes | Account ID whose warning was edited. |
-| `author_id` | `string (accountID)` | Yes | Account ID that edited the warning. |
-| `previous_reason` | `string` | Yes | Warning reason before the edit. |
-| `reason` | `string` | Yes | Updated warning reason. |
-| `warning_id` | `string (identifier)` | Yes | Warning record ID. |
+| Field             | Type                                       | Required | Description                          |
+| ----------------- | ------------------------------------------ | -------- | ------------------------------------ |
+| `event`           | `string, const EventAccountWarningUpdated` | Yes      | -                                    |
+| `account_id`      | `string (accountID)`                       | Yes      | Account ID whose warning was edited. |
+| `author_id`       | `string (accountID)`                       | Yes      | Account ID that edited the warning.  |
+| `previous_reason` | `string`                                   | Yes      | Warning reason before the edit.      |
+| `reason`          | `string`                                   | Yes      | Updated warning reason.              |
+| `warning_id`      | `string (identifier)`                      | Yes      | Warning record ID.                   |
 
 ### EventAccountWarningDeleted
 
@@ -439,12 +440,12 @@ Emitted when a moderation warning is permanently deleted.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventAccountWarningDeleted` | Yes | - |
-| `account_id` | `string (accountID)` | Yes | Account ID whose warning was deleted. |
-| `author_id` | `string (accountID)` | Yes | Account ID that deleted the warning. |
-| `warning_id` | `string (identifier)` | Yes | Warning record ID. |
+| Field        | Type                                       | Required | Description                           |
+| ------------ | ------------------------------------------ | -------- | ------------------------------------- |
+| `event`      | `string, const EventAccountWarningDeleted` | Yes      | -                                     |
+| `account_id` | `string (accountID)`                       | Yes      | Account ID whose warning was deleted. |
+| `author_id`  | `string (accountID)`                       | Yes      | Account ID that deleted the warning.  |
+| `warning_id` | `string (identifier)`                      | Yes      | Warning record ID.                    |
 
 ### EventReportCreated
 
@@ -452,12 +453,12 @@ Emitted when a new member or system report is created.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventReportCreated` | Yes | - |
-| `id` | `string (reportID)` | Yes | Report ID |
-| `reported_by` | `string (accountID)` | No | Optional account ID of reporter, not set if it was an automated system report. |
-| `target` | `DatagraphRef` | No | Reference to the item that was reported. |
+| Field         | Type                               | Required | Description                                                                    |
+| ------------- | ---------------------------------- | -------- | ------------------------------------------------------------------------------ |
+| `event`       | `string, const EventReportCreated` | Yes      | -                                                                              |
+| `id`          | `string (reportID)`                | Yes      | Report ID                                                                      |
+| `reported_by` | `string (accountID)`               | No       | Optional account ID of reporter, not set if it was an automated system report. |
+| `target`      | `DatagraphRef`                     | No       | Reference to the item that was reported.                                       |
 
 ### EventReportUpdated
 
@@ -465,14 +466,14 @@ Emitted when a report is updated, including status and handler changes.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventReportUpdated` | Yes | - |
-| `handled_by` | `string (accountID)` | No | Optional account ID of handler |
-| `id` | `string (reportID)` | Yes | Report ID |
-| `reported_by` | `string (accountID)` | No | Optional account ID of reporter |
-| `status` | `string (reportStatus)` | Yes | Report status |
-| `target` | `DatagraphRef` | No | Reference to the item that the report is about. |
+| Field         | Type                               | Required | Description                                     |
+| ------------- | ---------------------------------- | -------- | ----------------------------------------------- |
+| `event`       | `string, const EventReportUpdated` | Yes      | -                                               |
+| `handled_by`  | `string (accountID)`               | No       | Optional account ID of handler                  |
+| `id`          | `string (reportID)`                | Yes      | Report ID                                       |
+| `reported_by` | `string (accountID)`               | No       | Optional account ID of reporter                 |
+| `status`      | `string (reportStatus)`            | Yes      | Report status                                   |
+| `target`      | `DatagraphRef`                     | No       | Reference to the item that the report is about. |
 
 ### EventActivityCreated
 
@@ -480,10 +481,10 @@ Emitted after an activity event is created.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventActivityCreated` | Yes | - |
-| `id` | `string (eventID)` | Yes | Activity/Event ID |
+| Field   | Type                                 | Required | Description       |
+| ------- | ------------------------------------ | -------- | ----------------- |
+| `event` | `string, const EventActivityCreated` | Yes      | -                 |
+| `id`    | `string (eventID)`                   | Yes      | Activity/Event ID |
 
 ### EventActivityUpdated
 
@@ -491,10 +492,10 @@ Emitted after an activity event is updated.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventActivityUpdated` | Yes | - |
-| `id` | `string (eventID)` | Yes | Activity/Event ID |
+| Field   | Type                                 | Required | Description       |
+| ------- | ------------------------------------ | -------- | ----------------- |
+| `event` | `string, const EventActivityUpdated` | Yes      | -                 |
+| `id`    | `string (eventID)`                   | Yes      | Activity/Event ID |
 
 ### EventActivityDeleted
 
@@ -502,10 +503,10 @@ Emitted after an activity event is deleted.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventActivityDeleted` | Yes | - |
-| `id` | `string (eventID)` | Yes | Activity/Event ID |
+| Field   | Type                                 | Required | Description       |
+| ------- | ------------------------------------ | -------- | ----------------- |
+| `event` | `string, const EventActivityDeleted` | Yes      | -                 |
+| `id`    | `string (eventID)`                   | Yes      | Activity/Event ID |
 
 ### EventActivityPublished
 
@@ -513,10 +514,10 @@ Emitted when an activity event becomes published, either on create or after a vi
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventActivityPublished` | Yes | - |
-| `id` | `string (eventID)` | Yes | Activity/Event ID |
+| Field   | Type                                   | Required | Description       |
+| ------- | -------------------------------------- | -------- | ----------------- |
+| `event` | `string, const EventActivityPublished` | Yes      | -                 |
+| `id`    | `string (eventID)`                     | Yes      | Activity/Event ID |
 
 ### EventSettingsUpdated
 
@@ -524,8 +525,7 @@ Emitted when site settings are updated via the admin settings manager.
 
 Payload fields:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `event` | `string, const EventSettingsUpdated` | Yes | - |
-| `settings` | `object` | Yes | Settings object |
-
+| Field      | Type                                 | Required | Description     |
+| ---------- | ------------------------------------ | -------- | --------------- |
+| `event`    | `string, const EventSettingsUpdated` | Yes      | -               |
+| `settings` | `object`                             | Yes      | Settings object |

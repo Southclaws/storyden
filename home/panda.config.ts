@@ -63,6 +63,7 @@ const tokens = defineTokens({
 });
 
 export default defineConfig({
+  presets: ["@pandacss/preset-base", "@pandacss/preset-panda"],
   preflight: false,
   strictPropertyValues: true,
   strictTokens: false,
@@ -76,7 +77,7 @@ export default defineConfig({
   exclude: [],
   patterns: {
     extend: {
-      FrostedGlass: {
+      frostedGlass: {
         description: `A frosted glass effect for overlays, modals, menus, etc. This is most prominently used on the navigation overlays and menus.`,
         properties: {},
         transform() {
@@ -87,7 +88,7 @@ export default defineConfig({
           };
         },
       },
-      Floating: {
+      floating: {
         description: `Floating overlay elements.`,
         properties: {},
         transform() {
@@ -100,7 +101,7 @@ export default defineConfig({
           };
         },
       },
-      Card: {
+      card: {
         description: `A card component that can be used to display content in a container with a border and a shadow.`,
         properties: {
           kind: {

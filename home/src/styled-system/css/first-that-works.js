@@ -1,0 +1,1 @@
+export const firstThatWorks = (...values) => `firstThatWorks(${values.join(', ')})`

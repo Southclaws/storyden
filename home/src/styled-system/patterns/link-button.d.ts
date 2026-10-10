@@ -1,22 +1,18 @@
-/* eslint-disable */
-import type { SystemStyleObject, ConditionalValue } from '../types/index';
-import type { Properties } from '../types/csstype';
-import type { SystemProperties } from '../types/style-props';
-import type { DistributiveOmit } from '../types/system-types';
-import type { Tokens } from '../tokens/index';
+import type { PatternRuntimeConfig } from '../types/pattern';
+import type { SystemStyleObject } from '../types/system';
 
-export interface LinkButtonProperties {
-   
-}
+export interface LinkButtonProperties {}
 
-interface LinkButtonStyles extends LinkButtonProperties, DistributiveOmit<SystemStyleObject, keyof LinkButtonProperties > {}
+type LinkButtonRestStyles = Omit<SystemStyleObject, keyof LinkButtonProperties>
+
+interface LinkButtonStyles extends LinkButtonProperties, LinkButtonRestStyles {}
 
 interface LinkButtonPatternFn {
   (styles?: LinkButtonStyles): string
   raw: (styles?: LinkButtonStyles) => SystemStyleObject
+  propKeys: Array<keyof LinkButtonProperties>
 }
 
-/**
- * Link button
- */
+export declare function linkButtonRaw(styles?: LinkButtonStyles): SystemStyleObject;
+
 export declare const linkButton: LinkButtonPatternFn;

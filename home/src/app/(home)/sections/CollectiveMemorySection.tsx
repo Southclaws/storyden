@@ -176,7 +176,7 @@ function Curate() {
 export function CollectiveMemorySection() {
   return (
     <styled.section w="full" bgColor="Mono.slush">
-      <VStack position="relative" zIndex="1" w="full">
+      <VStack position="relative" zIndex="1" w="full" gap="0">
         <Permanence />
         <Organise />
         <Gardens />

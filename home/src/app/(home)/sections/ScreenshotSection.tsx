@@ -44,6 +44,7 @@ export function ScreenshotSection() {
             srcSet="/2026_app_screenshot_1024.webp 1024w, /2026_app_screenshot.webp 1469w"
             sizes="(min-width: 1597px) 1469px, (min-width: 1280px) calc(100vw - 128px), calc(100vw - 96px)"
           />
+          {/* oxlint-disable-next-line next/no-img-element -- Pre-optimized picture sources provide separate mobile and desktop crops. */}
           <img
             src="/2026_app_screenshot.png"
             alt=""

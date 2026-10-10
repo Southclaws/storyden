@@ -1,9 +1,3 @@
 {
-    "pages": [
-        "threads",
-        "categories",
-        "tags",
-        "replies",
-        "reacts"
-    ]
+  "pages": ["threads", "categories", "tags", "replies", "reacts"]
 }

@@ -1,9 +1,10 @@
-import { blog } from "@/lib/source";
-import { getMDXComponents } from "@/mdx-components";
-import { styled, VStack } from "@/styled-system/jsx";
-import { linkButton } from "@/styled-system/patterns";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import { notFound } from "next/navigation";
+
+import { blog } from "@/lib/source";
+import { getMDXComponents } from "@/mdx-components";
+import { VStack, styled } from "@/styled-system/jsx";
+import { linkButton } from "@/styled-system/patterns";
 
 export default async function Page(props: {
   params: Promise<{ slug?: string[] }>;

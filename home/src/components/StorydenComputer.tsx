@@ -1,23 +1,24 @@
 "use client";
 
+import Image from "next/image";
+import {
+  PropsWithChildren,
+  ReactElement,
+  forwardRef,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+
 import {
   Box,
   Center,
   Grid,
   GridItem,
-  styled,
   VStack,
+  styled,
 } from "@/styled-system/jsx";
 import { token } from "@/styled-system/tokens";
-import Image from "next/image";
-import {
-  forwardRef,
-  PropsWithChildren,
-  ReactElement,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
 
 type label = "l1" | "l2" | "l3" | "l4" | "l5" | "l6";
 
@@ -160,32 +161,32 @@ export function StorydenComputer() {
       const l1p = getSvgPoint(
         svgRef.current,
         l1.left + l1.width,
-        l1.top + l1.height / 2
+        l1.top + l1.height / 2,
       );
       const l2p = getSvgPoint(
         svgRef.current,
         l2.left + l2.width,
-        l2.top + l2.height / 2
+        l2.top + l2.height / 2,
       );
       const l3p = getSvgPoint(
         svgRef.current,
         l3.left + l3.width,
-        l3.top + l3.height / 2
+        l3.top + l3.height / 2,
       );
       const l4p = getSvgPoint(
         svgRef.current,
         l4.left, //
-        l4.top + l4.height / 2
+        l4.top + l4.height / 2,
       );
       const l5p = getSvgPoint(
         svgRef.current,
         l5.left, //
-        l5.top + l5.height / 2
+        l5.top + l5.height / 2,
       );
       const l6p = getSvgPoint(
         svgRef.current,
         l6.left, //
-        l6.top + l6.height / 2
+        l6.top + l6.height / 2,
       );
 
       setTest({
@@ -218,11 +219,9 @@ export function StorydenComputer() {
         width="1023"
         height="569"
         alt=""
-        style={
-          {
-            //   border: "1px solid blue",
-          }
-        }
+        style={{
+          //   border: "1px solid blue",
+        }}
       />
 
       <Grid
@@ -231,11 +230,9 @@ export function StorydenComputer() {
         h="full"
         gridTemplateRows="33% auto 33%"
         gridTemplateColumns="35% 1fr 25%"
-        style={
-          {
-            //   border: "1px dotted red",
-          }
-        }
+        style={{
+          //   border: "1px dotted red",
+        }}
       >
         <Center gridRow="1">
           <Label ref={l1ref} onClick={() => setModal("l1")}>

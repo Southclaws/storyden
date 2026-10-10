@@ -1,7 +1,3 @@
 {
-    "pages": [
-        "sqlite",
-        "postgresql",
-        "turso"
-    ]
+  "pages": ["sqlite", "postgresql", "turso"]
 }

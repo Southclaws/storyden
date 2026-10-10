@@ -1,9 +1,10 @@
 "use client";
 
-import { styled } from "@/styled-system/jsx";
 import { useCopyToClipboard, useIsClient } from "@uidotdev/usehooks";
 import { CopyIcon } from "lucide-react";
 import { useState } from "react";
+
+import { styled } from "@/styled-system/jsx";
 
 import "./hearts.css";
 
@@ -87,18 +88,18 @@ export function DockerCopyButton() {
 
       console.log(
         "%c ᛟ  Welcome to the homestead. Enjoy your corner of the web!",
-        "font-size: 1.5rem; font-weight: bold; color: #d8dbcd; background: linear-gradient(90deg, #307343, #104059); padding: 8px 12px; border-radius: 6px;"
+        "font-size: 1.5rem; font-weight: bold; color: #d8dbcd; background: linear-gradient(90deg, #307343, #104059); padding: 8px 12px; border-radius: 6px;",
       );
       console.log("You're curious, what are you looking for?");
       console.log(
-        "docs for your brand new copied docker command? https://www.storyden.org/docs/introduction/vps/docker"
+        "docs for your brand new copied docker command? https://www.storyden.org/docs/introduction/vps/docker",
       );
       console.log(
-        "feeling contribute-y? check out hub de la git: https://github.com/Southclaws/storyden"
+        "feeling contribute-y? check out hub de la git: https://github.com/Southclaws/storyden",
       );
       console.log(
         "%c ᛟ stay fresh",
-        "font-style: italic; color: #854627; background: #d68e4d; padding: 4px 8px; border-radius: 4px;"
+        "font-style: italic; color: #854627; background: #d68e4d; padding: 4px 8px; border-radius: 4px;",
       );
     }
 
@@ -122,9 +123,9 @@ export function DockerCopyButton() {
             setHearts((h) =>
               h.filter((i) => {
                 return !h.some((n) => n.id === i.id);
-              })
+              }),
             ),
-          1000
+          1000,
         );
       }, heart * 100);
     }

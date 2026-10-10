@@ -1,7 +1,4 @@
 {
-    "title": "Supervised Runtimes",
-    "pages": [
-        "local",
-        "sprites"
-    ]
+  "title": "Supervised Runtimes",
+  "pages": ["local", "sprites"]
 }

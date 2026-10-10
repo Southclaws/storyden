@@ -1,19 +1,19 @@
-/* eslint-disable */
-import type { SystemStyleObject } from '../types/index';
+import type { SystemStyleObject } from '../types/system';
 
 type Styles = SystemStyleObject | undefined | null | false
+type StyleList = Styles | StyleList[]
 
 interface CssRawFunction {
   (styles: Styles): SystemStyleObject
-  (styles: Styles[]): SystemStyleObject
-  (...styles: Array<Styles | Styles[]>): SystemStyleObject
+  (styles: StyleList[]): SystemStyleObject
+  (...styles: StyleList[]): SystemStyleObject
   (styles: Styles): SystemStyleObject
 }
 
 interface CssFunction {
   (styles: Styles): string
-  (styles: Styles[]): string
-  (...styles: Array<Styles | Styles[]>): string
+  (styles: StyleList[]): string
+  (...styles: StyleList[]): string
   (styles: Styles): string
 
   raw: CssRawFunction

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
 import type { MermaidConfig } from "mermaid";
 import { useTheme } from "next-themes";
+import { useEffect, useId, useRef, useState } from "react";
 
 export function Mermaid({ chart }: { chart: string }) {
   const id = useId();
@@ -30,7 +30,7 @@ export function Mermaid({ chart }: { chart: string }) {
           // strip invalid characters for `id` attribute
           id.replaceAll(":", ""),
           chart.replaceAll("\\n", "\n"),
-          containerRef.current
+          containerRef.current,
         );
         setSvg(svg);
       } catch (error) {

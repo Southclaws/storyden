@@ -1,8 +1,8 @@
-import { Box, Grid, GridItem, HStack, VStack } from "@/styled-system/jsx";
 import Image from "next/image";
 import Link from "next/link";
 
 import { cx } from "@/styled-system/css";
+import { Box, Grid, GridItem, HStack, VStack } from "@/styled-system/jsx";
 import { linkButton } from "@/styled-system/patterns";
 
 export function HeroSection() {

@@ -1,13 +1,13 @@
 import { RootProvider } from "fumadocs-ui/provider/next";
-import "fumadocs-ui/style.css";
+import { Metadata, Viewport } from "next";
+import Script from "next/script";
 import type { ReactNode } from "react";
 
-import { joie, worksans, hedvig, intelone, gorton } from "@/fonts";
-import "./globals.css";
-
-import Script from "next/script";
+import { gorton, hedvig, intelone, joie, worksans } from "@/fonts";
 import { cx } from "@/styled-system/css";
-import { Metadata, Viewport } from "next";
+
+import "./globals.css";
+import "fumadocs-ui/style.css";
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
@@ -18,7 +18,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         worksans.variable,
         hedvig.variable,
         intelone.variable,
-        gorton.variable
+        gorton.variable,
       )}
       suppressHydrationWarning
     >
@@ -40,7 +40,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           href="/favicon-96x96.png"
         />
         <link rel="manifest" href="/site.webmanifest" />
-        <Script type="text/javascript">
+        <Script id="clarity-analytics" type="text/javascript">
           {`(function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;

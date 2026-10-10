@@ -1,7 +1,5 @@
 {
-    "title": "Tutorials",
-    "description": "Hands-on plugin walkthroughs.",
-    "pages": [
-        "go-plugin"
-    ]
+  "title": "Tutorials",
+  "description": "Hands-on plugin walkthroughs.",
+  "pages": ["go-plugin"]
 }

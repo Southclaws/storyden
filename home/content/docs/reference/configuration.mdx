@@ -14,8 +14,14 @@ These settings general infrastructure-level configuration settings for managing 
 ### `LOG_LEVEL`
 
 <table>
-<tr><td>type</td><td>`debug`, `info`, `warn`, `error`</td></tr>
-<tr><td>default</td><td>`info`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`debug`, `info`, `warn`, `error`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`info`</td>
+  </tr>
 </table>
 
 Can be set to either:
@@ -28,8 +34,14 @@ Can be set to either:
 ### `LOG_FORMAT`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Can be set to either:
@@ -41,8 +53,14 @@ Can be set to either:
 ### `RUN_FRONTEND`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>(empty string)</td>
+  </tr>
 </table>
 
 Determines whether or not the backend service will also start the frontend Node.js process. When empty, it will not
@@ -52,8 +70,14 @@ When a path is provided, Storyden will execute `node <path>` to start the fronte
 ### `PROXY_FRONTEND_ADDRESS`
 
 <table>
-<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
+  <tr>
+    <td>type</td>
+    <td>url (e.g. http://example.com)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>(empty string)</td>
+  </tr>
 </table>
 
 Used in conjunction with `RUN_FRONTEND`. This is the address that the frontend will be available at. This is used by the fullstack Docker image to proxy requests that don't match any `/api` or other routes to the frontend process.
@@ -63,8 +87,14 @@ In the default `fullstack` image, this is set to `http://localhost:3000` which i
 ### `SSR_TRUSTED_SOURCE_CIDRS`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>(empty string)</td>
+  </tr>
 </table>
 
 Comma or newline separated list of CIDR ranges (or plain IPs) that are allowed as direct source addresses for SSR-origin API requests (`X-Storyden-SSR: 1`) when resolving `X-Forwarded-For` in `xff_trusted_proxies` mode.
@@ -72,6 +102,7 @@ Comma or newline separated list of CIDR ranges (or plain IPs) that are allowed a
 This is useful when your frontend SSR process runs outside the backend host and therefore SSR API calls do not originate from loopback.
 
 Storyden also derives trusted SSR source addresses from `PROXY_FRONTEND_ADDRESS` when possible:
+
 - `localhost` trusts both `127.0.0.1/32` and `::1/128`
 - literal IP hosts are trusted automatically
 
@@ -82,8 +113,14 @@ Configuration settings for aiding in development of Storyden clients.
 ### `DEV_CHAOS_SLOW_MODE`
 
 <table>
-<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>duration (e.g. 1h, 1m, 1s)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Simulates slow requests.
@@ -93,8 +130,14 @@ This will add a random delay between zero and this value to all requests. This i
 ### `DEV_CHAOS_SLOW_MODE_QUEUE`
 
 <table>
-<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>duration (e.g. 1h, 1m, 1s)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Simulates slow message delivery in the internal message queue.
@@ -104,8 +147,14 @@ This will add a random delay between zero and this value to all messages in the 
 ### `DEV_CHAOS_FAIL_RATE`
 
 <table>
-<tr><td>type</td><td>float (e.g. `1.0`, `1.5`)</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>float (e.g. `1.0`, `1.5`)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 A value between 0 and 1 which simulates failed requests.
@@ -119,13 +168,20 @@ Configuration settings for core functionality, pretty much all of these will nee
 ### `DATABASE_URL`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`sqlite://data/data.db?_pragma=foreign_keys(1)`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`sqlite://data/data.db?_pragma=foreign_keys(1)`</td>
+  </tr>
 </table>
 
 The database URL to connect to. This can be a SQLite, PostgreSQL, or CockroachDB URL.
 
 The accepted schemes for this URL are:
+
 - `sqlite://` or `sqlite3://` for SQLite or Litestream.
 - `postgres://` or `postgresql://` for PostgreSQL, CockroachDB and any other PostgreSQL-compatible database
 - `libsql://` for Turso/libSQL.
@@ -135,8 +191,14 @@ The accepted schemes for this URL are:
 ### `LISTEN_ADDR`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`0.0.0.0:8000`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`0.0.0.0:8000`</td>
+  </tr>
 </table>
 
 The interface on which the API service will for HTTP requests.
@@ -146,8 +208,14 @@ Typically, in a containerised environment, this should be all interfaces (`0.0.0
 ### `PUBLIC_WEB_ADDRESS`
 
 <table>
-<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
-<tr><td>default</td><td>`http://localhost:3000`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>url (e.g. http://example.com)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`http://localhost:3000`</td>
+  </tr>
 </table>
 
 The address at which the web frontend will be hosted.
@@ -159,8 +227,14 @@ This is by default `http://localhost:3000` when running locally, or when deployi
 ### `PUBLIC_API_ADDRESS`
 
 <table>
-<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
-<tr><td>default</td><td>`http://localhost:8000`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>url (e.g. http://example.com)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`http://localhost:8000`</td>
+  </tr>
 </table>
 
 The address at which the public API will be accessible.
@@ -172,8 +246,14 @@ Please note that both the public API address and public web address must share t
 ### `CORS_ALLOWED_ORIGINS`
 
 <table>
-<tr><td>type</td><td>`[]string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`[]string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Additional browser origins permitted to make credentialed cross-origin requests.
@@ -197,8 +277,14 @@ stored in the cache provider instead.
 ### `RATE_LIMIT`
 
 <table>
-<tr><td>type</td><td>`integer` (number without decimal point)</td></tr>
-<tr><td>default</td><td>`5000`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`integer` (number without decimal point)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`5000`</td>
+  </tr>
 </table>
 
 Maximum number of "units" allowed within the sliding window defined by `RATE_LIMIT_PERIOD`.
@@ -213,8 +299,14 @@ You can also configure custom overrides in the System Settings screen. However, 
 ### `RATE_LIMIT_PERIOD`
 
 <table>
-<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
-<tr><td>default</td><td>`1h`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>duration (e.g. 1h, 1m, 1s)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`1h`</td>
+  </tr>
 </table>
 
 Sliding window duration used to enforce `RATE_LIMIT`.
@@ -225,8 +317,14 @@ On each request, Storyden considers the total number of units consumed in the la
 ### `RATE_LIMIT_BUCKET`
 
 <table>
-<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
-<tr><td>default</td><td>`1m`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>duration (e.g. 1h, 1m, 1s)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`1m`</td>
+  </tr>
 </table>
 
 Bucket size (granularity) used to approximate the sliding window.
@@ -243,8 +341,14 @@ Rule of thumb: set this to ~1/60 of `RATE_LIMIT_PERIOD` (e.g. 1m buckets for a 1
 ### `RATE_LIMIT_GUEST_COST`
 
 <table>
-<tr><td>type</td><td>`integer` (number without decimal point)</td></tr>
-<tr><td>default</td><td>`1`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`integer` (number without decimal point)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`1`</td>
+  </tr>
 </table>
 
 Cost multiplier applied to unauthenticated (guest) requests.
@@ -259,11 +363,18 @@ Configuration for monitoring via OpenTelemetry-compatible software.
 ### `OTEL_PROVIDER`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>(empty string)</td>
+  </tr>
 </table>
 
 Either:
+
 - `otlp` for any standard OpenTelemetry collector, or `file://...` JSONL output when `OTEL_EXPORTER_OTLP_ENDPOINT` is a file URL.
 - `sentry` for Sentry (which is OpenTelemetry-compatible, however requires its own specific configuration.)
 - `logger` for local logging to the console. This is only really useful for Storyden developers and is very noisy.
@@ -271,8 +382,14 @@ Either:
 ### `OTEL_EXPORTER_OTLP_ENDPOINT`
 
 <table>
-<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
+  <tr>
+    <td>type</td>
+    <td>url (e.g. http://example.com)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>(empty string)</td>
+  </tr>
 </table>
 
 The collector endpoint for sending OTEL data.
@@ -284,8 +401,14 @@ or `file:./otel-logs.jsonl`.
 ### `SENTRY_DSN`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>(empty string)</td>
+  </tr>
 </table>
 
 When `OTEL_PROVIDER` is set to `sentry`, this is the DSN for the Sentry project.
@@ -299,8 +422,14 @@ When enabling email features, you must also set `JWT_SECRET` as this is used to 
 ### `EMAIL_PROVIDER`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Either:
@@ -313,8 +442,14 @@ Either:
 ### `SMTP_HOST`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The hostname of the SMTP server. This is required for sending emails via SMTP.
@@ -324,13 +459,20 @@ This is typically something like `smtp.gmail.com`, `smtp.outlook.com`, or your o
 ### `SMTP_PORT`
 
 <table>
-<tr><td>type</td><td>`integer` (number without decimal point)</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`integer` (number without decimal point)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The port of the SMTP server. This is required for sending emails via SMTP.
 
 Common values are:
+
 - `587` for STARTTLS (recommended)
 - `465` for implicit TLS/SSL
 - `25` for unencrypted SMTP (not recommended for production)
@@ -338,8 +480,14 @@ Common values are:
 ### `SMTP_USERNAME`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The username for SMTP authentication. This is typically your email address.
@@ -347,8 +495,14 @@ The username for SMTP authentication. This is typically your email address.
 ### `SMTP_PASSWORD`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The password for SMTP authentication. For services like Gmail, this may be an "app password" rather than your regular password.
@@ -356,8 +510,14 @@ The password for SMTP authentication. For services like Gmail, this may be an "a
 ### `SMTP_FROM_NAME`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The name that will be used as the sender name for emails sent via SMTP.
@@ -367,8 +527,14 @@ This is typically the name of your community or organisation.
 ### `SMTP_FROM_ADDRESS`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The email address that will be used as the sender address for emails sent via SMTP.
@@ -378,8 +544,14 @@ This is typically a no-reply address, such as `no-reply@<your-domain>`.
 ### `SMTP_USE_TLS`
 
 <table>
-<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
-<tr><td>default</td><td>`true`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>boolean (`true` or `false`, case sensitive)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`true`</td>
+  </tr>
 </table>
 
 Whether to require TLS encryption for SMTP connections.
@@ -390,8 +562,14 @@ Set to `false` only if your SMTP server does not support encryption (not recomme
 ### `SENDGRID_FROM_NAME`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The name that will be used as the sender name for emails sent via SendGrid.
@@ -401,8 +579,14 @@ This is typically the name of your community or organisation.
 ### `SENDGRID_FROM_ADDRESS`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The email address that will be used as the sender address for emails sent via SendGrid.
@@ -412,8 +596,14 @@ This is typically a no-reply address, such as `no-reply@<your-domain>`.
 ### `SENDGRID_API_KEY`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The API key for the SendGrid account. This is required for sending emails via SendGrid.
@@ -429,8 +619,14 @@ In order to enable any of these providers, you must set a JWT secret. This is us
 ### `JWT_SECRET`
 
 <table>
-<tr><td>type</td><td>`[]byte`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`[]byte`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The secret key used to sign JWT tokens. This is used for authentication and should be kept secret.
@@ -442,8 +638,14 @@ The JWT secret is required if you enable any of the OAuth providers or enable em
 ### `OAUTH_GOOGLE_ENABLED`
 
 <table>
-<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>boolean (`true` or `false`, case sensitive)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Enable Google SSO authentication.
@@ -451,8 +653,14 @@ Enable Google SSO authentication.
 ### `OAUTH_GOOGLE_CLIENT_ID`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The client ID for the Google OAuth2 application.
@@ -460,8 +668,14 @@ The client ID for the Google OAuth2 application.
 ### `OAUTH_GOOGLE_CLIENT_SECRET`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The client secret for the Google OAuth2 application.
@@ -469,8 +683,14 @@ The client secret for the Google OAuth2 application.
 ### `OAUTH_GITHUB_ENABLED`
 
 <table>
-<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>boolean (`true` or `false`, case sensitive)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Enable GitHub SSO authentication.
@@ -478,8 +698,14 @@ Enable GitHub SSO authentication.
 ### `OAUTH_GITHUB_CLIENT_ID`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The client ID for the GitHub OAuth2 application.
@@ -487,8 +713,14 @@ The client ID for the GitHub OAuth2 application.
 ### `OAUTH_GITHUB_CLIENT_SECRET`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The client secret for the GitHub OAuth2 application.
@@ -496,8 +728,14 @@ The client secret for the GitHub OAuth2 application.
 ### `OAUTH_DISCORD_ENABLED`
 
 <table>
-<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>boolean (`true` or `false`, case sensitive)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Enable Discord SSO authentication.
@@ -505,8 +743,14 @@ Enable Discord SSO authentication.
 ### `OAUTH_DISCORD_CLIENT_ID`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The client ID for the Discord OAuth2 application.
@@ -514,8 +758,14 @@ The client ID for the Discord OAuth2 application.
 ### `OAUTH_DISCORD_CLIENT_SECRET`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The client secret for the Discord OAuth2 application.
@@ -523,8 +773,14 @@ The client secret for the Discord OAuth2 application.
 ### `OAUTH_KEYCLOAK_ENABLED`
 
 <table>
-<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>boolean (`true` or `false`, case sensitive)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Enable Keycloak OIDC authentication.
@@ -532,8 +788,14 @@ Enable Keycloak OIDC authentication.
 ### `OAUTH_KEYCLOAK_CLIENT_ID`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The client ID for the Keycloak OAuth2 application.
@@ -541,8 +803,14 @@ The client ID for the Keycloak OAuth2 application.
 ### `OAUTH_KEYCLOAK_CLIENT_SECRET`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The client secret for the Keycloak OAuth2 application.
@@ -550,8 +818,14 @@ The client secret for the Keycloak OAuth2 application.
 ### `OAUTH_KEYCLOAK_ISSUER_URL`
 
 <table>
-<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>url (e.g. http://example.com)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The issuer/discovery URL for the Keycloak realm (e.g. https://auth.example.com/realms/YourRealm).
@@ -559,8 +833,14 @@ The issuer/discovery URL for the Keycloak realm (e.g. https://auth.example.com/r
 ### `OAUTH_KEYCLOAK_DISPLAY_NAME`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`Keycloak`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`Keycloak`</td>
+  </tr>
 </table>
 
 The display name shown for the Keycloak login button.
@@ -568,8 +848,14 @@ The display name shown for the Keycloak login button.
 ### `OAUTH_ENABLED`
 
 <table>
-<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>boolean (`true` or `false`, case sensitive)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Enable Storyden's built-in OAuth2/OIDC authorization server endpoints.
@@ -577,8 +863,14 @@ Enable Storyden's built-in OAuth2/OIDC authorization server endpoints.
 ### `OAUTH_ACCESS_TOKEN_TTL`
 
 <table>
-<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
-<tr><td>default</td><td>`15m`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>duration (e.g. 1h, 1m, 1s)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`15m`</td>
+  </tr>
 </table>
 
 Access token lifetime for Storyden OAuth tokens.
@@ -586,8 +878,14 @@ Access token lifetime for Storyden OAuth tokens.
 ### `OAUTH_REFRESH_TOKEN_TTL`
 
 <table>
-<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
-<tr><td>default</td><td>`720h`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>duration (e.g. 1h, 1m, 1s)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`720h`</td>
+  </tr>
 </table>
 
 Refresh token lifetime for Storyden OAuth tokens.
@@ -595,8 +893,14 @@ Refresh token lifetime for Storyden OAuth tokens.
 ### `OAUTH_DEVICE_CODE_TTL`
 
 <table>
-<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
-<tr><td>default</td><td>`10m`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>duration (e.g. 1h, 1m, 1s)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`10m`</td>
+  </tr>
 </table>
 
 Device code lifetime for the OAuth Device Authorization Grant.
@@ -604,8 +908,14 @@ Device code lifetime for the OAuth Device Authorization Grant.
 ### `OAUTH_DEVICE_POLL_EVERY`
 
 <table>
-<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
-<tr><td>default</td><td>`5s`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>duration (e.g. 1h, 1m, 1s)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`5s`</td>
+  </tr>
 </table>
 
 Poll interval used by device flow responses.
@@ -613,8 +923,14 @@ Poll interval used by device flow responses.
 ### `OAUTH_DEVICE_AUTHORISATION_CONSENT_URL`
 
 <table>
-<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>url (e.g. http://example.com)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Frontend URL used by OAuth Device Authorization Grant users to approve or deny consent.
@@ -622,8 +938,14 @@ Frontend URL used by OAuth Device Authorization Grant users to approve or deny c
 ### `OAUTH_AUTHORISATION_CODE_CONSENT_URL`
 
 <table>
-<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>url (e.g. http://example.com)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Frontend URL used by OAuth Authorization Code Grant users to approve or deny consent.
@@ -631,8 +953,14 @@ Frontend URL used by OAuth Authorization Code Grant users to approve or deny con
 ### `OAUTH_AUTHORISATION_LOGIN_URL`
 
 <table>
-<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
-<tr><td>default</td><td>`{PUBLIC_WEB_ADDRESS}/login`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>url (e.g. http://example.com)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`{PUBLIC_WEB_ADDRESS}/login`</td>
+  </tr>
 </table>
 
 Frontend URL to redirect unauthenticated users to when starting the OAuth Authorization Code flow without a session. Defaults to `{PUBLIC_WEB_ADDRESS}/login` when unset.
@@ -640,8 +968,14 @@ Frontend URL to redirect unauthenticated users to when starting the OAuth Author
 ### `OAUTH_SIGNING_KEY_BASE64`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Base64-encoded PEM private signing key used for OAuth2/OIDC JWT signing.
@@ -649,8 +983,14 @@ Base64-encoded PEM private signing key used for OAuth2/OIDC JWT signing.
 ### `OAUTH_SIGNING_KEY_ID`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Optional JWT key ID (kid) for OAuth signing keys.
@@ -658,8 +998,14 @@ Optional JWT key ID (kid) for OAuth signing keys.
 ### `OAUTH_CIMD_ENABLED`
 
 <table>
-<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
-<tr><td>default</td><td>`false`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>boolean (`true` or `false`, case sensitive)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`false`</td>
+  </tr>
 </table>
 
 Advertise and accept OAuth Client ID Metadata Documents (CIMD), letting clients identify themselves with an https URL client_id that resolves to a hosted metadata document instead of pre-registering.
@@ -667,8 +1013,14 @@ Advertise and accept OAuth Client ID Metadata Documents (CIMD), letting clients 
 ### `OAUTH_CIMD_ALLOWED_SCOPES`
 
 <table>
-<tr><td>type</td><td>`[]string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`[]string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Comma-separated list of permission scopes a CIMD client may request. Empty uses a conservative read-only default. Privileged scopes are still gated by OAUTH_CIMD_ALLOW_PRIVILEGED_SCOPES.
@@ -676,8 +1028,14 @@ Comma-separated list of permission scopes a CIMD client may request. Empty uses 
 ### `OAUTH_CIMD_ALLOW_PRIVILEGED_SCOPES`
 
 <table>
-<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>boolean (`true` or `false`, case sensitive)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Allow privileged/administrative permission scopes to be granted to CIMD clients.
@@ -687,8 +1045,14 @@ Off by default; only enable for trusted, controlled deployments.
 ### `OAUTH_CIMD_ALLOW_INSECURE_FETCH`
 
 <table>
-<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>boolean (`true` or `false`, case sensitive)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Relax CIMD metadata fetching restrictions (allow http, private hosts and skip TLS verification). For local development and testing only; never set in production.
@@ -700,8 +1064,14 @@ SMS sending configuration. This must be enabled in order to support SMS-based au
 ### `SMS_PROVIDER`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Either:
@@ -713,8 +1083,14 @@ Either:
 ### `TWILIO_ACCOUNT_SID`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The account SID for the Twilio account.
@@ -724,8 +1100,14 @@ This is typically a long string of characters that you can view in the Twilio da
 ### `TWILIO_PHONE_NUMBER`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The phone number that will be used as the sender number for SMS sent via Twilio.
@@ -733,8 +1115,14 @@ The phone number that will be used as the sender number for SMS sent via Twilio.
 ### `TWILIO_AUTH_TOKEN`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The auth token for the Twilio account. This is required for sending SMS via Twilio.
@@ -748,8 +1136,14 @@ Configuration for storing files such as avatars, uploaded images, etc.
 ### `ASSET_STORAGE_TYPE`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Either:
@@ -760,8 +1154,14 @@ Either:
 ### `ASSET_STORAGE_LOCAL_PATH`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 When `ASSET_STORAGE_TYPE` is set to `local`, this is the path to the directory where files will be stored.
@@ -769,8 +1169,14 @@ When `ASSET_STORAGE_TYPE` is set to `local`, this is the path to the directory w
 ### `S3_SECURE`
 
 <table>
-<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
-<tr><td>default</td><td>`true`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>boolean (`true` or `false`, case sensitive)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`true`</td>
+  </tr>
 </table>
 
 When `ASSET_STORAGE_TYPE` is set to `s3`, this determines whether or not to use HTTPS for the S3 connection. You should always set this to `true` unless your S3-compatible storage provider is internally but not publicly accessible, such as in a Kubernetes cluster or running on the same host.
@@ -778,8 +1184,14 @@ When `ASSET_STORAGE_TYPE` is set to `s3`, this determines whether or not to use 
 ### `S3_ENDPOINT`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The endpoint for the S3-compatible storage provider. This is typically the base URL of the provider, such as `https://s3.amazonaws.com` for AWS S3, or `https://storage.googleapis.com` for Google Cloud Storage, etc.
@@ -787,8 +1199,14 @@ The endpoint for the S3-compatible storage provider. This is typically the base 
 ### `S3_BUCKET`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The bucket name for Storyden assets to be stored in.
@@ -796,8 +1214,14 @@ The bucket name for Storyden assets to be stored in.
 ### `S3_REGION`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Most S3-compatible storage providers require a region to be specified. This is typically the region in which the bucket is located, such as `us-east-1` for AWS S3.
@@ -807,8 +1231,14 @@ However, some providers do not use regions but S3-compatible clients still requi
 ### `S3_ACCESS_KEY`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The access key for the S3-compatible storage provider.
@@ -816,8 +1246,14 @@ The access key for the S3-compatible storage provider.
 ### `S3_SECRET_KEY`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The secret key for the S3-compatible storage provider.
@@ -829,8 +1265,14 @@ Configuration for cachine. Caching is optional in Storyden, but is recommended f
 ### `CACHE_PROVIDER`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>(empty string)</td>
+  </tr>
 </table>
 
 When empty, caching will use an efficient in-memory store. This is usually fine for small to medium-sized deployments however it's worth keeping an eye on your deployment's machine memory usage.
@@ -842,8 +1284,14 @@ This is necessary for deploying replica instances of Storyden that are backed by
 ### `REDIS_URL`
 
 <table>
-<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
+  <tr>
+    <td>type</td>
+    <td>url (e.g. http://example.com)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>(empty string)</td>
+  </tr>
 </table>
 
 The Redis URL to connect to.
@@ -857,21 +1305,33 @@ Configuration for search features. This is not required for Storyden to run, by 
 ### `SEARCH_PROVIDER`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`database`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`database`</td>
+  </tr>
 </table>
 
 Either:
 
-- `database` for the default database-driven search.  This is not recommended for larger deployments as it does not scale well and has limited search quality.
+- `database` for the default database-driven search. This is not recommended for larger deployments as it does not scale well and has limited search quality.
 - `bleve` for Bleve. This is a local full-text search engine that is fast and efficient for small to medium-sized deployments. This is best used when you are using local disk storage, such as SQLite and local asset storage.
 - `redis` for Redisearch. This is a fast and efficient search provider that is recommended for larger deployments. This is recommended if your environment is ephemeral and you're already using external providers for database and asset storage.
 
 ### `SEARCH_INDEX_CHUNK_SIZE`
 
 <table>
-<tr><td>type</td><td>`integer` (number without decimal point)</td></tr>
-<tr><td>default</td><td>`1000`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`integer` (number without decimal point)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`1000`</td>
+  </tr>
 </table>
 
 When using `SEARCH_PROVIDER` set to either `bleve` or `redis`, this is the number of items that will be indexed in a single batch.
@@ -881,8 +1341,14 @@ Increasing this value will improve indexing performance, but will also increase 
 ### `BLEVE_PATH`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`data/bleve`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`data/bleve`</td>
+  </tr>
 </table>
 
 The path to the directory where Bleve will store search indexes. Only used when `SEARCH_PROVIDER` is set to `bleve`.
@@ -890,8 +1356,14 @@ The path to the directory where Bleve will store search indexes. Only used when 
 ### `REDIS_SEARCH_INDEX_NAME`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`storyden`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`storyden`</td>
+  </tr>
 </table>
 
 The name of the Redis search index. Only used when `SEARCH_PROVIDER` is set to `redis`.
@@ -903,8 +1375,14 @@ Configuration for message/job queue. This is not required for Storyden to run, b
 ### `QUEUE_TYPE`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`internal`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`internal`</td>
+  </tr>
 </table>
 
 Either:
@@ -915,8 +1393,14 @@ Either:
 ### `AMQP_URL`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`amqp://guest:guest@localhost:5672/`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`amqp://guest:guest@localhost:5672/`</td>
+  </tr>
 </table>
 
 The RabbitMQ URL to connect to.
@@ -930,8 +1414,14 @@ Storyden does not currently support `amqps://` (secure) URLs, but this will be a
 ### `QUEUE_MAX_RETRIES`
 
 <table>
-<tr><td>type</td><td>`integer` (number without decimal point)</td></tr>
-<tr><td>default</td><td>`5`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`integer` (number without decimal point)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`5`</td>
+  </tr>
 </table>
 
 The maximum number of times a failed message will be retried before being moved to the dead letter queue.
@@ -941,8 +1431,14 @@ Messages are retried with exponential backoff starting at 1 second and doubling 
 ### `QUEUE_RETRY_INITIAL_INTERVAL`
 
 <table>
-<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
-<tr><td>default</td><td>`1s`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>duration (e.g. 1h, 1m, 1s)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`1s`</td>
+  </tr>
 </table>
 
 The initial interval to wait before the first retry attempt.
@@ -950,8 +1446,14 @@ The initial interval to wait before the first retry attempt.
 ### `QUEUE_RETRY_MAX_INTERVAL`
 
 <table>
-<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
-<tr><td>default</td><td>`1m`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>duration (e.g. 1h, 1m, 1s)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`1m`</td>
+  </tr>
 </table>
 
 The maximum interval to wait between retry attempts. The exponential backoff will not exceed this value.
@@ -963,8 +1465,14 @@ Configuration for the plugin system. Plugins extend Storyden with custom functio
 ### `PLUGIN_DATA_PATH`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`./data/plugins`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`./data/plugins`</td>
+  </tr>
 </table>
 
 The directory where plugin files will be extracted and stored. Each plugin gets its own subdirectory keyed by the plugin installation ID.
@@ -974,8 +1482,14 @@ This directory should be persistent and writable by the Storyden process.
 ### `ROBOT_WORKSPACE_DATA_PATH`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`./data/robot-workspaces`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`./data/robot-workspaces`</td>
+  </tr>
 </table>
 
 The directory where local Robot workspace instance files will be stored. Each workspace instance gets its own subdirectory keyed by the workspace instance ID.
@@ -985,8 +1499,14 @@ This directory should be persistent and writable by the Storyden process when lo
 ### `PLUGIN_RUNTIME_PROVIDER`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`local`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`local`</td>
+  </tr>
 </table>
 
 The plugin runtime provider. Different runtime providers offer different security guarantees. The simplest is `local` which just runs the plugin as a child process on the same machine as Storyden.
@@ -998,8 +1518,14 @@ The plugin runtime provider. Different runtime providers offer different securit
 ### `SPRITES_API_KEY`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Required when `PLUGIN_RUNTIME_PROVIDER` is set to `sprites`.
@@ -1009,8 +1535,14 @@ This is the API key Storyden uses to create and manage plugin runtimes on Sprite
 ### `PLUGIN_MAX_RESTART_ATTEMPTS`
 
 <table>
-<tr><td>type</td><td>`integer` (number without decimal point)</td></tr>
-<tr><td>default</td><td>`3`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`integer` (number without decimal point)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`3`</td>
+  </tr>
 </table>
 
 Maximum number of consecutive restart attempts for a supervised plugin before marking it as errored.
@@ -1020,8 +1552,14 @@ When a plugin crashes during startup (before the runtime crash threshold), the r
 ### `PLUGIN_MAX_BACKOFF_DURATION`
 
 <table>
-<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
-<tr><td>default</td><td>`60s`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>duration (e.g. 1h, 1m, 1s)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`60s`</td>
+  </tr>
 </table>
 
 Maximum backoff duration between plugin restart attempts.
@@ -1031,8 +1569,14 @@ Restart delays use exponential backoff (1s, 2s, 4s, 8s, ...) capped at this maxi
 ### `PLUGIN_RUNTIME_CRASH_THRESHOLD`
 
 <table>
-<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
-<tr><td>default</td><td>`30s`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>duration (e.g. 1h, 1m, 1s)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`30s`</td>
+  </tr>
 </table>
 
 Time threshold to distinguish between startup crashes and runtime crashes.
@@ -1042,8 +1586,14 @@ If a plugin runs successfully for longer than this duration before crashing, it'
 ### `PLUGIN_RUNTIME_CRASH_BACKOFF`
 
 <table>
-<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
-<tr><td>default</td><td>`5s`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>duration (e.g. 1h, 1m, 1s)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`5s`</td>
+  </tr>
 </table>
 
 Backoff duration used specifically for runtime crashes (crashes that occur after the plugin has been running for longer than the runtime crash threshold).
@@ -1057,8 +1607,14 @@ Configuration for optional AI features. These can be useful for organising large
 ### `MCP_ENABLED`
 
 <table>
-<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
-<tr><td>default</td><td>`false`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>boolean (`true` or `false`, case sensitive)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`false`</td>
+  </tr>
 </table>
 
 Enables the Model Context Provider server, accessible via SSE at `/mcp`.
@@ -1070,8 +1626,14 @@ See [the documentation](https://storyden.org/docs/introduction/mcp) for more inf
 ### `LANGUAGE_MODEL_PROVIDER`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The provider for language model features.
@@ -1081,8 +1643,14 @@ The provider for language model features.
 ### `OPENAI_API_KEY`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 When `LANGUAGE_MODEL_PROVIDER` is set to `openai`, this is the API key for the OpenAI API.
@@ -1091,16 +1659,23 @@ When `LANGUAGE_MODEL_PROVIDER` is set to `openai`, this is the API key for the O
 
 The Semdex is a semantic index that provides vector-based storage of content. This is used for things like recommendations, search, etc.
 
- The Semdex works with the language model provider to create embeddings of content. Thus, enabling the Semdex requires a `LANGUAGE_MODEL_PROVIDER` to be set.
+The Semdex works with the language model provider to create embeddings of content. Thus, enabling the Semdex requires a `LANGUAGE_MODEL_PROVIDER` to be set.
 
 ### `SEMDEX_PROVIDER`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>(empty string)</td>
+  </tr>
 </table>
 
 Either:
+
 - `chromem` for an experimental local vector database. This is not recommended for use in large deployments as it's rather slow and memory-hungry.
 - `pinecone` for Pinecone, a fully managed vector database.
 
@@ -1111,8 +1686,14 @@ Configuration for when `SEMDEX_PROVIDER` is set to `chromem`.
 ### `SEMDEX_LOCAL_PATH`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`data/semdex`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`data/semdex`</td>
+  </tr>
 </table>
 
 The path to the directory where Chromem will store vector indexes.
@@ -1124,8 +1705,14 @@ Configuration for when `SEMDEX_PROVIDER` is set to `pinecone`.
 ### `PINECONE_API_KEY`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Your Pinecone API key. This is required for all Pinecone API requests.
@@ -1133,8 +1720,14 @@ Your Pinecone API key. This is required for all Pinecone API requests.
 ### `PINECONE_INDEX`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The index name that Storyden will use in your Pinecone workspace.
@@ -1142,8 +1735,14 @@ The index name that Storyden will use in your Pinecone workspace.
 ### `PINECONE_DIMENSIONS`
 
 <table>
-<tr><td>type</td><td>integer (e.g. `1`, `2`, `3`)</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>integer (e.g. `1`, `2`, `3`)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 This value is dependent on the underlying OpenAI configuration. Currently this is static and set to 3072 dimensions. In future, Storyden will provide more flexible configuration for language model providers.
@@ -1151,8 +1750,14 @@ This value is dependent on the underlying OpenAI configuration. Currently this i
 ### `PINECONE_CLOUD`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Pinecone provides hosting on different cloud providers, see the Pinecone documentation for more information. The cloud provider you choose will be reflected in your Pinecone dashboard.
@@ -1160,9 +1765,14 @@ Pinecone provides hosting on different cloud providers, see the Pinecone documen
 ### `PINECONE_REGION`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Same as above, but for the region. As with any third party providers, it's recommended to choose the region closest to both your Storyden deployment and your community members for best performance and experience.
-

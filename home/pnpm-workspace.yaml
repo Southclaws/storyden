@@ -2,8 +2,10 @@ packages:
   - "."
 
 minimumReleaseAge: 10080
+overrides:
+  # Scalar pins an Undici release with known vulnerabilities.
+  "@scalar/json-magic>undici": "7.29.1"
 allowBuilds:
+  "@parcel/watcher": true
   esbuild: true
   sharp: true
-minimumReleaseAgeExclude:
-  - '@fuma-translate/react@0.0.3'

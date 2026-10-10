@@ -1,9 +1,3 @@
 {
-    "pages": [
-        "introduction",
-        "extending",
-        "cookbook",
-        "reference",
-        "api"
-    ]
+  "pages": ["introduction", "extending", "cookbook", "reference", "api"]
 }

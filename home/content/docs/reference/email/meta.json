@@ -1,6 +1,3 @@
 {
-    "pages": [
-        "smtp",
-        "sendgrid"
-    ]
+  "pages": ["smtp", "sendgrid"]
 }

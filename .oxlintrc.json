@@ -1,4 +1,10 @@
 {
   "$schema": "./web/node_modules/oxlint/configuration_schema.json",
-  "ignorePatterns": ["**/*", "!web/", "!web/**"]
+  "ignorePatterns": [
+    "**/*",
+    "!web/",
+    "!web/**",
+    "!home/",
+    "!home/**"
+  ]
 }

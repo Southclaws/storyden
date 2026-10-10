@@ -1,9 +1,9 @@
 import Link from "next/link";
 
-import { css } from "@/styled-system/css";
-import { Center, VStack, styled } from "@/styled-system/jsx";
 import { DockerCopyButton } from "@/components/DockerCopyButton";
 import { StorydenComputer } from "@/components/StorydenComputer";
+import { css } from "@/styled-system/css";
+import { Center, VStack, styled } from "@/styled-system/jsx";
 
 export type HomeStats = {
   stars: number;
@@ -76,9 +76,14 @@ export function MilspecSection({ stats }: Props) {
           </styled.tr>
 
           <styled.tr>
-            <td colSpan={6}>
+            <td colSpan={6} aria-labelledby="knowledge-system-title">
               <Center w="full" py="8">
-                <styled.h2 fontFamily="gorton" fontSize="lg" textAlign="center">
+                <styled.h2
+                  id="knowledge-system-title"
+                  fontFamily="gorton"
+                  fontSize="lg"
+                  textAlign="center"
+                >
                   STORYDEN&nbsp;HUMAN&nbsp;COMPUTER
                   <br />
                   KNOWLEDGE&nbsp;SYSTEM
@@ -177,9 +182,14 @@ export function MilspecSection({ stats }: Props) {
           </styled.tr>
 
           <styled.tr>
-            <td colSpan={5}>
+            <td colSpan={5} aria-labelledby="deployment-title">
               <Center w="full" pt="4" pb="8">
-                <styled.h2 fontFamily="gorton" fontSize="lg" textAlign="center">
+                <styled.h2
+                  id="deployment-title"
+                  fontFamily="gorton"
+                  fontSize="lg"
+                  textAlign="center"
+                >
                   Up&nbsp;and&nbsp;running&nbsp;before
                   <wbr />
                   your&nbsp;coffee&nbsp;gets&nbsp;cold

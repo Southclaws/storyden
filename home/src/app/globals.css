@@ -1,4 +1,4 @@
-@layer reset, theme, base, panda_base, components,  panda_tokens, panda_recipes, panda_utilities, utilities;
+@layer reset, theme, base, panda_base, components, panda_tokens, panda_recipes, panda_utilities, utilities;
 
 @import "fumadocs-openapi/css/preset.css";
 

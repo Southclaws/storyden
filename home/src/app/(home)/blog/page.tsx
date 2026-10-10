@@ -1,3 +1,6 @@
+import { formatDate, formatDistanceToNow } from "date-fns";
+import Image from "next/image";
+
 import { RSSButtons } from "@/components/RSSButtons";
 import { blog } from "@/lib/source";
 import { css } from "@/styled-system/css";
@@ -7,11 +10,9 @@ import {
   Grid,
   GridItem,
   HStack,
-  styled,
   VStack,
+  styled,
 } from "@/styled-system/jsx";
-import { formatDate, formatDistanceToNow } from "date-fns";
-import Image from "next/image";
 
 const heroImageStyles = css({
   position: "relative",
@@ -33,7 +34,7 @@ const logoImageStyles = css({
 
 export default function Page() {
   const posts = [...blog.getPages()].sort(
-    (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+    (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
   );
 
   return (

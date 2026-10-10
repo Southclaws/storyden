@@ -1,0 +1,46 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "oxc", "react", "nextjs", "jsx-a11y"],
+  "categories": {
+    "correctness": "warn"
+  },
+  "rules": {
+    "no-unused-vars": "off",
+    "no-dupe-keys": "error",
+    "no-duplicate-case": "error",
+    "no-unreachable": "error",
+    "no-unsafe-finally": "error",
+    "no-unsafe-optional-chaining": "error",
+    "array-callback-return": "warn",
+    "react/rules-of-hooks": "error",
+    "react/jsx-no-duplicate-props": "error",
+    "react/error-boundaries": "off",
+    "react/globals": "off",
+    "react/immutability": "off",
+    "react/incompatible-library": "off",
+    "react/preserve-manual-memoization": "off",
+    "react/purity": "off",
+    "react/refs": "off",
+    "react/set-state-in-effect": "off",
+    "react/set-state-in-render": "off",
+    "react/static-components": "off",
+    "react/use-memo": "off",
+    "jsx-a11y/prefer-tag-over-role": "off",
+    "sort-imports": [
+      "warn",
+      {
+        "ignoreCase": false,
+        "ignoreDeclarationSort": true
+      }
+    ]
+  },
+  "ignorePatterns": [
+    ".next/**",
+    ".source/**",
+    "out/**",
+    "build/**",
+    "coverage/**",
+    "src/styled-system/**",
+    "content/docs/api/**"
+  ]
+}

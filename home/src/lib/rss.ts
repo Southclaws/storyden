@@ -1,8 +1,9 @@
 import { Feed } from "feed";
-import { blog } from "@/lib/source";
 import { readFileSync } from "fs";
-import { join } from "path";
 import { marked } from "marked";
+import { join } from "path";
+
+import { blog } from "@/lib/source";
 
 const baseUrl = "https://www.storyden.org";
 
@@ -27,7 +28,7 @@ export async function getRSS() {
   });
 
   async function getPostContent(
-    page: (typeof pages)[number]
+    page: (typeof pages)[number],
   ): Promise<string | undefined> {
     try {
       const filePath = join(process.cwd(), "content/blog", page.path);

@@ -1,23 +1,21 @@
-/* eslint-disable */
-import type { SystemStyleObject, ConditionalValue } from '../types/index';
-import type { Properties } from '../types/csstype';
-import type { SystemProperties } from '../types/style-props';
-import type { DistributiveOmit } from '../types/system-types';
-import type { Tokens } from '../tokens/index';
+import type { PatternRuntimeConfig } from '../types/pattern';
+import type { ConditionalValue, SystemProperties, SystemStyleObject } from '../types/system';
 
 export interface CardProperties {
-   kind?: ConditionalValue<"edge" | "default">
-	display?: SystemProperties["display"]
+  display?: SystemProperties["display"]
+  kind?: ConditionalValue<"edge" | "default">
 }
 
-interface CardStyles extends CardProperties, DistributiveOmit<SystemStyleObject, keyof CardProperties > {}
+type CardRestStyles = Omit<SystemStyleObject, keyof CardProperties>
+
+interface CardStyles extends CardProperties, CardRestStyles {}
 
 interface CardPatternFn {
   (styles?: CardStyles): string
   raw: (styles?: CardStyles) => SystemStyleObject
+  propKeys: Array<keyof CardProperties>
 }
 
-/**
- * A card component that can be used to display content in a container with a border and a shadow.
- */
-export declare const Card: CardPatternFn;
+export declare function cardRaw(styles?: CardStyles): SystemStyleObject;
+
+export declare const card: CardPatternFn;

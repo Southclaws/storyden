@@ -1,7 +1,7 @@
 import {
-  defineDocs,
-  defineConfig,
   defineCollections,
+  defineConfig,
+  defineDocs,
   frontmatterSchema,
 } from "fumadocs-mdx/config";
 import { z } from "zod";
