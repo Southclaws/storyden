@@ -80,7 +80,7 @@ function Gardens() {
           bgColor="#F6F6F6"
           borderRadius="xl"
           boxShadow="xs"
-          backgroundImage="linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(245, 245, 245, 0.62) 63%, rgba(245, 245, 245, 1) 86%), url('/square-tree-smol.png')"
+          backgroundImage="linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(245, 245, 245, 0.62) 63%, rgba(245, 245, 245, 1) 86%), url('/square-tree-smol.webp')"
           backgroundSize="cover"
           backgroundPosition="top"
           overflowClipMargin="unset"

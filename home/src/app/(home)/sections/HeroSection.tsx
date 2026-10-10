@@ -11,7 +11,7 @@ export function HeroSection() {
       <GridItem gridRow="1/2" gridColumn="1/2">
         <picture>
           <source
-            media="(max-width: 768px)"
+            media="(max-width: 767px)"
             srcSet="square-nice-lake.webp"
             width={1024}
             height={1024}
@@ -28,6 +28,7 @@ export function HeroSection() {
             alt="A sun-lit lake sitting before tall snow-covered mountains in the distance."
             width={3456}
             height={1728}
+            fetchPriority="high"
           />
         </picture>
       </GridItem>
@@ -48,6 +49,8 @@ export function HeroSection() {
               width="1790"
               height="1170"
               alt="The Storyden logo"
+              sizes="(min-width: 1024px) 192px, (min-width: 640px) 160px, 144px"
+              loading="eager"
             />
           </Box>
 
@@ -75,7 +78,7 @@ export function HeroSection() {
                     color: "black",
                     background: "white",
                   },
-                })
+                }),
               )}
               href="https://makeroom.club"
             >

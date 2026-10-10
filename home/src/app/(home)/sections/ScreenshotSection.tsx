@@ -6,8 +6,7 @@ export function ScreenshotSection() {
       maxW="100vw"
       w="full"
       maxH={{
-        base: "30vh",
-        sm: "40vh",
+        base: "calc(min(100vw - 32px, 390px) * 1.68)",
         md: "50vh",
         lg: "70vh",
       }}
@@ -25,21 +24,35 @@ export function ScreenshotSection() {
           xl: "16",
         }}
       >
-        <picture>
+        <Box as="picture" maxW={{ base: "390px", md: "none" }}>
           <source
-            media="(max-width: 768px)"
-            srcSet="2025_app_screenshot_viewport.png"
+            media="(max-width: 767px)"
+            type="image/webp"
+            srcSet="/2026_app_screenshot_mobile_390.webp 390w, /2026_app_screenshot_mobile.webp 780w"
+            sizes="(min-width: 422px) 390px, calc(100vw - 32px)"
+            width={780}
+            height={1544}
           />
-          <source media="(min-width: 768px)" srcSet="2025_app_screenshot.png" />
-          <source media="(min-width: 768px)" srcSet="2025_app_screenshot.png" />
+          <source
+            media="(max-width: 767px)"
+            srcSet="/2026_app_screenshot_mobile.png"
+            width={780}
+            height={1544}
+          />
+          <source
+            type="image/webp"
+            srcSet="/2026_app_screenshot_1024.webp 1024w, /2026_app_screenshot.webp 1469w"
+            sizes="(min-width: 1597px) 1469px, (min-width: 1280px) calc(100vw - 128px), calc(100vw - 96px)"
+          />
           <img
-            src="2025_app_screenshot.png"
+            src="/2026_app_screenshot.png"
             alt=""
             role="presentation"
             width={1469}
             height={961}
+            decoding="async"
           />
-        </picture>
+        </Box>
       </VStack>
     </Box>
   );
