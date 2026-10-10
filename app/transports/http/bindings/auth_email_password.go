@@ -79,7 +79,7 @@ func (i *Authentication) AuthPasswordResetRequestEmail(ctx context.Context, requ
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	lt, err := password_reset.NewLinkTemplate(request.Body.TokenUrl.Url, request.Body.TokenUrl.Query)
+	lt, err := password_reset.NewLinkTemplate(request.Body.TokenUrl.Url, request.Body.TokenUrl.Query, i.webAddress.Host)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

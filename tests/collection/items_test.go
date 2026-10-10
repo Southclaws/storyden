@@ -124,6 +124,26 @@ func TestCollectionItems(t *testing.T) {
 				matchThreadToItem(t, thread2create.JSON200, get1.JSON200.Items[1])
 			})
 
+			t.Run("remove_requires_ownership", func(t *testing.T) {
+				t.Parallel()
+
+				// a non-owner must not be able to pull items out of someone else's collection
+				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
+					Name: xid.New().String(),
+				}, session1)
+				tests.Ok(t, err, col)
+
+				add, err := cl.CollectionAddPostWithResponse(root, col.JSON200.Id, thread1create.JSON200.Id, session1)
+				tests.Ok(t, err, add)
+
+				removeByOther, err := cl.CollectionRemovePostWithResponse(root, col.JSON200.Id, thread1create.JSON200.Id, session2)
+				tests.Status(t, err, removeByOther, http.StatusForbidden)
+
+				get, err := cl.CollectionGetWithResponse(root, col.JSON200.Id)
+				tests.Ok(t, err, get)
+				require.Len(t, get.JSON200.Items, 1)
+			})
+
 			t.Run("add_idempotent", func(t *testing.T) {
 				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
 					Name: "x1",

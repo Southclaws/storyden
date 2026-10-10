@@ -47,6 +47,10 @@ func (m *Manager) PostAdd(ctx context.Context, qk collection.QueryKey, pid post.
 }
 
 func (m *Manager) PostRemove(ctx context.Context, qk collection.QueryKey, pid post.ID) (*collection.CollectionWithItems, error) {
+	if err := m.authoriseDirectUpdate(ctx, qk); err != nil {
+		return nil, err
+	}
+
 	col, err := m.repo.UpdateItems(ctx, qk, collection_item.WithPostRemove(pid))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
