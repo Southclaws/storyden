@@ -7,6 +7,8 @@ import {
   type NodeListResult,
   Permission,
 } from "@/api/openapi-schema";
+import { SidebarNavigationLink } from "@/components/site/Navigation/SidebarNavigation";
+import { InfoIcon } from "@/components/ui/icons/Info";
 import { hasCapability } from "@/lib/settings/capabilities";
 import { useNavigationConfig } from "@/lib/settings/navigation-client";
 import { type Settings } from "@/lib/settings/settings";
@@ -70,6 +72,12 @@ export function ContentNavigationList(props: Props) {
           robotsEnabled={robotsEnabled}
         />
       </div>
+      <SidebarNavigationLink
+        href="/developers"
+        label="Developers"
+        icon={<InfoIcon />}
+        active={currentPath === "/developers"}
+      />
     </styled.nav>
   );
 }
