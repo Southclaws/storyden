@@ -144,7 +144,6 @@ export function useLibraryPageLinkBlock() {
     data: {
       inputValue,
       resolvedLink,
-      defaultLinkURL,
       isImporting,
     },
     handlers: {

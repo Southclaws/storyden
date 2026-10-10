@@ -64,7 +64,6 @@ export function LibraryPageControls() {
         current={current}
         visibility={visibility}
         create={editing ? "edit" : "show"}
-        defaultValue={current.slug}
         value={current.slug}
         invalid={isSlugInvalid}
         onChange={handleSlugChange}
