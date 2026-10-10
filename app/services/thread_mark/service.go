@@ -2,63 +2,54 @@ package thread_mark
 
 import (
 	"context"
+	"log/slog"
+	"time"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/ftag"
-	"github.com/dboslee/lru"
 	"github.com/rs/xid"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
+	"github.com/Southclaws/storyden/internal/infrastructure/cache"
 )
 
 var ErrInvalidThreadMark = fault.New("invalid thread mark: thread mark did not point to a valid thread ID", ftag.With(ftag.NotFound))
 
-// from xid
 const xidEncodedLength = 20
 
 type Service interface {
 	Lookup(ctx context.Context, threadmark string) (post.ID, error)
 }
 
-func Build() fx.Option {
-	return fx.Provide(New)
-}
+func Build() fx.Option { return fx.Provide(New) }
 
 type service struct {
-	cache       *lru.SyncCache[string, xid.ID]
-	thread_repo *thread_querier.Querier
+	cache  cache.Store
+	logger *slog.Logger
 }
 
-func New(
-	thread_repo *thread_querier.Querier,
-) Service {
-	return &service{
-		cache:       lru.NewSync[string, xid.ID](lru.WithCapacity(1000)),
-		thread_repo: thread_repo,
-	}
+func New(store cache.Store, logger *slog.Logger) Service {
+	return &service{cache: store, logger: logger}
 }
 
 func (s *service) Lookup(ctx context.Context, threadmark string) (post.ID, error) {
-	// input is too short to be anything useful
 	if len(threadmark) < xidEncodedLength {
 		return post.ID(xid.NilID()), ErrInvalidThreadMark
 	}
-
-	if cv, ok := s.cache.Get(threadmark); ok {
-		return post.ID(cv), nil
+	prefix := threadmark[:xidEncodedLength]
+	key := "thread:mark:" + prefix
+	if stored, err := s.cache.Get(ctx, key); err == nil && stored == prefix {
+		if id, err := xid.FromString(stored); err == nil {
+			return post.ID(id), nil
+		}
 	}
-
-	// the input is in the format "<xid>-<thread-slug>"
-	if id, err := xid.FromString(threadmark[:xidEncodedLength]); err == nil {
-		return post.ID(id), nil
+	id, err := xid.FromString(prefix)
+	if err != nil {
+		return post.ID(xid.NilID()), ErrInvalidThreadMark
 	}
-
-	// doesn't currently support any other clever thread mark lookups.
-	//
-	// potential future support if the desire exists:
-	// - lookup by only the slug
-	// - slug normalisation, like Wordpress
-	return post.ID(xid.NilID()), ErrInvalidThreadMark
+	if err := s.cache.Set(ctx, key, id.String(), time.Hour); err != nil {
+		s.logger.WarnContext(ctx, "failed to cache thread mark", slog.String("error", err.Error()))
+	}
+	return post.ID(id), nil
 }

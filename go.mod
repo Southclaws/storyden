@@ -47,7 +47,6 @@ require (
 	github.com/coder/websocket v1.8.15
 	github.com/coreos/go-oidc/v3 v3.21.0
 	github.com/dave/jennifer v1.7.1
-	github.com/dboslee/lru v0.0.1
 	github.com/dgraph-io/ristretto/v2 v2.4.2
 	github.com/disintegration/imaging v1.6.2
 	github.com/durable-streams/durable-streams/packages/client-go v0.2.0
