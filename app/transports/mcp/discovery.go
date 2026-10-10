@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/opt"
 	sdkmcp "github.com/modelcontextprotocol/go-sdk/mcp"
 	"go.uber.org/fx"
+	"golang.org/x/net/idna"
 
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/app/resources/settings"
@@ -58,7 +59,7 @@ type apiCatalog struct {
 
 type apiCatalogLinks struct {
 	Anchor      string           `json:"anchor"`
-	Item        []apiCatalogLink `json:"item"`
+	Item        []apiCatalogLink `json:"item,omitempty"`
 	ServiceDesc []apiCatalogLink `json:"service-desc,omitempty"`
 }
 
@@ -68,23 +69,23 @@ type apiCatalogLink struct {
 }
 
 func serverName(webHost string) string {
-	if webHost == "" || net.ParseIP(webHost) != nil {
-		return "org.storyden/mcp"
+	host, err := idna.Lookup.ToASCII(webHost)
+	if err != nil {
+		return "localhost/mcp"
+	}
+	// Remove the optional DNS root dot before applying registration constraints.
+	host, err = idna.Registration.ToASCII(strings.TrimSuffix(host, "."))
+	if err != nil || host == "" || net.ParseIP(host) != nil {
+		return "localhost/mcp"
 	}
 
-	labels := strings.Split(strings.ToLower(webHost), ".")
-	for i, label := range labels {
-		if label == "" || strings.Trim(label, "abcdefghijklmnopqrstuvwxyz0123456789-") != "" {
-			return "org.storyden/mcp"
-		}
-		labels[i] = label
-	}
+	labels := strings.Split(host, ".")
 	for i, j := 0, len(labels)-1; i < j; i, j = i+1, j-1 {
 		labels[i], labels[j] = labels[j], labels[i]
 	}
 	name := strings.Join(labels, ".") + "/mcp"
 	if len(name) > 200 {
-		return "org.storyden/mcp"
+		return "localhost/mcp"
 	}
 	return name
 }

@@ -49,6 +49,37 @@ func TestDiscoveryDocuments(t *testing.T) {
 	for _, forbidden := range []string{`"tools"`, `"resources"`, `"prompts"`, `"headers"`} {
 		require.NotContains(t, string(cardJSON), forbidden)
 	}
+
+	for _, tc := range []struct {
+		host string
+		want string
+	}{
+		{"", "localhost/mcp"},
+		{"localhost", "localhost/mcp"},
+		{"127.0.0.1", "localhost/mcp"},
+		{"::1", "localhost/mcp"},
+		{"Community.Example.ORG", "org.example.community/mcp"},
+		{"community.example.org.", "org.example.community/mcp"},
+		{"bücher.example", "example.xn--bcher-kva/mcp"},
+		{"xn--bcher-kva.example", "example.xn--bcher-kva/mcp"},
+		{"bücher。example", "example.xn--bcher-kva/mcp"},
+		{"bücher。example。", "example.xn--bcher-kva/mcp"},
+		{"invalid_host", "localhost/mcp"},
+		{"-invalid.example", "localhost/mcp"},
+		{"invalid-.example", "localhost/mcp"},
+		{"example..org", "localhost/mcp"},
+		{".example.org", "localhost/mcp"},
+		{"example.org..", "localhost/mcp"},
+		{"xn--.example", "localhost/mcp"},
+		{strings.Repeat("a", 63) + ".example", "example." + strings.Repeat("a", 63) + "/mcp"},
+		{strings.Repeat("a", 64) + ".example", "localhost/mcp"},
+		{strings.Repeat("a", 63) + "." + strings.Repeat("b", 63) + "." + strings.Repeat("c", 63) + ".test", "test." + strings.Repeat("c", 63) + "." + strings.Repeat("b", 63) + "." + strings.Repeat("a", 63) + "/mcp"},
+		{strings.Repeat("a.", 98) + "b", "localhost/mcp"},
+	} {
+		t.Run("server name for "+tc.host, func(t *testing.T) {
+			require.Equal(t, tc.want, serverName(tc.host))
+		})
+	}
 }
 
 func TestDiscoveryDisabled(t *testing.T) {
@@ -164,6 +195,47 @@ func TestDiscoveryRoutesAllowBrowserPreflight(t *testing.T) {
 			require.Equal(t, "*", preflight.Header().Get("Access-Control-Allow-Origin"))
 			require.Contains(t, preflight.Header().Get("Access-Control-Allow-Headers"), "If-None-Match")
 			require.Empty(t, preflight.Body.String())
+		})
+	}
+}
+
+func TestAPICatalogLinksetWireFormat(t *testing.T) {
+	for _, enabled := range []bool{false, true} {
+		name := "MCP disabled"
+		if enabled {
+			name = "MCP enabled"
+		}
+		t.Run(name, func(t *testing.T) {
+			mux := http.NewServeMux()
+			mountDiscovery(mux, discoveryConfig(enabled), "Example community")
+			response := httptest.NewRecorder()
+			mux.ServeHTTP(response, httptest.NewRequest(http.MethodGet, "/.well-known/api-catalog", nil))
+			require.Equal(t, http.StatusOK, response.Code)
+			require.Equal(t, `application/linkset+json; profile="https://www.rfc-editor.org/info/rfc9727"`, response.Header().Get("Content-Type"))
+
+			var document map[string][]map[string]json.RawMessage
+			require.NoError(t, json.Unmarshal(response.Body.Bytes(), &document))
+			require.Len(t, document["linkset"], 2)
+			for _, context := range document["linkset"] {
+				for relation, value := range context {
+					if relation == "anchor" {
+						continue
+					}
+					require.NotEqual(t, "null", string(value), "RFC 9264 relation %s must be an array", relation)
+					var targets []map[string]json.RawMessage
+					require.NoError(t, json.Unmarshal(value, &targets))
+					require.NotEmpty(t, targets)
+					for _, target := range targets {
+						var href string
+						require.NoError(t, json.Unmarshal(target["href"], &href))
+						parsed, err := url.ParseRequestURI(href)
+						require.NoError(t, err)
+						require.True(t, parsed.IsAbs())
+					}
+				}
+			}
+			require.NotContains(t, document["linkset"][1], "item")
+			require.JSONEq(t, `[{"href":"https://api.example.org/api/openapi.json","type":"application/vnd.oai.openapi+json"}]`, string(document["linkset"][1]["service-desc"]))
 		})
 	}
 }
