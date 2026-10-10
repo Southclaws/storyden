@@ -29,6 +29,18 @@ You can also access interactive API documentation, powered by Scalar, at:
 
 Because Storyden uses simple browser cookies, you can use the docs to immediately start playing with the API.
 
+## Test against your own instance
+
+Use a separate local or disposable deployment as your integration sandbox. Storyden is self-hosted: a public community, including the Makeroom demo, is a live instance rather than a test mode. Follow the [Docker setup](/docs/introduction/vps/docker) or [local development guide](/docs/introduction/local-dev), and keep its database, asset storage, credentials, and external integrations separate from production. Create fixture accounts and content there before testing writes or moderation.
+
+For repeatable tests, pin the Storyden image tag or source revision and obtain `/api/openapi.json` from that same deployment. The repository's `task test:e2e:ci` command provides an isolated backend and frontend for contributors running the Playwright suite; it is not a hosted sandbox endpoint.
+
+## API contract and releases
+
+The REST API currently uses the unversioned `/api` prefix. Its contract is shipped with each Storyden release and is available from the running instance at `/api/openapi.json`. A self-hosted instance may run a different revision from the shared documentation, so inspect its own schema and use compatible generated clients and CLI builds.
+
+There is no separately advertised version-negotiation header or fixed deprecation window. Review the [release notes](https://github.com/Southclaws/storyden/releases) and test integrations against the target version before upgrading. Do not infer a `/v1` endpoint or a compatibility guarantee from the unversioned path.
+
 ## Authentication
 
 Storyden uses secure cookies for authentication. You can register for an account (or log in) either via the browser or via the API itself in order to obtain a session token. You'll find the session cookie under a cookie named:
