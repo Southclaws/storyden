@@ -72,7 +72,8 @@ func Mapper(am account.Lookup) func(in *ent.React) (*React, error) {
 }
 
 func IsValidEmoji(e string) (string, bool) {
-	if len(e) == 0 {
+	// need at least two bytes before probing e[1], a single byte is never an emoji
+	if len(e) < 2 {
 		return "", false
 	}
 
