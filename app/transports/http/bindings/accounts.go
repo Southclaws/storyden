@@ -860,7 +860,7 @@ func (h *Accounts) AccountEmailPasswordReset(ctx context.Context, request openap
 	accountID := account.AccountID(openapi.ParseID(request.AccountId))
 	emailAddressID := openapi.ParseID(request.Body.EmailAddressId)
 
-	lt, err := password_reset.NewLinkTemplate(request.Body.TokenUrl.Url, request.Body.TokenUrl.Query)
+	lt, err := password_reset.NewLinkTemplate(request.Body.TokenUrl.Url, request.Body.TokenUrl.Query, h.webAddress)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

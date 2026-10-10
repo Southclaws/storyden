@@ -44,7 +44,7 @@ func TestPasswordReset(t *testing.T) {
 						Query string `json:"query"`
 						Url   string `json:"url"`
 					}{
-						Url:   "http://localhost:3000/reset",
+						Url:   "http://localhost/reset",
 						Query: "token",
 					},
 				})
@@ -77,7 +77,7 @@ func TestPasswordReset(t *testing.T) {
 						Query string `json:"query"`
 						Url   string `json:"url"`
 					}{
-						Url:   "http://localhost:3000/reset",
+						Url:   "http://localhost/reset",
 						Query: "token",
 					},
 				})
