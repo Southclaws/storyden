@@ -127,7 +127,9 @@ export type pluginAddResponseSuccess = pluginAddResponse200 & {
   headers: Headers;
 };
 export type pluginAddResponseError = (
-  pluginAddResponse400 | pluginAddResponse401 | pluginAddResponseDefault
+  | pluginAddResponse400
+  | pluginAddResponse401
+  | pluginAddResponseDefault
 ) & {
   headers: Headers;
 };
@@ -197,7 +199,8 @@ export type pluginGetResponseSuccess = pluginGetResponse200 & {
   headers: Headers;
 };
 export type pluginGetResponseError = (
-  pluginGetResponse404 | pluginGetResponseDefault
+  | pluginGetResponse404
+  | pluginGetResponseDefault
 ) & {
   headers: Headers;
 };

@@ -88,7 +88,9 @@ export type PostUpdateMutationResult = NonNullable<
 
 export const usePostUpdate = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   postId: string,
   options?: {
@@ -148,7 +150,9 @@ export type PostDeleteMutationResult = NonNullable<
 
 export const usePostDelete = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   postId: string,
   options?: {
@@ -235,7 +239,9 @@ export type PostReactAddMutationResult = NonNullable<
 
 export const usePostReactAdd = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   postId: string,
   options?: {
@@ -299,7 +305,9 @@ export type PostReactRemoveMutationResult = NonNullable<
 
 export const usePostReactRemove = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   postId: string,
   reactId: string,
@@ -372,7 +380,9 @@ export type PostLocationGetQueryResult = NonNullable<
 
 export const usePostLocationGet = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   params: PostLocationGetParams,
   options?: {

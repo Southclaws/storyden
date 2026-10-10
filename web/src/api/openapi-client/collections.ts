@@ -209,7 +209,9 @@ export type CollectionGetQueryResult = NonNullable<
 
 export const useCollectionGet = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   collectionMark: string,
   options?: {
@@ -306,7 +308,9 @@ export type CollectionUpdateMutationResult = NonNullable<
 
 export const useCollectionUpdate = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   collectionMark: string,
   options?: {
@@ -370,7 +374,9 @@ export type CollectionDeleteMutationResult = NonNullable<
 
 export const useCollectionDelete = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   collectionMark: string,
   options?: {
@@ -445,7 +451,9 @@ export type CollectionAddPostMutationResult = NonNullable<
 
 export const useCollectionAddPost = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   collectionMark: string,
   postId: string,
@@ -523,7 +531,9 @@ export type CollectionRemovePostMutationResult = NonNullable<
 
 export const useCollectionRemovePost = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   collectionMark: string,
   postId: string,
@@ -602,7 +612,9 @@ export type CollectionAddNodeMutationResult = NonNullable<
 
 export const useCollectionAddNode = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   collectionMark: string,
   nodeId: string,
@@ -680,7 +692,9 @@ export type CollectionRemoveNodeMutationResult = NonNullable<
 
 export const useCollectionRemoveNode = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   collectionMark: string,
   nodeId: string,

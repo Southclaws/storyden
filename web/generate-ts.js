@@ -134,7 +134,12 @@ ${toolMappings
 `;
 
   const output =
-    types + "\n" + toolNameUnion + toolInputMap + toolOutputMap + vercelToolsType;
+    types +
+    "\n" +
+    toolNameUnion +
+    toolInputMap +
+    toolOutputMap +
+    vercelToolsType;
 
   fs.writeFileSync(outputPathTs, output);
 

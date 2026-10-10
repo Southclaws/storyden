@@ -1,5 +1,5 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import assert from "node:assert/strict";
+import { test } from "vitest";
 
 import {
   DefaultRoleMetadata,
@@ -14,7 +14,7 @@ test("parseRoleMetadata keeps valid metadata", () => {
     coloured: false,
   });
 
-  assert.equal(parsed, {
+  assert.deepStrictEqual(parsed, {
     bold: true,
     italic: false,
     coloured: false,
@@ -41,7 +41,7 @@ test("parseRoleMetadata falls back to defaults for invalid metadata", () => {
   }
 
   assert.ok(warned);
-  assert.equal(parsed, DefaultRoleMetadata);
+  assert.deepStrictEqual(parsed, DefaultRoleMetadata);
 });
 
 test("writeRoleMetadata preserves unknown keys", () => {
@@ -56,12 +56,10 @@ test("writeRoleMetadata preserves unknown keys", () => {
     },
   );
 
-  assert.equal(written, {
+  assert.deepStrictEqual(written, {
     rainbow: true,
     bold: true,
     italic: false,
     coloured: false,
   });
 });
-
-test.run();

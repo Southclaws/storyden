@@ -86,7 +86,9 @@ export type RoleCreateMutationResult = NonNullable<
 
 export const useRoleCreate = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof roleCreate>>,
@@ -216,7 +218,9 @@ export type RoleUpdateOrderMutationResult = NonNullable<
 
 export const useRoleUpdateOrder = <
   TError =
-    BadRequestResponse | UnauthorisedResponse | InternalServerErrorResponse,
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof roleUpdateOrder>>,
@@ -264,7 +268,9 @@ export type RoleGetQueryResult = NonNullable<
 
 export const useRoleGet = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   roleId: string,
   options?: {
@@ -355,7 +361,9 @@ export type RoleUpdateMutationResult = NonNullable<
 
 export const useRoleUpdate = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   roleId: string,
   options?: {
@@ -415,7 +423,9 @@ export type RoleDeleteMutationResult = NonNullable<
 
 export const useRoleDelete = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   roleId: string,
   options?: {

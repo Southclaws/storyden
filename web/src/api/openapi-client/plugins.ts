@@ -143,7 +143,9 @@ export type PluginAddMutationResult = NonNullable<
 
 export const usePluginAdd = <
   TError =
-    BadRequestResponse | UnauthorisedResponse | InternalServerErrorResponse,
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof pluginAdd>>,
@@ -262,7 +264,9 @@ export type PluginDeleteMutationResult = NonNullable<
 
 export const usePluginDelete = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   pluginInstanceId: string,
   options?: {
@@ -846,7 +850,9 @@ export type PluginGetConfigurationSchemaQueryResult = NonNullable<
 
 export const usePluginGetConfigurationSchema = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   pluginInstanceId: string,
   options?: {
@@ -913,7 +919,9 @@ export type PluginGetConfigurationQueryResult = NonNullable<
 
 export const usePluginGetConfiguration = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   pluginInstanceId: string,
   options?: {

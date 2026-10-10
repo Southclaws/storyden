@@ -11,4 +11,5 @@ import type { PluginInitialExternal } from "./pluginInitialExternal";
 import type { PluginInitialSupervised } from "./pluginInitialSupervised";
 
 export type PluginInitialProps =
-  PluginInitialSupervised | PluginInitialExternal;
+  | PluginInitialSupervised
+  | PluginInitialExternal;

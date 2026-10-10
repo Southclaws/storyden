@@ -161,7 +161,8 @@ export type reportListResponseSuccess = reportListResponse200 & {
   headers: Headers;
 };
 export type reportListResponseError = (
-  reportListResponse401 | reportListResponseDefault
+  | reportListResponse401
+  | reportListResponseDefault
 ) & {
   headers: Headers;
 };

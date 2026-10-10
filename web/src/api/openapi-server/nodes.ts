@@ -115,7 +115,8 @@ export type nodeCreateResponseSuccess = nodeCreateResponse200 & {
   headers: Headers;
 };
 export type nodeCreateResponseError = (
-  nodeCreateResponse401 | nodeCreateResponseDefault
+  | nodeCreateResponse401
+  | nodeCreateResponseDefault
 ) & {
   headers: Headers;
 };
@@ -182,7 +183,8 @@ export type nodeListResponseSuccess = nodeListResponse200 & {
   headers: Headers;
 };
 export type nodeListResponseError = (
-  nodeListResponse404 | nodeListResponseDefault
+  | nodeListResponse404
+  | nodeListResponseDefault
 ) & {
   headers: Headers;
 };
@@ -244,7 +246,8 @@ export type nodeDraftListResponseSuccess = nodeDraftListResponse200 & {
   headers: Headers;
 };
 export type nodeDraftListResponseError = (
-  nodeDraftListResponse401 | nodeDraftListResponseDefault
+  | nodeDraftListResponse401
+  | nodeDraftListResponseDefault
 ) & {
   headers: Headers;
 };
@@ -382,7 +385,9 @@ export type nodeUpdateResponseSuccess = nodeUpdateResponse200 & {
   headers: Headers;
 };
 export type nodeUpdateResponseError = (
-  nodeUpdateResponse401 | nodeUpdateResponse404 | nodeUpdateResponseDefault
+  | nodeUpdateResponse401
+  | nodeUpdateResponse404
+  | nodeUpdateResponseDefault
 ) & {
   headers: Headers;
 };
@@ -463,7 +468,9 @@ export type nodeDeleteResponseSuccess = nodeDeleteResponse200 & {
   headers: Headers;
 };
 export type nodeDeleteResponseError = (
-  nodeDeleteResponse401 | nodeDeleteResponse404 | nodeDeleteResponseDefault
+  | nodeDeleteResponse401
+  | nodeDeleteResponse404
+  | nodeDeleteResponseDefault
 ) & {
   headers: Headers;
 };
@@ -1989,7 +1996,9 @@ export type nodeAddNodeResponseSuccess = nodeAddNodeResponse200 & {
   headers: Headers;
 };
 export type nodeAddNodeResponseError = (
-  nodeAddNodeResponse401 | nodeAddNodeResponse404 | nodeAddNodeResponseDefault
+  | nodeAddNodeResponse401
+  | nodeAddNodeResponse404
+  | nodeAddNodeResponseDefault
 ) & {
   headers: Headers;
 };

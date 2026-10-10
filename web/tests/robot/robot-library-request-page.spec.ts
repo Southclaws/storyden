@@ -134,9 +134,7 @@ test.describe("Robot Chat — Library page request tool", () => {
         );
       });
 
-      await setupRobotProviderWithScript(
-        `mock/../robot/scripts/${scriptName}`,
-      );
+      await setupRobotProviderWithScript(`mock/../robot/scripts/${scriptName}`);
 
       await goToNewChat(page);
 

@@ -21,10 +21,12 @@ if (typeof globalThis.ResizeObserver === "undefined") {
     disconnect() {}
   }
 
-  globalThis.ResizeObserver = ResizeObserver as typeof globalThis.ResizeObserver;
+  globalThis.ResizeObserver =
+    ResizeObserver as typeof globalThis.ResizeObserver;
 }
 
 if (typeof document.execCommand !== "function") {
-  (document as Document & { execCommand?: typeof document.execCommand }).execCommand =
-    () => false;
+  (
+    document as Document & { execCommand?: typeof document.execCommand }
+  ).execCommand = () => false;
 }

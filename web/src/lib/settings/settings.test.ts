@@ -1,5 +1,5 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import assert from "node:assert/strict";
+import { test } from "vitest";
 
 import type {
   AdminSettingsProps,
@@ -63,23 +63,23 @@ test("parseSettings keeps valid metadata and applies nested defaults", () => {
     }),
   );
 
-  assert.equal(parsed.metadata.feed, {
+  assert.deepStrictEqual(parsed.metadata.feed, {
     blocks: [
       { type: "categories", layout: "grid" },
       { type: "quick-share", showCategorySelect: false },
       { type: "threads", source: "uncategorised" },
     ],
   });
-  assert.equal(parsed.metadata.editor, { mode: "richtext" });
-  assert.equal(parsed.metadata.navigation, DefaultNavigationConfig);
+  assert.deepStrictEqual(parsed.metadata.editor, { mode: "richtext" });
+  assert.deepStrictEqual(parsed.metadata.navigation, DefaultNavigationConfig);
 });
 
 test("parseSettings uses the fresh feed for absent or empty metadata", () => {
   const absent = parseSettings(baseInfo({ metadata: undefined }));
   const empty = parseSettings(baseInfo({ metadata: {} }));
 
-  assert.equal(absent.metadata.feed, DefaultFeedConfig);
-  assert.equal(empty.metadata.feed, DefaultFeedConfig);
+  assert.deepStrictEqual(absent.metadata.feed, DefaultFeedConfig);
+  assert.deepStrictEqual(empty.metadata.feed, DefaultFeedConfig);
 });
 
 test("parseSettings defaults a missing feed without discarding other metadata", () => {
@@ -92,7 +92,7 @@ test("parseSettings defaults a missing feed without discarding other metadata", 
     }),
   );
 
-  assert.equal(parsed.metadata, {
+  assert.deepStrictEqual(parsed.metadata, {
     feed: DefaultFeedConfig,
     navigation: DefaultNavigationConfig,
     editor: { mode: "markdown" },
@@ -125,7 +125,7 @@ test("parseSettings falls back to defaults for invalid metadata", () => {
   }
 
   assert.ok(warned);
-  assert.equal(parsed.metadata, DefaultFrontendConfig);
+  assert.deepStrictEqual(parsed.metadata, DefaultFrontendConfig);
 });
 
 test("parseAdminSettings fills missing editor with defaults", () => {
@@ -140,14 +140,14 @@ test("parseAdminSettings fills missing editor with defaults", () => {
     }),
   );
 
-  assert.equal(parsed.metadata.feed, {
+  assert.deepStrictEqual(parsed.metadata.feed, {
     blocks: [
       { type: "quick-share", showCategorySelect: true },
       { type: "threads", source: "all" },
     ],
   });
-  assert.equal(parsed.metadata.editor, { mode: "richtext" });
-  assert.equal(parsed.metadata.navigation, DefaultNavigationConfig);
+  assert.deepStrictEqual(parsed.metadata.editor, { mode: "richtext" });
+  assert.deepStrictEqual(parsed.metadata.navigation, DefaultNavigationConfig);
 });
 
 test("parseSettings keeps valid motd metadata type", () => {
@@ -160,7 +160,7 @@ test("parseSettings keeps valid motd metadata type", () => {
     }),
   );
 
-  assert.equal(parsed.motd?.metadata?.type, "alert");
+  assert.deepStrictEqual(parsed.motd?.metadata?.type, "alert");
 });
 
 test("parseSettings drops invalid motd metadata type", () => {
@@ -173,7 +173,5 @@ test("parseSettings drops invalid motd metadata type", () => {
     }),
   );
 
-  assert.equal(parsed.motd?.metadata, undefined);
+  assert.deepStrictEqual(parsed.motd?.metadata, undefined);
 });
-
-test.run();

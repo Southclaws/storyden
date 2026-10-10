@@ -1,5 +1,5 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import assert from "node:assert/strict";
+import { test } from "vitest";
 
 import type { Category } from "@/api/openapi-schema";
 
@@ -36,11 +36,11 @@ test("buildCategoryTree sorts roots and children by sort", () => {
 
   const tree = buildCategoryTree(categories);
 
-  assert.equal(
+  assert.deepStrictEqual(
     tree.map((c) => c.id),
     ["root-a", "root-b"],
   );
-  assert.equal(
+  assert.deepStrictEqual(
     tree[0]?.children.map((c) => c.id),
     ["child-a", "child-b"],
   );
@@ -49,7 +49,7 @@ test("buildCategoryTree sorts roots and children by sort", () => {
 test("buildCategoryTree treats unknown parent as root", () => {
   const categories = [category("orphan", 1, "missing-parent")];
   const tree = buildCategoryTree(categories);
-  assert.equal(
+  assert.deepStrictEqual(
     tree.map((c) => c.id),
     ["orphan"],
   );
@@ -63,7 +63,7 @@ test("isDescendant finds deep descendants", () => {
   ]);
 
   assert.ok(isDescendant(tree, "root", "leaf"));
-  assert.not.ok(isDescendant(tree, "leaf", "root"));
+  assert.ok(!isDescendant(tree, "leaf", "root"));
 });
 
 test("isDescendant returns false when ancestor does not exist", () => {
@@ -71,12 +71,10 @@ test("isDescendant returns false when ancestor does not exist", () => {
     category("root", 1),
     category("leaf", 1, "root"),
   ]);
-  assert.not.ok(isDescendant(tree, "missing", "leaf"));
+  assert.ok(!isDescendant(tree, "missing", "leaf"));
 });
 
 test("isDescendant does not treat a node as its own descendant", () => {
   const tree = buildCategoryTree([category("root", 1)]);
-  assert.not.ok(isDescendant(tree, "root", "root"));
+  assert.ok(!isDescendant(tree, "root", "root"));
 });
-
-test.run();

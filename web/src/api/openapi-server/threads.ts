@@ -163,7 +163,9 @@ export type threadListResponseSuccess = threadListResponse200 & {
   headers: Headers;
 };
 export type threadListResponseError = (
-  threadListResponse401 | threadListResponse404 | threadListResponseDefault
+  | threadListResponse401
+  | threadListResponse404
+  | threadListResponseDefault
 ) & {
   headers: Headers;
 };

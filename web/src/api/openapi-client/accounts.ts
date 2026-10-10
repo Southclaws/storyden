@@ -329,7 +329,9 @@ export type AccountUpdateMutationResult = NonNullable<
 
 export const useAccountUpdate = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof accountUpdate>>,
@@ -1645,7 +1647,9 @@ export type AccountEmailRemoveMutationResult = NonNullable<
 
 export const useAccountEmailRemove = <
   TError =
-    BadRequestResponse | UnauthorisedResponse | InternalServerErrorResponse,
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
 >(
   emailAddressId: string,
   options?: {
@@ -1734,7 +1738,9 @@ export type AccountSetAvatarMutationResult = NonNullable<
 
 export const useAccountSetAvatar = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof accountSetAvatar>>,
@@ -1786,7 +1792,9 @@ export type AccountGetAvatarQueryResult = NonNullable<
 
 export const useAccountGetAvatar = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   accountHandle: string,
   options?: {
@@ -1861,7 +1869,9 @@ export type AccountAddRoleMutationResult = NonNullable<
 
 export const useAccountAddRole = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   accountHandle: string,
   roleId: string,
@@ -1938,7 +1948,9 @@ export type AccountRemoveRoleMutationResult = NonNullable<
 
 export const useAccountRemoveRole = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   accountHandle: string,
   roleId: string,
@@ -2018,7 +2030,9 @@ export type AccountRoleSetBadgeMutationResult = NonNullable<
 
 export const useAccountRoleSetBadge = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   accountHandle: string,
   roleId: string,
@@ -2096,7 +2110,9 @@ export type AccountRoleRemoveBadgeMutationResult = NonNullable<
 
 export const useAccountRoleRemoveBadge = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   accountHandle: string,
   roleId: string,

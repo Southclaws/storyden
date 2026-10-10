@@ -50,7 +50,9 @@ export type LikePostGetQueryResult = NonNullable<
 
 export const useLikePostGet = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   postId: string,
   options?: {
@@ -118,7 +120,9 @@ export type LikePostAddMutationResult = NonNullable<
 
 export const useLikePostAdd = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   postId: string,
   options?: {
@@ -180,7 +184,9 @@ export type LikePostRemoveMutationResult = NonNullable<
 
 export const useLikePostRemove = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   postId: string,
   options?: {
@@ -253,7 +259,9 @@ export type LikeProfileGetQueryResult = NonNullable<
 
 export const useLikeProfileGet = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   accountHandle: string,
   params?: LikeProfileGetParams,

@@ -83,7 +83,9 @@ export type likePostGetResponseSuccess = likePostGetResponse200 & {
   headers: Headers;
 };
 export type likePostGetResponseError = (
-  likePostGetResponse401 | likePostGetResponse404 | likePostGetResponseDefault
+  | likePostGetResponse401
+  | likePostGetResponse404
+  | likePostGetResponseDefault
 ) & {
   headers: Headers;
 };
@@ -129,7 +131,9 @@ export type likePostAddResponseSuccess = likePostAddResponse200 & {
   headers: Headers;
 };
 export type likePostAddResponseError = (
-  likePostAddResponse401 | likePostAddResponse404 | likePostAddResponseDefault
+  | likePostAddResponse401
+  | likePostAddResponse404
+  | likePostAddResponseDefault
 ) & {
   headers: Headers;
 };

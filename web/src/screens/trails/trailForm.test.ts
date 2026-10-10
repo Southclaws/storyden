@@ -1,5 +1,5 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import assert from "node:assert/strict";
+import { test } from "vitest";
 
 import {
   initialTrailFormValues,
@@ -17,7 +17,7 @@ test("creates a weekly schedule from explicit form fields", () => {
   values.selectedDays = ["tuesday", "thursday"];
   values.localTime = "10:30";
 
-  assert.equal(trailFormSchedule(values), {
+  assert.deepStrictEqual(trailFormSchedule(values), {
     start: "2026-08-24T10:30:00",
     timezone: "Europe/London",
     rule: {
@@ -33,7 +33,7 @@ test("normalizes a monthly last-day schedule", () => {
   values.scheduleKind = "monthly";
   values.monthDay = "last";
 
-  assert.equal(trailFormSchedule(values), {
+  assert.deepStrictEqual(trailFormSchedule(values), {
     start: "2026-08-24T09:00:00",
     timezone: "UTC",
     rule: {
@@ -57,15 +57,15 @@ test("builds an initial payload without a creator field", () => {
 
   const payload = trailFormPayload(values, "active");
 
-  assert.equal(Object.keys(payload).sort(), [
+  assert.deepStrictEqual(Object.keys(payload).sort(), [
     "actions",
     "description",
     "name",
     "status",
     "trigger",
   ]);
-  assert.not.ok("account_id" in payload);
-  assert.not.ok("created_by" in payload);
+  assert.ok(!("account_id" in payload));
+  assert.ok(!("created_by" in payload));
 });
 
 test("preserves and submits an event trigger", () => {
@@ -90,12 +90,13 @@ test("preserves and submits an event trigger", () => {
     "2026-08-24",
   );
 
-  assert.is(values.triggerType, "event");
-  assert.equal(values.events, ["EventReportCreated", "EventReportUpdated"]);
-  assert.equal(trailFormPayload(values, "active").trigger, {
+  assert.strictEqual(values.triggerType, "event");
+  assert.deepStrictEqual(values.events, [
+    "EventReportCreated",
+    "EventReportUpdated",
+  ]);
+  assert.deepStrictEqual(trailFormPayload(values, "active").trigger, {
     type: "event",
     events: ["EventReportCreated", "EventReportUpdated"],
   });
 });
-
-test.run();

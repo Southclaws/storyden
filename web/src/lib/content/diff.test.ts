@@ -1,6 +1,6 @@
 import type { JSONContent } from "@tiptap/core";
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import assert from "node:assert/strict";
+import { test } from "vitest";
 
 import { countDiffMarks, diffTipTapJSON } from "./diff";
 
@@ -28,8 +28,8 @@ test("identical documents produce no diff marks", () => {
   const result = diffTipTapJSON(original, modified);
   const counts = countDiffMarks(result);
 
-  assert.equal(counts.insertions, 0);
-  assert.equal(counts.deletions, 0);
+  assert.deepStrictEqual(counts.insertions, 0);
+  assert.deepStrictEqual(counts.deletions, 0);
 });
 
 test("simple text insertion", () => {
@@ -56,8 +56,8 @@ test("simple text insertion", () => {
   const result = diffTipTapJSON(original, modified);
   const counts = countDiffMarks(result);
 
-  assert.equal(counts.insertions, 1);
-  assert.equal(counts.deletions, 0);
+  assert.deepStrictEqual(counts.insertions, 1);
+  assert.deepStrictEqual(counts.deletions, 0);
 
   // Check the merged content has both unchanged and inserted text
   const paragraph = result.content?.[0];
@@ -96,8 +96,8 @@ test("simple text deletion", () => {
   const result = diffTipTapJSON(original, modified);
   const counts = countDiffMarks(result);
 
-  assert.equal(counts.insertions, 0);
-  assert.equal(counts.deletions, 1);
+  assert.deepStrictEqual(counts.insertions, 0);
+  assert.deepStrictEqual(counts.deletions, 1);
 
   // Check the merged content has both unchanged and deleted text
   const paragraph = result.content?.[0];
@@ -167,9 +167,9 @@ test("paragraph addition", () => {
   const result = diffTipTapJSON(original, modified);
   const counts = countDiffMarks(result);
 
-  assert.equal(counts.insertions, 1);
-  assert.equal(counts.deletions, 0);
-  assert.equal(result.content?.length, 2, "Should have 2 paragraphs");
+  assert.deepStrictEqual(counts.insertions, 1);
+  assert.deepStrictEqual(counts.deletions, 0);
+  assert.deepStrictEqual(result.content?.length, 2, "Should have 2 paragraphs");
 });
 
 test("paragraph deletion", () => {
@@ -200,9 +200,13 @@ test("paragraph deletion", () => {
   const result = diffTipTapJSON(original, modified);
   const counts = countDiffMarks(result);
 
-  assert.equal(counts.insertions, 0);
-  assert.equal(counts.deletions, 1);
-  assert.equal(result.content?.length, 2, "Should show both paragraphs");
+  assert.deepStrictEqual(counts.insertions, 0);
+  assert.deepStrictEqual(counts.deletions, 1);
+  assert.deepStrictEqual(
+    result.content?.length,
+    2,
+    "Should show both paragraphs",
+  );
 });
 
 test("preserves text marks (bold, italic)", () => {
@@ -301,7 +305,7 @@ test("linkPreview node with different href shows both versions", () => {
   // Should have 2 linkPreview nodes in the paragraph
   const paragraph = result.content?.[0];
   assert.ok(paragraph?.content);
-  assert.equal(
+  assert.deepStrictEqual(
     paragraph.content.length,
     2,
     "Should show both old and new linkPreview",
@@ -310,7 +314,7 @@ test("linkPreview node with different href shows both versions", () => {
   const linkPreviews = paragraph.content.filter(
     (node) => node.type === "linkPreview",
   );
-  assert.equal(linkPreviews.length, 2);
+  assert.deepStrictEqual(linkPreviews.length, 2);
 
   // Check that hrefs are preserved
   const hrefs = linkPreviews.map((node) => node.attrs?.["href"]);
@@ -326,8 +330,8 @@ test("linkPreview node with different href shows both versions", () => {
   );
   assert.ok(deletionNode, "Should have deletion data-diff attribute");
   assert.ok(insertionNode, "Should have insertion data-diff attribute");
-  assert.equal(deletionNode?.attrs?.["href"], "https://example.com");
-  assert.equal(insertionNode?.attrs?.["href"], "https://barney.is");
+  assert.deepStrictEqual(deletionNode?.attrs?.["href"], "https://example.com");
+  assert.deepStrictEqual(insertionNode?.attrs?.["href"], "https://barney.is");
 });
 
 test("linkPreview node with same href does not duplicate", () => {
@@ -372,7 +376,11 @@ test("linkPreview node with same href does not duplicate", () => {
   // Should have only 1 linkPreview node since they're identical
   const paragraph = result.content?.[0];
   assert.ok(paragraph?.content);
-  assert.equal(paragraph.content.length, 1, "Should not duplicate same link");
+  assert.deepStrictEqual(
+    paragraph.content.length,
+    1,
+    "Should not duplicate same link",
+  );
 });
 
 test("image node with different src shows both versions", () => {
@@ -415,14 +423,14 @@ test("image node with different src shows both versions", () => {
   // Should have 2 image nodes in the paragraph
   const paragraph = result.content?.[0];
   assert.ok(paragraph?.content);
-  assert.equal(
+  assert.deepStrictEqual(
     paragraph.content.length,
     2,
     "Should show both old and new image",
   );
 
   const images = paragraph.content.filter((node) => node.type === "image");
-  assert.equal(images.length, 2);
+  assert.deepStrictEqual(images.length, 2);
 
   // Check that data-diff attributes are set
   const deletionNode = images.find(
@@ -433,8 +441,14 @@ test("image node with different src shows both versions", () => {
   );
   assert.ok(deletionNode, "Should have deletion data-diff attribute");
   assert.ok(insertionNode, "Should have insertion data-diff attribute");
-  assert.equal(deletionNode?.attrs?.["src"], "https://example.com/image1.jpg");
-  assert.equal(insertionNode?.attrs?.["src"], "https://example.com/image2.jpg");
+  assert.deepStrictEqual(
+    deletionNode?.attrs?.["src"],
+    "https://example.com/image1.jpg",
+  );
+  assert.deepStrictEqual(
+    insertionNode?.attrs?.["src"],
+    "https://example.com/image2.jpg",
+  );
 });
 
 test("heading changes preserve structure", () => {
@@ -463,8 +477,8 @@ test("heading changes preserve structure", () => {
   const result = diffTipTapJSON(original, modified);
 
   // Should still be a heading
-  assert.equal(result.content?.[0]?.type, "heading");
-  assert.equal(result.content?.[0]?.attrs?.["level"], 1);
+  assert.deepStrictEqual(result.content?.[0]?.type, "heading");
+  assert.deepStrictEqual(result.content?.[0]?.attrs?.["level"], 1);
 
   const counts = countDiffMarks(result);
   assert.ok(counts.insertions > 0);
@@ -533,14 +547,18 @@ test("complex document with multiple changes", () => {
   assert.ok(counts.insertions > 0, "Should have insertions");
 
   // Should preserve document structure
-  assert.equal(result.content?.length, 3, "Should have 3 top-level nodes");
+  assert.deepStrictEqual(
+    result.content?.length,
+    3,
+    "Should have 3 top-level nodes",
+  );
 
   // Check that linkPreview nodes are both present
   const lastParagraph = result.content?.[2];
   const linkPreviews = lastParagraph?.content?.filter(
     (node) => node.type === "linkPreview",
   );
-  assert.equal(
+  assert.deepStrictEqual(
     linkPreviews?.length,
     2,
     "Should have both old and new linkPreview nodes",
@@ -580,11 +598,11 @@ test("entire blockquote addition has data-diff attribute", () => {
   const result = diffTipTapJSON(original, modified);
 
   // Should have 2 nodes: paragraph (unchanged) and blockquote (added)
-  assert.equal(result.content?.length, 2);
+  assert.deepStrictEqual(result.content?.length, 2);
 
   const blockquote = result.content?.[1];
-  assert.equal(blockquote?.type, "blockquote");
-  assert.equal(blockquote?.attrs?.["data-diff"], "insertion");
+  assert.deepStrictEqual(blockquote?.type, "blockquote");
+  assert.deepStrictEqual(blockquote?.attrs?.["data-diff"], "insertion");
 });
 
 test("entire blockquote removal has data-diff attribute", () => {
@@ -620,11 +638,11 @@ test("entire blockquote removal has data-diff attribute", () => {
   const result = diffTipTapJSON(original, modified);
 
   // Should have 2 nodes: paragraph (unchanged) and blockquote (deleted)
-  assert.equal(result.content?.length, 2);
+  assert.deepStrictEqual(result.content?.length, 2);
 
   const blockquote = result.content?.[1];
-  assert.equal(blockquote?.type, "blockquote");
-  assert.equal(blockquote?.attrs?.["data-diff"], "deletion");
+  assert.deepStrictEqual(blockquote?.type, "blockquote");
+  assert.deepStrictEqual(blockquote?.attrs?.["data-diff"], "deletion");
 });
 
 test("inserting paragraph above linkPreview doesn't mark link as changed", () => {
@@ -677,25 +695,23 @@ test("inserting paragraph above linkPreview doesn't mark link as changed", () =>
   const result = diffTipTapJSON(original, modified);
 
   // Should have 4 nodes in result
-  assert.equal(result.content?.length, 4);
+  assert.deepStrictEqual(result.content?.length, 4);
 
   // First paragraph should have text changes (Content 1 -> Content 2)
   const firstPara = result.content?.[0];
-  assert.equal(firstPara?.type, "paragraph");
+  assert.deepStrictEqual(firstPara?.type, "paragraph");
 
   // Second paragraph should be marked as insertion (new "next" paragraph)
   const secondPara = result.content?.[1];
-  assert.equal(secondPara?.type, "paragraph");
+  assert.deepStrictEqual(secondPara?.type, "paragraph");
   assert.ok(secondPara?.attrs?.["data-diff"] === "insertion");
 
   // LinkPreview should NOT be marked as changed (same href)
   const linkPreview = result.content?.[2];
-  assert.equal(linkPreview?.type, "linkPreview");
-  assert.equal(linkPreview?.attrs?.["href"], "https://barney.is/");
+  assert.deepStrictEqual(linkPreview?.type, "linkPreview");
+  assert.deepStrictEqual(linkPreview?.attrs?.["href"], "https://barney.is/");
   assert.ok(
     !linkPreview?.attrs?.["data-diff"],
     "LinkPreview should not have data-diff attribute since it didn't change",
   );
 });
-
-test.run();

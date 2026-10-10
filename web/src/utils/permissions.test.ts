@@ -1,5 +1,5 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import assert from "node:assert/strict";
+import { test } from "vitest";
 
 import type { Account } from "@/api/openapi-schema";
 import { Permission } from "@/api/openapi-schema";
@@ -19,7 +19,7 @@ function accountWithPermissions(...permissions: string[]): Account {
 }
 
 test("hasPermission returns false without account", () => {
-  assert.not.ok(hasPermission(undefined, Permission.MANAGE_POSTS));
+  assert.ok(!hasPermission(undefined, Permission.MANAGE_POSTS));
 });
 
 test("hasPermission checks permissions across roles", () => {
@@ -32,7 +32,7 @@ test("hasPermission checks permissions across roles", () => {
   } as unknown as Account;
 
   assert.ok(hasPermission(account, Permission.MANAGE_POSTS));
-  assert.not.ok(hasPermission(account, Permission.MANAGE_SETTINGS));
+  assert.ok(!hasPermission(account, Permission.MANAGE_SETTINGS));
 });
 
 test("hasPermission grants all when account has ADMINISTRATOR", () => {
@@ -48,9 +48,5 @@ test("hasPermissionOr returns true from fallback when no permission", () => {
 });
 
 test("hasPermissionOr returns false without account even if fallback true", () => {
-  assert.not.ok(
-    hasPermissionOr(undefined, () => true, Permission.MANAGE_POSTS),
-  );
+  assert.ok(!hasPermissionOr(undefined, () => true, Permission.MANAGE_POSTS));
 });
-
-test.run();

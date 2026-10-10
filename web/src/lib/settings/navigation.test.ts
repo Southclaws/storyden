@@ -1,5 +1,5 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import assert from "node:assert/strict";
+import { test } from "vitest";
 
 import {
   DefaultNavigationConfig,
@@ -15,7 +15,7 @@ import {
 } from "./navigation";
 
 test("missing navigation configuration uses the current sidebar", () => {
-  assert.equal(
+  assert.deepStrictEqual(
     NavigationConfigSchema.parse(undefined),
     DefaultNavigationConfig,
   );
@@ -23,25 +23,25 @@ test("missing navigation configuration uses the current sidebar", () => {
 
 test("robots is available as an optional built-in navigation item", () => {
   const navigation = NavigationConfigSchema.parse({ items: [] });
-  assert.equal(addBuiltInNavigationItem(navigation, "robots").items, [
+  assert.deepStrictEqual(addBuiltInNavigationItem(navigation, "robots").items, [
     { type: "robots" },
   ]);
 });
 
 test("new thread is the first default item and can be added", () => {
-  assert.equal(DefaultNavigationConfig.items[0], { type: "compose" });
+  assert.deepStrictEqual(DefaultNavigationConfig.items[0], { type: "compose" });
 
   const navigation = NavigationConfigSchema.parse({
     items: [{ type: "categories" }],
   });
-  assert.equal(addBuiltInNavigationItem(navigation, "compose").items, [
-    { type: "categories" },
-    { type: "compose" },
-  ]);
+  assert.deepStrictEqual(
+    addBuiltInNavigationItem(navigation, "compose").items,
+    [{ type: "categories" }, { type: "compose" }],
+  );
 });
 
 test("the default navigation contains only first-class items", () => {
-  assert.equal(DefaultNavigationConfig.items, [
+  assert.deepStrictEqual(DefaultNavigationConfig.items, [
     { type: "compose" },
     { type: "categories" },
     { type: "library" },
@@ -57,7 +57,7 @@ test("built-in items may only appear once", () => {
     items: [{ type: "categories" }, { type: "categories" }],
   });
 
-  assert.is(result.success, false);
+  assert.strictEqual(result.success, false);
 });
 
 test("custom links use their stable ID for identity", () => {
@@ -68,7 +68,7 @@ test("custom links use their stable ID for identity", () => {
     href: "https://docs.example.com/",
   });
 
-  assert.equal(updated.items, [
+  assert.deepStrictEqual(updated.items, [
     {
       type: "custom-link",
       id: "docs",
@@ -76,7 +76,7 @@ test("custom links use their stable ID for identity", () => {
       href: "https://docs.example.com/",
     },
   ]);
-  assert.is(
+  assert.strictEqual(
     addCustomNavigationLink(updated, {
       id: "docs",
       label: "Duplicate",
@@ -84,7 +84,10 @@ test("custom links use their stable ID for identity", () => {
     }),
     updated,
   );
-  assert.is(getNavigationItemKey(updated.items[0]!), "custom-link:docs");
+  assert.strictEqual(
+    getNavigationItemKey(updated.items[0]!),
+    "custom-link:docs",
+  );
 });
 
 test("items can be inserted, reordered, replaced, and removed", () => {
@@ -93,20 +96,23 @@ test("items can be inserted, reordered, replaced, and removed", () => {
   });
   const inserted = addBuiltInNavigationItem(initial, "members", 0);
 
-  assert.equal(inserted.items, [
+  assert.deepStrictEqual(inserted.items, [
     { type: "categories" },
     { type: "members" },
     { type: "library" },
   ]);
-  assert.is(addBuiltInNavigationItem(inserted, "library"), inserted);
+  assert.strictEqual(addBuiltInNavigationItem(inserted, "library"), inserted);
 
   const reordered = reorderNavigationItem(inserted, "library", "categories");
-  assert.equal(reordered.items, [
+  assert.deepStrictEqual(reordered.items, [
     { type: "library" },
     { type: "categories" },
     { type: "members" },
   ]);
-  assert.is(reorderNavigationItem(reordered, "missing", "library"), reordered);
+  assert.strictEqual(
+    reorderNavigationItem(reordered, "missing", "library"),
+    reordered,
+  );
 
   const withLink = addCustomNavigationLink(reordered, {
     id: "community-guide",
@@ -119,14 +125,14 @@ test("items can be inserted, reordered, replaced, and removed", () => {
     label: "Start here",
     href: "/l/start-here",
   });
-  assert.equal(replaced.items.at(-1), {
+  assert.deepStrictEqual(replaced.items.at(-1), {
     type: "custom-link",
     id: "community-guide",
     label: "Start here",
     href: "/l/start-here",
   });
 
-  assert.equal(removeNavigationItem(replaced, "members").items, [
+  assert.deepStrictEqual(removeNavigationItem(replaced, "members").items, [
     { type: "library" },
     { type: "categories" },
     {
@@ -136,7 +142,7 @@ test("items can be inserted, reordered, replaced, and removed", () => {
       href: "/l/start-here",
     },
   ]);
-  assert.is(removeNavigationItem(replaced, "missing"), replaced);
+  assert.strictEqual(removeNavigationItem(replaced, "missing"), replaced);
 });
 
 test("navigation URLs accept safe local and HTTP links", () => {
@@ -144,15 +150,13 @@ test("navigation URLs accept safe local and HTTP links", () => {
   assert.ok(isSafeNavigationHref("?view=latest"));
   assert.ok(isSafeNavigationHref("#community"));
   assert.ok(isSafeNavigationHref("https://example.com/docs"));
-  assert.not.ok(isSafeNavigationHref("//example.com"));
-  assert.not.ok(isSafeNavigationHref("javascript:alert(1)"));
-  assert.not.ok(isSafeNavigationHref("data:text/html,hello"));
+  assert.ok(!isSafeNavigationHref("//example.com"));
+  assert.ok(!isSafeNavigationHref("javascript:alert(1)"));
+  assert.ok(!isSafeNavigationHref("data:text/html,hello"));
 
-  assert.is(
+  assert.strictEqual(
     normaliseNavigationHref("example.com/docs"),
     "https://example.com/docs",
   );
-  assert.is(normaliseNavigationHref("not a link"), undefined);
+  assert.strictEqual(normaliseNavigationHref("not a link"), undefined);
 });
-
-test.run();

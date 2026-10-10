@@ -326,9 +326,11 @@ test.describe("Library page WebMCP", () => {
 
       const firstRobotRequest = robotRequests[0];
       const requestContext = firstRobotRequest?.["context"] as
-        { datagraph_item?: { id?: string; slug?: string } } | undefined;
+        | { datagraph_item?: { id?: string; slug?: string } }
+        | undefined;
       const clientTools = firstRobotRequest?.["client_tools"] as
-        { client_id?: string; tools?: { name: string }[] } | undefined;
+        | { client_id?: string; tools?: { name: string }[] }
+        | undefined;
       expect(requestContext?.datagraph_item).toMatchObject({
         id: libraryPage.id,
         slug: libraryPage.slug,
@@ -341,7 +343,8 @@ test.describe("Library page WebMCP", () => {
         .poll(() =>
           robotRequests.some((request) => {
             const context = request["client_tools"] as
-              { tools?: { name: string }[] } | undefined;
+              | { tools?: { name: string }[] }
+              | undefined;
             return context?.tools?.some(
               (tool) => tool.name === "library_page_block_add",
             );

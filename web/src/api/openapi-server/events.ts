@@ -83,7 +83,8 @@ export type eventListResponseSuccess = eventListResponse200 & {
   headers: Headers;
 };
 export type eventListResponseError = (
-  eventListResponse404 | eventListResponseDefault
+  | eventListResponse404
+  | eventListResponseDefault
 ) & {
   headers: Headers;
 };
@@ -136,7 +137,8 @@ export type eventCreateResponseSuccess = eventCreateResponse200 & {
   headers: Headers;
 };
 export type eventCreateResponseError = (
-  eventCreateResponse401 | eventCreateResponseDefault
+  | eventCreateResponse401
+  | eventCreateResponseDefault
 ) & {
   headers: Headers;
 };
@@ -209,7 +211,9 @@ export type eventGetResponseSuccess = eventGetResponse200 & {
   headers: Headers;
 };
 export type eventGetResponseError = (
-  eventGetResponse401 | eventGetResponse404 | eventGetResponseDefault
+  | eventGetResponse401
+  | eventGetResponse404
+  | eventGetResponseDefault
 ) & {
   headers: Headers;
 };
@@ -255,7 +259,9 @@ export type eventUpdateResponseSuccess = eventUpdateResponse200 & {
   headers: Headers;
 };
 export type eventUpdateResponseError = (
-  eventUpdateResponse401 | eventUpdateResponse404 | eventUpdateResponseDefault
+  | eventUpdateResponse401
+  | eventUpdateResponse404
+  | eventUpdateResponseDefault
 ) & {
   headers: Headers;
 };
@@ -330,7 +336,9 @@ export type eventDeleteResponseSuccess = eventDeleteResponse200 & {
   headers: Headers;
 };
 export type eventDeleteResponseError = (
-  eventDeleteResponse401 | eventDeleteResponse404 | eventDeleteResponseDefault
+  | eventDeleteResponse401
+  | eventDeleteResponse404
+  | eventDeleteResponseDefault
 ) & {
   headers: Headers;
 };

@@ -13,13 +13,11 @@ import {
 import { isDefaultRole } from "@/lib/role/defaults";
 import { deriveError } from "@/utils/error";
 
-const roleToMultiSelectItem = map(
-  (role: Role): MultiSelectPickerItem => ({
-    label: role.name,
-    value: role.id,
-    colour: role.colour,
-  }),
-);
+const roleToMultiSelectItem = map((role: Role): MultiSelectPickerItem => ({
+  label: role.name,
+  value: role.id,
+  colour: role.colour,
+}));
 
 // Default roles are implicit or synthetic, so role-search predicates cannot
 // reliably match them through the account_roles join table.

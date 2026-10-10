@@ -76,7 +76,9 @@ export type ProfileListQueryResult = NonNullable<
 
 export const useProfileList = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   params?: ProfileListParams,
   options?: {
@@ -219,7 +221,9 @@ export type ProfileFollowersGetQueryResult = NonNullable<
 
 export const useProfileFollowersGet = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   accountHandle: string,
   params?: ProfileFollowersGetParams,
@@ -289,7 +293,9 @@ export type ProfileFollowersAddMutationResult = NonNullable<
 
 export const useProfileFollowersAdd = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   accountHandle: string,
   options?: {
@@ -353,7 +359,9 @@ export type ProfileFollowersRemoveMutationResult = NonNullable<
 
 export const useProfileFollowersRemove = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   accountHandle: string,
   options?: {

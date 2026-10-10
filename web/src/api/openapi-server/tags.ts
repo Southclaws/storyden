@@ -124,7 +124,8 @@ export type tagGetResponseSuccess = tagGetResponse200 & {
   headers: Headers;
 };
 export type tagGetResponseError = (
-  tagGetResponse404 | tagGetResponseDefault
+  | tagGetResponse404
+  | tagGetResponseDefault
 ) & {
   headers: Headers;
 };

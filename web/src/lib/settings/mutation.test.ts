@@ -1,5 +1,5 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import assert from "node:assert/strict";
+import { test } from "vitest";
 
 import type { AdminSettingsProps, Info } from "@/api/openapi-schema";
 import {
@@ -56,10 +56,10 @@ test("admin settings updates preserve public-only info fields", () => {
     }),
   );
 
-  assert.equal(updated.capabilities, [InstanceCapability.robots]);
-  assert.is(updated.onboarding_status, "complete");
-  assert.is(updated.title, "Updated Storyden");
-  assert.equal(updated.metadata, {
+  assert.deepStrictEqual(updated.capabilities, [InstanceCapability.robots]);
+  assert.strictEqual(updated.onboarding_status, "complete");
+  assert.strictEqual(updated.title, "Updated Storyden");
+  assert.deepStrictEqual(updated.metadata, {
     navigation: { items: [{ type: "robots" }] },
   });
 });
@@ -70,7 +70,5 @@ test("admin settings updates use capabilities when the response includes them", 
     baseAdminSettings({ capabilities: [] }),
   );
 
-  assert.equal(updated.capabilities, []);
+  assert.deepStrictEqual(updated.capabilities, []);
 });
-
-test.run();

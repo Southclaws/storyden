@@ -441,7 +441,9 @@ export type NodeUpdateMutationResult = NonNullable<
 
 export const useNodeUpdate = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   nodeSlug: string,
   options?: {
@@ -521,7 +523,9 @@ export type NodeDeleteMutationResult = NonNullable<
 
 export const useNodeDelete = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   nodeSlug: string,
   params?: NodeDeleteParams,
@@ -891,7 +895,9 @@ export type NodeListChildrenQueryResult = NonNullable<
 
 export const useNodeListChildren = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   nodeSlug: string,
   params?: NodeListChildrenParams,
@@ -995,7 +1001,9 @@ export type NodeUpdateChildrenPropertySchemaMutationResult = NonNullable<
 
 export const useNodeUpdateChildrenPropertySchema = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   nodeSlug: string,
   options?: {
@@ -1101,7 +1109,9 @@ export type NodeUpdatePropertySchemaMutationResult = NonNullable<
 
 export const useNodeUpdatePropertySchema = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   nodeSlug: string,
   options?: {
@@ -1293,7 +1303,9 @@ export type NodeUpdateVisibilityMutationResult = NonNullable<
 
 export const useNodeUpdateVisibility = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   nodeSlug: string,
   options?: {
@@ -1381,7 +1393,9 @@ export type NodeVersionListQueryResult = NonNullable<
 
 export const useNodeVersionList = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   nodeSlug: string,
   params?: NodeVersionListParams,
@@ -1558,7 +1572,9 @@ export type NodeVersionDraftGetQueryResult = NonNullable<
 
 export const useNodeVersionDraftGet = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   nodeSlug: string,
   options?: {
@@ -1734,7 +1750,9 @@ export type NodeVersionGetQueryResult = NonNullable<
 
 export const useNodeVersionGet = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   nodeSlug: string,
   versionId: string,
@@ -1937,7 +1955,9 @@ export type NodeVersionDeleteMutationResult = NonNullable<
 
 export const useNodeVersionDelete = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   nodeSlug: string,
   versionId: string,
@@ -2129,7 +2149,9 @@ export type NodeAddAssetMutationResult = NonNullable<
 
 export const useNodeAddAsset = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   nodeSlug: string,
   assetId: string,
@@ -2202,7 +2224,9 @@ export type NodeRemoveAssetMutationResult = NonNullable<
 
 export const useNodeRemoveAsset = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   nodeSlug: string,
   assetId: string,
@@ -2275,7 +2299,9 @@ export type NodeAddNodeMutationResult = NonNullable<
 
 export const useNodeAddNode = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   nodeSlug: string,
   nodeSlugChild: string,
@@ -2351,7 +2377,9 @@ export type NodeRemoveNodeMutationResult = NonNullable<
 
 export const useNodeRemoveNode = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   nodeSlug: string,
   nodeSlugChild: string,

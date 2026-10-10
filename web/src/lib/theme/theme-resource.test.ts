@@ -1,5 +1,5 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import assert from "node:assert/strict";
+import { test } from "vitest";
 
 import { createThemeResourceResponse } from "./theme-resource";
 
@@ -10,14 +10,17 @@ test("returns a cacheable theme resource with a strong content ETag", async () =
     "text/css",
   );
 
-  assert.is(response.status, 200);
-  assert.is(response.headers.get("Cache-Control"), "public, no-cache");
-  assert.is(response.headers.get("Content-Type"), "text/css; charset=utf-8");
-  assert.is(
+  assert.strictEqual(response.status, 200);
+  assert.strictEqual(response.headers.get("Cache-Control"), "public, no-cache");
+  assert.strictEqual(
+    response.headers.get("Content-Type"),
+    "text/css; charset=utf-8",
+  );
+  assert.strictEqual(
     response.headers.get("ETag"),
     '"sha256-LPJNul+wow4m6DsqxbninhsWHlwfp0JecwQzYpOLmCQ="',
   );
-  assert.is(await response.text(), "hello");
+  assert.strictEqual(await response.text(), "hello");
 });
 
 test("returns no body when the theme resource ETag matches", async () => {
@@ -34,12 +37,10 @@ test("returns no body when the theme resource ETag matches", async () => {
     "application/javascript",
   );
 
-  assert.is(response.status, 304);
-  assert.is(
+  assert.strictEqual(response.status, 304);
+  assert.strictEqual(
     response.headers.get("ETag"),
     '"sha256-LPJNul+wow4m6DsqxbninhsWHlwfp0JecwQzYpOLmCQ="',
   );
-  assert.is(await response.text(), "");
+  assert.strictEqual(await response.text(), "");
 });
-
-test.run();

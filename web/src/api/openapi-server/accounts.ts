@@ -103,7 +103,8 @@ export type accountListResponseSuccess = accountListResponse200 & {
   headers: Headers;
 };
 export type accountListResponseError = (
-  accountListResponse401 | accountListResponseDefault
+  | accountListResponse401
+  | accountListResponseDefault
 ) & {
   headers: Headers;
 };
@@ -1280,7 +1281,8 @@ export type accountAuthProviderListResponseSuccess =
     headers: Headers;
   };
 export type accountAuthProviderListResponseError = (
-  accountAuthProviderListResponse400 | accountAuthProviderListResponseDefault
+  | accountAuthProviderListResponse400
+  | accountAuthProviderListResponseDefault
 ) & {
   headers: Headers;
 };
@@ -1325,7 +1327,8 @@ export type accountAuthMethodDeleteResponseSuccess =
     headers: Headers;
   };
 export type accountAuthMethodDeleteResponseError = (
-  accountAuthMethodDeleteResponse400 | accountAuthMethodDeleteResponseDefault
+  | accountAuthMethodDeleteResponse400
+  | accountAuthMethodDeleteResponseDefault
 ) & {
   headers: Headers;
 };

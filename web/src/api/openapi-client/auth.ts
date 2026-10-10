@@ -380,7 +380,9 @@ export type AuthPasswordCreateMutationResult = NonNullable<
 
 export const useAuthPasswordCreate = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof authPasswordCreate>>,
@@ -463,7 +465,9 @@ export type AuthPasswordUpdateMutationResult = NonNullable<
 
 export const useAuthPasswordUpdate = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof authPasswordUpdate>>,
@@ -821,7 +825,9 @@ export type AuthPasswordResetRequestEmailMutationResult = NonNullable<
 
 export const useAuthPasswordResetRequestEmail = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof authPasswordResetRequestEmail>>,
@@ -1446,7 +1452,9 @@ export type OAuthDeviceConsentQueryResult = NonNullable<
 
 export const useOAuthDeviceConsent = <
   TError =
-    OAuthErrorResponse | UnauthorisedResponse | InternalServerErrorResponse,
+    | OAuthErrorResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
 >(
   params?: OAuthDeviceConsentParams,
   options?: {
@@ -1544,7 +1552,9 @@ export type OAuthDeviceConsentSubmitMutationResult = NonNullable<
 
 export const useOAuthDeviceConsentSubmit = <
   TError =
-    OAuthErrorResponse | UnauthorisedResponse | InternalServerErrorResponse,
+    | OAuthErrorResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof oAuthDeviceConsentSubmit>>,
@@ -2424,7 +2434,9 @@ export type WebAuthnGetAssertionQueryResult = NonNullable<
 
 export const useWebAuthnGetAssertion = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   accountHandle: string,
   options?: {
@@ -2516,7 +2528,9 @@ export type WebAuthnMakeAssertionMutationResult = NonNullable<
 
 export const useWebAuthnMakeAssertion = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof webAuthnMakeAssertion>>,
@@ -3055,7 +3069,9 @@ export type OAuthRefreshTokenDeleteMutationResult = NonNullable<
 
 export const useOAuthRefreshTokenDelete = <
   TError =
-    OAuthErrorResponse | UnauthorisedResponse | InternalServerErrorResponse,
+    | OAuthErrorResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
 >(
   oauthRefreshTokenId: string,
   options?: {
@@ -3262,7 +3278,9 @@ export type OAuthClientGetQueryResult = NonNullable<
 
 export const useOAuthClientGet = <
   TError =
-    OAuthErrorResponse | UnauthorisedResponse | InternalServerErrorResponse,
+    | OAuthErrorResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
 >(
   oauthClientId: string,
   options?: {
@@ -3439,7 +3457,9 @@ export type OAuthClientDeleteMutationResult = NonNullable<
 
 export const useOAuthClientDelete = <
   TError =
-    OAuthErrorResponse | UnauthorisedResponse | InternalServerErrorResponse,
+    | OAuthErrorResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
 >(
   oauthClientId: string,
   options?: {

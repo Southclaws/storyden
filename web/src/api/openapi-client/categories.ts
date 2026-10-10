@@ -90,7 +90,9 @@ export type CategoryCreateMutationResult = NonNullable<
 
 export const useCategoryCreate = <
   TError =
-    BadRequestResponse | UnauthorisedResponse | InternalServerErrorResponse,
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof categoryCreate>>,
@@ -281,7 +283,9 @@ export type CategoryUpdateMutationResult = NonNullable<
 
 export const useCategoryUpdate = <
   TError =
-    BadRequestResponse | UnauthorisedResponse | InternalServerErrorResponse,
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
 >(
   categorySlug: string,
   options?: {

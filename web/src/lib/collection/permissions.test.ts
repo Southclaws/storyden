@@ -1,5 +1,5 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import assert from "node:assert/strict";
+import { test } from "vitest";
 
 import type { Account, Collection } from "@/api/openapi-schema";
 import { Permission } from "@/api/openapi-schema";
@@ -21,8 +21,8 @@ function collection(ownerId: string): Collection {
 
 test("canDeleteCollection/canEditCollection returns false without account", () => {
   const col = collection("owner-1");
-  assert.not.ok(canDeleteCollection(col, undefined));
-  assert.not.ok(canEditCollection(col, undefined));
+  assert.ok(!canDeleteCollection(col, undefined));
+  assert.ok(!canEditCollection(col, undefined));
 });
 
 test("canDeleteCollection/canEditCollection allows the owner", () => {
@@ -42,8 +42,6 @@ test("canDeleteCollection/canEditCollection allows MANAGE_COLLECTIONS", () => {
 test("canDeleteCollection/canEditCollection denies non-owner without permission", () => {
   const col = collection("owner-1");
   const acc = account("user-1", [Permission.READ_COLLECTION]);
-  assert.not.ok(canDeleteCollection(col, acc));
-  assert.not.ok(canEditCollection(col, acc));
+  assert.ok(!canDeleteCollection(col, acc));
+  assert.ok(!canEditCollection(col, acc));
 });
-
-test.run();

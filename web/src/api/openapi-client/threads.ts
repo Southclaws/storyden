@@ -88,7 +88,9 @@ export type ThreadCreateMutationResult = NonNullable<
 
 export const useThreadCreate = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof threadCreate>>,
@@ -158,7 +160,9 @@ export type ThreadListQueryResult = NonNullable<
 
 export const useThreadList = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   params?: ThreadListParams,
   options?: {
@@ -332,7 +336,9 @@ export type ThreadUpdateMutationResult = NonNullable<
 
 export const useThreadUpdate = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   threadMark: string,
   options?: {
@@ -392,7 +398,9 @@ export type ThreadDeleteMutationResult = NonNullable<
 
 export const useThreadDelete = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   threadMark: string,
   options?: {

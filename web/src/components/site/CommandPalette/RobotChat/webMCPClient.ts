@@ -1,8 +1,5 @@
 import { initializeWebMCPPolyfill } from "@mcp-b/webmcp-polyfill";
-import type {
-  ChromeModelContext,
-  RegisteredTool,
-} from "@mcp-b/webmcp-types";
+import type { ChromeModelContext, RegisteredTool } from "@mcp-b/webmcp-types";
 
 import {
   RobotChatContext,
@@ -22,7 +19,8 @@ export type WebMCPToolCallMetadata = {
 };
 
 export type WebMCPExecutionResult =
-  { status: "unavailable" } | { status: "completed"; output: unknown };
+  | { status: "unavailable" }
+  | { status: "completed"; output: unknown };
 
 let fallbackClientID: string | undefined;
 

@@ -95,7 +95,9 @@ export type trailListResponseSuccess = trailListResponse200 & {
   headers: Headers;
 };
 export type trailListResponseError = (
-  trailListResponse401 | trailListResponse403 | trailListResponseDefault
+  | trailListResponse401
+  | trailListResponse403
+  | trailListResponseDefault
 ) & {
   headers: Headers;
 };

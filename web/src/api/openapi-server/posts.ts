@@ -86,7 +86,9 @@ export type postUpdateResponseSuccess = postUpdateResponse200 & {
   headers: Headers;
 };
 export type postUpdateResponseError = (
-  postUpdateResponse401 | postUpdateResponse404 | postUpdateResponseDefault
+  | postUpdateResponse401
+  | postUpdateResponse404
+  | postUpdateResponseDefault
 ) & {
   headers: Headers;
 };
@@ -159,7 +161,9 @@ export type postDeleteResponseSuccess = postDeleteResponse200 & {
   headers: Headers;
 };
 export type postDeleteResponseError = (
-  postDeleteResponse401 | postDeleteResponse404 | postDeleteResponseDefault
+  | postDeleteResponse401
+  | postDeleteResponse404
+  | postDeleteResponseDefault
 ) & {
   headers: Headers;
 };

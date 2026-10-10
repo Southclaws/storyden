@@ -1,5 +1,5 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import assert from "node:assert/strict";
+import { test } from "vitest";
 
 import {
   DefaultFeedConfig,
@@ -13,8 +13,8 @@ import {
 test("missing feed configuration uses the fresh-install default", () => {
   const feed = FeedConfigSchema.parse(undefined);
 
-  assert.equal(feed, DefaultFeedConfig);
-  assert.equal(feed.blocks, [
+  assert.deepStrictEqual(feed, DefaultFeedConfig);
+  assert.deepStrictEqual(feed.blocks, [
     { type: "title" },
     { type: "subtitle" },
     { type: "content" },
@@ -34,7 +34,7 @@ test("feed configuration preserves ordered blocks and applies block defaults", (
     ],
   });
 
-  assert.equal(feed.blocks, [
+  assert.deepStrictEqual(feed.blocks, [
     { type: "title" },
     { type: "categories", layout: "list" },
     { type: "threads", source: "uncategorised" },
@@ -48,7 +48,7 @@ test("feed configuration rejects duplicate block types", () => {
     blocks: [{ type: "title" }, { type: "title" }],
   });
 
-  assert.is(result.success, false);
+  assert.strictEqual(result.success, false);
 });
 
 test("legacy thread feeds preserve Quick Share visibility", () => {
@@ -61,11 +61,11 @@ test("legacy thread feeds preserve Quick Share visibility", () => {
     source: { type: "threads", quickShare: "disabled" },
   });
 
-  assert.equal(enabled.blocks, [
+  assert.deepStrictEqual(enabled.blocks, [
     { type: "quick-share", showCategorySelect: true },
     { type: "threads", source: "all" },
   ]);
-  assert.equal(disabled.blocks, [{ type: "threads", source: "all" }]);
+  assert.deepStrictEqual(disabled.blocks, [{ type: "threads", source: "all" }]);
 });
 
 test("legacy category feeds migrate their layout and thread source", () => {
@@ -78,7 +78,7 @@ test("legacy category feeds migrate their layout and thread source", () => {
     },
   });
 
-  assert.equal(feed.blocks, [
+  assert.deepStrictEqual(feed.blocks, [
     { type: "categories", layout: "grid" },
     { type: "quick-share", showCategorySelect: true },
     { type: "threads", source: "all" },
@@ -91,7 +91,7 @@ test("legacy category feeds hide the category picker for uncategorised threads",
     source: { type: "categories" },
   });
 
-  assert.equal(feed.blocks, [
+  assert.deepStrictEqual(feed.blocks, [
     { type: "categories", layout: "list" },
     { type: "quick-share", showCategorySelect: false },
     { type: "threads", source: "uncategorised" },
@@ -108,7 +108,7 @@ test("legacy category feeds without a thread list do not render Quick Share", ()
     },
   });
 
-  assert.equal(feed.blocks, [{ type: "categories", layout: "grid" }]);
+  assert.deepStrictEqual(feed.blocks, [{ type: "categories", layout: "grid" }]);
 });
 
 test("legacy category feeds preserve a disabled Quick Share", () => {
@@ -121,7 +121,7 @@ test("legacy category feeds preserve a disabled Quick Share", () => {
     },
   });
 
-  assert.equal(feed.blocks, [
+  assert.deepStrictEqual(feed.blocks, [
     { type: "categories", layout: "list" },
     { type: "threads", source: "all" },
   ]);
@@ -137,10 +137,12 @@ test("legacy library feeds migrate their page and layout", () => {
     source: { type: "library" },
   });
 
-  assert.equal(selectedPage.blocks, [
+  assert.deepStrictEqual(selectedPage.blocks, [
     { type: "library", node: "page-id", layout: "list" },
   ]);
-  assert.equal(libraryRoot.blocks, [{ type: "library", layout: "grid" }]);
+  assert.deepStrictEqual(libraryRoot.blocks, [
+    { type: "library", layout: "grid" },
+  ]);
 });
 
 test("blocks can be inserted after another block or at the end", () => {
@@ -148,12 +150,12 @@ test("blocks can be inserted after another block or at the end", () => {
     blocks: [{ type: "title" }, { type: "threads" }],
   });
 
-  assert.equal(addFeedBlock(feed, "content", 0).blocks, [
+  assert.deepStrictEqual(addFeedBlock(feed, "content", 0).blocks, [
     { type: "title" },
     { type: "content" },
     { type: "threads", source: "uncategorised" },
   ]);
-  assert.equal(addFeedBlock(feed, "quick-share").blocks, [
+  assert.deepStrictEqual(addFeedBlock(feed, "quick-share").blocks, [
     { type: "title" },
     { type: "threads", source: "uncategorised" },
     { type: "quick-share", showCategorySelect: true },
@@ -165,17 +167,17 @@ test("block insertion clamps invalid indices and ignores duplicates", () => {
     blocks: [{ type: "title" }, { type: "threads" }],
   });
 
-  assert.equal(addFeedBlock(feed, "content", -10).blocks, [
+  assert.deepStrictEqual(addFeedBlock(feed, "content", -10).blocks, [
     { type: "content" },
     { type: "title" },
     { type: "threads", source: "uncategorised" },
   ]);
-  assert.equal(addFeedBlock(feed, "content", 100).blocks, [
+  assert.deepStrictEqual(addFeedBlock(feed, "content", 100).blocks, [
     { type: "title" },
     { type: "threads", source: "uncategorised" },
     { type: "content" },
   ]);
-  assert.is(addFeedBlock(feed, "title"), feed);
+  assert.strictEqual(addFeedBlock(feed, "title"), feed);
 });
 
 test("blocks reorder consistently in both directions", () => {
@@ -188,19 +190,19 @@ test("blocks reorder consistently in both directions", () => {
     ],
   });
 
-  assert.equal(reorderFeedBlock(feed, "title", "categories").blocks, [
+  assert.deepStrictEqual(reorderFeedBlock(feed, "title", "categories").blocks, [
     { type: "content" },
     { type: "categories", layout: "list" },
     { type: "title" },
     { type: "threads", source: "uncategorised" },
   ]);
-  assert.equal(reorderFeedBlock(feed, "threads", "content").blocks, [
+  assert.deepStrictEqual(reorderFeedBlock(feed, "threads", "content").blocks, [
     { type: "title" },
     { type: "threads", source: "uncategorised" },
     { type: "content" },
     { type: "categories", layout: "list" },
   ]);
-  assert.is(reorderFeedBlock(feed, "title", "title"), feed);
+  assert.strictEqual(reorderFeedBlock(feed, "title", "title"), feed);
 });
 
 test("blocks can be replaced and removed without changing their neighbours", () => {
@@ -215,14 +217,12 @@ test("blocks can be replaced and removed without changing their neighbours", () 
     type: "categories",
     layout: "grid",
   });
-  assert.equal(replaced.blocks, [
+  assert.deepStrictEqual(replaced.blocks, [
     { type: "categories", layout: "grid" },
     { type: "threads", source: "uncategorised" },
   ]);
-  assert.equal(removeFeedBlock(replaced, "categories").blocks, [
+  assert.deepStrictEqual(removeFeedBlock(replaced, "categories").blocks, [
     { type: "threads", source: "uncategorised" },
   ]);
-  assert.is(removeFeedBlock(feed, "cover"), feed);
+  assert.strictEqual(removeFeedBlock(feed, "cover"), feed);
 });
-
-test.run();

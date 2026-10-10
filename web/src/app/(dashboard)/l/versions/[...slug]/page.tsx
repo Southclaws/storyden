@@ -36,10 +36,7 @@ export default async function Page(props: Props) {
   ]);
 
   return (
-    <LibraryPageVersionHistoryScreen
-      node={node}
-      versions={versions.versions}
-    />
+    <LibraryPageVersionHistoryScreen node={node} versions={versions.versions} />
   );
 }
 

@@ -419,7 +419,8 @@ function ClientIPTester({ canRun, initialHeaders }: ClientIPTesterProps) {
 
       if (!ssrResp.ok) {
         const data = (await ssrResp.json().catch(() => undefined)) as
-          { message?: string } | undefined;
+          | { message?: string }
+          | undefined;
         throw new Error(
           data?.message ?? `SSR test request failed with ${ssrResp.status}`,
         );

@@ -31,7 +31,9 @@ export function ThemeSettingsView(props: Props) {
         description="Edit installation-wide CSS and trusted JavaScript directly on the real Storyden interface."
         badge={
           <StatusBadge
-            tone={editingEnabled ? "info" : assets.length ? "success" : "neutral"}
+            tone={
+              editingEnabled ? "info" : assets.length ? "success" : "neutral"
+            }
           >
             {editingEnabled ? "Editing" : assets.length ? "Published" : "Empty"}
           </StatusBadge>

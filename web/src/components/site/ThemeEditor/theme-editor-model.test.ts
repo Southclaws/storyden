@@ -1,5 +1,5 @@
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
+import assert from "node:assert/strict";
+import { describe, test } from "vitest";
 
 import {
   type ThemeEditorDocument,
@@ -9,37 +9,37 @@ import {
   themeScriptSignature,
 } from "./theme-editor-model";
 
-const test = suite("theme editor model");
+describe("theme editor model", () => {
+  const css = document("css", "stylesheet", "body{}", "css-id");
+  const script = document("js", "script", "window.ready=true", "js-id");
 
-const css = document("css", "stylesheet", "body{}", "css-id");
-const script = document("js", "script", "window.ready=true", "js-id");
+  test("normalises stylesheets before scripts without changing peer order", () => {
+    assert.deepStrictEqual(
+      normaliseThemeDocumentOrder([script, { ...css, key: "css-2" }, css]).map(
+        ({ key }) => key,
+      ),
+      ["css-2", "css", "js"],
+    );
+  });
 
-test("normalises stylesheets before scripts without changing peer order", () => {
-  assert.equal(
-    normaliseThemeDocumentOrder([script, { ...css, key: "css-2" }, css]).map(
-      ({ key }) => key,
-    ),
-    ["css-2", "css", "js"],
-  );
+  test("signatures detect source, identity, and script ordering changes", () => {
+    assert.notDeepStrictEqual(
+      themeDocumentsSignature([css]),
+      themeDocumentsSignature([{ ...css, source: "body{color:red}" }]),
+    );
+    assert.ok(
+      themeScriptSignature([css, script]).endsWith("window.ready=true"),
+    );
+    assert.notDeepStrictEqual(
+      themeScriptSignature([script, { ...script, key: "js-2", source: "b()" }]),
+      themeScriptSignature([{ ...script, key: "js-2", source: "b()" }, script]),
+    );
+  });
+
+  test("counts encoded UTF-8 bytes rather than JavaScript characters", () => {
+    assert.strictEqual(themeDocumentBytes("a😀"), 5);
+  });
 });
-
-test("signatures detect source, identity, and script ordering changes", () => {
-  assert.not.equal(
-    themeDocumentsSignature([css]),
-    themeDocumentsSignature([{ ...css, source: "body{color:red}" }]),
-  );
-  assert.ok(themeScriptSignature([css, script]).endsWith("window.ready=true"));
-  assert.not.equal(
-    themeScriptSignature([script, { ...script, key: "js-2", source: "b()" }]),
-    themeScriptSignature([{ ...script, key: "js-2", source: "b()" }, script]),
-  );
-});
-
-test("counts encoded UTF-8 bytes rather than JavaScript characters", () => {
-  assert.is(themeDocumentBytes("a😀"), 5);
-});
-
-test.run();
 
 function document(
   key: string,

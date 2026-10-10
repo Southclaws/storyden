@@ -73,7 +73,9 @@ export type InvitationListQueryResult = NonNullable<
 
 export const useInvitationList = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   params?: InvitationListParams,
   options?: {
@@ -164,7 +166,9 @@ export type InvitationCreateMutationResult = NonNullable<
 
 export const useInvitationCreate = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof invitationCreate>>,
@@ -215,7 +219,9 @@ export type InvitationGetQueryResult = NonNullable<
 
 export const useInvitationGet = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   invitationId: string,
   options?: {
@@ -282,7 +288,9 @@ export type InvitationDeleteMutationResult = NonNullable<
 
 export const useInvitationDelete = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   invitationId: string,
   options?: {

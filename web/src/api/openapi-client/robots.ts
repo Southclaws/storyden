@@ -115,7 +115,9 @@ export type RobotsListQueryResult = NonNullable<
  */
 export const useRobotsList = <
   TError =
-    UnauthorisedResponse | ForbiddenResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
 >(
   params?: RobotsListParams,
   options?: {
@@ -271,7 +273,9 @@ export type RobotToolsListQueryResult = NonNullable<
  */
 export const useRobotToolsList = <
   TError =
-    UnauthorisedResponse | ForbiddenResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRConfiguration<Awaited<ReturnType<typeof robotToolsList>>, TError> & {
     swrKey?: Key;
@@ -327,7 +331,9 @@ export type RobotToolsetsListQueryResult = NonNullable<
  */
 export const useRobotToolsetsList = <
   TError =
-    UnauthorisedResponse | ForbiddenResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRConfiguration<
     Awaited<ReturnType<typeof robotToolsetsList>>,
@@ -473,7 +479,9 @@ export type RobotToolsetGetQueryResult = NonNullable<
  */
 export const useRobotToolsetGet = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   toolsetId: string,
   options?: {
@@ -703,7 +711,9 @@ export type RobotProvidersListQueryResult = NonNullable<
  */
 export const useRobotProvidersList = <
   TError =
-    UnauthorisedResponse | ForbiddenResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRConfiguration<
     Awaited<ReturnType<typeof robotProvidersList>>,
@@ -933,7 +943,9 @@ export type RobotModelsListQueryResult = NonNullable<
  */
 export const useRobotModelsList = <
   TError =
-    UnauthorisedResponse | ForbiddenResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRConfiguration<
     Awaited<ReturnType<typeof robotModelsList>>,
@@ -991,7 +1003,9 @@ export type RobotWorkspaceProvidersListQueryResult = NonNullable<
  */
 export const useRobotWorkspaceProvidersList = <
   TError =
-    UnauthorisedResponse | ForbiddenResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRConfiguration<
     Awaited<ReturnType<typeof robotWorkspaceProvidersList>>,
@@ -1065,7 +1079,9 @@ export type RobotWorkspacesListQueryResult = NonNullable<
  */
 export const useRobotWorkspacesList = <
   TError =
-    UnauthorisedResponse | ForbiddenResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
 >(
   params?: RobotWorkspacesListParams,
   options?: {
@@ -1158,7 +1174,9 @@ export type RobotWorkspaceCreateMutationResult = NonNullable<
  */
 export const useRobotWorkspaceCreate = <
   TError =
-    UnauthorisedResponse | ForbiddenResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof robotWorkspaceCreate>>,
@@ -1214,7 +1232,9 @@ export type RobotWorkspaceGetQueryResult = NonNullable<
  */
 export const useRobotWorkspaceGet = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   workspaceId: string,
   options?: {
@@ -1467,7 +1487,9 @@ export type RobotWorkspaceInstancesListQueryResult = NonNullable<
  */
 export const useRobotWorkspaceInstancesList = <
   TError =
-    UnauthorisedResponse | ForbiddenResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
 >(
   params?: RobotWorkspaceInstancesListParams,
   options?: {
@@ -1532,7 +1554,9 @@ export type RobotWorkspaceInstanceGetQueryResult = NonNullable<
  */
 export const useRobotWorkspaceInstanceGet = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   workspaceInstanceId: string,
   options?: {
@@ -1676,7 +1700,9 @@ export type RobotGetQueryResult = NonNullable<
  */
 export const useRobotGet = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   robotId: string,
   options?: {
@@ -2610,7 +2636,9 @@ export type RobotSessionGetQueryResult = NonNullable<
  */
 export const useRobotSessionGet = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   sessionId: string,
   params?: RobotSessionGetParams,
@@ -2672,7 +2700,9 @@ export type RobotMCPServersListQueryResult = NonNullable<
  */
 export const useRobotMCPServersList = <
   TError =
-    UnauthorisedResponse | ForbiddenResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRConfiguration<
     Awaited<ReturnType<typeof robotMCPServersList>>,

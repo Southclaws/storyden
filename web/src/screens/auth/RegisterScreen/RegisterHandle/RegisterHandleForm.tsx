@@ -9,11 +9,7 @@ import { Props, useRegisterHandleForm } from "./useRegisterHandleForm";
 
 export function RegisterHandleForm(props: Props) {
   const {
-    form: {
-      register,
-      handlePassword,
-      errors,
-    },
+    form: { register, handlePassword, errors },
   } = useRegisterHandleForm(props);
 
   return (

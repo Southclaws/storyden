@@ -86,7 +86,8 @@ export type collectionCreateResponseSuccess = collectionCreateResponse200 & {
   headers: Headers;
 };
 export type collectionCreateResponseError = (
-  collectionCreateResponse401 | collectionCreateResponseDefault
+  | collectionCreateResponse401
+  | collectionCreateResponseDefault
 ) & {
   headers: Headers;
 };
@@ -153,7 +154,8 @@ export type collectionListResponseSuccess = collectionListResponse200 & {
   headers: Headers;
 };
 export type collectionListResponseError = (
-  collectionListResponse404 | collectionListResponseDefault
+  | collectionListResponse404
+  | collectionListResponseDefault
 ) & {
   headers: Headers;
 };

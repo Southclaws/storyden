@@ -62,9 +62,7 @@ test.describe("Robot Chat — presentation markup", () => {
         );
       });
 
-      await setupRobotProviderWithScript(
-        `mock/../robot/scripts/${scriptName}`,
-      );
+      await setupRobotProviderWithScript(`mock/../robot/scripts/${scriptName}`);
 
       await goToNewChat(page);
 

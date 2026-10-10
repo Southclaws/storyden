@@ -198,7 +198,9 @@ export type categoryGetResponseSuccess = categoryGetResponse200 & {
   headers: Headers;
 };
 export type categoryGetResponseError = (
-  categoryGetResponse304 | categoryGetResponse404 | categoryGetResponseDefault
+  | categoryGetResponse304
+  | categoryGetResponse404
+  | categoryGetResponseDefault
 ) & {
   headers: Headers;
 };

@@ -87,7 +87,9 @@ export type roleCreateResponseSuccess = roleCreateResponse200 & {
   headers: Headers;
 };
 export type roleCreateResponseError = (
-  roleCreateResponse401 | roleCreateResponse404 | roleCreateResponseDefault
+  | roleCreateResponse401
+  | roleCreateResponse404
+  | roleCreateResponseDefault
 ) & {
   headers: Headers;
 };
@@ -268,7 +270,9 @@ export type roleGetResponseSuccess = roleGetResponse200 & {
   headers: Headers;
 };
 export type roleGetResponseError = (
-  roleGetResponse401 | roleGetResponse404 | roleGetResponseDefault
+  | roleGetResponse401
+  | roleGetResponse404
+  | roleGetResponseDefault
 ) & {
   headers: Headers;
 };
@@ -314,7 +318,9 @@ export type roleUpdateResponseSuccess = roleUpdateResponse200 & {
   headers: Headers;
 };
 export type roleUpdateResponseError = (
-  roleUpdateResponse401 | roleUpdateResponse404 | roleUpdateResponseDefault
+  | roleUpdateResponse401
+  | roleUpdateResponse404
+  | roleUpdateResponseDefault
 ) & {
   headers: Headers;
 };
@@ -387,7 +393,9 @@ export type roleDeleteResponseSuccess = roleDeleteResponse200 & {
   headers: Headers;
 };
 export type roleDeleteResponseError = (
-  roleDeleteResponse401 | roleDeleteResponse404 | roleDeleteResponseDefault
+  | roleDeleteResponse401
+  | roleDeleteResponse404
+  | roleDeleteResponseDefault
 ) & {
   headers: Headers;
 };

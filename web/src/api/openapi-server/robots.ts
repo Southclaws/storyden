@@ -132,7 +132,9 @@ export type robotsListResponseSuccess = robotsListResponse200 & {
   headers: Headers;
 };
 export type robotsListResponseError = (
-  robotsListResponse401 | robotsListResponse403 | robotsListResponseDefault
+  | robotsListResponse401
+  | robotsListResponse403
+  | robotsListResponseDefault
 ) & {
   headers: Headers;
 };
@@ -1502,7 +1504,9 @@ export type robotGetResponseSuccess = robotGetResponse200 & {
   headers: Headers;
 };
 export type robotGetResponseError = (
-  robotGetResponse401 | robotGetResponse404 | robotGetResponseDefault
+  | robotGetResponse401
+  | robotGetResponse404
+  | robotGetResponseDefault
 ) & {
   headers: Headers;
 };
@@ -1791,7 +1795,8 @@ export type robotSessionsListResponseSuccess = robotSessionsListResponse200 & {
   headers: Headers;
 };
 export type robotSessionsListResponseError = (
-  robotSessionsListResponse401 | robotSessionsListResponseDefault
+  | robotSessionsListResponse401
+  | robotSessionsListResponseDefault
 ) & {
   headers: Headers;
 };

@@ -1,0 +1,51 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 80,
+  "sortPackageJson": false,
+  "sortImports": {
+    "ignoreCase": false,
+    "newlinesBetween": true,
+    "sortSideEffects": true,
+    "customGroups": [
+      {
+        "groupName": "source",
+        "elementNamePattern": ["src/**"]
+      },
+      {
+        "groupName": "alias",
+        "elementNamePattern": ["@/**", "@.**"]
+      },
+      {
+        "groupName": "parents",
+        "elementNamePattern": ["../**"]
+      },
+      {
+        "groupName": "css",
+        "elementNamePattern": ["**/*.css", "*.css"]
+      },
+      {
+        "groupName": "local",
+        "elementNamePattern": ["./**", "/**", ".", ".."]
+      },
+      {
+        "groupName": "packages",
+        "elementNamePattern": ["**"]
+      }
+    ],
+    "groups": ["packages", "source", "alias", "parents", "css", "local"]
+  },
+  "ignorePatterns": [
+    ".next/**",
+    "out/**",
+    "build/**",
+    "coverage/**",
+    "storybook-static/**",
+    "playwright-report/**",
+    "test-results/**",
+    "styled-system/**",
+    "src/api/robots.ts",
+    "src/lib/webmcp/tools.generated.ts",
+    "pnpm-lock.yaml",
+    "src/api/robots.json"
+  ]
+}

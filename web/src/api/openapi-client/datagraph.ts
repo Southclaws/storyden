@@ -70,7 +70,9 @@ export type DatagraphSearchQueryResult = NonNullable<
 
 export const useDatagraphSearch = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   params?: DatagraphSearchParams,
   options?: {
@@ -158,7 +160,9 @@ export type DatagraphMatchesQueryResult = NonNullable<
 
 export const useDatagraphMatches = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   params: DatagraphMatchesParams,
   options?: {

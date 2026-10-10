@@ -1,10 +1,10 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import assert from "node:assert/strict";
+import { test } from "vitest";
 
 import { describeTrailSchedule } from "./trails";
 
 test("describes monthly last-day schedules", () => {
-  assert.is(
+  assert.strictEqual(
     describeTrailSchedule({
       start: "2026-08-31T09:30:00",
       timezone: "Europe/London",
@@ -19,7 +19,7 @@ test("describes monthly last-day schedules", () => {
 });
 
 test("describes selected weekdays", () => {
-  assert.is(
+  assert.strictEqual(
     describeTrailSchedule({
       start: "2026-08-17T18:00:00",
       timezone: "UTC",
@@ -34,7 +34,7 @@ test("describes selected weekdays", () => {
 });
 
 test("describes normalized one-time schedules", () => {
-  assert.is(
+  assert.strictEqual(
     describeTrailSchedule({
       start: "2026-12-24T18:00:00",
       timezone: "Europe/London",
@@ -43,5 +43,3 @@ test("describes normalized one-time schedules", () => {
     "Once on 2026-12-24 at 18:00",
   );
 });
-
-test.run();

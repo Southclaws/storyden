@@ -79,7 +79,8 @@ export type assetUploadResponseSuccess = assetUploadResponse200 & {
   headers: Headers;
 };
 export type assetUploadResponseError = (
-  assetUploadResponse401 | assetUploadResponseDefault
+  | assetUploadResponse401
+  | assetUploadResponseDefault
 ) & {
   headers: Headers;
 };
@@ -164,7 +165,9 @@ export type assetGetResponseSuccess = assetGetResponse200 & {
   headers: Headers;
 };
 export type assetGetResponseError = (
-  assetGetResponse401 | assetGetResponse404 | assetGetResponseDefault
+  | assetGetResponse401
+  | assetGetResponse404
+  | assetGetResponseDefault
 ) & {
   headers: Headers;
 };

@@ -49,12 +49,12 @@ describe("getColourVariants", () => {
   });
 
   test("extracts hue from arbitrary API colours and falls back safely", () => {
-    expect(
-      getColourVariants("#6855b8")["--accent-colour-light-9"],
-    ).toBe("hsl(251.52deg 51% 54.1%)");
-    expect(
-      getColourVariants("not-a-colour")["--accent-colour-light-9"],
-    ).toBe("hsl(156.99deg 51% 54.1%)");
+    expect(getColourVariants("#6855b8")["--accent-colour-light-9"]).toBe(
+      "hsl(251.52deg 51% 54.1%)",
+    );
+    expect(getColourVariants("not-a-colour")["--accent-colour-light-9"]).toBe(
+      "hsl(156.99deg 51% 54.1%)",
+    );
   });
 
   test.each([0, 30, 60, 120, 180, 240, 300])(

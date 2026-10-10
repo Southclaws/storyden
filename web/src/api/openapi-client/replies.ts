@@ -83,7 +83,9 @@ export type ReplyCreateMutationResult = NonNullable<
 
 export const useReplyCreate = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   threadMark: string,
   options?: {

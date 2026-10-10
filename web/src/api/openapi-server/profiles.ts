@@ -88,7 +88,9 @@ export type profileListResponseSuccess = profileListResponse200 & {
   headers: Headers;
 };
 export type profileListResponseError = (
-  profileListResponse401 | profileListResponse404 | profileListResponseDefault
+  | profileListResponse401
+  | profileListResponse404
+  | profileListResponseDefault
 ) & {
   headers: Headers;
 };

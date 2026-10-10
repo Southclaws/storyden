@@ -82,7 +82,9 @@ export type replyCreateResponseSuccess = replyCreateResponse200 & {
   headers: Headers;
 };
 export type replyCreateResponseError = (
-  replyCreateResponse401 | replyCreateResponse404 | replyCreateResponseDefault
+  | replyCreateResponse401
+  | replyCreateResponse404
+  | replyCreateResponseDefault
 ) & {
   headers: Headers;
 };

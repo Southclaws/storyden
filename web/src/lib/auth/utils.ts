@@ -13,8 +13,12 @@ const groupProviders = keyBy<AuthProvider>("provider");
 
 export function groupAuthProviders(providers: AuthProviderList) {
   // pull out password and phone, if present, the rest are OAuth2 providers.
-  const { password, phone, webauthn: _webauthn, ...rest } =
-    groupProviders(providers);
+  const {
+    password,
+    phone,
+    webauthn: _webauthn,
+    ...rest
+  } = groupProviders(providers);
 
   const oauth = filterWithLink(values(rest));
 
@@ -28,8 +32,12 @@ export function groupAuthProviders(providers: AuthProviderList) {
 const groupMethods = groupBy((v: AccountAuthMethod) => v.provider.provider);
 
 export function groupAuthMethods(methods: AccountAuthMethodList) {
-  const { password, phone, webauthn: _webauthn, ...rest } =
-    groupMethods(methods);
+  const {
+    password,
+    phone,
+    webauthn: _webauthn,
+    ...rest
+  } = groupMethods(methods);
 
   return {
     password: password,

@@ -1,0 +1,17 @@
+{
+  "oxc.path.oxlint": "./web/node_modules/oxlint/bin/oxlint",
+  "oxc.enable.oxfmt": true,
+  "oxc.useExecPath": true,
+  "oxc.path.oxfmt": "./web/node_modules/oxfmt/bin/oxfmt",
+  "[javascript][javascriptreact][typescript][typescriptreact][json][jsonc][css][scss][less][html][markdown][mdx][yaml][graphql]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[javascript][javascriptreact][typescript][typescriptreact]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.oxc": "explicit"
+    }
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  }
+}

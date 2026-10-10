@@ -1,5 +1,5 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import assert from "node:assert/strict";
+import { afterAll, beforeAll, test } from "vitest";
 
 import {
   type Asset,
@@ -13,12 +13,12 @@ import { deriveMutationFromDifference } from "./diff";
 const consoleDebug = console.debug;
 const consoleWarn = console.warn;
 
-test.before(() => {
+beforeAll(() => {
   console.debug = () => {};
   console.warn = () => {};
 });
 
-test.after(() => {
+afterAll(() => {
   console.debug = consoleDebug;
   console.warn = consoleWarn;
 });
@@ -90,9 +90,9 @@ test("deriveMutationFromDifference returns clean when nodes are identical", () =
   const result = deriveMutationFromDifference(current, updated);
 
   assert.ok(result.clean);
-  assert.equal(result.nodeMutation, {});
-  assert.equal(result.childMutation, {});
-  assert.is(result.childPropertySchemaMutation, undefined);
+  assert.deepStrictEqual(result.nodeMutation, {});
+  assert.deepStrictEqual(result.childMutation, {});
+  assert.strictEqual(result.childPropertySchemaMutation, undefined);
 });
 
 test("deriveMutationFromDifference skips invalid slug changes", () => {
@@ -102,7 +102,7 @@ test("deriveMutationFromDifference skips invalid slug changes", () => {
   const result = deriveMutationFromDifference(current, updated);
 
   assert.ok(result.clean);
-  assert.equal(result.nodeMutation, {});
+  assert.deepStrictEqual(result.nodeMutation, {});
 });
 
 test("deriveMutationFromDifference sets url to null when cleared", () => {
@@ -113,8 +113,8 @@ test("deriveMutationFromDifference sets url to null when cleared", () => {
 
   const result = deriveMutationFromDifference(current, updated);
 
-  assert.not.ok(result.clean);
-  assert.equal(result.nodeMutation, { url: null });
+  assert.ok(!result.clean);
+  assert.deepStrictEqual(result.nodeMutation, { url: null });
 });
 
 test("deriveMutationFromDifference does not clear url on invalid updated url", () => {
@@ -131,7 +131,7 @@ test("deriveMutationFromDifference does not clear url on invalid updated url", (
   const result = deriveMutationFromDifference(current, updated);
 
   assert.ok(result.clean);
-  assert.equal(result.nodeMutation, {});
+  assert.deepStrictEqual(result.nodeMutation, {});
 });
 
 test("deriveMutationFromDifference supports autosave URL typing flow", () => {
@@ -149,7 +149,7 @@ test("deriveMutationFromDifference supports autosave URL typing flow", () => {
 
   const invalidResult = deriveMutationFromDifference(base, invalidDraft);
   assert.ok(invalidResult.clean);
-  assert.equal(invalidResult.nodeMutation, {});
+  assert.deepStrictEqual(invalidResult.nodeMutation, {});
 
   // User finishes URL: autosave should now commit it.
   const validDraft = node("root", {
@@ -160,8 +160,10 @@ test("deriveMutationFromDifference supports autosave URL typing flow", () => {
   });
 
   const validResult = deriveMutationFromDifference(base, validDraft);
-  assert.not.ok(validResult.clean);
-  assert.equal(validResult.nodeMutation, { url: "https://example.org/new" });
+  assert.ok(!validResult.clean);
+  assert.deepStrictEqual(validResult.nodeMutation, {
+    url: "https://example.org/new",
+  });
 });
 
 test("deriveMutationFromDifference supports no-scheme URL typing flow", () => {
@@ -179,7 +181,7 @@ test("deriveMutationFromDifference supports no-scheme URL typing flow", () => {
 
   const partialResult = deriveMutationFromDifference(base, partialNoScheme);
   assert.ok(partialResult.clean);
-  assert.equal(partialResult.nodeMutation, {});
+  assert.deepStrictEqual(partialResult.nodeMutation, {});
 
   // Once the domain is complete, autosave should commit normalized https URL.
   const completeNoScheme = node("root", {
@@ -190,8 +192,10 @@ test("deriveMutationFromDifference supports no-scheme URL typing flow", () => {
   });
 
   const completeResult = deriveMutationFromDifference(base, completeNoScheme);
-  assert.not.ok(completeResult.clean);
-  assert.equal(completeResult.nodeMutation, { url: "https://website.com/" });
+  assert.ok(!completeResult.clean);
+  assert.deepStrictEqual(completeResult.nodeMutation, {
+    url: "https://website.com/",
+  });
 });
 
 test("deriveMutationFromDifference sets primary image to null when cleared", () => {
@@ -200,8 +204,8 @@ test("deriveMutationFromDifference sets primary image to null when cleared", () 
 
   const result = deriveMutationFromDifference(current, updated);
 
-  assert.not.ok(result.clean);
-  assert.equal(result.nodeMutation, { primary_image_asset_id: null });
+  assert.ok(!result.clean);
+  assert.deepStrictEqual(result.nodeMutation, { primary_image_asset_id: null });
 });
 
 test("deriveMutationFromDifference builds child mutations recursively", () => {
@@ -213,9 +217,11 @@ test("deriveMutationFromDifference builds child mutations recursively", () => {
 
   const result = deriveMutationFromDifference(current, updated);
 
-  assert.not.ok(result.clean);
-  assert.equal(result.nodeMutation, {});
-  assert.equal(result.childMutation["child-1"], [{ name: "child-new" }]);
+  assert.ok(!result.clean);
+  assert.deepStrictEqual(result.nodeMutation, {});
+  assert.deepStrictEqual(result.childMutation["child-1"], [
+    { name: "child-new" },
+  ]);
 });
 
 test("deriveMutationFromDifference omits fid for new child property schema fields", () => {
@@ -233,8 +239,8 @@ test("deriveMutationFromDifference omits fid for new child property schema field
 
   const result = deriveMutationFromDifference(current, updated);
 
-  assert.not.ok(result.clean);
-  assert.equal(result.childPropertySchemaMutation, [
+  assert.ok(!result.clean);
+  assert.deepStrictEqual(result.childPropertySchemaMutation, [
     {
       name: "New Field",
       sort: "1",
@@ -242,5 +248,3 @@ test("deriveMutationFromDifference omits fid for new child property schema field
     },
   ]);
 });
-
-test.run();

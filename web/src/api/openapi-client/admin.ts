@@ -179,7 +179,9 @@ export type AdminSettingsUpdateMutationResult = NonNullable<
 
 export const useAdminSettingsUpdate = <
   TError =
-    BadRequestResponse | UnauthorisedResponse | InternalServerErrorResponse,
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof adminSettingsUpdate>>,
@@ -226,7 +228,9 @@ export type AdminThemeGetQueryResult = NonNullable<
 
 export const useAdminThemeGet = <
   TError =
-    UnauthorisedResponse | ForbiddenResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRConfiguration<Awaited<ReturnType<typeof adminThemeGet>>, TError> & {
     swrKey?: Key;
@@ -567,7 +571,9 @@ export type AuditEventListQueryResult = NonNullable<
 
 export const useAuditEventList = <
   TError =
-    BadRequestResponse | UnauthorisedResponse | InternalServerErrorResponse,
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
 >(
   params?: AuditEventListParams,
   options?: {
@@ -645,7 +651,9 @@ export type EmailQueueListQueryResult = NonNullable<
 
 export const useEmailQueueList = <
   TError =
-    BadRequestResponse | UnauthorisedResponse | InternalServerErrorResponse,
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
 >(
   params?: EmailQueueListParams,
   options?: {
@@ -766,7 +774,9 @@ export type AuditEventGetQueryResult = NonNullable<
 
 export const useAuditEventGet = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   auditEventId: string,
   options?: {
@@ -858,7 +868,9 @@ export type ModerationActionCreateMutationResult = NonNullable<
 
 export const useModerationActionCreate = <
   TError =
-    BadRequestResponse | UnauthorisedResponse | InternalServerErrorResponse,
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof moderationActionCreate>>,
@@ -921,7 +933,9 @@ export type AdminAccountBanCreateMutationResult = NonNullable<
 
 export const useAdminAccountBanCreate = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   accountHandle: string,
   options?: {
@@ -988,7 +1002,9 @@ export type AdminAccountBanRemoveMutationResult = NonNullable<
 
 export const useAdminAccountBanRemove = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   accountHandle: string,
   options?: {

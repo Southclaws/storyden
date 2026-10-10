@@ -55,13 +55,16 @@ eval "$(fnm env --shell zsh)"
 fnm use 24
 ```
 
-Useful validation commands:
+Use the package scripts for validation:
 
 ```sh
-pnpm --dir web exec tsc --noEmit
-pnpm --dir web exec prettier --check "src/components/ui/**/*.stories.tsx"
+pnpm --dir web typecheck
+pnpm --dir web lint
+pnpm --dir web format:check
 pnpm --dir web build-storybook
-pnpm --dir web exec vitest run src/components/ui
+pnpm --dir web test
+pnpm --dir web test:unit
+pnpm --dir web test:ui src/components/ui
 ```
 
 Use the targeted commands that match the change. For broad UI component changes,

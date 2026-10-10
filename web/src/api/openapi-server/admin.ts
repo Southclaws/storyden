@@ -124,7 +124,8 @@ export type adminSettingsGetResponseSuccess = adminSettingsGetResponse200 & {
   headers: Headers;
 };
 export type adminSettingsGetResponseError = (
-  adminSettingsGetResponse401 | adminSettingsGetResponseDefault
+  | adminSettingsGetResponse401
+  | adminSettingsGetResponseDefault
 ) & {
   headers: Headers;
 };
@@ -1078,7 +1079,8 @@ export type adminOAuthClientListResponseSuccess =
     headers: Headers;
   };
 export type adminOAuthClientListResponseError = (
-  adminOAuthClientListResponse403 | adminOAuthClientListResponseDefault
+  | adminOAuthClientListResponse403
+  | adminOAuthClientListResponseDefault
 ) & {
   headers: Headers;
 };

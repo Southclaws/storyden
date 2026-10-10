@@ -1,5 +1,4 @@
 import path from "node:path";
-
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
@@ -24,9 +23,23 @@ export default defineConfig({
     ],
   },
   test: {
-    environment: "jsdom",
-    setupFiles: ["./vitest.setup.ts"],
-    include: ["src/**/*.test.tsx"],
+    projects: [
+      {
+        test: {
+          name: "unit",
+          environment: "node",
+          include: ["src/**/*.test.ts"],
+        },
+      },
+      {
+        test: {
+          name: "ui",
+          environment: "jsdom",
+          setupFiles: ["./vitest.setup.ts"],
+          include: ["src/**/*.test.tsx"],
+        },
+      },
+    ],
     clearMocks: true,
     restoreMocks: true,
     mockReset: true,

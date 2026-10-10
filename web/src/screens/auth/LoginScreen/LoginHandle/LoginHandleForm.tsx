@@ -9,11 +9,7 @@ import { useLoginHandleForm } from "./useLoginHandleForm";
 
 export function LoginHandleForm() {
   const {
-    form: {
-      register,
-      handlePassword,
-      errors,
-    },
+    form: { register, handlePassword, errors },
   } = useLoginHandleForm();
 
   return (

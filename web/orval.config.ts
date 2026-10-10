@@ -8,7 +8,7 @@ const input = {
 const common = {
   mode: "tags" as const,
   clean: true,
-  formatter: "prettier",
+  formatter: "oxfmt",
 } as OutputOptions;
 
 export default defineConfig({

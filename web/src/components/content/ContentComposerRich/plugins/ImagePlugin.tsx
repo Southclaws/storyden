@@ -38,7 +38,9 @@ function Component(props: NodeViewProps) {
   const uploadProgress = props.node.attrs["data-upload-progress"];
   const progressPercent = uploadProgress ? parseInt(uploadProgress, 10) : 0;
   const dataDiff = props.node.attrs["data-diff"] as
-    "insertion" | "deletion" | undefined;
+    | "insertion"
+    | "deletion"
+    | undefined;
 
   const isEditable = props.editor.isEditable;
   const isSelected = props.selected && isEditable;

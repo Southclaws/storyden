@@ -202,7 +202,9 @@ export type EventGetQueryResult = NonNullable<
 
 export const useEventGet = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   eventMark: string,
   options?: {
@@ -298,7 +300,9 @@ export type EventUpdateMutationResult = NonNullable<
 
 export const useEventUpdate = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   eventMark: string,
   options?: {
@@ -358,7 +362,9 @@ export type EventDeleteMutationResult = NonNullable<
 
 export const useEventDelete = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   eventMark: string,
   options?: {
@@ -475,7 +481,9 @@ export type EventParticipantUpdateMutationResult = NonNullable<
 
 export const useEventParticipantUpdate = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   eventMark: string,
   accountId: string,
@@ -550,7 +558,9 @@ export type EventParticipantRemoveMutationResult = NonNullable<
 
 export const useEventParticipantRemove = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   eventMark: string,
   accountId: string,

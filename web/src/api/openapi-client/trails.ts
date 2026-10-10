@@ -66,7 +66,9 @@ export type TrailListQueryResult = NonNullable<
  */
 export const useTrailList = <
   TError =
-    UnauthorisedResponse | ForbiddenResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRConfiguration<Awaited<ReturnType<typeof trailList>>, TError> & {
     swrKey?: Key;

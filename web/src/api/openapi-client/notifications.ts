@@ -75,7 +75,9 @@ export type NotificationListQueryResult = NonNullable<
 
 export const useNotificationList = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   params?: NotificationListParams,
   options?: {
@@ -170,7 +172,9 @@ export type NotificationUpdateManyMutationResult = NonNullable<
 
 export const useNotificationUpdateMany = <
   TError =
-    BadRequestResponse | UnauthorisedResponse | InternalServerErrorResponse,
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof notificationUpdateMany>>,
@@ -257,7 +261,9 @@ export type NotificationUpdateMutationResult = NonNullable<
 
 export const useNotificationUpdate = <
   TError =
-    BadRequestResponse | UnauthorisedResponse | InternalServerErrorResponse,
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
 >(
   notificationId: string,
   options?: {

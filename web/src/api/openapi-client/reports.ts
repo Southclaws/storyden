@@ -91,7 +91,9 @@ export type ReportCreateMutationResult = NonNullable<
 
 export const useReportCreate = <
   TError =
-    BadRequestResponse | UnauthorisedResponse | InternalServerErrorResponse,
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof reportCreate>>,

@@ -1,5 +1,5 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import assert from "node:assert/strict";
+import { test } from "vitest";
 
 import type { Account, PostReference } from "@/api/openapi-schema";
 import { Permission } from "@/api/openapi-schema";
@@ -21,8 +21,8 @@ function post(authorId: string): PostReference {
 
 test("canDeletePost/canEditPost returns false without account", () => {
   const pr = post("author-1");
-  assert.not.ok(canDeletePost(pr, undefined));
-  assert.not.ok(canEditPost(pr, undefined));
+  assert.ok(!canDeletePost(pr, undefined));
+  assert.ok(!canEditPost(pr, undefined));
 });
 
 test("canDeletePost/canEditPost allows the author", () => {
@@ -49,8 +49,6 @@ test("canDeletePost/canEditPost allows ADMINISTRATOR even when not author", () =
 test("canDeletePost/canEditPost denies non-author without permission", () => {
   const pr = post("author-1");
   const acc = account("user-1", [Permission.READ_PROFILE]);
-  assert.not.ok(canDeletePost(pr, acc));
-  assert.not.ok(canEditPost(pr, acc));
+  assert.ok(!canDeletePost(pr, acc));
+  assert.ok(!canEditPost(pr, acc));
 });
-
-test.run();

@@ -38,5 +38,3 @@ jobs:
         working-directory: web
       - run: pnpm test
         working-directory: web
-      - run: pnpm test:ui
-        working-directory: web

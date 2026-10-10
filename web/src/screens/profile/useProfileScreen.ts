@@ -14,8 +14,8 @@ import {
   ProfileGetOKResponse,
 } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
-import { useProfileMutations } from "@/lib/profile/mutation";
 import { UsernameSchema } from "@/lib/auth/schemas";
+import { useProfileMutations } from "@/lib/profile/mutation";
 import type { SignatureConfig } from "@/lib/settings/settings";
 import { hasPermissionOr } from "@/utils/permissions";
 

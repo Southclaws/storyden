@@ -21,10 +21,7 @@ type Props = {
   versions: NodeVersion[];
 };
 
-export function LibraryPageVersionHistoryScreen({
-  node,
-  versions,
-}: Props) {
+export function LibraryPageVersionHistoryScreen({ node, versions }: Props) {
   const pageHref = `/l/${[...node.ancestors, node]
     .map((part) => part.slug)
     .join("/")}`;

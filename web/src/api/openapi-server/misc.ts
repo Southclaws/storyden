@@ -299,7 +299,8 @@ export type iconUploadResponseSuccess = iconUploadResponse200 & {
   headers: Headers;
 };
 export type iconUploadResponseError = (
-  iconUploadResponse401 | iconUploadResponseDefault
+  | iconUploadResponse401
+  | iconUploadResponseDefault
 ) & {
   headers: Headers;
 };
@@ -399,7 +400,8 @@ export type bannerUploadResponseSuccess = bannerUploadResponse200 & {
   headers: Headers;
 };
 export type bannerUploadResponseError = (
-  bannerUploadResponse401 | bannerUploadResponseDefault
+  | bannerUploadResponse401
+  | bannerUploadResponseDefault
 ) & {
   headers: Headers;
 };

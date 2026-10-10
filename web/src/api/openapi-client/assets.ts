@@ -149,7 +149,9 @@ export type AssetGetQueryResult = NonNullable<
 
 export const useAssetGet = <
   TError =
-    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   assetFilename: string,
   options?: {

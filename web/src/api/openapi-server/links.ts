@@ -80,7 +80,8 @@ export type linkCreateResponseSuccess = linkCreateResponse200 & {
   headers: Headers;
 };
 export type linkCreateResponseError = (
-  linkCreateResponse401 | linkCreateResponseDefault
+  | linkCreateResponse401
+  | linkCreateResponseDefault
 ) & {
   headers: Headers;
 };
@@ -157,7 +158,8 @@ export type linkListResponseSuccess = linkListResponse200 & {
   headers: Headers;
 };
 export type linkListResponseError = (
-  linkListResponse404 | linkListResponseDefault
+  | linkListResponse404
+  | linkListResponseDefault
 ) & {
   headers: Headers;
 };
@@ -210,7 +212,8 @@ export type linkGetResponseSuccess = linkGetResponse200 & {
   headers: Headers;
 };
 export type linkGetResponseError = (
-  linkGetResponse404 | linkGetResponseDefault
+  | linkGetResponse404
+  | linkGetResponseDefault
 ) & {
   headers: Headers;
 };

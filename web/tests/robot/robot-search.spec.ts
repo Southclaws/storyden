@@ -98,23 +98,21 @@ test.describe("Robot Chat — library_search_pages tool", () => {
 
 test.describe("Robot Chat — thread_search tool", () => {
   test.beforeAll(async () => {
-    await withAdminAccessKey(
-      async ({ categoryCreate, threadCreate }) => {
-        const category = await categoryCreate({
-          colour: "#3b82f6",
-          description: "thread search test category",
-          name: `Thread Search Category ${Date.now()}`,
-          slug: `thread-search-cat-${Date.now()}`,
-        });
+    await withAdminAccessKey(async ({ categoryCreate, threadCreate }) => {
+      const category = await categoryCreate({
+        colour: "#3b82f6",
+        description: "thread search test category",
+        name: `Thread Search Category ${Date.now()}`,
+        slug: `thread-search-cat-${Date.now()}`,
+      });
 
-        await threadCreate({
-          title: "Magnolia Thread Discussion",
-          body: "<p>talk about magnolia trees</p>",
-          category: category.id,
-          visibility: "published",
-        });
-      },
-    );
+      await threadCreate({
+        title: "Magnolia Thread Discussion",
+        body: "<p>talk about magnolia trees</p>",
+        category: category.id,
+        visibility: "published",
+      });
+    });
     await setupRobotProviderWithScript(
       "mock/../robot/scripts/robot-chat-thread-search.yaml",
     );
@@ -190,23 +188,21 @@ test.describe("Robot Chat — reply_search tool", () => {
 
 test.describe("Robot Chat — post_search tool", () => {
   test.beforeAll(async () => {
-    await withAdminAccessKey(
-      async ({ categoryCreate, threadCreate }) => {
-        const category = await categoryCreate({
-          colour: "#3b82f6",
-          description: "post search test category",
-          name: `Post Search Category ${Date.now()}`,
-          slug: `post-search-cat-${Date.now()}`,
-        });
+    await withAdminAccessKey(async ({ categoryCreate, threadCreate }) => {
+      const category = await categoryCreate({
+        colour: "#3b82f6",
+        description: "post search test category",
+        name: `Post Search Category ${Date.now()}`,
+        slug: `post-search-cat-${Date.now()}`,
+      });
 
-        await threadCreate({
-          title: "Magnolia Post Thread",
-          body: "<p>magnolia post content</p>",
-          category: category.id,
-          visibility: "published",
-        });
-      },
-    );
+      await threadCreate({
+        title: "Magnolia Post Thread",
+        body: "<p>magnolia post content</p>",
+        category: category.id,
+        visibility: "published",
+      });
+    });
     await setupRobotProviderWithScript(
       "mock/../robot/scripts/robot-chat-post-search.yaml",
     );

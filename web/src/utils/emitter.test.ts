@@ -1,5 +1,5 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import assert from "node:assert/strict";
+import { test } from "vitest";
 
 import { createEmitter } from "./emitter";
 
@@ -20,7 +20,7 @@ test("emits payloads to listeners of the same event only", () => {
 
   emitter.emit("message", "hello");
 
-  assert.equal(received, ["hello"]);
+  assert.deepStrictEqual(received, ["hello"]);
 });
 
 test("off unsubscribes a listener", () => {
@@ -33,7 +33,7 @@ test("off unsubscribes a listener", () => {
   emitter.off("message", handler);
   emitter.emit("message", "two");
 
-  assert.equal(received, ["one"]);
+  assert.deepStrictEqual(received, ["one"]);
 });
 
 test("adding the same handler twice does not duplicate calls", () => {
@@ -45,7 +45,7 @@ test("adding the same handler twice does not duplicate calls", () => {
   emitter.on("message", handler);
   emitter.emit("message", "hello");
 
-  assert.equal(received, ["hello"]);
+  assert.deepStrictEqual(received, ["hello"]);
 });
 
 test("supports symbol event keys", () => {
@@ -73,7 +73,7 @@ test("listener added during emit does not run until next emit", () => {
   emitter.emit("message", "one");
   emitter.emit("message", "two");
 
-  assert.equal(calls, ["first:one", "first:two", "late:two"]);
+  assert.deepStrictEqual(calls, ["first:one", "first:two", "late:two"]);
 });
 
 test("listener removed during emit does not run later in same emit", () => {
@@ -89,7 +89,5 @@ test("listener removed during emit does not run later in same emit", () => {
 
   emitter.emit("message", "one");
 
-  assert.equal(calls, ["first:one"]);
+  assert.deepStrictEqual(calls, ["first:one"]);
 });
-
-test.run();

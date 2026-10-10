@@ -1,7 +1,11 @@
 import { Badge, type BadgeProps } from "@/components/ui/badge";
 
 export type StatusBadgeTone =
-  "danger" | "info" | "neutral" | "success" | "warning";
+  | "danger"
+  | "info"
+  | "neutral"
+  | "success"
+  | "warning";
 
 export type StatusBadgeProps = BadgeProps & {
   tone: StatusBadgeTone;

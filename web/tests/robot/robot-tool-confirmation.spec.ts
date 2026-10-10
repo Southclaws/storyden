@@ -177,9 +177,7 @@ test.describe("Robot Chat — tool confirmation", () => {
         );
       });
 
-      await setupRobotProviderWithScript(
-        `mock/../robot/scripts/${scriptName}`,
-      );
+      await setupRobotProviderWithScript(`mock/../robot/scripts/${scriptName}`);
 
       await goToNewChat(page);
 
@@ -282,9 +280,7 @@ test.describe("Robot Chat — tool confirmation", () => {
         );
       });
 
-      await setupRobotProviderWithScript(
-        `mock/../robot/scripts/${scriptName}`,
-      );
+      await setupRobotProviderWithScript(`mock/../robot/scripts/${scriptName}`);
 
       await goToNewChat(page);
 

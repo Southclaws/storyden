@@ -139,7 +139,8 @@ export type authProviderListResponseSuccess = authProviderListResponse200 & {
   headers: Headers;
 };
 export type authProviderListResponseError = (
-  authProviderListResponse400 | authProviderListResponseDefault
+  | authProviderListResponse400
+  | authProviderListResponseDefault
 ) & {
   headers: Headers;
 };
@@ -1250,7 +1251,8 @@ export type oAuthDeviceAuthorisationResponseSuccess =
     headers: Headers;
   };
 export type oAuthDeviceAuthorisationResponseError = (
-  oAuthDeviceAuthorisationResponse400 | oAuthDeviceAuthorisationResponseDefault
+  | oAuthDeviceAuthorisationResponse400
+  | oAuthDeviceAuthorisationResponseDefault
 ) & {
   headers: Headers;
 };
@@ -1765,7 +1767,9 @@ export type oAuthTokenResponseSuccess = oAuthTokenResponse200 & {
   headers: Headers;
 };
 export type oAuthTokenResponseError = (
-  oAuthTokenResponse400 | oAuthTokenResponse401 | oAuthTokenResponseDefault
+  | oAuthTokenResponse400
+  | oAuthTokenResponse401
+  | oAuthTokenResponseDefault
 ) & {
   headers: Headers;
 };
@@ -1882,7 +1886,8 @@ export type oAuthUserInfoResponseSuccess = oAuthUserInfoResponse200 & {
   headers: Headers;
 };
 export type oAuthUserInfoResponseError = (
-  oAuthUserInfoResponse401 | oAuthUserInfoResponseDefault
+  | oAuthUserInfoResponse401
+  | oAuthUserInfoResponseDefault
 ) & {
   headers: Headers;
 };
@@ -2499,7 +2504,8 @@ export type phoneSubmitCodeResponseSuccess = phoneSubmitCodeResponse200 & {
   headers: Headers;
 };
 export type phoneSubmitCodeResponseError = (
-  phoneSubmitCodeResponse400 | phoneSubmitCodeResponseDefault
+  | phoneSubmitCodeResponse400
+  | phoneSubmitCodeResponseDefault
 ) & {
   headers: Headers;
 };
@@ -2756,7 +2762,8 @@ export type oAuthRefreshTokenListResponseSuccess =
     headers: Headers;
   };
 export type oAuthRefreshTokenListResponseError = (
-  oAuthRefreshTokenListResponse401 | oAuthRefreshTokenListResponseDefault
+  | oAuthRefreshTokenListResponse401
+  | oAuthRefreshTokenListResponseDefault
 ) & {
   headers: Headers;
 };
@@ -2877,7 +2884,8 @@ export type oAuthClientListResponseSuccess = oAuthClientListResponse200 & {
   headers: Headers;
 };
 export type oAuthClientListResponseError = (
-  oAuthClientListResponse401 | oAuthClientListResponseDefault
+  | oAuthClientListResponse401
+  | oAuthClientListResponseDefault
 ) & {
   headers: Headers;
 };
@@ -3197,7 +3205,6 @@ export type authProviderLogoutResponse302 = {
   data: void;
   status: 302;
 };
-
 export type authProviderLogoutResponseError = authProviderLogoutResponse302 & {
   headers: Headers;
 };

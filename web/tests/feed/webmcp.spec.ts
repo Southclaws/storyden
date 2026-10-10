@@ -261,7 +261,8 @@ test.describe("Index page WebMCP", () => {
       ).toBeVisible({ timeout: 15000 });
 
       const firstClientTools = robotRequests[0]?.["client_tools"] as
-        { client_id?: string; tools?: { name: string }[] } | undefined;
+        | { client_id?: string; tools?: { name: string }[] }
+        | undefined;
       expect(firstClientTools?.client_id).toBeTruthy();
       expect(firstClientTools?.tools?.map((tool) => tool.name).sort()).toEqual(
         [...INDEX_VIEW_TOOL_NAMES].sort(),
@@ -270,7 +271,8 @@ test.describe("Index page WebMCP", () => {
         .poll(() =>
           robotRequests.some((request) => {
             const context = request["client_tools"] as
-              { tools?: { name: string }[] } | undefined;
+              | { tools?: { name: string }[] }
+              | undefined;
             return context?.tools?.some(
               (tool) => tool.name === "index_page_block_add",
             );
