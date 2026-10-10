@@ -55,7 +55,7 @@ func MountMCP(
 		title := set.Title.Or("Storyden")
 
 		mcpServer := sdkmcp.NewServer(&sdkmcp.Implementation{
-			Name:       "storyden-mcp", // TODO: make this configurable?
+			Name:       serverName(cfg.PublicWebAddress.Hostname()),
 			Title:      title,
 			Version:    config.Version,
 			WebsiteURL: cfg.PublicWebAddress.String(),
