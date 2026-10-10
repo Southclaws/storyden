@@ -11,6 +11,14 @@ The term "Settings" is distinct from these and refers to runtime-configurable va
 
 These settings general infrastructure-level configuration settings for managing a Storyden deployment.
 
+### `STORYDEN_SEARCH_CRAWLING`
+
+Set this on the frontend process to `false` to disallow search crawlers in `/robots.txt`. The default is `true`. Sitemap entries are still limited to content that an unauthenticated guest can list, and the sitemap is omitted when guests cannot access either threads or library pages. Search crawlers cannot access content protected by Storyden permissions regardless of this setting.
+
+### `STORYDEN_TRAINING_CRAWLING`
+
+Set this on the frontend process to `true` to allow known training crawlers under the general crawler policy. The default is `false`; `/robots.txt` disallows agents such as GPTBot, ClaudeBot, CCBot, Bytespider, Google-Extended, and Applebot-Extended. This is a robots preference, not an access control mechanism.
+
 ### `LOG_LEVEL`
 
 <table>

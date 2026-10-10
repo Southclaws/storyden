@@ -16,6 +16,7 @@ import { fetcher } from "../client";
 import type {
   BadRequestResponse,
   ConflictResponse,
+  ForbiddenResponse,
   InternalServerErrorResponse,
   NodeAddChildOKResponse,
   NodeCreateBody,
@@ -32,6 +33,8 @@ import type {
   NodeGenerateTitleOKResponse,
   NodeGetOKResponse,
   NodeGetParams,
+  NodeIndexListOKResponse,
+  NodeIndexListParams,
   NodeListChildrenParams,
   NodeListOKResponse,
   NodeListParams,
@@ -204,6 +207,77 @@ export const useNodeList = <
   const swrKey =
     swrOptions?.swrKey ?? (() => (isEnabled ? getNodeListKey(params) : null));
   const swrFn = () => nodeList(params, requestOptions);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getNodeIndexListUrl = (params?: NodeIndexListParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/nodes/index?${stringifiedParams}`
+    : `/nodes/index`;
+};
+
+/**
+ * List published library node URLs for public indexing, in stable pages.
+ */
+export const nodeIndexList = async (
+  params?: NodeIndexListParams,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<NodeIndexListOKResponse> => {
+  return fetcher<NodeIndexListOKResponse>(getNodeIndexListUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getNodeIndexListKey = (params?: NodeIndexListParams) =>
+  [`/nodes/index`, ...(params ? [params] : [])] as const;
+
+export type NodeIndexListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof nodeIndexList>>
+>;
+
+export const useNodeIndexList = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
+>(
+  params?: NodeIndexListParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof nodeIndexList>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getNodeIndexListKey(params) : null));
+  const swrFn = () => nodeIndexList(params, requestOptions);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

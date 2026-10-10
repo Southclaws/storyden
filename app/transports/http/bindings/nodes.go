@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/url"
 	"strconv"
+	"time"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -42,6 +43,7 @@ import (
 
 type Nodes struct {
 	accountQuery  *account_querier.Querier
+	publicIndex   *node_querier.Querier
 	nodeMutator   *node_mutate.Manager
 	tagger        *autotagger.Tagger
 	summariser    generative.Summariser
@@ -58,6 +60,7 @@ type Nodes struct {
 
 func NewNodes(
 	accountQuery *account_querier.Querier,
+	publicIndex *node_querier.Querier,
 	nodeMutator *node_mutate.Manager,
 	tagger *autotagger.Tagger,
 	summariser generative.Summariser,
@@ -73,6 +76,7 @@ func NewNodes(
 ) Nodes {
 	return Nodes{
 		accountQuery:  accountQuery,
+		publicIndex:   publicIndex,
 		nodeMutator:   nodeMutator,
 		tagger:        tagger,
 		summariser:    summariser,
@@ -86,6 +90,38 @@ func NewNodes(
 		schemaUpdater: schemaUpdater,
 		node_cache:    node_cache,
 	}
+}
+
+func (c *Nodes) NodeIndexList(ctx context.Context, request openapi.NodeIndexListRequestObject) (openapi.NodeIndexListResponseObject, error) {
+	page := 1
+	if request.Params.Page != nil {
+		v, err := strconv.Atoi(*request.Params.Page)
+		if err != nil || v < 1 || v > 1000000 {
+			return nil, fault.New("invalid page", ftag.With(ftag.InvalidArgument))
+		}
+		page = v
+	}
+
+	result, err := c.publicIndex.ListPublishedIndex(ctx, page, 500)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	return openapi.NodeIndexList200JSONResponse{
+		NodeIndexListOKJSONResponse: openapi.NodeIndexListOKJSONResponse{
+			Nodes: dt.Map(result.Entries, func(e node_querier.PublicIndexEntry) struct {
+				Slug      string    `json:"slug"`
+				UpdatedAt time.Time `json:"updated_at"`
+			} {
+				return struct {
+					Slug      string    `json:"slug"`
+					UpdatedAt time.Time `json:"updated_at"`
+				}{Slug: e.Slug, UpdatedAt: e.UpdatedAt}
+			}),
+			CurrentPage: result.Page,
+			TotalPages:  result.TotalPages,
+			PageSize:    result.PageSize,
+		},
+	}, nil
 }
 
 func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateRequestObject) (openapi.NodeCreateResponseObject, error) {
