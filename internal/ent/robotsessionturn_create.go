@@ -4,7 +4,7 @@ package ent
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"errors"
 	"fmt"
 	"time"
@@ -89,7 +89,7 @@ func (_c *RobotSessionTurnCreate) SetRobotRef(v string) *RobotSessionTurnCreate 
 }
 
 // SetInputData sets the "input_data" field.
-func (_c *RobotSessionTurnCreate) SetInputData(v json.RawMessage) *RobotSessionTurnCreate {
+func (_c *RobotSessionTurnCreate) SetInputData(v jsontext.Value) *RobotSessionTurnCreate {
 	_c.mutation.SetInputData(v)
 	return _c
 }
@@ -566,7 +566,7 @@ func (u *RobotSessionTurnUpsert) UpdateRobotRef() *RobotSessionTurnUpsert {
 }
 
 // SetInputData sets the "input_data" field.
-func (u *RobotSessionTurnUpsert) SetInputData(v json.RawMessage) *RobotSessionTurnUpsert {
+func (u *RobotSessionTurnUpsert) SetInputData(v jsontext.Value) *RobotSessionTurnUpsert {
 	u.Set(robotsessionturn.FieldInputData, v)
 	return u
 }
@@ -814,7 +814,7 @@ func (u *RobotSessionTurnUpsertOne) UpdateRobotRef() *RobotSessionTurnUpsertOne 
 }
 
 // SetInputData sets the "input_data" field.
-func (u *RobotSessionTurnUpsertOne) SetInputData(v json.RawMessage) *RobotSessionTurnUpsertOne {
+func (u *RobotSessionTurnUpsertOne) SetInputData(v jsontext.Value) *RobotSessionTurnUpsertOne {
 	return u.Update(func(s *RobotSessionTurnUpsert) {
 		s.SetInputData(v)
 	})
@@ -1249,7 +1249,7 @@ func (u *RobotSessionTurnUpsertBulk) UpdateRobotRef() *RobotSessionTurnUpsertBul
 }
 
 // SetInputData sets the "input_data" field.
-func (u *RobotSessionTurnUpsertBulk) SetInputData(v json.RawMessage) *RobotSessionTurnUpsertBulk {
+func (u *RobotSessionTurnUpsertBulk) SetInputData(v jsontext.Value) *RobotSessionTurnUpsertBulk {
 	return u.Update(func(s *RobotSessionTurnUpsert) {
 		s.SetInputData(v)
 	})

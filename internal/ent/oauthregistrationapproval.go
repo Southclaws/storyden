@@ -4,6 +4,7 @@ package ent
 
 import (
 	"encoding/json"
+	"encoding/json/jsontext"
 	"fmt"
 	"strings"
 	"time"
@@ -29,7 +30,7 @@ type OAuthRegistrationApproval struct {
 	// VerificationCodeDisplay holds the value of the "verification_code_display" field.
 	VerificationCodeDisplay string `json:"verification_code_display,omitempty"`
 	// Metadata holds the value of the "metadata" field.
-	Metadata json.RawMessage `json:"metadata,omitempty"`
+	Metadata jsontext.Value `json:"metadata,omitempty"`
 	// ExpiresAt holds the value of the "expires_at" field.
 	ExpiresAt time.Time `json:"expires_at,omitempty"`
 	// NextPollAt holds the value of the "next_poll_at" field.

@@ -119,7 +119,9 @@ func extractFunctionResponses(parts []*genai.Part) []responses.ResponseInputItem
 					resultJSON = string(b)
 				}
 			}
-			output = append(output, responses.ResponseInputItemParamOfFunctionCallOutput(id, resultJSON))
+			item := responses.ResponseInputItemParamOfFunctionCallOutput(resultJSON)
+			item.OfFunctionCallOutput.CallID = param.NewOpt(id)
+			output = append(output, item)
 		}
 	}
 

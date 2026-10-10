@@ -4,7 +4,7 @@ package ent
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"errors"
 	"fmt"
 	"time"
@@ -90,13 +90,13 @@ func (_u *TrailRunUpdate) SetNillableKind(v *trailrun.Kind) *TrailRunUpdate {
 }
 
 // SetTriggerPayload sets the "trigger_payload" field.
-func (_u *TrailRunUpdate) SetTriggerPayload(v json.RawMessage) *TrailRunUpdate {
+func (_u *TrailRunUpdate) SetTriggerPayload(v jsontext.Value) *TrailRunUpdate {
 	_u.mutation.SetTriggerPayload(v)
 	return _u
 }
 
 // AppendTriggerPayload appends value to the "trigger_payload" field.
-func (_u *TrailRunUpdate) AppendTriggerPayload(v json.RawMessage) *TrailRunUpdate {
+func (_u *TrailRunUpdate) AppendTriggerPayload(v jsontext.Value) *TrailRunUpdate {
 	_u.mutation.AppendTriggerPayload(v)
 	return _u
 }
@@ -513,13 +513,13 @@ func (_u *TrailRunUpdateOne) SetNillableKind(v *trailrun.Kind) *TrailRunUpdateOn
 }
 
 // SetTriggerPayload sets the "trigger_payload" field.
-func (_u *TrailRunUpdateOne) SetTriggerPayload(v json.RawMessage) *TrailRunUpdateOne {
+func (_u *TrailRunUpdateOne) SetTriggerPayload(v jsontext.Value) *TrailRunUpdateOne {
 	_u.mutation.SetTriggerPayload(v)
 	return _u
 }
 
 // AppendTriggerPayload appends value to the "trigger_payload" field.
-func (_u *TrailRunUpdateOne) AppendTriggerPayload(v json.RawMessage) *TrailRunUpdateOne {
+func (_u *TrailRunUpdateOne) AppendTriggerPayload(v jsontext.Value) *TrailRunUpdateOne {
 	_u.mutation.AppendTriggerPayload(v)
 	return _u
 }

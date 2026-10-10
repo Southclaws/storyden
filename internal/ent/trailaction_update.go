@@ -4,7 +4,7 @@ package ent
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"errors"
 	"fmt"
 	"time"
@@ -90,13 +90,13 @@ func (_u *TrailActionUpdate) AddPosition(v int) *TrailActionUpdate {
 }
 
 // SetConfig sets the "config" field.
-func (_u *TrailActionUpdate) SetConfig(v json.RawMessage) *TrailActionUpdate {
+func (_u *TrailActionUpdate) SetConfig(v jsontext.Value) *TrailActionUpdate {
 	_u.mutation.SetConfig(v)
 	return _u
 }
 
 // AppendConfig appends value to the "config" field.
-func (_u *TrailActionUpdate) AppendConfig(v json.RawMessage) *TrailActionUpdate {
+func (_u *TrailActionUpdate) AppendConfig(v jsontext.Value) *TrailActionUpdate {
 	_u.mutation.AppendConfig(v)
 	return _u
 }
@@ -413,13 +413,13 @@ func (_u *TrailActionUpdateOne) AddPosition(v int) *TrailActionUpdateOne {
 }
 
 // SetConfig sets the "config" field.
-func (_u *TrailActionUpdateOne) SetConfig(v json.RawMessage) *TrailActionUpdateOne {
+func (_u *TrailActionUpdateOne) SetConfig(v jsontext.Value) *TrailActionUpdateOne {
 	_u.mutation.SetConfig(v)
 	return _u
 }
 
 // AppendConfig appends value to the "config" field.
-func (_u *TrailActionUpdateOne) AppendConfig(v json.RawMessage) *TrailActionUpdateOne {
+func (_u *TrailActionUpdateOne) AppendConfig(v jsontext.Value) *TrailActionUpdateOne {
 	_u.mutation.AppendConfig(v)
 	return _u
 }

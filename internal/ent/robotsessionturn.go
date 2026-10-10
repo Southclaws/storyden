@@ -4,6 +4,7 @@ package ent
 
 import (
 	"encoding/json"
+	"encoding/json/jsontext"
 	"fmt"
 	"strings"
 	"time"
@@ -34,7 +35,7 @@ type RobotSessionTurn struct {
 	// RobotRef holds the value of the "robot_ref" field.
 	RobotRef string `json:"robot_ref,omitempty"`
 	// InputData holds the value of the "input_data" field.
-	InputData json.RawMessage `json:"input_data,omitempty"`
+	InputData jsontext.Value `json:"input_data,omitempty"`
 	// Status holds the value of the "status" field.
 	Status robotsessionturn.Status `json:"status,omitempty"`
 	// ContinuationOfTurnID holds the value of the "continuation_of_turn_id" field.

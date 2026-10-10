@@ -98,7 +98,7 @@ func (p *provider) listModels(ctx context.Context, req rpc.RPCRequestRobotModelP
 		return rpc.RPCResponseRobotModelProviderListModels{}, fmt.Errorf("OpenRouter returned no model response")
 	}
 
-	models := filterModels(res.Data, modelIDs(config))
+	models := filterModels(res.Result.Data, modelIDs(config))
 
 	return rpc.RPCResponseRobotModelProviderListModels{
 		Method: "robot_model_provider_list_models",
@@ -387,10 +387,6 @@ func convertToolCalls(calls []components.ChatToolCall) []rpc.RobotModelProviderT
 func contentText(content components.ChatAssistantMessageContent) string {
 	if content.Str != nil {
 		return *content.Str
-	}
-
-	if content.Any != nil {
-		return fmt.Sprint(content.Any)
 	}
 
 	if len(content.ArrayOfChatContentItems) == 0 {

@@ -79,6 +79,11 @@ func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openap
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	options, err := serialiseWebAuthnCredentialCreationOptions(*cred)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	// Encode the session data as a base64 JSON string
 
 	j, err := json.Marshal(sessionData)
@@ -107,7 +112,7 @@ func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openap
 			Headers: openapi.WebAuthnRequestCredentialOKResponseHeaders{
 				SetCookie: ptr(cookie.String()),
 			},
-			Body: serialiseWebAuthnCredentialCreationOptions(*cred),
+			Body: options,
 		},
 	}, nil
 }
@@ -257,7 +262,12 @@ func (a *WebAuthn) WebAuthnMakeAssertion(ctx context.Context, request openapi.We
 	}, nil
 }
 
-func serialiseWebAuthnCredentialCreationOptions(cred protocol.CredentialCreation) openapi.WebAuthnPublicKeyCreationOptions {
+func serialiseWebAuthnCredentialCreationOptions(cred protocol.CredentialCreation) (openapi.WebAuthnPublicKeyCreationOptions, error) {
+	extensions, err := cred.Response.Extensions.Map()
+	if err != nil {
+		return openapi.WebAuthnPublicKeyCreationOptions{}, fault.Wrap(err, fmsg.With("failed to serialise WebAuthn extensions"))
+	}
+
 	rp := openapi.PublicKeyCredentialRpEntity{
 		Id:   cred.Response.RelyingParty.ID,
 		Name: cred.Response.RelyingParty.Name,
@@ -307,9 +317,9 @@ func serialiseWebAuthnCredentialCreationOptions(cred protocol.CredentialCreation
 			ExcludeCredentials:     excludeCredentials,
 			AuthenticatorSelection: authenticatorSelection,
 			Attestation:            (*openapi.AttestationConveyancePreference)(&cred.Response.Attestation),
-			Extensions:             (*openapi.AuthenticationExtensionsClientInputs)(&cred.Response.Extensions),
+			Extensions:             (*openapi.AuthenticationExtensionsClientInputs)(&extensions),
 		},
-	}
+	}, nil
 }
 
 func serialiseWebAuthnCredentialRequestOptions(cred protocol.PublicKeyCredentialRequestOptions) openapi.CredentialRequestOptions {

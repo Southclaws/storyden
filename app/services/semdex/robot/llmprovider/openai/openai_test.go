@@ -85,7 +85,8 @@ func TestConvertToOpenAIInputPassesThroughToolResult(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, input, 1)
 	require.NotNil(t, input[0].OfFunctionCallOutput)
-	assert.Equal(t, "call_123", input[0].OfFunctionCallOutput.CallID)
+	require.True(t, input[0].OfFunctionCallOutput.CallID.Valid())
+	assert.Equal(t, "call_123", input[0].OfFunctionCallOutput.CallID.Value)
 	require.True(t, input[0].OfFunctionCallOutput.Output.OfString.Valid())
 	assert.JSONEq(t, `{"id":"d8818ueot5pfij6bvm90","name":"Documentation Hub","slug":"documentation-hub"}`, input[0].OfFunctionCallOutput.Output.OfString.Value)
 }

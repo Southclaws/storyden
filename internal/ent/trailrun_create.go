@@ -4,7 +4,7 @@ package ent
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"errors"
 	"fmt"
 	"time"
@@ -83,7 +83,7 @@ func (_c *TrailRunCreate) SetKind(v trailrun.Kind) *TrailRunCreate {
 }
 
 // SetTriggerPayload sets the "trigger_payload" field.
-func (_c *TrailRunCreate) SetTriggerPayload(v json.RawMessage) *TrailRunCreate {
+func (_c *TrailRunCreate) SetTriggerPayload(v jsontext.Value) *TrailRunCreate {
 	_c.mutation.SetTriggerPayload(v)
 	return _c
 }
@@ -483,7 +483,7 @@ func (u *TrailRunUpsert) UpdateKind() *TrailRunUpsert {
 }
 
 // SetTriggerPayload sets the "trigger_payload" field.
-func (u *TrailRunUpsert) SetTriggerPayload(v json.RawMessage) *TrailRunUpsert {
+func (u *TrailRunUpsert) SetTriggerPayload(v jsontext.Value) *TrailRunUpsert {
 	u.Set(trailrun.FieldTriggerPayload, v)
 	return u
 }
@@ -657,7 +657,7 @@ func (u *TrailRunUpsertOne) UpdateKind() *TrailRunUpsertOne {
 }
 
 // SetTriggerPayload sets the "trigger_payload" field.
-func (u *TrailRunUpsertOne) SetTriggerPayload(v json.RawMessage) *TrailRunUpsertOne {
+func (u *TrailRunUpsertOne) SetTriggerPayload(v jsontext.Value) *TrailRunUpsertOne {
 	return u.Update(func(s *TrailRunUpsert) {
 		s.SetTriggerPayload(v)
 	})
@@ -1008,7 +1008,7 @@ func (u *TrailRunUpsertBulk) UpdateKind() *TrailRunUpsertBulk {
 }
 
 // SetTriggerPayload sets the "trigger_payload" field.
-func (u *TrailRunUpsertBulk) SetTriggerPayload(v json.RawMessage) *TrailRunUpsertBulk {
+func (u *TrailRunUpsertBulk) SetTriggerPayload(v jsontext.Value) *TrailRunUpsertBulk {
 	return u.Update(func(s *TrailRunUpsert) {
 		s.SetTriggerPayload(v)
 	})

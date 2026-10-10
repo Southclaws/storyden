@@ -4,7 +4,7 @@ package ent
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"errors"
 	"fmt"
 	"time"
@@ -112,13 +112,13 @@ func (_u *TrailUpdate) SetNillableTriggerType(v *string) *TrailUpdate {
 }
 
 // SetTriggerConfig sets the "trigger_config" field.
-func (_u *TrailUpdate) SetTriggerConfig(v json.RawMessage) *TrailUpdate {
+func (_u *TrailUpdate) SetTriggerConfig(v jsontext.Value) *TrailUpdate {
 	_u.mutation.SetTriggerConfig(v)
 	return _u
 }
 
 // AppendTriggerConfig appends value to the "trigger_config" field.
-func (_u *TrailUpdate) AppendTriggerConfig(v json.RawMessage) *TrailUpdate {
+func (_u *TrailUpdate) AppendTriggerConfig(v jsontext.Value) *TrailUpdate {
 	_u.mutation.AppendTriggerConfig(v)
 	return _u
 }
@@ -582,13 +582,13 @@ func (_u *TrailUpdateOne) SetNillableTriggerType(v *string) *TrailUpdateOne {
 }
 
 // SetTriggerConfig sets the "trigger_config" field.
-func (_u *TrailUpdateOne) SetTriggerConfig(v json.RawMessage) *TrailUpdateOne {
+func (_u *TrailUpdateOne) SetTriggerConfig(v jsontext.Value) *TrailUpdateOne {
 	_u.mutation.SetTriggerConfig(v)
 	return _u
 }
 
 // AppendTriggerConfig appends value to the "trigger_config" field.
-func (_u *TrailUpdateOne) AppendTriggerConfig(v json.RawMessage) *TrailUpdateOne {
+func (_u *TrailUpdateOne) AppendTriggerConfig(v jsontext.Value) *TrailUpdateOne {
 	_u.mutation.AppendTriggerConfig(v)
 	return _u
 }

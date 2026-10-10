@@ -4,7 +4,7 @@ package ent
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"errors"
 	"fmt"
 	"sync"
@@ -32918,8 +32918,8 @@ type OAuthRegistrationApprovalMutation struct {
 	registration_code_hash     *string
 	verification_code_hash     *string
 	verification_code_display  *string
-	metadata                   *json.RawMessage
-	appendmetadata             json.RawMessage
+	metadata                   *jsontext.Value
+	appendmetadata             jsontext.Value
 	expires_at                 *time.Time
 	next_poll_at               *time.Time
 	poll_interval_seconds      *int
@@ -33185,13 +33185,13 @@ func (m *OAuthRegistrationApprovalMutation) ResetVerificationCodeDisplay() {
 }
 
 // SetMetadata sets the "metadata" field.
-func (m *OAuthRegistrationApprovalMutation) SetMetadata(jm json.RawMessage) {
-	m.metadata = &jm
+func (m *OAuthRegistrationApprovalMutation) SetMetadata(j jsontext.Value) {
+	m.metadata = &j
 	m.appendmetadata = nil
 }
 
 // Metadata returns the value of the "metadata" field in the mutation.
-func (m *OAuthRegistrationApprovalMutation) Metadata() (r json.RawMessage, exists bool) {
+func (m *OAuthRegistrationApprovalMutation) Metadata() (r jsontext.Value, exists bool) {
 	v := m.metadata
 	if v == nil {
 		return
@@ -33202,7 +33202,7 @@ func (m *OAuthRegistrationApprovalMutation) Metadata() (r json.RawMessage, exist
 // OldMetadata returns the old "metadata" field's value of the OAuthRegistrationApproval entity.
 // If the OAuthRegistrationApproval object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OAuthRegistrationApprovalMutation) OldMetadata(ctx context.Context) (v json.RawMessage, err error) {
+func (m *OAuthRegistrationApprovalMutation) OldMetadata(ctx context.Context) (v jsontext.Value, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldMetadata is only allowed on UpdateOne operations")
 	}
@@ -33216,13 +33216,13 @@ func (m *OAuthRegistrationApprovalMutation) OldMetadata(ctx context.Context) (v 
 	return oldValue.Metadata, nil
 }
 
-// AppendMetadata adds jm to the "metadata" field.
-func (m *OAuthRegistrationApprovalMutation) AppendMetadata(jm json.RawMessage) {
-	m.appendmetadata = append(m.appendmetadata, jm...)
+// AppendMetadata adds j to the "metadata" field.
+func (m *OAuthRegistrationApprovalMutation) AppendMetadata(j jsontext.Value) {
+	m.appendmetadata = append(m.appendmetadata, j...)
 }
 
 // AppendedMetadata returns the list of values that were appended to the "metadata" field in this mutation.
-func (m *OAuthRegistrationApprovalMutation) AppendedMetadata() (json.RawMessage, bool) {
+func (m *OAuthRegistrationApprovalMutation) AppendedMetadata() (jsontext.Value, bool) {
 	if len(m.appendmetadata) == 0 {
 		return nil, false
 	}
@@ -33816,7 +33816,7 @@ func (m *OAuthRegistrationApprovalMutation) SetField(name string, value ent.Valu
 		m.SetVerificationCodeDisplay(v)
 		return nil
 	case oauthregistrationapproval.FieldMetadata:
-		v, ok := value.(json.RawMessage)
+		v, ok := value.(jsontext.Value)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -51335,8 +51335,8 @@ type RobotSessionInputMutation struct {
 	addsequence      *int64
 	source_kind      *string
 	batch_key        *string
-	input_data       *json.RawMessage
-	appendinput_data json.RawMessage
+	input_data       *jsontext.Value
+	appendinput_data jsontext.Value
 	not_before       *time.Time
 	status           *robotsessioninput.Status
 	clearedFields    map[string]struct{}
@@ -51777,13 +51777,13 @@ func (m *RobotSessionInputMutation) ResetBatchKey() {
 }
 
 // SetInputData sets the "input_data" field.
-func (m *RobotSessionInputMutation) SetInputData(jm json.RawMessage) {
-	m.input_data = &jm
+func (m *RobotSessionInputMutation) SetInputData(j jsontext.Value) {
+	m.input_data = &j
 	m.appendinput_data = nil
 }
 
 // InputData returns the value of the "input_data" field in the mutation.
-func (m *RobotSessionInputMutation) InputData() (r json.RawMessage, exists bool) {
+func (m *RobotSessionInputMutation) InputData() (r jsontext.Value, exists bool) {
 	v := m.input_data
 	if v == nil {
 		return
@@ -51794,7 +51794,7 @@ func (m *RobotSessionInputMutation) InputData() (r json.RawMessage, exists bool)
 // OldInputData returns the old "input_data" field's value of the RobotSessionInput entity.
 // If the RobotSessionInput object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RobotSessionInputMutation) OldInputData(ctx context.Context) (v json.RawMessage, err error) {
+func (m *RobotSessionInputMutation) OldInputData(ctx context.Context) (v jsontext.Value, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldInputData is only allowed on UpdateOne operations")
 	}
@@ -51808,13 +51808,13 @@ func (m *RobotSessionInputMutation) OldInputData(ctx context.Context) (v json.Ra
 	return oldValue.InputData, nil
 }
 
-// AppendInputData adds jm to the "input_data" field.
-func (m *RobotSessionInputMutation) AppendInputData(jm json.RawMessage) {
-	m.appendinput_data = append(m.appendinput_data, jm...)
+// AppendInputData adds j to the "input_data" field.
+func (m *RobotSessionInputMutation) AppendInputData(j jsontext.Value) {
+	m.appendinput_data = append(m.appendinput_data, j...)
 }
 
 // AppendedInputData returns the list of values that were appended to the "input_data" field in this mutation.
-func (m *RobotSessionInputMutation) AppendedInputData() (json.RawMessage, bool) {
+func (m *RobotSessionInputMutation) AppendedInputData() (jsontext.Value, bool) {
 	if len(m.appendinput_data) == 0 {
 		return nil, false
 	}
@@ -52188,7 +52188,7 @@ func (m *RobotSessionInputMutation) SetField(name string, value ent.Value) error
 		m.SetBatchKey(v)
 		return nil
 	case robotsessioninput.FieldInputData:
-		v, ok := value.(json.RawMessage)
+		v, ok := value.(jsontext.Value)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -54022,8 +54022,8 @@ type RobotSessionTurnMutation struct {
 	updated_at              *time.Time
 	source_kind             *string
 	robot_ref               *string
-	input_data              *json.RawMessage
-	appendinput_data        json.RawMessage
+	input_data              *jsontext.Value
+	appendinput_data        jsontext.Value
 	status                  *robotsessionturn.Status
 	continuation_of_turn_id *xid.ID
 	started_at              *time.Time
@@ -54377,13 +54377,13 @@ func (m *RobotSessionTurnMutation) ResetRobotRef() {
 }
 
 // SetInputData sets the "input_data" field.
-func (m *RobotSessionTurnMutation) SetInputData(jm json.RawMessage) {
-	m.input_data = &jm
+func (m *RobotSessionTurnMutation) SetInputData(j jsontext.Value) {
+	m.input_data = &j
 	m.appendinput_data = nil
 }
 
 // InputData returns the value of the "input_data" field in the mutation.
-func (m *RobotSessionTurnMutation) InputData() (r json.RawMessage, exists bool) {
+func (m *RobotSessionTurnMutation) InputData() (r jsontext.Value, exists bool) {
 	v := m.input_data
 	if v == nil {
 		return
@@ -54394,7 +54394,7 @@ func (m *RobotSessionTurnMutation) InputData() (r json.RawMessage, exists bool) 
 // OldInputData returns the old "input_data" field's value of the RobotSessionTurn entity.
 // If the RobotSessionTurn object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RobotSessionTurnMutation) OldInputData(ctx context.Context) (v json.RawMessage, err error) {
+func (m *RobotSessionTurnMutation) OldInputData(ctx context.Context) (v jsontext.Value, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldInputData is only allowed on UpdateOne operations")
 	}
@@ -54408,13 +54408,13 @@ func (m *RobotSessionTurnMutation) OldInputData(ctx context.Context) (v json.Raw
 	return oldValue.InputData, nil
 }
 
-// AppendInputData adds jm to the "input_data" field.
-func (m *RobotSessionTurnMutation) AppendInputData(jm json.RawMessage) {
-	m.appendinput_data = append(m.appendinput_data, jm...)
+// AppendInputData adds j to the "input_data" field.
+func (m *RobotSessionTurnMutation) AppendInputData(j jsontext.Value) {
+	m.appendinput_data = append(m.appendinput_data, j...)
 }
 
 // AppendedInputData returns the list of values that were appended to the "input_data" field in this mutation.
-func (m *RobotSessionTurnMutation) AppendedInputData() (json.RawMessage, bool) {
+func (m *RobotSessionTurnMutation) AppendedInputData() (jsontext.Value, bool) {
 	if len(m.appendinput_data) == 0 {
 		return nil, false
 	}
@@ -55038,7 +55038,7 @@ func (m *RobotSessionTurnMutation) SetField(name string, value ent.Value) error 
 		m.SetRobotRef(v)
 		return nil
 	case robotsessionturn.FieldInputData:
-		v, ok := value.(json.RawMessage)
+		v, ok := value.(jsontext.Value)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -61383,8 +61383,8 @@ type TrailMutation struct {
 	description          *string
 	status               *trail.Status
 	trigger_type         *string
-	trigger_config       *json.RawMessage
-	appendtrigger_config json.RawMessage
+	trigger_config       *jsontext.Value
+	appendtrigger_config jsontext.Value
 	next_occurrence_at   *time.Time
 	last_occurrence_at   *time.Time
 	clearedFields        map[string]struct{}
@@ -61758,13 +61758,13 @@ func (m *TrailMutation) ResetTriggerType() {
 }
 
 // SetTriggerConfig sets the "trigger_config" field.
-func (m *TrailMutation) SetTriggerConfig(jm json.RawMessage) {
-	m.trigger_config = &jm
+func (m *TrailMutation) SetTriggerConfig(j jsontext.Value) {
+	m.trigger_config = &j
 	m.appendtrigger_config = nil
 }
 
 // TriggerConfig returns the value of the "trigger_config" field in the mutation.
-func (m *TrailMutation) TriggerConfig() (r json.RawMessage, exists bool) {
+func (m *TrailMutation) TriggerConfig() (r jsontext.Value, exists bool) {
 	v := m.trigger_config
 	if v == nil {
 		return
@@ -61775,7 +61775,7 @@ func (m *TrailMutation) TriggerConfig() (r json.RawMessage, exists bool) {
 // OldTriggerConfig returns the old "trigger_config" field's value of the Trail entity.
 // If the Trail object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TrailMutation) OldTriggerConfig(ctx context.Context) (v json.RawMessage, err error) {
+func (m *TrailMutation) OldTriggerConfig(ctx context.Context) (v jsontext.Value, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTriggerConfig is only allowed on UpdateOne operations")
 	}
@@ -61789,13 +61789,13 @@ func (m *TrailMutation) OldTriggerConfig(ctx context.Context) (v json.RawMessage
 	return oldValue.TriggerConfig, nil
 }
 
-// AppendTriggerConfig adds jm to the "trigger_config" field.
-func (m *TrailMutation) AppendTriggerConfig(jm json.RawMessage) {
-	m.appendtrigger_config = append(m.appendtrigger_config, jm...)
+// AppendTriggerConfig adds j to the "trigger_config" field.
+func (m *TrailMutation) AppendTriggerConfig(j jsontext.Value) {
+	m.appendtrigger_config = append(m.appendtrigger_config, j...)
 }
 
 // AppendedTriggerConfig returns the list of values that were appended to the "trigger_config" field in this mutation.
-func (m *TrailMutation) AppendedTriggerConfig() (json.RawMessage, bool) {
+func (m *TrailMutation) AppendedTriggerConfig() (jsontext.Value, bool) {
 	if len(m.appendtrigger_config) == 0 {
 		return nil, false
 	}
@@ -62235,7 +62235,7 @@ func (m *TrailMutation) SetField(name string, value ent.Value) error {
 		m.SetTriggerType(v)
 		return nil
 	case trail.FieldTriggerConfig:
-		v, ok := value.(json.RawMessage)
+		v, ok := value.(jsontext.Value)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -62492,8 +62492,8 @@ type TrailActionMutation struct {
 	kind          *string
 	position      *int
 	addposition   *int
-	_config       *json.RawMessage
-	append_config json.RawMessage
+	_config       *jsontext.Value
+	append_config jsontext.Value
 	archived_at   *time.Time
 	clearedFields map[string]struct{}
 	trail         *xid.ID
@@ -62811,13 +62811,13 @@ func (m *TrailActionMutation) ResetPosition() {
 }
 
 // SetConfig sets the "config" field.
-func (m *TrailActionMutation) SetConfig(jm json.RawMessage) {
-	m._config = &jm
+func (m *TrailActionMutation) SetConfig(j jsontext.Value) {
+	m._config = &j
 	m.append_config = nil
 }
 
 // Config returns the value of the "config" field in the mutation.
-func (m *TrailActionMutation) Config() (r json.RawMessage, exists bool) {
+func (m *TrailActionMutation) Config() (r jsontext.Value, exists bool) {
 	v := m._config
 	if v == nil {
 		return
@@ -62828,7 +62828,7 @@ func (m *TrailActionMutation) Config() (r json.RawMessage, exists bool) {
 // OldConfig returns the old "config" field's value of the TrailAction entity.
 // If the TrailAction object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TrailActionMutation) OldConfig(ctx context.Context) (v json.RawMessage, err error) {
+func (m *TrailActionMutation) OldConfig(ctx context.Context) (v jsontext.Value, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldConfig is only allowed on UpdateOne operations")
 	}
@@ -62842,13 +62842,13 @@ func (m *TrailActionMutation) OldConfig(ctx context.Context) (v json.RawMessage,
 	return oldValue.Config, nil
 }
 
-// AppendConfig adds jm to the "config" field.
-func (m *TrailActionMutation) AppendConfig(jm json.RawMessage) {
-	m.append_config = append(m.append_config, jm...)
+// AppendConfig adds j to the "config" field.
+func (m *TrailActionMutation) AppendConfig(j jsontext.Value) {
+	m.append_config = append(m.append_config, j...)
 }
 
 // AppendedConfig returns the list of values that were appended to the "config" field in this mutation.
-func (m *TrailActionMutation) AppendedConfig() (json.RawMessage, bool) {
+func (m *TrailActionMutation) AppendedConfig() (jsontext.Value, bool) {
 	if len(m.append_config) == 0 {
 		return nil, false
 	}
@@ -63137,7 +63137,7 @@ func (m *TrailActionMutation) SetField(name string, value ent.Value) error {
 		m.SetPosition(v)
 		return nil
 	case trailaction.FieldConfig:
-		v, ok := value.(json.RawMessage)
+		v, ok := value.(jsontext.Value)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -63359,15 +63359,15 @@ type TrailActionRunMutation struct {
 	created_at       *time.Time
 	updated_at       *time.Time
 	kind             *string
-	_config          *json.RawMessage
-	append_config    json.RawMessage
+	_config          *jsontext.Value
+	append_config    jsontext.Value
 	status           *trailactionrun.Status
 	lease_token      *string
 	lease_expires_at *time.Time
-	output           *json.RawMessage
-	appendoutput     json.RawMessage
-	target           *json.RawMessage
-	appendtarget     json.RawMessage
+	output           *jsontext.Value
+	appendoutput     jsontext.Value
+	target           *jsontext.Value
+	appendtarget     jsontext.Value
 	error_text       *string
 	started_at       *time.Time
 	finished_at      *time.Time
@@ -63667,13 +63667,13 @@ func (m *TrailActionRunMutation) ResetKind() {
 }
 
 // SetConfig sets the "config" field.
-func (m *TrailActionRunMutation) SetConfig(jm json.RawMessage) {
-	m._config = &jm
+func (m *TrailActionRunMutation) SetConfig(j jsontext.Value) {
+	m._config = &j
 	m.append_config = nil
 }
 
 // Config returns the value of the "config" field in the mutation.
-func (m *TrailActionRunMutation) Config() (r json.RawMessage, exists bool) {
+func (m *TrailActionRunMutation) Config() (r jsontext.Value, exists bool) {
 	v := m._config
 	if v == nil {
 		return
@@ -63684,7 +63684,7 @@ func (m *TrailActionRunMutation) Config() (r json.RawMessage, exists bool) {
 // OldConfig returns the old "config" field's value of the TrailActionRun entity.
 // If the TrailActionRun object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TrailActionRunMutation) OldConfig(ctx context.Context) (v json.RawMessage, err error) {
+func (m *TrailActionRunMutation) OldConfig(ctx context.Context) (v jsontext.Value, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldConfig is only allowed on UpdateOne operations")
 	}
@@ -63698,13 +63698,13 @@ func (m *TrailActionRunMutation) OldConfig(ctx context.Context) (v json.RawMessa
 	return oldValue.Config, nil
 }
 
-// AppendConfig adds jm to the "config" field.
-func (m *TrailActionRunMutation) AppendConfig(jm json.RawMessage) {
-	m.append_config = append(m.append_config, jm...)
+// AppendConfig adds j to the "config" field.
+func (m *TrailActionRunMutation) AppendConfig(j jsontext.Value) {
+	m.append_config = append(m.append_config, j...)
 }
 
 // AppendedConfig returns the list of values that were appended to the "config" field in this mutation.
-func (m *TrailActionRunMutation) AppendedConfig() (json.RawMessage, bool) {
+func (m *TrailActionRunMutation) AppendedConfig() (jsontext.Value, bool) {
 	if len(m.append_config) == 0 {
 		return nil, false
 	}
@@ -63852,13 +63852,13 @@ func (m *TrailActionRunMutation) ResetLeaseExpiresAt() {
 }
 
 // SetOutput sets the "output" field.
-func (m *TrailActionRunMutation) SetOutput(jm json.RawMessage) {
-	m.output = &jm
+func (m *TrailActionRunMutation) SetOutput(j jsontext.Value) {
+	m.output = &j
 	m.appendoutput = nil
 }
 
 // Output returns the value of the "output" field in the mutation.
-func (m *TrailActionRunMutation) Output() (r json.RawMessage, exists bool) {
+func (m *TrailActionRunMutation) Output() (r jsontext.Value, exists bool) {
 	v := m.output
 	if v == nil {
 		return
@@ -63869,7 +63869,7 @@ func (m *TrailActionRunMutation) Output() (r json.RawMessage, exists bool) {
 // OldOutput returns the old "output" field's value of the TrailActionRun entity.
 // If the TrailActionRun object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TrailActionRunMutation) OldOutput(ctx context.Context) (v json.RawMessage, err error) {
+func (m *TrailActionRunMutation) OldOutput(ctx context.Context) (v jsontext.Value, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldOutput is only allowed on UpdateOne operations")
 	}
@@ -63883,13 +63883,13 @@ func (m *TrailActionRunMutation) OldOutput(ctx context.Context) (v json.RawMessa
 	return oldValue.Output, nil
 }
 
-// AppendOutput adds jm to the "output" field.
-func (m *TrailActionRunMutation) AppendOutput(jm json.RawMessage) {
-	m.appendoutput = append(m.appendoutput, jm...)
+// AppendOutput adds j to the "output" field.
+func (m *TrailActionRunMutation) AppendOutput(j jsontext.Value) {
+	m.appendoutput = append(m.appendoutput, j...)
 }
 
 // AppendedOutput returns the list of values that were appended to the "output" field in this mutation.
-func (m *TrailActionRunMutation) AppendedOutput() (json.RawMessage, bool) {
+func (m *TrailActionRunMutation) AppendedOutput() (jsontext.Value, bool) {
 	if len(m.appendoutput) == 0 {
 		return nil, false
 	}
@@ -63917,13 +63917,13 @@ func (m *TrailActionRunMutation) ResetOutput() {
 }
 
 // SetTarget sets the "target" field.
-func (m *TrailActionRunMutation) SetTarget(jm json.RawMessage) {
-	m.target = &jm
+func (m *TrailActionRunMutation) SetTarget(j jsontext.Value) {
+	m.target = &j
 	m.appendtarget = nil
 }
 
 // Target returns the value of the "target" field in the mutation.
-func (m *TrailActionRunMutation) Target() (r json.RawMessage, exists bool) {
+func (m *TrailActionRunMutation) Target() (r jsontext.Value, exists bool) {
 	v := m.target
 	if v == nil {
 		return
@@ -63934,7 +63934,7 @@ func (m *TrailActionRunMutation) Target() (r json.RawMessage, exists bool) {
 // OldTarget returns the old "target" field's value of the TrailActionRun entity.
 // If the TrailActionRun object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TrailActionRunMutation) OldTarget(ctx context.Context) (v json.RawMessage, err error) {
+func (m *TrailActionRunMutation) OldTarget(ctx context.Context) (v jsontext.Value, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTarget is only allowed on UpdateOne operations")
 	}
@@ -63948,13 +63948,13 @@ func (m *TrailActionRunMutation) OldTarget(ctx context.Context) (v json.RawMessa
 	return oldValue.Target, nil
 }
 
-// AppendTarget adds jm to the "target" field.
-func (m *TrailActionRunMutation) AppendTarget(jm json.RawMessage) {
-	m.appendtarget = append(m.appendtarget, jm...)
+// AppendTarget adds j to the "target" field.
+func (m *TrailActionRunMutation) AppendTarget(j jsontext.Value) {
+	m.appendtarget = append(m.appendtarget, j...)
 }
 
 // AppendedTarget returns the list of values that were appended to the "target" field in this mutation.
-func (m *TrailActionRunMutation) AppendedTarget() (json.RawMessage, bool) {
+func (m *TrailActionRunMutation) AppendedTarget() (jsontext.Value, bool) {
 	if len(m.appendtarget) == 0 {
 		return nil, false
 	}
@@ -64433,7 +64433,7 @@ func (m *TrailActionRunMutation) SetField(name string, value ent.Value) error {
 		m.SetKind(v)
 		return nil
 	case trailactionrun.FieldConfig:
-		v, ok := value.(json.RawMessage)
+		v, ok := value.(jsontext.Value)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -64461,14 +64461,14 @@ func (m *TrailActionRunMutation) SetField(name string, value ent.Value) error {
 		m.SetLeaseExpiresAt(v)
 		return nil
 	case trailactionrun.FieldOutput:
-		v, ok := value.(json.RawMessage)
+		v, ok := value.(jsontext.Value)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetOutput(v)
 		return nil
 	case trailactionrun.FieldTarget:
-		v, ok := value.(json.RawMessage)
+		v, ok := value.(jsontext.Value)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -64752,8 +64752,8 @@ type TrailRunMutation struct {
 	created_at            *time.Time
 	updated_at            *time.Time
 	kind                  *trailrun.Kind
-	trigger_payload       *json.RawMessage
-	appendtrigger_payload json.RawMessage
+	trigger_payload       *jsontext.Value
+	appendtrigger_payload jsontext.Value
 	scheduled_for         *time.Time
 	status                *trailrun.Status
 	finished_at           *time.Time
@@ -65068,13 +65068,13 @@ func (m *TrailRunMutation) ResetKind() {
 }
 
 // SetTriggerPayload sets the "trigger_payload" field.
-func (m *TrailRunMutation) SetTriggerPayload(jm json.RawMessage) {
-	m.trigger_payload = &jm
+func (m *TrailRunMutation) SetTriggerPayload(j jsontext.Value) {
+	m.trigger_payload = &j
 	m.appendtrigger_payload = nil
 }
 
 // TriggerPayload returns the value of the "trigger_payload" field in the mutation.
-func (m *TrailRunMutation) TriggerPayload() (r json.RawMessage, exists bool) {
+func (m *TrailRunMutation) TriggerPayload() (r jsontext.Value, exists bool) {
 	v := m.trigger_payload
 	if v == nil {
 		return
@@ -65085,7 +65085,7 @@ func (m *TrailRunMutation) TriggerPayload() (r json.RawMessage, exists bool) {
 // OldTriggerPayload returns the old "trigger_payload" field's value of the TrailRun entity.
 // If the TrailRun object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TrailRunMutation) OldTriggerPayload(ctx context.Context) (v json.RawMessage, err error) {
+func (m *TrailRunMutation) OldTriggerPayload(ctx context.Context) (v jsontext.Value, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTriggerPayload is only allowed on UpdateOne operations")
 	}
@@ -65099,13 +65099,13 @@ func (m *TrailRunMutation) OldTriggerPayload(ctx context.Context) (v json.RawMes
 	return oldValue.TriggerPayload, nil
 }
 
-// AppendTriggerPayload adds jm to the "trigger_payload" field.
-func (m *TrailRunMutation) AppendTriggerPayload(jm json.RawMessage) {
-	m.appendtrigger_payload = append(m.appendtrigger_payload, jm...)
+// AppendTriggerPayload adds j to the "trigger_payload" field.
+func (m *TrailRunMutation) AppendTriggerPayload(j jsontext.Value) {
+	m.appendtrigger_payload = append(m.appendtrigger_payload, j...)
 }
 
 // AppendedTriggerPayload returns the list of values that were appended to the "trigger_payload" field in this mutation.
-func (m *TrailRunMutation) AppendedTriggerPayload() (json.RawMessage, bool) {
+func (m *TrailRunMutation) AppendedTriggerPayload() (jsontext.Value, bool) {
 	if len(m.appendtrigger_payload) == 0 {
 		return nil, false
 	}
@@ -65533,7 +65533,7 @@ func (m *TrailRunMutation) SetField(name string, value ent.Value) error {
 		m.SetKind(v)
 		return nil
 	case trailrun.FieldTriggerPayload:
-		v, ok := value.(json.RawMessage)
+		v, ok := value.(jsontext.Value)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

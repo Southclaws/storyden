@@ -37,12 +37,12 @@ func TestReportAuthorization(t *testing.T) {
 			adminCtx, adminAcc := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 
 			handle1 := xid.New().String()
-			acc1, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{handle1, "password"})
+			acc1, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{Identifier: handle1, Token: "password"})
 			tests.Ok(t, err, acc1)
 			session1 := sh.WithSession(e2e.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc1.JSON200.Id)))))
 
 			handle2 := xid.New().String()
-			acc2, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{handle2, "password"})
+			acc2, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{Identifier: handle2, Token: "password"})
 			tests.Ok(t, err, acc2)
 			session2 := sh.WithSession(e2e.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc2.JSON200.Id)))))
 
@@ -59,7 +59,7 @@ func TestReportAuthorization(t *testing.T) {
 			tests.Ok(t, err, addRole1)
 
 			handle3 := xid.New().String()
-			acc3, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{handle3, "password"})
+			acc3, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{Identifier: handle3, Token: "password"})
 			tests.Ok(t, err, acc3)
 			session3 := sh.WithSession(e2e.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc3.JSON200.Id)))))
 

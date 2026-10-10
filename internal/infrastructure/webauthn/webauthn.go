@@ -12,7 +12,7 @@ import (
 func New(cfg config.Config) (*webauthn.WebAuthn, error) {
 	wa, err := webauthn.New(&webauthn.Config{
 		RPDisplayName:         "Storyden",
-		RPID:                  cfg.PublicWebAddress.Host,
+		RPID:                  cfg.PublicWebAddress.Hostname(),
 		RPOrigins:             []string{cfg.PublicWebAddress.String()},
 		AttestationPreference: protocol.PreferIndirectAttestation,
 	})

@@ -4,6 +4,7 @@ package ent
 
 import (
 	"encoding/json"
+	"encoding/json/jsontext"
 	"fmt"
 	"strings"
 	"time"
@@ -32,7 +33,7 @@ type TrailActionRun struct {
 	// Kind holds the value of the "kind" field.
 	Kind string `json:"kind,omitempty"`
 	// Config holds the value of the "config" field.
-	Config json.RawMessage `json:"config,omitempty"`
+	Config jsontext.Value `json:"config,omitempty"`
 	// Status holds the value of the "status" field.
 	Status trailactionrun.Status `json:"status,omitempty"`
 	// LeaseToken holds the value of the "lease_token" field.
@@ -40,9 +41,9 @@ type TrailActionRun struct {
 	// LeaseExpiresAt holds the value of the "lease_expires_at" field.
 	LeaseExpiresAt *time.Time `json:"lease_expires_at,omitempty"`
 	// Output holds the value of the "output" field.
-	Output json.RawMessage `json:"output,omitempty"`
+	Output jsontext.Value `json:"output,omitempty"`
 	// Target holds the value of the "target" field.
-	Target json.RawMessage `json:"target,omitempty"`
+	Target jsontext.Value `json:"target,omitempty"`
 	// ErrorText holds the value of the "error_text" field.
 	ErrorText *string `json:"error_text,omitempty"`
 	// StartedAt holds the value of the "started_at" field.

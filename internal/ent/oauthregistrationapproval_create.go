@@ -4,7 +4,7 @@ package ent
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"errors"
 	"fmt"
 	"time"
@@ -59,7 +59,7 @@ func (_c *OAuthRegistrationApprovalCreate) SetVerificationCodeDisplay(v string) 
 }
 
 // SetMetadata sets the "metadata" field.
-func (_c *OAuthRegistrationApprovalCreate) SetMetadata(v json.RawMessage) *OAuthRegistrationApprovalCreate {
+func (_c *OAuthRegistrationApprovalCreate) SetMetadata(v jsontext.Value) *OAuthRegistrationApprovalCreate {
 	_c.mutation.SetMetadata(v)
 	return _c
 }

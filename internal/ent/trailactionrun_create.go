@@ -4,7 +4,7 @@ package ent
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"errors"
 	"fmt"
 	"time"
@@ -74,7 +74,7 @@ func (_c *TrailActionRunCreate) SetKind(v string) *TrailActionRunCreate {
 }
 
 // SetConfig sets the "config" field.
-func (_c *TrailActionRunCreate) SetConfig(v json.RawMessage) *TrailActionRunCreate {
+func (_c *TrailActionRunCreate) SetConfig(v jsontext.Value) *TrailActionRunCreate {
 	_c.mutation.SetConfig(v)
 	return _c
 }
@@ -114,13 +114,13 @@ func (_c *TrailActionRunCreate) SetNillableLeaseExpiresAt(v *time.Time) *TrailAc
 }
 
 // SetOutput sets the "output" field.
-func (_c *TrailActionRunCreate) SetOutput(v json.RawMessage) *TrailActionRunCreate {
+func (_c *TrailActionRunCreate) SetOutput(v jsontext.Value) *TrailActionRunCreate {
 	_c.mutation.SetOutput(v)
 	return _c
 }
 
 // SetTarget sets the "target" field.
-func (_c *TrailActionRunCreate) SetTarget(v json.RawMessage) *TrailActionRunCreate {
+func (_c *TrailActionRunCreate) SetTarget(v jsontext.Value) *TrailActionRunCreate {
 	_c.mutation.SetTarget(v)
 	return _c
 }
@@ -528,7 +528,7 @@ func (u *TrailActionRunUpsert) ClearLeaseExpiresAt() *TrailActionRunUpsert {
 }
 
 // SetOutput sets the "output" field.
-func (u *TrailActionRunUpsert) SetOutput(v json.RawMessage) *TrailActionRunUpsert {
+func (u *TrailActionRunUpsert) SetOutput(v jsontext.Value) *TrailActionRunUpsert {
 	u.Set(trailactionrun.FieldOutput, v)
 	return u
 }
@@ -546,7 +546,7 @@ func (u *TrailActionRunUpsert) ClearOutput() *TrailActionRunUpsert {
 }
 
 // SetTarget sets the "target" field.
-func (u *TrailActionRunUpsert) SetTarget(v json.RawMessage) *TrailActionRunUpsert {
+func (u *TrailActionRunUpsert) SetTarget(v jsontext.Value) *TrailActionRunUpsert {
 	u.Set(trailactionrun.FieldTarget, v)
 	return u
 }
@@ -769,7 +769,7 @@ func (u *TrailActionRunUpsertOne) ClearLeaseExpiresAt() *TrailActionRunUpsertOne
 }
 
 // SetOutput sets the "output" field.
-func (u *TrailActionRunUpsertOne) SetOutput(v json.RawMessage) *TrailActionRunUpsertOne {
+func (u *TrailActionRunUpsertOne) SetOutput(v jsontext.Value) *TrailActionRunUpsertOne {
 	return u.Update(func(s *TrailActionRunUpsert) {
 		s.SetOutput(v)
 	})
@@ -790,7 +790,7 @@ func (u *TrailActionRunUpsertOne) ClearOutput() *TrailActionRunUpsertOne {
 }
 
 // SetTarget sets the "target" field.
-func (u *TrailActionRunUpsertOne) SetTarget(v json.RawMessage) *TrailActionRunUpsertOne {
+func (u *TrailActionRunUpsertOne) SetTarget(v jsontext.Value) *TrailActionRunUpsertOne {
 	return u.Update(func(s *TrailActionRunUpsert) {
 		s.SetTarget(v)
 	})
@@ -1195,7 +1195,7 @@ func (u *TrailActionRunUpsertBulk) ClearLeaseExpiresAt() *TrailActionRunUpsertBu
 }
 
 // SetOutput sets the "output" field.
-func (u *TrailActionRunUpsertBulk) SetOutput(v json.RawMessage) *TrailActionRunUpsertBulk {
+func (u *TrailActionRunUpsertBulk) SetOutput(v jsontext.Value) *TrailActionRunUpsertBulk {
 	return u.Update(func(s *TrailActionRunUpsert) {
 		s.SetOutput(v)
 	})
@@ -1216,7 +1216,7 @@ func (u *TrailActionRunUpsertBulk) ClearOutput() *TrailActionRunUpsertBulk {
 }
 
 // SetTarget sets the "target" field.
-func (u *TrailActionRunUpsertBulk) SetTarget(v json.RawMessage) *TrailActionRunUpsertBulk {
+func (u *TrailActionRunUpsertBulk) SetTarget(v jsontext.Value) *TrailActionRunUpsertBulk {
 	return u.Update(func(s *TrailActionRunUpsert) {
 		s.SetTarget(v)
 	})

@@ -4,7 +4,7 @@ package ent
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"errors"
 	"fmt"
 	"time"
@@ -82,7 +82,7 @@ func (_c *TrailActionCreate) SetNillablePosition(v *int) *TrailActionCreate {
 }
 
 // SetConfig sets the "config" field.
-func (_c *TrailActionCreate) SetConfig(v json.RawMessage) *TrailActionCreate {
+func (_c *TrailActionCreate) SetConfig(v jsontext.Value) *TrailActionCreate {
 	_c.mutation.SetConfig(v)
 	return _c
 }
@@ -416,7 +416,7 @@ func (u *TrailActionUpsert) AddPosition(v int) *TrailActionUpsert {
 }
 
 // SetConfig sets the "config" field.
-func (u *TrailActionUpsert) SetConfig(v json.RawMessage) *TrailActionUpsert {
+func (u *TrailActionUpsert) SetConfig(v jsontext.Value) *TrailActionUpsert {
 	u.Set(trailaction.FieldConfig, v)
 	return u
 }
@@ -560,7 +560,7 @@ func (u *TrailActionUpsertOne) UpdatePosition() *TrailActionUpsertOne {
 }
 
 // SetConfig sets the "config" field.
-func (u *TrailActionUpsertOne) SetConfig(v json.RawMessage) *TrailActionUpsertOne {
+func (u *TrailActionUpsertOne) SetConfig(v jsontext.Value) *TrailActionUpsertOne {
 	return u.Update(func(s *TrailActionUpsert) {
 		s.SetConfig(v)
 	})
@@ -876,7 +876,7 @@ func (u *TrailActionUpsertBulk) UpdatePosition() *TrailActionUpsertBulk {
 }
 
 // SetConfig sets the "config" field.
-func (u *TrailActionUpsertBulk) SetConfig(v json.RawMessage) *TrailActionUpsertBulk {
+func (u *TrailActionUpsertBulk) SetConfig(v jsontext.Value) *TrailActionUpsertBulk {
 	return u.Update(func(s *TrailActionUpsert) {
 		s.SetConfig(v)
 	})

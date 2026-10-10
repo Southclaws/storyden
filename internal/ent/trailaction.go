@@ -4,6 +4,7 @@ package ent
 
 import (
 	"encoding/json"
+	"encoding/json/jsontext"
 	"fmt"
 	"strings"
 	"time"
@@ -31,7 +32,7 @@ type TrailAction struct {
 	// Position holds the value of the "position" field.
 	Position int `json:"position,omitempty"`
 	// Config holds the value of the "config" field.
-	Config json.RawMessage `json:"config,omitempty"`
+	Config jsontext.Value `json:"config,omitempty"`
 	// ArchivedAt holds the value of the "archived_at" field.
 	ArchivedAt *time.Time `json:"archived_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.

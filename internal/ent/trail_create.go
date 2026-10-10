@@ -4,7 +4,7 @@ package ent
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"errors"
 	"fmt"
 	"time"
@@ -95,7 +95,7 @@ func (_c *TrailCreate) SetTriggerType(v string) *TrailCreate {
 }
 
 // SetTriggerConfig sets the "trigger_config" field.
-func (_c *TrailCreate) SetTriggerConfig(v json.RawMessage) *TrailCreate {
+func (_c *TrailCreate) SetTriggerConfig(v jsontext.Value) *TrailCreate {
 	_c.mutation.SetTriggerConfig(v)
 	return _c
 }
@@ -526,7 +526,7 @@ func (u *TrailUpsert) UpdateTriggerType() *TrailUpsert {
 }
 
 // SetTriggerConfig sets the "trigger_config" field.
-func (u *TrailUpsert) SetTriggerConfig(v json.RawMessage) *TrailUpsert {
+func (u *TrailUpsert) SetTriggerConfig(v jsontext.Value) *TrailUpsert {
 	u.Set(trail.FieldTriggerConfig, v)
 	return u
 }
@@ -709,7 +709,7 @@ func (u *TrailUpsertOne) UpdateTriggerType() *TrailUpsertOne {
 }
 
 // SetTriggerConfig sets the "trigger_config" field.
-func (u *TrailUpsertOne) SetTriggerConfig(v json.RawMessage) *TrailUpsertOne {
+func (u *TrailUpsertOne) SetTriggerConfig(v jsontext.Value) *TrailUpsertOne {
 	return u.Update(func(s *TrailUpsert) {
 		s.SetTriggerConfig(v)
 	})
@@ -1067,7 +1067,7 @@ func (u *TrailUpsertBulk) UpdateTriggerType() *TrailUpsertBulk {
 }
 
 // SetTriggerConfig sets the "trigger_config" field.
-func (u *TrailUpsertBulk) SetTriggerConfig(v json.RawMessage) *TrailUpsertBulk {
+func (u *TrailUpsertBulk) SetTriggerConfig(v jsontext.Value) *TrailUpsertBulk {
 	return u.Update(func(s *TrailUpsert) {
 		s.SetTriggerConfig(v)
 	})

@@ -33,13 +33,13 @@ func TestNodeDraftList(t *testing.T) {
 
 			// Create two regular users
 			handle1 := xid.New().String()
-			acc1, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{handle1, "password"})
+			acc1, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{Identifier: handle1, Token: "password"})
 			tests.Ok(t, err, acc1)
 			user1ID := account.AccountID(utils.Must(xid.FromString(acc1.JSON200.Id)))
 			session1 := sh.WithSession(e2e.WithAccountID(root, user1ID))
 
 			handle2 := xid.New().String()
-			acc2, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{handle2, "password"})
+			acc2, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{Identifier: handle2, Token: "password"})
 			tests.Ok(t, err, acc2)
 			user2ID := account.AccountID(utils.Must(xid.FromString(acc2.JSON200.Id)))
 			_ = user2ID // May be used in future tests

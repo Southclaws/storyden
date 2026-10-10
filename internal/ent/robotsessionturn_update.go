@@ -4,7 +4,7 @@ package ent
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"errors"
 	"fmt"
 	"time"
@@ -104,13 +104,13 @@ func (_u *RobotSessionTurnUpdate) SetNillableRobotRef(v *string) *RobotSessionTu
 }
 
 // SetInputData sets the "input_data" field.
-func (_u *RobotSessionTurnUpdate) SetInputData(v json.RawMessage) *RobotSessionTurnUpdate {
+func (_u *RobotSessionTurnUpdate) SetInputData(v jsontext.Value) *RobotSessionTurnUpdate {
 	_u.mutation.SetInputData(v)
 	return _u
 }
 
 // AppendInputData appends value to the "input_data" field.
-func (_u *RobotSessionTurnUpdate) AppendInputData(v json.RawMessage) *RobotSessionTurnUpdate {
+func (_u *RobotSessionTurnUpdate) AppendInputData(v jsontext.Value) *RobotSessionTurnUpdate {
 	_u.mutation.AppendInputData(v)
 	return _u
 }
@@ -626,13 +626,13 @@ func (_u *RobotSessionTurnUpdateOne) SetNillableRobotRef(v *string) *RobotSessio
 }
 
 // SetInputData sets the "input_data" field.
-func (_u *RobotSessionTurnUpdateOne) SetInputData(v json.RawMessage) *RobotSessionTurnUpdateOne {
+func (_u *RobotSessionTurnUpdateOne) SetInputData(v jsontext.Value) *RobotSessionTurnUpdateOne {
 	_u.mutation.SetInputData(v)
 	return _u
 }
 
 // AppendInputData appends value to the "input_data" field.
-func (_u *RobotSessionTurnUpdateOne) AppendInputData(v json.RawMessage) *RobotSessionTurnUpdateOne {
+func (_u *RobotSessionTurnUpdateOne) AppendInputData(v jsontext.Value) *RobotSessionTurnUpdateOne {
 	_u.mutation.AppendInputData(v)
 	return _u
 }

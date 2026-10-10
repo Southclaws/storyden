@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/getsentry/sentry-go"
 	sentryotel "github.com/getsentry/sentry-go/otel"
+	sentryotlp "github.com/getsentry/sentry-go/otel/otlp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
@@ -86,16 +87,21 @@ func newExporter(ctx context.Context,
 			Dsn:              cfg.SentryDSN,
 			EnableTracing:    true,
 			TracesSampleRate: 1.0,
+			Integrations: func(integrations []sentry.Integration) []sentry.Integration {
+				return append(integrations, sentryotel.NewOtelIntegration())
+			},
 		})
 		if err != nil {
 			return nil, err
 		}
 
-		spanProc := sentryotel.NewSentrySpanProcessor()
+		exporter, err := sentryotlp.NewTraceExporter(ctx, cfg.SentryDSN)
+		if err != nil {
+			return nil, fault.Wrap(err, fmsg.With("failed to create Sentry trace exporter"))
+		}
 
-		// for some reason, sentry is a "span processor" not a "span exporter".
 		return []trace.TracerProviderOption{
-			trace.WithSpanProcessor(spanProc),
+			trace.WithBatcher(exporter),
 		}, nil
 
 	case "otlp":

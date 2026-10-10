@@ -4,6 +4,7 @@ package ent
 
 import (
 	"encoding/json"
+	"encoding/json/jsontext"
 	"fmt"
 	"strings"
 	"time"
@@ -35,7 +36,7 @@ type Trail struct {
 	// TriggerType holds the value of the "trigger_type" field.
 	TriggerType string `json:"trigger_type,omitempty"`
 	// TriggerConfig holds the value of the "trigger_config" field.
-	TriggerConfig json.RawMessage `json:"trigger_config,omitempty"`
+	TriggerConfig jsontext.Value `json:"trigger_config,omitempty"`
 	// NextOccurrenceAt holds the value of the "next_occurrence_at" field.
 	NextOccurrenceAt *time.Time `json:"next_occurrence_at,omitempty"`
 	// LastOccurrenceAt holds the value of the "last_occurrence_at" field.

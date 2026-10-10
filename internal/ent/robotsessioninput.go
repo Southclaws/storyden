@@ -4,6 +4,7 @@ package ent
 
 import (
 	"encoding/json"
+	"encoding/json/jsontext"
 	"fmt"
 	"strings"
 	"time"
@@ -39,7 +40,7 @@ type RobotSessionInput struct {
 	// Inputs with the same key may be claimed by one turn.
 	BatchKey string `json:"batch_key,omitempty"`
 	// InputData holds the value of the "input_data" field.
-	InputData json.RawMessage `json:"input_data,omitempty"`
+	InputData jsontext.Value `json:"input_data,omitempty"`
 	// Earliest time this input may be claimed by a turn.
 	NotBefore *time.Time `json:"not_before,omitempty"`
 	// Status holds the value of the "status" field.

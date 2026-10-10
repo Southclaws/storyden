@@ -4,6 +4,7 @@ package ent
 
 import (
 	"encoding/json"
+	"encoding/json/jsontext"
 	"fmt"
 	"strings"
 	"time"
@@ -32,7 +33,7 @@ type TrailRun struct {
 	// Kind holds the value of the "kind" field.
 	Kind trailrun.Kind `json:"kind,omitempty"`
 	// TriggerPayload holds the value of the "trigger_payload" field.
-	TriggerPayload json.RawMessage `json:"trigger_payload,omitempty"`
+	TriggerPayload jsontext.Value `json:"trigger_payload,omitempty"`
 	// ScheduledFor holds the value of the "scheduled_for" field.
 	ScheduledFor *time.Time `json:"scheduled_for,omitempty"`
 	// Status holds the value of the "status" field.

@@ -4,7 +4,7 @@ package ent
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"errors"
 	"fmt"
 	"time"
@@ -101,7 +101,7 @@ func (_c *RobotSessionInputCreate) SetBatchKey(v string) *RobotSessionInputCreat
 }
 
 // SetInputData sets the "input_data" field.
-func (_c *RobotSessionInputCreate) SetInputData(v json.RawMessage) *RobotSessionInputCreate {
+func (_c *RobotSessionInputCreate) SetInputData(v jsontext.Value) *RobotSessionInputCreate {
 	_c.mutation.SetInputData(v)
 	return _c
 }
@@ -529,7 +529,7 @@ func (u *RobotSessionInputUpsert) UpdateBatchKey() *RobotSessionInputUpsert {
 }
 
 // SetInputData sets the "input_data" field.
-func (u *RobotSessionInputUpsert) SetInputData(v json.RawMessage) *RobotSessionInputUpsert {
+func (u *RobotSessionInputUpsert) SetInputData(v jsontext.Value) *RobotSessionInputUpsert {
 	u.Set(robotsessioninput.FieldInputData, v)
 	return u
 }
@@ -734,7 +734,7 @@ func (u *RobotSessionInputUpsertOne) UpdateBatchKey() *RobotSessionInputUpsertOn
 }
 
 // SetInputData sets the "input_data" field.
-func (u *RobotSessionInputUpsertOne) SetInputData(v json.RawMessage) *RobotSessionInputUpsertOne {
+func (u *RobotSessionInputUpsertOne) SetInputData(v jsontext.Value) *RobotSessionInputUpsertOne {
 	return u.Update(func(s *RobotSessionInputUpsert) {
 		s.SetInputData(v)
 	})
@@ -1113,7 +1113,7 @@ func (u *RobotSessionInputUpsertBulk) UpdateBatchKey() *RobotSessionInputUpsertB
 }
 
 // SetInputData sets the "input_data" field.
-func (u *RobotSessionInputUpsertBulk) SetInputData(v json.RawMessage) *RobotSessionInputUpsertBulk {
+func (u *RobotSessionInputUpsertBulk) SetInputData(v jsontext.Value) *RobotSessionInputUpsertBulk {
 	return u.Update(func(s *RobotSessionInputUpsert) {
 		s.SetInputData(v)
 	})

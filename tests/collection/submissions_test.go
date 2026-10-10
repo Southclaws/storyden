@@ -34,15 +34,15 @@ func TestCollectionSubmissions(t *testing.T) {
 			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			adminSession := sh.WithSession(adminCtx)
 
-			acc1, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{xid.New().String(), "password"})
+			acc1, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{Identifier: xid.New().String(), Token: "password"})
 			tests.Ok(t, err, acc1)
 			session1 := sh.WithSession(e2e.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc1.JSON200.Id)))))
 
-			acc2, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{xid.New().String(), "password"})
+			acc2, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{Identifier: xid.New().String(), Token: "password"})
 			tests.Ok(t, err, acc2)
 			session2 := sh.WithSession(e2e.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc2.JSON200.Id)))))
 
-			acc3, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{xid.New().String(), "password"})
+			acc3, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{Identifier: xid.New().String(), Token: "password"})
 			tests.Ok(t, err, acc3)
 			session3 := sh.WithSession(e2e.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc3.JSON200.Id)))))
 

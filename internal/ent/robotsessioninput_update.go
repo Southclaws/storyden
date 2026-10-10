@@ -4,7 +4,7 @@ package ent
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"errors"
 	"fmt"
 	"time"
@@ -139,13 +139,13 @@ func (_u *RobotSessionInputUpdate) SetNillableBatchKey(v *string) *RobotSessionI
 }
 
 // SetInputData sets the "input_data" field.
-func (_u *RobotSessionInputUpdate) SetInputData(v json.RawMessage) *RobotSessionInputUpdate {
+func (_u *RobotSessionInputUpdate) SetInputData(v jsontext.Value) *RobotSessionInputUpdate {
 	_u.mutation.SetInputData(v)
 	return _u
 }
 
 // AppendInputData appends value to the "input_data" field.
-func (_u *RobotSessionInputUpdate) AppendInputData(v json.RawMessage) *RobotSessionInputUpdate {
+func (_u *RobotSessionInputUpdate) AppendInputData(v jsontext.Value) *RobotSessionInputUpdate {
 	_u.mutation.AppendInputData(v)
 	return _u
 }
@@ -537,13 +537,13 @@ func (_u *RobotSessionInputUpdateOne) SetNillableBatchKey(v *string) *RobotSessi
 }
 
 // SetInputData sets the "input_data" field.
-func (_u *RobotSessionInputUpdateOne) SetInputData(v json.RawMessage) *RobotSessionInputUpdateOne {
+func (_u *RobotSessionInputUpdateOne) SetInputData(v jsontext.Value) *RobotSessionInputUpdateOne {
 	_u.mutation.SetInputData(v)
 	return _u
 }
 
 // AppendInputData appends value to the "input_data" field.
-func (_u *RobotSessionInputUpdateOne) AppendInputData(v json.RawMessage) *RobotSessionInputUpdateOne {
+func (_u *RobotSessionInputUpdateOne) AppendInputData(v jsontext.Value) *RobotSessionInputUpdateOne {
 	_u.mutation.AppendInputData(v)
 	return _u
 }

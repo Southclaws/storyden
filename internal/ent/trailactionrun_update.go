@@ -4,7 +4,7 @@ package ent
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"errors"
 	"fmt"
 	"time"
@@ -92,13 +92,13 @@ func (_u *TrailActionRunUpdate) ClearLeaseExpiresAt() *TrailActionRunUpdate {
 }
 
 // SetOutput sets the "output" field.
-func (_u *TrailActionRunUpdate) SetOutput(v json.RawMessage) *TrailActionRunUpdate {
+func (_u *TrailActionRunUpdate) SetOutput(v jsontext.Value) *TrailActionRunUpdate {
 	_u.mutation.SetOutput(v)
 	return _u
 }
 
 // AppendOutput appends value to the "output" field.
-func (_u *TrailActionRunUpdate) AppendOutput(v json.RawMessage) *TrailActionRunUpdate {
+func (_u *TrailActionRunUpdate) AppendOutput(v jsontext.Value) *TrailActionRunUpdate {
 	_u.mutation.AppendOutput(v)
 	return _u
 }
@@ -110,13 +110,13 @@ func (_u *TrailActionRunUpdate) ClearOutput() *TrailActionRunUpdate {
 }
 
 // SetTarget sets the "target" field.
-func (_u *TrailActionRunUpdate) SetTarget(v json.RawMessage) *TrailActionRunUpdate {
+func (_u *TrailActionRunUpdate) SetTarget(v jsontext.Value) *TrailActionRunUpdate {
 	_u.mutation.SetTarget(v)
 	return _u
 }
 
 // AppendTarget appends value to the "target" field.
-func (_u *TrailActionRunUpdate) AppendTarget(v json.RawMessage) *TrailActionRunUpdate {
+func (_u *TrailActionRunUpdate) AppendTarget(v jsontext.Value) *TrailActionRunUpdate {
 	_u.mutation.AppendTarget(v)
 	return _u
 }
@@ -429,13 +429,13 @@ func (_u *TrailActionRunUpdateOne) ClearLeaseExpiresAt() *TrailActionRunUpdateOn
 }
 
 // SetOutput sets the "output" field.
-func (_u *TrailActionRunUpdateOne) SetOutput(v json.RawMessage) *TrailActionRunUpdateOne {
+func (_u *TrailActionRunUpdateOne) SetOutput(v jsontext.Value) *TrailActionRunUpdateOne {
 	_u.mutation.SetOutput(v)
 	return _u
 }
 
 // AppendOutput appends value to the "output" field.
-func (_u *TrailActionRunUpdateOne) AppendOutput(v json.RawMessage) *TrailActionRunUpdateOne {
+func (_u *TrailActionRunUpdateOne) AppendOutput(v jsontext.Value) *TrailActionRunUpdateOne {
 	_u.mutation.AppendOutput(v)
 	return _u
 }
@@ -447,13 +447,13 @@ func (_u *TrailActionRunUpdateOne) ClearOutput() *TrailActionRunUpdateOne {
 }
 
 // SetTarget sets the "target" field.
-func (_u *TrailActionRunUpdateOne) SetTarget(v json.RawMessage) *TrailActionRunUpdateOne {
+func (_u *TrailActionRunUpdateOne) SetTarget(v jsontext.Value) *TrailActionRunUpdateOne {
 	_u.mutation.SetTarget(v)
 	return _u
 }
 
 // AppendTarget appends value to the "target" field.
-func (_u *TrailActionRunUpdateOne) AppendTarget(v json.RawMessage) *TrailActionRunUpdateOne {
+func (_u *TrailActionRunUpdateOne) AppendTarget(v jsontext.Value) *TrailActionRunUpdateOne {
 	_u.mutation.AppendTarget(v)
 	return _u
 }
