@@ -90,7 +90,6 @@ require (
 	github.com/pb33f/libopenapi v0.41.5
 	github.com/philippgille/chromem-go v0.7.0
 	github.com/pinecone-io/go-pinecone/v4 v4.1.4
-	github.com/pkg/errors v0.9.1
 	github.com/puzpuzpuz/xsync/v4 v4.5.0
 	github.com/redis/rueidis v1.0.78
 	github.com/rs/cors v1.11.1
@@ -276,6 +275,7 @@ require (
 	github.com/pb33f/jsonpath v0.8.4 // indirect
 	github.com/pb33f/ordered-map/v2 v2.3.2 // indirect
 	github.com/philhofer/fwd v1.2.0 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/power-devops/perfstat v0.0.0-20260916203055-22a1a467d9f0 // indirect
 	github.com/prometheus/client_golang v1.25.0 // indirect
 	github.com/prometheus/client_model v0.6.3 // indirect

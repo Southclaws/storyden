@@ -3,12 +3,12 @@ package reaction_repo
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
-	"github.com/pkg/errors"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
