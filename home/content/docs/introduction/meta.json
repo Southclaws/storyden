@@ -28,6 +28,7 @@
     "trails",
     "---Extending---",
     "mcp",
+    "cli",
     "api",
     "oauth",
     "plugins",

@@ -1,78 +1,69 @@
 ---
 title: MCP (Model Context Protocol)
-description: Storyden comes with an MCP server built in! The only limit is your imagination! (and your AI usage credits...)
+description: Your favourite assistant, meet your community.
 ---
 
 For Storyden's built-in assistants, see [Robots](/docs/introduction/robots). To connect an external MCP server to those assistants, see [Connecting an MCP server](/docs/introduction/robots/connections#connecting-an-mcp-server). This page covers connecting an external assistant to Storyden's own MCP server.
 
-<Callout type="warn">
-  Storyden's built-in MCP server is a work in progress, experiment with care.
-  But have fun!
-</Callout>
+Storyden's MCP server lets an external assistant work with your community's content using your account's permissions. This guide walks through connecting a client and checking that it can read published Library pages.
 
-The Storyden MCP server provides a set of tools for agents to create, edit and organise content. Storyden currently uses the [Server Side Events transport aka Streamable HTTP](https://modelcontextprotocol.io/docs/concepts/transports#streamable-http). This may change with time as MCP is currently a quickly changing specification.
+## Before you connect
 
-You can enable the MCP server by setting the `MCP_ENABLED` environment variable to `true` and restarting the server process. [More information here](/docs/operation/configuration#mcp_enabled).
+The MCP server is optional and disabled by default. If you operate the community, set [`MCP_ENABLED=true`](/docs/reference/configuration#mcp_enabled) in the backend's environment and restart the backend. If someone else runs it, ask them whether MCP is enabled and which connection URL to use.
 
-Once enabled, your server will mount a new HTTP route at `/mcp` including an SSE endpoint at `/mcp/sse`.
+You need an MCP client that supports remote servers over **Streamable HTTP** and either bearer-token authentication or Storyden's OAuth flow.
 
-<Callout type="info">
-  MCP exists outside of the Storyden API specification and thus is not covered
-  by the specification contract. This is partly because OpenAPI is not a great
-  language for describing JSON-RPC streaming APIs and also because the actual
-  tools, resources and prompts exposed by MCP servers do not really need to be
-  stable and covered by any API guarantees as their intended consumers (language
-  model agents) discover and execute tools on an ad-hoc basis. This may change
-  if MCP clients start to introduce cachine and some form of schema validation.
-  Until then, Storyden's MCP will remain as a *sibling* route to `/api` and not
-  a *child* route.
-</Callout>
+For the access-key walkthrough below, you need the following [permissions](/docs/introduction/members/permissions):
 
-## Tools
+- **Use personal access keys** to create and use an access key.
+- **Read published library pages** to try the read-only request.
 
-Below is a list of the tools provided by Storyden's MCP server. This list may fall out of date as we develop and experiment with new tools.
+## Connect your client
 
-In the future, when the MCP implementation settles, we will move this to a dedicated tool documentation page generated from the code itself so it's always up to date.
+1. Get the community's MCP URL from its operator. If MCP is enabled, the community's `/llms.txt` also links to a **MCP Server Card** containing the advertised endpoint.
+2. In Storyden, open your account settings, choose **Access Keys**, and create a key for this client. Copy the secret when it appears; it is only shown once. See [Access Keys](/docs/reference/access-keys) for the full walkthrough.
+3. In your client's MCP settings, add a remote server with the connection details below. Field names vary between clients.
+4. Save the connection and let the client load the server's tools.
 
-| Tool                 | Description                                                                                        |
-| -------------------- | -------------------------------------------------------------------------------------------------- |
-| `createLibraryPage`  | Create a new page in the library                                                                   |
-| `createLink`         | Create or update a link in the shared bookmarks list and return its OpenGraph metadata             |
-| `createThread`       | Create a new discussion thread in the forum                                                        |
-| `getLibraryPage`     | Get a specific page from the library                                                               |
-| `getLibraryPageTree` | Get the full tree of pages in the library                                                          |
-| `getThread`          | Get a specific thread with its posts and replies                                                   |
-| `listCategories`     | List all thread categories with their names and descriptions                                       |
-| `listTags`           | Get a list of all tags on the site or search for tags by name using the optional 'query' argument. |
-| `listThreads`        | List and search discussion threads                                                                 |
-| `replyToThread`      | Add a reply to an existing thread                                                                  |
-| `searchLibraryPages` | Search for pages in the library.                                                                   |
-| `updateLibraryPage`  | Update an existing page in the library                                                             |
-| `updateThread`       | Update an existing thread                                                                          |
+| Setting        | Value                                                                        |
+| -------------- | ---------------------------------------------------------------------------- |
+| Server URL     | The advertised MCP endpoint, for example `https://api.community.example/mcp` |
+| Transport      | Streamable HTTP                                                              |
+| Authentication | Bearer token                                                                 |
+| Token          | Your access key secret                                                       |
 
-## Authentication
+If your client accepts custom HTTP headers instead of a token field, set `Authorization` to `Bearer YOUR_ACCESS_KEY`, replacing `YOUR_ACCESS_KEY` with the secret. Keep it in the client's credential settings rather than a conversation or shared configuration file.
 
-The Storyden MCP server requires authentication for any request. Requests require an `Authorization` header with an [Access Key](/docs/operation/access-keys) as a bearer token. See the Access Keys documentation for more information.
+The endpoint is the **public API origin** followed by `/mcp`. The API may be on a different domain from the community's website, so use the advertised URL rather than adding `/mcp` to the address in your browser.
 
-Once you have created an access key, you can use it in your favourite MCP client (Raycast, Claude, n8n, etc.) as a bearer token for the agent to make requests to Storyden.
+### Connecting with OAuth
 
-All tool calls are performed against the same permissions as the account that created the access key. If you don't have permission to edit library pages, your agent won't either.
+If the operator has enabled Storyden's OAuth server and your client supports its [OAuth flows](/docs/introduction/oauth), you can sign in and authorize the client instead of creating an access key. Your account needs the **Authorize OAuth applications** permission. Follow your client's sign-in flow and review the application before authorizing it.
 
-## Use cases
+OAuth client registration and autonomous bot registration are controlled separately by the operator; neither is implied by MCP being enabled. See [client registration](/docs/introduction/oauth/client-registration) if your client cannot register.
 
-MCP is a powerful connector that can almost seamlessly allow agents to interact with third party systems and even integrate them together.
+## Check the connection
 
-During development of the MCP server, we experimented with n8n.io and a Discord bot to allow members of our community to archive all the useful links they share in our Discord chat. The agent could:
+Try a small request that does not change any community content:
 
-- Use the `createLink` tool to get more information about a link that was shared
-- Decide if this link would be a good candidate to store in our Storyden instance by using `getLibraryPageTree`, `listTags` and `searchLibraryPages` to get an understanding of the kind of content we like to bookmark for our community.
-- If it determines the link shared has a place in our community bookmark directory, it may use the library page tree to determine which page to create the new page under.
-- Using the `createLibraryPage` with the URL the member shared and the metadata from `createLink`, it created pages in the most relevant places.
+> List up to five published pages from this community's Library, with their titles and links. Do not create or change anything.
 
-This allows our members to share cool stuff in Discord without leaving to open our Storyden site, go through a page creation flow by manually adding the link, writing a description about why they shared this link. It's all done automatically. With some human moderation to balance things out.
+Check that the client calls Storyden's Library listing tool and that the returned links open the expected pages. An empty result is valid if the Library has no published pages. If the assistant answers without calling a tool, ask it to use the connected Storyden server so you can verify the connection.
 
-Directories like this with human curators can really utilise the power of agents to automate the boring parts like organising, tagging and setting up pages.
+If the connection fails, check the advertised URL and that MCP is enabled. An authentication error can indicate an expired or revoked key; a permission error means the account needs permission for that particular action. See [Access Keys](/docs/reference/access-keys) and [Permissions](/docs/introduction/members/permissions).
 
-Other use cases for communities that use the web discussion features exist too, in future you will be able to trigger agent workflows either in n8n or in Storyden's native MRKL agent to moderate content, reply to questions, tag relevant members to help, organise threads and perform other tasks.
+## Permissions and tool access
 
-We're just starting to explore what's possible now. The goal is to provide a rich set of simple composable tools and see what the community does with them!
+An access key carries the member's current permissions. Connecting an assistant does not grant it additional access: Storyden checks permissions when tools execute. Use an account with the permissions needed for the task and review tool calls that write or moderate content.
+
+The tool list describes the server's exported tools and is shared across authenticated clients. Seeing a tool in your client does **not** mean your account can use it. For example, an account that can read the Library may still be unable to create or edit pages.
+
+## Discovery for integrations
+
+Clients that discover endpoints automatically can start at the community's web origin and read `/.well-known/ai-catalog.json`. When MCP is enabled, its `entries` include a URL for the [MCP Server Card](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/seps/2127-mcp-server-cards.md). The card describes the server and its Streamable HTTP endpoint. The community's `/llms.txt` links to the same discovery documents. An empty `entries` list means this instance does not advertise MCP.
+
+For example, a deployment with `https://community.example` as its web origin and `https://api.community.example` as its API origin publishes the catalog at `https://community.example/.well-known/ai-catalog.json`; the card may point to `https://api.community.example/mcp`.
+
+The Server Card intentionally does **not** list tools. After connecting, clients use MCP's `tools/list` operation to discover exported tool names and schemas. These can change between server versions, so integrations should use the instance's response rather than a hard-coded list. Authorization is checked separately when a tool is called.
+
+For scripts that call the REST API directly, see the [API guide](/docs/api) and [Storyden CLI](/docs/introduction/cli).
