@@ -30,6 +30,16 @@ var DefaultSettings = Settings{
 	AuthenticationMode: opt.New(authentication.ModeHandle),
 	RegistrationMode:   opt.New(RegistrationModePublic),
 	Services: opt.New(ServiceSettings{
+		Discovery: opt.New(DiscoveryServiceSettings{
+			SearchIndexing:   opt.New(true),
+			TrainingCrawling: opt.New(false),
+			LLMSTxt:          opt.New(false),
+			AuthMD:           opt.New(false),
+			AICatalog:        opt.New(false),
+			APICatalog:       opt.New(false),
+			MCPServerCard:    opt.New(false),
+			RobotsTxt:        opt.New(""),
+		}),
 		Moderation: opt.New(ModerationServiceSettings{
 			ThreadBodyLengthMax: opt.New(60000),
 			ReplyBodyLengthMax:  opt.New(10000),

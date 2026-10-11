@@ -8,6 +8,7 @@
  * OpenAPI spec version: v1.26.15-post
  */
 import type { ClientIPServiceSettings } from "./clientIPServiceSettings";
+import type { DiscoveryServiceSettings } from "./discoveryServiceSettings";
 import type { ModerationServiceSettings } from "./moderationServiceSettings";
 import type { OAuthServiceSettings } from "./oAuthServiceSettings";
 import type { RateLimitServiceSettings } from "./rateLimitServiceSettings";
@@ -17,6 +18,7 @@ export interface AdminSettingsServiceProps {
   oauth?: OAuthServiceSettings;
   client_ip?: ClientIPServiceSettings;
   rate_limiting?: RateLimitServiceSettings;
+  discovery?: DiscoveryServiceSettings;
   moderation?: ModerationServiceSettings;
   robots?: RobotServiceSettings;
 }

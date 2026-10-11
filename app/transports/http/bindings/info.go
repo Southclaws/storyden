@@ -145,6 +145,7 @@ func serialiseInfo(info *instance_info.Info) openapi.Info {
 		OnboardingStatus:   openapi.OnboardingStatus(info.OnboardingStatus.String()),
 		AuthenticationMode: openapi.AuthMode(info.Settings.AuthenticationMode.Or(authentication.ModeHandle).String()),
 		RegistrationMode:   openapi.RegistrationMode(info.Settings.RegistrationMode.Or(settings.RegistrationModePublic).String()),
+		Discovery:          opt.Map(info.Settings.Services.OrZero().Discovery, serialiseDiscoveryServiceSettings).Ptr(),
 		Capabilities:       serialiseCapabilitiesList(info.Capabilities),
 		WebAddress:         info.WebAddress.String(),
 		ApiAddress:         info.APIAddress.String(),

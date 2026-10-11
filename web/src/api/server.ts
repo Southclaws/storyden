@@ -9,7 +9,7 @@ const SSR_NETWORK_HEADER_NAMES = ["x-forwarded-for"] as const;
 
 export const fetcher = async <T>(
   url: string,
-  { method, ...opts }: Options,
+  { method, anonymous = false, ...opts }: Options & { anonymous?: boolean },
 ): Promise<T> => {
   const { headers: requestHeaders, ...requestInit } = opts;
   const headers = Object.fromEntries(new Headers(requestHeaders).entries());
@@ -37,8 +37,13 @@ export const fetcher = async <T>(
     ...requestInit,
   });
 
-  req.headers.set("Cookie", await getCookieHeader());
-  await applyForwardedClientHeaders(req.headers);
+  if (anonymous) {
+    req.headers.delete("Cookie");
+    req.headers.delete("Authorization");
+  } else {
+    req.headers.set("Cookie", await getCookieHeader());
+    await applyForwardedClientHeaders(req.headers);
+  }
 
   const response = await fetch(req);
 

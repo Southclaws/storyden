@@ -120,8 +120,6 @@ from
 -- optional where clause
 %s
 
-order by
-    depth, node_sort_key
 `
 
 type subtreeRow struct {
@@ -133,6 +131,11 @@ type subtreeRow struct {
 }
 
 func buildSubtreeQuery(id opt.Optional[library.NodeID], f filters, rebind func(string) string) (string, []interface{}) {
+	query, args := buildSubtreeSelection(id, f)
+	return rebind(query + "\norder by depth, node_sort_key"), args
+}
+
+func buildSubtreeSelection(id opt.Optional[library.NodeID], f filters) (string, []interface{}) {
 	var rootPredicate string
 	predicates := []string{}
 	args := []interface{}{}
@@ -164,7 +167,7 @@ func buildSubtreeQuery(id opt.Optional[library.NodeID], f filters, rebind func(s
 		additional = "where " + strings.Join(predicates, " AND ")
 	}
 
-	return rebind(fmt.Sprintf(ddl, rootPredicate, includeHiddenChildren, additional)), args
+	return fmt.Sprintf(ddl, rootPredicate, includeHiddenChildren, additional), args
 }
 
 func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID], flatten bool, fs ...Filter) ([]*library.Node, error) {
@@ -193,8 +196,28 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID],
 
 	filtered := dt.Filter(allRows, applyFilterRules(f))
 
-	// Now query every row returned from the recursive query hydrating all data.
 	ids := dt.Map(filtered, func(n subtreeRow) xid.ID { return n.NodeId })
+	flat, err := d.hydrateNodes(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	// Early valid return: if we're flattening the tree, no need to build it.
+	if flatten {
+		return flat, nil
+	}
+
+	// Rebuild the flat list into the tree
+	tree := buildTree(flat, id)
+
+	return tree, nil
+}
+
+func (d *database) hydrateNodes(ctx context.Context, ids []xid.ID) ([]*library.Node, error) {
+	if len(ids) == 0 {
+		return []*library.Node{}, nil
+	}
+
 	nodeRecords, err := d.db.Node.Query().
 		Where(node.IDIn(ids...)).
 		WithOwner().
@@ -223,8 +246,8 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID],
 	}
 
 	hydratedNodeMap := lo.KeyBy(nodeRecords, func(n *ent.Node) xid.ID { return n.ID })
-	flat, err := dt.MapErr(filtered, func(n subtreeRow) (*library.Node, error) {
-		hydratedNode, exists := hydratedNodeMap[n.NodeId]
+	flat, err := dt.MapErr(ids, func(id xid.ID) (*library.Node, error) {
+		hydratedNode, exists := hydratedNodeMap[id]
 		if !exists {
 			panic("recursive query result was not present in hydrated node map")
 		}
@@ -235,15 +258,7 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID],
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to hydrate nodes"))
 	}
 
-	// Early valid return: if we're flattening the tree, no need to build it.
-	if flatten {
-		return flat, nil
-	}
-
-	// Rebuild the flat list into the tree
-	tree := buildTree(flat, id)
-
-	return tree, nil
+	return flat, nil
 }
 
 func buildTree(hydrated []*library.Node, id opt.Optional[library.NodeID]) []*library.Node {

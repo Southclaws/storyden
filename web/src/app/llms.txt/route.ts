@@ -4,15 +4,26 @@ import {
   getInfo,
 } from "@/api/openapi-server/misc";
 import { getAICatalog, mcpCardURL } from "@/lib/discovery/public";
+import { resolveDiscoverySettings } from "@/lib/settings/discovery";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const [{ data: info }, catalog] = await Promise.all([
-      getInfo({ cache: "no-store" }),
-      getAICatalog(),
-    ]);
+    const { data: info } = await getInfo({
+      cache: "no-store",
+    });
+
+    const settings = resolveDiscoverySettings(info.discovery);
+
+    if (!settings.llms_txt) {
+      return new Response("Not found", {
+        status: 404,
+        headers: { "Cache-Control": "no-store" },
+      });
+    }
+
+    const catalog = settings.ai_catalog ? await getAICatalog() : null;
 
     const web = new URL(info.web_address);
     const api = new URL(info.api_address);
@@ -25,14 +36,15 @@ export async function GET() {
     const hasMCP = catalog?.entries.some(
       (entry) => entry.type === "application/mcp-server-card+json"
     );
+
     let mcpSection = "";
 
-    if (catalog === null) {
+    if (settings.ai_catalog && catalog === null) {
       mcpSection = `## MCP
 
 MCP discovery: unavailable from this instance.
 `;
-    } else if (hasMCP) {
+    } else if (hasMCP && settings.mcp_server_card) {
       const aiCatalog = new URL("/.well-known/ai-catalog.json", web);
       const card = mcpCardURL(catalog);
 
@@ -50,32 +62,39 @@ MCP discovery: unavailable from this instance.
       }
     }
 
+    const links = [
+      `- [Community](${web.href}):
+  Read public discussions and pages in the web interface.`,
+    ];
+
+    if (settings.auth_md) {
+      links.push(`- [Authentication guide](${authGuide}):
+  Choose member access keys or available OAuth flows.`);
+    }
+
+    if (settings.api_catalog) {
+      links.push(`- [API catalog](${apiCatalog}):
+  Find this instance's API services.`);
+    }
+
+    links.push(
+      `- [OpenAPI specification](${openAPI}):
+  Generate a client or inspect request and response schemas.`,
+      `- [API documentation](${apiDocs}):
+  Explore endpoints interactively.`,
+      `- [Storyden CLI](https://www.storyden.org/docs/introduction/cli):
+  Install and use \`sd\` for command line based access.`,
+      `- [OAuth and client registration](https://www.storyden.org/docs/introduction/oauth/client-registration):
+  Learn operator-controlled authorization options.`
+    );
+
     const body = `# ${info.title}
 
 > ${info.description}
 
 ## Explore and integrate
 
-- [Community](${web.href}):
-  Read public discussions and pages in the web interface.
-
-- [Authentication guide](${authGuide}):
-  Choose member access keys or available OAuth flows.
-
-- [API catalog](${apiCatalog}):
-  Find this instance's API services.
-
-- [OpenAPI specification](${openAPI}):
-  Generate a client or inspect request and response schemas.
-
-- [API documentation](${apiDocs}):
-  Explore endpoints interactively.
-
-- [Storyden CLI](https://www.storyden.org/docs/introduction/cli):
-  Install and use \`sd\` for command line based access.
-
-- [OAuth and client registration](https://www.storyden.org/docs/introduction/oauth/client-registration):
-  Learn operator-controlled authorization options.
+${links.join("\n\n")}
 
 ${mcpSection}`;
 

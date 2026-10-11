@@ -27,9 +27,18 @@ export async function getAICatalog(): Promise<AICatalog | null> {
       new URL("/.well-known/ai-catalog.json", getAPIAddress()),
       { cache: "no-store", signal: AbortSignal.timeout(5000) },
     );
-    if (!response.ok) return null;
+
+    if (!response.ok) {
+      return null;
+    }
+
     const catalog = AICatalogSchema.safeParse(await response.json());
-    return catalog.success ? catalog.data : null;
+
+    if (!catalog.success) {
+      return null;
+    }
+
+    return catalog.data;
   } catch {
     return null;
   }

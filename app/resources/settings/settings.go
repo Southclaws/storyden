@@ -80,6 +80,7 @@ type MessageOfTheDay struct {
 type ServiceSettings struct {
 	ClientIP   opt.Optional[ClientIPServiceSettings]
 	RateLimit  opt.Optional[RateLimitServiceSettings]
+	Discovery  opt.Optional[DiscoveryServiceSettings]
 	Moderation opt.Optional[ModerationServiceSettings]
 	Robots     opt.Optional[RobotServiceSettings]
 	OAuth      opt.Optional[OAuthServiceSettings]
@@ -97,6 +98,17 @@ type RateLimitServiceSettings struct {
 	RateLimitBucket    opt.Optional[time.Duration]
 	RateLimitGuestCost opt.Optional[int]
 	CostOverrides      opt.Optional[map[string]int]
+}
+
+type DiscoveryServiceSettings struct {
+	SearchIndexing   opt.Optional[bool]
+	TrainingCrawling opt.Optional[bool]
+	LLMSTxt          opt.Optional[bool]
+	AuthMD           opt.Optional[bool]
+	AICatalog        opt.Optional[bool]
+	APICatalog       opt.Optional[bool]
+	MCPServerCard    opt.Optional[bool]
+	RobotsTxt        opt.Optional[string]
 }
 
 type ModerationServiceSettings struct {

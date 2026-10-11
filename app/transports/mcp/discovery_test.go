@@ -1,7 +1,10 @@
 package mcp
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -10,11 +13,17 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/Southclaws/opt"
 	sdkmcp "github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/santhosh-tekuri/jsonschema/v6"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/fx"
 
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/integration"
+	"github.com/Southclaws/storyden/internal/integration/e2e"
+	"github.com/Southclaws/storyden/tests"
 )
 
 func discoveryConfig(enabled bool) config.Config {
@@ -39,7 +48,7 @@ func TestDiscoveryDocuments(t *testing.T) {
 		Type:       serverCardMediaType,
 		URL:        "https://api.example.org/mcp/server-card",
 	}}, ai.Entries)
-	require.Equal(t, "https://community.example.org/.well-known/api-catalog", api.Linkset[0].Anchor)
+	require.Equal(t, "https://api.example.org/.well-known/api-catalog", api.Linkset[0].Anchor)
 	require.Equal(t, "https://api.example.org/api", api.Linkset[0].Item[0].Href)
 	require.Equal(t, "https://api.example.org/mcp", api.Linkset[0].Item[1].Href)
 	require.Equal(t, "https://api.example.org/api/openapi.json", api.Linkset[1].ServiceDesc[0].Href)
@@ -131,7 +140,7 @@ func TestDiscoveryHandlerCacheAndCORS(t *testing.T) {
 	handler.ServeHTTP(get, httptest.NewRequest(http.MethodGet, "/mcp/server-card", nil))
 	require.Equal(t, http.StatusOK, get.Code)
 	require.Equal(t, serverCardMediaType, get.Header().Get("Content-Type"))
-	require.Equal(t, "public, max-age=3600", get.Header().Get("Cache-Control"))
+	require.Equal(t, "no-cache, must-revalidate", get.Header().Get("Cache-Control"))
 	require.Equal(t, "*", get.Header().Get("Access-Control-Allow-Origin"))
 	require.Equal(t, "GET", get.Header().Get("Access-Control-Allow-Methods"))
 	require.Equal(t, "Content-Type, If-None-Match", get.Header().Get("Access-Control-Allow-Headers"))
@@ -160,82 +169,305 @@ func TestDiscoveryHandlerCacheAndCORS(t *testing.T) {
 }
 
 func TestDiscoveryRoutesWhenMCPDisabled(t *testing.T) {
-	mux := http.NewServeMux()
-	mountDiscovery(mux, discoveryConfig(false), "Storyden")
+	if tests.IsSharedPostgresDatabase() {
+		t.Skip("skipping global discovery settings mutations on shared postgres database")
+	}
 
-	card := httptest.NewRecorder()
-	mux.ServeHTTP(card, httptest.NewRequest(http.MethodGet, "/mcp/server-card", nil))
-	require.Equal(t, http.StatusNotFound, card.Code)
+	cfg := discoveryConfig(false)
+	integration.Test(t, &cfg, e2e.Setup(), fx.Invoke(MountDiscovery), fx.Invoke(func(
+		lc fx.Lifecycle,
+		repo *settings.SettingsRepository,
+		ts *httptest.Server,
+	) {
+		lc.Append(fx.StartHook(func(ctx context.Context) {
+			r := require.New(t)
 
-	ai := httptest.NewRecorder()
-	mux.ServeHTTP(ai, httptest.NewRequest(http.MethodGet, "/.well-known/ai-catalog.json", nil))
-	require.Equal(t, http.StatusOK, ai.Code)
-	require.JSONEq(t, `{"specVersion":"1.0","entries":[]}`, ai.Body.String())
+			_, err := repo.Set(ctx, enabledDiscoverySettings())
+			r.NoError(err)
 
-	api := httptest.NewRecorder()
-	mux.ServeHTTP(api, httptest.NewRequest(http.MethodHead, "/.well-known/api-catalog", nil))
-	require.Equal(t, http.StatusOK, api.Code)
-	require.Equal(t, apiCatalogMediaType, api.Header().Get("Content-Type"))
-	require.Equal(t, "<https://community.example.org/.well-known/api-catalog>; rel=api-catalog", api.Header().Get("Link"))
-	require.Empty(t, api.Body.String())
+			card, err := ts.Client().Get(ts.URL + "/mcp/server-card")
+			r.NoError(err)
+			defer card.Body.Close()
+			r.Equal(http.StatusNotFound, card.StatusCode)
+
+			ai, err := ts.Client().Get(ts.URL + "/.well-known/ai-catalog.json")
+			r.NoError(err)
+			defer ai.Body.Close()
+			r.Equal(http.StatusOK, ai.StatusCode)
+
+			body, err := io.ReadAll(ai.Body)
+			r.NoError(err)
+			r.JSONEq(`{"specVersion":"1.0","entries":[]}`, string(body))
+
+			api, err := ts.Client().Head(ts.URL + "/.well-known/api-catalog")
+			r.NoError(err)
+			defer api.Body.Close()
+			r.Equal(http.StatusOK, api.StatusCode)
+			r.Equal(`application/linkset+json; profile="https://www.rfc-editor.org/info/rfc9727"`, api.Header.Get("Content-Type"))
+			r.Equal("<https://api.example.org/.well-known/api-catalog>; rel=api-catalog", api.Header.Get("Link"))
+
+			body, err = io.ReadAll(api.Body)
+			r.NoError(err)
+			r.Empty(body)
+		}))
+	}))
 }
 
 func TestDiscoveryRoutesAllowBrowserPreflight(t *testing.T) {
-	mux := http.NewServeMux()
-	mountDiscovery(mux, discoveryConfig(true), "Example community")
-	for _, path := range []string{"/mcp/server-card", "/.well-known/ai-catalog.json", "/.well-known/api-catalog"} {
-		t.Run(path, func(t *testing.T) {
-			preflight := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodOptions, path, nil)
-			req.Header.Set("Origin", "https://community.example.org")
-			req.Header.Set("Access-Control-Request-Method", "GET")
-			req.Header.Set("Access-Control-Request-Headers", "if-none-match")
-			mux.ServeHTTP(preflight, req)
-			require.Equal(t, http.StatusNoContent, preflight.Code)
-			require.Equal(t, "*", preflight.Header().Get("Access-Control-Allow-Origin"))
-			require.Contains(t, preflight.Header().Get("Access-Control-Allow-Headers"), "If-None-Match")
-			require.Empty(t, preflight.Body.String())
+	if tests.IsSharedPostgresDatabase() {
+		t.Skip("skipping global discovery settings mutations on shared postgres database")
+	}
+
+	cfg := discoveryConfig(true)
+	integration.Test(t, &cfg, e2e.Setup(), fx.Invoke(MountDiscovery), fx.Invoke(func(
+		lc fx.Lifecycle,
+		repo *settings.SettingsRepository,
+		ts *httptest.Server,
+	) {
+		lc.Append(fx.StartHook(func(ctx context.Context) {
+			_, err := repo.Set(ctx, enabledDiscoverySettings())
+			require.NoError(t, err)
+
+			for _, path := range []string{"/mcp/server-card", "/.well-known/ai-catalog.json", "/.well-known/api-catalog"} {
+				t.Run(path, func(t *testing.T) {
+					r := require.New(t)
+
+					req, err := http.NewRequestWithContext(ctx, http.MethodOptions, ts.URL+path, nil)
+					r.NoError(err)
+					req.Header.Set("Origin", "https://community.example.org")
+					req.Header.Set("Access-Control-Request-Method", "GET")
+					req.Header.Set("Access-Control-Request-Headers", "if-none-match")
+
+					resp, err := ts.Client().Do(req)
+					r.NoError(err)
+					defer resp.Body.Close()
+					r.Equal(http.StatusNoContent, resp.StatusCode)
+					r.Equal("*", resp.Header.Get("Access-Control-Allow-Origin"))
+					r.Equal("GET", resp.Header.Get("Access-Control-Allow-Methods"))
+					r.Equal("Content-Type, If-None-Match", resp.Header.Get("Access-Control-Allow-Headers"))
+
+					body, err := io.ReadAll(resp.Body)
+					r.NoError(err)
+					r.Empty(body)
+				})
+			}
+		}))
+	}))
+}
+
+func TestAPICatalogLinksetWireFormat(t *testing.T) {
+	if tests.IsSharedPostgresDatabase() {
+		t.Skip("skipping global discovery settings mutations on shared postgres database")
+	}
+
+	for _, enabled := range []bool{false, true} {
+		t.Run(fmt.Sprintf("MCP enabled=%t", enabled), func(t *testing.T) {
+			cfg := discoveryConfig(enabled)
+			integration.Test(t, &cfg, e2e.Setup(), fx.Invoke(MountDiscovery), fx.Invoke(func(
+				lc fx.Lifecycle,
+				repo *settings.SettingsRepository,
+				ts *httptest.Server,
+			) {
+				lc.Append(fx.StartHook(func(ctx context.Context) {
+					r := require.New(t)
+
+					_, err := repo.Set(ctx, enabledDiscoverySettings())
+					r.NoError(err)
+
+					resp, err := ts.Client().Get(ts.URL + "/.well-known/api-catalog")
+					r.NoError(err)
+					defer resp.Body.Close()
+					r.Equal(http.StatusOK, resp.StatusCode)
+					r.Equal(`application/linkset+json; profile="https://www.rfc-editor.org/info/rfc9727"`, resp.Header.Get("Content-Type"))
+					r.Equal("<https://api.example.org/.well-known/api-catalog>; rel=api-catalog", resp.Header.Get("Link"))
+
+					items := `{"href":"https://api.example.org/api"}`
+					if enabled {
+						items += `, {"href":"https://api.example.org/mcp"}`
+					}
+
+					body, err := io.ReadAll(resp.Body)
+					r.NoError(err)
+					r.JSONEq(fmt.Sprintf(`{
+						"linkset": [
+							{
+								"anchor": "https://api.example.org/.well-known/api-catalog",
+								"item": [%s]
+							},
+							{
+								"anchor": "https://api.example.org/api",
+								"service-desc": [{
+									"href": "https://api.example.org/api/openapi.json",
+									"type": "application/vnd.oai.openapi+json"
+								}]
+							}
+						]
+					}`, items), string(body))
+				}))
+			}))
 		})
 	}
 }
 
-func TestAPICatalogLinksetWireFormat(t *testing.T) {
-	for _, enabled := range []bool{false, true} {
-		name := "MCP disabled"
-		if enabled {
-			name = "MCP enabled"
-		}
-		t.Run(name, func(t *testing.T) {
-			mux := http.NewServeMux()
-			mountDiscovery(mux, discoveryConfig(enabled), "Example community")
-			response := httptest.NewRecorder()
-			mux.ServeHTTP(response, httptest.NewRequest(http.MethodGet, "/.well-known/api-catalog", nil))
-			require.Equal(t, http.StatusOK, response.Code)
-			require.Equal(t, `application/linkset+json; profile="https://www.rfc-editor.org/info/rfc9727"`, response.Header().Get("Content-Type"))
+func TestDiscoveryRoutesDisabledByDefault(t *testing.T) {
+	if tests.IsSharedPostgresDatabase() {
+		t.Skip("skipping global discovery defaults assertions on shared postgres database")
+	}
 
-			var document map[string][]map[string]json.RawMessage
-			require.NoError(t, json.Unmarshal(response.Body.Bytes(), &document))
-			require.Len(t, document["linkset"], 2)
-			for _, context := range document["linkset"] {
-				for relation, value := range context {
-					if relation == "anchor" {
-						continue
-					}
-					require.NotEqual(t, "null", string(value), "RFC 9264 relation %s must be an array", relation)
-					var targets []map[string]json.RawMessage
-					require.NoError(t, json.Unmarshal(value, &targets))
-					require.NotEmpty(t, targets)
-					for _, target := range targets {
-						var href string
-						require.NoError(t, json.Unmarshal(target["href"], &href))
-						parsed, err := url.ParseRequestURI(href)
-						require.NoError(t, err)
-						require.True(t, parsed.IsAbs())
-					}
+	cfg := discoveryConfig(true)
+	integration.Test(t, &cfg, e2e.Setup(), fx.Invoke(MountDiscovery), fx.Invoke(func(
+		lc fx.Lifecycle,
+		ts *httptest.Server,
+	) {
+		lc.Append(fx.StartHook(func(ctx context.Context) {
+			for _, path := range []string{"/mcp/server-card", "/.well-known/ai-catalog.json", "/.well-known/api-catalog"} {
+				for _, method := range []string{http.MethodGet, http.MethodHead, http.MethodOptions} {
+					t.Run(method+" "+path, func(t *testing.T) {
+						r := require.New(t)
+
+						req, err := http.NewRequestWithContext(ctx, method, ts.URL+path, nil)
+						r.NoError(err)
+
+						resp, err := ts.Client().Do(req)
+						r.NoError(err)
+						defer resp.Body.Close()
+						r.Equal(http.StatusNotFound, resp.StatusCode)
+						r.Equal("no-store", resp.Header.Get("Cache-Control"))
+					})
 				}
 			}
-			require.NotContains(t, document["linkset"][1], "item")
-			require.JSONEq(t, `[{"href":"https://api.example.org/api/openapi.json","type":"application/vnd.oai.openapi+json"}]`, string(document["linkset"][1]["service-desc"]))
-		})
+		}))
+	}))
+}
+
+func TestDiscoverySettingsApplyWithoutRestart(t *testing.T) {
+	if tests.IsSharedPostgresDatabase() {
+		t.Skip("skipping global discovery settings mutations on shared postgres database")
+	}
+
+	cfg := discoveryConfig(true)
+	integration.Test(t, &cfg, e2e.Setup(), fx.Invoke(MountDiscovery), fx.Invoke(func(
+		lc fx.Lifecycle,
+		repo *settings.SettingsRepository,
+		ts *httptest.Server,
+	) {
+		lc.Append(fx.StartHook(func(ctx context.Context) {
+			paths := []struct {
+				path   string
+				policy settings.DiscoveryServiceSettings
+			}{
+				{"/mcp/server-card", settings.DiscoveryServiceSettings{MCPServerCard: opt.New(false)}},
+				{"/.well-known/ai-catalog.json", settings.DiscoveryServiceSettings{AICatalog: opt.New(false)}},
+				{"/.well-known/api-catalog", settings.DiscoveryServiceSettings{APICatalog: opt.New(false)}},
+			}
+
+			for _, tc := range paths {
+				t.Run(tc.path, func(t *testing.T) {
+					r := require.New(t)
+
+					_, err := repo.Set(ctx, enabledDiscoverySettings())
+					r.NoError(err)
+
+					before, err := ts.Client().Get(ts.URL + tc.path)
+					r.NoError(err)
+					defer before.Body.Close()
+					r.Equal(http.StatusOK, before.StatusCode)
+					r.Equal("no-cache, must-revalidate", before.Header.Get("Cache-Control"))
+					etag := before.Header.Get("ETag")
+					r.NotEmpty(etag)
+
+					conditional, err := http.NewRequestWithContext(ctx, http.MethodGet, ts.URL+tc.path, nil)
+					r.NoError(err)
+					conditional.Header.Set("If-None-Match", etag)
+
+					unchanged, err := ts.Client().Do(conditional)
+					r.NoError(err)
+					defer unchanged.Body.Close()
+					r.Equal(http.StatusNotModified, unchanged.StatusCode)
+					r.Equal(etag, unchanged.Header.Get("ETag"))
+
+					_, err = repo.Set(ctx, settings.Settings{
+						Services: opt.New(settings.ServiceSettings{Discovery: opt.New(tc.policy)}),
+					})
+					r.NoError(err)
+
+					for _, method := range []string{http.MethodGet, http.MethodHead, http.MethodOptions} {
+						req, err := http.NewRequestWithContext(ctx, method, ts.URL+tc.path, nil)
+						r.NoError(err)
+						req.Header.Set("If-None-Match", etag)
+
+						resp, err := ts.Client().Do(req)
+						r.NoError(err)
+						defer resp.Body.Close()
+						r.Equal(http.StatusNotFound, resp.StatusCode, method)
+						r.Equal("no-store", resp.Header.Get("Cache-Control"))
+					}
+
+					for _, other := range paths {
+						if other.path == tc.path {
+							continue
+						}
+
+						resp, err := ts.Client().Get(ts.URL + other.path)
+						r.NoError(err)
+						defer resp.Body.Close()
+						r.Equal(http.StatusOK, resp.StatusCode, other.path)
+					}
+				})
+			}
+
+			t.Run("card visibility and title update", func(t *testing.T) {
+				r := require.New(t)
+
+				_, err := repo.Set(ctx, enabledDiscoverySettings())
+				r.NoError(err)
+
+				_, err = repo.Set(ctx, settings.Settings{
+					Services: opt.New(settings.ServiceSettings{
+						Discovery: opt.New(settings.DiscoveryServiceSettings{MCPServerCard: opt.New(false)}),
+					}),
+				})
+				r.NoError(err)
+
+				catalog, err := ts.Client().Get(ts.URL + "/.well-known/ai-catalog.json")
+				r.NoError(err)
+				defer catalog.Body.Close()
+				r.Equal(http.StatusOK, catalog.StatusCode)
+
+				body, err := io.ReadAll(catalog.Body)
+				r.NoError(err)
+				r.JSONEq(`{"specVersion":"1.0","entries":[]}`, string(body))
+
+				_, err = repo.Set(ctx, settings.Settings{
+					Title: opt.New("After"),
+					Services: opt.New(settings.ServiceSettings{
+						Discovery: opt.New(settings.DiscoveryServiceSettings{MCPServerCard: opt.New(true)}),
+					}),
+				})
+				r.NoError(err)
+
+				card, err := ts.Client().Get(ts.URL + "/mcp/server-card")
+				r.NoError(err)
+				defer card.Body.Close()
+				r.Equal(http.StatusOK, card.StatusCode)
+
+				var document map[string]any
+				r.NoError(json.NewDecoder(card.Body).Decode(&document))
+				r.Equal("After", document["title"])
+			})
+		}))
+	}))
+}
+
+func enabledDiscoverySettings() settings.Settings {
+	return settings.Settings{
+		Title: opt.New("Example community"),
+		Services: opt.New(settings.ServiceSettings{
+			Discovery: opt.New(settings.DiscoveryServiceSettings{
+				MCPServerCard: opt.New(true),
+				AICatalog:     opt.New(true),
+				APICatalog:    opt.New(true),
+			}),
+		}),
 	}
 }

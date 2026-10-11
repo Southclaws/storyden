@@ -270,6 +270,7 @@ export * from "./datagraphSearchOKResponse";
 export * from "./datagraphSearchParams";
 export * from "./datagraphSearchResult";
 export * from "./dataPart";
+export * from "./discoveryServiceSettings";
 export * from "./emailAddress";
 export * from "./emailQueueAttempt";
 export * from "./emailQueueAttemptStatus";
