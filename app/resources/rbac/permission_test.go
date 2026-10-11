@@ -39,3 +39,21 @@ func TestPermissionsIntersectWithEmpty(t *testing.T) {
 	assert.Empty(t, token.Intersect(NewList()).List())
 	assert.Empty(t, NewList().Intersect(token).List())
 }
+
+func TestHasAnyWriteCountsManagementPermissions(t *testing.T) {
+	t.Parallel()
+
+	// these management perms must count as write so the guest role cannot be
+	// granted them via validateGuestPermissionsMutation
+	for _, p := range []Permission{
+		PermissionManageReports,
+		PermissionManageModerationNotes,
+		PermissionManageRobots,
+		PermissionManageTrails,
+	} {
+		assert.True(t, NewList(p).HasAnyWrite(), p.String())
+	}
+
+	readOnly := NewList(PermissionReadPublishedThreads, PermissionReadProfile)
+	assert.False(t, readOnly.HasAnyWrite(), "a read-only set is not write")
+}
