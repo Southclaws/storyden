@@ -358,6 +358,8 @@ func (r *Repository) UpdateSortOrder(ctx context.Context, ids []role.RoleID) err
 	}
 
 	if len(customRoles) != len(ids) {
+		r.refreshRoleListCache(ctx)
+
 		return fault.New(
 			"role reorder list must include all custom roles exactly once",
 			fctx.With(ctx),
@@ -374,6 +376,8 @@ func (r *Repository) UpdateSortOrder(ctx context.Context, ids []role.RoleID) err
 	seen := make(map[role.RoleID]struct{}, len(ids))
 	for _, id := range ids {
 		if _, ok := existing[id]; !ok {
+			r.refreshRoleListCache(ctx)
+
 			return fault.New("unknown custom role ID in role reorder list", fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 		}
 		if _, ok := seen[id]; ok {

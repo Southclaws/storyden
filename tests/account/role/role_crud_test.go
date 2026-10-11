@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
 	"github.com/Southclaws/storyden/tests"
@@ -31,6 +32,7 @@ func TestRoleCRUD(t *testing.T) {
 		cl *openapi.ClientWithResponses,
 		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
+		db *ent.Client,
 	) {
 		lc.Append(fx.StartHook(func() {
 			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
@@ -127,6 +129,27 @@ func TestRoleCRUD(t *testing.T) {
 					Name:        &name,
 					Permissions: &permissions,
 				}, adminSession))(t, http.StatusBadRequest)
+			})
+
+			t.Run("role_reorder_refreshes_stale_list", func(t *testing.T) {
+				before := tests.AssertRequest(cl.RoleListWithResponse(adminCtx, adminSession))(t, http.StatusOK)
+				ids := lo.FilterMap(before.JSON200.Roles, func(v openapi.Role, _ int) (openapi.Identifier, bool) {
+					return v.Id, v.Id != role.DefaultRoleAdminID.String() &&
+						v.Id != role.DefaultRoleMemberID.String() && v.Id != role.DefaultRoleGuestID.String()
+				})
+
+				externalRole, err := db.Role.Create().
+					SetName("external-role-" + xid.New().String()).
+					SetPermissions([]string{}).SetSortKey(1).Save(adminCtx)
+				require.NoError(t, err)
+
+				tests.AssertRequest(cl.RoleUpdateOrderWithResponse(adminCtx, openapi.RoleUpdateOrderJSONRequestBody{
+					RoleIds: ids,
+				}, adminSession))(t, http.StatusBadRequest)
+
+				after := tests.AssertRequest(cl.RoleListWithResponse(adminCtx, adminSession))(t, http.StatusOK)
+				listedIDs := lo.Map(after.JSON200.Roles, func(v openapi.Role, _ int) string { return v.Id })
+				assert.Contains(t, listedIDs, externalRole.ID.String(), "relisting after a rejected reorder must include external changes")
 			})
 
 			t.Run("role_reorder_custom_roles", func(t *testing.T) {
