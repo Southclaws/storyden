@@ -271,6 +271,16 @@ func (r *Repository) Remove(ctx context.Context, accountID account.AccountID, em
 }
 
 func (r *Repository) syncVerifiedStatus(ctx context.Context, accountID account.AccountID) error {
+	acc, err := r.accountRepo.GetByID(ctx, accountID)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	// a manual admin override outranks email state, never downgrade it
+	if acc.VerifiedStatus == account.VerifiedStatusManual {
+		return nil
+	}
+
 	verified, err := r.db.Email.Query().
 		Where(
 			email_ent.AccountID(xid.ID(accountID)),
@@ -284,14 +294,6 @@ func (r *Repository) syncVerifiedStatus(ctx context.Context, accountID account.A
 	status := account.VerifiedStatusNone
 	if verified {
 		status = account.VerifiedStatusVerifiedEmail
-	} else {
-		acc, err := r.accountRepo.GetByID(ctx, accountID)
-		if err != nil {
-			return fault.Wrap(err, fctx.With(ctx))
-		}
-		if acc.VerifiedStatus == account.VerifiedStatusManual {
-			return nil
-		}
 	}
 
 	_, err = r.accountRepo.Update(ctx, accountID, account_repo.SetVerifiedStatus(status))
