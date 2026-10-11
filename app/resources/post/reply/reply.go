@@ -264,6 +264,7 @@ func ItemRef(r *ent.Post) (datagraph.Item, error) {
 	return &Reply{
 		Post: post.Post{
 			ID:         post.ID(r.ID),
+			Author:     profile.Ref{ID: account.AccountID(r.AccountPosts)},
 			Content:    content.Content,
 			Visibility: visibility.NewVisibilityFromEnt(r.Visibility),
 			Meta:       r.Metadata,

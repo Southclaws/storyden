@@ -5,6 +5,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -131,6 +132,7 @@ func ItemRef(c *ent.Node) (datagraph.Item, error) {
 
 	return &Node{
 		Mark:           NewMark(c.ID, c.Slug),
+		Owner:          profile.Ref{ID: account.AccountID(c.AccountID)},
 		CreatedAt:      c.CreatedAt,
 		UpdatedAt:      c.UpdatedAt,
 		IndexedAt:      opt.NewPtr(c.IndexedAt),

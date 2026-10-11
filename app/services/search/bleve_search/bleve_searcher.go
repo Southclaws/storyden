@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/analysis"
@@ -14,6 +15,7 @@ import (
 	"github.com/blevesearch/bleve/v2/search"
 	"github.com/blevesearch/bleve/v2/search/query"
 	"github.com/rs/xid"
+	"go.uber.org/fx"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -45,7 +47,11 @@ type BleveSearcher struct {
 	hydrator *hydrate.Hydrator
 }
 
-func New(ctx context.Context, cfg config.Config, hydrator *hydrate.Hydrator) (*BleveSearcher, error) {
+var registerInternationalAnalyser = sync.OnceValue(func() error {
+	return registry.RegisterAnalyzer("intl", InternationalAnalyser)
+})
+
+func New(ctx context.Context, lc fx.Lifecycle, cfg config.Config, hydrator *hydrate.Hydrator) (*BleveSearcher, error) {
 	if cfg.SearchProvider != "bleve" {
 		return nil, nil
 	}
@@ -58,6 +64,8 @@ func New(ctx context.Context, cfg config.Config, hydrator *hydrate.Hydrator) (*B
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to open or create bleve index"))
 	}
+
+	lc.Append(fx.StopHook(index.Close))
 
 	return &BleveSearcher{
 		client:   index,
@@ -333,10 +341,9 @@ func (s *BleveSearcher) Index(ctx context.Context, item datagraph.Item) error {
 	}
 
 	if v, ok := item.(datagraph.WithCategory); ok {
-		if v.GetCategory().IsNil() {
-			return fault.New("index: item has zero-value category ID")
+		if category := v.GetCategory(); !category.IsNil() {
+			doc.CategoryID = category.String()
 		}
-		doc.CategoryID = v.GetCategory().String()
 	}
 
 	if v, ok := item.(datagraph.WithTagNames); ok {
@@ -360,7 +367,7 @@ func (s *BleveSearcher) Deindex(ctx context.Context, ir datagraph.ItemRef) error
 }
 
 func openOrCreateIndex(path string) (bleve.Index, error) {
-	err := registry.RegisterAnalyzer("intl", InternationalAnalyser)
+	err := registerInternationalAnalyser()
 	if err != nil {
 		return nil, fault.Wrap(err, fmsg.With("failed to register international analyzer"))
 	}

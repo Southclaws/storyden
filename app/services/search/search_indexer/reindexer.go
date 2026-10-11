@@ -20,9 +20,12 @@ import (
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 )
 
+const indexTimestampOffset = 2 * time.Second
+
 func (idx *Indexer) ReindexAll(ctx context.Context) error {
 	started := time.Now().UTC()
-	idx.logger.Info("starting full reindex",
+	idx.logger.Info(
+		"starting full reindex",
 		slog.Int("chunk_size", idx.chunkSize),
 	)
 
@@ -44,7 +47,8 @@ func (idx *Indexer) ReindexAll(ctx context.Context) error {
 	processed := tn + rn + nn
 
 	if processed > 0 {
-		idx.logger.Info("reindex completed",
+		idx.logger.Info(
+			"reindex completed",
 			slog.Duration("duration", time.Since(started)),
 			slog.Int("processed", processed),
 		)
@@ -56,6 +60,8 @@ func (idx *Indexer) ReindexAll(ctx context.Context) error {
 }
 
 func (idx *Indexer) reindexThreads(ctx context.Context) (int, error) {
+	indexedBefore := time.Now().Add(indexTimestampOffset)
+
 	return reindex(ctx, idx, func() ([]datagraph.Item, error) {
 		threads, err := idx.db.Post.Query().
 			Where(
@@ -64,7 +70,10 @@ func (idx *Indexer) reindexThreads(ctx context.Context) (int, error) {
 				func(s *sql.Selector) {
 					s.Where(sql.Or(
 						sql.IsNull(ent_post.FieldIndexedAt),
-						sql.GT(ent_post.FieldUpdatedAt, sql.Raw(ent_post.FieldIndexedAt)),
+						sql.And(
+							sql.GT(ent_post.FieldUpdatedAt, sql.Raw(ent_post.FieldIndexedAt)),
+							sql.LT(ent_post.FieldIndexedAt, indexedBefore),
+						),
 					))
 				},
 			).
@@ -90,6 +99,8 @@ func (idx *Indexer) reindexThreads(ctx context.Context) (int, error) {
 }
 
 func (idx *Indexer) reindexReplies(ctx context.Context) (int, error) {
+	indexedBefore := time.Now().Add(indexTimestampOffset)
+
 	return reindex(ctx, idx, func() ([]datagraph.Item, error) {
 		replies, err := idx.db.Post.Query().
 			Where(
@@ -98,7 +109,10 @@ func (idx *Indexer) reindexReplies(ctx context.Context) (int, error) {
 				func(s *sql.Selector) {
 					s.Where(sql.Or(
 						sql.IsNull(ent_post.FieldIndexedAt),
-						sql.GT(ent_post.FieldUpdatedAt, sql.Raw(ent_post.FieldIndexedAt)),
+						sql.And(
+							sql.GT(ent_post.FieldUpdatedAt, sql.Raw(ent_post.FieldIndexedAt)),
+							sql.LT(ent_post.FieldIndexedAt, indexedBefore),
+						),
 					))
 				},
 			).
@@ -123,6 +137,8 @@ func (idx *Indexer) reindexReplies(ctx context.Context) (int, error) {
 }
 
 func (idx *Indexer) reindexNodes(ctx context.Context) (int, error) {
+	indexedBefore := time.Now().Add(indexTimestampOffset)
+
 	return reindex(ctx, idx, func() ([]datagraph.Item, error) {
 		threads, err := idx.db.Node.Query().
 			Where(
@@ -130,7 +146,10 @@ func (idx *Indexer) reindexNodes(ctx context.Context) (int, error) {
 				func(s *sql.Selector) {
 					s.Where(sql.Or(
 						sql.IsNull(node.FieldIndexedAt),
-						sql.GT(node.FieldUpdatedAt, sql.Raw(node.FieldIndexedAt)),
+						sql.And(
+							sql.GT(node.FieldUpdatedAt, sql.Raw(node.FieldIndexedAt)),
+							sql.LT(node.FieldIndexedAt, indexedBefore),
+						),
 					))
 				},
 			).
@@ -179,7 +198,8 @@ func reindex[T datagraph.Item](
 		for i, item := range v {
 			err := idx.searchIndexer.Index(ctx, item)
 			if err != nil {
-				idx.logger.Error("failed to index item",
+				idx.logger.Error(
+					"failed to index item",
 					slog.String("kind", item.GetKind().String()),
 					slog.String("id", item.GetID().String()),
 					slog.String("error", err.Error()),
@@ -192,16 +212,15 @@ func reindex[T datagraph.Item](
 			}
 		}
 
-		// Go 2 seconds forward, to ensure databases with 1 second precision do
-		// not round the indexed at time above the updated at time.
-		n, err := update(ids, time.Now().Add((2 * time.Second)))
+		n, err := update(ids, time.Now().Add(indexTimestampOffset))
 		if err != nil {
 			return processed, fault.Wrap(err, fctx.With(ctx))
 		}
 
 		processed += n
 
-		idx.logger.Debug("reindexed chunk",
+		idx.logger.Debug(
+			"reindexed chunk",
 			slog.String("kind", k.String()),
 			slog.Int("processed", n),
 		)

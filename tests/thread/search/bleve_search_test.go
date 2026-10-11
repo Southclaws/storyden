@@ -8,19 +8,126 @@ import (
 
 	"github.com/Southclaws/opt"
 	"github.com/google/uuid"
+	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
+	"github.com/Southclaws/storyden/app/resources/pagination"
+	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/seed"
+	"github.com/Southclaws/storyden/app/services/search/bleve_search"
 	"github.com/Southclaws/storyden/app/services/search/search_indexer"
+	"github.com/Southclaws/storyden/app/services/search/searcher"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/ent"
+	entnode "github.com/Southclaws/storyden/internal/ent/node"
+	entpost "github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
 	"github.com/Southclaws/storyden/tests"
 )
+
+func TestBleveReindexFutureContent(t *testing.T) {
+	cfg := &config.Config{
+		SearchProvider:       "bleve",
+		BlevePath:            t.TempDir() + "/search.bleve",
+		SearchIndexChunkSize: 2,
+	}
+
+	integration.Test(t, cfg, e2e.Setup(), fx.Invoke(func(
+		ctx context.Context,
+		lc fx.Lifecycle,
+		aw *account_writer.Writer,
+		db *ent.Client,
+		idx *search_indexer.Indexer,
+		search *bleve_search.BleveSearcher,
+	) {
+		lc.Append(fx.StartHook(func() {
+			ctx, owner := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
+			future := time.Now().UTC().AddDate(1, 0, 0).Truncate(time.Second)
+			keyword := "reindex" + xid.New().String()
+			threadIDs := make([]xid.ID, 0, 3)
+			postIDs := make([]xid.ID, 0, 6)
+			nodeIDs := make([]xid.ID, 0, 3)
+
+			for i := range 3 {
+				p, err := db.Post.Create().
+					SetAuthorID(xid.ID(owner.ID)).SetTitle(keyword).SetSlug(xid.New().String()).
+					SetBody("<p>Uncategorized future thread</p>").SetShort(keyword).
+					SetVisibility(entpost.VisibilityPublished).
+					SetCreatedAt(future).SetUpdatedAt(future).SetLastReplyAt(future).Save(ctx)
+				require.NoError(t, err)
+				threadIDs = append(threadIDs, p.ID)
+				postIDs = append(postIDs, p.ID)
+
+				if i == 0 {
+					item, err := thread.ItemRef(p)
+					require.NoError(t, err)
+					assert.NoError(t, search.Index(ctx, item), "uncategorized threads must be indexable")
+				}
+
+				reply, err := db.Post.Create().
+					SetAuthorID(xid.ID(owner.ID)).SetRootPostID(p.ID).
+					SetBody(fmt.Sprintf("<p>%s Future reply</p>", keyword)).SetShort(keyword).
+					SetVisibility(entpost.VisibilityPublished).
+					SetCreatedAt(future).SetUpdatedAt(future).SetLastReplyAt(future).Save(ctx)
+				require.NoError(t, err)
+				postIDs = append(postIDs, reply.ID)
+
+				n, err := db.Node.Create().
+					SetAccountID(xid.ID(owner.ID)).SetName(keyword).SetSlug(xid.New().String()).
+					SetVisibility(entnode.VisibilityPublished).
+					SetCreatedAt(future).SetUpdatedAt(future).Save(ctx)
+				require.NoError(t, err)
+				nodeIDs = append(nodeIDs, n.ID)
+			}
+
+			reindexCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+			defer cancel()
+			require.NoError(t, idx.ReindexAll(reindexCtx), "future content must not repeat indefinitely")
+
+			posts, err := db.Post.Query().Where(entpost.IDIn(postIDs...)).All(ctx)
+			require.NoError(t, err)
+			for _, p := range posts {
+				require.NotNil(t, p.IndexedAt)
+				assert.True(t, p.IndexedAt.Before(future), "index timestamps must remain at the current time")
+				assert.True(t, future.Equal(p.UpdatedAt), "indexing must not change content timestamps")
+			}
+
+			nodes, err := db.Node.Query().Where(entnode.IDIn(nodeIDs...)).All(ctx)
+			require.NoError(t, err)
+			for _, n := range nodes {
+				require.NotNil(t, n.IndexedAt)
+				assert.True(t, !n.IndexedAt.Before(n.UpdatedAt))
+			}
+
+			results, err := search.Search(ctx, keyword, pagination.NewPageParams(1, 20), searcher.Options{})
+			require.NoError(t, err)
+			indexedIDs := make([]xid.ID, len(results.Items))
+			for i, item := range results.Items {
+				indexedIDs[i] = item.GetID()
+			}
+			for _, id := range append(postIDs, nodeIDs...) {
+				assert.Contains(t, indexedIDs, id)
+			}
+
+			revisedKeyword := "revised" + xid.New().String()
+			revisedAt := future.Add(time.Minute)
+			_, err = db.Post.UpdateOneID(threadIDs[0]).
+				SetTitle(revisedKeyword).SetUpdatedAt(revisedAt).Save(ctx)
+			require.NoError(t, err)
+			require.NoError(t, idx.ReindexAll(reindexCtx))
+
+			matches, err := search.MatchFast(ctx, revisedKeyword, 10, searcher.Options{})
+			require.NoError(t, err)
+			require.Len(t, matches, 1)
+			assert.Equal(t, threadIDs[0], matches[0].ID, "later edits must still be indexed")
+		}))
+	}))
+}
 
 func TestBleveThreadSearch(t *testing.T) {
 	bleveName := time.Now().Format(time.RFC3339) + t.Name()
