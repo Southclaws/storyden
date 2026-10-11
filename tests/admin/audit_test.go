@@ -71,6 +71,30 @@ func TestAuditEventList(t *testing.T) {
 				a.Equal(openapi.Identifier(member.ID.String()), eventSuspended.AccountId)
 			})
 
+			t.Run("open_ended_start_range_returns_events", func(t *testing.T) {
+				a := assert.New(t)
+
+				adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+				adminSession := sh.WithSession(adminCtx)
+
+				memberCtx, member := e2e.WithAccount(root, aw, seed.Account_004_Loki)
+				_ = sh.WithSession(memberCtx)
+
+				suspend, err := cl.AdminAccountBanCreateWithResponse(adminCtx, member.Handle, adminSession)
+				tests.Ok(t, err, suspend)
+
+				time.Sleep(100 * time.Millisecond)
+
+				// a start-only range leaves End unset, the query must not clamp the
+				// upper bound to the zero time or it returns nothing
+				rangeParam := "2020-01-01/"
+				list, err := cl.AuditEventListWithResponse(adminCtx, &openapi.AuditEventListParams{
+					Range: &rangeParam,
+				}, adminSession)
+				tests.Ok(t, err, list)
+				a.NotEmpty(list.JSON200.Events)
+			})
+
 			t.Run("filters_by_event_type", func(t *testing.T) {
 				a := assert.New(t)
 
