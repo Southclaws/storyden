@@ -80,6 +80,7 @@ export const ThreadReferenceCard = memo(
         titleIcon={isPinned ? <PinIcon w="4" /> : undefined}
         text={thread.description}
         url={permalink}
+        prefetchOnIntent={!isDraft}
         image={image}
         controls={
           <HStack>
@@ -124,6 +125,7 @@ export const ThreadReferenceCard = memo(
               <Link
                 className="thread-byline__anchor"
                 href={permalink}
+                prefetch={false}
                 title={replyStatusLabel}
               >
                 <styled.span

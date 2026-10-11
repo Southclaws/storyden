@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Children,
   DOMAttributes,
@@ -34,6 +35,7 @@ export type CardItem = {
   menu?: React.ReactNode;
   controls?: React.ReactNode;
   disableAnchors?: boolean;
+  prefetchOnIntent?: boolean;
 };
 
 export type Props = CardItem & RichCardVariantProps;
@@ -52,8 +54,11 @@ export function Card({
   shape,
   backgroundColor,
   disableAnchors = false,
+  prefetchOnIntent = false,
   children,
 }: PropsWithChildren<Props>) {
+  const router = useRouter();
+  const prefetchedURL = useRef<string | null>(null);
   const hasImage = Boolean(image);
   const textContainerRef = useRef<HTMLDivElement>(null);
   const [showingMore, setShowingMore] = useState(false);
@@ -87,6 +92,20 @@ export function Card({
   });
 
   const externalURL = isExternalURL(url);
+
+  function handlePrefetch() {
+    if (
+      !prefetchOnIntent ||
+      disableAnchors ||
+      externalURL ||
+      prefetchedURL.current === url
+    ) {
+      return;
+    }
+
+    prefetchedURL.current = url;
+    router.prefetch(url);
+  }
 
   return (
     <styled.article id={id} className={styles.container}>
@@ -128,6 +147,9 @@ export function Card({
               <Link
                 className={linkOverlay()}
                 href={url}
+                prefetch={false}
+                onMouseEnter={handlePrefetch}
+                onFocus={handlePrefetch}
                 onClick={(e) => disableAnchors && e.preventDefault()}
               >
                 {title}
@@ -141,6 +163,9 @@ export function Card({
             <div ref={textContainerRef} className={longContentStyles}>
               <Link
                 href={url}
+                prefetch={false}
+                onMouseEnter={handlePrefetch}
+                onFocus={handlePrefetch}
                 className={linkOverlay()}
                 onClick={(e) => disableAnchors && e.preventDefault()}
               >

@@ -26,6 +26,7 @@ export function NodeCard({ node, libraryPath, ...rest }: Props) {
       title={node.name}
       text={node.description}
       url={url}
+      prefetchOnIntent
       image={image}
       // menu={<LibraryPageMenu node={node} />}
       controls={

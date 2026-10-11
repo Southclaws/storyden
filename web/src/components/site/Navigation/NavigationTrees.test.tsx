@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import type {
@@ -14,6 +14,13 @@ import { LibraryPageTree } from "@/components/library/LibraryPageTree/LibraryPag
 import { LibraryNavigationTree } from "@/components/site/Navigation/LibraryNavigationTree/LibraryNavigationTree";
 import { libraryNavigationVisibility } from "@/components/site/Navigation/LibraryNavigationTree/LibraryNavigationTree.constants";
 import { LinkButton } from "@/components/ui/link-button";
+import { Card } from "@/components/ui/surface";
+
+const router = vi.hoisted(() => ({ prefetch: vi.fn() }));
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => router,
+}));
 
 const dnd = vi.hoisted(() => ({
   draggables: [] as Array<Record<string, unknown>>,
@@ -130,6 +137,49 @@ beforeEach(() => {
 });
 
 describe("sidebar navigation trees", () => {
+  test("content cards warm a destination once across hover and keyboard focus", () => {
+    const { rerender } = render(
+      <Card
+        id="content"
+        title="Handbook"
+        text="Preview"
+        url="/l/handbook"
+        prefetchOnIntent
+      />,
+    );
+
+    expect(router.prefetch).not.toHaveBeenCalled();
+    fireEvent.mouseEnter(screen.getByRole("link", { name: "Preview" }));
+    fireEvent.focus(screen.getByRole("link", { name: "Handbook" }));
+    fireEvent.mouseEnter(screen.getByRole("link", { name: "Preview" }));
+    expect(router.prefetch).toHaveBeenCalledExactlyOnceWith("/l/handbook");
+
+    rerender(
+      <Card
+        id="content"
+        title="Discussion"
+        text="Preview"
+        url="/t/discussion"
+        prefetchOnIntent
+      />,
+    );
+    fireEvent.focus(screen.getByRole("link", { name: "Discussion" }));
+    expect(router.prefetch).toHaveBeenCalledTimes(2);
+    expect(router.prefetch).toHaveBeenLastCalledWith("/t/discussion");
+  });
+
+  test.each([
+    { url: "/m/member", prefetchOnIntent: false },
+    { url: "/l/disabled", prefetchOnIntent: true, disableAnchors: true },
+    { url: "https://example.com/article", prefetchOnIntent: true },
+  ])("cards do not prefetch ineligible destinations: $url", (props) => {
+    render(<Card id="content" title="Content" {...props} />);
+    const link = screen.getByRole("link", { name: "Content" });
+    fireEvent.mouseEnter(link);
+    fireEvent.focus(link);
+    expect(router.prefetch).not.toHaveBeenCalled();
+  });
+
   test.each([false, true, undefined])(
     "LinkButton forwards prefetch=%s to Next Link",
     (prefetch) => {

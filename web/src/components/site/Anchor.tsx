@@ -34,6 +34,7 @@ export function Anchor({
         className,
       )}
       href={href!}
+      prefetch={false}
       onClick={handleClick}
       {...rest}
     >

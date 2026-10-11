@@ -74,7 +74,7 @@ export function MemberOptionsMenu({
               <Menu.Separator />
 
               <Menu.ItemGroup>
-                <Link href={permalink}>
+                <Link href={permalink} prefetch={false}>
                   <Menu.Item value="view">View profile</Menu.Item>
                 </Link>
               </Menu.ItemGroup>

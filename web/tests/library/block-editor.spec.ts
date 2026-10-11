@@ -1,6 +1,7 @@
 import { Locator, Page, expect, test } from "@playwright/test";
 
 import { nodeDelete } from "../../src/api/openapi-client/nodes";
+import type { Node } from "../../src/api/openapi-schema";
 import {
   createAdmin,
   getAdminAccessKey,
@@ -48,6 +49,98 @@ test("library navigation does not speculatively fetch linked routes", async ({
       await nodeDelete(node.id, undefined, {
         headers: { Authorization: `Bearer ${getAdminAccessKey()}` },
       });
+    }
+  });
+});
+
+test("library cards prefetch only on intent and stop after warming the page", async ({
+  page,
+}) => {
+  const seed = Date.now();
+
+  await withAdminAccessKey(async ({ nodeCreate }) => {
+    const nodes: Node[] = [];
+
+    try {
+      for (const name of ["Hover", "Keyboard"]) {
+        nodes.push(
+          await nodeCreate({
+            name: `${name} prefetch ${seed}`,
+            slug: `${name.toLowerCase()}-prefetch-${seed}`,
+            content: `${name} page content`,
+            visibility: "published",
+          }),
+        );
+      }
+
+      const prefetches: string[] = [];
+
+      function waitForContentPrefetch(slug: string) {
+        return page.waitForResponse((response) => {
+          const request = response.request();
+          return (
+            new URL(response.url()).pathname === `/l/${slug}` &&
+            request.headers()["next-router-prefetch"] === "1"
+          );
+        });
+      }
+
+      page.on("request", (request) => {
+        const path = new URL(request.url()).pathname;
+        if (
+          request.headers()["next-router-prefetch"] === "1" &&
+          nodes.some((node) => path === `/l/${node.slug}`)
+        ) {
+          prefetches.push(path);
+        }
+      });
+
+      await page.goto("/l");
+      await page.waitForLoadState("networkidle");
+      expect(prefetches).toEqual([]);
+
+      const hoverCard = page.locator(`article[id="${nodes[0]!.id}"]`);
+      const keyboardCard = page.locator(`article[id="${nodes[1]!.id}"]`);
+      const hoverLink = hoverCard.getByRole("link", {
+        name: "Hover page content",
+      });
+
+      const hoverPrefetch = waitForContentPrefetch(nodes[0]!.slug);
+      await hoverLink.hover();
+      await hoverPrefetch;
+      await page.waitForLoadState("networkidle");
+      expect(new Set(prefetches)).toEqual(new Set([`/l/${nodes[0]!.slug}`]));
+
+      await hoverCard.getByRole("heading").getByRole("link").focus();
+      await hoverLink.hover();
+      await page.waitForLoadState("networkidle");
+      expect(new Set(prefetches)).toEqual(new Set([`/l/${nodes[0]!.slug}`]));
+
+      const keyboardPrefetch = waitForContentPrefetch(nodes[1]!.slug);
+      await keyboardCard.getByRole("heading").getByRole("link").focus();
+      await keyboardPrefetch;
+      await page.waitForLoadState("networkidle");
+
+      await page.keyboard.press("Tab");
+      await expect(
+        keyboardCard.getByRole("link", { name: "Keyboard page content" }),
+      ).toBeFocused();
+      await page.waitForLoadState("networkidle");
+      expect(new Set(prefetches)).toEqual(
+        new Set(nodes.map((node) => `/l/${node.slug}`)),
+      );
+
+      await hoverLink.click();
+      await page.waitForURL(`/l/${nodes[0]!.slug}`);
+      await expect(
+        page.getByText("Hover page content", { exact: true }),
+      ).toBeVisible();
+    } finally {
+      for (const node of nodes) {
+        await nodeDelete(node.id, undefined, {
+          headers: { Authorization: `Bearer ${getAdminAccessKey()}` },
+        });
+      }
     }
   });
 });

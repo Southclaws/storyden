@@ -138,6 +138,24 @@ export const Rows: Story = {
   render: () => <CardRows items={exampleItems} />,
 };
 
+export const ContentPrefetch: Story = {
+  args: {
+    id: "content-prefetch",
+    title: "Community handbook",
+    url: "/l/community-handbook",
+    text: "Hover or focus either content link to warm this page once.",
+    prefetchOnIntent: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Thread and Library previews opt into prefetchOnIntent. Nothing is prefetched on mount: hover or keyboard focus warms the destination once per card. Other cards, disabled anchors, and external URLs do not prefetch. Use this for content readers are likely to open, rather than profile, settings, or administrative destinations.",
+      },
+    },
+  },
+};
+
 export const Grid: Story = {
   args: {
     id: "example-grid",

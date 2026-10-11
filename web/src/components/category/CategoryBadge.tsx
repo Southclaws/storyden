@@ -31,7 +31,11 @@ export function CategoryBadge({
   );
 
   if (asLink) {
-    return <Link href={path}>{children}</Link>;
+    return (
+      <Link href={path} prefetch={false}>
+        {children}
+      </Link>
+    );
   }
 
   return children;

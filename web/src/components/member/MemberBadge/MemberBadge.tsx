@@ -61,6 +61,7 @@ export function MemberBadge({
     <Link
       className={cx("member-badge__link-container", identContainerStyles)}
       href={permalink}
+      prefetch={false}
     >
       <MemberIdent
         profile={profile}
