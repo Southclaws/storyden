@@ -7,6 +7,7 @@ import { memo } from "react";
 
 import { useNodeGet } from "@/api/openapi-client/nodes";
 import { UnreadyBanner } from "@/components/site/Unready";
+import { ContentOutline } from "@/components/ui/content-outline";
 import { LStack } from "@/styled-system/jsx";
 
 import { Params } from "../library-path";
@@ -18,6 +19,7 @@ import { LibraryPageControls } from "./LibraryPageControls";
 import { LibraryPageVersionReview } from "./LibraryPageVersionReview";
 import { LibraryPageWebMCPTools } from "./LibraryPageWebMCPTools";
 import { LibraryPageBlocks } from "./blocks/LibraryPageBlocks";
+import { collectLibraryOutline } from "./outline";
 import { LibraryPageEditProvider, useEditState } from "./useEditState";
 
 type LibraryPageScreenProps = Props & {
@@ -78,23 +80,29 @@ export function LibraryPage({ embedded = false }: { embedded?: boolean }) {
     clearOnDefault: true,
   });
 
-  const { editMode } = useEditState();
+  const { editMode, editing } = useEditState();
 
   const editingDraft = editMode === "proposal";
 
   return (
-    <LStack h="full" gap="3" alignItems="start">
-      {!embedded && <LibraryPageControls />}
-      {editingDraft && <EditingDraftWarning />}
-      {versionID ? (
-        <LibraryPageVersionReview
-          node={initialNode}
-          versionID={versionID}
-          onApplied={revalidate}
-        />
-      ) : (
-        <LibraryPageBlocks />
-      )}
-    </LStack>
+    <ContentOutline
+      label="On this page"
+      collectEntries={collectLibraryOutline}
+      disabled={embedded || editing || Boolean(versionID)}
+    >
+      <LStack h="full" gap="3" alignItems="start">
+        {!embedded && <LibraryPageControls />}
+        {editingDraft && <EditingDraftWarning />}
+        {versionID ? (
+          <LibraryPageVersionReview
+            node={initialNode}
+            versionID={versionID}
+            onApplied={revalidate}
+          />
+        ) : (
+          <LibraryPageBlocks />
+        )}
+      </LStack>
+    </ContentOutline>
   );
 }

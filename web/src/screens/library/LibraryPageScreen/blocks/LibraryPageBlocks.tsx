@@ -12,6 +12,7 @@ import { AddIcon } from "@/components/ui/icons/Add";
 import { DragItemLibraryBlock } from "@/lib/dragdrop/provider";
 import { useLibraryEvent } from "@/lib/library/events";
 import { LibraryPageBlock, LibraryPageBlockType } from "@/lib/library/metadata";
+import { Box } from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../Context";
 import { useWatch } from "../store";
@@ -115,7 +116,17 @@ export function LibraryPageBlocks() {
   return (
     <>
       {blocks.map((block) => {
-        return <LibraryPageBlockRender key={block.type} block={block} />;
+        return (
+          <Box
+            key={block.type}
+            data-outline-block={block.type}
+            width="full"
+            minW="0"
+            css={{ "&:empty": { display: "none" } }}
+          >
+            <LibraryPageBlockRender block={block} />
+          </Box>
+        );
       })}
     </>
   );

@@ -21,6 +21,7 @@ import { Signature } from "@/components/thread/Signature";
 import { ThreadDeletedAlert } from "@/components/thread/ThreadDeletedAlert";
 import { ThreadMenu } from "@/components/thread/ThreadMenu/ThreadMenu";
 import { ThreadTagListField } from "@/components/thread/ThreadTagList.field";
+import { ContentOutline } from "@/components/ui/content-outline";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { HeadingInputField } from "@/components/ui/heading-input";
 import {
@@ -33,6 +34,7 @@ import { VisibilityBadge } from "@/components/visibility/VisibilityBadge";
 import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
 import { pluralise } from "@/utils/text";
 
+import { collectThreadOutline } from "./outline";
 import { Form, Props, useThreadScreen } from "./useThreadScreen";
 
 export function ThreadScreen(props: Props) {
@@ -61,152 +63,163 @@ export function ThreadScreen(props: Props) {
 
   return (
     <ReplyProvider>
-      <LStack className="thread-page" data-sd-page="thread" gap="4">
-        <styled.form
-          className="thread-page__header"
-          display="flex"
-          flexDirection="column"
-          alignItems="start"
-          gap="1"
-          width="full"
-          onSubmit={handlers.handleSave}
-        >
-          <WStack alignItems="start">
-            <Breadcrumbs thread={thread} />
+      <ContentOutline
+        label="In this thread"
+        collectEntries={collectThreadOutline}
+        disabled={isEditing}
+      >
+        <LStack className="thread-page" data-sd-page="thread" gap="4">
+          <styled.form
+            data-outline-original=""
+            className="thread-page__header"
+            display="flex"
+            flexDirection="column"
+            alignItems="start"
+            gap="1"
+            width="full"
+            onSubmit={handlers.handleSave}
+          >
+            <WStack alignItems="start">
+              <Breadcrumbs thread={thread} />
 
-            <HStack>
-              {isEditing && (
-                <>
-                  <CancelAction
-                    type="button"
-                    onClick={handlers.handleDiscardChanges}
-                  >
-                    Discard
-                  </CancelAction>
-                  <SaveAction type="submit" disabled={isEmpty}>
-                    Save
-                  </SaveAction>
-                </>
-              )}
+              <HStack>
+                {isEditing && (
+                  <>
+                    <CancelAction
+                      type="button"
+                      onClick={handlers.handleDiscardChanges}
+                    >
+                      Discard
+                    </CancelAction>
+                    <SaveAction type="submit" disabled={isEmpty}>
+                      Save
+                    </SaveAction>
+                  </>
+                )}
 
-              <ThreadMenu thread={thread} editingEnabled movingEnabled />
-            </HStack>
-          </WStack>
+                <ThreadMenu thread={thread} editingEnabled movingEnabled />
+              </HStack>
+            </WStack>
 
-          {thread.deletedAt !== undefined && (
-            <ThreadDeletedAlert thread={thread} />
-          )}
-          <WStack justifyContent="space-between">
-            <HStack>
-              <Byline
-                href={`#${thread.id}`}
-                author={thread.author}
-                time={new Date(thread.createdAt)}
-                updated={new Date(thread.updatedAt)}
-              />
-
-              {thread.category && <CategoryBadge category={thread.category} />}
-            </HStack>
-
-            {match(thread.visibility)
-              .with(Visibility.published, () => null)
-              .with(Visibility.review, () => (
-                <PostReviewBadge
-                  isModerator={isModerator}
-                  postId={thread.id}
-                  onAccept={handlers.handleAcceptThread}
-                  onEditAndAccept={handlers.handleEditAndAccept}
-                  onDelete={handlers.handleConfirmDelete}
-                  isConfirmingDelete={isConfirmingDelete}
-                  onCancelDelete={handlers.handleCancelDelete}
+            {thread.deletedAt !== undefined && (
+              <ThreadDeletedAlert thread={thread} />
+            )}
+            <WStack justifyContent="space-between">
+              <HStack>
+                <Byline
+                  href={`#${thread.id}`}
+                  author={thread.author}
+                  time={new Date(thread.createdAt)}
+                  updated={new Date(thread.updatedAt)}
                 />
-              ))
-              .otherwise(() => (
-                <VisibilityBadge visibility={thread.visibility} />
-              ))}
-          </WStack>
-          <FormErrorText>{form.formState.errors.root?.message}</FormErrorText>
 
-          {isEditing ? (
-            <>
-              <HeadingInputField
-                id="title-input"
-                placeholder="Thread title..."
-                name="title"
+                {thread.category && (
+                  <CategoryBadge category={thread.category} />
+                )}
+              </HStack>
+
+              {match(thread.visibility)
+                .with(Visibility.published, () => null)
+                .with(Visibility.review, () => (
+                  <PostReviewBadge
+                    isModerator={isModerator}
+                    postId={thread.id}
+                    onAccept={handlers.handleAcceptThread}
+                    onEditAndAccept={handlers.handleEditAndAccept}
+                    onDelete={handlers.handleConfirmDelete}
+                    isConfirmingDelete={isConfirmingDelete}
+                    onCancelDelete={handlers.handleCancelDelete}
+                  />
+                ))
+                .otherwise(() => (
+                  <VisibilityBadge visibility={thread.visibility} />
+                ))}
+            </WStack>
+            <FormErrorText>{form.formState.errors.root?.message}</FormErrorText>
+
+            {isEditing ? (
+              <>
+                <HeadingInputField
+                  id="title-input"
+                  placeholder="Thread title..."
+                  name="title"
+                  control={form.control}
+                />
+                <FormErrorText>
+                  {form.formState.errors.title?.message}
+                </FormErrorText>
+              </>
+            ) : (
+              <PageHeading>{thread.title}</PageHeading>
+            )}
+
+            {isEditing ? (
+              <ThreadTagListField
+                name="tags"
                 control={form.control}
+                initialTags={thread.tags}
               />
-              <FormErrorText>
-                {form.formState.errors.title?.message}
-              </FormErrorText>
-            </>
-          ) : (
-            <PageHeading>{thread.title}</PageHeading>
-          )}
+            ) : (
+              <TagBadgeList tags={thread.tags} />
+            )}
 
-          {isEditing ? (
-            <ThreadTagListField
-              name="tags"
-              control={form.control}
-              initialTags={thread.tags}
+            {thread.link && <LinkCard link={thread.link} />}
+
+            <styled.div data-outline-body="" width="full" minW="0">
+              <ContentComposerField
+                control={form.control}
+                name="body"
+                initialValue={thread.body}
+                resetKey={resetKey}
+                disabled={!isEditing}
+                onEmptyStateChange={handlers.handleEmptyStateChange}
+              />
+            </styled.div>
+
+            {signatureConfig.enabled && (
+              <Signature
+                signature={thread.author.signature}
+                maxHeight={signatureConfig.maxHeight}
+              />
+            )}
+          </styled.form>
+
+          <ThreadStats thread={thread} />
+
+          <VStack className="thread-page__replies" w="full">
+            {data.thread.replies.total_pages > 1 && (
+              <PaginationControls
+                path={`/t/${thread.slug}`}
+                currentPage={data.thread.replies.current_page ?? 1}
+                totalPages={data.thread.replies.total_pages}
+                pageSize={data.thread.replies.page_size}
+              />
+            )}
+
+            <ReplyList
+              initialSession={props.initialSession}
+              thread={thread}
+              currentPage={data.thread.replies.current_page}
+              initialSignatureConfig={signatureConfig}
             />
-          ) : (
-            <TagBadgeList tags={thread.tags} />
-          )}
 
-          {thread.link && <LinkCard link={thread.link} />}
+            {data.thread.replies.total_pages > 1 && (
+              <PaginationControls
+                path={`/t/${thread.slug}`}
+                currentPage={data.thread.replies.current_page ?? 1}
+                totalPages={data.thread.replies.total_pages}
+                pageSize={data.thread.replies.page_size}
+              />
+            )}
+          </VStack>
 
-          <ContentComposerField
-            control={form.control}
-            name="body"
-            initialValue={thread.body}
-            resetKey={resetKey}
-            disabled={!isEditing}
-            onEmptyStateChange={handlers.handleEmptyStateChange}
-          />
-
-          {signatureConfig.enabled && (
-            <Signature
-              signature={thread.author.signature}
-              maxHeight={signatureConfig.maxHeight}
-            />
-          )}
-        </styled.form>
-
-        <ThreadStats thread={thread} />
-
-        <VStack className="thread-page__replies" w="full">
-          {data.thread.replies.total_pages > 1 && (
-            <PaginationControls
-              path={`/t/${thread.slug}`}
-              currentPage={data.thread.replies.current_page ?? 1}
-              totalPages={data.thread.replies.total_pages}
-              pageSize={data.thread.replies.page_size}
-            />
-          )}
-
-          <ReplyList
+          <ReplyBox
             initialSession={props.initialSession}
+            initialSettings={props.initialSettings}
             thread={thread}
-            currentPage={data.thread.replies.current_page}
-            initialSignatureConfig={signatureConfig}
           />
-
-          {data.thread.replies.total_pages > 1 && (
-            <PaginationControls
-              path={`/t/${thread.slug}`}
-              currentPage={data.thread.replies.current_page ?? 1}
-              totalPages={data.thread.replies.total_pages}
-              pageSize={data.thread.replies.page_size}
-            />
-          )}
-        </VStack>
-
-        <ReplyBox
-          initialSession={props.initialSession}
-          initialSettings={props.initialSettings}
-          thread={thread}
-        />
-      </LStack>
+        </LStack>
+      </ContentOutline>
     </ReplyProvider>
   );
 }
