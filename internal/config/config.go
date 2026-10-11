@@ -523,7 +523,7 @@ type Config struct {
 	// -
 
 	/*
-	   Enables the Model Context Provider server, accessible via SSE at `/mcp`.
+	   Enables the Model Context Protocol server, accessible via Streamable HTTP at `/mcp` on the public API origin. When enabled, the server publishes an MCP Server Card at `/mcp/server-card` and adds it to the web origin's `/.well-known/ai-catalog.json`.
 
 	   This is used to integrate Storyden into agentic workflow engines and other language model tooling.
 
