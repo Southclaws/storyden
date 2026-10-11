@@ -1,6 +1,7 @@
 import {
   type KeyboardEvent,
   type MouseEvent,
+  type PointerEvent,
   useEffect,
   useRef,
   useState,
@@ -22,6 +23,7 @@ export function useContentOutlineRail(activeKey?: string) {
   const closeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const focusFrame = useRef<number>(undefined);
   const dismissed = useRef(false);
+  const openBeforePointerDown = useRef<boolean | undefined>(undefined);
 
   useEffect(() => {
     return () => {
@@ -82,10 +84,21 @@ export function useContentOutlineRail(activeKey?: string) {
     triggerRef.current?.focus({ preventScroll: true });
   }
 
-  function handleTriggerPointerEnter() {
-    handleKeepOpen();
-    dismissed.current = false;
-    setOpen(true);
+  function handleTriggerPointerEnter(event: PointerEvent<HTMLButtonElement>) {
+    if (event.pointerType === "touch") {
+      return;
+    }
+
+    handleOpenChange({ open: true });
+  }
+
+  function handleTriggerPointerDown() {
+    // Capture runs before focus, including Ark's Safari focus handling.
+    openBeforePointerDown.current = open;
+  }
+
+  function handleTriggerPointerCancel() {
+    openBeforePointerDown.current = undefined;
   }
 
   function handleTriggerFocus() {
@@ -101,9 +114,13 @@ export function useContentOutlineRail(activeKey?: string) {
   }
 
   function handleTriggerClick(event: MouseEvent<HTMLButtonElement>) {
-    // Focus can open the popover before its built-in click toggle runs.
     event.preventDefault();
-    handleTriggerPointerEnter();
+
+    // Focus may have opened the panel during this press.
+    const wasOpen = openBeforePointerDown.current ?? open;
+    openBeforePointerDown.current = undefined;
+
+    handleOpenChange({ open: !wasOpen });
   }
 
   function handleTriggerKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
@@ -112,7 +129,8 @@ export function useContentOutlineRail(activeKey?: string) {
     }
 
     event.preventDefault();
-    handleTriggerPointerEnter();
+    openBeforePointerDown.current = undefined;
+    handleOpenChange({ open: true });
     focusFrame.current = requestAnimationFrame(() => {
       panelRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
     });
@@ -143,6 +161,8 @@ export function useContentOutlineRail(activeKey?: string) {
       handleFocusOutside,
       handleEscapeKeyDown,
       handleTriggerPointerEnter,
+      handleTriggerPointerDown,
+      handleTriggerPointerCancel,
       handleTriggerFocus,
       handleTriggerBlur,
       handleTriggerClick,

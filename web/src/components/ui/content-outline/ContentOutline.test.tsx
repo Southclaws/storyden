@@ -169,7 +169,7 @@ describe("ContentOutline", () => {
     "navigates rendered composer headings without changing saved content (%#)",
     async (Composer) => {
       const onChange = vi.fn();
-      const user = userEvent.setup();
+      const user = userEvent.setup({ skipHover: true });
       render(
         <ContentOutline label="On this page" collectEntries={collect}>
           <Composer
@@ -204,6 +204,64 @@ describe("ContentOutline", () => {
     await waitFor(() =>
       expect(trigger).toHaveAttribute("aria-expanded", "false"),
     );
+  });
+
+  it("keeps the first click open after focus, then closes and reopens on repeated clicks", async () => {
+    const user = userEvent.setup({ skipHover: true });
+    render(<Example />);
+
+    const trigger = await screen.findByRole("button", { name: "On this page" });
+
+    await user.click(trigger);
+    expect(trigger).toHaveFocus();
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("dialog")).toBeVisible();
+
+    await user.click(trigger);
+    expect(trigger).toHaveFocus();
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+
+    await user.click(trigger);
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("dialog")).toBeVisible();
+  });
+
+  it("closes a hover-opened outline when its trigger is clicked", async () => {
+    const user = userEvent.setup();
+    render(<Example />);
+
+    const trigger = await screen.findByRole("button", { name: "On this page" });
+
+    await user.hover(trigger);
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+
+    await user.click(trigger);
+    expect(trigger).toHaveFocus();
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  });
+
+  it("opens, closes and reopens on repeated touch activation", async () => {
+    const user = userEvent.setup();
+    render(<Example />);
+
+    const trigger = await screen.findByRole("button", { name: "On this page" });
+
+    await user.pointer({ keys: "[TouchA>]", target: trigger });
+    await user.pointer({ keys: "[/TouchA]", target: trigger });
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("dialog")).toBeVisible();
+
+    await user.pointer({ keys: "[TouchA>]", target: trigger });
+    await user.pointer({ keys: "[/TouchA]", target: trigger });
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+
+    await user.pointer({ keys: "[TouchA>]", target: trigger });
+    await user.pointer({ keys: "[/TouchA]", target: trigger });
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("dialog")).toBeVisible();
   });
 
   it("supports keyboard navigation, Escape, re-entry and destination focus", async () => {
@@ -264,8 +322,8 @@ describe("ContentOutline", () => {
     expect(screen.queryByRole("button", { name: "On this page" })).toBeNull();
   });
 
-  it("dismisses on outside interaction without returning focus to the hover trigger", async () => {
-    const user = userEvent.setup();
+  it("dismisses on outside interaction without returning focus to the trigger", async () => {
+    const user = userEvent.setup({ skipHover: true });
     render(<Example />);
     const trigger = await screen.findByRole("button", { name: "On this page" });
     await user.click(trigger);

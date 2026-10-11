@@ -53,6 +53,8 @@ export function ContentOutlineRail({ label, entries, activeKey }: Props) {
             variant="plain"
             aria-label={label}
             onPointerEnter={handlers.handleTriggerPointerEnter}
+            onPointerDownCapture={handlers.handleTriggerPointerDown}
+            onPointerCancel={handlers.handleTriggerPointerCancel}
             onPointerLeave={handlers.handleCloseSoon}
             onFocus={handlers.handleTriggerFocus}
             onBlur={handlers.handleTriggerBlur}
