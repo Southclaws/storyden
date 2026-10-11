@@ -53,6 +53,7 @@ func TestNotificationUpdateMany(t *testing.T) {
 			notlist, err := cl.NotificationListWithResponse(root, &openapi.NotificationListParams{}, userSession)
 			tests.Ok(t, err, notlist)
 			r.Len(notlist.JSON200.Notifications, 3)
+			a.Nil(notlist.JSON200.NextPage, "single page must not advertise a next page")
 
 			for _, n := range notlist.JSON200.Notifications {
 				a.Equal(openapi.Unread, n.Status)
@@ -74,6 +75,7 @@ func TestNotificationUpdateMany(t *testing.T) {
 			tests.Ok(t, err, updateResp)
 
 			r.Len(updateResp.JSON200.Notifications, 2)
+			a.Nil(updateResp.JSON200.NextPage, "single page must not advertise a next page")
 			for _, n := range updateResp.JSON200.Notifications {
 				a.Equal(openapi.Read, n.Status)
 			}

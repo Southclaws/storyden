@@ -46,7 +46,7 @@ func (h *Notifications) NotificationList(ctx context.Context, request openapi.No
 		NotificationListOKJSONResponse: openapi.NotificationListOKJSONResponse{
 			// TODO: Pagination at resource layer.
 			CurrentPage:   1,
-			NextPage:      new(int),
+			NextPage:      nil,
 			Notifications: notifications,
 			PageSize:      len(notifications),
 			Results:       len(notifications),
@@ -107,7 +107,7 @@ func (h *Notifications) NotificationUpdateMany(ctx context.Context, request open
 	return openapi.NotificationUpdateMany200JSONResponse{
 		NotificationUpdateManyOKJSONResponse: openapi.NotificationUpdateManyOKJSONResponse{
 			CurrentPage:   1,
-			NextPage:      new(int),
+			NextPage:      nil,
 			Notifications: notifications,
 			PageSize:      len(notifications),
 			Results:       len(notifications),
