@@ -58,6 +58,10 @@ export function useSettingsMutation() {
             return {
               ...current,
               ...publicPatch,
+              discovery: {
+                ...current.discovery,
+                ...services?.discovery,
+              },
               motd: mergeMotd(current.motd, motd),
               metadata: {
                 ...current.metadata,
@@ -99,6 +103,7 @@ export function mergeAdminSettingsIntoInfo(
     metadata: admin.metadata ?? current.metadata,
     motd: admin.motd,
     registration_mode: admin.registration_mode,
+    discovery: admin.services?.discovery ?? current.discovery,
     title: admin.title,
     web_address: admin.web_address,
   };

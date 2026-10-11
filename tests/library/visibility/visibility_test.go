@@ -39,6 +39,40 @@ func TestNodesVisibility(t *testing.T) {
 			authorSession := sh.WithSession(ctxAuthor)
 			randoSession := sh.WithSession(ctxRando)
 
+			t.Run("public_flat_list_only_lists_published_nodes", func(t *testing.T) {
+				t.Parallel()
+				a := assert.New(t)
+
+				published := openapi.VisibilityPublished
+				unlisted := openapi.VisibilityUnlisted
+				draft := openapi.VisibilityDraft
+				pubSlug := uuid.NewString()
+				unlistedSlug := uuid.NewString()
+				draftSlug := uuid.NewString()
+
+				tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+					Name: "indexed", Slug: &pubSlug, Visibility: &published,
+				}, adminSession))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+					Name: "unlisted", Slug: &unlistedSlug, Visibility: &unlisted,
+				}, adminSession))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+					Name: "draft", Slug: &draftSlug, Visibility: &draft,
+				}, adminSession))(t, http.StatusOK)
+
+				index := tests.AssertRequest(cl.NodeListWithResponse(root, &openapi.NodeListParams{
+					Format:     opt.New(openapi.NodeListParamsFormatFlat).Ptr(),
+					Visibility: &openapi.VisibilityParam{published},
+				}))(t, http.StatusOK)
+				slugs := make([]string, 0, len(index.JSON200.Nodes))
+				for _, n := range index.JSON200.Nodes {
+					slugs = append(slugs, n.Slug)
+				}
+				a.Contains(slugs, pubSlug)
+				a.NotContains(slugs, unlistedSlug)
+				a.NotContains(slugs, draftSlug)
+			})
+
 			t.Run("public_only", func(t *testing.T) {
 				t.Parallel()
 

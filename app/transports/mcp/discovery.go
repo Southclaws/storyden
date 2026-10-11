@@ -1,10 +1,9 @@
 package mcp
 
 import (
-	"context"
 	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"net"
 	"net/http"
 	"strings"
@@ -93,7 +92,7 @@ func serverName(webHost string) string {
 func discoveryDocuments(cfg config.Config, title string) (serverCard, aiCatalog, apiCatalog) {
 	apiURL := cfg.PublicAPIAddress.JoinPath("/api")
 	apiSchemaURL := cfg.PublicAPIAddress.JoinPath("/api/openapi.json")
-	apiCatalogURL := cfg.PublicWebAddress.JoinPath("/.well-known/api-catalog")
+	apiCatalogURL := cfg.PublicAPIAddress.JoinPath("/.well-known/api-catalog")
 
 	api := apiCatalog{Linkset: []apiCatalogLinks{
 		{Anchor: apiCatalogURL.String(), Item: []apiCatalogLink{{Href: apiURL.String()}}},
@@ -119,7 +118,7 @@ func discoveryDocuments(cfg config.Config, title string) (serverCard, aiCatalog,
 			card.Title = title
 		}
 		ai.Entries = append(ai.Entries, aiCatalogEntry{
-			Identifier: "urn:air:" + cfg.PublicWebAddress.Hostname() + ":mcp:storyden",
+			Identifier: fmt.Sprintf("urn:air:%s:mcp:storyden", cfg.PublicWebAddress.Hostname()),
 			Type:       serverCardMediaType, URL: cardURL.String(),
 		})
 		api.Linkset[0].Item = append(api.Linkset[0].Item, apiCatalogLink{Href: mcpURL.String()})
@@ -134,11 +133,11 @@ func discoveryHandler(document any, mediaType string, cors bool) http.Handler {
 	}
 	body = append(body, '\n')
 	hash := sha256.Sum256(body)
-	etag := "\"" + hex.EncodeToString(hash[:]) + "\""
+	etag := fmt.Sprintf("\"%x\"", hash)
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", mediaType)
-		w.Header().Set("Cache-Control", "public, max-age=3600")
+		w.Header().Set("Cache-Control", "no-cache, must-revalidate")
 		w.Header().Set("ETag", etag)
 		if cors {
 			w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -161,37 +160,61 @@ func discoveryHandler(document any, mediaType string, cors bool) http.Handler {
 	})
 }
 
-func MountDiscovery(lc fx.Lifecycle, ctx context.Context, cfg config.Config, settings *settings.SettingsRepository, mux *http.ServeMux) {
-	lc.Append(fx.StartHook(func() error {
-		title := "Storyden"
-		if cfg.MCPEnabled {
-			set, err := settings.Get(ctx)
+func MountDiscovery(lc fx.Lifecycle, cfg config.Config, repo *settings.SettingsRepository, mux *http.ServeMux) {
+	lc.Append(fx.StartHook(func() {
+		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Cache-Control", "no-store")
+
+			current, err := repo.Get(r.Context())
 			if err != nil {
-				return err
+				http.Error(w, "Discovery settings unavailable", http.StatusServiceUnavailable)
+				return
 			}
-			title = set.Title.Or(title)
+
+			policy := current.Services.OrZero().Discovery.OrZero()
+			card, ai, api := discoveryDocuments(cfg, current.Title.Or("Storyden"))
+			if !policy.MCPServerCard.Or(false) {
+				ai.Entries = []aiCatalogEntry{}
+			}
+
+			var enabled bool
+			var document any
+			var mediaType string
+
+			switch r.URL.Path {
+			case "/mcp/server-card":
+				enabled = policy.MCPServerCard.Or(false)
+				document, mediaType = card, serverCardMediaType
+
+			case "/.well-known/ai-catalog.json":
+				enabled = policy.AICatalog.Or(false)
+				document, mediaType = ai, "application/ai-catalog+json"
+
+			case "/.well-known/api-catalog":
+				enabled = policy.APICatalog.Or(false)
+				document, mediaType = api, apiCatalogMediaType
+			}
+
+			if !enabled {
+				http.NotFound(w, r)
+				return
+			}
+
+			if r.URL.Path == "/.well-known/api-catalog" {
+				w.Header().Set("Link", fmt.Sprintf("<%s>; rel=api-catalog", cfg.PublicAPIAddress.JoinPath("/.well-known/api-catalog")))
+			}
+
+			discoveryHandler(document, mediaType, true).ServeHTTP(w, r)
+		})
+
+		paths := []string{"/.well-known/ai-catalog.json", "/.well-known/api-catalog"}
+		if cfg.MCPEnabled {
+			paths = append(paths, "/mcp/server-card")
 		}
 
-		mountDiscovery(mux, cfg, title)
-		return nil
+		for _, path := range paths {
+			mux.Handle("GET "+path, handler)
+			mux.Handle("OPTIONS "+path, handler)
+		}
 	}))
-}
-
-func mountDiscovery(mux *http.ServeMux, cfg config.Config, title string) {
-	card, ai, api := discoveryDocuments(cfg, title)
-	if cfg.MCPEnabled {
-		cardHandler := discoveryHandler(card, serverCardMediaType, true)
-		mux.Handle("GET /mcp/server-card", cardHandler)
-		mux.Handle("OPTIONS /mcp/server-card", cardHandler)
-	}
-	aiHandler := discoveryHandler(ai, "application/ai-catalog+json", true)
-	mux.Handle("GET /.well-known/ai-catalog.json", aiHandler)
-	mux.Handle("OPTIONS /.well-known/ai-catalog.json", aiHandler)
-	apiHandler := discoveryHandler(api, apiCatalogMediaType, true)
-	linkedAPIHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Link", "<"+cfg.PublicWebAddress.JoinPath("/.well-known/api-catalog").String()+">; rel=api-catalog")
-		apiHandler.ServeHTTP(w, r)
-	})
-	mux.Handle("GET /.well-known/api-catalog", linkedAPIHandler)
-	mux.Handle("OPTIONS /.well-known/api-catalog", linkedAPIHandler)
 }

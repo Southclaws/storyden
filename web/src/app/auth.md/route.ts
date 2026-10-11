@@ -1,11 +1,23 @@
 import { InstanceCapability } from "@/api/openapi-schema";
 import { getInfo } from "@/api/openapi-server/misc";
+import { resolveDiscoverySettings } from "@/lib/settings/discovery";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const { data: info } = await getInfo({ cache: "no-store" });
+    const { data: info } = await getInfo({
+      cache: "no-store",
+    });
+
+    const settings = resolveDiscoverySettings(info.discovery);
+
+    if (!settings.auth_md) {
+      return new Response("Not found", {
+        status: 404,
+        headers: { "Cache-Control": "no-store" },
+      });
+    }
 
     const oauthEnabled = info.capabilities.includes(InstanceCapability.oauth);
     let oauthSection = "OAuth is not advertised by this instance.";
@@ -14,7 +26,7 @@ export async function GET() {
       const api = new URL(info.api_address);
       const oauthDiscovery = new URL(
         "/.well-known/oauth-authorization-server",
-        api
+        api,
       );
       const openIDDiscovery = new URL("/.well-known/openid-configuration", api);
 

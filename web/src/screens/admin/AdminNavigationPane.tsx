@@ -19,6 +19,7 @@ import { InboxIcon } from "@/components/ui/icons/Inbox";
 import { LayoutIcon } from "@/components/ui/icons/Layout";
 import { LinkIcon } from "@/components/ui/icons/Link";
 import { RobotIcon } from "@/components/ui/icons/Robot";
+import { SearchIcon } from "@/components/ui/icons/Search";
 import { SystemIcon } from "@/components/ui/icons/System";
 import { ToolIcon } from "@/components/ui/icons/Tool";
 import { useSettings } from "@/lib/settings/settings-client";
@@ -32,6 +33,7 @@ const sectionIcons: Record<AdminSectionID, ReactNode> = {
   theme: <ColourPipetteIcon />,
   moderation: <BanIcon />,
   system: <SystemIcon />,
+  discovery: <SearchIcon />,
   audit_log: <ArchiveIcon />,
   email: <InboxIcon />,
   authentication: <BiometricIcon />,

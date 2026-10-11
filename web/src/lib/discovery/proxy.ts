@@ -37,17 +37,20 @@ export async function proxyDiscovery(request: Request, path: string) {
       }
     }
 
-    return new Response(
+    let body = upstream.body;
+
+    if (
       upstream.status === 204 ||
       upstream.status === 304 ||
       request.method === "HEAD"
-        ? null
-        : upstream.body,
-      {
-        status: upstream.status,
-        headers: publicHeaders,
-      }
-    );
+    ) {
+      body = null;
+    }
+
+    return new Response(body, {
+      status: upstream.status,
+      headers: publicHeaders,
+    });
   } catch {
     return new Response("Discovery service unavailable", {
       status: 502,

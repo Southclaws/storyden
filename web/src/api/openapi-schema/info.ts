@@ -8,6 +8,7 @@
  * OpenAPI spec version: v1.26.15-post
  */
 import type { AuthMode } from "./authMode";
+import type { DiscoveryServiceSettings } from "./discoveryServiceSettings";
 import type { InstanceCapabilityList } from "./instanceCapabilityList";
 import type { MessageOfTheDay } from "./messageOfTheDay";
 import type { Metadata } from "./metadata";
@@ -26,6 +27,7 @@ export interface Info {
   onboarding_status: OnboardingStatus;
   authentication_mode: AuthMode;
   registration_mode: RegistrationMode;
+  discovery?: DiscoveryServiceSettings;
   capabilities: InstanceCapabilityList;
   /** The public web frontend address for this Storyden instance. */
   web_address: string;

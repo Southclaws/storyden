@@ -10,6 +10,7 @@ vi.mock("next/headers", () => ({
 
 import { GET as authGuide } from "@/app/auth.md/route";
 import { GET as llms } from "@/app/llms.txt/route";
+import { resolveDiscoverySettings } from "@/lib/settings/discovery";
 
 import { proxyDiscovery } from "./proxy";
 import { getAICatalog } from "./public";
@@ -63,7 +64,7 @@ test("catalog proxy preserves media, CORS, HEAD and upstream failure status", as
           headers: {
             "Content-Type": "application/ai-catalog+json",
             "Access-Control-Allow-Origin": "*",
-            Link: "<https://community.example/.well-known/api-catalog>; rel=api-catalog",
+            Link: "<https://api.community.example/.well-known/api-catalog>; rel=api-catalog",
           },
         }),
     ),
@@ -74,7 +75,10 @@ test("catalog proxy preserves media, CORS, HEAD and upstream failure status", as
   );
   assert.equal(get.headers.get("Content-Type"), "application/ai-catalog+json");
   assert.equal(get.headers.get("Access-Control-Allow-Origin"), "*");
-  assert.match(get.headers.get("Link") ?? "", /api-catalog/);
+  assert.equal(
+    get.headers.get("Link"),
+    "<https://api.community.example/.well-known/api-catalog>; rel=api-catalog",
+  );
   assert.equal(await get.text(), '{"entries":[]}');
 
   const head = await proxyDiscovery(
@@ -114,6 +118,13 @@ const info = {
   web_address: "https://community.example",
   api_address: "https://api.community.example",
   capabilities: ["oauth"],
+  discovery: {
+    llms_txt: true,
+    auth_md: true,
+    ai_catalog: true,
+    api_catalog: true,
+    mcp_server_card: true,
+  },
 };
 
 function discoveryFetch(entries: unknown, oauth = true) {
@@ -279,4 +290,80 @@ test("authentication guide reflects the instance OAuth capability", async () => 
     /api\.community\.example\/\.well-known\/oauth-authorization-server/,
   );
   assert.match(enabled, /Dynamic client registration is controlled/);
+});
+
+test("document switches are independent and disabled guides advertise nothing", async () => {
+  const fetcher = discoveryFetch([]);
+  const policy = {
+    llms_txt: false,
+    auth_md: true,
+    api_catalog: true,
+    ai_catalog: true,
+    mcp_server_card: true,
+  };
+  const fetchMock = vi.fn(async (input: Request | URL) => {
+    const url = input instanceof Request ? new URL(input.url) : input;
+    if (url.pathname === "/api/info")
+      return Response.json({ ...info, discovery: policy });
+    return fetcher(input);
+  });
+  vi.stubGlobal("fetch", fetchMock);
+  const disabled = await llms();
+  assert.equal(disabled.status, 404);
+  assert.equal(disabled.headers.get("Cache-Control"), "no-store");
+  assert.equal(fetchMock.mock.calls.length, 1);
+  assert.equal((await authGuide()).status, 200);
+
+  policy.llms_txt = true;
+  policy.auth_md = false;
+  policy.api_catalog = false;
+  policy.ai_catalog = false;
+  assert.equal((await authGuide()).status, 404);
+  const response = await llms();
+  assert.equal(response.status, 200);
+  const body = await response.text();
+  assert.doesNotMatch(body, /auth\.md|API catalog|AI catalog|MCP Server Card/);
+  assert.match(body, /OpenAPI specification/);
+});
+
+test.each([undefined, {}])(
+  "missing discovery settings keep documents opt-in: %j",
+  async (discovery) => {
+    const fetcher = vi.fn(async () => Response.json({ ...info, discovery }));
+    vi.stubGlobal("fetch", fetcher);
+
+    assert.deepEqual(resolveDiscoverySettings(discovery), {
+      search_indexing: true,
+      training_crawling: false,
+      llms_txt: false,
+      auth_md: false,
+      ai_catalog: false,
+      api_catalog: false,
+      mcp_server_card: false,
+      robots_txt: "",
+    });
+    assert.equal((await llms()).status, 404);
+    assert.equal((await authGuide()).status, 404);
+    assert.equal(fetcher.mock.calls.length, 2);
+  },
+);
+
+test("enabling one guide does not enable the other missing document settings", async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async () =>
+      Response.json({
+        ...info,
+        discovery: { llms_txt: true },
+      }),
+    ),
+  );
+
+  const response = await llms();
+  assert.equal(response.status, 200);
+  assert.doesNotMatch(
+    await response.text(),
+    /auth\.md|API catalog|AI catalog|MCP Server Card/,
+  );
+  assert.equal((await authGuide()).status, 404);
 });

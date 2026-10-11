@@ -15,6 +15,7 @@ export type AdminSectionID =
   | "theme"
   | "moderation"
   | "system"
+  | "discovery"
   | "audit_log"
   | "email"
   | "authentication"
@@ -125,6 +126,12 @@ export function getAdminSectionGroups(
           href: "/admin/system",
           label: "System",
           description: "Infrastructure and runtime settings",
+        },
+        {
+          id: "discovery",
+          href: "/admin/discovery",
+          label: "Discovery",
+          description: "Search, crawlers, and discovery documents",
         },
         {
           id: "audit_log",

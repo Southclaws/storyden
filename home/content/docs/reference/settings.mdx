@@ -42,6 +42,19 @@ To arrange the home feed and navigation, return to the community and choose **Ed
   an issue](https://github.com/Southclaws/storyden/issues).
 </Callout>
 
+## Discovery
+
+**Operations → Discovery** controls how search engines and other tools discover your site. Changes take effect without restarting Storyden.
+
+- **Search indexing** publishes sitemaps and allows search crawlers in the default `robots.txt`. Turning it off also disables the sitemap endpoints.
+- **AI training crawlers** are discouraged by default through `robots.txt`. This preference is separate from search indexing and discovery documents.
+- **Discovery documents** have individual switches for `llms.txt`, `auth.md`, the AI catalog, the API catalog and the MCP Server Card. Disabled documents return 404, and the remaining guides omit links to them. These controls do not change member permissions, OAuth or MCP functionality.
+- **Custom robots.txt** replaces the entire generated policy, including crawler rules and sitemap links. Leave it empty, or choose **Use default robots.txt** and save, to restore the generated policy.
+
+Search indexing is enabled by default. Discovery documents are disabled by default; enable each one when you want to advertise it. MCP Server Cards are only available when MCP is configured. Search indexing, AI training crawlers and discovery documents can be configured independently.
+
+Crawler rules are requests to cooperating crawlers. They do not restrict access to public content; use member permissions to control access.
+
 ## API
 
 You can configure anything you see on the admin page via the API programmatically. This is useful if you want to set up a new site with a script or change settings based on schedules or other events.

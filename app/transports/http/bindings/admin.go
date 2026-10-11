@@ -229,6 +229,8 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 			})
 		}
 
+		discovery := opt.Map(opt.NewPtr(request.Body.Services.Discovery), deserialiseDiscoveryServiceSettings)
+
 		var moderation opt.Optional[settings.ModerationServiceSettings]
 		if request.Body.Services.Moderation != nil {
 			moderationBody := request.Body.Services.Moderation
@@ -265,11 +267,12 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		if clientIP.Ok() || rateLimit.Ok() || moderation.Ok() || robots.Ok() || oauth.Ok() {
+		if clientIP.Ok() || rateLimit.Ok() || discovery.Ok() || moderation.Ok() || robots.Ok() || oauth.Ok() {
 			services = opt.New(settings.ServiceSettings{
 				OAuth:      oauth,
 				ClientIP:   clientIP,
 				RateLimit:  rateLimit,
+				Discovery:  discovery,
 				Moderation: moderation,
 				Robots:     robots,
 			})
@@ -948,6 +951,7 @@ func serialiseServiceSettings(in settings.ServiceSettings) openapi.AdminSettings
 		Oauth:        opt.Map(in.OAuth, serialiseOAuthServiceSettings).Ptr(),
 		ClientIp:     opt.Map(in.ClientIP, serialiseClientIPSettings).Ptr(),
 		RateLimiting: opt.Map(in.RateLimit, serialiseRateLimitSettings).Ptr(),
+		Discovery:    opt.Map(in.Discovery, serialiseDiscoveryServiceSettings).Ptr(),
 		Moderation:   opt.Map(in.Moderation, serialiseModerationSettings).Ptr(),
 		Robots:       opt.Map(in.Robots, serialiseRobotServiceSettings).Ptr(),
 	}
@@ -976,6 +980,32 @@ func serialiseRateLimitSettings(in settings.RateLimitServiceSettings) openapi.Ra
 		RateLimitBucket:    opt.Map(in.RateLimitBucket, func(d time.Duration) int { return int(d.Seconds()) }).Ptr(),
 		RateLimitGuestCost: in.RateLimitGuestCost.Ptr(),
 		CostOverrides:      in.CostOverrides.Ptr(),
+	}
+}
+
+func deserialiseDiscoveryServiceSettings(in openapi.DiscoveryServiceSettings) settings.DiscoveryServiceSettings {
+	return settings.DiscoveryServiceSettings{
+		SearchIndexing:   opt.NewPtr(in.SearchIndexing),
+		TrainingCrawling: opt.NewPtr(in.TrainingCrawling),
+		LLMSTxt:          opt.NewPtr(in.LlmsTxt),
+		AuthMD:           opt.NewPtr(in.AuthMd),
+		AICatalog:        opt.NewPtr(in.AiCatalog),
+		APICatalog:       opt.NewPtr(in.ApiCatalog),
+		MCPServerCard:    opt.NewPtr(in.McpServerCard),
+		RobotsTxt:        opt.NewPtr(in.RobotsTxt),
+	}
+}
+
+func serialiseDiscoveryServiceSettings(in settings.DiscoveryServiceSettings) openapi.DiscoveryServiceSettings {
+	return openapi.DiscoveryServiceSettings{
+		SearchIndexing:   in.SearchIndexing.Ptr(),
+		TrainingCrawling: in.TrainingCrawling.Ptr(),
+		LlmsTxt:          in.LLMSTxt.Ptr(),
+		AuthMd:           in.AuthMD.Ptr(),
+		AiCatalog:        in.AICatalog.Ptr(),
+		ApiCatalog:       in.APICatalog.Ptr(),
+		McpServerCard:    in.MCPServerCard.Ptr(),
+		RobotsTxt:        in.RobotsTxt.Ptr(),
 	}
 }
 

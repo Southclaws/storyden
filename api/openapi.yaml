@@ -7654,6 +7654,8 @@ components:
           $ref: "#/components/schemas/AuthMode"
         registration_mode:
           $ref: "#/components/schemas/RegistrationMode"
+        discovery:
+          $ref: "#/components/schemas/DiscoveryServiceSettings"
         capabilities:
           $ref: "#/components/schemas/InstanceCapabilityList"
         web_address:
@@ -8178,6 +8180,8 @@ components:
           $ref: "#/components/schemas/ClientIPServiceSettings"
         rate_limiting:
           $ref: "#/components/schemas/RateLimitServiceSettings"
+        discovery:
+          $ref: "#/components/schemas/DiscoveryServiceSettings"
         moderation:
           $ref: "#/components/schemas/ModerationServiceSettings"
         robots:
@@ -8306,6 +8310,36 @@ components:
           additionalProperties:
             type: integer
             description: The cost value for the corresponding action.
+
+    DiscoveryServiceSettings:
+      type: object
+      description: Public discovery and crawler preferences, configurable by administrators at runtime.
+      properties:
+        search_indexing:
+          type: boolean
+          description: Publish sitemaps and allow search crawling in the generated robots.txt.
+        training_crawling:
+          type: boolean
+          description: Allow known AI training crawlers in the generated robots.txt.
+        llms_txt:
+          type: boolean
+          description: Serve the llms.txt discovery guide.
+        auth_md:
+          type: boolean
+          description: Serve the auth.md authentication guide.
+        ai_catalog:
+          type: boolean
+          description: Serve the AI catalog.
+        api_catalog:
+          type: boolean
+          description: Serve the API catalog.
+        mcp_server_card:
+          type: boolean
+          description: Serve the MCP Server Card when MCP is enabled.
+        robots_txt:
+          type: string
+          maxLength: 65536
+          description: Custom robots.txt content. An empty string restores the generated policy. Custom content replaces generated crawler directives.
 
     ModerationServiceSettings:
       type: object

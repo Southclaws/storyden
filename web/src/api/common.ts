@@ -10,6 +10,7 @@ export type Options = {
   body?: unknown;
   responseType?: string;
   cookie?: string;
+  signal?: AbortSignal;
   revalidate?: number;
   cache?: RequestCache;
   next?: NextFetchRequestConfig;
@@ -46,7 +47,7 @@ export class RequestError extends Error {
 
 export function buildRequest(
   url: string,
-  { method = "GET", headers, params, body, revalidate, cache }: Options,
+  { method = "GET", headers, params, body, signal, revalidate, cache }: Options,
 ): Request {
   const apiAddress = getAPIAddress();
   const address = `${apiAddress}/api${url}${cleanQuery(params)}`;
@@ -60,6 +61,7 @@ export function buildRequest(
     credentials: "include",
     headers,
     body: buildPayload(body),
+    signal,
     cache,
     next: {
       tags,

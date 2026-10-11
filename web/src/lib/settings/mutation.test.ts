@@ -72,3 +72,19 @@ test("admin settings updates use capabilities when the response includes them", 
 
   assert.deepStrictEqual(updated.capabilities, []);
 });
+
+test("admin settings updates copy public discovery settings without private services", () => {
+  const updated = mergeAdminSettingsIntoInfo(
+    baseInfo({ discovery: { llms_txt: true } }),
+    baseAdminSettings({
+      services: {
+        rate_limiting: { rate_limit: 100 },
+        discovery: { llms_txt: false, auth_md: true },
+        moderation: { word_block_list: ["private rule"] },
+      },
+    }),
+  );
+
+  assert.deepStrictEqual(updated.discovery, { llms_txt: false, auth_md: true });
+  assert.equal("services" in updated, false);
+});
