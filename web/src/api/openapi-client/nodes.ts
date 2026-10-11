@@ -168,6 +168,11 @@ export const getNodeListUrl = (params?: NodeListParams) => {
 
 /**
  * List nodes using the given filters. Can be used to get a full tree.
+ *
+ * With `format=flat` and an explicit `page`, returns pages of 100 nodes
+ * ordered by creation time ascending, then ID. Filtering is applied before
+ * pagination. Without `page`, the complete flat list is returned. Tree
+ * responses remain unpaginated.
  */
 export const nodeList = async (
   params?: NodeListParams,

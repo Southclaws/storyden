@@ -75,31 +75,36 @@ describe("anonymous sitemap source", () => {
     },
   );
 
-  it("splits the unpaginated public node list into complete sitemap pages", async () => {
-    const nodes = Array.from({ length: 501 }, (_, i) => ({
+  it("requests library pages from the API and retains its pagination metadata", async () => {
+    const nodes = Array.from({ length: 101 }, (_, i) => ({
       slug: `node-${i + 1}`,
       updatedAt: "2026-01-02T03:04:05Z",
       visibility: "published",
     }));
     const fetchMock = vi
       .spyOn(globalThis, "fetch")
-      .mockImplementation(async () => Response.json({ nodes, total_pages: 0 }));
+      .mockResolvedValueOnce(
+        Response.json({ nodes: nodes.slice(0, 100), total_pages: 2 }),
+      )
+      .mockResolvedValueOnce(
+        Response.json({ nodes: nodes.slice(100), total_pages: 2 }),
+      );
 
     const firstPage = await getIndexPage("library", 1);
     const secondPage = await getIndexPage("library", 2);
 
     expect(firstPage?.totalPages).toBe(2);
-    expect(firstPage?.entries).toHaveLength(500);
+    expect(firstPage?.entries).toHaveLength(100);
     expect(firstPage?.entries[0]?.slug).toBe("node-1");
-    expect(firstPage?.entries[499]?.slug).toBe("node-500");
+    expect(firstPage?.entries[99]?.slug).toBe("node-100");
     expect(secondPage).toEqual({
-      entries: [{ slug: "node-501", updatedAt: "2026-01-02T03:04:05Z" }],
+      entries: [{ slug: "node-101", updatedAt: "2026-01-02T03:04:05Z" }],
       totalPages: 2,
     });
 
-    for (const [input] of fetchMock.mock.calls) {
+    for (const [i, [input]] of fetchMock.mock.calls.entries()) {
       expect((input as Request).url).toBe(
-        "https://api.community.example/api/nodes?visibility=published&format=flat",
+        `https://api.community.example/api/nodes?page=${i + 1}&visibility=published&format=flat`,
       );
     }
   });

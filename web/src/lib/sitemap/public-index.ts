@@ -17,7 +17,6 @@ export type IndexPage = {
   totalPages: number;
 };
 
-const LIBRARY_SITEMAP_PAGE_SIZE = 500;
 const MAX_SITEMAP_ENTRIES = 50_000;
 
 export const XML_HEADERS = {
@@ -81,7 +80,7 @@ async function getThreadIndexPage(page: number): Promise<IndexPage> {
 
 async function getLibraryIndexPage(page: number): Promise<IndexPage> {
   const { data } = await nodeList(
-    { visibility: ["published"], format: "flat" },
+    { page: String(page), visibility: ["published"], format: "flat" },
     { anonymous: true, cache: "no-store", signal: AbortSignal.timeout(10_000) },
   );
 
@@ -89,12 +88,12 @@ async function getLibraryIndexPage(page: number): Promise<IndexPage> {
     throw new Error("Node list returned non-published content");
   }
 
-  const start = (page - 1) * LIBRARY_SITEMAP_PAGE_SIZE;
-  const nodes = data.nodes.slice(start, start + LIBRARY_SITEMAP_PAGE_SIZE);
-  const entries = nodes.map(({ slug, updatedAt }) => ({ slug, updatedAt }));
-  const totalPages = Math.ceil(data.nodes.length / LIBRARY_SITEMAP_PAGE_SIZE);
+  const entries = data.nodes.map(({ slug, updatedAt }) => ({
+    slug,
+    updatedAt,
+  }));
 
-  return { entries, totalPages };
+  return { entries, totalPages: data.total_pages };
 }
 
 export function canonicalURL(path: string): string {

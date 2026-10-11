@@ -222,6 +222,30 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 
 	flatten := opt.NewPtr(request.Params.Format).Or(openapi.NodeListParamsFormatTree) == openapi.NodeListParamsFormatFlat
 
+	if flatten && request.Params.Page != nil {
+		page := deserialisePageParams(request.Params.Page, 100)
+		params := node_traversal.ListParams{
+			NewestFirst:           opt.New(false),
+			Root:                  nid,
+			IncludeHiddenChildren: opt.New(false),
+		}
+		result, err := c.ntr.List(ctx, page, params, opts...)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		return openapi.NodeList200JSONResponse{
+			NodeListOKJSONResponse: openapi.NodeListOKJSONResponse{
+				CurrentPage: result.CurrentPage,
+				NextPage:    result.NextPage.Ptr(),
+				PageSize:    result.Size,
+				Results:     result.Results,
+				Nodes:       dt.Map(result.Items, serialiseNodeWithItems),
+				TotalPages:  result.TotalPages,
+			},
+		}, nil
+	}
+
 	cs, err = c.ntr.Subtree(ctx, nid, flatten, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
