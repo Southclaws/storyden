@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "next build",
+    "build": "tsx scripts/refresh-home-stats.ts && next build",
+    "stats:refresh": "tsx scripts/refresh-home-stats.ts --github",
     "dev": "next dev",
     "start": "next start",
     "prepare": "panda codegen",
