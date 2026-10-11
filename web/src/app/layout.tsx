@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { PropsWithChildren } from "react";
 
-import { inter, interDisplay } from "@/app/fonts";
+import { inter, interItalic } from "@/app/fonts";
 import { serverEnvironment } from "@/config";
 import { resolveDiscoverySettings } from "@/lib/settings/discovery";
 import { getSettings } from "@/lib/settings/settings-server";
@@ -16,7 +16,7 @@ const { API_ADDRESS, WEB_ADDRESS } = serverEnvironment();
 
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
-    <html lang="en" className={`${inter.variable} ${interDisplay.variable}`}>
+    <html lang="en" className={`${inter.variable} ${interItalic.variable}`}>
       <head>
         {/*
           NOTE: Because the browser side does not support dynamic environment

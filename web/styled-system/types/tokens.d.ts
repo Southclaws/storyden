@@ -18,7 +18,7 @@ export type FontSizeToken = "2xl" | "2xs" | "lg" | "md" | "sm" | "xl" | "xs"
 
 export type FontWeightToken = "black" | "bold" | "extrabold" | "extralight" | "light" | "medium" | "normal" | "semibold" | "thin"
 
-export type FontToken = "body" | "heading" | "inter" | "interDisplay" | "mono"
+export type FontToken = "body" | "heading" | "inter" | "mono"
 
 export type LetterSpacingToken = "normal" | "tight" | "tighter" | "wide" | "wider" | "widest"
 

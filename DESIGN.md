@@ -13,12 +13,12 @@ colors:
   accent-default: "var(--accent-colour-flat-fill-400)"
 typography:
   page-heading:
-    fontFamily: "var(--font-inter-display), Inter, sans-serif"
+    fontFamily: "var(--font-inter), Inter, sans-serif"
     fontSize: "1.25rem"
     fontWeight: 600
     lineHeight: 1.5
   section-heading:
-    fontFamily: "var(--font-inter-display), Inter, sans-serif"
+    fontFamily: "var(--font-inter), Inter, sans-serif"
     fontSize: "1rem"
     fontWeight: 700
     lineHeight: 1.5
@@ -182,6 +182,14 @@ right. If the existing semantic role is insufficient, define the missing role.
 ## Typography
 
 Storyden has separate systems for product UI and community-authored content.
+
+Panda's definitions in `web/src/theme/base/typography.ts` and
+`web/src/theme/semantic/index.ts` are the source of truth for font tokens.
+The typography documented here reflects those definitions.
+
+Both systems use variable Inter for body text and headings. Only the upright
+face is preloaded; the true italic face loads on demand. The existing role
+weights remain constrained as specified above.
 
 ### Product UI
 

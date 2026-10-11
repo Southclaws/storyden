@@ -12,7 +12,7 @@ export const semanticTokens = defineSemanticTokens({
   },
   fonts: {
     body: { value: "var(--sd-font-body, {fonts.inter})" },
-    heading: { value: "var(--sd-font-heading, {fonts.interDisplay})" },
+    heading: { value: "var(--sd-font-heading, {fonts.inter})" },
   },
   blurs: {
     subtle: { value: "{blurs.sm}" },

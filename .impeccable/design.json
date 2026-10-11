@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-09T15:33:09Z",
+  "generatedAt": "2026-10-11T21:15:35Z",
   "title": "Design System: Storyden",
   "extensions": {
     "colorMeta": {
@@ -53,11 +53,11 @@
     "typographyMeta": {
       "page-heading": {
         "displayName": "Page heading",
-        "purpose": "The single h1 that identifies a product screen."
+        "purpose": "The single h1 that identifies a product screen, using variable Inter at weight 600."
       },
       "section-heading": {
         "displayName": "Section heading",
-        "purpose": "A muted, compact h2 for meaningful screen subdivisions."
+        "purpose": "A muted, compact h2 for meaningful screen subdivisions, using variable Inter at weight 700."
       },
       "body": {
         "displayName": "UI body",
@@ -102,11 +102,26 @@
       }
     ],
     "breakpoints": [
-      { "name": "sm", "value": "640px" },
-      { "name": "md", "value": "768px" },
-      { "name": "lg", "value": "1024px" },
-      { "name": "xl", "value": "1280px" },
-      { "name": "2xl", "value": "1536px" }
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      },
+      {
+        "name": "2xl",
+        "value": "1536px"
+      }
     ]
   },
   "components": [

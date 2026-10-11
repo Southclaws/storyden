@@ -14,27 +14,10 @@
   font-weight: 100 900;
 }
 
-@font-face {
-  font-family: "Inter Display";
-  src: url("../src/app/fonts/static/InterDisplay-Regular.woff2") format("woff2");
-  font-display: swap;
-  font-style: normal;
-  font-weight: 400;
-}
-
-@font-face {
-  font-family: "Inter Display";
-  src: url("../src/app/fonts/static/InterDisplay-Bold.woff2") format("woff2");
-  font-display: swap;
-  font-style: normal;
-  font-weight: 700;
-}
-
 :root,
 body,
 #storybook-root {
   --font-inter: "Inter", sans-serif;
-  --font-inter-display: "Inter Display", "Inter", sans-serif;
 }
 
 html,

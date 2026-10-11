@@ -41,7 +41,6 @@ export const lineHeights = defineTokens.lineHeights({
 
 export const fonts = defineTokens.fonts({
   inter: { value: "var(--font-inter)" },
-  interDisplay: { value: "var(--font-inter-display)" },
   mono: {
     value: [
       "ui-monospace",
