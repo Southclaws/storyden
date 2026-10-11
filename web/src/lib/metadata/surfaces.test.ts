@@ -6,7 +6,9 @@ import CategoryPage from "@/app/(dashboard)/d/[category]/page";
 import LibraryPage from "@/app/(dashboard)/l/[...slug]/page";
 import LibraryIndexPage from "@/app/(dashboard)/l/page";
 import ProfilePage from "@/app/(dashboard)/m/[handle]/page";
-import ThreadPage from "@/app/(dashboard)/t/[slug]/page";
+import ThreadPage, {
+  generateMetadata as threadMetadata,
+} from "@/app/(dashboard)/t/[slug]/page";
 import TagPage from "@/app/(dashboard)/tags/[tag]/page";
 
 vi.mock("@/config", () => ({
@@ -178,6 +180,66 @@ function structuredData(element: ReactNode) {
     ...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs),
   ].flatMap((match) => JSON.parse(match[1]!));
 }
+
+it.each([
+  { page: "3", totalPages: 2 },
+  { page: "999", totalPages: 2 },
+  { page: "2", totalPages: 0 },
+])(
+  "omits thread structured data for page $page with $totalPages total pages",
+  async ({ page, totalPages }) => {
+    const emptyPage = {
+      ...thread,
+      replies: {
+        current_page: Number(page),
+        total_pages: totalPages,
+        results: 0,
+        replies: [],
+      },
+    };
+    responses["/threads/thread-a-conversation"] = {
+      signed: emptyPage,
+      public: emptyPage,
+    };
+    const props = {
+      params: Promise.resolve({ slug: thread.slug }),
+      searchParams: Promise.resolve({ page }),
+    };
+
+    expect(structuredData(await ThreadPage(props))).toEqual([]);
+    expect(await threadMetadata(props)).toEqual({
+      title: "Thread Not Found",
+      description: "The thread you are looking for does not exist.",
+      robots: { index: false, follow: false },
+    });
+  },
+);
+
+it("retains structured data on the first page of a thread without replies", async () => {
+  const emptyThread = {
+    ...thread,
+    replies: { current_page: 1, total_pages: 0, results: 0, replies: [] },
+  };
+  responses["/threads/thread-a-conversation"] = {
+    signed: emptyThread,
+    public: emptyThread,
+  };
+  const props = {
+    params: Promise.resolve({ slug: thread.slug }),
+    searchParams: Promise.resolve({}),
+  };
+
+  expect(structuredData(await ThreadPage(props))).toEqual([
+    expect.objectContaining({
+      "@type": "DiscussionForumPosting",
+      commentCount: 0,
+      comment: [],
+    }),
+  ]);
+  expect((await threadMetadata(props)).alternates?.canonical).toBe(
+    "https://community.example/t/thread-a-conversation",
+  );
+});
 
 it("describes the anonymous profile, even when search indexing is disabled", async () => {
   const element = await ProfilePage({

@@ -36,7 +36,10 @@ const getPublicThread = cache(async (slug: string, page: number) => {
       },
     );
 
-    if (data.visibility === "published") {
+    if (
+      data.visibility === "published" &&
+      page <= Math.max(1, data.replies.total_pages)
+    ) {
       return data;
     }
   } catch {
