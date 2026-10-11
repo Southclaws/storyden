@@ -56,7 +56,7 @@ func TestRobotOpensAndNavigatesLibraryDocument(t *testing.T) {
 					content.WriteString(fmt.Sprintf("<h2>Topic %d</h2><p>Details for topic %d.</p>", index, index))
 				}
 				contentHTML := content.String()
-				page := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{
+				page := tests.AssertRequest(cl.NodeCreateWithResponse(root, nil, openapi.NodeCreateJSONRequestBody{
 					Name: "Document navigation test", Content: &contentHTML, Visibility: &visibility,
 				}, adminSession))(t, http.StatusOK)
 

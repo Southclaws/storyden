@@ -51,7 +51,7 @@ func TestReportCRUD(t *testing.T) {
 			}, sh.WithSession(adminCtx))
 			tests.Ok(t, err, cat1)
 
-			thread1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			thread1, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Body:     opt.New("<p>test thread content</p>").Ptr(),
 				Category: &cat1.JSON200.Id,
 				Title:    "test thread",

@@ -40,7 +40,7 @@ func TestNodesProperty(t *testing.T) {
 
 			parentname := "parent"
 			parentslug := parentname + uuid.NewString()
-			parent, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+			parent, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 				Name: parentname,
 				Slug: &parentslug,
 			}, session)
@@ -50,7 +50,7 @@ func TestNodesProperty(t *testing.T) {
 
 			name1 := "child-1"
 			slug1 := name1 + uuid.NewString()
-			node1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+			node1, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 				Name:   name1,
 				Slug:   &slug1,
 				Parent: &parent.JSON200.Slug,
@@ -59,7 +59,7 @@ func TestNodesProperty(t *testing.T) {
 
 			name2 := "child-2"
 			slug2 := name2 + uuid.NewString()
-			node2, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+			node2, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 				Name:   name2,
 				Slug:   &slug2,
 				Parent: &parent.JSON200.Slug,
@@ -68,7 +68,7 @@ func TestNodesProperty(t *testing.T) {
 
 			name3 := "child-3"
 			slug3 := name3 + uuid.NewString()
-			node3, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+			node3, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 				Name:   name3,
 				Slug:   &slug3,
 				Parent: &parent.JSON200.Slug,
@@ -79,7 +79,7 @@ func TestNodesProperty(t *testing.T) {
 
 			name34 := "child-3-4"
 			slug34 := name34 + uuid.NewString()
-			node34, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+			node34, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 				Name:   name34,
 				Slug:   &slug34,
 				Parent: &node3.JSON200.Slug,
@@ -88,7 +88,7 @@ func TestNodesProperty(t *testing.T) {
 
 			name35 := "child-3-5"
 			slug35 := name35 + uuid.NewString()
-			node35, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+			node35, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 				Name:   name35,
 				Slug:   &slug35,
 				Parent: &node3.JSON200.Slug,
@@ -223,7 +223,7 @@ func TestNodesPropertyFieldOrdering(t *testing.T) {
 
 			parentname := "parent"
 			parentslug := parentname + uuid.NewString()
-			parent, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			parent, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name: parentname,
 				Slug: &parentslug,
 			}, session)
@@ -233,7 +233,7 @@ func TestNodesPropertyFieldOrdering(t *testing.T) {
 
 			name1 := "child-1"
 			slug1 := name1 + uuid.NewString()
-			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node1, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:   name1,
 				Slug:   &slug1,
 				Parent: &parent.JSON200.Slug,
@@ -242,7 +242,7 @@ func TestNodesPropertyFieldOrdering(t *testing.T) {
 
 			name2 := "child-2"
 			slug2 := name2 + uuid.NewString()
-			node2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node2, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:   name2,
 				Slug:   &slug2,
 				Parent: &parent.JSON200.Slug,
@@ -251,7 +251,7 @@ func TestNodesPropertyFieldOrdering(t *testing.T) {
 
 			name3 := "child-3"
 			slug3 := name3 + uuid.NewString()
-			node3, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node3, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:   name3,
 				Slug:   &slug3,
 				Parent: &parent.JSON200.Slug,
@@ -351,7 +351,7 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 
 			parentname := "parent"
 			parentslug := parentname + uuid.NewString()
-			parent, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			parent, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name: parentname,
 				Slug: &parentslug,
 			}, session)
@@ -361,7 +361,7 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 
 			name1 := "child-1"
 			slug1 := name1 + uuid.NewString()
-			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node1, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:   name1,
 				Slug:   &slug1,
 				Parent: &parent.JSON200.Slug,
@@ -370,7 +370,7 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 
 			name2 := "child-2"
 			slug2 := name2 + uuid.NewString()
-			node2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node2, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:   name2,
 				Slug:   &slug2,
 				Parent: &parent.JSON200.Slug,
@@ -379,7 +379,7 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 
 			name3 := "child-3"
 			slug3 := name3 + uuid.NewString()
-			node3, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node3, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:   name3,
 				Slug:   &slug3,
 				Parent: &parent.JSON200.Slug,
@@ -390,7 +390,7 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 
 			name34 := "child-3-4"
 			slug34 := name34 + uuid.NewString()
-			node34, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node34, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:   name34,
 				Slug:   &slug34,
 				Parent: &node3.JSON200.Slug,
@@ -399,7 +399,7 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 
 			name35 := "child-3-5"
 			slug35 := name35 + uuid.NewString()
-			node35, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node35, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:   name35,
 				Slug:   &slug35,
 				Parent: &node3.JSON200.Slug,
@@ -498,7 +498,7 @@ func TestNodesPropertySchemaBadRequests(t *testing.T) {
 
 			parentname := "parent"
 			parentslug := parentname + uuid.NewString()
-			parent, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			parent, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name: parentname,
 				Slug: &parentslug,
 			}, session)
@@ -508,7 +508,7 @@ func TestNodesPropertySchemaBadRequests(t *testing.T) {
 
 			name1 := "child-1"
 			slug1 := name1 + uuid.NewString()
-			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node1, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:   name1,
 				Slug:   &slug1,
 				Parent: &parent.JSON200.Slug,

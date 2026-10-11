@@ -66,7 +66,7 @@ func createNode(
 	client *openapi.ClientWithResponses,
 	props openapi.NodeInitialProps,
 ) (*openapi.Node, error) {
-	response, err := client.NodeCreateWithResponse(ctx, props)
+	response, err := client.NodeCreateWithResponse(ctx, nil, props)
 	if err != nil {
 		return nil, err
 	}

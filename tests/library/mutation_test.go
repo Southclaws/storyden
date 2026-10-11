@@ -43,7 +43,7 @@ func TestNodesTreeMutations(t *testing.T) {
 
 			name1 := "test-node-1"
 			slug1 := name1 + uuid.NewString()
-			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node1, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:       name1,
 				Slug:       &slug1,
 				Visibility: &visibility,
@@ -52,7 +52,7 @@ func TestNodesTreeMutations(t *testing.T) {
 
 			name2 := "test-node-2"
 			slug2 := name2 + uuid.NewString()
-			node2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node2, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:       name2,
 				Slug:       &slug2,
 				Visibility: &visibility,
@@ -61,7 +61,7 @@ func TestNodesTreeMutations(t *testing.T) {
 
 			name3 := "test-node-3"
 			slug3 := name3 + uuid.NewString()
-			node3, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node3, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:       name3,
 				Slug:       &slug3,
 				Parent:     &slug2,
@@ -71,7 +71,7 @@ func TestNodesTreeMutations(t *testing.T) {
 
 			name4 := "test-node-4"
 			slug4 := name4 + uuid.NewString()
-			node4, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node4, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:       name4,
 				Slug:       &slug4,
 				Parent:     &slug3,
@@ -85,7 +85,7 @@ func TestNodesTreeMutations(t *testing.T) {
 
 				name5 := "test-node-5"
 				slug5 := name5 + uuid.NewString()
-				node5, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				node5, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 					Name:       name5,
 					Slug:       &slug5,
 					Visibility: &visibility,
@@ -170,7 +170,7 @@ func TestNodesTreeMutations(t *testing.T) {
 
 				nameP1 := "test-node-p1"
 				slugP1 := nameP1 + uuid.NewString()
-				nodeP1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				nodeP1, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 					Name:       nameP1,
 					Slug:       &slugP1,
 					Visibility: &visibility,
@@ -179,7 +179,7 @@ func TestNodesTreeMutations(t *testing.T) {
 
 				nameC1 := "test-node-c1"
 				slugC1 := nameC1 + uuid.NewString()
-				nodeC1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				nodeC1, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 					Name:       nameC1,
 					Slug:       &slugC1,
 					Visibility: &visibility,
@@ -213,14 +213,14 @@ func TestNodesTreeMutations(t *testing.T) {
 				// and the Queryable.Equal fix at app/resources/mark/mark.go.
 				childName := "pos-child-" + uuid.NewString()
 				child := tests.AssertRequest(
-					cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+					cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 						Name: childName, Slug: &childName, Visibility: &visibility,
 					}, sh.WithSession(ctx)),
 				)(t, 200)
 
 				parentName := "pos-parent-" + uuid.NewString()
 				parent := tests.AssertRequest(
-					cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+					cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 						Name: parentName, Slug: &parentName, Visibility: &visibility,
 					}, sh.WithSession(ctx)),
 				)(t, 200)

@@ -45,7 +45,7 @@ func TestNodeVersionProposalLifecycle(t *testing.T) {
 			published := openapi.VisibilityPublished
 			name := "version-target-" + uuid.NewString()
 
-			node, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+			node, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 				Name:       name,
 				Content:    &content,
 				Visibility: &published,

@@ -38,7 +38,7 @@ func TestNodesFiltering(t *testing.T) {
 			name1 := "test-node-owned-by-1"
 			slug1 := name1 + uuid.NewString()
 			content1 := "# Nodes\n\nOwned by Odin."
-			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node1, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:       name1,
 				Slug:       &slug1,
 				Content:    &content1,
@@ -49,7 +49,7 @@ func TestNodesFiltering(t *testing.T) {
 			name2 := "test-node-owned-by-2"
 			slug2 := name2 + uuid.NewString()
 			content2 := "# Nodes\n\nOwned by Frigg."
-			node2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node2, err := cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:       name2,
 				Slug:       &slug2,
 				Content:    &content2,

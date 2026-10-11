@@ -258,7 +258,7 @@ func TestOAuthRegistrationApproval(t *testing.T) {
 				require.NotContains(t, claims["scope"], "ADMINISTRATOR")
 				require.Contains(t, claims["scope"], "CREATE_POST")
 				category := tests.AssertRequest(cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Name: "agent-posts-" + xid.New().String()}, adminSession))(t, http.StatusOK)
-				thread := tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				thread := tests.AssertRequest(cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Title:      "Posted by an autonomous agent",
 					Body:       new("<p>Registered, authenticated, and posted.</p>"),
 					Category:   &category.JSON200.Id,

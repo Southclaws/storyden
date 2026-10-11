@@ -61,39 +61,39 @@ func TestResourceProfileReferencesIncludeRoles(t *testing.T) {
 			}, authorSession))(t, http.StatusOK)
 
 			vis := openapi.VisibilityPublished
-			threadCreate := tests.AssertRequest(cl.ThreadCreateWithResponse(authorCtx, openapi.ThreadInitialProps{
+			threadCreate := tests.AssertRequest(cl.ThreadCreateWithResponse(authorCtx, nil, openapi.ThreadInitialProps{
 				Title:      "thread-with-roles-" + xid.New().String(),
 				Body:       opt.New("<p>thread body</p>").Ptr(),
 				Category:   opt.New(threadCategory.JSON200.Id).Ptr(),
 				Visibility: &vis,
 			}, authorSession))(t, http.StatusOK)
 
-			replyCreate := tests.AssertRequest(cl.ReplyCreateWithResponse(authorCtx, threadCreate.JSON200.Slug, openapi.ReplyInitialProps{
+			replyCreate := tests.AssertRequest(cl.ReplyCreateWithResponse(authorCtx, threadCreate.JSON200.Slug, nil, openapi.ReplyInitialProps{
 				Body: "<p>reply body</p>",
 			}, authorSession))(t, http.StatusOK)
 
-			memberThreadCreate := tests.AssertRequest(cl.ThreadCreateWithResponse(memberCtx, openapi.ThreadInitialProps{
+			memberThreadCreate := tests.AssertRequest(cl.ThreadCreateWithResponse(memberCtx, nil, openapi.ThreadInitialProps{
 				Title:      "member-thread-with-default-role-" + xid.New().String(),
 				Body:       opt.New("<p>member thread body</p>").Ptr(),
 				Category:   opt.New(threadCategory.JSON200.Id).Ptr(),
 				Visibility: &vis,
 			}, memberSession))(t, http.StatusOK)
 
-			nodeCreate := tests.AssertRequest(cl.NodeCreateWithResponse(authorCtx, openapi.NodeCreateJSONRequestBody{
+			nodeCreate := tests.AssertRequest(cl.NodeCreateWithResponse(authorCtx, nil, openapi.NodeCreateJSONRequestBody{
 				Name:       "node-with-roles-" + xid.New().String(),
 				Visibility: &vis,
 			}, authorSession))(t, http.StatusOK)
 
 			tagName := "role-tag-" + xid.New().String()
 			tagNames := openapi.TagNameList{tagName}
-			taggedThreadCreate := tests.AssertRequest(cl.ThreadCreateWithResponse(authorCtx, openapi.ThreadInitialProps{
+			taggedThreadCreate := tests.AssertRequest(cl.ThreadCreateWithResponse(authorCtx, nil, openapi.ThreadInitialProps{
 				Title:      "tagged-thread-with-roles-" + xid.New().String(),
 				Body:       opt.New("<p>tagged thread body</p>").Ptr(),
 				Category:   opt.New(threadCategory.JSON200.Id).Ptr(),
 				Visibility: &vis,
 				Tags:       &tagNames,
 			}, authorSession))(t, http.StatusOK)
-			taggedNodeCreate := tests.AssertRequest(cl.NodeCreateWithResponse(authorCtx, openapi.NodeCreateJSONRequestBody{
+			taggedNodeCreate := tests.AssertRequest(cl.NodeCreateWithResponse(authorCtx, nil, openapi.NodeCreateJSONRequestBody{
 				Name:       "tagged-node-with-roles-" + xid.New().String(),
 				Visibility: &vis,
 				Tags:       &tagNames,
@@ -112,7 +112,7 @@ func TestResourceProfileReferencesIncludeRoles(t *testing.T) {
 			t.Cleanup(linkServer.Close)
 			linkURL := linkServer.URL + "/sprites-dev"
 
-			threadWithLink := tests.AssertRequest(cl.ThreadCreateWithResponse(authorCtx, openapi.ThreadInitialProps{
+			threadWithLink := tests.AssertRequest(cl.ThreadCreateWithResponse(authorCtx, nil, openapi.ThreadInitialProps{
 				Title:      "thread-with-link-and-roles-" + xid.New().String(),
 				Body:       opt.New("<p>thread body with link</p>").Ptr(),
 				Category:   opt.New(threadCategory.JSON200.Id).Ptr(),
@@ -120,7 +120,7 @@ func TestResourceProfileReferencesIncludeRoles(t *testing.T) {
 				Url:        &linkURL,
 			}, authorSession))(t, http.StatusOK)
 
-			nodeWithLink := tests.AssertRequest(cl.NodeCreateWithResponse(authorCtx, openapi.NodeCreateJSONRequestBody{
+			nodeWithLink := tests.AssertRequest(cl.NodeCreateWithResponse(authorCtx, nil, openapi.NodeCreateJSONRequestBody{
 				Name:       "node-with-link-and-roles-" + xid.New().String(),
 				Visibility: &vis,
 				Url:        &linkURL,

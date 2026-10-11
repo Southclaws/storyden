@@ -54,7 +54,7 @@ func TestRobotPresentationMarkupRenderCard(t *testing.T) {
 
 				pageSlug := "robot-presentation-page-" + xid.New().String()
 				vis := openapi.VisibilityPublished
-				page := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{
+				page := tests.AssertRequest(cl.NodeCreateWithResponse(root, nil, openapi.NodeCreateJSONRequestBody{
 					Name:        "Robot Presentation Page",
 					Slug:        &pageSlug,
 					Description: ptr("A page rendered as a Robot presentation card."),

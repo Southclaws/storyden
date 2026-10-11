@@ -43,7 +43,7 @@ func TestProfileLikesPageWithoutLosingRows(t *testing.T) {
 
 			const likeCount = 3
 			for range likeCount {
-				thread, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				thread, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Body:       opt.New("<p>likeable</p>").Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Title:      "like paging " + uuid.NewString(),

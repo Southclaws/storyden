@@ -69,7 +69,7 @@ func TestExternalPluginEventSubscription(t *testing.T) {
 			requireSessionState(t, root, runner, installationID, resource_plugin.ReportedStateActive)
 
 			thread := tests.AssertRequest(
-				cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Body:       opt.New("<p>external plugin event test</p>").Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Title:      "External Plugin Event " + xid.New().String(),
@@ -241,7 +241,7 @@ func TestExternalPluginManifestUpdateReconnectsWithNewSubscriptions(t *testing.T
 			requireSessionState(t, root, runner, installationID, resource_plugin.ReportedStateActive)
 
 			thread1 := tests.AssertRequest(
-				cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Body:       opt.New("<p>manifest update before change</p>").Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Title:      "Manifest Update Before " + xid.New().String(),
@@ -291,7 +291,7 @@ func TestExternalPluginManifestUpdateReconnectsWithNewSubscriptions(t *testing.T
 			requireSessionState(t, root, runner, installationID, resource_plugin.ReportedStateActive)
 
 			tests.AssertRequest(
-				cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Body:       opt.New("<p>manifest update after change</p>").Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Title:      "Manifest Update After " + xid.New().String(),

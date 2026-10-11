@@ -40,7 +40,7 @@ func TestNodeCacheWithUpdate(t *testing.T) {
 			name := "cache-test-node-" + uuid.NewString()
 			slug := name
 
-			nodeCreate := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			nodeCreate := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:       name,
 				Slug:       &slug,
 				Visibility: &visibility,
@@ -104,7 +104,7 @@ func TestNodeCacheSeparatesChildSelections(t *testing.T) {
 			visibility := openapi.VisibilityPublished
 			slug := "cache-child-selection-" + uuid.NewString()
 
-			tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:       slug,
 				Slug:       &slug,
 				Visibility: &visibility,
@@ -162,7 +162,7 @@ func TestNodeCacheCanonicalisesIDQueryForms(t *testing.T) {
 			visibility := openapi.VisibilityPublished
 			name := "cache-alias-node-" + uuid.NewString()
 
-			created := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			created := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name: name, Slug: &name, Visibility: &visibility,
 			}, session))(t, http.StatusOK).JSON200
 			mark := created.Id + "-" + created.Slug
@@ -213,7 +213,7 @@ func TestNodeRenameAndDeleteRejectCurrentValidatorForRetiredSlugs(t *testing.T) 
 			oldSlug := "cache-retired-node-" + uuid.NewString()
 			newSlug := "cache-current-node-" + uuid.NewString()
 
-			created := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			created := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name: oldSlug, Slug: &oldSlug, Visibility: &visibility,
 			}, session))(t, http.StatusOK).JSON200
 
@@ -265,7 +265,7 @@ func TestNodeDeleteInvalidatesEveryConditionalRequestAlias(t *testing.T) {
 			visibility := openapi.VisibilityPublished
 			slug := "cache-delete-node-" + uuid.NewString()
 
-			created := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			created := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name: slug, Slug: &slug, Visibility: &visibility,
 			}, session))(t, http.StatusOK).JSON200
 			mark := created.Id + "-" + created.Slug
@@ -317,10 +317,10 @@ func TestNodeDeleteInvalidatesParentRepresentation(t *testing.T) {
 			parentSlug := "cache-delete-parent-" + uuid.NewString()
 			childSlug := "cache-delete-child-" + uuid.NewString()
 
-			parent := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			parent := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name: parentSlug, Slug: &parentSlug, Visibility: &visibility,
 			}, session))(t, http.StatusOK).JSON200
-			child := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			child := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name: childSlug, Slug: &childSlug, Visibility: &visibility,
 			}, session))(t, http.StatusOK).JSON200
 
@@ -360,7 +360,7 @@ func TestNodeCacheRejectsOldValidatorDuringConcurrentUpdates(t *testing.T) {
 			session := sh.WithSession(ctx)
 			visibility := openapi.VisibilityPublished
 			slug := "cache-concurrent-node-" + uuid.NewString()
-			created := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			created := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name: slug, Slug: &slug, Visibility: &visibility,
 			}, session))(t, http.StatusOK).JSON200
 
@@ -440,10 +440,10 @@ func TestNodeTreeMoveInvalidatesParentRepresentation(t *testing.T) {
 			parentSlug := "cache-parent-" + uuid.NewString()
 			childSlug := "cache-child-" + uuid.NewString()
 
-			parent := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			parent := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name: parentSlug, Slug: &parentSlug, Visibility: &visibility,
 			}, session))(t, http.StatusOK).JSON200
-			child := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			child := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name: childSlug, Slug: &childSlug, Visibility: &visibility,
 			}, session))(t, http.StatusOK).JSON200
 
@@ -494,7 +494,7 @@ func TestNodeCacheWithPropertySchemaUpdate(t *testing.T) {
 			slug := name
 			ptype := openapi.PropertyTypeText
 
-			nodeCreate := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			nodeCreate := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, nil, openapi.NodeInitialProps{
 				Name:       name,
 				Slug:       &slug,
 				Visibility: &visibility,

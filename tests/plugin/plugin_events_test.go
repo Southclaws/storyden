@@ -101,7 +101,7 @@ func TestPluginEventSubscription(t *testing.T) {
 
 			threadTitle := "Event Test Thread " + xid.New().String()
 			threadCreate := tests.AssertRequest(
-				cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Body:       opt.New("<p>test event publishing</p>").Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Title:      threadTitle,

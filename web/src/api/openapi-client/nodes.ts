@@ -67,6 +67,8 @@ export const getNodeCreateUrl = () => {
 
 /**
  * Create a node for curating structured knowledge together.
+ * Optional Idempotency-Key protection follows the 24-hour replay and
+ * uncertain-outcome rules of ThreadCreate.
  */
 export const nodeCreate = async (
   nodeCreateBody?: NodeCreateBody,
@@ -118,7 +120,10 @@ export type NodeCreateMutationResult = NonNullable<
 >;
 
 export const useNodeCreate = <
-  TError = UnauthorisedResponse | InternalServerErrorResponse,
+  TError =
+    | UnauthorisedResponse
+    | ConflictResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof nodeCreate>>,

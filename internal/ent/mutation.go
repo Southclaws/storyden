@@ -27,6 +27,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/emailqueue"
 	"github.com/Southclaws/storyden/internal/ent/event"
 	"github.com/Southclaws/storyden/internal/ent/eventparticipant"
+	"github.com/Southclaws/storyden/internal/ent/idempotencyreceipt"
 	"github.com/Southclaws/storyden/internal/ent/invitation"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
@@ -103,6 +104,7 @@ const (
 	TypeEmailQueue                           = "EmailQueue"
 	TypeEvent                                = "Event"
 	TypeEventParticipant                     = "EventParticipant"
+	TypeIdempotencyReceipt                   = "IdempotencyReceipt"
 	TypeInvitation                           = "Invitation"
 	TypeLikePost                             = "LikePost"
 	TypeLink                                 = "Link"
@@ -17376,6 +17378,811 @@ func (m *EventParticipantMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown EventParticipant edge %s", name)
+}
+
+// IdempotencyReceiptMutation represents an operation that mutates the IdempotencyReceipt nodes in the graph.
+type IdempotencyReceiptMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *string
+	principal_id  *string
+	operation     *string
+	key_hash      *string
+	claim_token   *string
+	fingerprint   *string
+	response      *string
+	failed_at     *time.Time
+	created_at    *time.Time
+	expires_at    *time.Time
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*IdempotencyReceipt, error)
+	predicates    []predicate.IdempotencyReceipt
+}
+
+var _ ent.Mutation = (*IdempotencyReceiptMutation)(nil)
+
+// idempotencyreceiptOption allows management of the mutation configuration using functional options.
+type idempotencyreceiptOption func(*IdempotencyReceiptMutation)
+
+// newIdempotencyReceiptMutation creates new mutation for the IdempotencyReceipt entity.
+func newIdempotencyReceiptMutation(c config, op Op, opts ...idempotencyreceiptOption) *IdempotencyReceiptMutation {
+	m := &IdempotencyReceiptMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeIdempotencyReceipt,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withIdempotencyReceiptID sets the ID field of the mutation.
+func withIdempotencyReceiptID(id string) idempotencyreceiptOption {
+	return func(m *IdempotencyReceiptMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *IdempotencyReceipt
+		)
+		m.oldValue = func(ctx context.Context) (*IdempotencyReceipt, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().IdempotencyReceipt.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withIdempotencyReceipt sets the old IdempotencyReceipt of the mutation.
+func withIdempotencyReceipt(node *IdempotencyReceipt) idempotencyreceiptOption {
+	return func(m *IdempotencyReceiptMutation) {
+		m.oldValue = func(context.Context) (*IdempotencyReceipt, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m IdempotencyReceiptMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m IdempotencyReceiptMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of IdempotencyReceipt entities.
+func (m *IdempotencyReceiptMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *IdempotencyReceiptMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *IdempotencyReceiptMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().IdempotencyReceipt.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetPrincipalID sets the "principal_id" field.
+func (m *IdempotencyReceiptMutation) SetPrincipalID(s string) {
+	m.principal_id = &s
+}
+
+// PrincipalID returns the value of the "principal_id" field in the mutation.
+func (m *IdempotencyReceiptMutation) PrincipalID() (r string, exists bool) {
+	v := m.principal_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPrincipalID returns the old "principal_id" field's value of the IdempotencyReceipt entity.
+// If the IdempotencyReceipt object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IdempotencyReceiptMutation) OldPrincipalID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPrincipalID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPrincipalID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPrincipalID: %w", err)
+	}
+	return oldValue.PrincipalID, nil
+}
+
+// ResetPrincipalID resets all changes to the "principal_id" field.
+func (m *IdempotencyReceiptMutation) ResetPrincipalID() {
+	m.principal_id = nil
+}
+
+// SetOperation sets the "operation" field.
+func (m *IdempotencyReceiptMutation) SetOperation(s string) {
+	m.operation = &s
+}
+
+// Operation returns the value of the "operation" field in the mutation.
+func (m *IdempotencyReceiptMutation) Operation() (r string, exists bool) {
+	v := m.operation
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOperation returns the old "operation" field's value of the IdempotencyReceipt entity.
+// If the IdempotencyReceipt object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IdempotencyReceiptMutation) OldOperation(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOperation is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOperation requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOperation: %w", err)
+	}
+	return oldValue.Operation, nil
+}
+
+// ResetOperation resets all changes to the "operation" field.
+func (m *IdempotencyReceiptMutation) ResetOperation() {
+	m.operation = nil
+}
+
+// SetKeyHash sets the "key_hash" field.
+func (m *IdempotencyReceiptMutation) SetKeyHash(s string) {
+	m.key_hash = &s
+}
+
+// KeyHash returns the value of the "key_hash" field in the mutation.
+func (m *IdempotencyReceiptMutation) KeyHash() (r string, exists bool) {
+	v := m.key_hash
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldKeyHash returns the old "key_hash" field's value of the IdempotencyReceipt entity.
+// If the IdempotencyReceipt object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IdempotencyReceiptMutation) OldKeyHash(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldKeyHash is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldKeyHash requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldKeyHash: %w", err)
+	}
+	return oldValue.KeyHash, nil
+}
+
+// ResetKeyHash resets all changes to the "key_hash" field.
+func (m *IdempotencyReceiptMutation) ResetKeyHash() {
+	m.key_hash = nil
+}
+
+// SetClaimToken sets the "claim_token" field.
+func (m *IdempotencyReceiptMutation) SetClaimToken(s string) {
+	m.claim_token = &s
+}
+
+// ClaimToken returns the value of the "claim_token" field in the mutation.
+func (m *IdempotencyReceiptMutation) ClaimToken() (r string, exists bool) {
+	v := m.claim_token
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldClaimToken returns the old "claim_token" field's value of the IdempotencyReceipt entity.
+// If the IdempotencyReceipt object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IdempotencyReceiptMutation) OldClaimToken(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldClaimToken is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldClaimToken requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldClaimToken: %w", err)
+	}
+	return oldValue.ClaimToken, nil
+}
+
+// ResetClaimToken resets all changes to the "claim_token" field.
+func (m *IdempotencyReceiptMutation) ResetClaimToken() {
+	m.claim_token = nil
+}
+
+// SetFingerprint sets the "fingerprint" field.
+func (m *IdempotencyReceiptMutation) SetFingerprint(s string) {
+	m.fingerprint = &s
+}
+
+// Fingerprint returns the value of the "fingerprint" field in the mutation.
+func (m *IdempotencyReceiptMutation) Fingerprint() (r string, exists bool) {
+	v := m.fingerprint
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFingerprint returns the old "fingerprint" field's value of the IdempotencyReceipt entity.
+// If the IdempotencyReceipt object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IdempotencyReceiptMutation) OldFingerprint(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFingerprint is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFingerprint requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFingerprint: %w", err)
+	}
+	return oldValue.Fingerprint, nil
+}
+
+// ResetFingerprint resets all changes to the "fingerprint" field.
+func (m *IdempotencyReceiptMutation) ResetFingerprint() {
+	m.fingerprint = nil
+}
+
+// SetResponse sets the "response" field.
+func (m *IdempotencyReceiptMutation) SetResponse(s string) {
+	m.response = &s
+}
+
+// Response returns the value of the "response" field in the mutation.
+func (m *IdempotencyReceiptMutation) Response() (r string, exists bool) {
+	v := m.response
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldResponse returns the old "response" field's value of the IdempotencyReceipt entity.
+// If the IdempotencyReceipt object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IdempotencyReceiptMutation) OldResponse(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldResponse is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldResponse requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldResponse: %w", err)
+	}
+	return oldValue.Response, nil
+}
+
+// ClearResponse clears the value of the "response" field.
+func (m *IdempotencyReceiptMutation) ClearResponse() {
+	m.response = nil
+	m.clearedFields[idempotencyreceipt.FieldResponse] = struct{}{}
+}
+
+// ResponseCleared returns if the "response" field was cleared in this mutation.
+func (m *IdempotencyReceiptMutation) ResponseCleared() bool {
+	_, ok := m.clearedFields[idempotencyreceipt.FieldResponse]
+	return ok
+}
+
+// ResetResponse resets all changes to the "response" field.
+func (m *IdempotencyReceiptMutation) ResetResponse() {
+	m.response = nil
+	delete(m.clearedFields, idempotencyreceipt.FieldResponse)
+}
+
+// SetFailedAt sets the "failed_at" field.
+func (m *IdempotencyReceiptMutation) SetFailedAt(t time.Time) {
+	m.failed_at = &t
+}
+
+// FailedAt returns the value of the "failed_at" field in the mutation.
+func (m *IdempotencyReceiptMutation) FailedAt() (r time.Time, exists bool) {
+	v := m.failed_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFailedAt returns the old "failed_at" field's value of the IdempotencyReceipt entity.
+// If the IdempotencyReceipt object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IdempotencyReceiptMutation) OldFailedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFailedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFailedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFailedAt: %w", err)
+	}
+	return oldValue.FailedAt, nil
+}
+
+// ClearFailedAt clears the value of the "failed_at" field.
+func (m *IdempotencyReceiptMutation) ClearFailedAt() {
+	m.failed_at = nil
+	m.clearedFields[idempotencyreceipt.FieldFailedAt] = struct{}{}
+}
+
+// FailedAtCleared returns if the "failed_at" field was cleared in this mutation.
+func (m *IdempotencyReceiptMutation) FailedAtCleared() bool {
+	_, ok := m.clearedFields[idempotencyreceipt.FieldFailedAt]
+	return ok
+}
+
+// ResetFailedAt resets all changes to the "failed_at" field.
+func (m *IdempotencyReceiptMutation) ResetFailedAt() {
+	m.failed_at = nil
+	delete(m.clearedFields, idempotencyreceipt.FieldFailedAt)
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *IdempotencyReceiptMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *IdempotencyReceiptMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the IdempotencyReceipt entity.
+// If the IdempotencyReceipt object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IdempotencyReceiptMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *IdempotencyReceiptMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (m *IdempotencyReceiptMutation) SetExpiresAt(t time.Time) {
+	m.expires_at = &t
+}
+
+// ExpiresAt returns the value of the "expires_at" field in the mutation.
+func (m *IdempotencyReceiptMutation) ExpiresAt() (r time.Time, exists bool) {
+	v := m.expires_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExpiresAt returns the old "expires_at" field's value of the IdempotencyReceipt entity.
+// If the IdempotencyReceipt object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IdempotencyReceiptMutation) OldExpiresAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExpiresAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExpiresAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExpiresAt: %w", err)
+	}
+	return oldValue.ExpiresAt, nil
+}
+
+// ResetExpiresAt resets all changes to the "expires_at" field.
+func (m *IdempotencyReceiptMutation) ResetExpiresAt() {
+	m.expires_at = nil
+}
+
+// Where appends a list predicates to the IdempotencyReceiptMutation builder.
+func (m *IdempotencyReceiptMutation) Where(ps ...predicate.IdempotencyReceipt) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the IdempotencyReceiptMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *IdempotencyReceiptMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.IdempotencyReceipt, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *IdempotencyReceiptMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *IdempotencyReceiptMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (IdempotencyReceipt).
+func (m *IdempotencyReceiptMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *IdempotencyReceiptMutation) Fields() []string {
+	fields := make([]string, 0, 9)
+	if m.principal_id != nil {
+		fields = append(fields, idempotencyreceipt.FieldPrincipalID)
+	}
+	if m.operation != nil {
+		fields = append(fields, idempotencyreceipt.FieldOperation)
+	}
+	if m.key_hash != nil {
+		fields = append(fields, idempotencyreceipt.FieldKeyHash)
+	}
+	if m.claim_token != nil {
+		fields = append(fields, idempotencyreceipt.FieldClaimToken)
+	}
+	if m.fingerprint != nil {
+		fields = append(fields, idempotencyreceipt.FieldFingerprint)
+	}
+	if m.response != nil {
+		fields = append(fields, idempotencyreceipt.FieldResponse)
+	}
+	if m.failed_at != nil {
+		fields = append(fields, idempotencyreceipt.FieldFailedAt)
+	}
+	if m.created_at != nil {
+		fields = append(fields, idempotencyreceipt.FieldCreatedAt)
+	}
+	if m.expires_at != nil {
+		fields = append(fields, idempotencyreceipt.FieldExpiresAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *IdempotencyReceiptMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case idempotencyreceipt.FieldPrincipalID:
+		return m.PrincipalID()
+	case idempotencyreceipt.FieldOperation:
+		return m.Operation()
+	case idempotencyreceipt.FieldKeyHash:
+		return m.KeyHash()
+	case idempotencyreceipt.FieldClaimToken:
+		return m.ClaimToken()
+	case idempotencyreceipt.FieldFingerprint:
+		return m.Fingerprint()
+	case idempotencyreceipt.FieldResponse:
+		return m.Response()
+	case idempotencyreceipt.FieldFailedAt:
+		return m.FailedAt()
+	case idempotencyreceipt.FieldCreatedAt:
+		return m.CreatedAt()
+	case idempotencyreceipt.FieldExpiresAt:
+		return m.ExpiresAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *IdempotencyReceiptMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case idempotencyreceipt.FieldPrincipalID:
+		return m.OldPrincipalID(ctx)
+	case idempotencyreceipt.FieldOperation:
+		return m.OldOperation(ctx)
+	case idempotencyreceipt.FieldKeyHash:
+		return m.OldKeyHash(ctx)
+	case idempotencyreceipt.FieldClaimToken:
+		return m.OldClaimToken(ctx)
+	case idempotencyreceipt.FieldFingerprint:
+		return m.OldFingerprint(ctx)
+	case idempotencyreceipt.FieldResponse:
+		return m.OldResponse(ctx)
+	case idempotencyreceipt.FieldFailedAt:
+		return m.OldFailedAt(ctx)
+	case idempotencyreceipt.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case idempotencyreceipt.FieldExpiresAt:
+		return m.OldExpiresAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown IdempotencyReceipt field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *IdempotencyReceiptMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case idempotencyreceipt.FieldPrincipalID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPrincipalID(v)
+		return nil
+	case idempotencyreceipt.FieldOperation:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOperation(v)
+		return nil
+	case idempotencyreceipt.FieldKeyHash:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetKeyHash(v)
+		return nil
+	case idempotencyreceipt.FieldClaimToken:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetClaimToken(v)
+		return nil
+	case idempotencyreceipt.FieldFingerprint:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFingerprint(v)
+		return nil
+	case idempotencyreceipt.FieldResponse:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetResponse(v)
+		return nil
+	case idempotencyreceipt.FieldFailedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFailedAt(v)
+		return nil
+	case idempotencyreceipt.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case idempotencyreceipt.FieldExpiresAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExpiresAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown IdempotencyReceipt field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *IdempotencyReceiptMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *IdempotencyReceiptMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *IdempotencyReceiptMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown IdempotencyReceipt numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *IdempotencyReceiptMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(idempotencyreceipt.FieldResponse) {
+		fields = append(fields, idempotencyreceipt.FieldResponse)
+	}
+	if m.FieldCleared(idempotencyreceipt.FieldFailedAt) {
+		fields = append(fields, idempotencyreceipt.FieldFailedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *IdempotencyReceiptMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *IdempotencyReceiptMutation) ClearField(name string) error {
+	switch name {
+	case idempotencyreceipt.FieldResponse:
+		m.ClearResponse()
+		return nil
+	case idempotencyreceipt.FieldFailedAt:
+		m.ClearFailedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown IdempotencyReceipt nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *IdempotencyReceiptMutation) ResetField(name string) error {
+	switch name {
+	case idempotencyreceipt.FieldPrincipalID:
+		m.ResetPrincipalID()
+		return nil
+	case idempotencyreceipt.FieldOperation:
+		m.ResetOperation()
+		return nil
+	case idempotencyreceipt.FieldKeyHash:
+		m.ResetKeyHash()
+		return nil
+	case idempotencyreceipt.FieldClaimToken:
+		m.ResetClaimToken()
+		return nil
+	case idempotencyreceipt.FieldFingerprint:
+		m.ResetFingerprint()
+		return nil
+	case idempotencyreceipt.FieldResponse:
+		m.ResetResponse()
+		return nil
+	case idempotencyreceipt.FieldFailedAt:
+		m.ResetFailedAt()
+		return nil
+	case idempotencyreceipt.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case idempotencyreceipt.FieldExpiresAt:
+		m.ResetExpiresAt()
+		return nil
+	}
+	return fmt.Errorf("unknown IdempotencyReceipt field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *IdempotencyReceiptMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *IdempotencyReceiptMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *IdempotencyReceiptMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *IdempotencyReceiptMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *IdempotencyReceiptMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *IdempotencyReceiptMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *IdempotencyReceiptMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown IdempotencyReceipt unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *IdempotencyReceiptMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown IdempotencyReceipt edge %s", name)
 }
 
 // InvitationMutation represents an operation that mutates the Invitation nodes in the graph.

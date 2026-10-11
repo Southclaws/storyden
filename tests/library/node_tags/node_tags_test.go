@@ -42,7 +42,7 @@ func TestNodeTags(t *testing.T) {
 				t3 := xid.New().String()
 
 				tags := []string{t1, t2, t3}
-				create, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				create, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 					Name: un("n1"),
 					Tags: &tags,
 				}, adminSession)
@@ -63,7 +63,7 @@ func TestNodeTags(t *testing.T) {
 				t3 := xid.New().String()
 
 				n1tags := []string{t1, t2, t3}
-				create1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				create1, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 					Name: un("n1"),
 					Tags: &n1tags,
 				}, adminSession)
@@ -71,7 +71,7 @@ func TestNodeTags(t *testing.T) {
 
 				t4 := xid.New().String()
 				n2tags := []string{t2, t3, t4}
-				create2, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				create2, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 					Name: un("n1"),
 					Tags: &n2tags,
 				}, adminSession)
@@ -93,7 +93,7 @@ func TestNodeTags(t *testing.T) {
 				t3 := xid.New().String()
 
 				tags := []string{t1, t2}
-				create1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				create1, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 					Name: un("n1"),
 					Tags: &tags,
 				}, adminSession)
@@ -125,7 +125,7 @@ func TestNodeTags(t *testing.T) {
 				t3 := xid.New().String()
 
 				tags := []string{t1, t2, t3}
-				create1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				create1, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 					Name: un("n1"),
 					Tags: &tags,
 				}, adminSession)

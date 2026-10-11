@@ -46,7 +46,7 @@ func TestThreadCacheWithReactions(t *testing.T) {
 				Name:        catName,
 			}, session1))(t, http.StatusOK)
 
-			threadCreate := tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadCreate := tests.AssertRequest(cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>test thread for cache</p>").Ptr(),
 				Category:   opt.New(catCreate.JSON200.Id).Ptr(),
 				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -116,7 +116,7 @@ func TestThreadCacheWithReplies(t *testing.T) {
 				Name:        catName,
 			}, session1))(t, http.StatusOK)
 
-			threadCreate := tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadCreate := tests.AssertRequest(cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>test thread for replies</p>").Ptr(),
 				Category:   opt.New(catCreate.JSON200.Id).Ptr(),
 				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -137,7 +137,7 @@ func TestThreadCacheWithReplies(t *testing.T) {
 			}))(t, http.StatusNotModified)
 			a.Nil(threadGet304.JSON200, "304 response should have no body")
 
-			tests.AssertRequest(cl.ReplyCreateWithResponse(root, threadCreate.JSON200.Slug, openapi.ReplyInitialProps{
+			tests.AssertRequest(cl.ReplyCreateWithResponse(root, threadCreate.JSON200.Slug, nil, openapi.ReplyInitialProps{
 				Body: "<p>This is a test reply</p>",
 			}, session2))(t, http.StatusOK)
 
@@ -179,14 +179,14 @@ func TestThreadCacheWithReplyUpdate(t *testing.T) {
 				Name:        catName,
 			}, session1))(t, http.StatusOK)
 
-			threadCreate := tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadCreate := tests.AssertRequest(cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>test thread for reply update</p>").Ptr(),
 				Category:   opt.New(catCreate.JSON200.Id).Ptr(),
 				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Title:      "Thread cache test - reply update",
 			}, session1))(t, http.StatusOK)
 
-			replyCreate := tests.AssertRequest(cl.ReplyCreateWithResponse(root, threadCreate.JSON200.Slug, openapi.ReplyInitialProps{
+			replyCreate := tests.AssertRequest(cl.ReplyCreateWithResponse(root, threadCreate.JSON200.Slug, nil, openapi.ReplyInitialProps{
 				Body: "<p>Original reply content</p>",
 			}, session2))(t, http.StatusOK)
 			replyID := replyCreate.JSON200.Id

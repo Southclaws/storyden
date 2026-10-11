@@ -264,7 +264,7 @@ func TestAuditLogging(t *testing.T) {
 				memberSession := sh.WithSession(memberCtx)
 
 				vis := openapi.VisibilityPublished
-				createThread, err := cl.ThreadCreateWithResponse(memberCtx, openapi.ThreadInitialProps{
+				createThread, err := cl.ThreadCreateWithResponse(memberCtx, nil, openapi.ThreadInitialProps{
 					Title:      "Test Thread",
 					Body:       opt.New("<p>Test content</p>").Ptr(),
 					Visibility: &vis,
@@ -308,14 +308,14 @@ func TestAuditLogging(t *testing.T) {
 				memberSession := sh.WithSession(memberCtx)
 
 				vis := openapi.VisibilityPublished
-				createThread, err := cl.ThreadCreateWithResponse(memberCtx, openapi.ThreadInitialProps{
+				createThread, err := cl.ThreadCreateWithResponse(memberCtx, nil, openapi.ThreadInitialProps{
 					Title:      "Test Thread for Replies",
 					Body:       opt.New("<p>Test content</p>").Ptr(),
 					Visibility: &vis,
 				}, memberSession)
 				tests.Ok(t, err, createThread)
 
-				replyResp, err := cl.ReplyCreateWithResponse(memberCtx, createThread.JSON200.Slug, openapi.ReplyInitialProps{
+				replyResp, err := cl.ReplyCreateWithResponse(memberCtx, createThread.JSON200.Slug, nil, openapi.ReplyInitialProps{
 					Body: "Test reply",
 				}, memberSession)
 				tests.Ok(t, err, replyResp)

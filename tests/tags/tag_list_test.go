@@ -49,7 +49,7 @@ func TestTagListIsPagedAndOrderedByUse(t *testing.T) {
 			}
 
 			create := func(tags []openapi.TagName) {
-				resp, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				resp, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Body:       opt.New("<p>tagged</p>").Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Title:      "tag paging " + uuid.NewString(),
@@ -61,7 +61,7 @@ func TestTagListIsPagedAndOrderedByUse(t *testing.T) {
 			for range 3 {
 				create([]openapi.TagName{popular})
 			}
-			tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+			tests.AssertRequest(cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 				Name:       "tag paging " + uuid.NewString(),
 				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Tags:       &[]openapi.TagName{popular},

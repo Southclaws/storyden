@@ -42,6 +42,8 @@ type Tx struct {
 	Event *EventClient
 	// EventParticipant is the client for interacting with the EventParticipant builders.
 	EventParticipant *EventParticipantClient
+	// IdempotencyReceipt is the client for interacting with the IdempotencyReceipt builders.
+	IdempotencyReceipt *IdempotencyReceiptClient
 	// Invitation is the client for interacting with the Invitation builders.
 	Invitation *InvitationClient
 	// LikePost is the client for interacting with the LikePost builders.
@@ -283,6 +285,7 @@ func (tx *Tx) init() {
 	tx.EmailQueue = NewEmailQueueClient(tx.config)
 	tx.Event = NewEventClient(tx.config)
 	tx.EventParticipant = NewEventParticipantClient(tx.config)
+	tx.IdempotencyReceipt = NewIdempotencyReceiptClient(tx.config)
 	tx.Invitation = NewInvitationClient(tx.config)
 	tx.LikePost = NewLikePostClient(tx.config)
 	tx.Link = NewLinkClient(tx.config)

@@ -62,7 +62,7 @@ func TestGuestRolePermissions(t *testing.T) {
 			t.Run("guest_cannot_create_post", func(t *testing.T) {
 				// PermissionCreatePost
 				AssertRequest(
-					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{}),
+					cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{}),
 				)(t, http.StatusUnauthorized)
 			})
 
@@ -74,7 +74,7 @@ func TestGuestRolePermissions(t *testing.T) {
 			})
 
 			t.Run("guest_cannot_create_reaction", func(t *testing.T) {
-				thread := AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				thread := AssertRequest(cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Title:      "guest_cannot_create_reaction" + uuid.NewString(),
 					Body:       opt.New("<body>This is a test thread.</body>").Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -90,7 +90,7 @@ func TestGuestRolePermissions(t *testing.T) {
 			})
 
 			t.Run("guest_cannot_read_published_library", func(t *testing.T) {
-				node := AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				node := AssertRequest(cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 					Name:       "guest_cannot_read_published_library" + uuid.NewString(),
 					Content:    &content,
 					Visibility: &published,
@@ -107,7 +107,7 @@ func TestGuestRolePermissions(t *testing.T) {
 			t.Run("guest_cannot_create_node", func(t *testing.T) {
 				// PermissionSubmitLibraryNode
 				AssertRequest(
-					cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+					cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 						Name:       "guest_cannot_create_node" + uuid.NewString(),
 						Content:    &content,
 						Visibility: &review,
@@ -174,14 +174,14 @@ func TestGuestRolePermissions(t *testing.T) {
 					}, adminSession),
 				)(t, http.StatusOK)
 
-				thread := AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				thread := AssertRequest(cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Title:      "guest_cannot_create_collection_item",
 					Body:       opt.New("<body>This is a test thread.</body>").Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Category:   opt.New(cat.JSON200.Id).Ptr(),
 				}, adminSession))(t, http.StatusOK)
 
-				node := AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				node := AssertRequest(cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 					Name:       "guest_cannot_create_collection_item" + uuid.NewString(),
 					Content:    &content,
 					Visibility: &published,
@@ -240,7 +240,7 @@ func TestGuestRoleWithPermissions(t *testing.T) {
 			Ok(t, err, edit)
 
 			t.Run("guest_can_read_published_threads", func(t *testing.T) {
-				thread := AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				thread := AssertRequest(cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Title:      "guest_can_read_published_threads" + uuid.NewString(),
 					Body:       opt.New("<body>This is a test thread.</body>").Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -257,7 +257,7 @@ func TestGuestRoleWithPermissions(t *testing.T) {
 			})
 
 			t.Run("guest_can_read_published_library", func(t *testing.T) {
-				node := AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				node := AssertRequest(cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 					Name:       "guest_can_read_published_library" + uuid.NewString(),
 					Content:    &content,
 					Visibility: &published,
@@ -350,7 +350,7 @@ func TestMemberRolePermissions(t *testing.T) {
 			t.Run("member_cannot_create_post", func(t *testing.T) {
 				// PermissionCreatePost
 				AssertRequest(
-					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{}, member1Session),
+					cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{}, member1Session),
 				)(t, http.StatusForbidden)
 			})
 
@@ -362,7 +362,7 @@ func TestMemberRolePermissions(t *testing.T) {
 			})
 
 			t.Run("member_cannot_create_reaction", func(t *testing.T) {
-				thread := AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				thread := AssertRequest(cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Title:      "member_cannot_create_reaction" + uuid.NewString(),
 					Body:       opt.New("<body>This is a test thread.</body>").Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -378,7 +378,7 @@ func TestMemberRolePermissions(t *testing.T) {
 			})
 
 			t.Run("member_cannot_read_published_library", func(t *testing.T) {
-				node := AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				node := AssertRequest(cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 					Name:       "member_cannot_read_published_library" + uuid.NewString(),
 					Content:    &content,
 					Visibility: &published,
@@ -395,7 +395,7 @@ func TestMemberRolePermissions(t *testing.T) {
 			t.Run("member_cannot_create_node", func(t *testing.T) {
 				// PermissionSubmitLibraryNode
 				AssertRequest(
-					cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+					cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 						Name:       "member_cannot_create_node" + uuid.NewString(),
 						Content:    &content,
 						Visibility: &review,
@@ -466,14 +466,14 @@ func TestMemberRolePermissions(t *testing.T) {
 					}, adminSession),
 				)(t, http.StatusOK)
 
-				thread := AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				thread := AssertRequest(cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Title:      "member_cannot_create_collection_item",
 					Body:       opt.New("<body>This is a test thread.</body>").Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Category:   opt.New(cat.JSON200.Id).Ptr(),
 				}, adminSession))(t, http.StatusOK)
 
-				node := AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				node := AssertRequest(cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 					Name:       "member_cannot_create_collection_item" + uuid.NewString(),
 					Content:    &content,
 					Visibility: &published,
@@ -512,7 +512,7 @@ func TestGuestVsMemberAccess(t *testing.T) {
 				Name: "TestGuestVsMemberAccess" + uuid.NewString(),
 			}, adminSession))(t, http.StatusOK)
 
-			AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			AssertRequest(cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "guest_cannot_create_reaction" + uuid.NewString(),
 				Body:       opt.New("<body>This is a test thread.</body>").Ptr(),
 				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -546,7 +546,7 @@ func TestGuestVsMemberAccess(t *testing.T) {
 				}, adminSession))(t, http.StatusOK)
 
 			t.Run("read_published_library", func(t *testing.T) {
-				node := AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				node := AssertRequest(cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 					Name:       "read_published_library" + uuid.NewString(),
 					Content:    &content,
 					Visibility: &published,

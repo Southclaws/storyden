@@ -38,7 +38,7 @@ func TestSimpleSearchThreadReplyFiltering(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, catResp)
 
-			threadResp, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			threadResp, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Title:      "Test Thread About Programming",
 				Body:       opt.New("<p>A thread discussing programming topics</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
@@ -46,12 +46,12 @@ func TestSimpleSearchThreadReplyFiltering(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadResp)
 
-			reply1Resp, err := cl.ReplyCreateWithResponse(root, threadResp.JSON200.Slug, openapi.ReplyInitialProps{
+			reply1Resp, err := cl.ReplyCreateWithResponse(root, threadResp.JSON200.Slug, nil, openapi.ReplyInitialProps{
 				Body: "<p>This is a reply about programming languages</p>",
 			}, adminSession)
 			tests.Ok(t, err, reply1Resp)
 
-			reply2Resp, err := cl.ReplyCreateWithResponse(root, threadResp.JSON200.Slug, openapi.ReplyInitialProps{
+			reply2Resp, err := cl.ReplyCreateWithResponse(root, threadResp.JSON200.Slug, nil, openapi.ReplyInitialProps{
 				Body: "<p>Another reply discussing programming paradigms</p>",
 			}, adminSession)
 			tests.Ok(t, err, reply2Resp)

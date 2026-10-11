@@ -274,7 +274,7 @@ func TestOAuthDeviceFlowPermissionPolicies(t *testing.T) {
 					Name: "oauth-explicit-category-" + uuid.NewString(),
 				}, adminSession))(t, http.StatusOK)
 
-				thread := tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				thread := tests.AssertRequest(cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Title:      "oauth explicit thread " + uuid.NewString(),
 					Body:       new("<p>created with an oauth token</p>"),
 					Category:   &category.JSON200.Id,

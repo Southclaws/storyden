@@ -54,7 +54,7 @@ func TestThreadReadState(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
 
-				threadCreate, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				threadCreate, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Body:       opt.New("<p>original thread</p>").Ptr(),
 					Category:   opt.New(catCreate.JSON200.Id).Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -89,7 +89,7 @@ func TestThreadReadState(t *testing.T) {
 				// we don't store millisecond level precision in the database.
 				time.Sleep(1100 * time.Millisecond)
 
-				replyCreate, err := cl.ReplyCreateWithResponse(acc2ctx, threadCreate.JSON200.Slug, openapi.ReplyInitialProps{
+				replyCreate, err := cl.ReplyCreateWithResponse(acc2ctx, threadCreate.JSON200.Slug, nil, openapi.ReplyInitialProps{
 					Body: "this is a reply from acc2",
 				}, session2)
 				tests.Ok(t, err, replyCreate)

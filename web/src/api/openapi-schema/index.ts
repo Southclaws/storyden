@@ -331,6 +331,7 @@ export * from "./getSessionOKResponse";
 export * from "./getSpec200";
 export * from "./hasCollected";
 export * from "./id";
+export * from "./idempotencyKeyParameter";
 export * from "./identifier";
 export * from "./info";
 export * from "./instanceCapability";

@@ -34,6 +34,7 @@ func (m *Middleware) WithCORS() func(next http.Handler) http.Handler {
 		"Authorization",
 		"Content-Type",
 		"Content-Length",
+		"Idempotency-Key",
 		"X-CSRF-Token",
 		"X-Correlation-ID",
 		"X-Forwarded-Host",

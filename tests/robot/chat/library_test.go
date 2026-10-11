@@ -63,19 +63,19 @@ func TestRobotChatLibraryPageList(t *testing.T) {
 				robotID := string(rob.JSON200.Id)
 
 				vis := openapi.VisibilityPublished
-				tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{
+				tests.AssertRequest(cl.NodeCreateWithResponse(root, nil, openapi.NodeCreateJSONRequestBody{
 					Name:       "Robot Test Page Alpha",
 					Visibility: &vis,
 				}, adminSession))(t, http.StatusOK)
 
-				publishedPage := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{
+				publishedPage := tests.AssertRequest(cl.NodeCreateWithResponse(root, nil, openapi.NodeCreateJSONRequestBody{
 					Name:       "Robot Test Page Beta",
 					Visibility: &vis,
 				}, adminSession))(t, http.StatusOK)
 
 				reviewVisibility := openapi.VisibilityReview
 				reviewContent := "This page is ready for a substantive review."
-				reviewPage := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{
+				reviewPage := tests.AssertRequest(cl.NodeCreateWithResponse(root, nil, openapi.NodeCreateJSONRequestBody{
 					Name:       "Robot Review Page",
 					Content:    &reviewContent,
 					Visibility: &reviewVisibility,
@@ -170,7 +170,7 @@ func TestRobotChatLibrarySearchPages(t *testing.T) {
 				robotID := string(rob.JSON200.Id)
 
 				vis := openapi.VisibilityPublished
-				tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{
+				tests.AssertRequest(cl.NodeCreateWithResponse(root, nil, openapi.NodeCreateJSONRequestBody{
 					Name:       "Magnolia Library Page " + xid.New().String(),
 					Visibility: &vis,
 				}, adminSession))(t, http.StatusOK)

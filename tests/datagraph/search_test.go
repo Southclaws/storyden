@@ -55,27 +55,27 @@ func TestSearchMultipleKinds(t *testing.T) {
 			hot := "<p>this contains the keyword we want</p>"
 			cold := "<p>this contains none of the words we want</p>"
 
-			t1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			t1, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Body:       opt.New(hot).Ptr(),
 				Category:   opt.New(cat1.JSON200.Id).Ptr(),
 				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Title:      "thread",
 			}, session1)
 			tests.Ok(t, err, t1)
-			t2, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			t2, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Body:       opt.New(cold).Ptr(),
 				Category:   opt.New(cat1.JSON200.Id).Ptr(),
 				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Title:      "thread",
 			}, session2)
 			tests.Ok(t, err, t2)
-			n1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+			n1, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 				Name:       "node 1" + uuid.NewString(),
 				Content:    &hot,
 				Visibility: &published,
 			}, adminSession)
 			tests.Ok(t, err, n1)
-			n2, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+			n2, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 				Name:       "node 2" + uuid.NewString(),
 				Content:    &cold,
 				Visibility: &draft,
@@ -223,27 +223,27 @@ func TestSearchVisibilityRules(t *testing.T) {
 			hot := "<p>this contains the keyword we want</p>"
 			cold := "<p>this contains the keyword we want but it's not published</p>"
 
-			t1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			t1, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Body:       opt.New(hot).Ptr(),
 				Category:   opt.New(cat1.JSON200.Id).Ptr(),
 				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Title:      "thread",
 			}, session1)
 			tests.Ok(t, err, t1)
-			t2, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			t2, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Body:       opt.New(cold).Ptr(),
 				Category:   opt.New(cat1.JSON200.Id).Ptr(),
 				Visibility: opt.New(openapi.VisibilityDraft).Ptr(),
 				Title:      "thread",
 			}, session2)
 			tests.Ok(t, err, t2)
-			n1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+			n1, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 				Name:       "node 1" + uuid.NewString(),
 				Content:    &hot,
 				Visibility: &published,
 			}, adminSession)
 			tests.Ok(t, err, n1)
-			n2, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+			n2, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 				Name:       "node 2" + uuid.NewString(),
 				Content:    &cold,
 				Visibility: &draft,
@@ -298,7 +298,7 @@ func TestSearchEmptyQueryWithAuthorFilter(t *testing.T) {
 			cat1, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Name: uuid.NewString(), Colour: "#000"}, adminSession)
 			tests.Ok(t, err, cat1)
 
-			t1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			t1, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>a thread by baldur</p>").Ptr(),
 				Category:   opt.New(cat1.JSON200.Id).Ptr(),
 				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -306,7 +306,7 @@ func TestSearchEmptyQueryWithAuthorFilter(t *testing.T) {
 			}, session1)
 			tests.Ok(t, err, t1)
 
-			t2, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			t2, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>a thread by loki</p>").Ptr(),
 				Category:   opt.New(cat1.JSON200.Id).Ptr(),
 				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -349,14 +349,14 @@ func TestSearchNodeQueryDoesNotMatchAll(t *testing.T) {
 			matchingContent := "<p>this node mentions " + keyword + " in its body</p>"
 			unrelatedContent := "<p>this node has entirely different words</p>"
 
-			matching, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+			matching, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 				Name:       "matching node " + uuid.NewString(),
 				Content:    &matchingContent,
 				Visibility: &published,
 			}, adminSession)
 			tests.Ok(t, err, matching)
 
-			unrelated, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+			unrelated, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 				Name:       "unrelated node " + uuid.NewString(),
 				Content:    &unrelatedContent,
 				Visibility: &published,
@@ -444,7 +444,7 @@ func TestSearchFilters(t *testing.T) {
 			hot := "<p>keyword</p>"
 
 			// Create threads with different authors, categories, and tags
-			t1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			t1, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Body:       opt.New(hot).Ptr(),
 				Category:   opt.New(cat1.JSON200.Id).Ptr(),
 				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -453,7 +453,7 @@ func TestSearchFilters(t *testing.T) {
 			}, session1)
 			tests.Ok(t, err, t1)
 
-			t2, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			t2, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Body:       opt.New(hot).Ptr(),
 				Category:   opt.New(cat2.JSON200.Id).Ptr(),
 				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -462,7 +462,7 @@ func TestSearchFilters(t *testing.T) {
 			}, session2)
 			tests.Ok(t, err, t2)
 
-			t3, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			t3, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 				Body:       opt.New(hot).Ptr(),
 				Category:   opt.New(cat1.JSON200.Id).Ptr(),
 				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
@@ -471,7 +471,7 @@ func TestSearchFilters(t *testing.T) {
 			}, session1)
 			tests.Ok(t, err, t3)
 
-			n1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+			n1, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 				Name:       "node by odin with sharing" + uuid.NewString(),
 				Content:    &hot,
 				Visibility: &published,
@@ -479,7 +479,7 @@ func TestSearchFilters(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, n1)
 
-			n2, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+			n2, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 				Name:       "node by baldur with tips" + uuid.NewString(),
 				Content:    &hot,
 				Visibility: &published,

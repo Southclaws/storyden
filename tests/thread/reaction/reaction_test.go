@@ -44,7 +44,7 @@ func TestReactions(t *testing.T) {
 
 			t.Run("react to thread", func(t *testing.T) {
 				// acc1 creates a thread
-				thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{Body: opt.New("<p>this is a thread</p>").Ptr(), Category: opt.New(cat1create.JSON200.Id).Ptr(), Visibility: opt.New(openapi.VisibilityPublished).Ptr(), Title: "Thread testing"}, session1)
+				thread1create, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{Body: opt.New("<p>this is a thread</p>").Ptr(), Category: opt.New(cat1create.JSON200.Id).Ptr(), Visibility: opt.New(openapi.VisibilityPublished).Ptr(), Title: "Thread testing"}, session1)
 				tests.Ok(t, err, thread1create)
 				threadID := thread1create.JSON200.Id
 
@@ -63,7 +63,7 @@ func TestReactions(t *testing.T) {
 
 			t.Run("delete thread react", func(t *testing.T) {
 				// acc1 creates a thread
-				thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{Body: opt.New("<p>this is a thread</p>").Ptr(), Category: opt.New(cat1create.JSON200.Id).Ptr(), Visibility: opt.New(openapi.VisibilityPublished).Ptr(), Title: "Thread testing"}, session1)
+				thread1create, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{Body: opt.New("<p>this is a thread</p>").Ptr(), Category: opt.New(cat1create.JSON200.Id).Ptr(), Visibility: opt.New(openapi.VisibilityPublished).Ptr(), Title: "Thread testing"}, session1)
 				tests.Ok(t, err, thread1create)
 				threadID := thread1create.JSON200.Id
 
@@ -82,9 +82,9 @@ func TestReactions(t *testing.T) {
 
 			t.Run("react to reply", func(t *testing.T) {
 				// acc1 creates a thread with 1 reply
-				thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{Body: opt.New("<p>this is a thread</p>").Ptr(), Category: opt.New(cat1create.JSON200.Id).Ptr(), Visibility: opt.New(openapi.VisibilityPublished).Ptr(), Title: "Thread testing"}, session1)
+				thread1create, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{Body: opt.New("<p>this is a thread</p>").Ptr(), Category: opt.New(cat1create.JSON200.Id).Ptr(), Visibility: opt.New(openapi.VisibilityPublished).Ptr(), Title: "Thread testing"}, session1)
 				tests.Ok(t, err, thread1create)
-				reply1create, err := cl.ReplyCreateWithResponse(root, thread1create.JSON200.Id, openapi.ReplyInitialProps{Body: "<p>this is a reply</p>"}, session1)
+				reply1create, err := cl.ReplyCreateWithResponse(root, thread1create.JSON200.Id, nil, openapi.ReplyInitialProps{Body: "<p>this is a reply</p>"}, session1)
 				tests.Ok(t, err, reply1create)
 
 				// acc2 reacts to the reply
@@ -105,9 +105,9 @@ func TestReactions(t *testing.T) {
 
 			t.Run("delete reply react", func(t *testing.T) {
 				// acc1 creates a thread
-				thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{Body: opt.New("<p>this is a thread</p>").Ptr(), Category: opt.New(cat1create.JSON200.Id).Ptr(), Visibility: opt.New(openapi.VisibilityPublished).Ptr(), Title: "Thread testing"}, session1)
+				thread1create, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{Body: opt.New("<p>this is a thread</p>").Ptr(), Category: opt.New(cat1create.JSON200.Id).Ptr(), Visibility: opt.New(openapi.VisibilityPublished).Ptr(), Title: "Thread testing"}, session1)
 				tests.Ok(t, err, thread1create)
-				reply1create, err := cl.ReplyCreateWithResponse(root, thread1create.JSON200.Id, openapi.ReplyInitialProps{Body: "<p>this is a reply</p>"}, session1)
+				reply1create, err := cl.ReplyCreateWithResponse(root, thread1create.JSON200.Id, nil, openapi.ReplyInitialProps{Body: "<p>this is a reply</p>"}, session1)
 				tests.Ok(t, err, reply1create)
 
 				// acc2 reacts to it
@@ -127,7 +127,7 @@ func TestReactions(t *testing.T) {
 			})
 
 			t.Run("idempotent_reactions", func(t *testing.T) {
-				thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{Body: opt.New("<p>this is a thread</p>").Ptr(), Category: opt.New(cat1create.JSON200.Id).Ptr(), Visibility: opt.New(openapi.VisibilityPublished).Ptr(), Title: "Thread testing"}, session1)
+				thread1create, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{Body: opt.New("<p>this is a thread</p>").Ptr(), Category: opt.New(cat1create.JSON200.Id).Ptr(), Visibility: opt.New(openapi.VisibilityPublished).Ptr(), Title: "Thread testing"}, session1)
 				tests.Ok(t, err, thread1create)
 				threadID := thread1create.JSON200.Id
 

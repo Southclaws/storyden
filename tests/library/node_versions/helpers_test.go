@@ -23,7 +23,7 @@ func createPublishedNode(
 	published := openapi.VisibilityPublished
 	name := prefix + "-" + uuid.NewString()
 
-	node, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+	node, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 		Name:       name,
 		Visibility: &published,
 	}, adminSession)

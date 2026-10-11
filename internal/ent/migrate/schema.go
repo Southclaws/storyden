@@ -496,6 +496,37 @@ var (
 			},
 		},
 	}
+	// IdempotencyReceiptsColumns holds the columns for the "idempotency_receipts" table.
+	IdempotencyReceiptsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 64},
+		{Name: "principal_id", Type: field.TypeString, Size: 20},
+		{Name: "operation", Type: field.TypeString, Size: 64},
+		{Name: "key_hash", Type: field.TypeString, Size: 64},
+		{Name: "claim_token", Type: field.TypeString, Size: 20},
+		{Name: "fingerprint", Type: field.TypeString, Size: 64},
+		{Name: "response", Type: field.TypeString, Nullable: true},
+		{Name: "failed_at", Type: field.TypeTime, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "expires_at", Type: field.TypeTime},
+	}
+	// IdempotencyReceiptsTable holds the schema information for the "idempotency_receipts" table.
+	IdempotencyReceiptsTable = &schema.Table{
+		Name:       "idempotency_receipts",
+		Columns:    IdempotencyReceiptsColumns,
+		PrimaryKey: []*schema.Column{IdempotencyReceiptsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "idempotencyreceipt_principal_id_operation_key_hash",
+				Unique:  true,
+				Columns: []*schema.Column{IdempotencyReceiptsColumns[1], IdempotencyReceiptsColumns[2], IdempotencyReceiptsColumns[3]},
+			},
+			{
+				Name:    "idempotencyreceipt_expires_at",
+				Unique:  false,
+				Columns: []*schema.Column{IdempotencyReceiptsColumns[9]},
+			},
+		},
+	}
 	// InvitationsColumns holds the columns for the "invitations" table.
 	InvitationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -2538,6 +2569,7 @@ var (
 		EmailQueuesTable,
 		EventsTable,
 		EventParticipantsTable,
+		IdempotencyReceiptsTable,
 		InvitationsTable,
 		LikePostsTable,
 		LinksTable,

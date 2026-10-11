@@ -14,6 +14,7 @@ import type { SWRMutationConfiguration } from "swr/mutation";
 
 import { fetcher } from "../client";
 import type {
+  ConflictResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
   NotModifiedResponse,
@@ -35,7 +36,12 @@ export const getThreadCreateUrl = () => {
 };
 
 /**
- * Create a new thread within the specified category.
+ * Create a new thread within the specified category. Optional Idempotency-Key
+ * protection lasts 24 hours per account and operation. Identical retries replay
+ * the successful response. Changed requests, active requests, and uncertain
+ * failures return 409. Reconcile uncertain outcomes by reading the collection;
+ * retrying with a new key may create another resource. A key can create a new
+ * resource after its 24-hour retention expires.
  */
 export const threadCreate = async (
   threadCreateBody?: ThreadCreateBody,
@@ -90,6 +96,7 @@ export const useThreadCreate = <
   TError =
     | UnauthorisedResponse
     | NotFoundResponse
+    | ConflictResponse
     | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<

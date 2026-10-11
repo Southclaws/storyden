@@ -8,6 +8,7 @@
  * OpenAPI spec version: v1.26.15-post
  */
 import type {
+  ConflictResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
   ReplyCreateBody,
@@ -73,9 +74,14 @@ export type replyCreateResponse404 = {
   status: 404;
 };
 
+export type replyCreateResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
 export type replyCreateResponseDefault = {
   data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 401 | 404>;
+  status: Exclude<HTTPStatusCodes, 200 | 401 | 404 | 409>;
 };
 
 export type replyCreateResponseSuccess = replyCreateResponse200 & {
@@ -84,6 +90,7 @@ export type replyCreateResponseSuccess = replyCreateResponse200 & {
 export type replyCreateResponseError = (
   | replyCreateResponse401
   | replyCreateResponse404
+  | replyCreateResponse409
   | replyCreateResponseDefault
 ) & {
   headers: Headers;
@@ -94,7 +101,8 @@ export const getReplyCreateUrl = (threadMark: string) => {
 };
 
 /**
- * Create a new post within a thread.
+ * Create a new post within a thread. Optional Idempotency-Key protection
+ * follows the 24-hour replay and uncertain-outcome rules of ThreadCreate.
  */
 export const replyCreate = async (
   threadMark: string,

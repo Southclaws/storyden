@@ -48,6 +48,9 @@ type Event func(*sql.Selector)
 // EventParticipant is the predicate function for eventparticipant builders.
 type EventParticipant func(*sql.Selector)
 
+// IdempotencyReceipt is the predicate function for idempotencyreceipt builders.
+type IdempotencyReceipt func(*sql.Selector)
+
 // Invitation is the predicate function for invitation builders.
 type Invitation func(*sql.Selector)
 

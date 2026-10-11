@@ -51,7 +51,7 @@ func TestThreadListPagesWhenThreadsShareATimestamp(t *testing.T) {
 			created := map[xid.ID]struct{}{}
 
 			for range threadCount {
-				thread, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				thread, err := cl.ThreadCreateWithResponse(root, nil, openapi.ThreadInitialProps{
 					Body:       opt.New("<p>paged</p>").Ptr(),
 					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Title:      "thread paging " + uuid.NewString(),

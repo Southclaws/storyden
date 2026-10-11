@@ -65,16 +65,16 @@ func TestCollectionItems(t *testing.T) {
 
 			published := openapi.VisibilityPublished
 
-			thread1create, err := cl.ThreadCreateWithResponse(root, threadCreateProps, session1)
+			thread1create, err := cl.ThreadCreateWithResponse(root, nil, threadCreateProps, session1)
 			tests.Ok(t, err, thread1create)
 
-			thread2create, err := cl.ThreadCreateWithResponse(root, threadCreateProps, session2)
+			thread2create, err := cl.ThreadCreateWithResponse(root, nil, threadCreateProps, session2)
 			tests.Ok(t, err, thread2create)
 
-			node1create, err := cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &published}, adminSession)
+			node1create, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &published}, adminSession)
 			tests.Ok(t, err, node1create)
 
-			node2create, err := cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &published}, adminSession)
+			node2create, err := cl.NodeCreateWithResponse(root, nil, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &published}, adminSession)
 			tests.Ok(t, err, node2create)
 
 			t.Run("unauthorised", func(t *testing.T) {
@@ -168,7 +168,7 @@ func TestCollectionItems(t *testing.T) {
 				}, session1)
 				tests.Ok(t, err, col)
 
-				thr, err := cl.ThreadCreateWithResponse(root, threadCreateProps, session1)
+				thr, err := cl.ThreadCreateWithResponse(root, nil, threadCreateProps, session1)
 				tests.Ok(t, err, thr)
 
 				addThr, err := cl.CollectionAddPostWithResponse(root, col.JSON200.Id, thr.JSON200.Id, session1)

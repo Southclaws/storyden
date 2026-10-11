@@ -48,7 +48,7 @@ func TestNodeSorting(t *testing.T) {
 			makenode := func(name string, parent *string) *openapi.Node {
 				slug := name + uuid.NewString()
 				n := tests.AssertRequest(
-					cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+					cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 						Name: name, Slug: &slug, Visibility: &visibility,
 						Parent: parent,
 					}, session),
@@ -357,7 +357,7 @@ func TestNodeSortKeyNormalise(t *testing.T) {
 			makenode := func(name string, parent *string) *openapi.Node {
 				slug := name + uuid.NewString()
 				n := tests.AssertRequest(
-					cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+					cl.NodeCreateWithResponse(root, nil, openapi.NodeInitialProps{
 						Name: name, Slug: &slug, Visibility: &visibility,
 						Parent: parent,
 					}, session),
