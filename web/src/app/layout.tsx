@@ -3,6 +3,7 @@ import { PropsWithChildren } from "react";
 
 import { inter, interDisplay } from "@/app/fonts";
 import { serverEnvironment } from "@/config";
+import { resolveDiscoverySettings } from "@/lib/settings/discovery";
 import { getSettings } from "@/lib/settings/settings-server";
 import { getColourAsHex } from "@/utils/colour";
 import { getIconURL } from "@/utils/icon";
@@ -63,6 +64,7 @@ export async function generateViewport(): Promise<Viewport> {
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
+  const discovery = resolveDiscoverySettings(settings.discovery);
 
   const iconURL = getIconURL("512x512");
 
@@ -76,6 +78,9 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(canonical),
     title: title,
     description: settings.description,
+    robots: discovery.search_indexing
+      ? undefined
+      : { index: false, follow: false },
     icons: {
       icon: iconURL,
       shortcut: iconURL,

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { categoryGet } from "@/api/openapi-server/categories";
 import { threadList } from "@/api/openapi-server/threads";
 import { UnreadyBanner } from "@/components/site/Unready";
+import { canonicalPage, jsonLD } from "@/lib/metadata/public";
 import { CategoryScreen } from "@/screens/category/CategoryScreen";
 
 type Props = {
@@ -15,32 +16,94 @@ type Props = {
 const QuerySchema = z.object({
   page: z
     .string()
-    .transform((v) => parseInt(v, 10))
+    .regex(/^[1-9]\d*$/)
+    .transform(Number)
+    .refine(Number.isSafeInteger)
     .optional(),
 });
-type Query = z.infer<typeof QuerySchema>;
+type Query = z.input<typeof QuerySchema>;
 
 export default async function Page({ params, searchParams }: Props) {
+  const { category: slug } = await params;
+  let page;
+  let categoryData;
+  let threadListData;
+
   try {
-    const { category: slug } = await params;
-    const { page } = QuerySchema.parse(await searchParams);
+    ({ page } = QuerySchema.parse(await searchParams));
 
-    const { data: categoryData } = await categoryGet(slug);
+    ({ data: categoryData } = await categoryGet(slug));
 
-    const { data: threadListData } = await threadList({
+    ({ data: threadListData } = await threadList({
       categories: [slug],
       page: page?.toString(),
-    });
+    }));
+  } catch (error) {
+    return <UnreadyBanner error={error} />;
+  }
 
-    return (
+  let structuredData;
+
+  try {
+    const [category, threads] = await Promise.all([
+      categoryGet(slug, { anonymous: true, cache: "no-store" }),
+      threadList(
+        {
+          categories: [slug],
+          page: String(page ?? 1),
+          visibility: ["published"],
+        },
+        { anonymous: true, cache: "no-store" },
+      ),
+    ]);
+
+    if ((page ?? 1) <= Math.max(1, threads.data.total_pages)) {
+      structuredData = {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        name: category.data.name,
+        description: category.data.description,
+        url: canonicalPage(
+          `/d/${encodeURIComponent(category.data.slug)}`,
+          page,
+        ),
+        mainEntity: {
+          "@type": "ItemList",
+          itemListElement: threads.data.threads
+            .filter(
+              (thread) =>
+                thread.visibility === "published" &&
+                threadListData.threads.some(
+                  (visibleThread) => visibleThread.id === thread.id,
+                ),
+            )
+            .map((thread, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              name: thread.title,
+              url: canonicalPage(`/t/${encodeURIComponent(thread.slug)}`),
+            })),
+        },
+      };
+    }
+  } catch {
+    // The signed-in category can still render without public structured data.
+  }
+
+  return (
+    <>
+      {structuredData && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLD(structuredData) }}
+        />
+      )}
       <CategoryScreen
         initialPage={page ?? 1}
         slug={slug}
         initialCategory={categoryData}
         initialThreadList={threadListData}
       />
-    );
-  } catch (error) {
-    return <UnreadyBanner error={error} />;
-  }
+    </>
+  );
 }
