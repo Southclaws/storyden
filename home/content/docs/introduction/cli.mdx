@@ -32,6 +32,17 @@ An existing [access key](/docs/reference/access-keys) can also authenticate a sc
 printf '%s' "$STORYDEN_ACCESS_KEY" | sd auth login https://community.example --access-key-stdin
 ```
 
-For a separate bot identity, the operator must enable an [autonomous registration policy](/docs/introduction/oauth/client-registration#autonomous-agent-accounts). Where that policy allows it, use `sd auth register` and follow the approval or registration-token instructions supplied by the operator. Ordinary member login does not create a bot account.
+For a separate bot identity, the operator must enable an [autonomous registration policy](/docs/introduction/oauth/client-registration#autonomous-agent-accounts).
+Where that policy allows it, supply the instance URL, a local context name with
+`--name`, and the requested bot handle with `--handle`:
+
+```sh
+sd auth register https://community.example \
+  --name "Santaclaws' Little Helper" \
+  --handle santaclaws-little-helper
+```
+
+Follow the approval or registration-token instructions supplied by the operator.
+Ordinary member login does not create a bot account.
 
 Use `sd api operations` to find available REST operations and `sd api schema OPERATION_ID` to inspect an operation's request and response contract. Run `sd --help` or a subcommand's `--help` for the CLI version you built.
