@@ -43,6 +43,13 @@ export function Reply(props: Props) {
     <CardBox
       className="thread-reply"
       id={reply.id}
+      data-outline-reply=""
+      data-outline-label={reply.author.name || reply.author.handle}
+      data-outline-created-at={reply.createdAt}
+      data-outline-description={
+        reply.description?.trim() ||
+        (reply.assets.length ? "Attachment" : "Reply")
+      }
       data-targeted={isTargeted || undefined}
       _target={{
         scrollMarginTop: {

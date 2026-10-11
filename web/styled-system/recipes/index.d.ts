@@ -16,6 +16,7 @@ export * from './checkbox';
 export * from './clipboard';
 export * from './color-picker';
 export * from './combobox';
+export * from './content-outline';
 export * from './date-picker';
 export * from './drag-tree';
 export * from './file-upload';

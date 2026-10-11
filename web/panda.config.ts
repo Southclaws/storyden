@@ -10,6 +10,7 @@ import { checkbox } from "@/components/ui/checkbox/Checkbox.recipe";
 import { clipboard } from "@/components/ui/clipboard/Clipboard.recipe";
 import { colorPicker } from "@/components/ui/color-picker/ColorPicker.recipe";
 import { combobox } from "@/components/ui/combobox/Combobox.recipe";
+import { contentOutline } from "@/components/ui/content-outline/ContentOutline.recipe";
 import { datePicker } from "@/components/ui/date-picker/DatePicker.recipe";
 import { fileUpload } from "@/components/ui/file-upload/FileUpload.recipe";
 import { floatingPanel } from "@/components/ui/floating-panel/FloatingPanel.recipe";
@@ -226,6 +227,7 @@ export default defineConfig({
         sectionNavigation: sectionNavigation,
         colorPicker: colorPicker,
         combobox: combobox,
+        contentOutline: contentOutline,
         menu: menu,
         fileUpload: fileUpload,
         floatingPanel: floatingPanel,
