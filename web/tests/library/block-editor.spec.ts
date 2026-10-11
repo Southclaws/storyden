@@ -1,12 +1,56 @@
 import { Locator, Page, expect, test } from "@playwright/test";
 
+import { nodeDelete } from "../../src/api/openapi-client/nodes";
 import {
   createAdmin,
+  getAdminAccessKey,
   login,
   withAdminAccessKey,
 } from "../access_key_admin_assignment";
 
 const PASSWORD = "TestPassword123!";
+
+test("library navigation does not speculatively fetch linked routes", async ({
+  page,
+}) => {
+  const slug = `library-navigation-${Date.now()}`;
+  const prefetches: string[] = [];
+
+  await withAdminAccessKey(async ({ nodeCreate }) => {
+    const node = await nodeCreate({
+      name: "Library navigation prefetch check",
+      slug,
+      content: "A public page with navigation links.",
+      visibility: "published",
+    });
+
+    try {
+      page.on("request", (request) => {
+        if (request.headers()["next-router-prefetch"] === "1") {
+          prefetches.push(request.url());
+        }
+      });
+
+      await page.goto(`/l/${slug}`);
+      await expect(
+        page.getByRole("tree", { name: "Library pages" }),
+      ).toBeVisible();
+      await page.locator('[data-navigation-anchor="home"]:visible').hover();
+      await page.waitForLoadState("networkidle");
+      expect(prefetches).toEqual([]);
+
+      await page.locator('[data-navigation-anchor="home"]:visible').click();
+      await page.waitForURL("/");
+      await expect(
+        page.locator('[data-navigation-anchor="home"]:visible'),
+      ).toBeVisible();
+    } finally {
+      await nodeDelete(node.id, undefined, {
+        headers: { Authorization: `Bearer ${getAdminAccessKey()}` },
+      });
+    }
+  });
+});
 
 async function clickOutsideOpenMenu(page: Page) {
   await page.locator("#block-content_content:visible").click();

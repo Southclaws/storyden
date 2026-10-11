@@ -25,6 +25,7 @@ export function LinkButton({
   className,
   href,
   onClick,
+  prefetch,
   ...props
 }: PropsWithChildren<LinkProps>) {
   const [vp, stripped] = button.splitVariantProps(props);
@@ -56,6 +57,7 @@ export function LinkButton({
       href={href}
       target={target}
       onClick={onClick}
+      prefetch={prefetch}
       {...passthroughProps}
     >
       <styled.span

@@ -419,6 +419,7 @@ function DragTreeNode<TNode>({
               aria-current={selected ? "page" : undefined}
               className={styles.link}
               href={getHref(node)}
+              prefetch={false}
               onClick={preventNavigationWhileDragging}
               onTouchStart={preventNavigationWhileDragging}
             >

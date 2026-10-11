@@ -3,7 +3,13 @@ import { JsxStyleProps } from "@/styled-system/types";
 
 export function LoginAnchor(props: JsxStyleProps) {
   return (
-    <LinkButton href="/login" variant="ghost" size="sm" {...props}>
+    <LinkButton
+      href="/login"
+      variant="ghost"
+      size="sm"
+      {...props}
+      prefetch={false}
+    >
       Login
     </LinkButton>
   );
@@ -11,7 +17,7 @@ export function LoginAnchor(props: JsxStyleProps) {
 
 export function RegisterAnchor(props: JsxStyleProps) {
   return (
-    <LinkButton href="/register" size="sm" {...props}>
+    <LinkButton href="/register" size="sm" {...props} prefetch={false}>
       Register
     </LinkButton>
   );

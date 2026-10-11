@@ -49,7 +49,13 @@ export const Breadcrumbs_ = (
       pt="scrollGutter"
       mt="-scrollGutter"
     >
-      <LinkButton variant="subtle" flexShrink="0" minW="min" href="/l">
+      <LinkButton
+        variant="subtle"
+        flexShrink="0"
+        minW="min"
+        href="/l"
+        prefetch={false}
+      >
         Library
       </LinkButton>
       {nodes.map((node, index) => {
@@ -91,6 +97,7 @@ export const Breadcrumbs_ = (
                 isCurrent && visibility !== "published" ? "thin" : "none"
               }
               href={`/l/${path}`}
+              prefetch={false}
             >
               {node.name}{" "}
               {isCurrent && visibility && visibility !== "published" && (

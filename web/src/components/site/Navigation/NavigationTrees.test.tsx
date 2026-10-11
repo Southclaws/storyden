@@ -13,6 +13,7 @@ import { CategoryListTree } from "@/components/category/CategoryList/CategoryLis
 import { LibraryPageTree } from "@/components/library/LibraryPageTree/LibraryPageTree";
 import { LibraryNavigationTree } from "@/components/site/Navigation/LibraryNavigationTree/LibraryNavigationTree";
 import { libraryNavigationVisibility } from "@/components/site/Navigation/LibraryNavigationTree/LibraryNavigationTree.constants";
+import { LinkButton } from "@/components/ui/link-button";
 
 const dnd = vi.hoisted(() => ({
   draggables: [] as Array<Record<string, unknown>>,
@@ -129,6 +130,16 @@ beforeEach(() => {
 });
 
 describe("sidebar navigation trees", () => {
+  test.each([false, true, undefined])(
+    "LinkButton forwards prefetch=%s to Next Link",
+    (prefetch) => {
+      const link = LinkButton({ href: "/l", children: "Library", prefetch });
+
+      expect(link.props.prefetch).toBe(prefetch);
+      expect(link.props.href).toBe("/l");
+    },
+  );
+
   test("category navigation renders and expands nested category routes", () => {
     const categories = [
       category("engineering", "Engineering", 1),

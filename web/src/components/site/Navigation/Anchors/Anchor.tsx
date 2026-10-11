@@ -40,6 +40,7 @@ export function Anchor({
       data-navigation-anchor={id}
       aria-label={hideLabel ? label : undefined}
       {...props}
+      prefetch={false}
     >
       <span className="navigation-anchor__icon" aria-hidden="true">
         {React.cloneElement(icon, {
@@ -66,6 +67,7 @@ export function MenuItem({
       className={cx("navigation-menu-anchor", `navigation-menu-anchor--${id}`)}
       data-navigation-anchor={id}
       href={href}
+      prefetch={false}
       aria-label={hideLabel ? label : undefined}
       title={hideLabel ? label : undefined}
     >

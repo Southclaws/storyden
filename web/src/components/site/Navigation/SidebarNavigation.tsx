@@ -79,6 +79,7 @@ export function SidebarNavigationLink({
     <Link
       className="sidebar-navigation__link"
       href={href}
+      prefetch={false}
       aria-current={active ? "page" : undefined}
       onClick={onClick}
     >

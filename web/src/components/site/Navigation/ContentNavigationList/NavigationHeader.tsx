@@ -24,7 +24,7 @@ export function NavigationHeader({
 }: PropsWithChildren<Props>) {
   return (
     <WStack>
-      <Link className={linkStyles} href={href}>
+      <Link className={linkStyles} href={href} prefetch={false}>
         <styled.h1 fontSize="xs" fontWeight="medium">
           {children}
         </styled.h1>

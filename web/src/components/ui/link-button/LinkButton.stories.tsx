@@ -30,6 +30,11 @@ const meta = {
       control: "select",
       options: ["solid", "outline", "ghost", "subtle"],
     },
+    prefetch: {
+      control: "boolean",
+      description:
+        "Controls Next.js route prefetching; disable for large navigation lists.",
+    },
   },
 } satisfies Meta<typeof LinkButton>;
 
@@ -38,6 +43,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
+
+export const WithoutPrefetch: Story = {
+  args: {
+    href: "/l",
+    children: "Open library",
+    prefetch: false,
+  },
+};
 
 export const Variants: Story = {
   render: () => (
