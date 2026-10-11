@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { getInfo } from "../../src/api/openapi-client/misc";
+import { resolveDiscoverySettings } from "../../src/lib/settings/discovery";
 import {
   createAdmin,
   login,
@@ -13,7 +14,7 @@ test("discovery presets, handwritten robots.txt and reset persist through the re
   page,
   context,
 }) => {
-  const original = (await getInfo()).discovery;
+  const original = resolveDiscoverySettings((await getInfo()).discovery);
   const username = `discovery-${Date.now()}`;
   await createAdmin(context, username, PASSWORD);
   await login(page, username, PASSWORD);
@@ -102,5 +103,6 @@ test("discovery presets, handwritten robots.txt and reset persist through the re
     await withAdminAccessKey(async ({ adminSettingsUpdate }) => {
       await adminSettingsUpdate({ services: { discovery: original } });
     });
+    expect((await getInfo()).discovery).toEqual(original);
   }
 });
