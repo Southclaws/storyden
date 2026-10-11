@@ -47,9 +47,11 @@ type aiCatalog struct {
 }
 
 type aiCatalogEntry struct {
-	Identifier string `json:"identifier"`
-	Type       string `json:"type"`
-	URL        string `json:"url"`
+	Identifier  string `json:"identifier"`
+	DisplayName string `json:"displayName"`
+	Description string `json:"description"`
+	Type        string `json:"type"`
+	URL         string `json:"url"`
 }
 
 type apiCatalog struct {
@@ -118,8 +120,10 @@ func discoveryDocuments(cfg config.Config, title string) (serverCard, aiCatalog,
 			card.Title = title
 		}
 		ai.Entries = append(ai.Entries, aiCatalogEntry{
-			Identifier: fmt.Sprintf("urn:air:%s:mcp:storyden", cfg.PublicWebAddress.Hostname()),
-			Type:       serverCardMediaType, URL: cardURL.String(),
+			Identifier:  fmt.Sprintf("urn:air:%s:mcp:storyden", cfg.PublicWebAddress.Hostname()),
+			DisplayName: title,
+			Description: fmt.Sprintf("Explore discussions and Library pages in %s through MCP.", title),
+			Type:        serverCardMediaType, URL: cardURL.String(),
 		})
 		api.Linkset[0].Item = append(api.Linkset[0].Item, apiCatalogLink{Href: mcpURL.String()})
 	}

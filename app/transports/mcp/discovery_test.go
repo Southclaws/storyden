@@ -44,9 +44,11 @@ func TestDiscoveryDocuments(t *testing.T) {
 	require.Equal(t, sdkmcp.SupportedProtocolVersions(), card.Remotes[0].SupportedProtocolVersions)
 	require.Equal(t, "1.0", ai.SpecVersion)
 	require.Equal(t, []aiCatalogEntry{{
-		Identifier: "urn:air:community.example.org:mcp:storyden",
-		Type:       serverCardMediaType,
-		URL:        "https://api.example.org/mcp/server-card",
+		Identifier:  "urn:air:community.example.org:mcp:storyden",
+		DisplayName: "Example community",
+		Description: "Explore discussions and Library pages in Example community through MCP.",
+		Type:        serverCardMediaType,
+		URL:         "https://api.example.org/mcp/server-card",
 	}}, ai.Entries)
 	require.Equal(t, "https://api.example.org/.well-known/api-catalog", api.Linkset[0].Anchor)
 	require.Equal(t, "https://api.example.org/api", api.Linkset[0].Item[0].Href)
@@ -454,6 +456,19 @@ func TestDiscoverySettingsApplyWithoutRestart(t *testing.T) {
 				var document map[string]any
 				r.NoError(json.NewDecoder(card.Body).Decode(&document))
 				r.Equal("After", document["title"])
+
+				catalog, err = ts.Client().Get(ts.URL + "/.well-known/ai-catalog.json")
+				r.NoError(err)
+				defer catalog.Body.Close()
+				r.Equal(http.StatusOK, catalog.StatusCode)
+
+				var listing struct {
+					Entries []map[string]any `json:"entries"`
+				}
+				r.NoError(json.NewDecoder(catalog.Body).Decode(&listing))
+				r.Len(listing.Entries, 1)
+				r.Equal("After", listing.Entries[0]["displayName"])
+				r.Equal("Explore discussions and Library pages in After through MCP.", listing.Entries[0]["description"])
 			})
 		}))
 	}))
