@@ -52,10 +52,14 @@ func (q *Querier) List(
 	})
 
 	filter.TimeRange.Call(func(tr TimeRange) {
-		query.Where(
-			ent_auditlog.CreatedAtGTE(tr.Start),
-			ent_auditlog.CreatedAtLTE(tr.End),
-		)
+		// an open-ended range leaves the other bound as the zero time, only
+		// constrain the sides that were actually given
+		if !tr.Start.IsZero() {
+			query.Where(ent_auditlog.CreatedAtGTE(tr.Start))
+		}
+		if !tr.End.IsZero() {
+			query.Where(ent_auditlog.CreatedAtLTE(tr.End))
+		}
 	})
 
 	total, err := query.Count(ctx)
