@@ -2,18 +2,23 @@
 
 import { Title as DialogTitle } from "@radix-ui/react-dialog";
 import { Command } from "cmdk";
+import dynamic from "next/dynamic";
 
-import { WStack, styled } from "@/styled-system/jsx";
+import { styled } from "@/styled-system/jsx";
 
 import { UnreadyBanner } from "../Unready";
 
 import "./styles.css";
 
-import { CommandPaletteContent } from "./CommandPaletteContent";
 import { CommandPaletteProvider, useCommandPalette } from "./Context";
-import { RobotChatContext } from "./RobotChat/RobotChatContext";
-import { RobotCommandPaletteStatusBar } from "./RobotChat/RobotCommandPaletteStatusBar";
-import { useChatSessionState } from "./RobotChat/useChatSessionState";
+
+const CommandPaletteDialogContent = dynamic(
+  () =>
+    import("./CommandPaletteDialogContent").then(
+      (module) => module.CommandPaletteDialogContent,
+    ),
+  { ssr: false, loading: () => <UnreadyBanner /> },
+);
 
 export function CommandPalette() {
   return (
@@ -24,8 +29,7 @@ export function CommandPalette() {
 }
 
 function CommandPaletteDialog() {
-  const { open, dialogRef, initialSessionID } = useCommandPalette();
-  const { loadingState, sessionState } = useChatSessionState(initialSessionID);
+  const { open, dialogRef } = useCommandPalette();
 
   return (
     <Command.Dialog
@@ -37,48 +41,7 @@ function CommandPaletteDialog() {
       <DialogTitle asChild>
         <styled.h2 srOnly>Command Menu</styled.h2>
       </DialogTitle>
-      <RobotChatContext
-        key={sessionState.id}
-        initialSessionID={sessionState.id}
-        initialActiveTurnID={sessionState.activeTurnID}
-        initialSelectedWorkspaceID={sessionState.activeWorkspaceID}
-        initialMessages={sessionState.messages}
-        initialNextBefore={sessionState.nextBefore}
-        initialStreamOffset={sessionState.streamOffset}
-      >
-        {loadingState.isLoading || loadingState.error ? (
-          <UnreadyBanner error={loadingState.error} />
-        ) : (
-          <CommandPaletteContent />
-        )}
-
-        <WStack
-          fontSize="xs"
-          color="text.subtle"
-          lineHeight="tight"
-          px="1"
-          pt="2"
-        >
-          <CommandPaletteStatusBar />
-        </WStack>
-      </RobotChatContext>
+      {open && <CommandPaletteDialogContent />}
     </Command.Dialog>
   );
-}
-
-function CommandPaletteStatusBar() {
-  const { mode } = useCommandPalette();
-
-  switch (mode) {
-    case "chat":
-      return <RobotCommandPaletteStatusBar />;
-
-    default:
-      return (
-        <>
-          <p>Storyden</p>
-          <p>{mode}</p>
-        </>
-      );
-  }
 }

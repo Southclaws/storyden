@@ -1,4 +1,6 @@
 [cmdk-dialog] {
+  /* The focus trap targets this full-screen container while content loads. */
+  outline: none;
   position: fixed;
   top: 0;
   left: 0;
