@@ -6,7 +6,6 @@ import { parseAsArrayOf, parseAsString, useQueryStates } from "nuqs";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { categoryList } from "@/api/openapi-client/categories";
 import { useDatagraphSearch } from "@/api/openapi-client/datagraph";
@@ -20,6 +19,7 @@ import {
 import { useSearchQueryState } from "@/components/search/Search/useSearch";
 import { MultiSelectPickerItem } from "@/components/ui/multi-select-picker";
 import { DatagraphKindSchema } from "@/lib/datagraph/schema";
+import * as z from "@/lib/validation";
 import { deriveError } from "@/utils/error";
 
 export type Props = {
@@ -34,7 +34,7 @@ export type Props = {
 
 export const FormSchema = z.object({
   q: z.string(),
-  kind: z.array(DatagraphKindSchema).optional(),
+  kind: z.optional(z.array(DatagraphKindSchema)),
 });
 export type Form = z.infer<typeof FormSchema>;
 

@@ -3,13 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 
 import { handle } from "@/api/client";
 import { useAccountGet } from "@/api/openapi-client/accounts";
 import { authPasswordUpdate } from "@/api/openapi-client/auth";
 import { APIError } from "@/api/openapi-schema";
 import { ExistingPasswordSchema, PasswordSchema } from "@/lib/auth/schemas";
+import * as z from "@/lib/validation";
 import { deriveError } from "@/utils/error";
 
 const FormSchema = z.object({

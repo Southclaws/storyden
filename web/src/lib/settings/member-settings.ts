@@ -1,12 +1,11 @@
-import z from "zod";
-
 import { Account } from "@/api/openapi-schema";
+import * as z from "@/lib/validation";
 
 import { EditorSettingsSchema } from "./editor";
 import { FrontendConfiguration } from "./settings";
 
 const MemberCustomSettingsParseSchema = z.object({
-  editor: EditorSettingsSchema.optional(),
+  editor: z.optional(EditorSettingsSchema),
 });
 
 export const MemberCustomSettingsSchema = z.object({

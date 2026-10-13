@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { mutate } from "swr";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import {
@@ -9,19 +8,26 @@ import {
   getCategoryListKey,
 } from "@/api/openapi-client/categories";
 import { Asset } from "@/api/openapi-schema";
+import * as z from "@/lib/validation";
 import { slugify, slugifyDraft } from "@/utils/slugify";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 export const FormSchema = z.object({
-  name: z.string().min(1, "Please enter a name for the category."),
-  slug: z
+  name: z
     .string()
-    .transform(slugify)
-    .pipe(z.string().min(1, "Please enter a URL slug for the category.")),
-  description: z.string().min(1, "Please enter a short description."),
+    .check(z.minLength(1, "Please enter a name for the category.")),
+  slug: z.pipe(
+    z.pipe(z.string(), z.transform(slugify)),
+    z
+      .string()
+      .check(z.minLength(1, "Please enter a URL slug for the category.")),
+  ),
+  description: z
+    .string()
+    .check(z.minLength(1, "Please enter a short description.")),
   colour: z.string(),
-  parent: z.string().optional(),
-  cover_image_asset_id: z.string().optional(),
+  parent: z.optional(z.string()),
+  cover_image_asset_id: z.optional(z.string()),
 });
 export type Form = z.infer<typeof FormSchema>;
 

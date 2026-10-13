@@ -1,10 +1,9 @@
-import { z } from "zod";
-
 import {
   RecurrenceSchedule,
   RecurrenceWeekday,
   TrailMutableProps,
 } from "@/api/openapi-schema";
+import * as z from "@/lib/validation";
 
 export const scheduleKinds = [
   "once",
@@ -28,15 +27,23 @@ export const weekdays = [
 
 export const TrailFormSchema = z
   .object({
-    name: z.string().trim().min(1, "Name is required").max(120),
+    name: z
+      .string()
+      .check(z.trim(), z.minLength(1, "Name is required"), z.maxLength(120)),
     description: z.string(),
     triggerType: z.enum(triggerTypes),
     events: z.array(z.string()),
     scheduleKind: z.enum(scheduleKinds),
-    timezone: z.string().trim().min(1, "Timezone is required"),
-    startDate: z.string().min(1, "Starting date is required"),
-    localTime: z.string().regex(/^\d{2}:\d{2}$/, "Local time is required"),
-    interval: z.number().int().min(1, "Interval must be at least 1"),
+    timezone: z
+      .string()
+      .check(z.trim(), z.minLength(1, "Timezone is required")),
+    startDate: z.string().check(z.minLength(1, "Starting date is required")),
+    localTime: z
+      .string()
+      .check(z.regex(/^\d{2}:\d{2}$/, "Local time is required")),
+    interval: z
+      .number()
+      .check(z.int(), z.minimum(1, "Interval must be at least 1")),
     intervalUnit: z.enum(["hours", "days"]),
     selectedDays: z.array(z.enum(weekdays)),
     month: z.string(),
@@ -45,33 +52,37 @@ export const TrailFormSchema = z
       .array(
         z.object({
           type: z.literal("robot_run"),
-          robot_ref: z.string().min(1, "Choose a Robot"),
-          instruction: z.string().trim().min(1, "Instruction is required"),
+          robot_ref: z.string().check(z.minLength(1, "Choose a Robot")),
+          instruction: z
+            .string()
+            .check(z.trim(), z.minLength(1, "Instruction is required")),
         }),
       )
-      .min(1, "Add at least one Robot action"),
+      .check(z.minLength(1, "Add at least one Robot action")),
   })
-  .superRefine((values, context) => {
-    if (values.triggerType === "event" && values.events.length === 0) {
-      context.addIssue({
-        code: "custom",
-        message: "Choose at least one event",
-        path: ["events"],
-      });
-    }
+  .check(
+    z.superRefine((values, context) => {
+      if (values.triggerType === "event" && values.events.length === 0) {
+        context.addIssue({
+          code: "custom",
+          message: "Choose at least one event",
+          path: ["events"],
+        });
+      }
 
-    if (
-      values.triggerType === "schedule" &&
-      values.scheduleKind === "weekly" &&
-      values.selectedDays.length === 0
-    ) {
-      context.addIssue({
-        code: "custom",
-        message: "Choose at least one weekday",
-        path: ["selectedDays"],
-      });
-    }
-  });
+      if (
+        values.triggerType === "schedule" &&
+        values.scheduleKind === "weekly" &&
+        values.selectedDays.length === 0
+      ) {
+        context.addIssue({
+          code: "custom",
+          message: "Choose at least one weekday",
+          path: ["selectedDays"],
+        });
+      }
+    }),
+  );
 
 export type TrailFormValues = z.infer<typeof TrailFormSchema>;
 

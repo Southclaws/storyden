@@ -1,6 +1,5 @@
-import { z } from "zod";
-
 import { UnreadyBanner } from "@/components/site/Unready";
+import * as z from "@/lib/validation";
 import { PasswordResetVerifyScreen } from "@/screens/auth/PasswordResetScreen/PasswordResetVerifyScreen";
 
 type Props = {
@@ -10,7 +9,7 @@ type Props = {
 };
 
 const QuerySchema = z.object({
-  token: z.string().optional(),
+  token: z.optional(z.string()),
 });
 
 export default async function Page(props: Props) {

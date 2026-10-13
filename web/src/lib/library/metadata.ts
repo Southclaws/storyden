@@ -1,6 +1,5 @@
-import { z } from "zod";
-
 import { Metadata, Node, NodeWithChildren } from "@/api/openapi-schema";
+import * as z from "@/lib/validation";
 
 export const CoverImageSchema = z.object({
   top: z.number(),
@@ -36,28 +35,28 @@ export type LibraryPageBlockType = z.infer<typeof LibraryPageBlockTypeSchema>;
 // -
 
 export const LibraryPageBlockTypeTitleSchema = z.object({
-  type: z.literal(LibraryPageBlockTypeSchema.enum.title),
+  type: z.literal("title"),
 });
 export type LibraryPageBlockTypeTitle = z.infer<
   typeof LibraryPageBlockTypeTitleSchema
 >;
 
 export const LibraryPageBlockTypeCoverSchema = z.object({
-  type: z.literal(LibraryPageBlockTypeSchema.enum.cover),
+  type: z.literal("cover"),
 });
 export type LibraryPageBlockTypeCover = z.infer<
   typeof LibraryPageBlockTypeCoverSchema
 >;
 
 export const LibraryPageBlockTypeLinkSchema = z.object({
-  type: z.literal(LibraryPageBlockTypeSchema.enum.link),
+  type: z.literal("link"),
 });
 export type LibraryPageBlockTypeLink = z.infer<
   typeof LibraryPageBlockTypeLinkSchema
 >;
 
 export const LibraryPageBlockTypeContentSchema = z.object({
-  type: z.literal(LibraryPageBlockTypeSchema.enum.content),
+  type: z.literal("content"),
 });
 export type LibraryPageBlockTypeContent = z.infer<
   typeof LibraryPageBlockTypeContentSchema
@@ -70,22 +69,22 @@ export type LibraryPageBlockTypeAssetsLayout = z.infer<
 
 export const LibraryPageBlockTypeAssetsConfigSchema = z.object({
   layout: LibraryPageBlockTypeAssetsLayoutSchema,
-  gridSize: z.number().optional(),
+  gridSize: z.optional(z.number()),
 });
 export type LibraryPageBlockTypeAssetsConfig = z.infer<
   typeof LibraryPageBlockTypeAssetsConfigSchema
 >;
 
 export const LibraryPageBlockTypeAssetsSchema = z.object({
-  type: z.literal(LibraryPageBlockTypeSchema.enum.assets),
-  config: LibraryPageBlockTypeAssetsConfigSchema.optional(),
+  type: z.literal("assets"),
+  config: z.optional(LibraryPageBlockTypeAssetsConfigSchema),
 });
 export type LibraryPageBlockTypeAssets = z.infer<
   typeof LibraryPageBlockTypeAssetsSchema
 >;
 
 export const LibraryPageBlockTypePropertiesSchema = z.object({
-  type: z.literal(LibraryPageBlockTypeSchema.enum.properties),
+  type: z.literal("properties"),
 });
 export type LibraryPageBlockTypeProperties = z.infer<
   typeof LibraryPageBlockTypePropertiesSchema
@@ -101,7 +100,7 @@ export type LibraryPageBlockTypeDirectoryLayout = z.infer<
 
 export const LibraryPageBlockTypeDirectoryColumnSchema = z.object({
   fid: z.string(),
-  hidden: z.boolean().default(false),
+  hidden: z._default(z.boolean(), false),
 });
 export type LibraryPageBlockTypeDirectoryColumn = z.infer<
   typeof LibraryPageBlockTypeDirectoryColumnSchema
@@ -116,15 +115,15 @@ export type LibraryPageBlockTypeDirectoryConfig = z.infer<
 >;
 
 export const LibraryPageBlockTypeDirectorySchema = z.object({
-  type: z.literal(LibraryPageBlockTypeSchema.enum.directory),
-  config: LibraryPageBlockTypeDirectoryConfigSchema.optional(),
+  type: z.literal("directory"),
+  config: z.optional(LibraryPageBlockTypeDirectoryConfigSchema),
 });
 export type LibraryPageBlockTypeDirectory = z.infer<
   typeof LibraryPageBlockTypeDirectorySchema
 >;
 
 export const LibraryPageBlockTypeTagsSchema = z.object({
-  type: z.literal(LibraryPageBlockTypeSchema.enum.tags),
+  type: z.literal("tags"),
 });
 export type LibraryPageBlockTypeTags = z.infer<
   typeof LibraryPageBlockTypeTagsSchema
@@ -152,8 +151,8 @@ export const NodeLayoutSchema = z.object({
 export type NodeLayout = z.infer<typeof NodeLayoutSchema>;
 
 export const NodeMetadataSchema = z.object({
-  coverImage: CoverImageSchema.optional().nullable(),
-  layout: NodeLayoutSchema.optional(),
+  coverImage: z.nullable(z.optional(CoverImageSchema)),
+  layout: z.optional(NodeLayoutSchema),
 });
 export type NodeMetadata = z.infer<typeof NodeMetadataSchema>;
 

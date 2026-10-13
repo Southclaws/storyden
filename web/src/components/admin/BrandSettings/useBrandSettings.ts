@@ -1,13 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { iconUpload } from "@/api/openapi-client/misc";
 import { isContentEmpty } from "@/lib/content/content";
 import { useSettingsMutation } from "@/lib/settings/mutation";
 import { MotdAlertTypeSchema, Settings } from "@/lib/settings/settings";
+import * as z from "@/lib/validation";
 import { getColourVariants } from "@/utils/colour";
 import { getIconURL } from "@/utils/icon";
 
@@ -19,31 +19,33 @@ export const FormSchema = z
   .object({
     title: z.string(),
     description: z.string(),
-    content: z.string().optional(),
+    content: z.optional(z.string()),
     accentColour: z.string(),
-    motdContent: z.string().optional(),
-    motdStartAt: z.string().optional(),
-    motdEndAt: z.string().optional(),
-    motdType: z.union([MotdAlertTypeSchema, z.literal("")]).optional(),
+    motdContent: z.optional(z.string()),
+    motdStartAt: z.optional(z.string()),
+    motdEndAt: z.optional(z.string()),
+    motdType: z.optional(z.union([MotdAlertTypeSchema, z.literal("")])),
   })
-  .refine(
-    (data) => {
-      if (!data.motdStartAt || !data.motdEndAt) {
-        return true;
-      }
+  .check(
+    z.refine(
+      (data) => {
+        if (!data.motdStartAt || !data.motdEndAt) {
+          return true;
+        }
 
-      const start = new Date(data.motdStartAt).getTime();
-      const end = new Date(data.motdEndAt).getTime();
-      if (Number.isNaN(start) || Number.isNaN(end)) {
-        return true;
-      }
+        const start = new Date(data.motdStartAt).getTime();
+        const end = new Date(data.motdEndAt).getTime();
+        if (Number.isNaN(start) || Number.isNaN(end)) {
+          return true;
+        }
 
-      return start <= end;
-    },
-    {
-      message: "MOTD end date must be after start date.",
-      path: ["motdEndAt"],
-    },
+        return start <= end;
+      },
+      {
+        message: "MOTD end date must be after start date.",
+        path: ["motdEndAt"],
+      },
+    ),
   );
 export type Form = z.infer<typeof FormSchema>;
 

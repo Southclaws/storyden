@@ -1,5 +1,3 @@
-import { z } from "zod";
-
 import {
   AdminSettingsProps,
   AuthMode,
@@ -7,6 +5,7 @@ import {
   MessageOfTheDay,
   RegistrationMode,
 } from "@/api/openapi-schema";
+import * as z from "@/lib/validation";
 import { FALLBACK_COLOUR } from "@/utils/colour";
 
 import { EditorSettingsSchema } from "./editor";
@@ -24,11 +23,9 @@ export const MotdAlertTypeSchema = z.enum([
 ]);
 export type MotdAlertType = z.infer<typeof MotdAlertTypeSchema>;
 
-export const MotdMetadataSchema = z
-  .object({
-    type: MotdAlertTypeSchema,
-  })
-  .passthrough();
+export const MotdMetadataSchema = z.looseObject({
+  type: MotdAlertTypeSchema,
+});
 export type MotdMetadata = z.infer<typeof MotdMetadataSchema>;
 
 export const DefaultFrontendConfig = {
@@ -57,19 +54,24 @@ export const DefaultSettings = {
 
 // The frontend configuration is stored in Storyden's settings metadata field
 // which is untyped on the backend so we provide a schema for validation here.
-export const FrontendConfigurationSchema = z
-  .object({
+export const FrontendConfigurationSchema = z._default(
+  z.object({
     feed: FeedConfigSchema,
     navigation: NavigationConfigSchema,
-    editor: EditorSettingsSchema.default(DefaultEditorSettings),
-    signatures: z
-      .object({
-        enabled: z.boolean().default(true),
-        maxHeight: z.number().int().positive().max(2000).default(160),
-      })
-      .default({ enabled: true, maxHeight: 160 }),
-  })
-  .default(DefaultFrontendConfig);
+    editor: z._default(EditorSettingsSchema, DefaultEditorSettings),
+    signatures: z._default(
+      z.object({
+        enabled: z._default(z.boolean(), true),
+        maxHeight: z._default(
+          z.number().check(z.int(), z.positive(), z.maximum(2000)),
+          160,
+        ),
+      }),
+      { enabled: true, maxHeight: 160 },
+    ),
+  }),
+  DefaultFrontendConfig,
+);
 export type FrontendConfiguration = z.infer<typeof FrontendConfigurationSchema>;
 export type SignatureConfig = FrontendConfiguration["signatures"];
 

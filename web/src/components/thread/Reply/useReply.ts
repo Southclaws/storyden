@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { Account, Permission, Reply, Thread } from "@/api/openapi-schema";
@@ -11,10 +10,11 @@ import { useReportContext } from "@/lib/report/useReportContext";
 import type { SignatureConfig } from "@/lib/settings/settings";
 import { useThreadMutations } from "@/lib/thread/mutation";
 import { withUndo } from "@/lib/thread/undo";
+import * as z from "@/lib/validation";
 import { hasPermission } from "@/utils/permissions";
 
 export const FormSchema = z.object({
-  body: z.string().min(1, "Reply is empty."),
+  body: z.string().check(z.minLength(1, "Reply is empty.")),
 });
 export type Form = z.infer<typeof FormSchema>;
 

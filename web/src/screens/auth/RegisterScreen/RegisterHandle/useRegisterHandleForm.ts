@@ -3,12 +3,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 
 import { useAccountGet } from "@/api/openapi-client/accounts";
 import { authPasswordSignup } from "@/api/openapi-client/auth";
 import { APIError } from "@/api/openapi-schema";
 import { PasswordSchema, UsernameSchema } from "@/lib/auth/schemas";
+import * as z from "@/lib/validation";
 import { deriveError } from "@/utils/error";
 
 export type Props = {
@@ -17,7 +17,7 @@ export type Props = {
 
 const FormSchema = z.object({
   identifier: UsernameSchema,
-  token: z.string().optional(), // Validated properly during password submission
+  token: z.optional(z.string()), // Validated properly during password submission
 });
 const FormPasswordSchema = z.object({
   identifier: UsernameSchema,
@@ -40,7 +40,7 @@ export function useRegisterHandleForm({ invitationID }: Props) {
   async function handlePassword(payload: Form) {
     const parsed = FormPasswordSchema.safeParse(payload);
     if (!parsed.success) {
-      const fieldErrors = parsed.error.flatten().fieldErrors;
+      const fieldErrors = z.flattenError(parsed.error).fieldErrors;
 
       if (fieldErrors.identifier) {
         setError("identifier", {

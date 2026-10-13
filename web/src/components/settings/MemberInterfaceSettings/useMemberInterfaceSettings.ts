@@ -1,10 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { useProfileMutations } from "@/lib/profile/mutation";
 import { Member } from "@/lib/settings/member-settings";
+import * as z from "@/lib/validation";
 
 export const FormSchema = z.object({
   editorMode: z.enum(["richtext", "markdown"]),

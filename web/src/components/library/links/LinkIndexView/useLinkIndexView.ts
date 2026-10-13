@@ -3,10 +3,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { KeyedMutator } from "swr";
-import { z } from "zod";
 
 import { linkCreate } from "@/api/openapi-client/links";
 import { LinkListResult, LinkReference } from "@/api/openapi-schema";
+import * as z from "@/lib/validation";
 
 export type Props = {
   links: LinkListResult;

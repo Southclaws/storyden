@@ -1,6 +1,5 @@
-import { z } from "zod";
-
 import { Permission } from "@/api/openapi-schema";
+import * as z from "@/lib/validation";
 
 export const PermissionSchema = z.nativeEnum(Permission);
 

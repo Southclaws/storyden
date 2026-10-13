@@ -1,9 +1,8 @@
-import { z } from "zod";
-
 import { categoryGet } from "@/api/openapi-server/categories";
 import { threadList } from "@/api/openapi-server/threads";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { canonicalPage, jsonLD } from "@/lib/metadata/public";
+import * as z from "@/lib/validation";
 import { CategoryScreen } from "@/screens/category/CategoryScreen";
 
 type Props = {
@@ -14,12 +13,11 @@ type Props = {
 };
 
 const QuerySchema = z.object({
-  page: z
-    .string()
-    .regex(/^[1-9]\d*$/)
-    .transform(Number)
-    .refine(Number.isSafeInteger)
-    .optional(),
+  page: z.optional(
+    z
+      .pipe(z.string().check(z.regex(/^[1-9]\d*$/)), z.transform(Number))
+      .check(z.refine(Number.isSafeInteger)),
+  ),
 });
 type Query = z.input<typeof QuerySchema>;
 

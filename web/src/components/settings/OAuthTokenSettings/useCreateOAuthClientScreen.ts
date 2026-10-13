@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import {
@@ -16,16 +15,24 @@ import {
   OAuthClientSelfCreateBody,
 } from "@/api/openapi-schema";
 import { PermissionSchema } from "@/lib/permission/permission";
+import * as z from "@/lib/validation";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 export type OAuthClientPreset = "machine" | "app_integration" | "public_app";
 
 export const FormSchema = z.object({
-  name: z.string().min(1, "Name is required").max(80, "Name is too long"),
+  name: z
+    .string()
+    .check(
+      z.minLength(1, "Name is required"),
+      z.maxLength(80, "Name is too long"),
+    ),
   preset: z.enum(["machine", "app_integration", "public_app"]),
-  redirectUris: z
-    .array(z.object({ value: z.string().url("Must be a valid URL") }))
-    .optional(),
+  redirectUris: z.optional(
+    z.array(
+      z.object({ value: z.string().check(z.url("Must be a valid URL")) }),
+    ),
+  ),
   permissions: z.array(PermissionSchema),
 });
 export type Form = z.infer<typeof FormSchema>;

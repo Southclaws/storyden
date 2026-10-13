@@ -1,11 +1,10 @@
-import { z } from "zod";
-
 import {
   PropertySchema,
   PropertySchemaList,
   PropertyType,
 } from "@/api/openapi-schema";
 import { CoverImageSchema, NodeMetadataSchema } from "@/lib/library/metadata";
+import * as z from "@/lib/validation";
 
 const CoverImageFormSchema = z.union([
   CoverImageSchema,
@@ -20,7 +19,7 @@ const PropertyTypes = Object.keys(PropertyType) as unknown as readonly [
 ];
 
 export const FormNodePropertySchema = z.object({
-  fid: z.string().optional(),
+  fid: z.optional(z.string()),
   name: z.string(),
   type: z.enum(PropertyTypes),
   sort: z.string(),

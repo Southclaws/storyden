@@ -1,7 +1,7 @@
 import { filter, flow, reduce, toPairs } from "lodash/fp";
-import { z } from "zod";
 
 import { getAPIAddress } from "@/config";
+import * as z from "@/lib/validation";
 
 export type Options = {
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD";
@@ -17,17 +17,17 @@ export type Options = {
 };
 
 export const ProblemDetailsSchema = z.object({
-  trace_id: z.string().min(1),
-  type: z.string().optional(),
-  title: z.string().optional(),
-  detail: z.string().optional(),
-  metadata: z.unknown().optional(),
+  trace_id: z.string().check(z.minLength(1)),
+  type: z.optional(z.string()),
+  title: z.optional(z.string()),
+  detail: z.optional(z.string()),
+  metadata: z.optional(z.unknown()),
 });
 export type ProblemDetails = z.infer<typeof ProblemDetailsSchema>;
 
 const OAuthErrorSchema = z.object({
-  error: z.string().min(1),
-  error_description: z.string().optional(),
+  error: z.string().check(z.minLength(1)),
+  error_description: z.optional(z.string()),
 });
 
 type OAuthError = z.infer<typeof OAuthErrorSchema>;

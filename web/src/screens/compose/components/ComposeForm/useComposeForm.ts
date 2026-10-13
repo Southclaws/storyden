@@ -2,21 +2,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { threadCreate, threadUpdate } from "@/api/openapi-client/threads";
 import { Thread, ThreadInitialProps, Visibility } from "@/api/openapi-schema";
 import { NO_CATEGORY_VALUE } from "@/components/category/CategorySelect/useCategorySelect";
+import * as z from "@/lib/validation";
 
 export type Props = { editing?: string; initialDraft?: Thread };
 
 export const FormShapeSchema = z.object({
   title: z.string(),
-  body: z.string().min(1),
-  category: z.string().optional(),
-  tags: z.string().array().optional(),
-  url: z.string().optional(),
+  body: z.string().check(z.minLength(1)),
+  category: z.optional(z.string()),
+  tags: z.optional(z.array(z.string())),
+  url: z.optional(z.string()),
 });
 export type FormShape = z.infer<typeof FormShapeSchema>;
 

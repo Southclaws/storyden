@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import {
@@ -11,6 +10,7 @@ import {
   robotToolsetUpdate,
 } from "@/api/openapi-client/robots";
 import { RobotToolset } from "@/api/openapi-schema";
+import * as z from "@/lib/validation";
 
 export type RobotToolsetFormProps = {
   toolset?: RobotToolset;
@@ -19,7 +19,7 @@ export type RobotToolsetFormProps = {
 };
 
 const FormSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  name: z.string().check(z.minLength(1, "Name is required")),
   description: z.string(),
   instruction: z.string(),
   tools: z.array(z.string()),

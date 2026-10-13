@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "@/lib/validation";
 
 export const FeedBlockTypeSchema = z.enum([
   "title",
@@ -13,40 +13,40 @@ export const FeedBlockTypeSchema = z.enum([
 export type FeedBlockType = z.infer<typeof FeedBlockTypeSchema>;
 
 const FeedTitleBlockSchema = z.object({
-  type: z.literal(FeedBlockTypeSchema.enum.title),
+  type: z.literal("title"),
 });
 
 const FeedSubtitleBlockSchema = z.object({
-  type: z.literal(FeedBlockTypeSchema.enum.subtitle),
+  type: z.literal("subtitle"),
 });
 
 const FeedContentBlockSchema = z.object({
-  type: z.literal(FeedBlockTypeSchema.enum.content),
+  type: z.literal("content"),
 });
 
 const FeedCoverBlockSchema = z.object({
-  type: z.literal(FeedBlockTypeSchema.enum.cover),
+  type: z.literal("cover"),
 });
 
 const FeedCategoriesBlockSchema = z.object({
-  type: z.literal(FeedBlockTypeSchema.enum.categories),
-  layout: z.enum(["list", "grid"]).default("list"),
+  type: z.literal("categories"),
+  layout: z._default(z.enum(["list", "grid"]), "list"),
 });
 
 const FeedThreadsBlockSchema = z.object({
-  type: z.literal(FeedBlockTypeSchema.enum.threads),
-  source: z.enum(["all", "uncategorised"]).default("uncategorised"),
+  type: z.literal("threads"),
+  source: z._default(z.enum(["all", "uncategorised"]), "uncategorised"),
 });
 
 const FeedQuickShareBlockSchema = z.object({
-  type: z.literal(FeedBlockTypeSchema.enum["quick-share"]),
-  showCategorySelect: z.boolean().default(true),
+  type: z.literal("quick-share"),
+  showCategorySelect: z._default(z.boolean(), true),
 });
 
 const FeedLibraryBlockSchema = z.object({
-  type: z.literal(FeedBlockTypeSchema.enum.library),
-  node: z.string().optional(),
-  layout: z.enum(["list", "grid"]).default("list"),
+  type: z.literal("library"),
+  node: z.optional(z.string()),
+  layout: z._default(z.enum(["list", "grid"]), "list"),
 });
 
 export const FeedBlockSchema = z.discriminatedUnion("type", [
@@ -65,20 +65,22 @@ const OrderedFeedConfigSchema = z
   .object({
     blocks: z.array(FeedBlockSchema),
   })
-  .superRefine(({ blocks }, context) => {
-    const seen = new Set<FeedBlockType>();
+  .check(
+    z.superRefine(({ blocks }, context) => {
+      const seen = new Set<FeedBlockType>();
 
-    blocks.forEach((block, index) => {
-      if (seen.has(block.type)) {
-        context.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Feed block "${block.type}" may only appear once.`,
-          path: ["blocks", index],
-        });
-      }
-      seen.add(block.type);
-    });
-  });
+      blocks.forEach((block, index) => {
+        if (seen.has(block.type)) {
+          context.addIssue({
+            code: "custom",
+            message: `Feed block "${block.type}" may only appear once.`,
+            path: ["blocks", index],
+          });
+        }
+        seen.add(block.type);
+      });
+    }),
+  );
 export type FeedConfig = z.infer<typeof OrderedFeedConfigSchema>;
 
 const LegacyFeedLayoutConfigSchema = z.object({
@@ -88,18 +90,19 @@ const LegacyFeedLayoutConfigSchema = z.object({
 const LegacyFeedSourceConfigSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("threads"),
-    quickShare: z.enum(["enabled", "disabled"]).default("enabled"),
+    quickShare: z._default(z.enum(["enabled", "disabled"]), "enabled"),
   }),
   z.object({
     type: z.literal("library"),
-    node: z.string().optional(),
+    node: z.optional(z.string()),
   }),
   z.object({
     type: z.literal("categories"),
-    threadListMode: z
-      .enum(["none", "all", "uncategorised"])
-      .default("uncategorised"),
-    quickShare: z.enum(["enabled", "disabled"]).default("enabled"),
+    threadListMode: z._default(
+      z.enum(["none", "all", "uncategorised"]),
+      "uncategorised",
+    ),
+    quickShare: z._default(z.enum(["enabled", "disabled"]), "enabled"),
   }),
 ]);
 
@@ -118,21 +121,25 @@ export const DefaultFeedConfig = {
   ],
 } satisfies FeedConfig;
 
-export const FeedConfigSchema = z
-  .preprocess((value) => {
-    const current = OrderedFeedConfigSchema.safeParse(value);
-    if (current.success) {
-      return current.data;
-    }
+export const FeedConfigSchema = z._default(
+  z.pipe(
+    z.transform((value) => {
+      const current = OrderedFeedConfigSchema.safeParse(value);
+      if (current.success) {
+        return current.data;
+      }
 
-    const legacy = LegacyFeedConfigSchema.safeParse(value);
-    if (legacy.success) {
-      return migrateLegacyFeedConfig(legacy.data);
-    }
+      const legacy = LegacyFeedConfigSchema.safeParse(value);
+      if (legacy.success) {
+        return migrateLegacyFeedConfig(legacy.data);
+      }
 
-    return value;
-  }, OrderedFeedConfigSchema)
-  .default(DefaultFeedConfig);
+      return value;
+    }),
+    OrderedFeedConfigSchema,
+  ),
+  DefaultFeedConfig,
+);
 
 type LegacyFeedConfig = z.infer<typeof LegacyFeedConfigSchema>;
 

@@ -1,13 +1,13 @@
 import { indexOf } from "lodash";
 import { uniq } from "lodash/fp";
-import { z } from "zod";
+
+import * as z from "@/lib/validation";
 
 export const ParamsSchema = z.object({
-  slug: z
-    .string()
-    .array()
-    .min(1)
-    .transform((slugs) => slugs.map((s) => decodeURIComponent(s))),
+  slug: z.pipe(
+    z.array(z.string()).check(z.minLength(1)),
+    z.transform((slugs) => slugs.map((s) => decodeURIComponent(s))),
+  ),
 });
 export type Params = z.infer<typeof ParamsSchema>;
 

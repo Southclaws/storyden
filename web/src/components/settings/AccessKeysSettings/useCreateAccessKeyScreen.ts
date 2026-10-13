@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import {
@@ -12,11 +11,17 @@ import {
   getAccessKeyListKey,
 } from "@/api/openapi-client/auth";
 import { AccessKeyCreateBody } from "@/api/openapi-schema";
+import * as z from "@/lib/validation";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 export const FormSchema = z.object({
-  name: z.string().min(1, "Name is required").max(50, "Name is too long"),
-  expires_at: z.string().optional(),
+  name: z
+    .string()
+    .check(
+      z.minLength(1, "Name is required"),
+      z.maxLength(50, "Name is too long"),
+    ),
+  expires_at: z.optional(z.string()),
 });
 export type Form = z.infer<typeof FormSchema>;
 

@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import useSWR from "swr";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { Button } from "@/components/ui/button";
@@ -19,6 +18,7 @@ import { resolveDiscoverySettings } from "@/lib/settings/discovery";
 import { useSettingsMutation } from "@/lib/settings/mutation";
 import { generateRobotsTxt } from "@/lib/settings/robots-txt";
 import type { AdminSettings } from "@/lib/settings/settings";
+import * as z from "@/lib/validation";
 import { LStack, WStack, styled } from "@/styled-system/jsx";
 
 const FormSchema = z.object({
@@ -29,7 +29,7 @@ const FormSchema = z.object({
   ai_catalog: z.boolean(),
   api_catalog: z.boolean(),
   mcp_server_card: z.boolean(),
-  robots_txt: z.string().max(65536),
+  robots_txt: z.string().check(z.maxLength(65536)),
 });
 
 type Form = z.infer<typeof FormSchema>;

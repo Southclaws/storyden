@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 
 import { handle } from "@/api/client";
 import { authPasswordResetRequestEmail } from "@/api/openapi-client/auth";
@@ -14,12 +13,13 @@ import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { Input } from "@/components/ui/input";
 import { WEB_ADDRESS } from "@/config";
+import * as z from "@/lib/validation";
 import { styled } from "@/styled-system/jsx";
 import { vstack } from "@/styled-system/patterns";
 import { deriveError } from "@/utils/error";
 
 const FormSchema = z.object({
-  email: z.string().email(),
+  email: z.string().check(z.email()),
 });
 type Form = z.infer<typeof FormSchema>;
 

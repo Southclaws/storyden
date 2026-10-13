@@ -1,6 +1,6 @@
-import { z } from "zod";
+import * as z from "@/lib/validation";
 
 export const ParamSchema = z.object({
-  handle: z.string().optional(),
-  collection: z.string().optional(),
+  handle: z.optional(z.string()),
+  collection: z.optional(z.string()),
 });

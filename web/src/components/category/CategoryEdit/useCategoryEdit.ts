@@ -2,11 +2,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { Asset, Category } from "@/api/openapi-schema";
 import { useCategoryMutations } from "@/lib/category/mutation";
+import * as z from "@/lib/validation";
 import { slugify, slugifyDraft } from "@/utils/slugify";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
 
@@ -15,11 +15,14 @@ export type Props = {
 } & UseDisclosureProps;
 
 export const FormSchema = z.object({
-  name: z.string().min(1),
-  slug: z.string().transform(slugify).pipe(z.string().min(1)),
-  description: z.string().min(1),
+  name: z.string().check(z.minLength(1)),
+  slug: z.pipe(
+    z.pipe(z.string(), z.transform(slugify)),
+    z.string().check(z.minLength(1)),
+  ),
+  description: z.string().check(z.minLength(1)),
   colour: z.string(),
-  cover_image: z.custom<Asset>().nullable().optional(),
+  cover_image: z.optional(z.nullable(z.custom<Asset>())),
 });
 export type Form = z.infer<typeof FormSchema>;
 

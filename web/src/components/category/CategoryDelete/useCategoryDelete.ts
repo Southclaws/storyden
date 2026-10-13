@@ -1,15 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePathname, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { categoryGet } from "@/api/openapi-client/categories";
 import { useCategoryMutations } from "@/lib/category/mutation";
+import * as z from "@/lib/validation";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 const FormSchema = z.object({
-  move_to: z.string().min(1, "Please select a category to move posts to."),
+  move_to: z
+    .string()
+    .check(z.minLength(1, "Please select a category to move posts to.")),
 });
 
 export type FormData = z.infer<typeof FormSchema>;

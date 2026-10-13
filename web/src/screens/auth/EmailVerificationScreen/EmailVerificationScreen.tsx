@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { authEmailVerify } from "@/api/openapi-client/auth";
@@ -15,11 +14,14 @@ import { FormErrorText } from "@/components/ui/form-error-text";
 import { Input } from "@/components/ui/input";
 import { PageHeading } from "@/components/ui/page-heading";
 import { PinInputField } from "@/components/ui/pin-input";
+import * as z from "@/lib/validation";
 import { vstack } from "@/styled-system/patterns";
 
 export const FormSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  code: z.string().length(6, "Please enter the 6 digit code from your email."),
+  email: z.string().check(z.email("Please enter a valid email address")),
+  code: z
+    .string()
+    .check(z.length(6, "Please enter the 6 digit code from your email.")),
 });
 export type Form = z.infer<typeof FormSchema>;
 

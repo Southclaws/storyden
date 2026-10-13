@@ -1,9 +1,9 @@
-import z from "zod";
+import * as z from "@/lib/validation";
 
 export const EditorModeSchema = z.enum(["richtext", "markdown"]);
 export type EditorMode = z.infer<typeof EditorModeSchema>;
 
 export const EditorSettingsSchema = z.object({
-  mode: EditorModeSchema.optional(),
+  mode: z.optional(EditorModeSchema),
 });
 export type EditorSettings = z.infer<typeof EditorSettingsSchema>;

@@ -3,10 +3,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+
+import * as z from "@/lib/validation";
 
 export const FormSchema = z.object({
-  q: z.string().min(1, { message: "Please enter a search term" }),
+  q: z
+    .string()
+    .check(z.minLength(1, { message: "Please enter a search term" })),
 });
 export type Form = z.infer<typeof FormSchema>;
 

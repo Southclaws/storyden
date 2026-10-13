@@ -1,10 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { moderationActionCreate } from "@/api/openapi-client/admin";
 import { ModerationActionPurgeAccountContentType } from "@/api/openapi-schema";
+import * as z from "@/lib/validation";
 
 export type Props = {
   accountId: string;
@@ -15,7 +15,7 @@ export type Props = {
 const schema = z.object({
   contentTypes: z
     .array(z.nativeEnum(ModerationActionPurgeAccountContentType))
-    .min(1, "Select at least one content type to purge"),
+    .check(z.minLength(1, "Select at least one content type to purge")),
 });
 
 type FormValues = z.infer<typeof schema>;

@@ -1,10 +1,10 @@
 import { keyBy } from "lodash/fp";
-import { z } from "zod";
 
 import { categoryList } from "@/api/openapi-server/categories";
 import { datagraphSearch } from "@/api/openapi-server/datagraph";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { DatagraphKindSchema } from "@/lib/datagraph/schema";
+import * as z from "@/lib/validation";
 import { SearchScreen } from "@/screens/search/SearchScreen";
 
 type Props = {
@@ -12,47 +12,61 @@ type Props = {
 };
 
 const QuerySchema = z.object({
-  q: z.string().optional(),
-  page: z
-    .string()
-    .transform((v) => parseInt(v, 10))
-    .optional(),
-  kind: z
-    .preprocess((arg: unknown) => {
-      if (typeof arg === "string") {
-        return [arg];
-      }
+  q: z.optional(z.string()),
+  page: z.optional(
+    z.pipe(
+      z.string(),
+      z.transform((v) => parseInt(v, 10)),
+    ),
+  ),
+  kind: z.optional(
+    z.pipe(
+      z.transform((arg: unknown) => {
+        if (typeof arg === "string") {
+          return [arg];
+        }
 
-      return arg;
-    }, z.array(DatagraphKindSchema))
-    .optional(),
-  authors: z
-    .preprocess((arg: unknown) => {
-      if (typeof arg === "string") {
-        return [arg];
-      }
+        return arg;
+      }),
+      z.array(DatagraphKindSchema),
+    ),
+  ),
+  authors: z.optional(
+    z.pipe(
+      z.transform((arg: unknown) => {
+        if (typeof arg === "string") {
+          return [arg];
+        }
 
-      return arg;
-    }, z.array(z.string()))
-    .optional(),
-  categories: z
-    .preprocess((arg: unknown) => {
-      if (typeof arg === "string") {
-        return [arg];
-      }
+        return arg;
+      }),
+      z.array(z.string()),
+    ),
+  ),
+  categories: z.optional(
+    z.pipe(
+      z.transform((arg: unknown) => {
+        if (typeof arg === "string") {
+          return [arg];
+        }
 
-      return arg;
-    }, z.array(z.string()))
-    .optional(),
-  tags: z
-    .preprocess((arg: unknown) => {
-      if (typeof arg === "string") {
-        return [arg];
-      }
+        return arg;
+      }),
+      z.array(z.string()),
+    ),
+  ),
+  tags: z.optional(
+    z.pipe(
+      z.transform((arg: unknown) => {
+        if (typeof arg === "string") {
+          return [arg];
+        }
 
-      return arg;
-    }, z.array(z.string()))
-    .optional(),
+        return arg;
+      }),
+      z.array(z.string()),
+    ),
+  ),
 });
 
 type Query = z.infer<typeof QuerySchema>;

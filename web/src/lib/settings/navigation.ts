@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "@/lib/validation";
 
 export const BuiltInNavigationItemTypeSchema = z.enum([
   "compose",
@@ -20,14 +20,16 @@ const BuiltInNavigationItemSchema = z.object({
 
 const CustomNavigationLinkSchema = z.object({
   type: z.literal("custom-link"),
-  id: z.string().trim().min(1).max(64),
-  label: z.string().trim().min(1).max(80),
+  id: z.string().check(z.trim(), z.minLength(1), z.maxLength(64)),
+  label: z.string().check(z.trim(), z.minLength(1), z.maxLength(80)),
   href: z
     .string()
-    .trim()
-    .min(1)
-    .max(2048)
-    .refine(isSafeNavigationHref, "Enter a safe internal or HTTP(S) URL."),
+    .check(
+      z.trim(),
+      z.minLength(1),
+      z.maxLength(2048),
+      z.refine(isSafeNavigationHref, "Enter a safe internal or HTTP(S) URL."),
+    ),
 });
 
 export const NavigationItemSchema = z.discriminatedUnion("type", [
@@ -44,21 +46,23 @@ const NavigationConfigValueSchema = z
   .object({
     items: z.array(NavigationItemSchema),
   })
-  .superRefine(({ items }, context) => {
-    const seen = new Set<string>();
+  .check(
+    z.superRefine(({ items }, context) => {
+      const seen = new Set<string>();
 
-    items.forEach((item, index) => {
-      const key = getNavigationItemKey(item);
-      if (seen.has(key)) {
-        context.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Navigation item "${key}" may only appear once.`,
-          path: ["items", index],
-        });
-      }
-      seen.add(key);
-    });
-  });
+      items.forEach((item, index) => {
+        const key = getNavigationItemKey(item);
+        if (seen.has(key)) {
+          context.addIssue({
+            code: "custom",
+            message: `Navigation item "${key}" may only appear once.`,
+            path: ["items", index],
+          });
+        }
+        seen.add(key);
+      });
+    }),
+  );
 export type NavigationConfig = z.infer<typeof NavigationConfigValueSchema>;
 
 export const DefaultNavigationConfig = {
@@ -73,7 +77,8 @@ export const DefaultNavigationConfig = {
   ],
 } satisfies NavigationConfig;
 
-export const NavigationConfigSchema = NavigationConfigValueSchema.default(
+export const NavigationConfigSchema = z._default(
+  NavigationConfigValueSchema,
   DefaultNavigationConfig,
 );
 

@@ -1,6 +1,5 @@
-import { z } from "zod";
-
 import { RegistrationMode } from "@/api/openapi-schema";
+import * as z from "@/lib/validation";
 
 export const RegistrationModeTable: { [K in RegistrationMode]: string } = {
   public: "public",

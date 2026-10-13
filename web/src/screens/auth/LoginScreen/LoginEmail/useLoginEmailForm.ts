@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 
 import { handle } from "@/api/client";
 import { useAccountGet } from "@/api/openapi-client/accounts";
@@ -16,6 +15,7 @@ import {
   UsernameOrEmailSchema,
 } from "@/lib/auth/schemas";
 import { refreshFeed } from "@/lib/feed/refresh";
+import * as z from "@/lib/validation";
 
 const FormSchema = z.object({
   identifier: UsernameOrEmailSchema,

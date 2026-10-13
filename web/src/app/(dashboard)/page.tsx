@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { z } from "zod";
 
 import { threadList } from "@/api/openapi-server/threads";
 import { UnreadyBanner } from "@/components/site/Unready";
@@ -7,6 +6,7 @@ import { getCategoryThreadListParams } from "@/lib/feed/category";
 import { canonicalPage, jsonLD, pageLinks } from "@/lib/metadata/public";
 import type { Settings } from "@/lib/settings/settings";
 import { getSettings } from "@/lib/settings/settings-server";
+import * as z from "@/lib/validation";
 import { FeedScreen } from "@/screens/feed/FeedScreen";
 
 type Props = {
@@ -14,12 +14,11 @@ type Props = {
 };
 
 const QuerySchema = z.object({
-  page: z
-    .string()
-    .regex(/^[1-9]\d*$/)
-    .transform(Number)
-    .refine(Number.isSafeInteger)
-    .optional(),
+  page: z.optional(
+    z
+      .pipe(z.string().check(z.regex(/^[1-9]\d*$/)), z.transform(Number))
+      .check(z.refine(Number.isSafeInteger)),
+  ),
 });
 type Query = z.input<typeof QuerySchema>;
 

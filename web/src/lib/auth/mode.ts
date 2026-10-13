@@ -1,6 +1,5 @@
-import { z } from "zod";
-
 import { AuthMode } from "@/api/openapi-schema";
+import * as z from "@/lib/validation";
 
 export const AuthenticationModeTable: { [K in AuthMode]: string } = {
   handle: "handle",

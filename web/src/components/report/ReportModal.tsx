@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ReactNode } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { reportCreate } from "@/api/openapi-client/reports";
@@ -12,6 +11,7 @@ import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
+import * as z from "@/lib/validation";
 import { WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
@@ -19,7 +19,7 @@ import { UseDisclosureProps } from "@/utils/useDisclosure";
 import { Input } from "../ui/input";
 
 const FormSchema = z.object({
-  comment: z.string().max(1000).optional(),
+  comment: z.optional(z.string().check(z.maxLength(1000))),
 });
 type Form = z.infer<typeof FormSchema>;
 

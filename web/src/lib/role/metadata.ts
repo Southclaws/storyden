@@ -1,11 +1,10 @@
-import { z } from "zod";
-
 import { Metadata } from "@/api/openapi-schema";
+import * as z from "@/lib/validation";
 
 const RoleMetadataParseSchema = z.object({
-  bold: z.boolean().optional(),
-  italic: z.boolean().optional(),
-  coloured: z.boolean().optional(),
+  bold: z.optional(z.boolean()),
+  italic: z.optional(z.boolean()),
+  coloured: z.optional(z.boolean()),
 });
 
 export const RoleMetadataSchema = z.object({

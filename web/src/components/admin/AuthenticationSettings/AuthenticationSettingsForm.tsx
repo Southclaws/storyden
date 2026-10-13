@@ -1,7 +1,6 @@
 import { createListCollection } from "@ark-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { OAuthAutonomousRegistrationMode, Role } from "@/api/openapi-schema";
@@ -27,6 +26,7 @@ import {
 import { isGuestRole } from "@/lib/role/defaults";
 import { useSettingsMutation } from "@/lib/settings/mutation";
 import { AdminSettings } from "@/lib/settings/settings";
+import * as z from "@/lib/validation";
 import { LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
@@ -40,10 +40,10 @@ export type Props = {
 export const FormSchema = z.object({
   authentication_mode: AuthenticationModeSchema,
   registration_mode: RegistrationModeSchema,
-  autonomous_registration_mode: z
-    .enum(OAuthAutonomousRegistrationMode)
-    .optional(),
-  autonomous_registration_role_id: z.string().optional(),
+  autonomous_registration_mode: z.optional(
+    z.enum(OAuthAutonomousRegistrationMode),
+  ),
+  autonomous_registration_role_id: z.optional(z.string()),
 });
 export type Form = z.infer<typeof FormSchema>;
 

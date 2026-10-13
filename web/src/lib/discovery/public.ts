@@ -1,21 +1,26 @@
 import "server-only";
-import { z } from "zod";
 
 import { getAPIAddress } from "@/config";
+import * as z from "@/lib/validation";
 
 const CatalogEntrySchema = z
   .object({
     identifier: z.string(),
     type: z.string(),
-    url: z.url().optional(),
-    data: z.unknown().optional(),
+    url: z.optional(z.url()),
+    data: z.optional(z.unknown()),
   })
-  .refine((entry) => (entry.url !== undefined) !== (entry.data !== undefined), {
-    message: "A catalog entry must contain exactly one of url or data",
-  });
+  .check(
+    z.refine(
+      (entry) => (entry.url !== undefined) !== (entry.data !== undefined),
+      {
+        message: "A catalog entry must contain exactly one of url or data",
+      },
+    ),
+  );
 
 const AICatalogSchema = z.object({
-  specVersion: z.string().regex(/^1\.\d+$/),
+  specVersion: z.string().check(z.regex(/^1\.\d+$/)),
   entries: z.array(CatalogEntrySchema),
 });
 

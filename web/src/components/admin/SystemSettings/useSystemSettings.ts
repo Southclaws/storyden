@@ -1,10 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { useSettingsMutation } from "@/lib/settings/mutation";
 import { AdminSettings } from "@/lib/settings/settings";
+import * as z from "@/lib/validation";
 
 export type Props = {
   settings: AdminSettings;

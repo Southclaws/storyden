@@ -2,10 +2,55 @@ import assert from "node:assert/strict";
 import { test } from "vitest";
 
 import {
+  TrailFormSchema,
   initialTrailFormValues,
   trailFormPayload,
   trailFormSchedule,
 } from "./trailForm";
+
+test("trail forms normalize text and report nested action errors", () => {
+  const input = initialTrailFormValues(undefined, "UTC", "2026-08-24");
+  input.name = "  Daily review  ";
+  input.actions = [
+    {
+      type: "robot_run",
+      robot_ref: "robot_1",
+      instruction: "  Review reports  ",
+    },
+  ];
+  const parsed = TrailFormSchema.parse(input);
+  assert.strictEqual(parsed.name, "Daily review");
+  assert.strictEqual(parsed.actions[0]?.instruction, "Review reports");
+
+  input.actions[0]!.instruction = "  ";
+  const invalid = TrailFormSchema.safeParse(input);
+  assert.ok(!invalid.success);
+  assert.deepStrictEqual(
+    invalid.error.issues.map(({ path, message }) => ({ path, message })),
+    [
+      {
+        path: ["actions", 0, "instruction"],
+        message: "Instruction is required",
+      },
+    ],
+  );
+});
+
+test("trail intervals must be positive integers", () => {
+  const input = initialTrailFormValues(undefined, "UTC", "2026-08-24");
+  input.name = "Daily review";
+  input.actions = [
+    { type: "robot_run", robot_ref: "robot_1", instruction: "Review reports" },
+  ];
+  for (const interval of [0, -1, 1.5]) {
+    const parsed = TrailFormSchema.safeParse({ ...input, interval });
+    assert.ok(!parsed.success);
+    assert.deepStrictEqual(
+      parsed.error.issues.map((issue) => issue.path),
+      [["interval"]],
+    );
+  }
+});
 
 test("creates a weekly schedule from explicit form fields", () => {
   const values = initialTrailFormValues(

@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { type MouseEvent, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { RequestError } from "@/api/common";
@@ -63,6 +62,7 @@ import { SelectField } from "@/components/ui/select";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Text } from "@/components/ui/text";
 import { useSettingsMutation } from "@/lib/settings/mutation";
+import * as z from "@/lib/validation";
 import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { timestamp } from "@/utils/date";
@@ -82,7 +82,7 @@ const DefaultModelFormSchema = z.object({
 type DefaultModelForm = z.infer<typeof DefaultModelFormSchema>;
 
 const WorkspaceFormSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  name: z.string().check(z.minLength(1, "Name is required")),
   description: z.string(),
   provider: z.nativeEnum(RobotWorkspaceProvider),
   allow_untrusted_commands: z.boolean(),

@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { useProfileGet } from "@/api/openapi-client/profiles";
@@ -17,6 +16,7 @@ import { useSession } from "@/auth";
 import { UsernameSchema } from "@/lib/auth/schemas";
 import { useProfileMutations } from "@/lib/profile/mutation";
 import type { SignatureConfig } from "@/lib/settings/settings";
+import * as z from "@/lib/validation";
 import { hasPermissionOr } from "@/utils/permissions";
 
 export type Props = {
@@ -26,7 +26,7 @@ export type Props = {
 };
 
 export const FormSchema = z.object({
-  name: z.string().min(1, "Please enter a name."),
+  name: z.string().check(z.minLength(1, "Please enter a name.")),
   handle: UsernameSchema,
 
   bio: z.string(),

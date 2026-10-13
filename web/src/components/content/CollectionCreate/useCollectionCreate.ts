@@ -1,17 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { mutate } from "swr";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { getCollectionListKey } from "@/api/openapi-client/collections";
 import { Account } from "@/api/openapi-schema";
 import { useCollectionMutations } from "@/lib/collection/mutation";
+import * as z from "@/lib/validation";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 export const FormSchema = z.object({
-  name: z.string().min(1, "Please enter a name for the collection."),
-  description: z.string().optional(),
+  name: z
+    .string()
+    .check(z.minLength(1, "Please enter a name for the collection.")),
+  description: z.optional(z.string()),
 });
 export type Form = z.infer<typeof FormSchema>;
 

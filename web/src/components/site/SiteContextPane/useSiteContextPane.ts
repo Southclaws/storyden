@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryState } from "nuqs";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { Account, Permission } from "@/api/openapi-schema";
@@ -12,6 +11,7 @@ import { Editing, EditingSchema } from "@/components/site/editing";
 import { useSettingsMutation } from "@/lib/settings/mutation";
 import { Settings } from "@/lib/settings/settings";
 import { useSettings } from "@/lib/settings/settings-client";
+import * as z from "@/lib/validation";
 import { getIconURL } from "@/utils/icon";
 import { hasPermission } from "@/utils/permissions";
 
@@ -21,9 +21,11 @@ export type Props = {
 };
 
 export const FormSchema = z.object({
-  title: z.string().min(1, "Please write a title."),
-  description: z.string().min(1, "Please write a short description."),
-  content: z.string().optional(),
+  title: z.string().check(z.minLength(1, "Please write a title.")),
+  description: z
+    .string()
+    .check(z.minLength(1, "Please write a short description.")),
+  content: z.optional(z.string()),
 });
 export type Form = z.infer<typeof FormSchema>;
 

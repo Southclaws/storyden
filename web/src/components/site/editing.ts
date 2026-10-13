@@ -1,7 +1,7 @@
-import { z } from "zod";
+import * as z from "@/lib/validation";
 
-export const EditingSchema = z.preprocess(
-  (value) => {
+export const EditingSchema = z.pipe(
+  z.transform((value) => {
     if (typeof value === "string" && value === "") {
       return undefined;
     }
@@ -11,7 +11,7 @@ export const EditingSchema = z.preprocess(
     }
 
     return value;
-  },
-  z.enum(["settings", "site"]).optional(),
+  }),
+  z.optional(z.enum(["settings", "site"])),
 );
 export type Editing = z.infer<typeof EditingSchema>;

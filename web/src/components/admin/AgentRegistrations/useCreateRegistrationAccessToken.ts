@@ -4,27 +4,31 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import {
   adminOAuthDynamicRegistrationAccessTokenCreate,
   getAdminOAuthDynamicRegistrationAccessTokenListKey,
 } from "@/api/openapi-client/admin";
+import * as z from "@/lib/validation";
 import { deriveError } from "@/utils/error";
 
 export const FormSchema = z.object({
   label: z
     .string()
-    .trim()
-    .min(1, "Label is required")
-    .max(200, "Label is too long"),
+    .check(
+      z.trim(),
+      z.minLength(1, "Label is required"),
+      z.maxLength(200, "Label is too long"),
+    ),
   lifetime: z.enum(["1", "24", "168", "720"]),
   max_registrations: z
     .number()
-    .int()
-    .min(1, "Allow at least one registration")
-    .max(2147483647),
+    .check(
+      z.int(),
+      z.minimum(1, "Allow at least one registration"),
+      z.maximum(2147483647),
+    ),
 });
 
 export function useCreateRegistrationAccessToken() {

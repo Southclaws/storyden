@@ -1,17 +1,17 @@
-import { z } from "zod";
+import * as z from "@/lib/validation";
 
 const ThemeAssetSchema = z.object({
   id: z.string(),
   filename: z.string(),
   path: z.string(),
   mime_type: z.enum(["text/css", "application/javascript"]),
-  size: z.number().int().positive(),
-  integrity: z.string().startsWith("sha256-"),
+  size: z.number().check(z.int(), z.positive()),
+  integrity: z.string().check(z.startsWith("sha256-")),
 });
 
 export const ThemeManifestSchema = z.object({
-  stylesheets: z.array(ThemeAssetSchema).max(32),
-  scripts: z.array(ThemeAssetSchema).max(32),
+  stylesheets: z.array(ThemeAssetSchema).check(z.maxLength(32)),
+  scripts: z.array(ThemeAssetSchema).check(z.maxLength(32)),
 });
 
 export type ThemeManifest = z.infer<typeof ThemeManifestSchema>;

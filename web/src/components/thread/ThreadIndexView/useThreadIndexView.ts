@@ -2,9 +2,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { KeyedMutator } from "swr";
-import { z } from "zod";
 
 import { ThreadListResult } from "@/api/openapi-schema";
+import * as z from "@/lib/validation";
 
 export type Props = {
   threads: ThreadListResult;

@@ -1,12 +1,12 @@
 "use client";
 
 import { use } from "react";
-import { z } from "zod";
 
+import * as z from "@/lib/validation";
 import { ComposeScreen } from "@/screens/compose/ComposeScreen";
 
 const QuerySchema = z.object({
-  id: z.string().optional(),
+  id: z.optional(z.string()),
 });
 
 type Props = {

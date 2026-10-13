@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { Account, DatagraphItemKind, Thread } from "@/api/openapi-schema";
@@ -11,6 +10,7 @@ import { useSession } from "@/auth";
 import { sendBeacon } from "@/lib/beacon/beacon";
 import type { Settings } from "@/lib/settings/settings";
 import { useThreadMutations } from "@/lib/thread/mutation";
+import * as z from "@/lib/validation";
 
 import { useReplyContext } from "../ReplyContext";
 
@@ -27,7 +27,7 @@ type ReplyLocationState = {
 };
 
 export const FormSchema = z.object({
-  body: z.string().min(1, "Please enter a message."),
+  body: z.string().check(z.minLength(1, "Please enter a message.")),
 });
 export type Form = z.infer<typeof FormSchema>;
 

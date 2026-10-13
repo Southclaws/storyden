@@ -1,5 +1,3 @@
-import z from "zod";
-
 import {
   DatagraphItemKind,
   Permission,
@@ -8,6 +6,7 @@ import {
 import { reportList } from "@/api/openapi-server/reports";
 import { getServerSession } from "@/auth/server-session";
 import { UnreadyBanner } from "@/components/site/Unready";
+import * as z from "@/lib/validation";
 import { ReportScreen } from "@/screens/reports/ReportScreen";
 import { hasPermission } from "@/utils/permissions";
 
@@ -16,12 +15,14 @@ type Props = {
 };
 
 const QuerySchema = z.object({
-  page: z
-    .string()
-    .transform((v) => parseInt(v, 10))
-    .optional(),
-  status: z.nativeEnum(ReportStatus).optional(),
-  kind: z.nativeEnum(DatagraphItemKind).optional(),
+  page: z.optional(
+    z.pipe(
+      z.string(),
+      z.transform((v) => parseInt(v, 10)),
+    ),
+  ),
+  status: z.optional(z.nativeEnum(ReportStatus)),
+  kind: z.optional(z.nativeEnum(DatagraphItemKind)),
 });
 type Query = z.infer<typeof QuerySchema>;
 

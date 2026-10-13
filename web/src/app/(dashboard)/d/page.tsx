@@ -1,8 +1,7 @@
-import z from "zod";
-
 import { threadList } from "@/api/openapi-server/threads";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { categoryListCached } from "@/lib/category/server-category-list";
+import * as z from "@/lib/validation";
 import { CategoryIndexScreen } from "@/screens/category/CategoryIndexScreen";
 
 type Props = {
@@ -10,10 +9,12 @@ type Props = {
 };
 
 const QuerySchema = z.object({
-  page: z
-    .string()
-    .transform((v) => parseInt(v, 10))
-    .optional(),
+  page: z.optional(
+    z.pipe(
+      z.string(),
+      z.transform((v) => parseInt(v, 10)),
+    ),
+  ),
 });
 type Query = z.infer<typeof QuerySchema>;
 

@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import {
@@ -17,6 +16,7 @@ import {
   parseRoleMetadata,
   writeRoleMetadata,
 } from "@/lib/role/metadata";
+import * as z from "@/lib/validation";
 
 export type Props = {
   role: Role;

@@ -1,6 +1,5 @@
-import { z } from "zod";
-
 import { DatagraphItemKind } from "@/api/openapi-schema";
+import * as z from "@/lib/validation";
 
 export const DatagraphKindTable: { [K in DatagraphItemKind]: string } = {
   post: "Post",

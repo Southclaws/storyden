@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import {
@@ -15,11 +14,12 @@ import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { SaveIcon } from "@/components/ui/icons/Save";
 import { Input } from "@/components/ui/input";
 import { useProfileMutations } from "@/lib/profile/mutation";
+import * as z from "@/lib/validation";
 import { HStack } from "@/styled-system/jsx";
 import { wstack } from "@/styled-system/patterns";
 
 export const FormSchema = z.object({
-  email: z.string().email(),
+  email: z.string().check(z.email()),
 });
 export type Form = z.infer<typeof FormSchema>;
 

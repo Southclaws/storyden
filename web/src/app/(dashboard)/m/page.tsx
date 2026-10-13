@@ -1,40 +1,49 @@
-import { z } from "zod";
-
 import { Permission } from "@/api/openapi-schema";
 import { accountList } from "@/api/openapi-server/accounts";
 import { profileList } from "@/api/openapi-server/profiles";
 import { getServerSession } from "@/auth/server-session";
 import { UnreadyBanner } from "@/components/site/Unready";
+import * as z from "@/lib/validation";
 import { AdminMemberIndexScreen } from "@/screens/library/members/AdminMemberIndexScreen/AdminMemberIndexScreen";
 import { MemberIndexScreen } from "@/screens/library/members/MemberIndexScreen/MemberIndexScreen";
 import { hasPermission } from "@/utils/permissions";
 
 const QuerySchema = z.object({
-  mode: z.enum(["default", "admin"]).optional(),
-  q: z.string().optional(),
-  page: z
-    .string()
-    .transform((v) => parseInt(v, 10))
-    .optional(),
-  roles: z
-    .union([z.string(), z.array(z.string())])
-    .transform((v) => (Array.isArray(v) ? v : v.split(",")))
-    .optional(),
-  invited_by: z
-    .union([z.string(), z.array(z.string())])
-    .transform((v) => (Array.isArray(v) ? v : v.split(",")))
-    .optional(),
-  joined: z.string().optional(),
-  sort: z.string().optional(),
-  admin: z
-    .enum(["true", "false"])
-    .transform((v) => v === "true")
-    .optional(),
-  suspended: z
-    .enum(["true", "false"])
-    .transform((v) => v === "true")
-    .optional(),
-  kind: z.enum(["human", "bot"]).optional(),
+  mode: z.optional(z.enum(["default", "admin"])),
+  q: z.optional(z.string()),
+  page: z.optional(
+    z.pipe(
+      z.string(),
+      z.transform((v) => parseInt(v, 10)),
+    ),
+  ),
+  roles: z.optional(
+    z.pipe(
+      z.union([z.string(), z.array(z.string())]),
+      z.transform((v) => (Array.isArray(v) ? v : v.split(","))),
+    ),
+  ),
+  invited_by: z.optional(
+    z.pipe(
+      z.union([z.string(), z.array(z.string())]),
+      z.transform((v) => (Array.isArray(v) ? v : v.split(","))),
+    ),
+  ),
+  joined: z.optional(z.string()),
+  sort: z.optional(z.string()),
+  admin: z.optional(
+    z.pipe(
+      z.enum(["true", "false"]),
+      z.transform((v) => v === "true"),
+    ),
+  ),
+  suspended: z.optional(
+    z.pipe(
+      z.enum(["true", "false"]),
+      z.transform((v) => v === "true"),
+    ),
+  ),
+  kind: z.optional(z.enum(["human", "bot"])),
 });
 type Query = z.infer<typeof QuerySchema>;
 

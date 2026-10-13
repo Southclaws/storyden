@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "@/lib/validation";
 
 export const DEFAULT_API_ADDRESS = "http://localhost:8000";
 export const DEFAULT_WEB_ADDRESS = "http://localhost:3000";

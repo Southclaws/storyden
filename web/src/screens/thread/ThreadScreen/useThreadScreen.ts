@@ -3,7 +3,6 @@ import { useRouter } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { threadUpdate, useThreadGet } from "@/api/openapi-client/threads";
@@ -20,6 +19,7 @@ import { useReportContext } from "@/lib/report/useReportContext";
 import type { Settings, SignatureConfig } from "@/lib/settings/settings";
 import { useThreadMutations } from "@/lib/thread/mutation";
 import { withUndo } from "@/lib/thread/undo";
+import * as z from "@/lib/validation";
 import { hasPermission } from "@/utils/permissions";
 
 export type Props = {
@@ -32,9 +32,9 @@ export type Props = {
 };
 
 export const FormSchema = z.object({
-  title: z.string().min(1, "Please enter a title."),
-  body: z.string().min(1),
-  tags: z.array(z.string()).optional(),
+  title: z.string().check(z.minLength(1, "Please enter a title.")),
+  body: z.string().check(z.minLength(1)),
+  tags: z.optional(z.array(z.string())),
 });
 export type Form = z.infer<typeof FormSchema>;
 

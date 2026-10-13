@@ -1,18 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { useSettingsMutation } from "@/lib/settings/mutation";
 import { AdminSettings } from "@/lib/settings/settings";
+import * as z from "@/lib/validation";
 
 export type Props = {
   settings: AdminSettings;
 };
 
 export const FormSchema = z.object({
-  threadBodyMaxSize: z.number().min(0).max(1_000_000),
-  replyBodyMaxSize: z.number().min(0).max(1_000_000),
+  threadBodyMaxSize: z.number().check(z.minimum(0), z.maximum(1_000_000)),
+  replyBodyMaxSize: z.number().check(z.minimum(0), z.maximum(1_000_000)),
   wordBlockList: z.array(z.string()),
   wordReportList: z.array(z.string()),
 });
