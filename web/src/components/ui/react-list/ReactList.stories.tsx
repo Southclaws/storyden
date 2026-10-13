@@ -5,6 +5,14 @@ import { ReactList } from ".";
 const meta = {
   title: "Components/Data Display/React List",
   component: ReactList,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Use ReactList for existing emoji reactions and an authenticated add-reaction picker. Reaction buttons use system emoji characters; the native emoji picker loads when opened. Use IconButton for a single standalone action rather than reaction counts and selection.",
+      },
+    },
+  },
   args: {
     isLoggedIn: true,
     reactions: [
@@ -41,5 +49,11 @@ export const Guest: Story = {
 export const Pending: Story = {
   args: {
     pendingEmojis: new Set(["🔥"]),
+  },
+};
+
+export const Empty: Story = {
+  args: {
+    reactions: [],
   },
 };

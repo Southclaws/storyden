@@ -1,5 +1,5 @@
 import { Portal } from "@ark-ui/react";
-import { EmojiClickData, EmojiStyle } from "emoji-picker-react";
+import type { EmojiClickData } from "emoji-picker-react";
 import { LazyMotion, domAnimation, m } from "framer-motion";
 import throttle from "lodash/throttle";
 import dynamic from "next/dynamic";
@@ -15,12 +15,7 @@ import { useHydrated } from "@/utils/useHydrated";
 
 const REACTION_THROTTLE = 180;
 
-const EmojiPicker = dynamic(
-  () => {
-    return import("emoji-picker-react");
-  },
-  { ssr: false },
-);
+const EmojiPicker = dynamic(() => import("./ReactionPicker"), { ssr: false });
 
 export type ReactListItem = {
   emoji: string;
@@ -208,15 +203,7 @@ function ReactionPickerTrigger({
               <Popover.ArrowTip />
             </Popover.Arrow>
 
-            <EmojiPicker
-              onEmojiClick={handleSelect}
-              emojiStyle={EmojiStyle.NATIVE}
-              searchDisabled
-              previewConfig={{
-                showPreview: false,
-              }}
-              lazyLoadEmojis
-            />
+            <EmojiPicker onEmojiClick={handleSelect} />
           </Popover.Content>
         </Popover.Positioner>
       </Portal>
