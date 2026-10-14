@@ -1,11 +1,20 @@
+import dynamic from "next/dynamic";
+
 import { useNodeGet, useNodeList } from "@/api/openapi-client/nodes";
 import { NodeCardGrid, NodeCardRows } from "@/components/library/NodeCardList";
 import { EmptyState } from "@/components/site/EmptyState";
 import { Unready } from "@/components/site/Unready";
 import { FeedBlock } from "@/lib/settings/feed";
-import { LibraryPageScreen } from "@/screens/library/LibraryPageScreen/LibraryPageScreen";
 
 import { useFeedBlockEditor } from "../Context";
+
+const LibraryPageScreen = dynamic(
+  () =>
+    import("@/screens/library/LibraryPageScreen/LibraryPageScreen").then(
+      (module) => module.LibraryPageScreen,
+    ),
+  { ssr: true },
+);
 
 export function FeedLibraryBlock({
   block,
