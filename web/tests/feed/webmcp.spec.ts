@@ -9,6 +9,7 @@ import {
 } from "../access_key_admin_assignment";
 import {
   DEFAULT_ROBOT_MODEL,
+  openCommandPalette,
   setupRobotProviderWithScript,
 } from "../robot/helpers";
 
@@ -142,7 +143,10 @@ test.describe("Index page WebMCP", () => {
   }) => {
     await loginAsFixtureAdmin(page);
     await page.goto("/");
+    await expectIndexTools(page, []);
+    await openCommandPalette(page);
     await expectIndexTools(page, INDEX_VIEW_TOOL_NAMES);
+    await page.keyboard.press("Escape");
 
     const viewTools = await getIndexTools(page);
     expect(
@@ -200,7 +204,10 @@ test.describe("Index page WebMCP", () => {
     await expect(quickShareBlock.getByRole("combobox")).toHaveCount(0);
 
     await page.reload();
+    await expectIndexTools(page, []);
+    await openCommandPalette(page);
     await expectIndexTools(page, INDEX_TOOL_NAMES);
+    await page.keyboard.press("Escape");
     const persisted = await executeIndexTool(page, "index_page_layout_get", {});
     expect(persisted["layout"]).toEqual(moved["layout"]);
 
@@ -220,7 +227,7 @@ test.describe("Index page WebMCP", () => {
     try {
       await loginAsFixtureAdmin(page);
       await page.goto("/");
-      await expectIndexTools(page, INDEX_VIEW_TOOL_NAMES);
+      await expectIndexTools(page, []);
 
       const robotRequests: Record<string, unknown>[] = [];
       page.on("request", (request) => {
@@ -232,8 +239,8 @@ test.describe("Index page WebMCP", () => {
         }
       });
 
-      await page.keyboard.press("ControlOrMeta+k");
-      const palette = page.getByRole("dialog", { name: "Command Menu" });
+      const palette = await openCommandPalette(page);
+      await expectIndexTools(page, INDEX_VIEW_TOOL_NAMES);
       await expect(palette).toBeVisible();
       const commandInput = palette.getByRole("combobox", {
         name: "Command Menu",
@@ -261,8 +268,7 @@ test.describe("Index page WebMCP", () => {
       ).toBeVisible({ timeout: 15000 });
 
       const firstClientTools = robotRequests[0]?.["client_tools"] as
-        | { client_id?: string; tools?: { name: string }[] }
-        | undefined;
+        { client_id?: string; tools?: { name: string }[] } | undefined;
       expect(firstClientTools?.client_id).toBeTruthy();
       expect(firstClientTools?.tools?.map((tool) => tool.name).sort()).toEqual(
         [...INDEX_VIEW_TOOL_NAMES].sort(),
@@ -271,8 +277,7 @@ test.describe("Index page WebMCP", () => {
         .poll(() =>
           robotRequests.some((request) => {
             const context = request["client_tools"] as
-              | { tools?: { name: string }[] }
-              | undefined;
+              { tools?: { name: string }[] } | undefined;
             return context?.tools?.some(
               (tool) => tool.name === "index_page_block_add",
             );

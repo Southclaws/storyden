@@ -9,6 +9,7 @@ import {
 } from "../access_key_admin_assignment";
 import {
   DEFAULT_ROBOT_MODEL,
+  openCommandPalette,
   setupRobotProviderWithScript,
 } from "../robot/helpers";
 
@@ -167,7 +168,10 @@ test.describe("Library page WebMCP", () => {
     await loginAsFixtureAdmin(page);
     await page.goto(`/l/${libraryPage.slug}`);
 
+    await expectLibraryTools(page, []);
+    await openCommandPalette(page);
     await expectLibraryTools(page, LIBRARY_VIEW_TOOL_NAMES);
+    await page.keyboard.press("Escape");
 
     await page.getByRole("button", { name: "Edit", exact: true }).click();
     await page.getByRole("menuitem", { name: "Quick edit" }).click();
@@ -208,7 +212,10 @@ test.describe("Library page WebMCP", () => {
     const libraryPage = await createLibraryPageFixture();
     await loginAsFixtureAdmin(page);
     await enterQuickEdit(page, libraryPage.slug);
+    await expectLibraryTools(page, []);
+    await openCommandPalette(page);
     await expectLibraryTools(page, LIBRARY_TOOL_NAMES);
+    await page.keyboard.press("Escape");
 
     await expect(
       executeLibraryTool(page, "library_page_block_add", {
@@ -266,7 +273,10 @@ test.describe("Library page WebMCP", () => {
     ).rejects.toThrow(/cannot be moved before itself/i);
 
     await page.reload();
+    await expectLibraryTools(page, []);
+    await openCommandPalette(page);
     await expectLibraryTools(page, LIBRARY_TOOL_NAMES);
+    await page.keyboard.press("Escape");
     const persisted = await executeLibraryTool(
       page,
       "library_page_layout_get",
@@ -285,7 +295,7 @@ test.describe("Library page WebMCP", () => {
       const libraryPage = await createLibraryPageFixture();
       await loginAsFixtureAdmin(page);
       await page.goto(`/l/${libraryPage.slug}`);
-      await expectLibraryTools(page, LIBRARY_VIEW_TOOL_NAMES);
+      await expectLibraryTools(page, []);
 
       const robotRequests: Record<string, unknown>[] = [];
       page.on("request", (request) => {
@@ -297,8 +307,8 @@ test.describe("Library page WebMCP", () => {
         }
       });
 
-      await page.keyboard.press("ControlOrMeta+k");
-      const palette = page.getByRole("dialog", { name: "Command Menu" });
+      const palette = await openCommandPalette(page);
+      await expectLibraryTools(page, LIBRARY_VIEW_TOOL_NAMES);
       await expect(palette).toBeVisible();
       const commandInput = palette.getByRole("combobox", {
         name: "Command Menu",
@@ -326,11 +336,9 @@ test.describe("Library page WebMCP", () => {
 
       const firstRobotRequest = robotRequests[0];
       const requestContext = firstRobotRequest?.["context"] as
-        | { datagraph_item?: { id?: string; slug?: string } }
-        | undefined;
+        { datagraph_item?: { id?: string; slug?: string } } | undefined;
       const clientTools = firstRobotRequest?.["client_tools"] as
-        | { client_id?: string; tools?: { name: string }[] }
-        | undefined;
+        { client_id?: string; tools?: { name: string }[] } | undefined;
       expect(requestContext?.datagraph_item).toMatchObject({
         id: libraryPage.id,
         slug: libraryPage.slug,
@@ -343,8 +351,7 @@ test.describe("Library page WebMCP", () => {
         .poll(() =>
           robotRequests.some((request) => {
             const context = request["client_tools"] as
-              | { tools?: { name: string }[] }
-              | undefined;
+              { tools?: { name: string }[] } | undefined;
             return context?.tools?.some(
               (tool) => tool.name === "library_page_block_add",
             );
@@ -407,10 +414,10 @@ test.describe("Library page WebMCP", () => {
       await setupRobotProviderWithScript(`mock/../robot/scripts/${scriptName}`);
       await loginAsFixtureAdmin(page);
       await page.goto(`/l/${libraryPage.slug}`);
-      await expectLibraryTools(page, LIBRARY_VIEW_TOOL_NAMES);
+      await expectLibraryTools(page, []);
 
-      await page.keyboard.press("ControlOrMeta+k");
-      const palette = page.getByRole("dialog", { name: "Command Menu" });
+      const palette = await openCommandPalette(page);
+      await expectLibraryTools(page, LIBRARY_VIEW_TOOL_NAMES);
       const commandInput = palette.getByRole("combobox", {
         name: "Command Menu",
       });

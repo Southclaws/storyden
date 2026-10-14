@@ -32,6 +32,24 @@ export async function goToNewChat(page: Page) {
   await page.goto("/robots/chats/new");
 }
 
+export async function openCommandPalette(page: Page) {
+  const palette = page.getByRole("dialog", { name: "Command Menu" });
+
+  // A shortcut sent before hydration or session loading completes is ignored.
+  await expect(async () => {
+    if (!(await palette.isVisible())) {
+      await page.keyboard.press("ControlOrMeta+k");
+    }
+    await expect(palette).toBeVisible({ timeout: 1000 });
+  }).toPass({ timeout: 10000 });
+
+  await expect(
+    palette.getByRole("combobox", { name: "Command Menu" }),
+  ).toBeVisible();
+
+  return palette;
+}
+
 export async function sendMessage(
   page: Page,
   text: string,
