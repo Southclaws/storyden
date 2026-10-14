@@ -34,7 +34,7 @@ export function MemberActions({ session, canRegister }: Props) {
         </>
       ) : (
         <>
-          {canRegister && <RegisterAnchor w="full" />}
+          {canRegister && <RegisterAnchor flex="1" />}
           <LoginAnchor flexShrink={0} />
         </>
       )}
