@@ -69,7 +69,7 @@ async function chooseBlockMenuItem(page: Page, item: string, value: string) {
 }
 
 async function clickOutsideOpenMenu(page: Page) {
-  await page.locator("main").dispatchEvent("pointerdown");
+  await page.locator("main").click({ position: { x: 1, y: 1 } });
 }
 
 async function expectMenuAnchoredToTrigger(page: Page, trigger: Locator) {

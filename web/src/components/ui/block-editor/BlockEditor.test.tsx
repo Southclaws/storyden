@@ -62,8 +62,17 @@ it("closes only after a genuine outside interaction", async () => {
     await screen.findByRole("menuitem", { name: "Run action" }),
   ).toBeVisible();
 
-  await new Promise((resolve) => setTimeout(resolve, 0));
-  await user.click(screen.getByRole("button", { name: "Outside" }));
+  await waitFor(() => expect(screen.getByRole("menu")).toHaveFocus());
+  // Ark defers outside-event registration until after the opening interaction.
+  await new Promise<void>((resolve) =>
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+  );
+  // JSDOM gives the menu a zero-sized rect at (0, 0).
+  await user.pointer({
+    target: screen.getByRole("button", { name: "Outside" }),
+    keys: "[MouseLeft]",
+    coords: { clientX: 100, clientY: 100 },
+  });
 
   await waitFor(() =>
     expect(

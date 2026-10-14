@@ -4,7 +4,6 @@ import { Portal } from "@ark-ui/react";
 import {
   type ComponentProps,
   forwardRef,
-  useEffect,
   useImperativeHandle,
   useRef,
   useState,
@@ -79,8 +78,6 @@ export const MenuHandle = forwardRef<HTMLButtonElement, MenuHandleProps>(
     ref,
   ) {
     const [internalOpen, setInternalOpen] = useState(false);
-    const handleRef = useRef<HTMLDivElement>(null);
-    const contentRef = useRef<HTMLDivElement>(null);
     const triggerRef = useRef<HTMLButtonElement>(null);
     const menuOpen = open ?? internalOpen;
 
@@ -93,30 +90,9 @@ export const MenuHandle = forwardRef<HTMLButtonElement, MenuHandleProps>(
       onOpenChange?.(nextOpen);
     }
 
-    useEffect(() => {
-      if (!menuOpen) return;
-
-      function closeOnOutsidePointerDown(event: PointerEvent) {
-        const target = event.target;
-
-        if (
-          !(target instanceof Node) ||
-          handleRef.current?.contains(target) ||
-          contentRef.current?.contains(target)
-        ) {
-          return;
-        }
-
-        setMenuOpen(false);
-      }
-
-      document.addEventListener("pointerdown", closeOnOutsidePointerDown);
-      return () =>
-        document.removeEventListener("pointerdown", closeOnOutsidePointerDown);
-    }, [menuOpen]);
-
     return (
-      <Handle ref={handleRef}>
+      <Handle>
+        {/* Ark's dismissal includes portaled submenus in the menu tree. */}
         <Menu.Root
           lazyMount
           open={menuOpen}
@@ -139,7 +115,7 @@ export const MenuHandle = forwardRef<HTMLButtonElement, MenuHandleProps>(
 
           <Portal>
             <Menu.Positioner>
-              <MenuContent ref={contentRef}>{children}</MenuContent>
+              <MenuContent>{children}</MenuContent>
             </Menu.Positioner>
           </Portal>
         </Menu.Root>

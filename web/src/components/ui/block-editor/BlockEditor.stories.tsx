@@ -1,4 +1,6 @@
+import { Portal } from "@ark-ui/react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { useState } from "react";
 
 import { CardBox } from "@/components/ui/card-box";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
@@ -54,4 +56,52 @@ export const Item: Story = {
       </BlockEditor.Root>
     </Box>
   ),
+};
+
+export const NestedConfiguration: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Portalled submenus stay inside the block menu's interaction boundary. Select a layout with the mouse or keyboard; clicking outside still dismisses the whole menu.",
+      },
+    },
+  },
+  render: function NestedConfiguration() {
+    const [layout, setLayout] = useState("list");
+
+    return (
+      <Box maxW="2xl" ml="8">
+        <BlockEditor.Root className="group">
+          <BlockEditor.Gutter>
+            <BlockEditor.MenuHandle>
+              <Menu.ItemGroup>
+                <Menu.ItemGroupLabel>Library</Menu.ItemGroupLabel>
+                <Menu.Separator />
+                <Menu.Root onSelect={({ value }) => setLayout(value)}>
+                  <Menu.TriggerItem>
+                    <LayoutIcon />
+                    Layout
+                  </Menu.TriggerItem>
+                  <Portal>
+                    <Menu.Positioner>
+                      <Menu.Content>
+                        <Menu.Item value="list">List</Menu.Item>
+                        <Menu.Item value="grid">Grid</Menu.Item>
+                      </Menu.Content>
+                    </Menu.Positioner>
+                  </Portal>
+                </Menu.Root>
+              </Menu.ItemGroup>
+            </BlockEditor.MenuHandle>
+          </BlockEditor.Gutter>
+          <BlockEditor.Content>
+            <CardBox>
+              <Text>Library layout: {layout}</Text>
+            </CardBox>
+          </BlockEditor.Content>
+        </BlockEditor.Root>
+      </Box>
+    );
+  },
 };
