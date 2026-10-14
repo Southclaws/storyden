@@ -7,6 +7,8 @@ import {
   RobotClientToolAnnotations,
   RobotClientToolContext,
 } from "@/api/openapi-schema";
+import { enableWebMCPTools } from "@/lib/webmcp/activation";
+import { waitForWebMCPTool } from "@/lib/webmcp/waitForTool";
 import { generateXid } from "@/utils/xid";
 
 initializeWebMCPPolyfill();
@@ -65,7 +67,24 @@ export async function getWebMCPClientToolContext(
   return { client_id: clientID, tools };
 }
 
-export function getCurrentWebMCPClientToolContext() {
+export async function getCurrentWebMCPClientToolContext(
+  pageContext: RobotChatContext,
+) {
+  enableWebMCPTools();
+  const expectedTool =
+    pageContext.page_type === "Index page"
+      ? "index_page_layout_get"
+      : pageContext.datagraph_item?.kind === "node"
+        ? "library_page_layout_get"
+        : undefined;
+
+  if (expectedTool && getBrowserModelContext()) {
+    await waitForWebMCPTool(
+      expectedTool,
+      "The page's WebMCP tools could not be loaded. Please try again.",
+      10_000,
+    );
+  }
   return getWebMCPClientToolContext(getWebMCPClientID());
 }
 

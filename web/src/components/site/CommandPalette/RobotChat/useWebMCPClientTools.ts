@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import type { RobotChatContext } from "@/api/openapi-schema";
 import type { ToolName } from "@/api/robots";
 import type { StorydenUIMessage } from "@/api/robots-types";
+import { enableWebMCPTools } from "@/lib/webmcp/activation";
 import { deriveError } from "@/utils/error";
 
 import {
@@ -123,6 +124,7 @@ export function useWebMCPClientTools(
   );
 
   useEffect(() => {
+    enableWebMCPTools();
     return subscribeToWebMCPToolChanges(() => {
       for (const toolCall of pendingToolCallsRef.current.values()) {
         void executePendingToolCall(toolCall);

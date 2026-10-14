@@ -1,6 +1,5 @@
 "use client";
 
-import { initializeWebMCPPolyfill } from "@mcp-b/webmcp-polyfill";
 import { useMemo } from "react";
 
 import {
@@ -11,8 +10,6 @@ import { WEBMCP_TOOL_DEFINITIONS } from "@/lib/webmcp/tools.generated";
 
 import { useFeedBlockEditor } from "./Context";
 import { createIndexPageLayoutToolImplementations } from "./indexPageLayoutTools";
-
-initializeWebMCPPolyfill();
 
 type Props = {
   isEditingEnabled: boolean;

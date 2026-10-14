@@ -3,6 +3,7 @@ import type { WebMCPToolName } from "./tools.generated";
 export async function waitForWebMCPTool(
   expectedTool: WebMCPToolName,
   unavailableMessage: string,
+  timeoutMs = 2_000,
 ) {
   const modelContext = document.modelContext;
   if (!modelContext) {
@@ -20,7 +21,7 @@ export async function waitForWebMCPTool(
     const timeout = window.setTimeout(() => {
       cleanup();
       reject(new Error(unavailableMessage));
-    }, 2_000);
+    }, timeoutMs);
 
     const handleToolChange = () => {
       void isRegistered()

@@ -259,7 +259,8 @@ export function RobotChatContext({
             ? (JSON.parse(init.body) as Record<string, unknown>)
             : {};
         const pageContext = await getPageContext();
-        const clientTools = await getCurrentWebMCPClientToolContext();
+        const clientTools =
+          await getCurrentWebMCPClientToolContext(pageContext);
 
         request = {
           ...request,

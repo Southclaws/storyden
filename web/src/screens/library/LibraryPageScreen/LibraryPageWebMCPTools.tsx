@@ -1,6 +1,5 @@
 "use client";
 
-import { initializeWebMCPPolyfill } from "@mcp-b/webmcp-polyfill";
 import { useMemo } from "react";
 
 import {
@@ -13,8 +12,6 @@ import { useLibraryPageContext } from "./Context";
 import { createLibraryPageLayoutToolImplementations } from "./libraryPageLayoutTools";
 import { useLibraryPagePermissions } from "./permissions";
 import { useEditState } from "./useEditState";
-
-initializeWebMCPPolyfill();
 
 export function LibraryPageWebMCPTools() {
   const { store } = useLibraryPageContext();

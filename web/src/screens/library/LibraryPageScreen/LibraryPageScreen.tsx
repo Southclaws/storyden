@@ -1,6 +1,7 @@
 "use client";
 
 import { last } from "lodash";
+import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
 import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
 import { memo } from "react";
@@ -8,6 +9,7 @@ import { memo } from "react";
 import { useNodeGet } from "@/api/openapi-client/nodes";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { ContentOutline } from "@/components/ui/content-outline";
+import { useWebMCPToolsEnabled } from "@/lib/webmcp/activation";
 import { LStack } from "@/styled-system/jsx";
 
 import { Params } from "../library-path";
@@ -17,10 +19,17 @@ import { EditingDraftWarning } from "./EditingDraftWarning";
 import { LibraryPageAutosaveController } from "./LibraryPageAutosaveController";
 import { LibraryPageControls } from "./LibraryPageControls";
 import { LibraryPageVersionReview } from "./LibraryPageVersionReview";
-import { LibraryPageWebMCPTools } from "./LibraryPageWebMCPTools";
 import { LibraryPageBlocks } from "./blocks/LibraryPageBlocks";
 import { collectLibraryOutline } from "./outline";
 import { LibraryPageEditProvider, useEditState } from "./useEditState";
+
+const LibraryPageWebMCPTools = dynamic(
+  () =>
+    import("./LibraryPageWebMCPTools").then(
+      (module) => module.LibraryPageWebMCPTools,
+    ),
+  { ssr: false },
+);
 
 type LibraryPageScreenProps = Props & {
   embedded?: boolean;
@@ -61,11 +70,12 @@ export function LibraryPageScreen(props: LibraryPageScreenProps) {
 }
 
 const LibraryPageForm = memo((props: LibraryPageScreenProps) => {
+  const webMCPEnabled = useWebMCPToolsEnabled();
   return (
     <LibraryPageProvider node={props.node} childNodes={props.childNodes}>
       <LibraryPageEditProvider disabled={props.embedded}>
         {!props.embedded && <LibraryPageAutosaveController />}
-        {!props.embedded && <LibraryPageWebMCPTools />}
+        {!props.embedded && webMCPEnabled && <LibraryPageWebMCPTools />}
         <LibraryPage embedded={props.embedded} />
       </LibraryPageEditProvider>
     </LibraryPageProvider>

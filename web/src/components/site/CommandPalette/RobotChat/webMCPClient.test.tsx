@@ -1,7 +1,9 @@
+import { waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   executeWebMCPTool,
+  getCurrentWebMCPClientToolContext,
   getWebMCPClientToolContext,
   readWebMCPToolCallMetadata,
   webMCPToolScopeMatches,
@@ -26,6 +28,65 @@ afterEach(() => {
     Reflect.deleteProperty(document, "modelContext");
   }
   vi.restoreAllMocks();
+});
+
+describe("getCurrentWebMCPClientToolContext", () => {
+  it.each([
+    {
+      context: { page_type: "Index page" },
+      toolName: "index_page_layout_get",
+    },
+    {
+      context: { datagraph_item: { id: "page-1", kind: "node" as const } },
+      toolName: "library_page_layout_get",
+    },
+  ])(
+    "waits for deferred $toolName registration before snapshotting tools",
+    async ({ context, toolName }) => {
+      const events = new EventTarget();
+      const getTools = vi.fn().mockResolvedValue([]);
+      const addEventListener = vi.fn(events.addEventListener.bind(events));
+      const removeEventListener = vi.fn(
+        events.removeEventListener.bind(events),
+      );
+      installModelContext({ getTools, addEventListener, removeEventListener });
+
+      let resolved = false;
+      const pending = getCurrentWebMCPClientToolContext(context).then(
+        (result) => {
+          resolved = true;
+          return result;
+        },
+      );
+      await waitFor(() => expect(addEventListener).toHaveBeenCalled());
+      expect(resolved).toBe(false);
+
+      getTools.mockResolvedValue([
+        {
+          name: toolName,
+          description: "Read the layout.",
+          inputSchema: { type: "object" },
+        },
+      ]);
+      events.dispatchEvent(new Event("toolchange"));
+
+      expect((await pending)?.tools.map((tool) => tool.name)).toEqual([
+        toolName,
+      ]);
+      expect(removeEventListener).toHaveBeenCalled();
+    },
+  );
+
+  it("does not wait for page tools on routes without a layout editor", async () => {
+    const getTools = vi.fn().mockResolvedValue([]);
+    const addEventListener = vi.fn();
+    installModelContext({ getTools, addEventListener });
+
+    await expect(
+      getCurrentWebMCPClientToolContext({ page_type: "Search page" }),
+    ).resolves.toBeUndefined();
+    expect(addEventListener).not.toHaveBeenCalled();
+  });
 });
 
 describe("getWebMCPClientToolContext", () => {
