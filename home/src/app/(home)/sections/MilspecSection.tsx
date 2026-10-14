@@ -151,7 +151,7 @@ export function MilspecSection({ stats }: Props) {
               MIN MEMORY
             </td>
             <td style={cellStyle} colSpan={2}>
-              NOT BENCHMARKED
+              256 MB
             </td>
           </styled.tr>
 
@@ -166,7 +166,7 @@ export function MilspecSection({ stats }: Props) {
               MIN CORES
             </td>
             <td style={cellStyle} colSpan={2}>
-              WORKLOAD DEPENDENT
+              2 CPU
             </td>
           </styled.tr>
         </tbody>
