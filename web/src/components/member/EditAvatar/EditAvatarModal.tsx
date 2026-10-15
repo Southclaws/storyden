@@ -1,12 +1,20 @@
+"use client";
+
+import dynamic from "next/dynamic";
 import { PropsWithChildren } from "react";
 
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
+import { Unready } from "@/components/site/Unready";
 import { Button, ButtonProps } from "@/components/ui/button";
 import { Slot } from "@/components/ui/slot";
 import { useDisclosure } from "@/utils/useDisclosure";
 
-import { EditAvatarScreen } from "./EditAvatarScreen";
-import { Props } from "./useEditAvatar";
+import type { Props } from "./useEditAvatar";
+
+const EditAvatarScreen = dynamic(
+  () => import("./EditAvatarScreen").then((module) => module.EditAvatarScreen),
+  { ssr: false, loading: () => <Unready /> },
+);
 
 function EditAvatarButton(props: ButtonProps) {
   return <Button {...props}>Edit</Button>;
