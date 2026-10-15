@@ -19,7 +19,7 @@ test.describe("utility", () => {
     await login(adminPage, adminHandle, password);
     await adminPage.goto("/settings");
     await expect(
-      adminPage.getByRole("heading", { name: "Settings" }),
+      adminPage.getByRole("heading", { name: "Settings", exact: true }),
     ).toBeVisible();
 
     const memberPage = await memberctx.newPage();

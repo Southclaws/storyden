@@ -13,7 +13,7 @@ import { ReplyIcon } from "@/components/ui/icons/Reply";
 import { ShowIcon } from "@/components/ui/icons/ShowIcon";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
-import { css } from "@/styled-system/css";
+import { css, cx } from "@/styled-system/css";
 import { LStack, styled } from "@/styled-system/jsx";
 import { markdownURLTransform, remarkLooseLists } from "@/utils/markdown";
 
@@ -64,7 +64,10 @@ export function ContentComposerMarkdown(props: ContentComposerProps) {
   if (props.disabled) {
     return (
       <LStack
-        className="markdown-editor-readonly typography"
+        className={cx(
+          "content-composer content-composer--readonly content-composer--markdown markdown-editor-readonly typography",
+          props.className,
+        )}
         position="relative"
         minHeight="8"
         maxHeight="fit"
@@ -81,7 +84,15 @@ export function ContentComposerMarkdown(props: ContentComposerProps) {
   }
 
   return (
-    <LStack position="relative" minHeight="8" maxHeight="fit">
+    <LStack
+      className={cx(
+        "content-composer content-composer--markdown",
+        props.className,
+      )}
+      position="relative"
+      minHeight="8"
+      maxHeight="fit"
+    >
       <ComposerTools
         enabled={!props.disabled}
         icon={<ShowIcon />}
@@ -110,6 +121,8 @@ export function ContentComposerMarkdown(props: ContentComposerProps) {
       ) : (
         <>
           <styled.textarea
+            className="content-composer__editor"
+            aria-label="Markdown editor"
             ref={textareaRef}
             onChange={handleBufferChange}
             onPaste={handlePaste}

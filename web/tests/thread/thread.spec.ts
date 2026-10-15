@@ -31,7 +31,7 @@ async function createThread(
 
   await page.locator("#title-input").fill(title);
 
-  const editor = page.locator(".ProseMirror").first();
+  const editor = page.locator(".content-composer__editor");
   await editor.click();
   await editor.fill(body);
 
@@ -45,7 +45,7 @@ async function createThread(
 
 async function postReply(page: Page, body: string) {
   const replyForm = page.locator("form").filter({ hasText: "Reply to" });
-  const replyEditor = replyForm.locator(".ProseMirror[contenteditable='true']");
+  const replyEditor = replyForm.locator(".content-composer__editor");
   await replyEditor.click();
   await replyEditor.fill(body);
 
@@ -131,9 +131,7 @@ test.describe("Thread Replies", () => {
       .locator("form")
       .filter({ has: page.getByRole("button", { name: "Post" }) })
       .last();
-    const replyEditor = replyBox.locator(
-      ".ProseMirror[contenteditable='true']",
-    );
+    const replyEditor = replyBox.locator(".content-composer__editor");
     await replyEditor.click();
     await replyEditor.fill("This is a reply to the first reply.");
 
@@ -254,7 +252,8 @@ test.describe("Thread Editing", () => {
     await page.keyboard.type("Updated Thread Title");
 
     const editor = page
-      .locator("main .ProseMirror[contenteditable='true']")
+      .getByRole("main")
+      .locator(".content-composer__editor")
       .first();
     await editor.click();
     await page.keyboard.press("Meta+a");
@@ -323,7 +322,9 @@ test.describe("Reply Editing", () => {
     const saveButton = page.getByRole("button", { name: "Save" });
     await expect(saveButton).toBeVisible({ timeout: 10000 });
 
-    const replyEditor = page.locator("li .ProseMirror[contenteditable='true']");
+    const replyEditor = page
+      .getByRole("listitem")
+      .locator(".content-composer__editor");
     await expect(replyEditor).toBeVisible({ timeout: 5000 });
     await replyEditor.click();
     await page.keyboard.press("Meta+a");
@@ -360,7 +361,9 @@ test.describe("Reply Editing", () => {
     const discardButton = page.getByRole("button", { name: "Discard" });
     await expect(discardButton).toBeVisible({ timeout: 10000 });
 
-    const replyEditor = page.locator("li .ProseMirror[contenteditable='true']");
+    const replyEditor = page
+      .getByRole("listitem")
+      .locator(".content-composer__editor");
     await expect(replyEditor).toBeVisible({ timeout: 5000 });
     await replyEditor.click();
     await page.keyboard.press("Meta+a");
@@ -390,9 +393,7 @@ test.describe("Thread Pagination", () => {
         .locator("form")
         .filter({ has: page.getByRole("button", { name: "Post" }) })
         .last();
-      const replyEditor = replyForm.locator(
-        ".ProseMirror[contenteditable='true']",
-      );
+      const replyEditor = replyForm.locator(".content-composer__editor");
       await replyEditor.click();
       await replyEditor.fill(`Reply number ${i} for pagination test.`);
       await replyForm.getByRole("button", { name: "Post" }).click();

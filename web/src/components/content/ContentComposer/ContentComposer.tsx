@@ -1,24 +1,28 @@
 "use client";
 
-import { useSession } from "@/auth";
+import { Suspense, lazy } from "react";
 
-import { ContentComposerMarkdown } from "../ContentComposerMarkdown/ContentComposerMarkdown";
-import { ContentComposerRich } from "../ContentComposerRich/ContentComposerRich";
-import { ContentComposerProps } from "../composer-props";
+import { useHydrated } from "@/utils/useHydrated";
+
+import { ContentRenderer } from "../ContentRenderer/ContentRenderer";
+import type { ContentComposerProps } from "../composer-props";
+
+const ContentEditor = lazy(() =>
+  import("./ContentEditor").then((module) => ({
+    default: module.ContentEditor,
+  })),
+);
 
 export function ContentComposer(props: ContentComposerProps) {
-  const session = useSession();
+  const isHydrated = useHydrated();
 
-  const editorMode = session?.meta.editor.mode;
-
-  switch (editorMode) {
-    case "richtext":
-      return <ContentComposerRich {...props} />;
-
-    case "markdown":
-      return <ContentComposerMarkdown {...props} />;
-
-    default:
-      return <ContentComposerRich {...props} />;
+  if (props.disabled || !isHydrated) {
+    return <ContentRenderer {...props} />;
   }
+
+  return (
+    <Suspense fallback={<ContentRenderer {...props} />}>
+      <ContentEditor {...props} />
+    </Suspense>
+  );
 }

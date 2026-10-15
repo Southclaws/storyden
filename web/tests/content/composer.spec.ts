@@ -1,4 +1,4 @@
-import { Page, expect, test } from "@playwright/test";
+import { Locator, Page, expect, test } from "@playwright/test";
 
 const PASSWORD = "TestPassword123!";
 const IMAGE_BYTES = Buffer.from(
@@ -22,14 +22,14 @@ async function openComposer(page: Page) {
   await expect(page).toHaveURL("/");
 
   await page.goto("/new");
-  const editor = page.locator(".ProseMirror[contenteditable='true']");
+  const editor = page.locator(".content-composer__editor");
   await expect(editor).toBeVisible();
 
   return editor;
 }
 
-async function pasteText(page: Page, selector: string, text: string) {
-  await page.locator(selector).evaluate((element, value) => {
+async function pasteText(editor: Locator, text: string) {
+  await editor.evaluate((element, value) => {
     const clipboard = new DataTransfer();
     clipboard.setData("text/plain", value);
     element.dispatchEvent(
@@ -63,7 +63,7 @@ test.describe("Content composer", () => {
     const url = "https://example.com/storyden";
 
     await editor.click();
-    await pasteText(page, ".ProseMirror[contenteditable='true']", url);
+    await pasteText(editor, url);
 
     await expect(page.getByText("Show link as")).toBeVisible();
     await page.getByRole("button", { name: "Text", exact: true }).click();
