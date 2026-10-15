@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { FixedCropperRef } from "react-advanced-cropper";
+import type { FixedCropperRef } from "react-advanced-cropper";
 
 import { handle } from "@/api/client";
 import { assetUpload } from "@/api/openapi-client/assets";
@@ -9,10 +9,8 @@ import { getAssetURL } from "@/utils/asset";
 
 import { useLibraryPageContext } from "../../Context";
 
+import { CROP_STENCIL_HEIGHT, CROP_STENCIL_WIDTH } from "./constants";
 import { useLibraryCoverEvent } from "./events";
-
-export const CROP_STENCIL_WIDTH = 1536;
-export const CROP_STENCIL_HEIGHT = 384;
 
 export function useLibraryPageCoverBlock() {
   const { store } = useLibraryPageContext();
