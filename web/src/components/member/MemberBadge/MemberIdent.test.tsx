@@ -2,7 +2,6 @@ import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { AccountRoleRef, ProfileReference } from "@/api/openapi-schema";
-import { token } from "@/styled-system/tokens";
 
 import { MemberIdent, MemberName } from "./MemberIdent";
 
@@ -68,7 +67,7 @@ describe("MemberIdent decorations", () => {
     ) as HTMLDivElement;
     expect(
       withoutColourRoot.style.getPropertyValue("--colors-color-palette"),
-    ).toBe(token("colors.text.default"));
+    ).toBe("var(--member-name-colour)");
   });
 
   it("uses bold and italic metadata for decoration vars", () => {
@@ -91,7 +90,7 @@ describe("MemberIdent decorations", () => {
       "italic",
     );
     expect(root.style.getPropertyValue("--decoration-font-weight")).toBe(
-      token("fontWeights.semibold"),
+      "var(--member-name-bold-weight)",
     );
   });
 
@@ -134,7 +133,7 @@ describe("MemberIdent decorations", () => {
       ".member-name__show-handle",
     ) as HTMLDivElement;
     expect(root.style.getPropertyValue("--colors-color-palette")).toBe(
-      token("colors.text.muted"),
+      "var(--member-name-colour)",
     );
   });
 });

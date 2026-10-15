@@ -197,7 +197,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Storyden icons are semantic product exports, not a shape catalogue. Product code imports from `components/ui/icons`; raw Lucide or Heroicons imports belong inside this library. Choose an icon by its exported meaning—`CollectionIcon` represents Storyden Collections and `ToolsetIcon` represents Robot Toolsets. If no semantic icon matches, prefer no icon before adding decoration. Add a new export only for a recurring product concept. The containing component owns contextual size whenever possible: compact inline and Card title icons render at 16px, while icon buttons derive icon size from the control.",
+          "Storyden icons are semantic product exports, not a shape catalogue. Product code imports from `components/ui/icons`; raw Lucide or Heroicons imports belong inside this library. Choose an icon by its exported meaning—`CollectionIcon` represents Storyden Collections and `ToolsetIcon` represents Robot Toolsets. If no semantic icon matches, prefer no icon before adding decoration. Add a new export only for a recurring product concept. The containing component owns contextual size whenever possible: compact inline and Card title icons render at 16px, while icon buttons derive icon size from the control. BulletIcon uses the text.subtle Panda token through CSS, including light and dark themes.",
       },
     },
   },

@@ -2,7 +2,6 @@ import { AccountRoleRefList, ProfileReference } from "@/api/openapi-schema";
 import { RoleBadgeList } from "@/components/role/RoleBadge/RoleBadgeList";
 import { parseRoleMetadata } from "@/lib/role/metadata";
 import { Flex, HStack, styled } from "@/styled-system/jsx";
-import { token } from "@/styled-system/tokens";
 
 import { MemberAvatar } from "./MemberAvatar";
 
@@ -48,18 +47,17 @@ function topRoleForDecoration(roles: AccountRoleRefList) {
   });
 }
 
-function getRoleDecorationStyle(
-  roles: AccountRoleRefList,
-  defaultColour: string,
-  defaultWeight: string,
-  boldWeight: string,
-) {
+function getRoleDecorationStyle(roles: AccountRoleRefList) {
   const role = topRoleForDecoration(roles);
   const metadata = role ? parseRoleMetadata(role.meta) : null;
-  const resolvedWeight = metadata?.bold ? boldWeight : defaultWeight;
+  const resolvedWeight = metadata?.bold
+    ? "var(--member-name-bold-weight)"
+    : "var(--member-name-weight)";
   const resolvedStyle = metadata?.italic ? "italic" : "normal";
   const resolvedColour =
-    metadata?.coloured && role?.colour ? role.colour : defaultColour;
+    metadata?.coloured && role?.colour
+      ? role.colour
+      : "var(--member-name-colour)";
 
   return {
     "--colors-color-palette": resolvedColour,
@@ -76,20 +74,22 @@ export function MemberName({
 }: Props) {
   switch (name) {
     case "full-horizontal": {
-      const decorationStyle = getRoleDecorationStyle(
-        profile.roles,
-        token("colors.text.default"),
-        size === "lg"
-          ? token("fontWeights.semibold")
-          : token("fontWeights.normal"),
-        size === "lg"
-          ? token("fontWeights.extrabold")
-          : token("fontWeights.bold"),
-      );
+      const decorationStyle = getRoleDecorationStyle(profile.roles);
 
       return (
         <Flex
           className="member-name__show-horizontal"
+          css={{
+            "--member-name-colour": "token(colors.text.default)",
+            "--member-name-weight":
+              size === "lg"
+                ? "token(fontWeights.semibold)"
+                : "token(fontWeights.normal)",
+            "--member-name-bold-weight":
+              size === "lg"
+                ? "token(fontWeights.extrabold)"
+                : "token(fontWeights.bold)",
+          }}
           maxW="full"
           direction="row"
           gap="1"
@@ -139,18 +139,19 @@ export function MemberName({
     }
 
     case "full-vertical": {
-      const decorationStyle = getRoleDecorationStyle(
-        profile.roles,
-        token("colors.text.default"),
-        size === "lg"
-          ? token("fontWeights.bold")
-          : token("fontWeights.semibold"),
-        token("fontWeights.extrabold"),
-      );
+      const decorationStyle = getRoleDecorationStyle(profile.roles);
 
       return (
         <Flex
           className="member-name__show-vertical"
+          css={{
+            "--member-name-colour": "token(colors.text.default)",
+            "--member-name-weight":
+              size === "lg"
+                ? "token(fontWeights.bold)"
+                : "token(fontWeights.semibold)",
+            "--member-name-bold-weight": "token(fontWeights.extrabold)",
+          }}
           maxW="full"
           minW="0"
           direction="column"
@@ -200,20 +201,22 @@ export function MemberName({
     }
 
     case "handle": {
-      const decorationStyle = getRoleDecorationStyle(
-        profile.roles,
-        token("colors.text.muted"),
-        size === "lg"
-          ? token("fontWeights.medium")
-          : token("fontWeights.normal"),
-        size === "lg"
-          ? token("fontWeights.bold")
-          : token("fontWeights.semibold"),
-      );
+      const decorationStyle = getRoleDecorationStyle(profile.roles);
 
       return (
         <HStack
           className="member-name__show-handle"
+          css={{
+            "--member-name-colour": "token(colors.text.muted)",
+            "--member-name-weight":
+              size === "lg"
+                ? "token(fontWeights.medium)"
+                : "token(fontWeights.normal)",
+            "--member-name-bold-weight":
+              size === "lg"
+                ? "token(fontWeights.bold)"
+                : "token(fontWeights.semibold)",
+          }}
           maxW="full"
           gap="1"
           minW="0"
