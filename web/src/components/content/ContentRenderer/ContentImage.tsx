@@ -1,3 +1,5 @@
+"use client";
+
 import type { ElementType } from "react";
 
 import { Button } from "@/components/ui/button";

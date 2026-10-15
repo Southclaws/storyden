@@ -1,3 +1,5 @@
+"use client";
+
 import { type ElementType, useEffect } from "react";
 
 import { useLinkCreate } from "@/api/openapi-client/links";

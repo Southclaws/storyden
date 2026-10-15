@@ -3,6 +3,7 @@ import { cache } from "react";
 
 import { NodeListResult, NodeWithChildren } from "@/api/openapi-schema";
 import { nodeGet, nodeListChildren } from "@/api/openapi-server/nodes";
+import { ServerRenderedContent } from "@/components/content/ContentRenderer/ServerRenderedContent";
 import { getTargetSlug } from "@/components/library/utils";
 import { WEB_ADDRESS } from "@/config";
 import {
@@ -100,7 +101,9 @@ export default async function Page(props: Props) {
           }}
         />
       )}
-      <LibraryPageScreen node={data} childNodes={children} />
+      <ServerRenderedContent values={[data.content]}>
+        <LibraryPageScreen node={data} childNodes={children} />
+      </ServerRenderedContent>
     </>
   );
 }

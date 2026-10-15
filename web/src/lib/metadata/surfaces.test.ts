@@ -11,6 +11,9 @@ import ThreadPage, {
 } from "@/app/(dashboard)/t/[slug]/page";
 import TagPage from "@/app/(dashboard)/tags/[tag]/page";
 
+vi.mock("@/components/content/ContentRenderer/ServerRenderedContent", () => ({
+  ServerRenderedContent: ({ children }: { children: ReactNode }) => children,
+}));
 vi.mock("@/config", () => ({
   API_ADDRESS: "https://api.example",
   WEB_ADDRESS: "https://community.example",

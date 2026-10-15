@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import {
   createAdmin,
   login,
+  registerUser,
   withAdminAccessKey,
 } from "../access_key_admin_assignment";
 
@@ -153,3 +154,76 @@ for (const mode of ["richtext", "markdown"] as const) {
     ).toBeAttached();
   });
 }
+
+test("server-renders a published thread and its replies for anonymous readers", async ({
+  browser,
+  page,
+}) => {
+  const thread = await withAdminAccessKey(
+    async ({ threadCreate, replyCreate }) => {
+      const thread = await threadCreate({
+        title: `Reading thread ${randomUUID().slice(0, 8)}`,
+        body: CONTENT,
+        visibility: "published",
+      });
+      await replyCreate(thread.slug, {
+        body: "<h3>Reader reply</h3><p>A server-rendered reply.</p>",
+      });
+      return thread;
+    },
+  );
+  const plainContext = await browser.newContext({ javaScriptEnabled: false });
+  try {
+    const plain = await plainContext.newPage();
+    await plain.goto(`/t/${thread.slug}`);
+    await expect(plain.locator(".thread-page h2")).toHaveText("Field notes");
+    await expect(plain.locator(".thread-reply h3")).toHaveText("Reader reply");
+  } finally {
+    await plainContext.close();
+  }
+  await page.goto(`/t/${thread.slug}`);
+  await expect(
+    page.getByRole("heading", { name: "Field notes" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Reader reply" }),
+  ).toBeVisible();
+  await expect(page.locator(".content-composer__editor")).toHaveCount(0);
+});
+
+test("server-renders profile biographies with the same rich content", async ({
+  browser,
+  page,
+}) => {
+  const handle = await registerUser(
+    page,
+    "reading-profile",
+    "TestPassword123!",
+  );
+  const updated = await page.request.patch(
+    "http://localhost:8001/api/accounts",
+    { data: { bio: CONTENT } },
+  );
+  expect(updated.ok()).toBe(true);
+  const plainContext = await browser.newContext({ javaScriptEnabled: false });
+  try {
+    const plain = await plainContext.newPage();
+    await plain.goto(`/m/${handle}`);
+    await expect(plain.locator(".content-composer__content h2")).toHaveText(
+      "Field notes",
+    );
+    await expect(plain.locator(".content-composer__content strong")).toHaveText(
+      "Bold note",
+    );
+  } finally {
+    await plainContext.close();
+  }
+  await page.goto(`/m/${handle}`);
+  await expect(
+    page.getByRole("heading", { name: "Field notes" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("img", { name: "Field photograph" }),
+  ).toBeAttached();
+  await expect(page.locator(".content-composer__editor")).toHaveCount(0);
+});

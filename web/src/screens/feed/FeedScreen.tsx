@@ -1,6 +1,7 @@
 import { nodeGet } from "@/api/openapi-server/nodes";
 import { threadList } from "@/api/openapi-server/threads";
 import { getServerSession } from "@/auth/server-session";
+import { ServerRenderedContent } from "@/components/content/ContentRenderer/ServerRenderedContent";
 import { categoryListCached } from "@/lib/category/server-category-list";
 import { getCategoryThreadListParams } from "@/lib/feed/category";
 import { nodeListCached } from "@/lib/library/server-node-list";
@@ -32,13 +33,22 @@ export async function FeedScreen({ page }: Props) {
   );
 
   return (
-    <VStack className="feed-page" data-sd-page="home" paddingBlockEnd="4">
-      <FeedScreenContent
-        initialData={initialData}
-        initialSettings={initialSettings}
-        initialSession={initialSession}
-      />
-    </VStack>
+    <ServerRenderedContent
+      values={[
+        getBlock(feedConfig.blocks, "content")
+          ? initialSettings.content
+          : undefined,
+        initialData.initialLibraryNode?.content,
+      ]}
+    >
+      <VStack className="feed-page" data-sd-page="home" paddingBlockEnd="4">
+        <FeedScreenContent
+          initialData={initialData}
+          initialSettings={initialSettings}
+          initialSession={initialSession}
+        />
+      </VStack>
+    </ServerRenderedContent>
   );
 }
 

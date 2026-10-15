@@ -3,6 +3,7 @@ import { cache } from "react";
 
 import { threadGet } from "@/api/openapi-server/threads";
 import { getServerSession } from "@/auth/server-session";
+import { ServerRenderedContent } from "@/components/content/ContentRenderer/ServerRenderedContent";
 import { getPermalinkForPost } from "@/components/thread/utils";
 import { canonicalPage, jsonLD, pageLinks } from "@/lib/metadata/public";
 import { getSettings } from "@/lib/settings/settings-server";
@@ -111,14 +112,18 @@ export default async function Page(props: Props) {
           dangerouslySetInnerHTML={{ __html: jsonLD(structuredData) }}
         />
       )}
-      <ThreadScreen
-        initialSession={session}
-        initialPage={page}
-        slug={slug}
-        thread={data}
-        initialSettings={settings}
-        initialSignatureConfig={settings.metadata.signatures}
-      />
+      <ServerRenderedContent
+        values={[data.body, ...data.replies.replies.map((reply) => reply.body)]}
+      >
+        <ThreadScreen
+          initialSession={session}
+          initialPage={page}
+          slug={slug}
+          thread={data}
+          initialSettings={settings}
+          initialSignatureConfig={settings.metadata.signatures}
+        />
+      </ServerRenderedContent>
     </>
   );
 }

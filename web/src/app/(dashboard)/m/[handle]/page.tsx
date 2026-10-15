@@ -1,6 +1,7 @@
 import type { PublicProfile } from "@/api/openapi-schema";
 import { profileGet } from "@/api/openapi-server/profiles";
 import { getServerSession } from "@/auth/server-session";
+import { ServerRenderedContent } from "@/components/content/ContentRenderer/ServerRenderedContent";
 import { getAvatarURL } from "@/components/member/MemberBadge/MemberAvatar";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { canonicalPage, jsonLD } from "@/lib/metadata/public";
@@ -63,11 +64,13 @@ export default async function Page(props: Props) {
           dangerouslySetInnerHTML={{ __html: jsonLD(structuredData) }}
         />
       )}
-      <ProfileScreen
-        initialSession={session}
-        profile={data}
-        initialSignatureConfig={settings.metadata.signatures}
-      />
+      <ServerRenderedContent values={[data.bio, data.signature ?? undefined]}>
+        <ProfileScreen
+          initialSession={session}
+          profile={data}
+          initialSignatureConfig={settings.metadata.signatures}
+        />
+      </ServerRenderedContent>
     </>
   );
 }
