@@ -137,7 +137,6 @@ export function useContentComposer(props: ContentComposerProps) {
 
   const editor = useEditor({
     immediatelyRender: false,
-    autofocus: props.focusOnReady ? "end" : false,
     editorProps: {
       attributes: {
         role: "textbox",
@@ -174,6 +173,12 @@ export function useContentComposer(props: ContentComposerProps) {
       props.onChange?.(html, editor.isEmpty);
     },
   });
+
+  useEffect(() => {
+    if (editor && props.focusOnReady && !props.disabled) {
+      editor.commands.focus("end");
+    }
+  }, [editor, props.focusOnReady, props.disabled]);
 
   // This is a huge hack but it means the composer doesn't need to be made into
   // a controlled component. Baiscally, if the resetKey changes, we reset the

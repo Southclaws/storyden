@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useState } from "react";
 
 import { ContentComposerField } from "@/components/content/ContentComposer";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
@@ -17,10 +18,13 @@ import { timestamp } from "@/utils/date";
 
 import { useReplyContext } from "../ReplyContext";
 
-import { Form, Props, useReplyBox } from "./useReplyBox";
+import { Props, useReplyBox } from "./useReplyBox";
 
 export function ReplyBox(props: Props) {
   const { replyTo, clearReplyTo } = useReplyContext();
+  const [isActivated, setIsActivated] = useState(false);
+  const [focusOnReady, setFocusOnReady] = useState(false);
+  const isActive = isActivated || !!replyTo;
   const {
     isLoggedIn,
     isEmpty,
@@ -30,6 +34,17 @@ export function ReplyBox(props: Props) {
     postedReply,
     handlers,
   } = useReplyBox(props);
+
+  function handleActivate() {
+    setIsActivated(true);
+    setFocusOnReady(true);
+  }
+
+  function handleClearReplyTo() {
+    // Keep the editor and any draft when removing the reply target.
+    setIsActivated(true);
+    clearReplyTo();
+  }
 
   if (!isLoggedIn) {
     return <LoginToReply initialSettings={props.initialSettings} />;
@@ -73,7 +88,24 @@ export function ReplyBox(props: Props) {
         flexDirection="column"
         gap="1"
         width="full"
-        onSubmit={handlers.handleSubmit}
+        onPointerEnter={(event) => {
+          if (event.pointerType === "mouse") {
+            setIsActivated(true);
+          }
+        }}
+        onPointerDown={(event) => {
+          // Remember a click on the placeholder while the editor downloads.
+          if (
+            event.target instanceof Element &&
+            event.target.closest(".content-composer--readonly")
+          ) {
+            handleActivate();
+          }
+        }}
+        onSubmit={(event) => {
+          setIsActivated(true);
+          return handlers.handleSubmit(event);
+        }}
       >
         {replyTo && (
           <WStack py="1" px="2" borderRadius="md" bgColor="background.inset">
@@ -93,7 +125,7 @@ export function ReplyBox(props: Props) {
               type="button"
               variant="ghost"
               aria-label="Clear reply-to"
-              onClick={clearReplyTo}
+              onClick={handleClearReplyTo}
             >
               <CloseIcon />
             </IconButton>
@@ -115,12 +147,36 @@ export function ReplyBox(props: Props) {
           </Button>
         </HStack>
 
-        <ContentComposerField
-          name="body"
-          control={form.control}
-          onEmptyStateChange={handlers.handleEmptyStateChange}
-          resetKey={resetKey}
-        />
+        {isActive ? (
+          <ContentComposerField
+            name="body"
+            control={form.control}
+            focusOnReady={focusOnReady || !!replyTo}
+            onEmptyStateChange={handlers.handleEmptyStateChange}
+            resetKey={resetKey}
+          />
+        ) : (
+          <Button
+            className="content-composer content-composer--idle reply-composer__trigger"
+            type="button"
+            variant="ghost"
+            aria-label="Write a reply"
+            w="full"
+            minH="8"
+            px="0"
+            alignItems="start"
+            justifyContent="start"
+            fontWeight="normal"
+            fontSize="md"
+            color="text.muted"
+            textAlign="start"
+            whiteSpace="normal"
+            onFocus={handleActivate}
+            onClick={handleActivate}
+          >
+            Write your heart out...
+          </Button>
+        )}
       </styled.form>
     </VStack>
   );

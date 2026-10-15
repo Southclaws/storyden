@@ -44,7 +44,8 @@ async function createThread(
 }
 
 async function postReply(page: Page, body: string) {
-  const replyForm = page.locator("form").filter({ hasText: "Reply to" });
+  const replyForm = page.getByRole("main").locator(".reply-composer__form");
+  await replyForm.hover();
   const replyEditor = replyForm.locator(".content-composer__editor");
   await replyEditor.click();
   await replyEditor.fill(body);
@@ -127,10 +128,7 @@ test.describe("Thread Replies", () => {
 
     await expect(page.getByText("Replying to")).toBeVisible();
 
-    const replyBox = page
-      .locator("form")
-      .filter({ has: page.getByRole("button", { name: "Post" }) })
-      .last();
+    const replyBox = page.getByRole("main").locator(".reply-composer__form");
     const replyEditor = replyBox.locator(".content-composer__editor");
     await replyEditor.click();
     await replyEditor.fill("This is a reply to the first reply.");
@@ -389,11 +387,9 @@ test.describe("Thread Pagination", () => {
     );
 
     for (let i = 1; i <= 53; i++) {
-      const replyForm = page
-        .locator("form")
-        .filter({ has: page.getByRole("button", { name: "Post" }) })
-        .last();
+      const replyForm = page.getByRole("main").locator(".reply-composer__form");
       const replyEditor = replyForm.locator(".content-composer__editor");
+      await replyForm.hover();
       await replyEditor.click();
       await replyEditor.fill(`Reply number ${i} for pagination test.`);
       await replyForm.getByRole("button", { name: "Post" }).click();
