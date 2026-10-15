@@ -6,7 +6,6 @@ import {
   createTreeCollection,
 } from "@ark-ui/react/tree-view";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
-import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
 import {
@@ -161,45 +160,40 @@ export function DragTree<TNode>({
     >
       <ArkTreeView.Label className={styles.label}>{label}</ArkTreeView.Label>
       <ArkTreeView.Tree className={styles.tree}>
-        <SortableContext
-          items={rootNodes.map(getId)}
-          strategy={rectSortingStrategy}
-        >
-          {rootNodes.map((node, index) => {
-            const context = {
-              node,
-              parent: null,
-              isRoot: true,
-              index,
-              siblings: rootNodes,
-            };
+        {rootNodes.map((node, index) => {
+          const context = {
+            node,
+            parent: null,
+            isRoot: true,
+            index,
+            siblings: rootNodes,
+          };
 
-            return (
-              <Fragment key={getId(node)}>
-                {renderBefore?.(context)}
-                <DragTreeNode
-                  treeId={id}
-                  allNodes={nodes}
-                  node={node}
-                  parent={null}
-                  indexPath={[index]}
-                  position={getDragTreePosition(rootNodes.length, index)}
-                  getChildren={getChildren}
-                  getHref={getHref}
-                  getId={getId}
-                  getLabel={getLabel}
-                  drag={drag}
-                  getLabelClassName={getLabelClassName}
-                  handleExpandNode={handleExpandNode}
-                  handleToggleNode={handleToggleNode}
-                  isSelected={isSelected}
-                  renderActions={renderActions}
-                  styles={styles}
-                />
-              </Fragment>
-            );
-          })}
-        </SortableContext>
+          return (
+            <Fragment key={getId(node)}>
+              {renderBefore?.(context)}
+              <DragTreeNode
+                treeId={id}
+                allNodes={nodes}
+                node={node}
+                parent={null}
+                indexPath={[index]}
+                position={getDragTreePosition(rootNodes.length, index)}
+                getChildren={getChildren}
+                getHref={getHref}
+                getId={getId}
+                getLabel={getLabel}
+                drag={drag}
+                getLabelClassName={getLabelClassName}
+                handleExpandNode={handleExpandNode}
+                handleToggleNode={handleToggleNode}
+                isSelected={isSelected}
+                renderActions={renderActions}
+                styles={styles}
+              />
+            </Fragment>
+          );
+        })}
       </ArkTreeView.Tree>
     </ArkTreeView.Root>
   );
@@ -438,33 +432,28 @@ function DragTreeNode<TNode>({
         </div>
 
         <ArkTreeView.BranchContent className={styles.branchContent}>
-          <SortableContext
-            items={children.map(getId)}
-            strategy={rectSortingStrategy}
-          >
-            {children.map((child, index) => (
-              <DragTreeNode
-                key={getId(child)}
-                treeId={treeId}
-                allNodes={allNodes}
-                node={child}
-                parent={node}
-                indexPath={[...indexPath, index]}
-                position={getDragTreePosition(children.length, index)}
-                getChildren={getChildren}
-                getHref={getHref}
-                getId={getId}
-                getLabel={getLabel}
-                drag={drag}
-                getLabelClassName={getLabelClassName}
-                handleExpandNode={handleExpandNode}
-                handleToggleNode={handleToggleNode}
-                isSelected={isSelected}
-                renderActions={renderActions}
-                styles={styles}
-              />
-            ))}
-          </SortableContext>
+          {children.map((child, index) => (
+            <DragTreeNode
+              key={getId(child)}
+              treeId={treeId}
+              allNodes={allNodes}
+              node={child}
+              parent={node}
+              indexPath={[...indexPath, index]}
+              position={getDragTreePosition(children.length, index)}
+              getChildren={getChildren}
+              getHref={getHref}
+              getId={getId}
+              getLabel={getLabel}
+              drag={drag}
+              getLabelClassName={getLabelClassName}
+              handleExpandNode={handleExpandNode}
+              handleToggleNode={handleToggleNode}
+              isSelected={isSelected}
+              renderActions={renderActions}
+              styles={styles}
+            />
+          ))}
         </ArkTreeView.BranchContent>
       </ArkTreeView.Branch>
 
