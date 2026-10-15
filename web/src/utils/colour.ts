@@ -1,5 +1,6 @@
-import chroma from "chroma-js";
-import { readableColor } from "polished";
+import readableColor from "polished/lib/color/readableColor";
+
+import { contrast as colourContrast, oklch, parseColour } from "./colour-core";
 
 export const FALLBACK_COLOUR = "#27b981";
 
@@ -97,11 +98,11 @@ function getHue(colour: string): number {
   }
 
   try {
-    const hue = chroma(colour).hsl()[0];
+    const hue = parseColour(colour).hsl()[0];
 
     return Number.isFinite(hue) ? hue : 0;
   } catch {
-    return chroma(FALLBACK_COLOUR).hsl()[0];
+    return parseColour(FALLBACK_COLOUR).hsl()[0];
   }
 }
 
@@ -135,7 +136,7 @@ function createScale(
     let lightness = stop[1];
 
     while (
-      chroma.contrast(scale[index] ?? value, background) < minimum &&
+      colourContrast(scale[index] ?? value, background) < minimum &&
       lightness > 0 &&
       lightness < 100
     ) {
@@ -154,9 +155,9 @@ export function getColourAsHex(colour: string) {
 
 function parseColourWithFallback(colour: string) {
   try {
-    return chroma(colour);
+    return parseColour(colour);
   } catch (e) {
-    return chroma(FALLBACK_COLOUR);
+    return parseColour(FALLBACK_COLOUR);
   }
 }
 
@@ -179,5 +180,5 @@ export function deriveColour(s: string): string {
 
   const hue = hash;
 
-  return chroma(0.7226, 0.12, hue, "oklch").hex();
+  return oklch(0.7226, 0.12, hue).hex();
 }

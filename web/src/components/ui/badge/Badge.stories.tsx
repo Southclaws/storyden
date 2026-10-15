@@ -79,6 +79,14 @@ export const ColourPalette: Story = {
 };
 
 export const CustomColour: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Custom colours retain the existing Chroma palette conversions and readable contrast; the shared path loads only the required conversion modules.",
+      },
+    },
+  },
   render: () => (
     <HStack gap="3" flexWrap="wrap">
       <Badge style={badgeColourPalette(badgeColours("#27b981"))}>Open</Badge>

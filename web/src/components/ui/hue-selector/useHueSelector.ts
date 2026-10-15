@@ -1,6 +1,6 @@
 "use client";
 
-import { parseToHsl } from "polished";
+import parseToHsl from "polished/lib/color/parseToHsl";
 import { useEffect, useRef, useState } from "react";
 
 export type HueSelectorProps = {

@@ -1,6 +1,5 @@
-import chroma from "chroma-js";
-
 import { getReadableTextColour } from "@/utils/colour";
+import { parseColour } from "@/utils/colour-core";
 
 import { badgeColourPalette } from "../ui/badge/Badge.internal";
 
@@ -11,10 +10,10 @@ export function badgeColourCSS(c: string) {
 export function badgeColours(c: string) {
   let colour;
   try {
-    colour = chroma(c);
+    colour = parseColour(c);
   } catch {
     // Default to green if colour is invalid or empty
-    colour = chroma("#22c55e");
+    colour = parseColour("#22c55e");
   }
 
   const background = colour.brighten(2).desaturate(3).css();

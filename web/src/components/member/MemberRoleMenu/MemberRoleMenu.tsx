@@ -1,7 +1,6 @@
 "use client";
 
 import { Portal } from "@ark-ui/react";
-import chroma from "chroma-js";
 
 import { RoleBadge } from "@/components/role/RoleBadge/RoleBadge";
 import { badgeColourCSS } from "@/components/role/colours";
