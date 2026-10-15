@@ -1,6 +1,7 @@
 "use client";
 
 import { MenuSelectionDetails, Portal } from "@ark-ui/react";
+import dynamic from "next/dynamic";
 
 import { Account } from "@/api/openapi-schema";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
@@ -8,6 +9,8 @@ import {
   MemberIdent,
   type Props as MemberIdentProps,
 } from "@/components/member/MemberBadge/MemberIdent";
+import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
+import { UnreadyBanner } from "@/components/site/Unready";
 import * as Menu from "@/components/ui/menu";
 import { hasPermission } from "@/utils/permissions";
 import { useDisclosure } from "@/utils/useDisclosure";
@@ -20,12 +23,12 @@ import { QueueMenuItem } from "../Anchors/Queue";
 import { ReportsMenuItem } from "../Anchors/Reports";
 import { SettingsMenuItem } from "../Anchors/Settings";
 
-import {
-  InvitationID,
-  InvitationMenuItem,
-  InvitationModal,
-  useInvitation,
-} from "./InvitationMenuItem";
+import { InvitationID, InvitationMenuItem } from "./InvitationMenuItem";
+
+const InvitationScreen = dynamic(
+  () => import("./InvitationScreen").then((module) => module.InvitationScreen),
+  { ssr: false, loading: () => <UnreadyBanner /> },
+);
 
 type Props = {
   account: Account;
@@ -37,16 +40,9 @@ export function AccountMenu({ account, size = "md", name = "hidden" }: Props) {
   const isAdmin = hasPermission(account, "ADMINISTRATOR");
   const canCreateInvitations = hasPermission(account, "CREATE_INVITATION");
   const invitationDisclosure = useDisclosure();
-  const invitation = useInvitation();
-
-  async function handleInvitationSelect() {
-    invitationDisclosure.onOpen();
-    await invitation.createInvitation();
-  }
-
   function handleSelect(details: MenuSelectionDetails) {
     if (details.value === InvitationID) {
-      void handleInvitationSelect();
+      invitationDisclosure.onOpen();
     }
   }
 
@@ -108,12 +104,13 @@ export function AccountMenu({ account, size = "md", name = "hidden" }: Props) {
         </Portal>
       </Menu.Root>
 
-      <InvitationModal
+      <ModalDrawer
+        title="Invite someone"
         isOpen={invitationDisclosure.isOpen}
-        invitation={invitation.invitation}
-        onRetry={invitation.createInvitation}
         onClose={invitationDisclosure.onClose}
-      />
+      >
+        <InvitationScreen onClose={invitationDisclosure.onClose} />
+      </ModalDrawer>
     </>
   );
 }

@@ -1,11 +1,19 @@
+import dynamic from "next/dynamic";
 import React, { PropsWithChildren } from "react";
 
 import { ProfileReference } from "@/api/openapi-schema";
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
+import { UnreadyBanner } from "@/components/site/Unready";
 import { Button } from "@/components/ui/button";
 import { useDisclosure } from "@/utils/useDisclosure";
 
-import { MemberPasswordResetDialog } from "./MemberPasswordResetDialog";
+const MemberPasswordResetDialog = dynamic(
+  () =>
+    import("./MemberPasswordResetDialog").then(
+      (module) => module.MemberPasswordResetDialog,
+    ),
+  { ssr: false, loading: () => <UnreadyBanner /> },
+);
 
 export type Props = {
   profile: ProfileReference;

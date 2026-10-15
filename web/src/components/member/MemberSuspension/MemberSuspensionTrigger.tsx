@@ -1,11 +1,20 @@
+import dynamic from "next/dynamic";
 import React, { PropsWithChildren } from "react";
 
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
+import { UnreadyBanner } from "@/components/site/Unready";
 import { Button } from "@/components/ui/button";
 import { useDisclosure } from "@/utils/useDisclosure";
 
-import { MemberSuspensionConfirmation } from "./MemberSuspensionConfirmation";
-import { Props } from "./useMemberSuspension";
+import type { Props } from "./useMemberSuspension";
+
+const MemberSuspensionConfirmation = dynamic(
+  () =>
+    import("./MemberSuspensionConfirmation").then(
+      (module) => module.MemberSuspensionConfirmation,
+    ),
+  { ssr: false, loading: () => <UnreadyBanner /> },
+);
 
 export function MemberSuspensionTrigger({
   children,

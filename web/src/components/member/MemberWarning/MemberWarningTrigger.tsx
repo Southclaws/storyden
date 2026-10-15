@@ -1,19 +1,19 @@
+import dynamic from "next/dynamic";
 import React, { ReactNode, useState } from "react";
-import { toast } from "sonner";
-import { useSWRConfig } from "swr";
 
-import { handle } from "@/api/client";
-import {
-  getAccountWarningListKey,
-  useAccountWarningCreate,
-} from "@/api/openapi-client/accounts";
 import { ProfileReference } from "@/api/openapi-schema";
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
+import { UnreadyBanner } from "@/components/site/Unready";
 import { Button } from "@/components/ui/button";
-import { Text } from "@/components/ui/text";
-import { Textarea } from "@/components/ui/textarea";
-import { HStack, VStack } from "@/styled-system/jsx";
 import { useDisclosure } from "@/utils/useDisclosure";
+
+const MemberWarningScreen = dynamic(
+  () =>
+    import("./MemberWarningScreen").then(
+      (module) => module.MemberWarningScreen,
+    ),
+  { ssr: false, loading: () => <UnreadyBanner /> },
+);
 
 type MemberWarningTriggerProps = {
   children?: ReactNode;
@@ -24,28 +24,8 @@ export function MemberWarningTrigger({
   children,
   profile,
 }: MemberWarningTriggerProps) {
-  const { mutate } = useSWRConfig();
   const { onOpen, onClose, isOpen } = useDisclosure();
-  const { trigger: createWarning, isMutating: loading } =
-    useAccountWarningCreate(profile.id);
   const [reason, setReason] = useState("");
-
-  async function issueWarning() {
-    if (!reason.trim()) {
-      toast.error("Please provide a warning reason.");
-      return;
-    }
-
-    await handle(async () => {
-      await createWarning({
-        reason: reason.trim(),
-      });
-      await mutate(getAccountWarningListKey(profile.id));
-      toast.success(`Warning issued to ${profile.name}.`);
-      setReason("");
-      onClose();
-    });
-  }
 
   const triggerNode = React.isValidElement<{
     onClick?: React.MouseEventHandler;
@@ -65,38 +45,12 @@ export function MemberWarningTrigger({
         onClose={onClose}
         title={`Issue warning to ${profile.name}`}
       >
-        <VStack alignItems="start" gap="3">
-          <Text variant="supporting">
-            Warnings are recorded for internal moderation history.
-          </Text>
-          <Textarea
-            rows={5}
-            value={reason}
-            onChange={(e) => setReason(e.currentTarget.value)}
-            placeholder="Clear, specific reason for this warning"
-          />
-
-          <HStack w="full">
-            <Button
-              type="button"
-              flexGrow="1"
-              onClick={onClose}
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              flexGrow="1"
-              intent="warning"
-              variant="solid"
-              onClick={issueWarning}
-              loading={loading}
-            >
-              Issue warning
-            </Button>
-          </HStack>
-        </VStack>
+        <MemberWarningScreen
+          profile={profile}
+          reason={reason}
+          onReasonChange={setReason}
+          onClose={onClose}
+        />
       </ModalDrawer>
     </>
   );
