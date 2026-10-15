@@ -28,9 +28,13 @@ const RootBase = withRootProvider<Assign<Menu.RootProps, MenuVariantProps>>(
 
 export type RootProps = ComponentProps<typeof RootBase>;
 
-export function Root({ positioning, ...props }: RootProps) {
+export function Root({ positioning, lazyMount = true, ...props }: RootProps) {
   return (
-    <RootBase {...props} positioning={{ ...menuPositioning, ...positioning }} />
+    <RootBase
+      {...props}
+      lazyMount={lazyMount}
+      positioning={{ ...menuPositioning, ...positioning }}
+    />
   );
 }
 

@@ -91,6 +91,7 @@ for (const { mode, input } of [
           exact: true,
         });
         await expect(noCategory).toBeVisible();
+        await expect(page.getByRole("listbox")).toBeFocused();
         await page.keyboard.press("Home");
         await expect(noCategory).toHaveAttribute("data-highlighted", "");
         await page.keyboard.press("Enter");

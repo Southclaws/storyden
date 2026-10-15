@@ -17,7 +17,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "A compact Overlay for contextual commands. Prefer the closed Menu so portalling, placement, collision handling, and click-away behavior use Storyden's defaults. Use the compound slots only when the menu genuinely needs custom composition. Menus contain commands, not primary navigation or complete forms.",
+          "A compact Overlay for contextual commands. Prefer the closed Menu so portalling, placement, collision handling, and click-away behavior use Storyden's defaults. Use the compound slots only when the menu genuinely needs custom composition. Menus contain commands, not primary navigation or complete forms. Content mounts on first open and stays mounted after closing so menu-owned dialogs and state survive selection. Only opt out of lazyMount when content must be prepared before opening.",
       },
     },
   },
@@ -26,6 +26,10 @@ const meta = {
     children: <Menu.Item value="example">Example</Menu.Item>,
   },
   argTypes: {
+    lazyMount: {
+      control: "boolean",
+      table: { defaultValue: { summary: "true" } },
+    },
     size: {
       control: "select",
       options: ["xs", "sm", "md", "lg"],
@@ -107,4 +111,17 @@ export const Compound: Story = {
       </Menu.Positioner>
     </Menu.Root>
   ),
+};
+
+export const EagerContent: Story = {
+  args: { lazyMount: false },
+  render: (args) => <Example {...args} />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Explicit opt-out for menus that must prepare their content before opening. Prefer the lazy default for ordinary command menus.",
+      },
+    },
+  },
 };

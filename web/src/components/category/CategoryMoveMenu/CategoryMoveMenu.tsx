@@ -60,7 +60,9 @@ export function CategoryMoveMenu(props: Props) {
   return (
     <Menu.Root
       size="xs"
-      //   lazyMount
+      // Loading currently replaces Menu.Content. Keep it ready before opening;
+      // the parent thread menu already defers this entire submenu.
+      lazyMount={false}
       positioning={{ placement: "right-start", gutter: -2 }}
       onSelect={handlers.handleSelect}
     >
