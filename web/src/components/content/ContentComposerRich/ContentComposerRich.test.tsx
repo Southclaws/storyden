@@ -21,6 +21,17 @@ vi.mock("../useImageUpload", async (importOriginal) => {
 });
 
 describe("ContentComposerRich", () => {
+  it("exposes the editable document as a named multiline textbox", async () => {
+    render(<ContentComposerRich initialValue="<p>Example content</p>" />);
+    const editor = await screen.findByRole("textbox", {
+      name: "Rich text editor",
+    });
+    expect(editor).toHaveAttribute("aria-multiline", "true");
+    expect(editor).toHaveAttribute("contenteditable", "true");
+    expect(editor).toHaveClass("content-composer__editor");
+    expect(editor).toHaveTextContent("Example content");
+  });
+
   it("renders the image upload node view while pending and replaces it on success", async () => {
     const user = userEvent.setup();
     const onAssetUpload = vi.fn();

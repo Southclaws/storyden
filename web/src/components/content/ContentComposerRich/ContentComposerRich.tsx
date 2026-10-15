@@ -40,7 +40,10 @@ export function ContentComposerRich(props: ContentComposerProps) {
     <LStack
       id={`rich-text-editor-${uniqueID}`}
       containerType="inline-size"
-      className={cx("typography", props.className)}
+      className={cx(
+        "content-composer content-composer--richtext typography",
+        props.className,
+      )}
       position="relative"
       w="full"
       gap="1"

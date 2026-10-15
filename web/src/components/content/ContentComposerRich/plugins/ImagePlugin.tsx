@@ -1,26 +1,18 @@
-import Image, { ImageOptions } from "@tiptap/extension-image";
+import type { ImageOptions } from "@tiptap/extension-image";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
-import { EditorView } from "@tiptap/pm/view";
+import type { EditorView } from "@tiptap/pm/view";
 import {
-  NodeViewProps,
+  type NodeViewProps,
   NodeViewWrapper,
   ReactNodeViewRenderer,
-  mergeAttributes,
 } from "@tiptap/react";
 
-import { Asset } from "@/api/openapi-schema";
-import { Button } from "@/components/ui/button";
-import { ProgressCircle } from "@/components/ui/progress";
-import { Text } from "@/components/ui/text";
-import { css } from "@/styled-system/css";
-import { styled } from "@/styled-system/jsx";
+import type { Asset } from "@/api/openapi-schema";
 
-// NOTE: This is the name of the component that will be used in the HTML.
-// It cannot be changed.
-const COMPONENT_NAME = "img";
+import { ContentImage } from "../../ContentRenderer/ContentImage";
+import { ImageNode } from "../../ContentRenderer/ImageNode";
 
-// NOTE: This plugin key is used to store the upload positions in ProseMirror
-// state to remove the need to scan the whole document for positions.
+// Track upload positions without repeatedly scanning the editor document.
 export const uploadPositionsKey = new PluginKey<Map<string, number>>(
   "uploadPositions",
 );
@@ -32,197 +24,23 @@ type Options = {
 };
 
 function Component(props: NodeViewProps) {
-  const isUploading = props.node.attrs["data-uploading"] === "true";
-  const uploadError = props.node.attrs["data-upload-error"];
-  const uploadId = props.node.attrs["data-upload-id"];
-  const uploadProgress = props.node.attrs["data-upload-progress"];
-  const progressPercent = uploadProgress ? parseInt(uploadProgress, 10) : 0;
-  const dataDiff = props.node.attrs["data-diff"] as
-    | "insertion"
-    | "deletion"
-    | undefined;
-
-  const isEditable = props.editor.isEditable;
-  const isSelected = props.selected && isEditable;
-
   const { handleRetry, handleCancel } = props.extension.options as Options;
-  const diffClass = dataDiff ? `diff-node-${dataDiff}` : "";
-
+  const uploadId = props.node.attrs["data-upload-id"];
   return (
-    <NodeViewWrapper
-      data-diff={dataDiff}
-      className={`${diffClass} ${css({
-        position: "relative",
-        display: "inline-block",
-        cursor: "pointer",
-        outlineWidth: isSelected ? "medium" : "none",
-        outlineStyle: "solid",
-        outlineColor: isSelected ? "blue.a6" : "transparent",
-        borderRadius: "lg",
-        userSelect: isEditable ? "none" : "auto",
-        saturate: isSelected && !isUploading ? "150%" : "100%",
-        filter: "auto",
-        background: isSelected && !isUploading ? "blue.5" : "transparent",
-        mixBlendMode: isSelected && !isUploading ? "screen" : "normal",
-      })}`}
-    >
-      <styled.img
-        borderRadius="lg"
-        opacity={isUploading ? "5" : "full"}
-        transition="all"
-        {...props.node.attrs}
-      />
-      {isUploading && (
-        <styled.div
-          position="absolute"
-          top="0"
-          left="0"
-          width="full"
-          height="full"
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-          pointerEvents="none"
-          gap="3"
-          padding="4"
-        >
-          <ProgressCircle value={progressPercent} size="md" />
-        </styled.div>
-      )}
-      {uploadError && (
-        <styled.div
-          position="absolute"
-          inset="0"
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-          backgroundColor="status.danger.surface"
-          opacity="9"
-          borderRadius="md"
-          padding="3"
-          gap="2"
-          userSelect="none"
-          contentEditable={false}
-        >
-          <Text
-            variant="supporting"
-            color="status.danger.content"
-            fontWeight="medium"
-          >
-            Upload failed
-          </Text>
-          <styled.div display="flex" gap="2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => handleRetry?.(props.view, uploadId)}
-            >
-              Retry
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => handleCancel?.(props.view, uploadId)}
-            >
-              Remove
-            </Button>
-          </styled.div>
-        </styled.div>
-      )}
-    </NodeViewWrapper>
+    <ContentImage
+      attrs={props.node.attrs}
+      isEditable={props.editor.isEditable}
+      isSelected={props.selected && props.editor.isEditable}
+      onRetry={() => handleRetry?.(props.view, uploadId)}
+      onCancel={() => handleCancel?.(props.view, uploadId)}
+      Wrapper={NodeViewWrapper}
+    />
   );
 }
 
-export const ImageExtended = Image.extend<ImageOptions & Options>({
-  content: "inline*",
-  addOptions() {
-    return {
-      inline: false,
-      allowBase64: false,
-      HTMLAttributes: {},
-      resize: false,
-      ...this.parent?.(),
-    };
-  },
-  addAttributes() {
-    return {
-      ...this.parent?.(),
-      "data-upload-id": {
-        default: null,
-        parseHTML: (element) => element.getAttribute("data-upload-id"),
-        renderHTML: (attributes) => {
-          if (!attributes["data-upload-id"]) {
-            return {};
-          }
-          return {
-            "data-upload-id": attributes["data-upload-id"],
-          };
-        },
-      },
-      "data-uploading": {
-        default: null,
-        parseHTML: (element) => element.getAttribute("data-uploading"),
-        renderHTML: (attributes) => {
-          if (!attributes["data-uploading"]) {
-            return {};
-          }
-          return {
-            "data-uploading": attributes["data-uploading"],
-          };
-        },
-      },
-      "data-upload-error": {
-        default: null,
-        parseHTML: (element) => element.getAttribute("data-upload-error"),
-        renderHTML: (attributes) => {
-          if (!attributes["data-upload-error"]) {
-            return {};
-          }
-          return {
-            "data-upload-error": attributes["data-upload-error"],
-          };
-        },
-      },
-      "data-upload-progress": {
-        default: null,
-        parseHTML: (element) => element.getAttribute("data-upload-progress"),
-        renderHTML: (attributes) => {
-          if (!attributes["data-upload-progress"]) {
-            return {};
-          }
-          return {
-            "data-upload-progress": attributes["data-upload-progress"],
-          };
-        },
-      },
-      "data-diff": {
-        default: null,
-        parseHTML: (element) => element.getAttribute("data-diff"),
-        renderHTML: (attributes) => {
-          if (!attributes["data-diff"]) {
-            return {};
-          }
-          return {
-            "data-diff": attributes["data-diff"],
-          };
-        },
-      },
-    };
-  },
+export const ImageExtended = ImageNode.extend<ImageOptions & Options>({
   addNodeView() {
     return ReactNodeViewRenderer(Component);
-  },
-  parseHTML() {
-    return [
-      {
-        tag: COMPONENT_NAME,
-      },
-    ];
-  },
-  renderHTML({ HTMLAttributes }) {
-    return [COMPONENT_NAME, mergeAttributes(HTMLAttributes), 0];
   },
   addProseMirrorPlugins() {
     const handleFiles = this.options.handleFiles;

@@ -1,7 +1,6 @@
 "use client";
 
 import FocusClasses from "@tiptap/extension-focus";
-import { Link } from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import { generateHTML, generateJSON } from "@tiptap/html";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
@@ -12,10 +11,11 @@ import { ChangeEvent, useEffect, useId, useRef, useState } from "react";
 
 import { handle } from "@/api/client";
 import { Asset } from "@/api/openapi-schema";
-import { css } from "@/styled-system/css";
+import { css, cx } from "@/styled-system/css";
 import { getAssetURL } from "@/utils/asset";
 import { pluralise } from "@/utils/text";
 
+import { ContentLink } from "../ContentRenderer/extensions";
 import { ContentComposerProps } from "../composer-props";
 import {
   hasImageFile,
@@ -103,22 +103,9 @@ export function useContentComposer(props: ContentComposerProps) {
     FocusClasses,
     LinkPreview,
     LinkPasteMenuPlugin,
-    Link.configure({
+    ContentLink.configure({
       // Disable navigation when clicking links in the editor if it's active.
       openOnClick: props.disabled ? true : false,
-    }).extend({
-      inclusive: false,
-      parseHTML() {
-        return [
-          {
-            tag: "a[href]:not([data-display])",
-            getAttrs: (dom) => {
-              const href = dom.getAttribute("href");
-              return href ? { href } : false;
-            },
-          },
-        ];
-      },
     }),
 
     ImageExtended.configure({
@@ -152,11 +139,17 @@ export function useContentComposer(props: ContentComposerProps) {
     immediatelyRender: false,
     editorProps: {
       attributes: {
+        role: "textbox",
+        "aria-label": "Rich text editor",
+        "aria-multiline": "true",
         "data-editor-id": uniqueID,
-        class: css({
-          height: "full",
-          width: "full",
-        }),
+        class: cx(
+          "content-composer__editor",
+          css({
+            height: "full",
+            width: "full",
+          }),
+        ),
       },
     },
     extensions,

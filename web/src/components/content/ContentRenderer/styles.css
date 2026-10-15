@@ -1,0 +1,16 @@
+/* Preserve ProseMirror's reading layout without creating an editor view. */
+.content-renderer {
+  position: relative;
+  overflow-wrap: break-word;
+  white-space: break-spaces;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0;
+}
+
+.content-renderer pre {
+  white-space: pre-wrap;
+}
+
+.content-renderer li {
+  position: relative;
+}

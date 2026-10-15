@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { parseAsString, useQueryState } from "nuqs";
 import { ReactNode, useMemo, useState } from "react";
 
@@ -18,7 +19,6 @@ import {
   PropertyMutation,
 } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
-import { ContentDiffView } from "@/components/content/DiffViewer/ContentDiffView";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
 import { Timestamp } from "@/components/site/Timestamp";
@@ -34,6 +34,14 @@ import { css } from "@/styled-system/css";
 import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { hasPermission } from "@/utils/permissions";
 import { useIsTextWrapping } from "@/utils/useIsTextWrapping";
+
+const ContentDiffView = dynamic(
+  () =>
+    import("@/components/content/DiffViewer/ContentDiffView").then(
+      (module) => module.ContentDiffView,
+    ),
+  { ssr: false },
+);
 
 export function LibraryPageVersionReview({
   node,
