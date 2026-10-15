@@ -1,5 +1,5 @@
 import { indexOf } from "lodash";
-import { uniq } from "lodash/fp";
+import uniq from "lodash/fp/uniq";
 
 import * as z from "@/lib/validation";
 

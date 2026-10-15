@@ -1,4 +1,7 @@
-import { flatten, groupBy, keyBy, values } from "lodash/fp";
+import flatten from "lodash/fp/flatten";
+import groupBy from "lodash/fp/groupBy";
+import keyBy from "lodash/fp/keyBy";
+import values from "lodash/fp/values";
 
 import {
   AccountAuthMethod,

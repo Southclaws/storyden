@@ -1,4 +1,4 @@
-import { includes } from "lodash/fp";
+import includes from "lodash/fp/includes";
 
 import {
   InstanceCapability,

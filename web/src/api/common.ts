@@ -1,4 +1,7 @@
-import { filter, flow, reduce, toPairs } from "lodash/fp";
+import filter from "lodash/fp/filter";
+import flow from "lodash/fp/flow";
+import reduce from "lodash/fp/reduce";
+import toPairs from "lodash/fp/toPairs";
 
 import { getAPIAddress } from "@/config";
 import * as z from "@/lib/validation";

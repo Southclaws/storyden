@@ -1,4 +1,4 @@
-import { uniq } from "lodash/fp";
+import uniq from "lodash/fp/uniq";
 import { type ChangeEvent, type KeyboardEvent, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";

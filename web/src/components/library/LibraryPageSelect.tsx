@@ -4,7 +4,7 @@ import {
   ComboboxValueChangeDetails,
   createListCollection,
 } from "@ark-ui/react";
-import { map } from "lodash/fp";
+import map from "lodash/fp/map";
 import { useState } from "react";
 
 import { useNodeList } from "@/api/openapi-client/nodes";

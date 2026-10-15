@@ -1,4 +1,6 @@
-import { filter, flow, map } from "lodash/fp";
+import filter from "lodash/fp/filter";
+import flow from "lodash/fp/flow";
+import map from "lodash/fp/map";
 
 import { handle } from "@/api/client";
 import {

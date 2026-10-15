@@ -1,4 +1,4 @@
-import { debounce } from "lodash/fp";
+import debounce from "lodash/fp/debounce";
 import { useQueryState } from "nuqs";
 import { PropsWithChildren, createContext, useContext } from "react";
 import { mutate } from "swr";

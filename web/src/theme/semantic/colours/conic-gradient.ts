@@ -1,5 +1,5 @@
 import { range } from "lodash";
-import { map } from "lodash/fp";
+import map from "lodash/fp/map";
 
 // Dynamic lightness for theming
 const L = "80%";

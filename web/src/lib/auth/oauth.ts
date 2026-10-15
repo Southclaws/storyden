@@ -1,4 +1,4 @@
-import { filter } from "lodash/fp";
+import filter from "lodash/fp/filter";
 
 import { AuthProvider } from "@/api/openapi-schema";
 

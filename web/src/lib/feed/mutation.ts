@@ -1,4 +1,4 @@
-import { uniqueId } from "lodash/fp";
+import uniqueId from "lodash/fp/uniqueId";
 import { Arguments, MutatorCallback, useSWRConfig } from "swr";
 
 import { likePostAdd, likePostRemove } from "@/api/openapi-client/likes";

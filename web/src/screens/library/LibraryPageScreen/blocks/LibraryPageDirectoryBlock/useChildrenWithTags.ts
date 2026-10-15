@@ -1,4 +1,6 @@
-import { flow, reduce, uniqBy } from "lodash/fp";
+import flow from "lodash/fp/flow";
+import reduce from "lodash/fp/reduce";
+import uniqBy from "lodash/fp/uniqBy";
 
 import { useNodeListChildren } from "@/api/openapi-client/nodes";
 import {

@@ -1,6 +1,7 @@
 "use client";
 
-import { filter, map } from "lodash/fp";
+import filter from "lodash/fp/filter";
+import map from "lodash/fp/map";
 import { parseAsArrayOf, parseAsString, useQueryState } from "nuqs";
 import { useEffect, useMemo, useState } from "react";
 

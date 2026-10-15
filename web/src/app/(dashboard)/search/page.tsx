@@ -1,4 +1,4 @@
-import { keyBy } from "lodash/fp";
+import keyBy from "lodash/fp/keyBy";
 
 import { categoryList } from "@/api/openapi-server/categories";
 import { datagraphSearch } from "@/api/openapi-server/datagraph";
