@@ -34,7 +34,7 @@ for (const { mode, input } of [
           metadata: {
             feed: {
               blocks: [
-                { type: "quick-share", showCategorySelect: false },
+                { type: "quick-share", showCategorySelect: true },
                 { type: "threads", source: "all" },
               ],
             },
@@ -54,15 +54,49 @@ for (const { mode, input } of [
       );
       expect(preference.ok()).toBe(true);
       await page.mouse.move(0, 0);
-      await page.goto("/", { waitUntil: "networkidle" });
+      const response = await page.goto("/", { waitUntil: "networkidle" });
+      const serverCategory = await page.evaluate(
+        (html) => {
+          const document = new DOMParser().parseFromString(html, "text/html");
+          return document.querySelector('.quick-share [role="combobox"]')
+            ?.textContent;
+        },
+        await response!.text(),
+      );
+      expect(serverCategory).toBe("Category");
       const card = page.locator(".quick-share");
       const editor = card.getByRole("textbox", {
         name: mode === "markdown" ? "Markdown editor" : "Rich text editor",
       });
       await expect(card).toBeVisible();
       await expect(card.locator(".content-composer__editor")).toHaveCount(0);
-      const prompt = card.getByRole("button", { name: "Write a quick share" });
+      const prompt = card.getByRole("button", {
+        name: "Quickly create a new thread",
+      });
       await expect(prompt).toBeVisible();
+      const form = await card.locator(".quick-share__form").elementHandle();
+      const actions = await card
+        .locator(".quick-share__actions")
+        .elementHandle();
+      const share = card.getByRole("button", { name: "Share", exact: true });
+      const category = card.getByRole("combobox");
+      await expect(share).toBeVisible();
+      await expect(category).toBeVisible();
+
+      if (input === "keyboard") {
+        await category.focus();
+        await category.press("ArrowDown");
+        const noCategory = page.getByRole("option", {
+          name: "No category",
+          exact: true,
+        });
+        await expect(noCategory).toBeVisible();
+        await page.keyboard.press("Home");
+        await expect(noCategory).toHaveAttribute("data-highlighted", "");
+        await page.keyboard.press("Enter");
+        await expect(category).toContainText("No category");
+        await expect(card.locator(".content-composer__editor")).toHaveCount(0);
+      }
 
       if (input === "hover") {
         await card.hover();
@@ -75,6 +109,14 @@ for (const { mode, input } of [
       } else {
         await prompt.tap();
         await expect(editor).toBeFocused();
+      }
+
+      expect(await form?.evaluate((element) => element.isConnected)).toBe(true);
+      expect(await actions?.evaluate((element) => element.isConnected)).toBe(
+        true,
+      );
+      if (input === "keyboard") {
+        await expect(category).toContainText("No category");
       }
 
       const title = `Quick Share ${handle}`;

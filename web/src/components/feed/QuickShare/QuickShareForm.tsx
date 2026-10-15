@@ -9,13 +9,19 @@ import { CreateIcon } from "@/components/ui/icons/Create";
 import { Spinner } from "@/components/ui/spinner";
 import { Card } from "@/components/ui/surface";
 import { cx } from "@/styled-system/css";
-import { HStack, WStack } from "@/styled-system/jsx";
+import { Box, HStack, WStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { getAssetURL } from "@/utils/asset";
 
 import { Props, useQuickShare } from "./useQuickShare";
 
-export function QuickShareForm(props: Props & { focusOnReady: boolean }) {
+export function QuickShareForm(
+  props: Props & {
+    isActive: boolean;
+    focusOnReady: boolean;
+    onActivate: () => void;
+  },
+) {
   const {
     form,
     state: { hydratedLink, resetKey },
@@ -31,17 +37,50 @@ export function QuickShareForm(props: Props & { focusOnReady: boolean }) {
             gap: "2",
           }),
         )}
-        onSubmit={handlers.handlePost}
+        onSubmit={(event) => {
+          if (!props.isActive) {
+            event.preventDefault();
+            props.onActivate();
+            return;
+          }
+          return handlers.handlePost(event);
+        }}
       >
-        <ContentComposerField
-          control={form.control}
-          focusOnReady={props.focusOnReady}
-          name="body"
-          placeholder="Share a thought, a link, something cool..."
-          resetKey={resetKey}
-        />
+        <Box className="quick-share__composer" w="full" minH="8">
+          {props.isActive ? (
+            <ContentComposerField
+              control={form.control}
+              focusOnReady={props.focusOnReady}
+              name="body"
+              placeholder="Share a thought, a link, something cool..."
+              resetKey={resetKey}
+            />
+          ) : (
+            <Button
+              className="content-composer content-composer--idle quick-share__trigger"
+              type="button"
+              variant="ghost"
+              aria-label="Quickly create a new thread"
+              w="full"
+              minH="8"
+              px="0"
+              alignItems="start"
+              justifyContent="start"
+              fontWeight="normal"
+              fontSize="md"
+              color="text.muted"
+              textAlign="start"
+              whiteSpace="normal"
+              onFocus={props.onActivate}
+              onClick={props.onActivate}
+            >
+              Share a thought, a link, something cool...
+            </Button>
+          )}
+        </Box>
 
         <WStack
+          className="quick-share__actions"
           w="full"
           justifyContent={
             props.showCategorySelect ? "space-between" : "flex-end"
@@ -49,7 +88,11 @@ export function QuickShareForm(props: Props & { focusOnReady: boolean }) {
         >
           {props.showCategorySelect && (
             <HStack alignItems="center">
-              <CategorySelect control={form.control} name="category" />
+              <CategorySelect
+                control={form.control}
+                name="category"
+                initialCategoryList={props.initialCategoryList}
+              />
 
               <FormErrorText>
                 {form.formState.errors["category"]?.message}

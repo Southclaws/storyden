@@ -8,12 +8,13 @@ export function FeedQuickShareBlock({
 }: {
   block: Extract<FeedBlock, { type: "quick-share" }>;
 }) {
-  const { initialSession } = useFeedBlockEditor();
+  const { initialSession, initialData } = useFeedBlockEditor();
 
   return (
     <QuickShare
       initialSession={initialSession}
       initialCategory={undefined}
+      initialCategoryList={initialData.initialCategoryList}
       showCategorySelect={block.showCategorySelect}
     />
   );

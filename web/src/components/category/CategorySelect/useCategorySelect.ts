@@ -1,12 +1,20 @@
 import { createListCollection } from "@ark-ui/react";
 
 import { useCategoryList } from "@/api/openapi-client/categories";
+import { CategoryListOKResponse } from "@/api/openapi-schema";
 import { SelectFieldItem } from "@/components/ui/select";
 
 export const NO_CATEGORY_VALUE = "__none__";
 
-export function useCategorySelect() {
-  const { data, error } = useCategoryList();
+export function useCategorySelect(
+  initialCategoryList?: CategoryListOKResponse,
+) {
+  const { data, error } = useCategoryList({
+    swr: {
+      fallbackData: initialCategoryList,
+      revalidateOnMount: initialCategoryList ? false : undefined,
+    },
+  });
 
   if (!data) {
     if (error) {

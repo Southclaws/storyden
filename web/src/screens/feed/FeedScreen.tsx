@@ -25,7 +25,11 @@ export async function FeedScreen({ page }: Props) {
   const initialSettings = await getSettings();
 
   const feedConfig = initialSettings.metadata.feed;
-  const initialData = await getInitialFeedData(feedConfig, page);
+  const initialData = await getInitialFeedData(
+    feedConfig,
+    page,
+    !!initialSession,
+  );
 
   return (
     <VStack className="feed-page" data-sd-page="home" paddingBlockEnd="4">
@@ -40,15 +44,17 @@ export async function FeedScreen({ page }: Props) {
 
 async function getInitialFeedData(
   feedConfig: FrontendConfiguration["feed"],
-  page?: number,
+  page: number | undefined,
+  signedIn: boolean,
 ): Promise<InitialData> {
   try {
     const categoriesBlock = getBlock(feedConfig.blocks, "categories");
+    const quickShareBlock = getBlock(feedConfig.blocks, "quick-share");
     const threadsBlock = getBlock(feedConfig.blocks, "threads");
     const libraryBlock = getBlock(feedConfig.blocks, "library");
 
     const [categories, threads, libraryNode, libraryNodes] = await Promise.all([
-      categoriesBlock
+      categoriesBlock || (signedIn && quickShareBlock?.showCategorySelect)
         ? categoryListCached().then(({ data }) => data)
         : undefined,
       threadsBlock

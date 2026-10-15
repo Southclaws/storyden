@@ -1,5 +1,6 @@
 import { FieldValues } from "react-hook-form";
 
+import { CategoryListOKResponse } from "@/api/openapi-schema";
 import { ErrorTooltip } from "@/components/ui/error-tooltip";
 import { SelectField, SelectFieldProps } from "@/components/ui/select";
 import { HStack } from "@/styled-system/jsx";
@@ -10,9 +11,9 @@ export function CategorySelect<T extends FieldValues>(
   props: Omit<
     SelectFieldProps<T, { label: string; value: string }>,
     "collection" | "placeholder"
-  >,
+  > & { initialCategoryList?: CategoryListOKResponse },
 ) {
-  const result = useCategorySelect();
+  const result = useCategorySelect(props.initialCategoryList);
   const { ready, collection, error } = result;
 
   return (

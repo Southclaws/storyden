@@ -4,7 +4,12 @@ import { useForm } from "react-hook-form";
 
 import { handle } from "@/api/client";
 import { linkCreate } from "@/api/openapi-client/links";
-import { Account, Category, LinkReference } from "@/api/openapi-schema";
+import {
+  Account,
+  Category,
+  CategoryListOKResponse,
+  LinkReference,
+} from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { NO_CATEGORY_VALUE } from "@/components/category/CategorySelect/useCategorySelect";
 import { useFeedMutations } from "@/lib/feed/mutation";
@@ -13,6 +18,7 @@ import * as z from "@/lib/validation";
 export type Props = {
   initialSession?: Account;
   initialCategory?: Category | null;
+  initialCategoryList?: CategoryListOKResponse;
   showCategorySelect: boolean;
 };
 
