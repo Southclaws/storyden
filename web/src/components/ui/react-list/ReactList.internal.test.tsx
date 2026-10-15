@@ -3,16 +3,6 @@ import { describe, expect, test, vi } from "vitest";
 
 import { ReactList, type ReactListItem } from "./ReactList.internal";
 
-vi.mock("framer-motion", () => ({
-  domAnimation: {},
-  LazyMotion: ({ children }: { children: React.ReactNode }) => children,
-  m: {
-    span: ({ children }: { children: React.ReactNode }) => (
-      <span>{children}</span>
-    ),
-  },
-}));
-
 function reaction(): ReactListItem {
   return {
     emoji: "🔥",
@@ -70,6 +60,7 @@ describe("ReactList", () => {
     fireEvent.click(button);
 
     expect(button).toHaveTextContent("🔥3");
+    expect(screen.getByText("3")).toHaveAttribute("data-direction", "1");
     expect(onReactExisting).toHaveBeenCalledOnce();
     expect(onReactExisting).toHaveBeenCalledWith("🔥");
   });
@@ -89,5 +80,33 @@ describe("ReactList", () => {
     );
 
     expect(screen.getByTitle("🔥: odin, southclaws")).toHaveTextContent("🔥4");
+  });
+
+  test("animates removing a reaction in the opposite direction", () => {
+    const onReactExisting = vi.fn();
+    render(
+      <ReactList
+        isLoggedIn
+        reactions={[{ ...reaction(), hasReacted: true }]}
+        onReactExisting={onReactExisting}
+        onReactPicker={vi.fn()}
+      />,
+    );
+    fireEvent.click(screen.getByTitle("🔥: odin, southclaws"));
+    expect(screen.getByText("1")).toHaveAttribute("data-direction", "-1");
+    expect(onReactExisting).toHaveBeenCalledWith("🔥");
+  });
+
+  test("removes the button when the final reaction is removed", () => {
+    render(
+      <ReactList
+        isLoggedIn
+        reactions={[{ ...reaction(), count: 1, hasReacted: true }]}
+        onReactExisting={vi.fn()}
+        onReactPicker={vi.fn()}
+      />,
+    );
+    fireEvent.click(screen.getByTitle("🔥: odin, southclaws"));
+    expect(screen.queryByTitle("🔥: odin, southclaws")).not.toBeInTheDocument();
   });
 });

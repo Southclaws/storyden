@@ -1,6 +1,5 @@
 import { Portal } from "@ark-ui/react";
 import type { EmojiClickData } from "emoji-picker-react";
-import { LazyMotion, domAnimation, m } from "framer-motion";
 import throttle from "lodash/throttle";
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
@@ -129,19 +128,14 @@ function ReactTrigger({
       title={buttonLabel}
     >
       {reaction.emoji}
-      <LazyMotion features={domAnimation}>
-        <m.span
-          key={count}
-          className={styles.count}
-          initial={
-            isHydrated ? { y: direction === 1 ? 10 : -10, opacity: 0 } : false
-          }
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        >
-          {count}
-        </m.span>
-      </LazyMotion>
+      <span
+        key={count}
+        className={styles.count}
+        data-animated={isHydrated}
+        data-direction={direction}
+      >
+        {count}
+      </span>
     </Button>
   );
 }

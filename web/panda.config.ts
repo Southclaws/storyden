@@ -248,6 +248,13 @@ export default defineConfig({
       semanticTokens,
       tokens: tokens,
       keyframes: {
+        slideFadeIn: {
+          from: {
+            opacity: "0",
+            transform: "translateY(var(--slide-distance, 2px))",
+          },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
         fadeIn: {
           from: { opacity: "0" },
           to: { opacity: "1" },

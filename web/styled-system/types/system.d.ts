@@ -413,7 +413,7 @@ export type InvertValue = string | number | CssVars | AnyString
 
 export type JustifyContentValue = PropertyValueMap["justifyContent"]
 
-export type KeyframesValue = WithEscapeHatch<CssGlobals | "fadeIn" | "fadeOut" | "shimmer" | "targetPulse" | CssVars>
+export type KeyframesValue = WithEscapeHatch<CssGlobals | "fadeIn" | "fadeOut" | "shimmer" | "slideFadeIn" | "targetPulse" | CssVars>
 
 export type LetterSpacingsValue = WithEscapeHatch<CssGlobals | TokenValue<"letterSpacings"> | CssVars>
 

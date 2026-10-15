@@ -1,5 +1,4 @@
 import { usePopover } from "@ark-ui/react";
-import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { toast } from "sonner";
 import { match } from "ts-pattern";
@@ -191,22 +190,22 @@ export function CreatePageFromURLAction({
                 .otherwise(() => (
                   <Spinner />
                 ))}
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={importState.step}
-                  initial={{ opacity: 0, y: 2 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -2 }}
-                  transition={{ duration: 0.15 }}
+              <styled.div
+                key={importState.step}
+                animation="[slideFadeIn 150ms ease-out]"
+                css={{
+                  "@media (prefers-reduced-motion: reduce)": {
+                    animation: "[none]",
+                  },
+                }}
+              >
+                <styled.span
+                  color={getImportStateColor(importState.step)}
+                  px="2"
                 >
-                  <styled.span
-                    color={getImportStateColor(importState.step)}
-                    px="2"
-                  >
-                    {importStateLabel[importState.step]}
-                  </styled.span>
-                </motion.div>
-              </AnimatePresence>
+                  {importStateLabel[importState.step]}
+                </styled.span>
+              </styled.div>
             </HStack>
           )}
         </Popover.Content>

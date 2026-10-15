@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Use ReactList for existing emoji reactions and an authenticated add-reaction picker. Reaction buttons use system emoji characters; the native emoji picker loads when opened. Use IconButton for a single standalone action rather than reaction counts and selection.",
+          "Use ReactList for existing emoji reactions and an authenticated add-reaction picker. Reaction buttons use system emoji characters; the native emoji picker loads when opened. Counts animate with CSS and respect reduced motion. Use IconButton for a single standalone action rather than reaction counts and selection.",
       },
     },
   },
