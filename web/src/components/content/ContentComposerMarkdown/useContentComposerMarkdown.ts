@@ -17,6 +17,7 @@ const PLACEHOLDER_SEPARATOR = "\n\n";
 const ERROR_UNSUPPORTED_FILE_TYPE = "File type not supported";
 
 export function useContentComposerMarkdown(props: ContentComposerProps) {
+  const { focusOnReady, disabled } = props;
   const [value, setValue] = useState(() => getInitialMarkdownValue(props));
   const { upload } = useImageUpload();
   const [previewHTML, setPreviewHTML] = useState<string>("");
@@ -29,6 +30,12 @@ export function useContentComposerMarkdown(props: ContentComposerProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const uploadCounterRef = useRef(0);
   const dragCounterRef = useRef(0);
+
+  useEffect(() => {
+    if (focusOnReady && !disabled && !showPreview) {
+      textareaRef.current?.focus();
+    }
+  }, [focusOnReady, disabled, showPreview]);
 
   useEffect(() => {
     if (props.resetKey) {

@@ -1,98 +1,73 @@
-import { match } from "ts-pattern";
+"use client";
 
-import { LinkReference } from "@/api/openapi-schema";
-import { CategorySelect } from "@/components/category/CategorySelect/CategorySelect";
-import { ContentComposerField } from "@/components/content/ContentComposer";
+import { Suspense, lazy, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { CardBox } from "@/components/ui/card-box";
-import { FormErrorText } from "@/components/ui/form-error-text";
-import { CreateIcon } from "@/components/ui/icons/Create";
-import { Spinner } from "@/components/ui/spinner";
-import { Card } from "@/components/ui/surface";
-import { cx } from "@/styled-system/css";
-import { HStack, WStack } from "@/styled-system/jsx";
-import { lstack } from "@/styled-system/patterns";
-import { getAssetURL } from "@/utils/asset";
 
-import { Props, useQuickShare } from "./useQuickShare";
+import type { Props } from "./useQuickShare";
+
+const QuickShareForm = lazy(() =>
+  import("./QuickShareForm").then((module) => ({
+    default: module.QuickShareForm,
+  })),
+);
 
 export function QuickShare(props: Props) {
-  const {
-    form,
-    state: { formRef, hydratedLink, resetKey },
-    handlers,
-  } = useQuickShare(props);
+  const [isActive, setIsActive] = useState(false);
+  const [focusOnReady, setFocusOnReady] = useState(false);
 
-  // TODO: Render a prompt to sign up to contribute if not logged in.
   if (!props.initialSession) {
     return null;
   }
+
+  function handleActivate() {
+    setFocusOnReady(true);
+    setIsActive(true);
+  }
+
+  const prompt = (
+    <Button
+      className="quick-share__trigger"
+      type="button"
+      variant="ghost"
+      aria-label="Quickly create a new thread"
+      aria-busy={isActive || undefined}
+      w="full"
+      minH="16"
+      px="0"
+      alignItems="start"
+      justifyContent="start"
+      fontWeight="normal"
+      fontSize="md"
+      color="text.muted"
+      textAlign="start"
+      whiteSpace="normal"
+      onFocus={handleActivate}
+      onClick={handleActivate}
+    >
+      Share a thought, a link, something cool...
+    </Button>
+  );
 
   return (
     <CardBox
       className="quick-share"
       bgColor="background.control"
       borderRadius="md"
+      onPointerEnter={(event) => {
+        if (event.pointerType === "mouse") {
+          setIsActive(true);
+        }
+      }}
     >
-      <form
-        className={cx(
-          "quick-share__form",
-          lstack({
-            gap: "2",
-          }),
+      <Suspense fallback={prompt}>
+        {isActive ? (
+          <QuickShareForm {...props} focusOnReady={focusOnReady} />
+        ) : (
+          prompt
         )}
-        ref={formRef}
-        onFocus={handlers.handleFocus}
-        onSubmit={handlers.handlePost}
-      >
-        <ContentComposerField
-          control={form.control}
-          name="body"
-          placeholder="Share a thought, a link, something cool..."
-          resetKey={resetKey}
-        />
-
-        <WStack
-          w="full"
-          justifyContent={
-            props.showCategorySelect ? "space-between" : "flex-end"
-          }
-        >
-          {props.showCategorySelect && (
-            <HStack alignItems="center">
-              <CategorySelect control={form.control} name="category" />
-
-              <FormErrorText>
-                {form.formState.errors["category"]?.message}
-              </FormErrorText>
-            </HStack>
-          )}
-
-          <Button
-            type="submit"
-            size="sm"
-            variant="subtle"
-            loading={form.formState.isSubmitting}
-          >
-            <CreateIcon />
-            Share
-          </Button>
-        </WStack>
-      </form>
-
-      {match(hydratedLink)
-        .with(null, () => null)
-        .with("loading", () => <Spinner />)
-        .otherwise((link: LinkReference) => (
-          <Card
-            id={link.slug}
-            shape="row"
-            title={link.title || "(No site title found)"}
-            text={link.description || "(No site description found)"}
-            image={getAssetURL(link.primary_image?.path)}
-            url={link.url}
-          />
-        ))}
+      </Suspense>
     </CardBox>
   );
 }

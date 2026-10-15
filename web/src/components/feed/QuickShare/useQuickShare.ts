@@ -9,7 +9,6 @@ import { useSession } from "@/auth";
 import { NO_CATEGORY_VALUE } from "@/components/category/CategorySelect/useCategorySelect";
 import { useFeedMutations } from "@/lib/feed/mutation";
 import * as z from "@/lib/validation";
-import { useClickAway } from "@/utils/useClickAway";
 
 export type Props = {
   initialSession?: Account;
@@ -25,12 +24,10 @@ export type Form = z.infer<typeof FormSchema>;
 
 export function useQuickShare({ initialCategory }: Props) {
   const session = useSession();
-  const [editing, setEditing] = useState(false);
   const [postURL, setPostURL] = useState<string | null>(null);
   const [hydratedLink, setHydratedLink] = useState<
     LinkReference | "loading" | null
   >(null);
-  const formRef = useClickAway<HTMLFormElement>(() => setEditing(false));
   const [resetKey, setResetKey] = useState("");
 
   const form = useForm<Form>({
@@ -130,20 +127,13 @@ export function useQuickShare({ initialCategory }: Props) {
     );
   });
 
-  function handleFocus() {
-    setEditing(true);
-  }
-
   return {
     form,
     state: {
-      formRef,
-      editing,
       hydratedLink,
       resetKey,
     },
     handlers: {
-      handleFocus,
       handlePost,
     },
   };

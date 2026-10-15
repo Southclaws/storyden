@@ -137,6 +137,7 @@ export function useContentComposer(props: ContentComposerProps) {
 
   const editor = useEditor({
     immediatelyRender: false,
+    autofocus: props.focusOnReady ? "end" : false,
     editorProps: {
       attributes: {
         role: "textbox",

@@ -13,7 +13,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Use ContentComposer for persisted TipTap HTML that can switch between reading and editing. Reading uses the shared TipTap document schema without an editor instance. Editing loads the viewer's preferred rich-text or Markdown editor. Theme hooks: content-composer is the root, content-composer__content is read-only content, and content-composer__editor is the active rich-text or Markdown input. Use Text for plain labels and supporting copy; use ContentComposerField to bind editable content to a form.",
+          "Use ContentComposer for persisted TipTap HTML that can switch between reading and editing. Reading uses the shared TipTap document schema without an editor instance. Editing loads the viewer's preferred rich-text or Markdown editor. Set focusOnReady only after an explicit user action, not for background loading. Theme hooks: content-composer is the root, content-composer__content is read-only content, and content-composer__editor is the active rich-text or Markdown input. Use Text for plain labels and supporting copy; use ContentComposerField to bind editable content to a form.",
       },
     },
   },
@@ -45,6 +45,7 @@ export const ReadAndEdit: Story = {
         <ContentComposer
           {...args}
           disabled={!editing}
+          focusOnReady={editing}
           initialValue={content}
           onChange={setContent}
         />
