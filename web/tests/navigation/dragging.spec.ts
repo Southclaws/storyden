@@ -11,6 +11,14 @@ test("sidebar category and Library drags preserve nesting and disclosure", async
   page,
 }) => {
   const seed = randomUUID().slice(0, 8);
+  await withAdminAccessKey(async ({ nodeCreate }) => {
+    for (let index = 0; index < 24; index++) {
+      await nodeCreate({
+        name: `Sidebar overflow ${seed} ${index}`,
+        visibility: "published",
+      });
+    }
+  });
   const { category, targetCategory, node, targetNode } =
     await withAdminAccessKey(async ({ categoryCreate, nodeCreate }) => ({
       category: await categoryCreate({
@@ -55,6 +63,12 @@ test("sidebar category and Library drags preserve nesting and disclosure", async
     const tree = page.getByRole("tree", { name: item.tree });
     const source = tree.getByRole("link", { name: item.source, exact: true });
     const target = tree.getByRole("link", { name: item.target, exact: true });
+    // Keep the drop target away from the auto-scroll edge so it does not move
+    // out from under the measured mouse coordinates during the drag.
+    await target.evaluate((element) =>
+      element.scrollIntoView({ block: "center", inline: "nearest" }),
+    );
+    await source.scrollIntoViewIfNeeded();
     const sourceBox = await source.boundingBox();
     const targetBox = await target.boundingBox();
     expect(sourceBox).not.toBeNull();
@@ -85,12 +99,28 @@ test("sidebar category and Library drags preserve nesting and disclosure", async
     expect(response.request().postDataJSON()).toMatchObject({
       parent: item.targetId,
     });
+    // Check the persisted hierarchy and let the drag sensor's post-drop click
+    // suppression finish before exercising the disclosure controls.
+    await page.reload();
     const toggle = tree.getByRole("button", { name: `Toggle ${item.target}` });
     await expect(toggle).toBeVisible();
     // Disclosure and navigation stay separate after the hierarchy changes.
+    const targetRow = target.locator("..");
+    const sourceRow = source.locator("..");
+    if (
+      (await targetRow.locator("..").getAttribute("aria-expanded")) === "true"
+    ) {
+      await toggle.click();
+      await expect(source).toBeHidden();
+    }
     await toggle.click();
-    if (!(await source.isVisible())) await toggle.click();
     await expect(source).toBeVisible();
+    await target.hover({ position: { x: 10, y: 10 } });
+    await expect(targetRow.and(page.locator(":hover"))).toHaveCount(1);
+    await expect(sourceRow.and(page.locator(":hover"))).toHaveCount(0);
+    await source.hover({ position: { x: 10, y: 10 } });
+    await expect(sourceRow.and(page.locator(":hover"))).toHaveCount(1);
+    await expect(targetRow.and(page.locator(":hover"))).toHaveCount(0);
     await target.focus();
     await expect(target).toBeFocused();
   }

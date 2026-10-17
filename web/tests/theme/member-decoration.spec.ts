@@ -87,4 +87,6 @@ test("member decorations and navigation bullets resolve Panda tokens in CSS", as
     .locator("..")
     .locator('svg:has(circle[r="2.5"])');
   await expect(bullet).toHaveCSS("fill", "rgb(12, 34, 56)");
+  await expect(bullet).toHaveCSS("width", "16px");
+  await expect(bullet).toHaveCSS("height", "16px");
 });
