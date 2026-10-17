@@ -250,7 +250,7 @@ export default defineConfig({
       keyframes: {
         slideFadeIn: {
           from: {
-            opacity: "0",
+            opacity: "0.8",
             transform: "translateY(var(--slide-distance, 2px))",
           },
           to: { opacity: "1", transform: "translateY(0)" },

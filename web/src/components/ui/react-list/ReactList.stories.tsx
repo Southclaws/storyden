@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Use ReactList for existing emoji reactions and an authenticated add-reaction picker. Reaction buttons use system emoji characters; the native emoji picker loads when opened. Counts animate with CSS and respect reduced motion. Use IconButton for a single standalone action rather than reaction counts and selection.",
+          "Use ReactList for existing emoji reactions and an authenticated add-reaction picker. Your own reactions use the theme's selected surface and an inset border; aria-pressed exposes the same toggle state to assistive technology. Guest reactions retain their button fill while remaining disabled, and pending reactions preserve selection. Reaction buttons use system emoji characters; the native emoji picker loads when opened. Counts animate with CSS only when the user's motion preference allows it. Use IconButton for a single standalone action rather than reaction counts and selection.",
       },
     },
   },
@@ -43,6 +43,10 @@ export const Default: Story = {};
 export const Guest: Story = {
   args: {
     isLoggedIn: false,
+    reactions: meta.args.reactions.map((reaction) => ({
+      ...reaction,
+      hasReacted: false,
+    })),
   },
 };
 

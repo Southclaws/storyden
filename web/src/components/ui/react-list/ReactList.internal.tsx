@@ -124,6 +124,7 @@ function ReactTrigger({
       variant="subtle"
       disabled={disabled}
       aria-busy={pending || undefined}
+      aria-pressed={reaction.hasReacted}
       onClick={handleClick}
       title={buttonLabel}
     >

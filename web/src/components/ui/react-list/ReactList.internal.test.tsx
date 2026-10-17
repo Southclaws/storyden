@@ -24,6 +24,10 @@ describe("ReactList", () => {
     );
 
     expect(screen.getByTitle("🔥: odin, southclaws")).toBeDisabled();
+    expect(screen.getByTitle("🔥: odin, southclaws")).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
     expect(
       screen.queryByRole("button", { name: "Add reaction" }),
     ).not.toBeInTheDocument();
@@ -43,6 +47,38 @@ describe("ReactList", () => {
     const button = screen.getByTitle("🔥: odin, southclaws");
     expect(button).toBeDisabled();
     expect(button).toHaveAttribute("aria-busy", "true");
+  });
+
+  test("exposes whether the current account has reacted, including while pending", () => {
+    const props = {
+      isLoggedIn: true,
+      onReactExisting: vi.fn(),
+      onReactPicker: vi.fn(),
+    };
+    const { rerender } = render(
+      <ReactList {...props} reactions={[reaction()]} />,
+    );
+    expect(screen.getByTitle("🔥: odin, southclaws")).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+    rerender(
+      <ReactList
+        {...props}
+        pendingEmojis={new Set(["🔥"])}
+        reactions={[{ ...reaction(), hasReacted: true }]}
+      />,
+    );
+    expect(screen.getByTitle("🔥: odin, southclaws")).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByTitle("🔥: odin, southclaws")).toBeDisabled();
+    rerender(<ReactList {...props} reactions={[reaction()]} />);
+    expect(screen.getByTitle("🔥: odin, southclaws")).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
   });
 
   test("updates the visible count immediately before the request resolves", () => {
