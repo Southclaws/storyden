@@ -12,6 +12,7 @@ export function ThreadIndexScreen(props: Props) {
 
   return (
     <ThreadIndexView
+      initialSession={props.initialSession}
       threads={data}
       mutate={mutate}
       query={props.query}

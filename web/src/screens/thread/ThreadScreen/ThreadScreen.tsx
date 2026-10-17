@@ -97,7 +97,12 @@ export function ThreadScreen(props: Props) {
                   </>
                 )}
 
-                <ThreadMenu thread={thread} editingEnabled movingEnabled />
+                <ThreadMenu
+                  initialSession={props.initialSession}
+                  thread={thread}
+                  editingEnabled
+                  movingEnabled
+                />
               </HStack>
             </WStack>
 

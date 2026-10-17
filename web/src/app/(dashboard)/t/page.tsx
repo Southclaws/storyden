@@ -1,4 +1,5 @@
 import { threadList } from "@/api/openapi-server/threads";
+import { getServerSession } from "@/auth/server-session";
 import * as z from "@/lib/validation";
 import { ThreadIndexScreen } from "@/screens/thread/ThreadIndexScreen/ThreadIndexScreen";
 
@@ -20,13 +21,17 @@ type Query = z.infer<typeof QuerySchema>;
 
 export default async function Page(props: Props) {
   const searchParams = await props.searchParams;
-  const { data } = await threadList({
-    ...(searchParams.q ? { q: searchParams.q } : {}),
-    ...(searchParams.page ? { page: searchParams.page?.toString() } : {}),
-  });
+  const [initialSession, { data }] = await Promise.all([
+    getServerSession(),
+    threadList({
+      ...(searchParams.q ? { q: searchParams.q } : {}),
+      ...(searchParams.page ? { page: searchParams.page?.toString() } : {}),
+    }),
+  ]);
 
   return (
     <ThreadIndexScreen
+      initialSession={initialSession}
       threads={data}
       page={searchParams.page}
       query={searchParams.q}

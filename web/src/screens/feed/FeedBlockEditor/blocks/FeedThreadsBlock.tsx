@@ -8,10 +8,11 @@ export function FeedThreadsBlock({
 }: {
   block: Extract<FeedBlock, { type: "threads" }>;
 }) {
-  const { initialData } = useFeedBlockEditor();
+  const { initialData, initialSession } = useFeedBlockEditor();
 
   return (
     <ThreadFeed
+      initialSession={initialSession}
       initialPage={initialData.initialPage}
       initialPageData={
         initialData.initialThreadSource === block.source

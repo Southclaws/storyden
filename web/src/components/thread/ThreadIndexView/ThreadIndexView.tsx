@@ -61,7 +61,10 @@ export function ThreadIndexView(props: Props) {
         pageSize={data.threads.page_size}
       />
 
-      <ThreadReferenceList threads={data.threads.threads} />
+      <ThreadReferenceList
+        initialSession={props.initialSession}
+        threads={data.threads.threads}
+      />
     </LStack>
   );
 }

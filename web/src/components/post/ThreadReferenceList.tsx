@@ -1,9 +1,10 @@
-import { ThreadReference } from "@/api/openapi-schema";
+import { Account, ThreadReference } from "@/api/openapi-schema";
 import { styled } from "@/styled-system/jsx";
 
 import { ThreadReferenceCard } from "./ThreadCard";
 
 type Props = {
+  initialSession?: Account;
   threads: ThreadReference[];
 };
 
@@ -11,7 +12,11 @@ export function ThreadReferenceList(props: Props) {
   return (
     <styled.ol width="full" display="flex" flexDirection="column" gap="4">
       {props.threads.map((t) => (
-        <ThreadReferenceCard key={t.id} thread={t} />
+        <ThreadReferenceCard
+          key={t.id}
+          initialSession={props.initialSession}
+          thread={t}
+        />
       ))}
     </styled.ol>
   );

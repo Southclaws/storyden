@@ -24,7 +24,7 @@ export function DraftListScreen(props: Props) {
       <PageHeading>Your drafts</PageHeading>
 
       <SectionHeading>Threads</SectionHeading>
-      <ThreadReferenceList threads={threads} />
+      <ThreadReferenceList initialSession={props.session} threads={threads} />
 
       <SectionHeading>Library</SectionHeading>
       <NodeCardRows libraryPath={libraryPath} context="generic" nodes={nodes} />

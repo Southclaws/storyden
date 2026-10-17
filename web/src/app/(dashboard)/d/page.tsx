@@ -1,4 +1,5 @@
 import { threadList } from "@/api/openapi-server/threads";
+import { getServerSession } from "@/auth/server-session";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { categoryListCached } from "@/lib/category/server-category-list";
 import * as z from "@/lib/validation";
@@ -21,8 +22,10 @@ type Query = z.infer<typeof QuerySchema>;
 export default async function Page({ searchParams }: Props) {
   try {
     const { page } = QuerySchema.parse(await searchParams);
-
-    const { data: categories } = await categoryListCached();
+    const [initialSession, { data: categories }] = await Promise.all([
+      getServerSession(),
+      categoryListCached(),
+    ]);
     const { data: threads } = await threadList({
       page: page?.toString() ?? "1",
       // NOTE: The string "null" is a special case that yields all threads that
@@ -37,6 +40,7 @@ export default async function Page({ searchParams }: Props) {
 
     return (
       <CategoryIndexScreen
+        initialSession={initialSession}
         layout={"list"}
         threadListMode="uncategorised"
         showQuickShare={true}

@@ -3,9 +3,10 @@
 import { parseAsInteger, useQueryState } from "nuqs";
 
 import { useThreadList } from "@/api/openapi-client/threads";
-import { Category, ThreadListResult } from "@/api/openapi-schema";
+import { Account, Category, ThreadListResult } from "@/api/openapi-schema";
 
 export type Props = {
+  initialSession?: Account;
   initialPage?: number;
   initialPageData?: ThreadListResult;
   category:

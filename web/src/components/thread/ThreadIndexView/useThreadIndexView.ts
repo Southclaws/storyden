@@ -3,10 +3,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { KeyedMutator } from "swr";
 
-import { ThreadListResult } from "@/api/openapi-schema";
+import { Account, ThreadListResult } from "@/api/openapi-schema";
 import * as z from "@/lib/validation";
 
 export type Props = {
+  initialSession?: Account;
   threads: ThreadListResult;
   mutate?: KeyedMutator<ThreadListResult>;
   query?: string;

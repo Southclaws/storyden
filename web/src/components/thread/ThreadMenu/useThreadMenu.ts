@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
 
 import { handle } from "@/api/client";
-import { Permission, ThreadReference } from "@/api/openapi-schema";
+import { Account, Permission, ThreadReference } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { useFeedMutations } from "@/lib/feed/mutation";
@@ -18,18 +18,20 @@ import { useCopyToClipboard } from "@/utils/useCopyToClipboard";
 import { getPermalinkForThread } from "../utils";
 
 export type Props = {
+  initialSession?: Account;
   thread: ThreadReference;
   editingEnabled?: boolean;
   movingEnabled?: boolean;
 };
 
 export function useThreadMenu({
+  initialSession,
   thread,
   editingEnabled,
   movingEnabled,
 }: Props) {
   const router = useRouter();
-  const account = useSession();
+  const account = useSession(initialSession);
   const { resolveReport } = useReportContext();
   const [_, setEditing] = useQueryState("edit", parseAsBoolean);
   const [, copyToClipboard] = useCopyToClipboard();

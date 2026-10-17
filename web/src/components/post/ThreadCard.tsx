@@ -1,7 +1,12 @@
 import Link from "next/link";
 import { memo } from "react";
 
-import { Permission, ThreadReference, Visibility } from "@/api/openapi-schema";
+import {
+  Account,
+  Permission,
+  ThreadReference,
+  Visibility,
+} from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { Byline } from "@/components/content/Byline";
 import { CollectionMenu } from "@/components/content/CollectionMenu/CollectionMenu";
@@ -26,13 +31,14 @@ import { LikeButton } from "./LikeButton/LikeButton";
 import { useThreadCardModeration } from "./useThreadCardModeration";
 
 type Props = {
+  initialSession?: Account;
   thread: ThreadReference;
   hideCategoryBadge?: boolean;
 };
 
 export const ThreadReferenceCard = memo(
-  ({ thread, hideCategoryBadge = false }: Props) => {
-    const session = useSession();
+  ({ initialSession, thread, hideCategoryBadge = false }: Props) => {
+    const session = useSession(initialSession);
     const isDraft = thread.visibility === Visibility.draft;
     const permalink = isDraft ? `/new?id=${thread.id}` : `/t/${thread.slug}`;
     const isModerator = hasPermission(
@@ -101,13 +107,17 @@ export const ThreadReferenceCard = memo(
               </>
             ) : (
               <>
-                <LikeButton thread={thread} showCount />
+                <LikeButton
+                  initialSession={session}
+                  thread={thread}
+                  showCount
+                />
                 {session && (
                   <CollectionMenu account={session} thread={thread} />
                 )}
               </>
             )}
-            <ThreadMenu thread={thread} />
+            <ThreadMenu initialSession={session} thread={thread} />
           </HStack>
         }
       >

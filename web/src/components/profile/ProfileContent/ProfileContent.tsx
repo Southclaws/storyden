@@ -28,7 +28,10 @@ export function ProfileContent(props: Props) {
         </Tabs.List>
 
         <Tabs.Content value="threads">
-          <ThreadReferenceList threads={threads} />
+          <ThreadReferenceList
+            initialSession={props.session}
+            threads={threads}
+          />
         </Tabs.Content>
 
         <Tabs.Content className={lstack()} value="collections">

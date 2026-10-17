@@ -1,5 +1,6 @@
 import { categoryGet } from "@/api/openapi-server/categories";
 import { threadList } from "@/api/openapi-server/threads";
+import { getServerSession } from "@/auth/server-session";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { canonicalPage, jsonLD } from "@/lib/metadata/public";
 import * as z from "@/lib/validation";
@@ -26,16 +27,19 @@ export default async function Page({ params, searchParams }: Props) {
   let page;
   let categoryData;
   let threadListData;
+  let initialSession;
 
   try {
     ({ page } = QuerySchema.parse(await searchParams));
 
-    ({ data: categoryData } = await categoryGet(slug));
-
-    ({ data: threadListData } = await threadList({
-      categories: [slug],
-      page: page?.toString(),
-    }));
+    const [session, categoryResult, threadListResult] = await Promise.all([
+      getServerSession(),
+      categoryGet(slug),
+      threadList({ categories: [slug], page: page?.toString() }),
+    ]);
+    initialSession = session;
+    categoryData = categoryResult.data;
+    threadListData = threadListResult.data;
   } catch (error) {
     return <UnreadyBanner error={error} />;
   }
@@ -97,6 +101,7 @@ export default async function Page({ params, searchParams }: Props) {
         />
       )}
       <CategoryScreen
+        initialSession={initialSession}
         initialPage={page ?? 1}
         slug={slug}
         initialCategory={categoryData}

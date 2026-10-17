@@ -1,14 +1,15 @@
 import { handle } from "@/api/client";
-import { PostReference } from "@/api/openapi-schema";
+import { Account, PostReference } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { useFeedMutations } from "@/lib/feed/mutation";
 
 export type Props = {
+  initialSession?: Account;
   thread: PostReference;
 };
 
-export function useLikeButton({ thread }: Props) {
-  const session = useSession();
+export function useLikeButton({ initialSession, thread }: Props) {
+  const session = useSession(initialSession);
   const { likePost, unlikePost, revalidate } = useFeedMutations();
 
   const enabled = Boolean(session);

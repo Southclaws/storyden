@@ -1,6 +1,5 @@
 "use client";
 
-import { type Account } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { FeedEmptyState } from "@/components/feed/FeedEmptyState";
 import { QuickShare } from "@/components/feed/QuickShare/QuickShare";
@@ -28,7 +27,6 @@ export function ThreadFeedScreen({
   showCategorySelect: boolean;
   hideCategoryBadge?: boolean;
   showQuickShare?: boolean;
-  initialSession?: Account;
   initialSettings?: Settings;
 }) {
   const session = useSession(initialSession, initialSettings);
@@ -43,6 +41,7 @@ export function ThreadFeedScreen({
         />
       )}
       <ThreadFeed
+        initialSession={session}
         initialPage={initialPage}
         initialPageData={initialPageData}
         category={category}
@@ -84,6 +83,7 @@ export function ThreadFeed(props: Props & { hideCategoryBadge?: boolean }) {
           return (
             <ThreadReferenceCard
               key={t.slug}
+              initialSession={props.initialSession}
               thread={t}
               hideCategoryBadge={props.hideCategoryBadge}
             />

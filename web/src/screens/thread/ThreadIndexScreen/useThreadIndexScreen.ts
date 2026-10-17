@@ -1,7 +1,8 @@
 import { useThreadList } from "@/api/openapi-client/threads";
-import { ThreadListResult } from "@/api/openapi-schema";
+import { Account, ThreadListResult } from "@/api/openapi-schema";
 
 export type Props = {
+  initialSession?: Account;
   query?: string;
   page?: number;
   threads: ThreadListResult;

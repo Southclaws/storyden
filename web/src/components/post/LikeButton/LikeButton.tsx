@@ -10,7 +10,7 @@ type LikeButtonProps = Props & {
 };
 
 export function LikeButton({ showCount = false, ...props }: LikeButtonProps) {
-  const { enabled, handleClick } = useLikeButton({ thread: props.thread });
+  const { enabled, handleClick } = useLikeButton(props);
   const likeCount = props.thread.likes.likes;
 
   if (showCount) {

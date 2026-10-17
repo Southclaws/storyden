@@ -41,7 +41,7 @@ export function CollectionMenu(props: Props) {
   });
 
   return (
-    <Box onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
+    <Box display="flex" onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
       <Menu.Root
         lazyMount
         closeOnSelect={!multiSelect}

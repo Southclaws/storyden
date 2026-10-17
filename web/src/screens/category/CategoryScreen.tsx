@@ -2,6 +2,7 @@
 
 import { useCategoryGet } from "@/api/openapi-client/categories";
 import {
+  Account,
   CategoryGetOKResponse,
   Permission,
   ThreadListOKResponse,
@@ -25,13 +26,18 @@ import { hasPermission } from "@/utils/permissions";
 import { ThreadFeedScreen } from "../feed/ThreadFeedScreen/ThreadFeedScreen";
 
 export type Props = {
+  initialSession?: Account;
   initialCategory: CategoryGetOKResponse;
   initialThreadList: ThreadListOKResponse;
   slug: string;
 };
 
-export function useCategoryScreen({ initialCategory, slug }: Props) {
-  const session = useSession();
+export function useCategoryScreen({
+  initialSession,
+  initialCategory,
+  slug,
+}: Props) {
+  const session = useSession(initialSession);
 
   const { data, error } = useCategoryGet(slug, {
     swr: { fallbackData: initialCategory },
@@ -112,6 +118,7 @@ export function CategoryScreen(props: ScreenProps) {
       )}
 
       <ThreadFeedScreen
+        initialSession={props.initialSession}
         initialPage={props.initialPage}
         initialPageData={props.initialThreadList}
         category={category}
