@@ -40,6 +40,12 @@ test("member decorations and navigation bullets resolve Panda tokens in CSS", as
   await expect(name).toHaveCSS("font-style", "normal");
   await page.addStyleTag({ content: ":root { --font-weights-normal: 450; }" });
   await expect(name).toHaveCSS("font-weight", "450");
+  await page.goto(`/m/${admin}`);
+  const profileName = page
+    .getByRole("main")
+    .locator(".member-name__show-vertical-display-name");
+  await expect(profileName).toHaveCSS("font-weight", "700");
+  await expect(profileName).toHaveCSS("font-style", "normal");
 
   const roleResponse = await page.request.post(
     "http://localhost:8001/api/roles",
@@ -89,4 +95,12 @@ test("member decorations and navigation bullets resolve Panda tokens in CSS", as
   await expect(bullet).toHaveCSS("fill", "rgb(12, 34, 56)");
   await expect(bullet).toHaveCSS("width", "16px");
   await expect(bullet).toHaveCSS("height", "16px");
+  await page.goto(`/m/${admin}`);
+  await expect(profileName).toHaveCSS("font-weight", "800");
+  await expect(profileName).toHaveCSS("font-style", "italic");
+  await expect(profileName).toHaveCSS("color", "rgb(18, 52, 86)");
+  await page.addStyleTag({
+    content: ":root { --font-weights-extrabold: 850; }",
+  });
+  await expect(profileName).toHaveCSS("font-weight", "850");
 });

@@ -203,7 +203,7 @@ test.describe("Thread Notifications", () => {
 
 test.describe("Thread Reactions", () => {
   test("should add a reaction to a reply", async ({ page }) => {
-    await registerUser(page, "reaction-author", PASSWORD);
+    const author = await registerUser(page, "reaction-author", PASSWORD);
     const threadUrl = await createThread(
       page,
       "Thread for Reaction Test",
@@ -213,7 +213,8 @@ test.describe("Thread Reactions", () => {
     await postReply(page, "A reply to react to.");
 
     const reply = page
-      .locator("li")
+      .getByRole("main")
+      .getByRole("listitem")
       .filter({ hasText: "A reply to react to." });
     const reactionButton = reply.getByRole("button", { name: "Add reaction" });
     await expect(reactionButton).toBeVisible({ timeout: 10000 });
@@ -226,6 +227,73 @@ test.describe("Thread Reactions", () => {
     await expect(
       reply.locator("button").filter({ hasText: /^\p{Emoji}.*\d$/u }),
     ).toBeVisible({ timeout: 5000 });
+    const count = reply.locator(".reactList__count");
+    await expect(count).toHaveText("1");
+    await expect(count).toHaveCSS("animation-name", "slideFadeIn");
+    await expect(count).toHaveCSS("animation-duration", "0.25s");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await expect(count).toHaveCSS("animation-name", "none");
+    await logout(page);
+    const peer = await registerUser(page, "reaction-peer", PASSWORD);
+    await navigateToThread(page, threadUrl);
+    await expect(count).toHaveText("1");
+    const normalBackground = await count
+      .locator("..")
+      .evaluate((element) => getComputedStyle(element).backgroundColor);
+    await logout(page);
+    await navigateToThread(page, threadUrl);
+    await expect(count.locator("..")).toBeDisabled();
+    await expect(count.locator("..")).toHaveCSS(
+      "background-color",
+      normalBackground,
+    );
+    await count.locator("..").hover();
+    await expect(count.locator("..")).toHaveCSS(
+      "background-color",
+      normalBackground,
+    );
+    await test.info().attach("Guest reaction button", {
+      body: await reply.screenshot(),
+      contentType: "image/png",
+    });
+    await login(page, peer);
+    await navigateToThread(page, threadUrl);
+    await expect(count.locator("..")).toHaveAttribute("aria-pressed", "false");
+    await count.locator("..").click();
+    await expect(count).toHaveText("2");
+    await expect(count.locator("..")).toHaveAttribute("aria-pressed", "true");
+    await expect(count.locator("..")).not.toHaveCSS(
+      "background-color",
+      normalBackground,
+    );
+    await expect(count.locator("..")).not.toHaveCSS("box-shadow", "none");
+    await test.info().attach("Your selected reaction", {
+      body: await reply.screenshot(),
+      contentType: "image/png",
+    });
+    await expect(count.locator("..")).toHaveAttribute(
+      "title",
+      new RegExp(`${author}.*${peer}|${peer}.*${author}`),
+    );
+    await expect(count.locator("..")).toBeEnabled();
+    await count.locator("..").focus();
+    await page.keyboard.press("Enter");
+    await expect(count).toHaveText("1");
+    await expect(count.locator("..")).toHaveAttribute("aria-pressed", "false");
+    await page.mouse.move(0, 0);
+    await expect(count.locator("..")).toHaveCSS(
+      "background-color",
+      normalBackground,
+    );
+    await logout(page);
+    await login(page, author);
+    await navigateToThread(page, threadUrl);
+    await expect(count).toHaveText("1");
+    await expect(count.locator("..")).toHaveAttribute("aria-pressed", "true");
+    await expect(count.locator("..")).toBeEnabled();
+    await count.locator("..").focus();
+    await page.keyboard.press("Enter");
+    await expect(count).toHaveCount(0);
   });
 });
 
