@@ -14,12 +14,10 @@ import * as Popover from "@/components/ui/popover";
 import { Spinner } from "@/components/ui/spinner";
 import { useCapability } from "@/lib/settings/capabilities";
 import { HStack, styled } from "@/styled-system/jsx";
-import type { SystemProperties } from "@/styled-system/types";
 import { deriveError } from "@/utils/error";
 
 import {
   ImportState,
-  ImportStep,
   importFromURLGenerator,
   importStateLabel,
 } from "./import";
@@ -176,16 +174,10 @@ export function CreatePageFromURLAction({
             <HStack gap="2" justify="space-between">
               {match(importState.step)
                 .with("complete", () => (
-                  <CheckCircleIcon
-                    color="status.success.content"
-                    fill="status.success.surface"
-                  />
+                  <CheckCircleIcon w="5" h="5" color="status.success.content" />
                 ))
                 .with("failed", () => (
-                  <WarningIcon
-                    color="status.warning.content"
-                    fill="status.warning.surface"
-                  />
+                  <WarningIcon w="5" h="5" color="status.danger.content" />
                 ))
                 .otherwise(() => (
                   <Spinner />
@@ -199,10 +191,7 @@ export function CreatePageFromURLAction({
                   },
                 }}
               >
-                <styled.span
-                  color={getImportStateColor(importState.step)}
-                  px="2"
-                >
+                <styled.span color="text.subtle" px="2">
                   {importStateLabel[importState.step]}
                 </styled.span>
               </styled.div>
@@ -228,13 +217,4 @@ export function CreatePageFromURLMenuItem({ hideLabel }: Props) {
       )}
     </Item>
   );
-}
-
-function getImportStateColor(state: ImportStep): SystemProperties["color"] {
-  switch (state) {
-    case "failed":
-      return "status.warning.content";
-    default:
-      return "text.subtle";
-  }
 }

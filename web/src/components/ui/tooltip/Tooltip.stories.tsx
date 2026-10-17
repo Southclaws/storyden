@@ -65,6 +65,14 @@ export const ViewportEdge: Story = {
 };
 
 export const Error: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A failed operation uses an unfilled WarningIcon with status.danger.content, matching compact inline error indicators such as URL-import failures. Reserve status.warning.content for cautions where the operation has not failed. Keep tooltip copy neutral; full status surfaces belong to Alert.",
+      },
+    },
+  },
   render: () => (
     <ErrorTooltip
       error={new globalThis.Error("The category list could not be loaded.")}

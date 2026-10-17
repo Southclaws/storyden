@@ -11,7 +11,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Indeterminate activity for compact controls or regions whose completion cannot be measured. Preserve the control's width while loading. Use Progress for measurable work and a skeleton when loading content should retain its eventual layout.",
+          "Indeterminate activity for compact controls or regions whose completion cannot be measured. One Panda recipe owns sizing, stroke width, theme colours, and rotation: background.controlTrack for the track, text.muted for the active segment, and the shared spin animation. Keep activity neutral; semantic success, warning, and danger colours communicate outcomes rather than waiting. Preserve the control's width while loading. Use Progress for measurable work and a skeleton when loading content should retain its eventual layout.",
       },
     },
   },

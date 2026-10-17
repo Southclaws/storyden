@@ -30,6 +30,7 @@ import { reactList } from "@/components/ui/react-list/ReactList.recipe";
 import { sectionNavigation } from "@/components/ui/section-navigation/SectionNavigation.recipe";
 import { select } from "@/components/ui/select/Select.recipe";
 import { slider } from "@/components/ui/slider/Slider.recipe";
+import { spinner } from "@/components/ui/spinner/Spinner.recipe";
 import { cardGrid } from "@/components/ui/surface/CardGrid.recipe";
 import { cardRows } from "@/components/ui/surface/CardRows.recipe";
 import { richCard } from "@/components/ui/surface/RichCard.recipe";
@@ -206,6 +207,7 @@ export default defineConfig({
         cardRows: cardRows,
         group: group,
         input: input,
+        spinner: spinner,
         multiSelectPicker: multiSelectPicker,
         text: text,
         textarea: textarea,

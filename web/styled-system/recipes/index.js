@@ -7,6 +7,7 @@ export * from './group';
 export * from './heading-input';
 export * from './input';
 export * from './multi-select-picker';
+export * from './spinner';
 export * from './text';
 export * from './textarea';
 export * from './alert';

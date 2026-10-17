@@ -253,3 +253,40 @@ export const All: Story = {
     </styled.div>
   ),
 };
+
+export const StatusColours: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Ordinary navigation and action icons inherit the surrounding text colour. Apply semantic content colours only when an icon communicates an actual outcome or risk: success for completion, warning for a caution, and danger for a failed operation or error details. Compact indicators keep the icon unfilled and their text neutral. Alert owns the coordinated surface, border, and content colours for a full status message; do not fill an individual outline icon with a status surface token.",
+      },
+    },
+  },
+  render: () => (
+    <styled.div
+      display="flex"
+      flexDirection="column"
+      gap="3"
+      color="text.muted"
+      css={{ "& svg": { width: "4", height: "4" } }}
+    >
+      <styled.div display="flex" alignItems="center" gap="2">
+        <WarningIcons.WarningIcon />
+        <span>Ordinary icon: inherit surrounding text colour</span>
+      </styled.div>
+      <styled.div display="flex" alignItems="center" gap="2">
+        <CheckCircleIcons.CheckCircleIcon color="status.success.content" />
+        <span>Complete: success stroke</span>
+      </styled.div>
+      <styled.div display="flex" alignItems="center" gap="2">
+        <WarningIcons.WarningIcon color="status.warning.content" />
+        <span>Caution: warning stroke</span>
+      </styled.div>
+      <styled.div display="flex" alignItems="center" gap="2">
+        <WarningIcons.WarningIcon color="status.danger.content" />
+        <span>Failed operation or error details: danger stroke</span>
+      </styled.div>
+    </styled.div>
+  ),
+};
