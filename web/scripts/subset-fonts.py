@@ -5,6 +5,7 @@
 """Regenerate Inter's static Unicode subsets: uv run web/scripts/subset-fonts.py."""
 
 from pathlib import Path
+from unicodedata import normalize
 
 from fontTools import subset
 from fontTools.ttLib import TTFont
@@ -40,6 +41,29 @@ def unicode_range(codepoints):
     )
 
 
+def composed_characters(codepoints, characters):
+    """Keep canonical compositions beside their base letters and marks."""
+    return {
+        cp
+        for cp in codepoints
+        if all(ord(char) in characters for char in normalize("NFD", chr(cp)))
+    }
+
+
+def restore_character_mappings(font, source_cmap):
+    """Retain mappings used by HarfBuzz composition and FreeType auto-hinting."""
+    glyphs = set(font.getGlyphOrder())
+    for table in font["cmap"].tables:
+        if table.isUnicode():
+            table.cmap.update(
+                {
+                    cp: glyph
+                    for cp, glyph in source_cmap.items()
+                    if glyph in glyphs and (cp <= 0xFFFF or table.format in (12, 13))
+                }
+            )
+
+
 def generate():
     output = FONT_DIR / "static/subsets"
     output.mkdir(exist_ok=True)
@@ -50,9 +74,12 @@ def generate():
     ]:
         source = FONT_DIR / "static" / filename
         with TTFont(source) as original:
-            codepoints = set(original.getBestCmap())
+            source_cmap = original.getBestCmap()
+            codepoints = set(source_cmap)
         marks = codepoints & set(subset.parse_unicodes(MARKS))
-        groups = {"latin": codepoints & set(subset.parse_unicodes(LATIN))}
+        latin_characters = set(subset.parse_unicodes(LATIN)) & codepoints
+        groups = {"latin": composed_characters(codepoints, latin_characters | marks)}
+        print(f"{style} Latin Unicode range: {unicode_range(groups['latin'] | marks)}")
         for name, ranges in SCRIPT_RANGES.items():
             groups[name] = (codepoints & set(subset.parse_unicodes(ranges))) - groups["latin"]
         groups["symbols"] = codepoints - set().union(*groups.values())
@@ -67,6 +94,7 @@ def generate():
             subsetter = subset.Subsetter(options=options)
             subsetter.populate(unicodes=characters)
             subsetter.subset(font)
+            restore_character_mappings(font, source_cmap)
             font.flavor = "woff2"
             destination = output / f"{source.stem}-{name}.woff2"
             font.save(destination)

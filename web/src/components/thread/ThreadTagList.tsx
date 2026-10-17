@@ -2,6 +2,7 @@ import { Suspense, lazy } from "react";
 
 import { TagNameList, TagReferenceList } from "@/api/openapi-schema";
 import { TagBadgeList } from "@/components/tag/TagBadgeList";
+import { useHydrated } from "@/utils/useHydrated";
 
 const ThreadTagListEditing = lazy(() =>
   import("./ThreadTagListEditing").then((module) => ({
@@ -17,9 +18,10 @@ export type Props = {
 };
 
 export function ThreadTagList(props: Props) {
+  const isHydrated = useHydrated();
   const tags = <TagBadgeList tags={props.initialTags ?? []} />;
 
-  if (props.editing) {
+  if (props.editing && isHydrated) {
     return (
       <Suspense fallback={tags}>
         <ThreadTagListEditing {...props} />

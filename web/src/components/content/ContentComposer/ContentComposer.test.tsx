@@ -7,6 +7,14 @@ import { RenderedContentProvider } from "../ContentRenderer/RenderedContentConte
 import { ContentComposer } from "./ContentComposer";
 
 const editor = vi.hoisted(() => ({ loaded: vi.fn(), rendered: vi.fn() }));
+const renderClient = vi.hoisted(() => vi.fn());
+
+vi.mock("../ContentRenderer/ContentRendererBody", () => ({
+  ContentRendererBody: ({ html }: { html: string }) => {
+    renderClient(html);
+    return <h2>Saved</h2>;
+  },
+}));
 
 vi.mock("./ContentEditor", () => {
   editor.loaded();
@@ -31,6 +39,7 @@ describe("ContentComposer boundary", () => {
     expect(html).not.toContain("contenteditable");
     expect(editor.loaded).not.toHaveBeenCalled();
     expect(editor.rendered).not.toHaveBeenCalled();
+    expect(renderClient).not.toHaveBeenCalled();
   });
 
   it("renders content without loading the editor and loads it when editing starts", async () => {
@@ -55,9 +64,11 @@ describe("ContentComposer boundary", () => {
       "<h2>Original</h2>",
     );
     expect(editor.loaded).toHaveBeenCalledOnce();
+    expect(renderClient).not.toHaveBeenCalled();
 
     rerender(<ContentComposer disabled initialValue="<h2>Saved</h2>" />);
     expect(await screen.findByRole("heading", { name: "Saved" })).toBeVisible();
+    expect(renderClient).toHaveBeenCalledWith("<h2>Saved</h2>");
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
   });
 });

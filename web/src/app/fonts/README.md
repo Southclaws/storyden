@@ -16,13 +16,17 @@ CSS `unicode-range` lets the browser select files from the actual text, includin
 mixed-language content, without locale detection. Italics load only when used.
 All source characters, variable axes, hinting and applicable OpenType features
 are retained. Combining marks are included in each subset for decomposed text.
+The Latin face also covers their precomposed forms, including Vietnamese
+accents. Retained glyphs keep their Unicode mappings for shaping and Linux
+automatic hinting, even when CSS assigns those characters to another face.
 
 Kerning cannot cross font-file boundaries. Letter shapes are preserved, but
 some punctuation beside another script can have slightly different spacing.
 For example, `«Тест»` is about 0.8 px wider at a 16 px font size.
 
-Keep the Latin Unicode ranges in `index.ts` aligned with the generator's `LATIN`
-definition. Other ranges and CSS are generated from the fonts' character maps.
+Keep the Latin Unicode ranges in `index.ts` aligned with the ranges printed by
+the generator, which include the `LATIN` definition and its composed accents.
+Other ranges and CSS are generated from the fonts' character maps.
 The complete original fonts are not imported by the application. CJK, Thai and
 other scripts not supplied by Inter continue to use the existing system fallback.
 

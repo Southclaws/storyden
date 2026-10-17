@@ -33,7 +33,7 @@ test("ordinary browsing downloads Latin fonts and preloads only regular Latin", 
 for (const { language, text, subset } of [
   { language: "Russian", text: "Привет мир", subset: "cyrillic" },
   { language: "Greek", text: "Καλημέρα κόσμε", subset: "greek" },
-  { language: "Vietnamese", text: "Tiếng Việt", subset: "latin-ext" },
+  { language: "Vietnamese", text: "Tiếng Việt đồng", subset: "latin-ext" },
   { language: "CJK", text: "中文日本語한국어", subset: undefined },
   { language: "Thai", text: "สวัสดีชาวโลก", subset: undefined },
 ]) {
