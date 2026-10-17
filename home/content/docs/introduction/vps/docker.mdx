@@ -75,6 +75,35 @@ Example: `PUBLIC_API_ADDRESS=https://api.the-secret-agent.club`
   set both environment variables to the same value.
 </Callout>
 
+### Check your addresses
+
+The web server checks that the public addresses and any `SSR_API_ADDRESS` are
+complete HTTP or HTTPS URLs when it starts. If an address is malformed, startup
+fails with an error naming the environment variable to fix. An internal HTTP
+`SSR_API_ADDRESS` can be used with public HTTPS addresses.
+
+Den Doctor checks these addresses before the first account is created and in
+**Admin → System settings**. If it finds a problem, it explains what to change
+in your deployment configuration. Restart Storyden after changing the addresses.
+
+The simplest setup uses the same address for the website and API. When hosting
+them separately, use the same scheme for both and hostnames that can share
+Storyden's sign-in cookie. For example, `https://community.example.com` for the
+website and `https://api.community.example.com` for the API work together.
+Sibling hostnames such as `www.example.com` and `api.example.com` do not share
+Storyden's current session cookie with the website.
+
+Host the supplied web app at the root of a hostname, rather than a sub-path such
+as `example.com/community`. The API address normally also points to a root
+address: Storyden adds `/api` when making requests. An intentional API path
+prefix needs custom reverse-proxy routing, including forwarding API, asset and
+discovery requests to the backend correctly; setting the address alone does not
+configure that routing.
+
+The public API address must be reachable from visitors' browsers. A `localhost`
+address points to each visitor's own computer. For container-only connections,
+use `SSR_API_ADDRESS` instead; the full-stack image configures this automatically.
+
 ## Mounting `/storyden/data`
 
 Storyden does not depend on external services by default, so unless you specify, persistent storage such as the database and assets are stored on the local disk.
@@ -168,7 +197,9 @@ Or with a directory mounted into the container:
 
 ## Next Steps
 
-Now you've got an instance running, you must expose it to the internet using a reverse proxy. Storyden does not accept HTTPS connections but it requires that the site itself run on a HTTPS address for security reasons.
+For a public deployment, expose your instance through a reverse proxy that provides HTTPS. Storyden itself accepts HTTP connections.
+
+HTTP is also supported for local and trusted internal networks. Set `PUBLIC_WEB_ADDRESS` and `PUBLIC_API_ADDRESS` to the URLs used by your browser, using the same scheme for both. Session cookies omit the `Secure` flag when `PUBLIC_API_ADDRESS` uses `http://`; HTTPS API addresses retain the flag.
 
 We recommend using something like [Caddy](https://caddyserver.com/) or [Traefik](https://traefik.io/) to act as a reverse proxy that handles HTTPS.
 

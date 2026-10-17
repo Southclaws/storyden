@@ -31,6 +31,7 @@ type Jar struct {
 	validator        *session.Validator
 	issuer           *session.Issuer
 	domain           string
+	secure           bool
 	secureCookieName string
 }
 
@@ -42,6 +43,7 @@ func New(cfg config.Config, v *session.Validator) (*Jar, error) {
 
 	return &Jar{
 		domain:           domain,
+		secure:           cfg.PublicAPIAddress.Scheme != "http",
 		validator:        v,
 		secureCookieName: secureCookieName,
 	}, nil
@@ -56,8 +58,7 @@ func (j *Jar) createWithValue(value string, expire time.Time) *http.Cookie {
 		Path:     "/",
 		Domain:   j.domain,
 
-		// Always secure, localhost is automatically excluded by browsers.
-		Secure: true,
+		Secure: j.secure,
 
 		// JS never needs to access these cookies.
 		HttpOnly: true,

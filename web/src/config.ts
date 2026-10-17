@@ -3,25 +3,75 @@ import * as z from "@/lib/validation";
 export const DEFAULT_API_ADDRESS = "http://localhost:8000";
 export const DEFAULT_WEB_ADDRESS = "http://localhost:3000";
 
+const AddressSchema = z
+  .string()
+  .check(
+    z.refine(
+      isHTTPAddress,
+      "Expected an absolute HTTP or HTTPS URL without a username or password.",
+    ),
+  );
+
 export const ConfigSchema = z.object({
-  API_ADDRESS: z.string(),
-  WEB_ADDRESS: z.string(),
+  API_ADDRESS: AddressSchema,
+  WEB_ADDRESS: AddressSchema,
   source: z.union([z.literal("server"), z.literal("script")]),
 });
 export type Config = z.infer<typeof ConfigSchema>;
 
-export function serverEnvironment() {
+export function serverEnvironment(): Config {
+  const apiSetting =
+    global.process.env["NEXT_PUBLIC_API_ADDRESS"] !== undefined
+      ? "NEXT_PUBLIC_API_ADDRESS"
+      : "PUBLIC_API_ADDRESS";
+  const webSetting =
+    global.process.env["NEXT_PUBLIC_WEB_ADDRESS"] !== undefined
+      ? "NEXT_PUBLIC_WEB_ADDRESS"
+      : "PUBLIC_WEB_ADDRESS";
+  const ssrAddress = global.process.env["SSR_API_ADDRESS"];
+
+  if (ssrAddress !== undefined) {
+    validateAddress(ssrAddress, "SSR_API_ADDRESS");
+  }
+
   return {
-    API_ADDRESS:
-      global.process.env["NEXT_PUBLIC_API_ADDRESS"] ??
-      global.process.env["PUBLIC_API_ADDRESS"] ??
-      DEFAULT_API_ADDRESS,
-    WEB_ADDRESS:
-      global.process.env["NEXT_PUBLIC_WEB_ADDRESS"] ??
-      global.process.env["PUBLIC_WEB_ADDRESS"] ??
-      DEFAULT_WEB_ADDRESS,
+    API_ADDRESS: validateAddress(
+      global.process.env[apiSetting] ?? DEFAULT_API_ADDRESS,
+      apiSetting,
+    ),
+    WEB_ADDRESS: validateAddress(
+      global.process.env[webSetting] ?? DEFAULT_WEB_ADDRESS,
+      webSetting,
+    ),
     source: "server" as const,
   };
+}
+
+function isHTTPAddress(value: string): boolean {
+  try {
+    const url = new URL(value);
+
+    return (
+      /^https?:\/\//i.test(value) &&
+      ["http:", "https:"].includes(url.protocol) &&
+      !url.username &&
+      !url.password
+    );
+  } catch {
+    return false;
+  }
+}
+
+function validateAddress(value: string, setting: string): string {
+  const parsed = AddressSchema.safeParse(value);
+
+  if (!parsed.success) {
+    throw new Error(
+      `Invalid ${setting}: expected an absolute HTTP or HTTPS URL without a username or password.`,
+    );
+  }
+
+  return parsed.data;
 }
 
 function isomorphicEnvironment(): Config {

@@ -1,8 +1,11 @@
 import { PropsWithChildren, ReactNode } from "react";
 
+import { FreshDenDoctor } from "@/components/site/DenDoctor/FreshDenDoctor";
 import { MotdBanner } from "@/components/site/MotdBanner/MotdBanner";
 import { Navigation } from "@/components/site/Navigation/Navigation";
-import { getSettings } from "@/lib/settings/settings-server";
+import { API_ADDRESS, WEB_ADDRESS } from "@/config";
+import { diagnoseInstallation } from "@/lib/den-doctor/diagnostics";
+import { getSettingsResult } from "@/lib/settings/settings-server";
 import { Flex, styled } from "@/styled-system/jsx";
 
 type Props = {
@@ -10,7 +13,8 @@ type Props = {
 };
 
 export async function Default({ sidebar, children }: PropsWithChildren<Props>) {
-  const settings = await getSettings();
+  const result = await getSettingsResult();
+  const settings = result.ready ? result.settings : undefined;
 
   return (
     <Flex
@@ -29,7 +33,16 @@ export async function Default({ sidebar, children }: PropsWithChildren<Props>) {
           height="full"
           minW="0"
         >
-          <MotdBanner motd={settings.motd} />
+          <MotdBanner motd={settings?.motd} />
+          {(!settings ||
+            settings.onboarding_status === "requires_first_account") && (
+            <FreshDenDoctor
+              settings={settings}
+              hasAddressIssues={
+                diagnoseInstallation(API_ADDRESS, WEB_ADDRESS).length > 0
+              }
+            />
+          )}
           {children}
           {/* <Box height="24"></Box> */}
         </styled.main>

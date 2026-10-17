@@ -13,11 +13,22 @@ const getSettingsCached = cache(async () => {
   return parseSettings(data);
 });
 
-export async function getSettings(): Promise<Settings> {
+export type SettingsResult =
+  | { ready: true; settings: Settings }
+  | { ready: false; error: unknown };
+
+export async function getSettingsResult(): Promise<SettingsResult> {
   try {
     const settings = await getSettingsCached();
-    return settings;
-  } catch (e) {
-    return DefaultSettings;
+
+    return { ready: true, settings };
+  } catch (error) {
+    return { ready: false, error };
   }
+}
+
+export async function getSettings(): Promise<Settings> {
+  const result = await getSettingsResult();
+
+  return result.ready ? result.settings : DefaultSettings;
 }

@@ -5,6 +5,7 @@ import { useWatch } from "react-hook-form";
 import { adminSettingsGet } from "@/api/openapi-client/admin";
 import { getGetInfoKey, getSession } from "@/api/openapi-client/misc";
 import { ClientInfo, NetworkHeadersSample } from "@/api/openapi-schema";
+import { DenDoctor } from "@/components/site/DenDoctor/DenDoctor";
 import { InfoTip } from "@/components/site/InfoTip";
 import { Admonition } from "@/components/ui/admonition";
 import * as Alert from "@/components/ui/alert";
@@ -123,6 +124,8 @@ export function SystemSettingsForm(props: Props) {
           {errorMessages}
         </Admonition>
       )}
+
+      <DenDoctor showHealthy />
 
       <SectionHeading>Rate limits</SectionHeading>
 
