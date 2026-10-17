@@ -50,7 +50,7 @@ type Provider struct {
 	sender *email_verify.Verifier
 }
 
-var service = authentication.ServicePassword
+var service = authentication.AuthServicePassword
 
 func New(
 	logger *slog.Logger,
