@@ -105,22 +105,11 @@ describe("server address configuration", () => {
     });
   });
 
-  it("exits when startup configuration validation fails", async () => {
+  it("rejects startup when configuration validation fails", async () => {
     vi.stubEnv("SSR_API_ADDRESS", "backend:8000");
-    const stopped = new Error("Process exited");
-    const exit = vi.spyOn(process, "exit").mockImplementation(() => {
-      throw stopped;
-    });
-    const log = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    await expect(register()).rejects.toBe(stopped);
-
-    expect(exit).toHaveBeenCalledWith(1);
-    expect(log).toHaveBeenCalledWith(
-      expect.objectContaining({
-        message:
-          "Invalid SSR_API_ADDRESS: expected an absolute HTTP or HTTPS URL without a username or password.",
-      }),
+    await expect(register()).rejects.toThrow(
+      "Invalid SSR_API_ADDRESS: expected an absolute HTTP or HTTPS URL without a username or password.",
     );
   });
 
