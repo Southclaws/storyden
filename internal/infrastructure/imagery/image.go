@@ -171,6 +171,8 @@ func Estimate(s *Source, width, height int) int64 {
 	const outputPixelBytes = 24
 	const codecOverhead = 16 << 20
 	const resizePixelBytes = 4 * 8
+	const contributionSourceBytes = 4 * 16
+	const contributionOutputBytes = 8 * 16
 
 	sourceBytes := int64(s.Config.Width) * int64(s.Config.Height) * sourcePixelBytes
 	outputBytes := int64(width) * int64(height) * outputPixelBytes
@@ -186,7 +188,16 @@ func Estimate(s *Source, width, height int) int64 {
 	)
 	resizeBytes := (resizePixels + int64(width)) * resizePixelBytes
 
-	return sourceBytes + outputBytes + encodedBytes + codecOverhead + resizeBytes
+	// Catmull-Rom also allocates contribution tables for both axes. These matter
+	// for very tall or wide images even when the pixel count is small.
+	contributionBytes := (sourceWidth + sourceHeight) * contributionSourceBytes
+	contributionBytes += int64(width+height) * contributionOutputBytes
+	workingBytes := sourceBytes + outputBytes + encodedBytes + codecOverhead
+	workingBytes += resizeBytes + contributionBytes
+
+	// The Go encoder grows and copies its backing memory. Corpus measurements also
+	// include unreclaimed intermediates between sequential variants.
+	return workingBytes + workingBytes/2
 }
 
 func Encode(w io.Writer, img image.Image, pngOutput bool) error {

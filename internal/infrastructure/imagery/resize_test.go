@@ -138,8 +138,57 @@ func TestEagerVariantMemoryAdmission(t *testing.T) {
 		Size:   8 << 20,
 	}
 
-	const budget int64 = 256 << 20
+	const budget int64 = 768 << 20
 	require.Less(t, Estimate(source, 320, 320), budget)
 	require.Equal(t, Estimate(source, 320, 320), Estimate(portrait, 320, 320))
 	require.Greater(t, Estimate(thin, 320, 320), budget)
+}
+
+func TestEstimateCoversMeasuredMemory(t *testing.T) {
+	t.Parallel()
+
+	for _, test := range []struct {
+		name     string
+		width    int
+		height   int
+		encoded  int64
+		target   int
+		measured int64
+	}{
+		{
+			name:     "transparent maximum with sequential variants",
+			width:    4000,
+			height:   3000,
+			encoded:  300706,
+			target:   1920,
+			measured: 600 << 20,
+		},
+		{
+			name:     "webp medium",
+			width:    1024,
+			height:   670,
+			encoded:  74498,
+			target:   960,
+			measured: 90 << 20,
+		},
+		{
+			name:     "thin image contribution tables",
+			width:    1,
+			height:   1000000,
+			encoded:  28000,
+			target:   320,
+			measured: 100 << 20,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			source := &Source{
+				Config: image.Config{Width: test.width, Height: test.height},
+				Size:   test.encoded,
+			}
+
+			estimate := Estimate(source, test.target, test.target)
+			require.Greater(t, estimate, test.measured)
+			require.Less(t, estimate, int64(768<<20))
+		})
+	}
 }
