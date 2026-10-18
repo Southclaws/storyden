@@ -29,11 +29,11 @@ export const imageCropper = defineSlotRecipe({
     viewport: {
       width: "full",
       height: "full",
-      opacity: "full",
+      opacity: "100",
       transitionProperty: "opacity",
       transitionDuration: "normal",
       '&[data-saving="true"]': {
-        opacity: "6",
+        opacity: "60",
         transitionDelay: "150ms",
       },
       _focusVisible: {

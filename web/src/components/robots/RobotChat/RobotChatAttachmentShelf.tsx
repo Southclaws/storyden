@@ -61,7 +61,7 @@ export function RobotChatAttachmentShelf({ attachments, onRemove }: Props) {
                 w="full"
                 h="full"
                 objectFit="cover"
-                opacity="6"
+                opacity="60"
               />
               <Box
                 role="status"

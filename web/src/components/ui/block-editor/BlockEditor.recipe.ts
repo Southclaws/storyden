@@ -41,7 +41,7 @@ export const blockEditor = defineSlotRecipe({
       borderRadius: "sm",
       color: "text.muted",
       cursor: "grab",
-      opacity: "full",
+      opacity: "100",
     },
     menuTrigger: {
       width: "6",

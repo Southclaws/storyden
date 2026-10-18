@@ -158,7 +158,7 @@ export function ComposerTools({
       >
         <Box
           className="composer-tools__hover-trigger"
-          opacity={isExpanded ? "full" : "5"}
+          opacity={isExpanded ? "100" : "50"}
           onPointerEnter={handlePointerEnter}
           onPointerLeave={handlePointerLeave}
           cursor="pointer"

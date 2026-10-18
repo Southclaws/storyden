@@ -40,7 +40,7 @@ const backdropStyles = css({
 
 const backdropImageStyles = css({
   blur: "3xl",
-  opacity: "2",
+  opacity: "20",
   brightness: "0.5",
   filter: "auto",
 });

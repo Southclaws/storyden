@@ -32,7 +32,7 @@ export const inputBase = {
   },
   _placeholder: {
     color: "text.muted",
-    opacity: "full",
+    opacity: "100",
   },
 } as const;
 

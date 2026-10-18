@@ -35,7 +35,7 @@ export function MemberList({ profiles }: Props) {
 
               return (
                 <Table.Row key={profile.id}>
-                  <Table.Cell py="1" opacity={isBanned ? "5" : "full"}>
+                  <Table.Cell py="1" opacity={isBanned ? "50" : "100"}>
                     <MemberBadge profile={profile} name="full-vertical" />
                   </Table.Cell>
 
@@ -81,7 +81,7 @@ export function MemberList({ profiles }: Props) {
               borderWidth="thin"
               borderRadius="lg"
               p="4"
-              opacity={isBanned ? "5" : "full"}
+              opacity={isBanned ? "50" : "100"}
               width="full"
             >
               <VStack gap="4" alignItems="stretch">

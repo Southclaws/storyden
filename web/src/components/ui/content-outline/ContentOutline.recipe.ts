@@ -58,9 +58,9 @@ export const contentOutline = defineSlotRecipe({
       padding: "2",
       opacity: "0.55",
       transition: "opacity 150ms ease-out",
-      _hover: { opacity: "full" },
-      _focusVisible: { opacity: "full" },
-      '&[data-state="open"]': { opacity: "full" },
+      _hover: { opacity: "100" },
+      _focusVisible: { opacity: "100" },
+      '&[data-state="open"]': { opacity: "100" },
       // The plain button's enlarged hit area must not intercept wheel input.
       _after: { pointerEvents: "none" },
       "@media (prefers-reduced-motion: reduce)": { transition: "none" },

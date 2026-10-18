@@ -81,10 +81,10 @@ export function TagBadge({
     const highlightStyles = shouldShowHighlightStyles
       ? highlighted
         ? css({
-            opacity: "full",
+            opacity: "100",
           })
         : css({
-            opacity: "5",
+            opacity: "50",
           })
       : undefined;
 

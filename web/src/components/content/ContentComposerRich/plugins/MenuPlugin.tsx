@@ -202,9 +202,9 @@ const menuStyles = css({
 });
 
 const defaultStyles = css({
-  opacity: "5",
+  opacity: "50",
 });
 
 const hoverStyles = css({
-  opacity: "full",
+  opacity: "100",
 });

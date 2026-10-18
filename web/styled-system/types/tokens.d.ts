@@ -24,7 +24,7 @@ export type LetterSpacingToken = "normal" | "tight" | "tighter" | "wide" | "wide
 
 export type LineHeightToken = "loose" | "none" | "normal" | "relaxed" | "tight"
 
-export type OpacityToken = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "full"
+export type OpacityToken = "0" | "10" | "100" | "20" | "30" | "40" | "50" | "60" | "70" | "80" | "90"
 
 export type RadiusToken = "2xl" | "2xs" | "3xl" | "control" | "full" | "lg" | "md" | "none" | "overlay" | "panel" | "pill" | "sm" | "xl" | "xs"
 

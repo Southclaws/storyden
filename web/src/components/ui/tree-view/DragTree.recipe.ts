@@ -160,10 +160,10 @@ export const dragTree = defineSlotRecipe({
       minWidth: "min",
       opacity: "0",
       _groupFocusWithin: {
-        opacity: "full",
+        opacity: "100",
       },
       _groupHover: {
-        opacity: "full",
+        opacity: "100",
       },
     },
     link: {
@@ -198,7 +198,7 @@ export const dragTree = defineSlotRecipe({
       transitionTimingFunction: "default",
       '&[data-active="true"]': {
         background: "selection.background",
-        opacity: "full",
+        opacity: "100",
       },
     },
     tree: {

@@ -54,7 +54,7 @@ export function ContentImage({
     >
       <styled.img
         borderRadius="lg"
-        opacity={isUploading ? "5" : "full"}
+        opacity={isUploading ? "50" : "100"}
         transition="all"
         {...attrs}
         src={getImageVariantURL(attrs["src"], "l")}
@@ -86,7 +86,7 @@ export function ContentImage({
           alignItems="center"
           justifyContent="center"
           backgroundColor="status.danger.surface"
-          opacity="9"
+          opacity="90"
           borderRadius="md"
           padding="3"
           gap="2"

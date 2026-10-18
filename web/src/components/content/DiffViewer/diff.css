@@ -39,7 +39,7 @@
   padding-block: var(--spacing-2);
   margin-block: var(--spacing-2);
   border-radius: var(--radii-md);
-  opacity: var(--opacity-7);
+  opacity: var(--opacity-70);
 }
 
 /* Custom node insertions (linkPreview, image, etc.) */

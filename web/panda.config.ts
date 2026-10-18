@@ -257,21 +257,21 @@ export default defineConfig({
         },
         slideFadeIn: {
           from: {
-            opacity: "0.8",
+            opacity: "80",
             transform: "translateY(var(--slide-distance, 2px))",
           },
-          to: { opacity: "1", transform: "translateY(0)" },
+          to: { opacity: "100", transform: "translateY(0)" },
         },
         fadeIn: {
           from: { opacity: "0" },
-          to: { opacity: "1" },
+          to: { opacity: "100" },
         },
         fadeOut: {
-          from: { opacity: "1" },
+          from: { opacity: "100" },
           to: { opacity: "0" },
         },
         imageCropperSaved: {
-          from: { opacity: "full" },
+          from: { opacity: "100" },
           to: { opacity: "0" },
         },
         shimmer: {

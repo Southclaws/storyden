@@ -471,7 +471,7 @@ function DragOverlayNavigationCategory({
 }) {
   const styles = treeView();
   return (
-    <Box className={cx(styles.branchControl)} opacity="5">
+    <Box className={cx(styles.branchControl)} opacity="50">
       <Box className={styles.branchIndicator}>
         {activeItem?.hasChildren ? <ChevronRightIcon /> : <BulletIcon />}
       </Box>
@@ -488,7 +488,7 @@ function DragOverlayNavigationNode({
 }) {
   const styles = treeView();
   return (
-    <Box className={cx(styles.branchControl)} opacity="5">
+    <Box className={cx(styles.branchControl)} opacity="50">
       <Box className={styles.branchIndicator}>
         {activeItem?.node.children.length > 0 ? (
           <ChevronRightIcon />
