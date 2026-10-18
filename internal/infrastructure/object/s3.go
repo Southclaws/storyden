@@ -53,9 +53,9 @@ func NewS3Storer(ctx context.Context, cfg config.Config) (Storer, error) {
 func (s *s3Storer) Exists(ctx context.Context, path string) (bool, error) {
 	_, err := s.minioClient.StatObject(ctx, s.bucket, path, minio.GetObjectOptions{})
 	if err != nil {
-		// TODO: figure out if there's a way to differentiate between an error
-		// and an item just not existing. Ideally we want to treat actual
-		// transport errors and such as actual errors and non-existence as nil.
+		if minio.ToErrorResponse(err).Code == minio.NoSuchKey {
+			return false, nil
+		}
 		return false, fault.Wrap(err, fctx.With(ctx))
 	}
 
