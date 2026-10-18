@@ -26,7 +26,7 @@ func TestMediaSettings(t *testing.T) {
 
 	cfg := &config.Config{
 		ImageWorkers:      1,
-		ImageMemoryBudget: 512 << 20,
+		ImageMemoryBudget: 128 << 20,
 	}
 	integration.Test(t, cfg, e2e.Setup(), fx.Invoke(func(
 		lc fx.Lifecycle,

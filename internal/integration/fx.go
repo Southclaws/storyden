@@ -47,6 +47,11 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 		PluginDataPath:   makePerTestPluginDataPath(t.Name()),
 	}
 
+	defaultConfig, err := config.ApplyDefaults(defaultConfig)
+	if err != nil {
+		t.Fatalf("failed to configure integration app: %v", err)
+	}
+
 	if dbURL := os.Getenv("DATABASE_URL"); dbURL != "" {
 		if isMaybeProdDB(dbURL) {
 			panic("maybe accidental prod DATABASE_URL in integration tests!")
@@ -96,7 +101,7 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 		cf()
 	})
 
-	err := app.Start(ctx)
+	err = app.Start(ctx)
 	if err != nil {
 		t.Fatalf("failed to start integration app: %v", err)
 	}

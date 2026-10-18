@@ -47,11 +47,11 @@ func TestUploadedCropsHaveIndependentVariants(t *testing.T) {
 		lc.Append(fx.StartHook(func() {
 			ctx, _ := e2e.WithAccount(ctx, accounts, seed.Account_001_Odin)
 			auth := sessions.WithSession(ctx)
-			original := image.NewNRGBA(image.Rect(0, 0, 1800, 900))
+			original := image.NewNRGBA(image.Rect(0, 0, 1600, 800))
 			blue := image.NewUniform(color.NRGBA{B: 255, A: 255})
 			red := image.NewUniform(color.NRGBA{R: 255, A: 255})
-			draw.Draw(original, image.Rect(0, 0, 1800, 450), blue, image.Point{}, draw.Src)
-			draw.Draw(original, image.Rect(0, 450, 1800, 900), red, image.Point{}, draw.Src)
+			draw.Draw(original, image.Rect(0, 0, 1600, 400), blue, image.Point{}, draw.Src)
+			draw.Draw(original, image.Rect(0, 400, 1600, 800), red, image.Point{}, draw.Src)
 			var originalPNG bytes.Buffer
 			require.NoError(t, png.Encode(&originalPNG, original))
 
@@ -70,7 +70,7 @@ func TestUploadedCropsHaveIndependentVariants(t *testing.T) {
 
 			for index, rectangle := range []image.Rectangle{
 				image.Rect(0, 0, 1280, 320),
-				image.Rect(0, 500, 1280, 820),
+				image.Rect(0, 480, 1280, 800),
 			} {
 				var cropPNG bytes.Buffer
 				require.NoError(t, png.Encode(&cropPNG, original.SubImage(rectangle)))
