@@ -81,6 +81,18 @@ func (f AuthenticationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Val
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AuthenticationMutation", m)
 }
 
+// The BackgroundJobFunc type is an adapter to allow the use of ordinary
+// function as BackgroundJob mutator.
+type BackgroundJobFunc func(context.Context, *ent.BackgroundJobMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BackgroundJobFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.BackgroundJobMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BackgroundJobMutation", m)
+}
+
 // The CategoryFunc type is an adapter to allow the use of ordinary
 // function as Category mutator.
 type CategoryFunc func(context.Context, *ent.CategoryMutation) (ent.Value, error)

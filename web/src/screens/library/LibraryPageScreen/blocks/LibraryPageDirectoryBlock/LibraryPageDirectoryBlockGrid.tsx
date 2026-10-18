@@ -345,7 +345,7 @@ function GridCard({
         <Link {...linkDisabledProps(editing)} href={`/l/${node.slug}`}>
           {node.primary_image ? (
             <styled.img
-              src={getAssetURL(node.primary_image.path)}
+              src={getAssetURL(node.primary_image.path, "m")}
               objectFit="cover"
               w="full"
               h="32"

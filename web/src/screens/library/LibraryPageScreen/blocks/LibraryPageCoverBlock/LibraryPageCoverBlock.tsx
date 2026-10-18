@@ -3,7 +3,7 @@ import { ReactNode, Suspense, lazy } from "react";
 
 import { css } from "@/styled-system/css";
 import { Box } from "@/styled-system/jsx";
-import { getAssetURL } from "@/utils/asset";
+import { getAssetImageProps } from "@/utils/asset";
 
 import { useWatch } from "../../store";
 import { useEditState } from "../../useEditState";
@@ -20,23 +20,31 @@ const LibraryPageCoverBlockEditing = lazy(() =>
 export function LibraryPageCoverBlock() {
   const { isDirectEditing } = useEditState();
   const primary_image = useWatch((s) => s.draft.primary_image);
-  const primaryAssetURL = getAssetURL(primary_image?.path);
+  const imageProps = getAssetImageProps(primary_image, "l");
 
-  const cover = primaryAssetURL ? (
+  const cover = imageProps.src ? (
     <Box height="64" width="full">
-      <Image
-        className={css({
-          width: "full",
-          height: "full",
-          borderRadius: "md",
-          objectFit: "cover",
-          objectPosition: "center",
-        })}
-        src={primaryAssetURL}
-        alt=""
-        width={CROP_STENCIL_WIDTH}
-        height={CROP_STENCIL_HEIGHT}
-      />
+      <picture>
+        <source
+          srcSet={imageProps.srcSet}
+          sizes="(max-width: 960px) 100vw, 1200px"
+        />
+        <Image
+          className={css({
+            width: "full",
+            height: "full",
+            borderRadius: "md",
+            objectFit: "cover",
+            objectPosition: "center",
+          })}
+          src={imageProps.src}
+          sizes="(max-width: 960px) 100vw, 1200px"
+          loading="eager"
+          alt=""
+          width={CROP_STENCIL_WIDTH}
+          height={CROP_STENCIL_HEIGHT}
+        />
+      </picture>
     </Box>
   ) : null;
 

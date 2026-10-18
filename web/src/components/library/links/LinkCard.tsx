@@ -24,7 +24,7 @@ export function LinkCard({ link, disableAnchors, ...rest }: Props) {
       title={title}
       url={linkPagePath}
       text={link.description || "(no description)"}
-      image={getAssetURL(asset?.path)}
+      image={getAssetURL(asset?.path, "m")}
       shape="row"
       disableAnchors={disableAnchors}
       {...rest}

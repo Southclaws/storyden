@@ -7,6 +7,7 @@ import { ProgressCircle } from "@/components/ui/progress";
 import { Text } from "@/components/ui/text";
 import { css } from "@/styled-system/css";
 import { styled } from "@/styled-system/jsx";
+import { getImageVariantURL } from "@/utils/asset";
 
 export function ContentImage({
   attrs,
@@ -56,6 +57,7 @@ export function ContentImage({
         opacity={isUploading ? "5" : "full"}
         transition="all"
         {...attrs}
+        src={getImageVariantURL(attrs["src"], "l")}
       />
       {isUploading && (
         <styled.div

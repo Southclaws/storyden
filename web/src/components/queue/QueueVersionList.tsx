@@ -37,7 +37,7 @@ function QueueVersionListItem({ draft }: { draft: NodeDraft }) {
       id={draft.id}
       shape="responsive"
       url={url}
-      image={getAssetURL(node.primary_image?.path)}
+      image={getAssetURL(node.primary_image?.path, "s")}
       title={node.name}
       text="Draft edit proposal"
       titleIcon={<DraftIcon width="4" height="4" />}

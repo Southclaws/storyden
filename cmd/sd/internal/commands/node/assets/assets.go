@@ -325,7 +325,7 @@ func removeAsset(
 }
 
 func downloadAsset(ctx context.Context, client *openapi.ClientWithResponses, filename string) ([]byte, error) {
-	response, err := client.AssetGetWithResponse(ctx, filename)
+	response, err := client.AssetGetWithResponse(ctx, filename, nil)
 	if err != nil {
 		return nil, err
 	}

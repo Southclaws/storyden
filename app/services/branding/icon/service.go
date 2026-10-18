@@ -5,153 +5,99 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
-	"image/png"
 	"io"
-	"net/url"
-	"strings"
 
-	"github.com/Southclaws/fault"
-	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/fault/ftag"
-	"github.com/disintegration/imaging"
-	"github.com/rs/xid"
+	"github.com/Southclaws/opt"
 
-	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/asset/asset_download"
 	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
-	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/infrastructure/imagesafe"
-	"github.com/Southclaws/storyden/internal/infrastructure/object"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/mime"
 )
 
 //go:embed embed/default_icon.png
 var defaultIcon []byte
 
-const (
-	iconFileTemplate = "icon-%s.png"
-)
-
-type Size string
-
-var sizes = []Size{
-	"512x512",
-	"180x180",
-	"167x167",
-	"152x152",
-	"120x120",
-	"32x32",
-}
-
-var sizeMap = map[Size]int{
-	"512x512": 512,
-	"180x180": 180,
-	"167x167": 167,
-	"152x152": 152,
-	"120x120": 120,
-	"32x32":   32,
-}
-
-var errBadFormat = fault.Wrap(fault.New("bad format"), ftag.With(ftag.InvalidArgument))
-
 type Service interface {
-	Upload(ctx context.Context, r io.Reader) error
-	Get(ctx context.Context, size string) (*asset.Asset, io.Reader, error)
+	Upload(context.Context, io.Reader) error
+	Get(context.Context, string) (*asset.Asset, io.Reader, error)
 }
 
 type service struct {
-	accountQuery *account_querier.Querier
-	uploader     *asset_upload.Uploader
-	downloader   *asset_download.Downloader
-
-	os object.Storer
-
-	address url.URL
+	settings *settings.SettingsRepository
+	upload   *asset_upload.Uploader
+	download *asset_download.Downloader
 }
 
 func New(
-	accountQuery *account_querier.Querier,
-	uploader *asset_upload.Uploader,
-	downloader *asset_download.Downloader,
-
-	os object.Storer,
-	cfg config.Config,
+	settings *settings.SettingsRepository,
+	upload *asset_upload.Uploader,
+	download *asset_download.Downloader,
 ) Service {
 	return &service{
-		accountQuery: accountQuery,
-		uploader:     uploader,
-		downloader:   downloader,
-		os:           os,
-		address:      cfg.PublicWebAddress,
+		settings: settings,
+		upload:   upload,
+		download: download,
 	}
 }
 
-func (s *service) Upload(ctx context.Context, r io.Reader) error {
-	return s.uploadSizes(ctx, r, sizes)
-}
-
-func (s *service) uploadSizes(ctx context.Context, or io.Reader, sizes []Size) error {
-	mt, r, err := mime.Detect(or)
+func (s *service) Upload(ctx context.Context, stream io.Reader) error {
+	owner, err := session.GetAccountID(ctx)
 	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-	mime := mt.String()
-	ctx = fctx.WithMeta(ctx, "mimetype", mime)
-
-	if !strings.HasPrefix(mime, "image") {
-		return fault.Wrap(errBadFormat, fctx.With(ctx))
+		return err
 	}
 
-	source, t, err := imagesafe.Decode(r)
+	source, err := s.upload.UploadImage(
+		ctx,
+		owner,
+		stream,
+		-1,
+		asset.NewFilename("icon-original"),
+		asset_upload.Options{ImagePresets: asset.IconImagePresets},
+	)
 	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
+		return err
 	}
 
-	ctx = fctx.WithMeta(ctx, "type", t)
-
-	// re-used across each size
-	resizeBuffer := bytes.NewBuffer(nil)
-
-	for _, size := range sizes {
-		px := sizeMap[size]
-		filename := fmt.Sprintf(iconFileTemplate, size)
-		assetFilename := asset.NewFilepathFilename(filename)
-
-		resized := imaging.Resize(source, px, px, imaging.Lanczos)
-
-		resizeBuffer.Reset()
-
-		if err := png.Encode(resizeBuffer, resized); err != nil {
-			return fault.Wrap(err, fctx.With(ctx))
-		}
-
-		_, err = s.uploader.Upload(ctx, resizeBuffer, int64(resizeBuffer.Len()), assetFilename, asset_upload.Options{})
-		if err != nil {
-			return fault.Wrap(err, fctx.With(ctx))
-		}
-	}
-
-	return nil
+	_, err = s.settings.Set(ctx, settings.Settings{IconAssetID: opt.New(source.ID)})
+	return err
 }
 
 func (s *service) Get(ctx context.Context, size string) (*asset.Asset, io.Reader, error) {
-	filename := asset.NewFilepathFilename(fmt.Sprintf(iconFileTemplate, size))
-
-	a, r, err := s.downloader.Get(ctx, filename)
-	if err != nil {
-		a, r = s.getDefaultIcon()
+	var pixels int
+	if _, err := fmt.Sscanf(size, "%dx", &pixels); err != nil {
+		return nil, nil, err
 	}
 
-	return a, r, nil
-}
+	variant := asset.Variant(fmt.Sprintf("icon_%d", pixels))
+	if preset, ok := asset.Preset(variant); !ok || !preset.PNG {
+		return nil, nil, fmt.Errorf("invalid icon size %q", size)
+	}
 
-func (s *service) getDefaultIcon() (*asset.Asset, io.Reader) {
-	defaultIconReader := bytes.NewReader(defaultIcon)
-	return &asset.Asset{
-		ID:   xid.NilID(),
+	configured, err := s.settings.Get(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	if id, ok := configured.IconAssetID.Get(); ok {
+		icon, stream, pending, err := s.download.VariantByID(ctx, id, variant)
+		if err != nil {
+			return nil, nil, err
+		}
+		if !pending && icon.MIME.String() == "image/png" {
+			return icon, stream, nil
+		}
+		if closer, ok := stream.(io.Closer); ok {
+			closer.Close()
+		}
+	}
+
+	icon := &asset.Asset{
 		Name: asset.NewFilepathFilename("default-icon.png"),
 		Size: len(defaultIcon),
 		MIME: mime.New("image/png"),
-	}, defaultIconReader
+	}
+
+	return icon, bytes.NewReader(defaultIcon), nil
 }

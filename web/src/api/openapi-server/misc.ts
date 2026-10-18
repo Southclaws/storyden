@@ -10,6 +10,8 @@
 import type {
   AssetGetOKResponse,
   AssetUploadBody,
+  BadRequestResponse,
+  BannerGetParams,
   BeaconBody,
   GetInfoOKResponse,
   GetSessionOKResponse,
@@ -353,29 +355,50 @@ export type bannerGetResponse200 = {
   status: 200;
 };
 
+export type bannerGetResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
 export type bannerGetResponseDefault = {
   data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200>;
+  status: Exclude<HTTPStatusCodes, 200 | 400>;
 };
 
 export type bannerGetResponseSuccess = bannerGetResponse200 & {
   headers: Headers;
 };
-export type bannerGetResponseError = bannerGetResponseDefault & {
+export type bannerGetResponseError = (
+  | bannerGetResponse400
+  | bannerGetResponseDefault
+) & {
   headers: Headers;
 };
 
-export const getBannerGetUrl = () => {
-  return `/info/banner`;
+export const getBannerGetUrl = (params?: BannerGetParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/info/banner?${stringifiedParams}`
+    : `/info/banner`;
 };
 
 /**
  * Get the banner image.
  */
 export const bannerGet = async (
+  params?: BannerGetParams,
   options?: Parameters<typeof fetcher>[1],
 ): Promise<bannerGetResponseSuccess> => {
-  return fetcher<bannerGetResponseSuccess>(getBannerGetUrl(), {
+  return fetcher<bannerGetResponseSuccess>(getBannerGetUrl(params), {
     ...options,
     method: "GET",
   });

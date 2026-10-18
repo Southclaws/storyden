@@ -162,6 +162,7 @@ func TestOAuthRegistrationAccessTokens(t *testing.T) {
 				require.NotEqual(t, client.ID, *client.AccountID)
 				bot, err := db.Account.Get(root, *client.AccountID)
 				require.NoError(t, err)
+				require.NotNil(t, bot.AvatarAssetID)
 				require.Equal(t, "bot", bot.Kind.String())
 				require.Equal(t, *body.ClientName, bot.Handle)
 				assertion := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{

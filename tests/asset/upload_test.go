@@ -40,8 +40,10 @@ func TestUploadRecordsBytesWrittenNotDeclaredSize(t *testing.T) {
 
 			name := asset.NewFilename("declared-size-lies.txt")
 
-			a, err := uploader.Upload(ctx, bytes.NewReader(payload), 10, name, asset_upload.Options{})
+			a, err := uploader.Upload(root, acc.ID, bytes.NewReader(payload), 10, name, asset_upload.Options{})
 			require.NoError(t, err)
+
+			assert.EqualValues(t, acc.ID, a.OwnerID)
 
 			assert.Equal(t, len(payload), a.Size, "the recorded size must be the bytes actually stored")
 
@@ -74,8 +76,10 @@ func TestUploadRecordsSizeForUnknownLength(t *testing.T) {
 			payload := bytes.Repeat([]byte("chunked"), 128)
 			name := asset.NewFilename("unknown-length.txt")
 
-			a, err := uploader.Upload(ctx, bytes.NewReader(payload), -1, name, asset_upload.Options{})
+			a, err := uploader.Upload(root, acc.ID, bytes.NewReader(payload), -1, name, asset_upload.Options{})
 			require.NoError(t, err)
+
+			assert.EqualValues(t, acc.ID, a.OwnerID)
 
 			assert.Equal(t, len(payload), a.Size, "a chunked upload reports -1 and must still record a real size")
 

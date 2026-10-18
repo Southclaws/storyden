@@ -276,7 +276,7 @@ function RobotNodeCard({ data }: { data: RobotRenderCardData }) {
         title={page.name}
         text={page.description}
         url={url}
-        image={getAssetURL(page.primary_image?.path)}
+        image={getAssetURL(page.primary_image?.path, "m")}
         shape="row"
       />
     </Box>
@@ -457,6 +457,7 @@ function RobotThreadReferenceCard({
   const title = thread.title || thread.link?.title || "Untitled thread";
   const image = getAssetURL(
     thread.assets?.[0]?.path ?? thread.link?.primary_image?.path,
+    "m",
   );
   const replyCount = thread.reply_status.replies;
   const replyLabel = `${replyCount} ${pluralise(replyCount, "reply", "replies")}`;

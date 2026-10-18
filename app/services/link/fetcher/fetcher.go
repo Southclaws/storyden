@@ -23,6 +23,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/link/scrape"
 	"github.com/Southclaws/storyden/internal/infrastructure/httpsafe"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
@@ -167,6 +168,11 @@ func (s *Fetcher) ScrapeAndStore(ctx context.Context, u url.URL) (*link_ref.Link
 }
 
 func (s *Fetcher) CopyAsset(ctx context.Context, url string) (*asset.Asset, error) {
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	body, err := fetchBounded(ctx, s.client, url, assetFetchMaxBytes)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -175,7 +181,14 @@ func (s *Fetcher) CopyAsset(ctx context.Context, url string) (*asset.Asset, erro
 	// TODO: Better naming???
 	name := mark.Slugify(url)
 
-	a, err := s.uploader.Upload(ctx, bytes.NewReader(body), int64(len(body)), asset.NewFilename(name), asset_upload.Options{})
+	a, err := s.uploader.Upload(
+		ctx,
+		accountID,
+		bytes.NewReader(body),
+		int64(len(body)),
+		asset.NewFilename(name),
+		asset_upload.Options{},
+	)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

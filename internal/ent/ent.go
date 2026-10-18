@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/auditlog"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
+	"github.com/Southclaws/storyden/internal/ent/backgroundjob"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
@@ -140,6 +141,7 @@ func checkColumn(t, c string) error {
 			asset.Table:                     asset.ValidColumn,
 			auditlog.Table:                  auditlog.ValidColumn,
 			authentication.Table:            authentication.ValidColumn,
+			backgroundjob.Table:             backgroundjob.ValidColumn,
 			category.Table:                  category.ValidColumn,
 			collection.Table:                collection.ValidColumn,
 			collectionnode.Table:            collectionnode.ValidColumn,

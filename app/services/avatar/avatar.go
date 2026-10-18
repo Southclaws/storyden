@@ -1,82 +1,87 @@
 package avatar
 
 import (
-	"bytes"
 	"context"
 	"image/png"
 	"io"
-	"path"
 
-	"github.com/Southclaws/fault"
-	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/roboticon"
+	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_repo"
+	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
+	"github.com/Southclaws/storyden/internal/mime"
 )
 
-func avatarPath(aid account.AccountID) string {
-	return path.Join("avatar", aid.String())
-}
-
 func (s *service) Exists(ctx context.Context, accountID account.AccountID) bool {
-	exists, err := s.storage.Exists(ctx, avatarPath(accountID))
-	if err != nil {
-		return false // errors are ignored for now 🤠
-	}
-
-	return exists
+	owner, err := s.accounts.GetRefByID(ctx, accountID)
+	return err == nil && owner.AvatarAssetID.Ok()
 }
 
 func (s *service) Set(ctx context.Context, accountID account.AccountID, stream io.Reader, size int64) error {
-	if err := s.storage.Write(ctx, avatarPath(accountID), stream, size); err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
+	source, err := s.upload.UploadImage(
+		ctx,
+		accountID,
+		stream,
+		size,
+		asset.NewFilename("avatar-original"),
+		asset_upload.Options{},
+	)
+	if err != nil {
+		return err
 	}
 
-	return nil
-}
-
-func (s *service) SetRobot(ctx context.Context, accountID account.AccountID) error {
-	var image bytes.Buffer
-	robot := roboticon.Generate(accountID.String())
-	if err := robot.RenderPNG(&image, 256); err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return s.Set(ctx, accountID, &image, int64(image.Len()))
+	_, err = s.accounts.Update(ctx, accountID, account_repo.SetAvatarAssetID(opt.New(source.ID)))
+	return err
 }
 
 func (s *service) Delete(ctx context.Context, accountID account.AccountID) error {
-	if err := s.storage.Delete(ctx, avatarPath(accountID)); err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return nil
+	_, err := s.accounts.Update(ctx, accountID, account_repo.SetAvatarAssetID(opt.NewEmpty[asset.AssetID]()))
+	return err
 }
 
 func (s *service) Get(ctx context.Context, accountID account.AccountID) (io.Reader, int64, error) {
-	stream, size, err := s.storage.Read(ctx, avatarPath(accountID))
+	a, r, _, err := s.GetVariant(ctx, accountID, asset.Original)
 	if err != nil {
-		r, w := io.Pipe()
+		return nil, 0, err
+	}
+	return r, int64(a.Size), nil
+}
 
-		go func() {
-			// close the writer, not the reader: that is what signals EOF (or the
-			// error) to whoever is consuming r
-			i, err := s.generator.Generate(ctx, accountID.String())
-			if err != nil {
-				w.CloseWithError(err)
-				return
-			}
-
-			if err := png.Encode(w, i); err != nil {
-				w.CloseWithError(err)
-				return
-			}
-
-			w.Close()
-		}()
-
-		return r, 0, nil
+func (s *service) GetVariant(
+	ctx context.Context,
+	accountID account.AccountID,
+	variant asset.Variant,
+) (*asset.Asset, io.Reader, bool, error) {
+	owner, err := s.accounts.GetRefByID(ctx, accountID)
+	if err != nil {
+		return nil, nil, false, err
+	}
+	if id, ok := owner.AvatarAssetID.Get(); ok {
+		return s.download.VariantByID(ctx, id, variant)
 	}
 
-	return stream, size, nil
+	return s.generated(ctx, accountID)
+}
+
+func (s *service) generated(ctx context.Context, accountID account.AccountID) (*asset.Asset, io.Reader, bool, error) {
+	r, w := io.Pipe()
+
+	go func() {
+		i, err := s.generator.Generate(ctx, accountID.String())
+		if err != nil {
+			w.CloseWithError(err)
+			return
+		}
+
+		if err := png.Encode(w, i); err != nil {
+			w.CloseWithError(err)
+			return
+		}
+
+		w.Close()
+	}()
+
+	return &asset.Asset{MIME: mime.New("image/png")}, r, false, nil
 }

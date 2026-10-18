@@ -42,7 +42,7 @@ export function AssetThumbnail({
     clearOnDefault: true,
     parse: (value) => (value === "" ? null : value),
   });
-  const url = getAssetURL(asset.path)!;
+  const url = getAssetURL(asset.path, "thumb_l")!;
 
   const lightbox = view === asset.id;
 

@@ -103,7 +103,10 @@ test.describe("Content composer", () => {
     });
 
     const image = editor.locator('img[alt="composer-image.png"]');
-    await expect(image).toHaveAttribute("src", /composer-image\.png$/);
+    await expect(image).toHaveAttribute(
+      "src",
+      /composer-image\.png\?variant=l$/,
+    );
     await expect(image.locator("xpath=..")).toHaveAttribute(
       "data-node-view-wrapper",
     );

@@ -14,7 +14,7 @@ import { useLibraryCoverEvent } from "./events";
 
 export function useLibraryPageCoverBlock() {
   const { store } = useLibraryPageContext();
-  const { draft, setPrimaryImage } = store.getState();
+  const { setPrimaryImage } = store.getState();
 
   const cropperRef = useRef<FixedCropperRef>(null);
 
@@ -123,6 +123,8 @@ export function useLibraryPageCoverBlock() {
       return;
     }
 
+    const primaryImage = store.getState().draft.primary_image;
+
     const canvas = cropperRef.current.getCanvas();
     if (!canvas) {
       throw new Error("An unexpected error occurred with the image editor.");
@@ -147,20 +149,7 @@ export function useLibraryPageCoverBlock() {
       });
     });
 
-    if (draft.primary_image) {
-      // TODO: Delete the original asset maybe?
-    }
-
-    // The cover image is determined to be a copy of an original if it has a
-    // parent asset associated with it. Original assets do not have parents.
-    const isCopy = draft.primary_image?.parent?.id !== undefined;
-
-    const parent_asset_id = isCopy
-      ? // If the primary image is already a copy, use the existing parent.
-        draft.primary_image?.parent?.id
-      : // Otherwise, use the primary image asset ID, which will result in
-        // this ID becoming the parent.
-        draft.primary_image?.id;
+    const parent_asset_id = primaryImage?.parent?.id ?? primaryImage?.id;
 
     // The result of this is that when the asset revalidates, the original
     // asset will be present in the primary image asset object. This means

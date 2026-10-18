@@ -11789,6 +11789,17 @@ commands:
     operationId: apiAssetGet
     description: Download an asset by its filename.
     flags:
+    - name: variant
+      description: Image preset to download; omit for the original file.
+      choices:
+      - original
+      - s
+      - m
+      - l
+      - thumb_s
+      - thumb_m
+      - thumb_l
+      trackChanged: true
     - $ref: '#/components/flags/api-output'
     - $ref: '#/components/flags/api-output-file'
     - $ref: '#/components/flags/api-timeout'
@@ -11800,6 +11811,9 @@ commands:
       # Download an asset by its filename
 
       Download an asset by its filename.
+
+      Use `--variant` to request an image preset. Omit it to download the
+      original file.
 
       Inspect the local request and response contract with `sd api schema
       AssetGet`. This calls `GET /assets/{asset_filename}` using the selected

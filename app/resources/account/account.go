@@ -12,6 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_ref"
 	"github.com/Southclaws/storyden/app/resources/account/role/held"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/schema"
@@ -35,6 +36,7 @@ type Account struct {
 	Roles          held.Roles
 	Admin          bool
 	Metadata       map[string]any
+	AvatarAssetID  opt.Optional[asset.AssetID]
 
 	DeletedAt opt.Optional[time.Time]
 	IndexedAt opt.Optional[time.Time]

@@ -39,6 +39,7 @@ require (
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/alitto/pond/v2 v2.7.2
 	github.com/anthropics/anthropic-sdk-go v1.80.0
+	github.com/bep/imagemeta v1.1.0
 	github.com/blevesearch/bleve/v2 v2.6.1
 	github.com/britishboop/hermes v0.0.0-20251206153109-3b31218be4fc
 	github.com/bwmarrin/discordgo v0.29.0
@@ -48,11 +49,11 @@ require (
 	github.com/coreos/go-oidc/v3 v3.21.0
 	github.com/dave/jennifer v1.7.1
 	github.com/dgraph-io/ristretto/v2 v2.4.2
-	github.com/disintegration/imaging v1.6.2
 	github.com/durable-streams/durable-streams/packages/client-go v0.2.0
 	github.com/dustin/go-humanize v1.1.0
 	github.com/forPelevin/gomoji v1.4.1
 	github.com/gabriel-vasile/mimetype v1.4.15
+	github.com/gen2brain/webp v0.6.4
 	github.com/getkin/kin-openapi v0.149.0
 	github.com/getsentry/sentry-go v0.50.0
 	github.com/getsentry/sentry-go/otel v0.50.0
@@ -114,6 +115,7 @@ require (
 	go.uber.org/fx v1.24.0
 	golang.org/x/crypto v0.58.0
 	golang.org/x/exp v0.0.0-20261009195045-ca0d7ba23607
+	golang.org/x/image v0.47.0
 	golang.org/x/mod v0.42.0
 	golang.org/x/net v0.61.0
 	golang.org/x/oauth2 v0.37.0
@@ -331,7 +333,6 @@ require (
 	go.uber.org/zap v1.28.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	go.yaml.in/yaml/v4 v4.0.0-rc.6 // indirect
-	golang.org/x/image v0.47.0 // indirect
 	golang.org/x/time v0.16.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20261005182115-fad411399dd8 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20261005182115-fad411399dd8 // indirect

@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/auditlog"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
+	"github.com/Southclaws/storyden/internal/ent/backgroundjob"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
@@ -95,6 +96,7 @@ const (
 	TypeAsset                                = "Asset"
 	TypeAuditLog                             = "AuditLog"
 	TypeAuthentication                       = "Authentication"
+	TypeBackgroundJob                        = "BackgroundJob"
 	TypeCategory                             = "Category"
 	TypeCollection                           = "Collection"
 	TypeCollectionNode                       = "CollectionNode"
@@ -166,6 +168,7 @@ type AccountMutation struct {
 	handle                                      *string
 	name                                        *string
 	bio                                         *string
+	avatar_asset_id                             *xid.ID
 	signature                                   *string
 	kind                                        *account.Kind
 	verified_status                             *account.VerifiedStatus
@@ -727,6 +730,55 @@ func (m *AccountMutation) BioCleared() bool {
 func (m *AccountMutation) ResetBio() {
 	m.bio = nil
 	delete(m.clearedFields, account.FieldBio)
+}
+
+// SetAvatarAssetID sets the "avatar_asset_id" field.
+func (m *AccountMutation) SetAvatarAssetID(x xid.ID) {
+	m.avatar_asset_id = &x
+}
+
+// AvatarAssetID returns the value of the "avatar_asset_id" field in the mutation.
+func (m *AccountMutation) AvatarAssetID() (r xid.ID, exists bool) {
+	v := m.avatar_asset_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAvatarAssetID returns the old "avatar_asset_id" field's value of the Account entity.
+// If the Account object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountMutation) OldAvatarAssetID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAvatarAssetID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAvatarAssetID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAvatarAssetID: %w", err)
+	}
+	return oldValue.AvatarAssetID, nil
+}
+
+// ClearAvatarAssetID clears the value of the "avatar_asset_id" field.
+func (m *AccountMutation) ClearAvatarAssetID() {
+	m.avatar_asset_id = nil
+	m.clearedFields[account.FieldAvatarAssetID] = struct{}{}
+}
+
+// AvatarAssetIDCleared returns if the "avatar_asset_id" field was cleared in this mutation.
+func (m *AccountMutation) AvatarAssetIDCleared() bool {
+	_, ok := m.clearedFields[account.FieldAvatarAssetID]
+	return ok
+}
+
+// ResetAvatarAssetID resets all changes to the "avatar_asset_id" field.
+func (m *AccountMutation) ResetAvatarAssetID() {
+	m.avatar_asset_id = nil
+	delete(m.clearedFields, account.FieldAvatarAssetID)
 }
 
 // SetSignature sets the "signature" field.
@@ -3864,7 +3916,7 @@ func (m *AccountMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AccountMutation) Fields() []string {
-	fields := make([]string, 0, 14)
+	fields := make([]string, 0, 15)
 	if m.created_at != nil {
 		fields = append(fields, account.FieldCreatedAt)
 	}
@@ -3885,6 +3937,9 @@ func (m *AccountMutation) Fields() []string {
 	}
 	if m.bio != nil {
 		fields = append(fields, account.FieldBio)
+	}
+	if m.avatar_asset_id != nil {
+		fields = append(fields, account.FieldAvatarAssetID)
 	}
 	if m.signature != nil {
 		fields = append(fields, account.FieldSignature)
@@ -3929,6 +3984,8 @@ func (m *AccountMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case account.FieldBio:
 		return m.Bio()
+	case account.FieldAvatarAssetID:
+		return m.AvatarAssetID()
 	case account.FieldSignature:
 		return m.Signature()
 	case account.FieldKind:
@@ -3966,6 +4023,8 @@ func (m *AccountMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldName(ctx)
 	case account.FieldBio:
 		return m.OldBio(ctx)
+	case account.FieldAvatarAssetID:
+		return m.OldAvatarAssetID(ctx)
 	case account.FieldSignature:
 		return m.OldSignature(ctx)
 	case account.FieldKind:
@@ -4037,6 +4096,13 @@ func (m *AccountMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetBio(v)
+		return nil
+	case account.FieldAvatarAssetID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAvatarAssetID(v)
 		return nil
 	case account.FieldSignature:
 		v, ok := value.(string)
@@ -4126,6 +4192,9 @@ func (m *AccountMutation) ClearedFields() []string {
 	if m.FieldCleared(account.FieldBio) {
 		fields = append(fields, account.FieldBio)
 	}
+	if m.FieldCleared(account.FieldAvatarAssetID) {
+		fields = append(fields, account.FieldAvatarAssetID)
+	}
 	if m.FieldCleared(account.FieldSignature) {
 		fields = append(fields, account.FieldSignature)
 	}
@@ -4160,6 +4229,9 @@ func (m *AccountMutation) ClearField(name string) error {
 		return nil
 	case account.FieldBio:
 		m.ClearBio()
+		return nil
+	case account.FieldAvatarAssetID:
+		m.ClearAvatarAssetID()
 		return nil
 	case account.FieldSignature:
 		m.ClearSignature()
@@ -4201,6 +4273,9 @@ func (m *AccountMutation) ResetField(name string) error {
 		return nil
 	case account.FieldBio:
 		m.ResetBio()
+		return nil
+	case account.FieldAvatarAssetID:
+		m.ResetAvatarAssetID()
 		return nil
 	case account.FieldSignature:
 		m.ResetSignature()
@@ -6823,7 +6898,8 @@ type AssetMutation struct {
 	size                  *int
 	addsize               *int
 	mime_type             *string
-	metadata              *map[string]interface{}
+	metadata              *jsontext.Value
+	appendmetadata        jsontext.Value
 	clearedFields         map[string]struct{}
 	posts                 map[xid.ID]struct{}
 	removedposts          map[xid.ID]struct{}
@@ -7157,12 +7233,13 @@ func (m *AssetMutation) ResetMimeType() {
 }
 
 // SetMetadata sets the "metadata" field.
-func (m *AssetMutation) SetMetadata(value map[string]interface{}) {
-	m.metadata = &value
+func (m *AssetMutation) SetMetadata(j jsontext.Value) {
+	m.metadata = &j
+	m.appendmetadata = nil
 }
 
 // Metadata returns the value of the "metadata" field in the mutation.
-func (m *AssetMutation) Metadata() (r map[string]interface{}, exists bool) {
+func (m *AssetMutation) Metadata() (r jsontext.Value, exists bool) {
 	v := m.metadata
 	if v == nil {
 		return
@@ -7173,7 +7250,7 @@ func (m *AssetMutation) Metadata() (r map[string]interface{}, exists bool) {
 // OldMetadata returns the old "metadata" field's value of the Asset entity.
 // If the Asset object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AssetMutation) OldMetadata(ctx context.Context) (v map[string]interface{}, err error) {
+func (m *AssetMutation) OldMetadata(ctx context.Context) (v jsontext.Value, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldMetadata is only allowed on UpdateOne operations")
 	}
@@ -7187,9 +7264,23 @@ func (m *AssetMutation) OldMetadata(ctx context.Context) (v map[string]interface
 	return oldValue.Metadata, nil
 }
 
+// AppendMetadata adds j to the "metadata" field.
+func (m *AssetMutation) AppendMetadata(j jsontext.Value) {
+	m.appendmetadata = append(m.appendmetadata, j...)
+}
+
+// AppendedMetadata returns the list of values that were appended to the "metadata" field in this mutation.
+func (m *AssetMutation) AppendedMetadata() (jsontext.Value, bool) {
+	if len(m.appendmetadata) == 0 {
+		return nil, false
+	}
+	return m.appendmetadata, true
+}
+
 // ClearMetadata clears the value of the "metadata" field.
 func (m *AssetMutation) ClearMetadata() {
 	m.metadata = nil
+	m.appendmetadata = nil
 	m.clearedFields[asset.FieldMetadata] = struct{}{}
 }
 
@@ -7202,6 +7293,7 @@ func (m *AssetMutation) MetadataCleared() bool {
 // ResetMetadata resets all changes to the "metadata" field.
 func (m *AssetMutation) ResetMetadata() {
 	m.metadata = nil
+	m.appendmetadata = nil
 	delete(m.clearedFields, asset.FieldMetadata)
 }
 
@@ -7847,7 +7939,7 @@ func (m *AssetMutation) SetField(name string, value ent.Value) error {
 		m.SetMimeType(v)
 		return nil
 	case asset.FieldMetadata:
-		v, ok := value.(map[string]interface{})
+		v, ok := value.(jsontext.Value)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -9975,6 +10067,1071 @@ func (m *AuthenticationMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Authentication edge %s", name)
+}
+
+// BackgroundJobMutation represents an operation that mutates the BackgroundJob nodes in the graph.
+type BackgroundJobMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *xid.ID
+	created_at     *time.Time
+	updated_at     *time.Time
+	kind           *string
+	key            *string
+	payload        *jsontext.Value
+	appendpayload  jsontext.Value
+	revision       *int64
+	addrevision    *int64
+	status         *backgroundjob.Status
+	attempts       *int
+	addattempts    *int
+	reason         *string
+	lease_token    *string
+	lease_until    *time.Time
+	dispatch_until *time.Time
+	available_at   *time.Time
+	clearedFields  map[string]struct{}
+	done           bool
+	oldValue       func(context.Context) (*BackgroundJob, error)
+	predicates     []predicate.BackgroundJob
+}
+
+var _ ent.Mutation = (*BackgroundJobMutation)(nil)
+
+// backgroundjobOption allows management of the mutation configuration using functional options.
+type backgroundjobOption func(*BackgroundJobMutation)
+
+// newBackgroundJobMutation creates new mutation for the BackgroundJob entity.
+func newBackgroundJobMutation(c config, op Op, opts ...backgroundjobOption) *BackgroundJobMutation {
+	m := &BackgroundJobMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeBackgroundJob,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withBackgroundJobID sets the ID field of the mutation.
+func withBackgroundJobID(id xid.ID) backgroundjobOption {
+	return func(m *BackgroundJobMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *BackgroundJob
+		)
+		m.oldValue = func(ctx context.Context) (*BackgroundJob, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().BackgroundJob.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withBackgroundJob sets the old BackgroundJob of the mutation.
+func withBackgroundJob(node *BackgroundJob) backgroundjobOption {
+	return func(m *BackgroundJobMutation) {
+		m.oldValue = func(context.Context) (*BackgroundJob, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m BackgroundJobMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m BackgroundJobMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of BackgroundJob entities.
+func (m *BackgroundJobMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *BackgroundJobMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *BackgroundJobMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().BackgroundJob.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *BackgroundJobMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *BackgroundJobMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the BackgroundJob entity.
+// If the BackgroundJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BackgroundJobMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *BackgroundJobMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *BackgroundJobMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *BackgroundJobMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the BackgroundJob entity.
+// If the BackgroundJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BackgroundJobMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *BackgroundJobMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetKind sets the "kind" field.
+func (m *BackgroundJobMutation) SetKind(s string) {
+	m.kind = &s
+}
+
+// Kind returns the value of the "kind" field in the mutation.
+func (m *BackgroundJobMutation) Kind() (r string, exists bool) {
+	v := m.kind
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldKind returns the old "kind" field's value of the BackgroundJob entity.
+// If the BackgroundJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BackgroundJobMutation) OldKind(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldKind is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldKind requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldKind: %w", err)
+	}
+	return oldValue.Kind, nil
+}
+
+// ResetKind resets all changes to the "kind" field.
+func (m *BackgroundJobMutation) ResetKind() {
+	m.kind = nil
+}
+
+// SetKey sets the "key" field.
+func (m *BackgroundJobMutation) SetKey(s string) {
+	m.key = &s
+}
+
+// Key returns the value of the "key" field in the mutation.
+func (m *BackgroundJobMutation) Key() (r string, exists bool) {
+	v := m.key
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldKey returns the old "key" field's value of the BackgroundJob entity.
+// If the BackgroundJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BackgroundJobMutation) OldKey(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldKey is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldKey requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldKey: %w", err)
+	}
+	return oldValue.Key, nil
+}
+
+// ResetKey resets all changes to the "key" field.
+func (m *BackgroundJobMutation) ResetKey() {
+	m.key = nil
+}
+
+// SetPayload sets the "payload" field.
+func (m *BackgroundJobMutation) SetPayload(j jsontext.Value) {
+	m.payload = &j
+	m.appendpayload = nil
+}
+
+// Payload returns the value of the "payload" field in the mutation.
+func (m *BackgroundJobMutation) Payload() (r jsontext.Value, exists bool) {
+	v := m.payload
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPayload returns the old "payload" field's value of the BackgroundJob entity.
+// If the BackgroundJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BackgroundJobMutation) OldPayload(ctx context.Context) (v jsontext.Value, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPayload is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPayload requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPayload: %w", err)
+	}
+	return oldValue.Payload, nil
+}
+
+// AppendPayload adds j to the "payload" field.
+func (m *BackgroundJobMutation) AppendPayload(j jsontext.Value) {
+	m.appendpayload = append(m.appendpayload, j...)
+}
+
+// AppendedPayload returns the list of values that were appended to the "payload" field in this mutation.
+func (m *BackgroundJobMutation) AppendedPayload() (jsontext.Value, bool) {
+	if len(m.appendpayload) == 0 {
+		return nil, false
+	}
+	return m.appendpayload, true
+}
+
+// ResetPayload resets all changes to the "payload" field.
+func (m *BackgroundJobMutation) ResetPayload() {
+	m.payload = nil
+	m.appendpayload = nil
+}
+
+// SetRevision sets the "revision" field.
+func (m *BackgroundJobMutation) SetRevision(i int64) {
+	m.revision = &i
+	m.addrevision = nil
+}
+
+// Revision returns the value of the "revision" field in the mutation.
+func (m *BackgroundJobMutation) Revision() (r int64, exists bool) {
+	v := m.revision
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRevision returns the old "revision" field's value of the BackgroundJob entity.
+// If the BackgroundJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BackgroundJobMutation) OldRevision(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRevision is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRevision requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRevision: %w", err)
+	}
+	return oldValue.Revision, nil
+}
+
+// AddRevision adds i to the "revision" field.
+func (m *BackgroundJobMutation) AddRevision(i int64) {
+	if m.addrevision != nil {
+		*m.addrevision += i
+	} else {
+		m.addrevision = &i
+	}
+}
+
+// AddedRevision returns the value that was added to the "revision" field in this mutation.
+func (m *BackgroundJobMutation) AddedRevision() (r int64, exists bool) {
+	v := m.addrevision
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRevision resets all changes to the "revision" field.
+func (m *BackgroundJobMutation) ResetRevision() {
+	m.revision = nil
+	m.addrevision = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *BackgroundJobMutation) SetStatus(b backgroundjob.Status) {
+	m.status = &b
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *BackgroundJobMutation) Status() (r backgroundjob.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the BackgroundJob entity.
+// If the BackgroundJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BackgroundJobMutation) OldStatus(ctx context.Context) (v backgroundjob.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *BackgroundJobMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetAttempts sets the "attempts" field.
+func (m *BackgroundJobMutation) SetAttempts(i int) {
+	m.attempts = &i
+	m.addattempts = nil
+}
+
+// Attempts returns the value of the "attempts" field in the mutation.
+func (m *BackgroundJobMutation) Attempts() (r int, exists bool) {
+	v := m.attempts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAttempts returns the old "attempts" field's value of the BackgroundJob entity.
+// If the BackgroundJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BackgroundJobMutation) OldAttempts(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAttempts is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAttempts requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAttempts: %w", err)
+	}
+	return oldValue.Attempts, nil
+}
+
+// AddAttempts adds i to the "attempts" field.
+func (m *BackgroundJobMutation) AddAttempts(i int) {
+	if m.addattempts != nil {
+		*m.addattempts += i
+	} else {
+		m.addattempts = &i
+	}
+}
+
+// AddedAttempts returns the value that was added to the "attempts" field in this mutation.
+func (m *BackgroundJobMutation) AddedAttempts() (r int, exists bool) {
+	v := m.addattempts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetAttempts resets all changes to the "attempts" field.
+func (m *BackgroundJobMutation) ResetAttempts() {
+	m.attempts = nil
+	m.addattempts = nil
+}
+
+// SetReason sets the "reason" field.
+func (m *BackgroundJobMutation) SetReason(s string) {
+	m.reason = &s
+}
+
+// Reason returns the value of the "reason" field in the mutation.
+func (m *BackgroundJobMutation) Reason() (r string, exists bool) {
+	v := m.reason
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldReason returns the old "reason" field's value of the BackgroundJob entity.
+// If the BackgroundJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BackgroundJobMutation) OldReason(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldReason is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldReason requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldReason: %w", err)
+	}
+	return oldValue.Reason, nil
+}
+
+// ResetReason resets all changes to the "reason" field.
+func (m *BackgroundJobMutation) ResetReason() {
+	m.reason = nil
+}
+
+// SetLeaseToken sets the "lease_token" field.
+func (m *BackgroundJobMutation) SetLeaseToken(s string) {
+	m.lease_token = &s
+}
+
+// LeaseToken returns the value of the "lease_token" field in the mutation.
+func (m *BackgroundJobMutation) LeaseToken() (r string, exists bool) {
+	v := m.lease_token
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLeaseToken returns the old "lease_token" field's value of the BackgroundJob entity.
+// If the BackgroundJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BackgroundJobMutation) OldLeaseToken(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLeaseToken is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLeaseToken requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLeaseToken: %w", err)
+	}
+	return oldValue.LeaseToken, nil
+}
+
+// ResetLeaseToken resets all changes to the "lease_token" field.
+func (m *BackgroundJobMutation) ResetLeaseToken() {
+	m.lease_token = nil
+}
+
+// SetLeaseUntil sets the "lease_until" field.
+func (m *BackgroundJobMutation) SetLeaseUntil(t time.Time) {
+	m.lease_until = &t
+}
+
+// LeaseUntil returns the value of the "lease_until" field in the mutation.
+func (m *BackgroundJobMutation) LeaseUntil() (r time.Time, exists bool) {
+	v := m.lease_until
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLeaseUntil returns the old "lease_until" field's value of the BackgroundJob entity.
+// If the BackgroundJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BackgroundJobMutation) OldLeaseUntil(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLeaseUntil is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLeaseUntil requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLeaseUntil: %w", err)
+	}
+	return oldValue.LeaseUntil, nil
+}
+
+// ResetLeaseUntil resets all changes to the "lease_until" field.
+func (m *BackgroundJobMutation) ResetLeaseUntil() {
+	m.lease_until = nil
+}
+
+// SetDispatchUntil sets the "dispatch_until" field.
+func (m *BackgroundJobMutation) SetDispatchUntil(t time.Time) {
+	m.dispatch_until = &t
+}
+
+// DispatchUntil returns the value of the "dispatch_until" field in the mutation.
+func (m *BackgroundJobMutation) DispatchUntil() (r time.Time, exists bool) {
+	v := m.dispatch_until
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDispatchUntil returns the old "dispatch_until" field's value of the BackgroundJob entity.
+// If the BackgroundJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BackgroundJobMutation) OldDispatchUntil(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDispatchUntil is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDispatchUntil requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDispatchUntil: %w", err)
+	}
+	return oldValue.DispatchUntil, nil
+}
+
+// ResetDispatchUntil resets all changes to the "dispatch_until" field.
+func (m *BackgroundJobMutation) ResetDispatchUntil() {
+	m.dispatch_until = nil
+}
+
+// SetAvailableAt sets the "available_at" field.
+func (m *BackgroundJobMutation) SetAvailableAt(t time.Time) {
+	m.available_at = &t
+}
+
+// AvailableAt returns the value of the "available_at" field in the mutation.
+func (m *BackgroundJobMutation) AvailableAt() (r time.Time, exists bool) {
+	v := m.available_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAvailableAt returns the old "available_at" field's value of the BackgroundJob entity.
+// If the BackgroundJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BackgroundJobMutation) OldAvailableAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAvailableAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAvailableAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAvailableAt: %w", err)
+	}
+	return oldValue.AvailableAt, nil
+}
+
+// ResetAvailableAt resets all changes to the "available_at" field.
+func (m *BackgroundJobMutation) ResetAvailableAt() {
+	m.available_at = nil
+}
+
+// Where appends a list predicates to the BackgroundJobMutation builder.
+func (m *BackgroundJobMutation) Where(ps ...predicate.BackgroundJob) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the BackgroundJobMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *BackgroundJobMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.BackgroundJob, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *BackgroundJobMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *BackgroundJobMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (BackgroundJob).
+func (m *BackgroundJobMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *BackgroundJobMutation) Fields() []string {
+	fields := make([]string, 0, 13)
+	if m.created_at != nil {
+		fields = append(fields, backgroundjob.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, backgroundjob.FieldUpdatedAt)
+	}
+	if m.kind != nil {
+		fields = append(fields, backgroundjob.FieldKind)
+	}
+	if m.key != nil {
+		fields = append(fields, backgroundjob.FieldKey)
+	}
+	if m.payload != nil {
+		fields = append(fields, backgroundjob.FieldPayload)
+	}
+	if m.revision != nil {
+		fields = append(fields, backgroundjob.FieldRevision)
+	}
+	if m.status != nil {
+		fields = append(fields, backgroundjob.FieldStatus)
+	}
+	if m.attempts != nil {
+		fields = append(fields, backgroundjob.FieldAttempts)
+	}
+	if m.reason != nil {
+		fields = append(fields, backgroundjob.FieldReason)
+	}
+	if m.lease_token != nil {
+		fields = append(fields, backgroundjob.FieldLeaseToken)
+	}
+	if m.lease_until != nil {
+		fields = append(fields, backgroundjob.FieldLeaseUntil)
+	}
+	if m.dispatch_until != nil {
+		fields = append(fields, backgroundjob.FieldDispatchUntil)
+	}
+	if m.available_at != nil {
+		fields = append(fields, backgroundjob.FieldAvailableAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *BackgroundJobMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case backgroundjob.FieldCreatedAt:
+		return m.CreatedAt()
+	case backgroundjob.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case backgroundjob.FieldKind:
+		return m.Kind()
+	case backgroundjob.FieldKey:
+		return m.Key()
+	case backgroundjob.FieldPayload:
+		return m.Payload()
+	case backgroundjob.FieldRevision:
+		return m.Revision()
+	case backgroundjob.FieldStatus:
+		return m.Status()
+	case backgroundjob.FieldAttempts:
+		return m.Attempts()
+	case backgroundjob.FieldReason:
+		return m.Reason()
+	case backgroundjob.FieldLeaseToken:
+		return m.LeaseToken()
+	case backgroundjob.FieldLeaseUntil:
+		return m.LeaseUntil()
+	case backgroundjob.FieldDispatchUntil:
+		return m.DispatchUntil()
+	case backgroundjob.FieldAvailableAt:
+		return m.AvailableAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *BackgroundJobMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case backgroundjob.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case backgroundjob.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case backgroundjob.FieldKind:
+		return m.OldKind(ctx)
+	case backgroundjob.FieldKey:
+		return m.OldKey(ctx)
+	case backgroundjob.FieldPayload:
+		return m.OldPayload(ctx)
+	case backgroundjob.FieldRevision:
+		return m.OldRevision(ctx)
+	case backgroundjob.FieldStatus:
+		return m.OldStatus(ctx)
+	case backgroundjob.FieldAttempts:
+		return m.OldAttempts(ctx)
+	case backgroundjob.FieldReason:
+		return m.OldReason(ctx)
+	case backgroundjob.FieldLeaseToken:
+		return m.OldLeaseToken(ctx)
+	case backgroundjob.FieldLeaseUntil:
+		return m.OldLeaseUntil(ctx)
+	case backgroundjob.FieldDispatchUntil:
+		return m.OldDispatchUntil(ctx)
+	case backgroundjob.FieldAvailableAt:
+		return m.OldAvailableAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown BackgroundJob field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *BackgroundJobMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case backgroundjob.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case backgroundjob.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case backgroundjob.FieldKind:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetKind(v)
+		return nil
+	case backgroundjob.FieldKey:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetKey(v)
+		return nil
+	case backgroundjob.FieldPayload:
+		v, ok := value.(jsontext.Value)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPayload(v)
+		return nil
+	case backgroundjob.FieldRevision:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRevision(v)
+		return nil
+	case backgroundjob.FieldStatus:
+		v, ok := value.(backgroundjob.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case backgroundjob.FieldAttempts:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAttempts(v)
+		return nil
+	case backgroundjob.FieldReason:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetReason(v)
+		return nil
+	case backgroundjob.FieldLeaseToken:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLeaseToken(v)
+		return nil
+	case backgroundjob.FieldLeaseUntil:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLeaseUntil(v)
+		return nil
+	case backgroundjob.FieldDispatchUntil:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDispatchUntil(v)
+		return nil
+	case backgroundjob.FieldAvailableAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAvailableAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown BackgroundJob field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *BackgroundJobMutation) AddedFields() []string {
+	var fields []string
+	if m.addrevision != nil {
+		fields = append(fields, backgroundjob.FieldRevision)
+	}
+	if m.addattempts != nil {
+		fields = append(fields, backgroundjob.FieldAttempts)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *BackgroundJobMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case backgroundjob.FieldRevision:
+		return m.AddedRevision()
+	case backgroundjob.FieldAttempts:
+		return m.AddedAttempts()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *BackgroundJobMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case backgroundjob.FieldRevision:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRevision(v)
+		return nil
+	case backgroundjob.FieldAttempts:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddAttempts(v)
+		return nil
+	}
+	return fmt.Errorf("unknown BackgroundJob numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *BackgroundJobMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *BackgroundJobMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *BackgroundJobMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown BackgroundJob nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *BackgroundJobMutation) ResetField(name string) error {
+	switch name {
+	case backgroundjob.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case backgroundjob.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case backgroundjob.FieldKind:
+		m.ResetKind()
+		return nil
+	case backgroundjob.FieldKey:
+		m.ResetKey()
+		return nil
+	case backgroundjob.FieldPayload:
+		m.ResetPayload()
+		return nil
+	case backgroundjob.FieldRevision:
+		m.ResetRevision()
+		return nil
+	case backgroundjob.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case backgroundjob.FieldAttempts:
+		m.ResetAttempts()
+		return nil
+	case backgroundjob.FieldReason:
+		m.ResetReason()
+		return nil
+	case backgroundjob.FieldLeaseToken:
+		m.ResetLeaseToken()
+		return nil
+	case backgroundjob.FieldLeaseUntil:
+		m.ResetLeaseUntil()
+		return nil
+	case backgroundjob.FieldDispatchUntil:
+		m.ResetDispatchUntil()
+		return nil
+	case backgroundjob.FieldAvailableAt:
+		m.ResetAvailableAt()
+		return nil
+	}
+	return fmt.Errorf("unknown BackgroundJob field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *BackgroundJobMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *BackgroundJobMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *BackgroundJobMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *BackgroundJobMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *BackgroundJobMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *BackgroundJobMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *BackgroundJobMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown BackgroundJob unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *BackgroundJobMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown BackgroundJob edge %s", name)
 }
 
 // CategoryMutation represents an operation that mutates the Category nodes in the graph.

@@ -16,6 +16,8 @@ import { fetcher } from "../client";
 import type {
   AssetGetOKResponse,
   AssetUploadBody,
+  BadRequestResponse,
+  BannerGetParams,
   BeaconBody,
   GetInfoOKResponse,
   GetSessionOKResponse,
@@ -426,41 +428,60 @@ export const useIconUpload = <
     ...query,
   };
 };
-export const getBannerGetUrl = () => {
-  return `/info/banner`;
+export const getBannerGetUrl = (params?: BannerGetParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/info/banner?${stringifiedParams}`
+    : `/info/banner`;
 };
 
 /**
  * Get the banner image.
  */
 export const bannerGet = async (
+  params?: BannerGetParams,
   options?: Parameters<typeof fetcher>[1],
 ): Promise<AssetGetOKResponse> => {
-  return fetcher<AssetGetOKResponse>(getBannerGetUrl(), {
+  return fetcher<AssetGetOKResponse>(getBannerGetUrl(params), {
     ...options,
     method: "GET",
   });
 };
 
-export const getBannerGetKey = () => [`/info/banner`] as const;
+export const getBannerGetKey = (params?: BannerGetParams) =>
+  [`/info/banner`, ...(params ? [params] : [])] as const;
 
 export type BannerGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof bannerGet>>
 >;
 
-export const useBannerGet = <TError = InternalServerErrorResponse>(options?: {
-  swr?: SWRConfiguration<Awaited<ReturnType<typeof bannerGet>>, TError> & {
-    swrKey?: Key;
-    enabled?: boolean;
-  };
-  request?: SecondParameter<typeof fetcher>;
-}) => {
+export const useBannerGet = <
+  TError = BadRequestResponse | InternalServerErrorResponse,
+>(
+  params?: BannerGetParams,
+  options?: {
+    swr?: SWRConfiguration<Awaited<ReturnType<typeof bannerGet>>, TError> & {
+      swrKey?: Key;
+      enabled?: boolean;
+    };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
   const { swr: swrOptions, request: requestOptions } = options ?? {};
 
   const isEnabled = swrOptions?.enabled !== false;
   const swrKey =
-    swrOptions?.swrKey ?? (() => (isEnabled ? getBannerGetKey() : null));
-  const swrFn = () => bannerGet(requestOptions);
+    swrOptions?.swrKey ?? (() => (isEnabled ? getBannerGetKey(params) : null));
+  const swrFn = () => bannerGet(params, requestOptions);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

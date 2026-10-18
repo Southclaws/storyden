@@ -23,7 +23,7 @@ export function LinkView({ link, asset }: Props) {
       {asset && (
         <Box flexGrow="1" flexShrink="0" width="32">
           <styled.img
-            src={getAssetURL(asset.filename)}
+            src={getAssetURL(asset.path, "s")}
             height="full"
             objectPosition="left"
             objectFit="cover"

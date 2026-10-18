@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -113,7 +114,7 @@ func (s *localStorer) Delete(ctx context.Context, path string) error {
 }
 
 func (s *localStorer) List(ctx context.Context, prefix string) ([]string, error) {
-	entries, err := fs.ReadDir(s.s, prefix)
+	entries, err := fs.ReadDir(s.s, strings.TrimSuffix(prefix, "/"))
 	if err != nil {
 		// NOTE: The Storer interface is an abstraction over both S3-style and
 		// local filesystems. In the case of S3, listing a non-existent prefix

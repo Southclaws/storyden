@@ -121,7 +121,7 @@ export function QuickShareForm(
             shape="row"
             title={link.title || "(No site title found)"}
             text={link.description || "(No site description found)"}
-            image={getAssetURL(link.primary_image?.path)}
+            image={getAssetURL(link.primary_image?.path, "m")}
             url={link.url}
           />
         ))}

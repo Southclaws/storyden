@@ -116,7 +116,7 @@ export function DatagraphItemNodeCard({ item }: { item: DatagraphItemNode }) {
       url={url}
       title={ref.name}
       text={ref.description}
-      image={getAssetURL(ref.primary_image?.path)}
+      image={getAssetURL(ref.primary_image?.path, "m")}
       controls={
         <WStack>
           <HStack gap="1" minWidth="0" color="text.muted">

@@ -64,6 +64,7 @@ func MapRef(a *ent.Account) (*Account, error) {
 		Admin:          a.Admin, // TODO: should this be derived from roles?
 		Roles:          roles,
 		Metadata:       a.Metadata,
+		AvatarAssetID:  opt.NewPtr(a.AvatarAssetID),
 
 		DeletedAt: opt.NewPtr(a.DeletedAt),
 		IndexedAt: opt.NewPtr(a.IndexedAt),

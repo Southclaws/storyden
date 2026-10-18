@@ -104,6 +104,8 @@ func Build() fx.Option {
 					field := exported(f.Name)
 					if f.Repeatable {
 						fmt.Fprintf(&b, "if p.%sSet { query[%q] = p.%s }\n", field, name, field)
+					} else if len(f.Choices) > 0 {
+						fmt.Fprintf(&b, "if p.%sSet { query.Set(%q, string(p.%s)) }\n", field, name, field)
 					} else {
 						fmt.Fprintf(&b, "if p.%sSet { query.Set(%q, p.%s) }\n", field, name, field)
 					}

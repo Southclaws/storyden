@@ -18,7 +18,7 @@ export type Props = {
 export function NodeCard({ node, libraryPath, ...rest }: Props) {
   const slug = joinLibraryPath(libraryPath, node.slug);
   const url = `/l/${slug}`;
-  const image = getAssetURL(node.primary_image?.path);
+  const image = getAssetURL(node.primary_image?.path, "m");
 
   return (
     <Card

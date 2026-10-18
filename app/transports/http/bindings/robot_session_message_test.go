@@ -1,6 +1,7 @@
 package bindings
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -27,13 +28,13 @@ func TestSerialiseRobotSessionMessageIncludesImageAssets(t *testing.T) {
 				ID:       firstID,
 				Name:     asset.NewExistingFilename(firstID, "first.png"),
 				MIME:     mime.New("image/png"),
-				Metadata: asset.Metadata{"width": float64(800), "height": float64(600)},
+				Metadata: asset.Metadata{RawMessage: json.RawMessage(`{"width":800,"height":600}`)},
 			},
 			{
 				ID:       secondID,
 				Name:     asset.NewExistingFilename(secondID, "second.webp"),
 				MIME:     mime.New("image/webp"),
-				Metadata: asset.Metadata{"width": float64(1200), "height": float64(900)},
+				Metadata: asset.Metadata{RawMessage: json.RawMessage(`{"width":1200,"height":900}`)},
 			},
 		},
 		Event: adksession.Event{

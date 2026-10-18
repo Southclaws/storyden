@@ -20,7 +20,7 @@ import { PageHeading } from "@/components/ui/page-heading";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Text } from "@/components/ui/text";
 import { Box, LStack, styled } from "@/styled-system/jsx";
-import { getAssetURL } from "@/utils/asset";
+import { getAssetImageProps } from "@/utils/asset";
 import { hasPermission } from "@/utils/permissions";
 
 import { ThreadFeedScreen } from "../feed/ThreadFeedScreen/ThreadFeedScreen";
@@ -72,7 +72,7 @@ export function CategoryScreen(props: ScreenProps) {
   }
 
   const { category } = data;
-  const coverImageURL = getAssetURL(category.cover_image?.path);
+  const coverImage = getAssetImageProps(category.cover_image, "l");
 
   return (
     <LStack className="category-page" data-sd-page="category">
@@ -88,11 +88,13 @@ export function CategoryScreen(props: ScreenProps) {
         <CategoryMenu category={category} />
       </Breadcrumbs>
 
-      {coverImageURL && (
+      {coverImage.src && (
         <Box className="category-page__cover" height="auto" width="full">
           <styled.img
             className="category-page__cover-image"
-            src={coverImageURL}
+            {...coverImage}
+            sizes="(max-width: 960px) 100vw, 1200px"
+            loading="eager"
             alt="" // No alt image, decorative
             aria-hidden="true"
             width="full"

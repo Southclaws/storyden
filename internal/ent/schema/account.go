@@ -26,6 +26,7 @@ func (Account) Fields() []ent.Field {
 		field.String("handle").Unique().NotEmpty(),
 		field.String("name").NotEmpty(),
 		field.String("bio").Optional(),
+		field.String("avatar_asset_id").GoType(xid.ID{}).Optional().Nillable(),
 		field.String("signature").Optional().Nillable(),
 		field.Enum("kind").
 			Values("human", "bot").

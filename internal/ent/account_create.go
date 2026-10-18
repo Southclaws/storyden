@@ -151,6 +151,20 @@ func (_c *AccountCreate) SetNillableBio(v *string) *AccountCreate {
 	return _c
 }
 
+// SetAvatarAssetID sets the "avatar_asset_id" field.
+func (_c *AccountCreate) SetAvatarAssetID(v xid.ID) *AccountCreate {
+	_c.mutation.SetAvatarAssetID(v)
+	return _c
+}
+
+// SetNillableAvatarAssetID sets the "avatar_asset_id" field if the given value is not nil.
+func (_c *AccountCreate) SetNillableAvatarAssetID(v *xid.ID) *AccountCreate {
+	if v != nil {
+		_c.SetAvatarAssetID(*v)
+	}
+	return _c
+}
+
 // SetSignature sets the "signature" field.
 func (_c *AccountCreate) SetSignature(v string) *AccountCreate {
 	_c.mutation.SetSignature(v)
@@ -1190,6 +1204,10 @@ func (_c *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		_spec.SetField(account.FieldBio, field.TypeString, value)
 		_node.Bio = value
 	}
+	if value, ok := _c.mutation.AvatarAssetID(); ok {
+		_spec.SetField(account.FieldAvatarAssetID, field.TypeString, value)
+		_node.AvatarAssetID = &value
+	}
 	if value, ok := _c.mutation.Signature(); ok {
 		_spec.SetField(account.FieldSignature, field.TypeString, value)
 		_node.Signature = &value
@@ -2196,6 +2214,24 @@ func (u *AccountUpsert) ClearBio() *AccountUpsert {
 	return u
 }
 
+// SetAvatarAssetID sets the "avatar_asset_id" field.
+func (u *AccountUpsert) SetAvatarAssetID(v xid.ID) *AccountUpsert {
+	u.Set(account.FieldAvatarAssetID, v)
+	return u
+}
+
+// UpdateAvatarAssetID sets the "avatar_asset_id" field to the value that was provided on create.
+func (u *AccountUpsert) UpdateAvatarAssetID() *AccountUpsert {
+	u.SetExcluded(account.FieldAvatarAssetID)
+	return u
+}
+
+// ClearAvatarAssetID clears the value of the "avatar_asset_id" field.
+func (u *AccountUpsert) ClearAvatarAssetID() *AccountUpsert {
+	u.SetNull(account.FieldAvatarAssetID)
+	return u
+}
+
 // SetSignature sets the "signature" field.
 func (u *AccountUpsert) SetSignature(v string) *AccountUpsert {
 	u.Set(account.FieldSignature, v)
@@ -2457,6 +2493,27 @@ func (u *AccountUpsertOne) UpdateBio() *AccountUpsertOne {
 func (u *AccountUpsertOne) ClearBio() *AccountUpsertOne {
 	return u.Update(func(s *AccountUpsert) {
 		s.ClearBio()
+	})
+}
+
+// SetAvatarAssetID sets the "avatar_asset_id" field.
+func (u *AccountUpsertOne) SetAvatarAssetID(v xid.ID) *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetAvatarAssetID(v)
+	})
+}
+
+// UpdateAvatarAssetID sets the "avatar_asset_id" field to the value that was provided on create.
+func (u *AccountUpsertOne) UpdateAvatarAssetID() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateAvatarAssetID()
+	})
+}
+
+// ClearAvatarAssetID clears the value of the "avatar_asset_id" field.
+func (u *AccountUpsertOne) ClearAvatarAssetID() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.ClearAvatarAssetID()
 	})
 }
 
@@ -2906,6 +2963,27 @@ func (u *AccountUpsertBulk) UpdateBio() *AccountUpsertBulk {
 func (u *AccountUpsertBulk) ClearBio() *AccountUpsertBulk {
 	return u.Update(func(s *AccountUpsert) {
 		s.ClearBio()
+	})
+}
+
+// SetAvatarAssetID sets the "avatar_asset_id" field.
+func (u *AccountUpsertBulk) SetAvatarAssetID(v xid.ID) *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetAvatarAssetID(v)
+	})
+}
+
+// UpdateAvatarAssetID sets the "avatar_asset_id" field to the value that was provided on create.
+func (u *AccountUpsertBulk) UpdateAvatarAssetID() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateAvatarAssetID()
+	})
+}
+
+// ClearAvatarAssetID clears the value of the "avatar_asset_id" field.
+func (u *AccountUpsertBulk) ClearAvatarAssetID() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.ClearAvatarAssetID()
 	})
 }
 

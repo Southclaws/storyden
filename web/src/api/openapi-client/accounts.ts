@@ -19,6 +19,7 @@ import type {
   AccountEmailPasswordResetBody,
   AccountEmailUpdateOKResponse,
   AccountEmailVerifiedStatusUpdateBody,
+  AccountGetAvatarParams,
   AccountGetAvatarResponse,
   AccountGetOKResponse,
   AccountListOKResponse,
@@ -1763,8 +1764,23 @@ export const useAccountSetAvatar = <
     ...query,
   };
 };
-export const getAccountGetAvatarUrl = (accountHandle: string) => {
-  return `/accounts/${accountHandle}/avatar`;
+export const getAccountGetAvatarUrl = (
+  accountHandle: string,
+  params?: AccountGetAvatarParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/accounts/${accountHandle}/avatar?${stringifiedParams}`
+    : `/accounts/${accountHandle}/avatar`;
 };
 
 /**
@@ -1772,10 +1788,11 @@ export const getAccountGetAvatarUrl = (accountHandle: string) => {
  */
 export const accountGetAvatar = async (
   accountHandle: string,
+  params?: AccountGetAvatarParams,
   options?: Parameters<typeof fetcher>[1],
 ): Promise<AccountGetAvatarResponse> => {
   return fetcher<AccountGetAvatarResponse>(
-    getAccountGetAvatarUrl(accountHandle),
+    getAccountGetAvatarUrl(accountHandle, params),
     {
       ...options,
       method: "GET",
@@ -1783,8 +1800,11 @@ export const accountGetAvatar = async (
   );
 };
 
-export const getAccountGetAvatarKey = (accountHandle: string) =>
-  [`/accounts/${accountHandle}/avatar`] as const;
+export const getAccountGetAvatarKey = (
+  accountHandle: string,
+  params?: AccountGetAvatarParams,
+) =>
+  [`/accounts/${accountHandle}/avatar`, ...(params ? [params] : [])] as const;
 
 export type AccountGetAvatarQueryResult = NonNullable<
   Awaited<ReturnType<typeof accountGetAvatar>>
@@ -1792,11 +1812,13 @@ export type AccountGetAvatarQueryResult = NonNullable<
 
 export const useAccountGetAvatar = <
   TError =
+    | BadRequestResponse
     | UnauthorisedResponse
     | NotFoundResponse
     | InternalServerErrorResponse,
 >(
   accountHandle: string,
+  params?: AccountGetAvatarParams,
   options?: {
     swr?: SWRConfiguration<
       Awaited<ReturnType<typeof accountGetAvatar>>,
@@ -1813,8 +1835,8 @@ export const useAccountGetAvatar = <
     accountHandle !== undefined;
   const swrKey =
     swrOptions?.swrKey ??
-    (() => (isEnabled ? getAccountGetAvatarKey(accountHandle) : null));
-  const swrFn = () => accountGetAvatar(accountHandle, requestOptions);
+    (() => (isEnabled ? getAccountGetAvatarKey(accountHandle, params) : null));
+  const swrFn = () => accountGetAvatar(accountHandle, params, requestOptions);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

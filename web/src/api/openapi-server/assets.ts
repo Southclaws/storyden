@@ -9,9 +9,11 @@
  */
 import type {
   AssetGetOKResponse,
+  AssetGetParams,
   AssetUploadBody,
   AssetUploadOKResponse,
   AssetUploadParams,
+  BadRequestResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
   UnauthorisedResponse,
@@ -146,6 +148,11 @@ export type assetGetResponse200 = {
   status: 200;
 };
 
+export type assetGetResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
 export type assetGetResponse401 = {
   data: UnauthorisedResponse;
   status: 401;
@@ -158,13 +165,14 @@ export type assetGetResponse404 = {
 
 export type assetGetResponseDefault = {
   data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 401 | 404>;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 404>;
 };
 
 export type assetGetResponseSuccess = assetGetResponse200 & {
   headers: Headers;
 };
 export type assetGetResponseError = (
+  | assetGetResponse400
   | assetGetResponse401
   | assetGetResponse404
   | assetGetResponseDefault
@@ -172,8 +180,23 @@ export type assetGetResponseError = (
   headers: Headers;
 };
 
-export const getAssetGetUrl = (assetFilename: string) => {
-  return `/assets/${assetFilename}`;
+export const getAssetGetUrl = (
+  assetFilename: string,
+  params?: AssetGetParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/assets/${assetFilename}?${stringifiedParams}`
+    : `/assets/${assetFilename}`;
 };
 
 /**
@@ -181,10 +204,14 @@ export const getAssetGetUrl = (assetFilename: string) => {
  */
 export const assetGet = async (
   assetFilename: string,
+  params?: AssetGetParams,
   options?: Parameters<typeof fetcher>[1],
 ): Promise<assetGetResponseSuccess> => {
-  return fetcher<assetGetResponseSuccess>(getAssetGetUrl(assetFilename), {
-    ...options,
-    method: "GET",
-  });
+  return fetcher<assetGetResponseSuccess>(
+    getAssetGetUrl(assetFilename, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
 };

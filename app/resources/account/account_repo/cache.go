@@ -102,6 +102,7 @@ type cachedAccount struct {
 	Admin          bool           `json:"admin"`
 	RoleIDs        []string       `json:"role_ids,omitempty"`
 	Metadata       map[string]any `json:"metadata,omitempty"`
+	AvatarAssetID  *string        `json:"avatar_asset_id,omitempty"`
 	DeletedAt      *time.Time     `json:"deleted_at,omitempty"`
 	IndexedAt      *time.Time     `json:"indexed_at,omitempty"`
 }
@@ -123,9 +124,10 @@ func fromDomain(in *account.Account) cachedAccount {
 		RoleIDs: dt.Map(in.Roles, func(r *held.Role) string {
 			return r.ID.String()
 		}),
-		Metadata:  in.Metadata,
-		DeletedAt: in.DeletedAt.Ptr(),
-		IndexedAt: in.IndexedAt.Ptr(),
+		Metadata:      in.Metadata,
+		AvatarAssetID: opt.Map(in.AvatarAssetID, xid.ID.String).Ptr(),
+		DeletedAt:     in.DeletedAt.Ptr(),
+		IndexedAt:     in.IndexedAt.Ptr(),
 	}
 }
 
@@ -160,6 +162,11 @@ func (in cachedAccount) toDomain() (*account.Account, error) {
 		return nil, fault.Wrap(err)
 	}
 
+	avatarAssetID, err := opt.MapErr(opt.NewPtr(in.AvatarAssetID), xid.FromString)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
 	roles := make(held.Roles, 0, len(in.RoleIDs))
 	for _, roleID := range in.RoleIDs {
 		parsedID, err := xid.FromString(roleID)
@@ -190,6 +197,7 @@ func (in cachedAccount) toDomain() (*account.Account, error) {
 		Admin:          in.Admin,
 		Roles:          roles,
 		Metadata:       in.Metadata,
+		AvatarAssetID:  avatarAssetID,
 		DeletedAt:      opt.NewPtr(in.DeletedAt),
 		IndexedAt:      opt.NewPtr(in.IndexedAt),
 	}, nil

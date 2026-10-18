@@ -10,6 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/role"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -54,6 +55,12 @@ type Settings struct {
 	// Theme is the installation-wide custom frontend theme. Theme entrypoints
 	// are immutable assets; replacing this value publishes a new live manifest.
 	Theme opt.Optional[ThemeSettings]
+
+	// The site's icon (favicon, app icon, etc.)
+	IconAssetID opt.Optional[asset.AssetID]
+
+	// The site's banner/cover image, used for social previews, opengraph, etc.
+	BannerAssetID opt.Optional[asset.AssetID]
 }
 
 type ThemeSettings struct {

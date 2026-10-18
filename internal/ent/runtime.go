@@ -12,6 +12,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/auditlog"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
+	"github.com/Southclaws/storyden/internal/ent/backgroundjob"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
@@ -104,7 +105,7 @@ func init() {
 	// account.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	account.NameValidator = accountDescName.Validators[0].(func(string) error)
 	// accountDescAdmin is the schema descriptor for admin field.
-	accountDescAdmin := accountFields[6].Descriptor()
+	accountDescAdmin := accountFields[7].Descriptor()
 	// account.DefaultAdmin holds the default value on creation for the admin field.
 	account.DefaultAdmin = accountDescAdmin.Default.(bool)
 	// accountDescID is the schema descriptor for id field.
@@ -293,6 +294,77 @@ func init() {
 	// authentication.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	authentication.IDValidator = func() func(string) error {
 		validators := authenticationDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	backgroundjobMixin := schema.BackgroundJob{}.Mixin()
+	backgroundjobMixinFields0 := backgroundjobMixin[0].Fields()
+	_ = backgroundjobMixinFields0
+	backgroundjobMixinFields1 := backgroundjobMixin[1].Fields()
+	_ = backgroundjobMixinFields1
+	backgroundjobMixinFields2 := backgroundjobMixin[2].Fields()
+	_ = backgroundjobMixinFields2
+	backgroundjobFields := schema.BackgroundJob{}.Fields()
+	_ = backgroundjobFields
+	// backgroundjobDescCreatedAt is the schema descriptor for created_at field.
+	backgroundjobDescCreatedAt := backgroundjobMixinFields1[0].Descriptor()
+	// backgroundjob.DefaultCreatedAt holds the default value on creation for the created_at field.
+	backgroundjob.DefaultCreatedAt = backgroundjobDescCreatedAt.Default.(func() time.Time)
+	// backgroundjobDescUpdatedAt is the schema descriptor for updated_at field.
+	backgroundjobDescUpdatedAt := backgroundjobMixinFields2[0].Descriptor()
+	// backgroundjob.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	backgroundjob.DefaultUpdatedAt = backgroundjobDescUpdatedAt.Default.(func() time.Time)
+	// backgroundjob.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	backgroundjob.UpdateDefaultUpdatedAt = backgroundjobDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// backgroundjobDescKey is the schema descriptor for key field.
+	backgroundjobDescKey := backgroundjobFields[1].Descriptor()
+	// backgroundjob.KeyValidator is a validator for the "key" field. It is called by the builders before save.
+	backgroundjob.KeyValidator = backgroundjobDescKey.Validators[0].(func(string) error)
+	// backgroundjobDescRevision is the schema descriptor for revision field.
+	backgroundjobDescRevision := backgroundjobFields[3].Descriptor()
+	// backgroundjob.DefaultRevision holds the default value on creation for the revision field.
+	backgroundjob.DefaultRevision = backgroundjobDescRevision.Default.(int64)
+	// backgroundjobDescAttempts is the schema descriptor for attempts field.
+	backgroundjobDescAttempts := backgroundjobFields[5].Descriptor()
+	// backgroundjob.DefaultAttempts holds the default value on creation for the attempts field.
+	backgroundjob.DefaultAttempts = backgroundjobDescAttempts.Default.(int)
+	// backgroundjobDescReason is the schema descriptor for reason field.
+	backgroundjobDescReason := backgroundjobFields[6].Descriptor()
+	// backgroundjob.DefaultReason holds the default value on creation for the reason field.
+	backgroundjob.DefaultReason = backgroundjobDescReason.Default.(string)
+	// backgroundjobDescLeaseToken is the schema descriptor for lease_token field.
+	backgroundjobDescLeaseToken := backgroundjobFields[7].Descriptor()
+	// backgroundjob.DefaultLeaseToken holds the default value on creation for the lease_token field.
+	backgroundjob.DefaultLeaseToken = backgroundjobDescLeaseToken.Default.(string)
+	// backgroundjobDescLeaseUntil is the schema descriptor for lease_until field.
+	backgroundjobDescLeaseUntil := backgroundjobFields[8].Descriptor()
+	// backgroundjob.DefaultLeaseUntil holds the default value on creation for the lease_until field.
+	backgroundjob.DefaultLeaseUntil = backgroundjobDescLeaseUntil.Default.(func() time.Time)
+	// backgroundjobDescDispatchUntil is the schema descriptor for dispatch_until field.
+	backgroundjobDescDispatchUntil := backgroundjobFields[9].Descriptor()
+	// backgroundjob.DefaultDispatchUntil holds the default value on creation for the dispatch_until field.
+	backgroundjob.DefaultDispatchUntil = backgroundjobDescDispatchUntil.Default.(func() time.Time)
+	// backgroundjobDescAvailableAt is the schema descriptor for available_at field.
+	backgroundjobDescAvailableAt := backgroundjobFields[10].Descriptor()
+	// backgroundjob.DefaultAvailableAt holds the default value on creation for the available_at field.
+	backgroundjob.DefaultAvailableAt = backgroundjobDescAvailableAt.Default.(func() time.Time)
+	// backgroundjobDescID is the schema descriptor for id field.
+	backgroundjobDescID := backgroundjobMixinFields0[0].Descriptor()
+	// backgroundjob.DefaultID holds the default value on creation for the id field.
+	backgroundjob.DefaultID = backgroundjobDescID.Default.(func() xid.ID)
+	// backgroundjob.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	backgroundjob.IDValidator = func() func(string) error {
+		validators := backgroundjobDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

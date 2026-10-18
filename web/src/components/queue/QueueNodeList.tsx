@@ -35,7 +35,7 @@ export function QueueNodeListItem({ node }: { node: NodeWithChildren }) {
       id={node.id}
       shape="responsive"
       url={url}
-      image={getAssetURL(node.primary_image?.path)}
+      image={getAssetURL(node.primary_image?.path, "s")}
       title={node.name}
       text={node.description}
       controls={

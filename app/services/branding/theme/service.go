@@ -33,10 +33,7 @@ const (
 	MaxActiveSizeBytes  = 5 * 1024 * 1024
 	MaxActiveAssetCount = 32
 
-	metadataPurposeKey   = "purpose"
 	metadataPurposeTheme = "theme"
-	metadataKindKey      = "theme_kind"
-	metadataIntegrityKey = "theme_integrity"
 )
 
 var (
@@ -44,20 +41,6 @@ var (
 	errInvalidTheme = fault.Wrap(fault.New("invalid theme manifest"), ftag.With(ftag.InvalidArgument))
 	errActiveAsset  = fault.Wrap(fault.New("active theme assets cannot be deleted"), ftag.With(ftag.InvalidArgument))
 )
-
-type AssetKind string
-
-const (
-	AssetKindStylesheet AssetKind = "stylesheet"
-	AssetKindScript     AssetKind = "script"
-)
-
-func (k AssetKind) MIME() string {
-	if k == AssetKindStylesheet {
-		return "text/css"
-	}
-	return "application/javascript"
-}
 
 type Service struct {
 	settings   *settings_manager.Manager
@@ -140,20 +123,18 @@ func (s *Service) Upload(ctx context.Context, r io.Reader, size int64, clientFil
 		filename,
 		len(content),
 		mime.New(kind.MIME()),
-		asset_writer.WithMetadata(
-			asset.Metadata{
-				metadataPurposeKey:   metadataPurposeTheme,
-				metadataKindKey:      string(kind),
-				metadataIntegrityKey: integrity,
-			},
-		),
+		asset_writer.WithMetadata(asset.ThemeMetadata{
+			Purpose:   metadataPurposeTheme,
+			Kind:      kind,
+			Integrity: integrity,
+		}),
 	)
 	if err != nil {
 		_ = s.objects.Delete(ctx, path)
 		return settings.ThemeAsset{}, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return mapAsset(stored, kind), nil
+	return mapAsset(stored, kind)
 }
 
 func (s *Service) Publish(ctx context.Context, stylesheetIDs, scriptIDs []string) (settings.ThemeSettings, error) {
@@ -164,11 +145,11 @@ func (s *Service) Publish(ctx context.Context, stylesheetIDs, scriptIDs []string
 		return settings.ThemeSettings{}, fault.Wrap(errInvalidTheme, fmsg.Withf("a theme may contain at most %d active assets", MaxActiveAssetCount))
 	}
 
-	stylesheets, err := s.resolve(ctx, stylesheetIDs, AssetKindStylesheet)
+	stylesheets, err := s.resolve(ctx, stylesheetIDs, asset.ThemeAssetKindStylesheet)
 	if err != nil {
 		return settings.ThemeSettings{}, err
 	}
-	scripts, err := s.resolve(ctx, scriptIDs, AssetKindScript)
+	scripts, err := s.resolve(ctx, scriptIDs, asset.ThemeAssetKindScript)
 	if err != nil {
 		return settings.ThemeSettings{}, err
 	}
@@ -206,7 +187,7 @@ func (s *Service) GetAsset(ctx context.Context, filename string) (settings.Theme
 	if !ok {
 		return settings.ThemeAsset{}, fault.Wrap(errInvalidAsset, ftag.With(ftag.NotFound))
 	}
-	return mapAsset(a, kind), nil
+	return mapAsset(a, kind)
 }
 
 func (s *Service) OpenAsset(ctx context.Context, filename string) (io.Reader, int64, error) {
@@ -254,7 +235,11 @@ func (s *Service) DeleteAsset(ctx context.Context, filename string) error {
 	return nil
 }
 
-func (s *Service) resolve(ctx context.Context, ids []string, expected AssetKind) ([]settings.ThemeAsset, error) {
+func (s *Service) resolve(
+	ctx context.Context,
+	ids []string,
+	expected asset.ThemeAssetKind,
+) ([]settings.ThemeAsset, error) {
 	seen := map[string]struct{}{}
 	out := make([]settings.ThemeAsset, 0, len(ids))
 	for _, raw := range ids {
@@ -274,44 +259,59 @@ func (s *Service) resolve(ctx context.Context, ids []string, expected AssetKind)
 			return nil, fault.Wrap(errInvalidTheme, fmsg.Withf("asset %q is not a theme %s", raw, expected))
 		}
 		seen[raw] = struct{}{}
-		out = append(out, mapAsset(a, kind))
+		mapped, err := mapAsset(a, kind)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, mapped)
 	}
 	return out, nil
 }
 
-func classify(name string) (AssetKind, error) {
+func classify(name string) (asset.ThemeAssetKind, error) {
 	trimmed := strings.TrimSpace(name)
 	if trimmed == "" || strings.ContainsAny(trimmed, `/\\`) || filepath.Base(trimmed) != trimmed {
 		return "", fault.Wrap(errInvalidAsset, fmsg.With("filename must be a plain .css or .js filename"))
 	}
 	switch strings.ToLower(filepath.Ext(trimmed)) {
 	case ".css":
-		return AssetKindStylesheet, nil
+		return asset.ThemeAssetKindStylesheet, nil
 	case ".js":
-		return AssetKindScript, nil
+		return asset.ThemeAssetKindScript, nil
 	default:
 		return "", fault.Wrap(errInvalidAsset, fmsg.With("theme assets must use .css or .js"))
 	}
 }
 
-func themeAssetKind(a *asset.Asset) (AssetKind, bool) {
-	if a.Metadata[metadataPurposeKey] != metadataPurposeTheme {
+func themeAssetKind(a *asset.Asset) (asset.ThemeAssetKind, bool) {
+	metadata, err := a.ThemeMetadata()
+	if err != nil || metadata == nil {
 		return "", false
 	}
-	kind, ok := a.Metadata[metadataKindKey].(string)
-	if !ok || (AssetKind(kind) != AssetKindStylesheet && AssetKind(kind) != AssetKindScript) {
+	if metadata.Purpose != metadataPurposeTheme {
 		return "", false
 	}
-	return AssetKind(kind), true
+	if metadata.Kind != asset.ThemeAssetKindStylesheet && metadata.Kind != asset.ThemeAssetKindScript {
+		return "", false
+	}
+
+	return metadata.Kind, true
 }
 
-func mapAsset(a *asset.Asset, kind AssetKind) settings.ThemeAsset {
-	integrity, _ := a.Metadata[metadataIntegrityKey].(string)
+func mapAsset(a *asset.Asset, kind asset.ThemeAssetKind) (settings.ThemeAsset, error) {
+	metadata, err := a.ThemeMetadata()
+	if err != nil {
+		return settings.ThemeAsset{}, err
+	}
+	if metadata == nil {
+		return settings.ThemeAsset{}, errInvalidAsset
+	}
+
 	return settings.ThemeAsset{
 		ID:        a.ID.String(),
 		Filename:  a.Name.String(),
 		MIMEType:  kind.MIME(),
 		Size:      a.Size,
-		Integrity: integrity,
-	}
+		Integrity: metadata.Integrity,
+	}, nil
 }

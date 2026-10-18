@@ -28,7 +28,11 @@ func NewAssets(uploader *asset_upload.Uploader, downloader *asset_download.Downl
 }
 
 func (i *Assets) AssetGet(ctx context.Context, request openapi.AssetGetRequestObject) (openapi.AssetGetResponseObject, error) {
-	a, r, err := i.downloader.Get(ctx, asset.NewFilepathFilename(request.AssetFilename))
+	variant, err := asset.ParseVariant(string(opt.NewPtr(request.Params.Variant).Or(openapi.Original)))
+	if err != nil {
+		return nil, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
+	}
+	a, r, pending, err := i.downloader.Variant(ctx, asset.NewFilepathFilename(request.AssetFilename), variant)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -39,7 +43,7 @@ func (i *Assets) AssetGet(ctx context.Context, request openapi.AssetGetRequestOb
 			ContentType:   a.MIME.String(),
 			ContentLength: int64(a.Size),
 			Headers: openapi.AssetGetOKResponseHeaders{
-				CacheControl: ptr("public, max-age=31536000"),
+				CacheControl: ptr(assetCacheControl(ctx, variant, pending)),
 			},
 		},
 	}, nil
@@ -47,7 +51,8 @@ func (i *Assets) AssetGet(ctx context.Context, request openapi.AssetGetRequestOb
 
 func (i *Assets) AssetUpload(ctx context.Context, request openapi.AssetUploadRequestObject) (openapi.AssetUploadResponseObject, error) {
 	// NOTE: This op doesn't run the authorisation validator for some reason.
-	if !session.GetOptAccountID(ctx).Ok() {
+	accountID, ok := session.GetOptAccountID(ctx).Get()
+	if !ok {
 		return nil, fault.Wrap(fault.New("session required for upload", fctx.With(ctx)), fctx.With(ctx), ftag.With(ftag.Unauthenticated))
 	}
 
@@ -67,7 +72,7 @@ func (i *Assets) AssetUpload(ctx context.Context, request openapi.AssetUploadReq
 		ParentID: parentID,
 	}
 
-	a, err := i.uploader.Upload(ctx, request.Body, request.Params.ContentLength, filename, opts)
+	a, err := i.uploader.Upload(ctx, accountID, request.Body, request.Params.ContentLength, filename, opts)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -80,15 +85,19 @@ func (i *Assets) AssetUpload(ctx context.Context, request openapi.AssetUploadReq
 func serialiseAsset(a asset.Asset) openapi.Asset {
 	path := fmt.Sprintf(`/api/assets/%s`, a.Name.String())
 
-	return openapi.Asset{
+	result := openapi.Asset{
 		Id:       a.ID.String(),
 		Filename: a.Name.String(),
 		Path:     path,
 		Parent:   opt.Map(a.Parent, serialiseAsset).Ptr(),
 		MimeType: a.MIME.String(),
-		Width:    float32(a.Metadata.GetWidth()),
-		Height:   float32(a.Metadata.GetHeight()),
 	}
+	if metadata, err := a.ImageMetadata(); err == nil && metadata != nil {
+		result.Width = float32(metadata.Width)
+		result.Height = float32(metadata.Height)
+	}
+
+	return result
 }
 
 func serialiseAssetPtr(a *asset.Asset) openapi.Asset {
@@ -101,4 +110,14 @@ func deserialiseAssetID(in string) asset.AssetID {
 
 func deserialiseAssetIDs(ids []string) []asset.AssetID {
 	return dt.Map(ids, deserialiseAssetID)
+}
+
+func assetCacheControl(ctx context.Context, v asset.Variant, pending bool) string {
+	if pending {
+		return getAuthStateCacheControl(ctx, "no-cache")
+	}
+	if v == asset.Original {
+		return getAuthStateCacheControl(ctx, "max-age=31536000")
+	}
+	return getAuthStateCacheControl(ctx, "max-age=86400")
 }

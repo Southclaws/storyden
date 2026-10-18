@@ -3,45 +3,23 @@ package banner
 import (
 	"bytes"
 	"context"
-	"fmt"
-	"image/png"
 	"io"
-	"strings"
 
-	"github.com/Southclaws/fault"
-	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/fault/ftag"
-	"github.com/disintegration/imaging"
-	"github.com/rs/xid"
+	"github.com/Southclaws/opt"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/asset/asset_download"
 	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
-	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/infrastructure/imagesafe"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/mime"
 )
 
-const (
-	bannerFileTemplate = "banner-%s.png"
-)
-
-type Size string
-
-var sizes = []Size{
-	"1200x630",
-}
-
-var sizeMap = map[Size][2]int{
-	"1200x630": {1200, 630},
-}
-
-var errBadFormat = fault.Wrap(fault.New("bad format"), ftag.With(ftag.InvalidArgument))
-
 type Service interface {
-	Upload(ctx context.Context, r io.Reader) error
-	Get(ctx context.Context) (*asset.Asset, io.Reader, error)
+	Upload(context.Context, io.Reader) error
+	Get(context.Context) (*asset.Asset, io.Reader, error)
+	GetVariant(context.Context, asset.Variant) (*asset.Asset, io.Reader, bool, error)
 }
 
 func Build() fx.Option {
@@ -49,85 +27,74 @@ func Build() fx.Option {
 }
 
 type service struct {
-	uploader   *asset_upload.Uploader
-	downloader *asset_download.Downloader
+	settings *settings.SettingsRepository
+	upload   *asset_upload.Uploader
+	download *asset_download.Downloader
 }
 
 func New(
-	uploader *asset_upload.Uploader,
-	downloader *asset_download.Downloader,
-
-	cfg config.Config,
+	settings *settings.SettingsRepository,
+	upload *asset_upload.Uploader,
+	download *asset_download.Downloader,
 ) Service {
 	return &service{
-		uploader:   uploader,
-		downloader: downloader,
+		settings: settings,
+		upload:   upload,
+		download: download,
 	}
 }
 
-func (s *service) Upload(ctx context.Context, r io.Reader) error {
-	return s.uploadSizes(ctx, r, sizes)
-}
-
-func (s *service) uploadSizes(ctx context.Context, or io.Reader, sizes []Size) error {
-	mt, r, err := mime.Detect(or)
+func (s *service) Upload(ctx context.Context, stream io.Reader) error {
+	owner, err := session.GetAccountID(ctx)
 	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-	mime := mt.String()
-	ctx = fctx.WithMeta(ctx, "mimetype", mime)
-
-	if !strings.HasPrefix(mime, "image") {
-		return fault.Wrap(errBadFormat, fctx.With(ctx))
+		return err
 	}
 
-	source, t, err := imagesafe.Decode(r)
+	source, err := s.upload.UploadImage(
+		ctx,
+		owner,
+		stream,
+		-1,
+		asset.NewFilename("banner-original"),
+		asset_upload.Options{ImagePresets: asset.BannerImagePresets},
+	)
 	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
+		return err
 	}
 
-	ctx = fctx.WithMeta(ctx, "type", t)
-
-	// re-used across each size
-	resizeBuffer := bytes.NewBuffer(nil)
-
-	for _, size := range sizes {
-		px, py := sizeMap[size][0], sizeMap[size][1]
-		assetFilename := getFilepathForSize(size)
-
-		resized := imaging.Resize(source, px, py, imaging.Lanczos)
-
-		resizeBuffer.Reset()
-
-		if err := png.Encode(resizeBuffer, resized); err != nil {
-			return fault.Wrap(err, fctx.With(ctx))
-		}
-
-		_, err = s.uploader.Upload(ctx, resizeBuffer, int64(resizeBuffer.Len()), assetFilename, asset_upload.Options{})
-		if err != nil {
-			return fault.Wrap(err, fctx.With(ctx))
-		}
-	}
-
-	return nil
+	_, err = s.settings.Set(ctx, settings.Settings{BannerAssetID: opt.New(source.ID)})
+	return err
 }
 
 func (s *service) Get(ctx context.Context) (*asset.Asset, io.Reader, error) {
-	filename := getFilepathForSize(Size("1200x630"))
-
-	a, r, err := s.downloader.Get(ctx, filename)
-	if err != nil {
-		return &asset.Asset{
-			ID:   xid.New(),
-			Name: filename,
-			Size: len(defaultBanner),
-			MIME: mime.New("image/png"),
-		}, bytes.NewReader(defaultBanner), nil
-	}
-
-	return a, r, nil
+	banner, stream, _, err := s.GetVariant(ctx, "banner")
+	return banner, stream, err
 }
 
-func getFilepathForSize(size Size) asset.Filename {
-	return asset.NewFilepathFilename(fmt.Sprintf(bannerFileTemplate, size))
+func (s *service) GetVariant(ctx context.Context, variant asset.Variant) (*asset.Asset, io.Reader, bool, error) {
+	configured, err := s.settings.Get(ctx)
+	if err != nil {
+		return nil, nil, false, err
+	}
+	if id, ok := configured.BannerAssetID.Get(); ok {
+		banner, stream, pending, err := s.download.VariantByID(ctx, id, variant)
+		if err != nil {
+			return nil, nil, false, err
+		}
+		preset, _ := asset.Preset(variant)
+		if !preset.PNG || (!pending && banner.MIME.String() == "image/png") {
+			return banner, stream, pending, nil
+		}
+		if closer, ok := stream.(io.Closer); ok {
+			closer.Close()
+		}
+	}
+
+	banner := &asset.Asset{
+		Name: asset.NewFilepathFilename("default-banner.png"),
+		Size: len(defaultBanner),
+		MIME: mime.New("image/png"),
+	}
+
+	return banner, bytes.NewReader(defaultBanner), true, nil
 }

@@ -1,7 +1,75 @@
+import type { Asset, AssetVariant } from "@/api/openapi-schema";
 import { API_ADDRESS } from "@/config";
 
-export function getAssetURL(filename?: string) {
-  if (!filename) return;
+export function getAssetURL(path?: string, variant?: AssetVariant) {
+  if (!path) {
+    return;
+  }
 
-  return `${API_ADDRESS}${filename}`;
+  const source = /^(https?:|blob:|data:|\/\/)/.test(path)
+    ? path
+    : `${API_ADDRESS}${path}`;
+  return variant ? getImageVariantURL(source, variant) : source;
+}
+
+export function getImageVariantURL(
+  source: string | undefined,
+  variant: AssetVariant,
+) {
+  if (!source) {
+    return source;
+  }
+
+  try {
+    const base = new URL(API_ADDRESS);
+    const url = new URL(source, base);
+    if (
+      url.origin !== base.origin ||
+      !url.pathname.startsWith("/api/assets/")
+    ) {
+      return source;
+    }
+
+    url.searchParams.set("variant", variant);
+    return source.startsWith("/") && !source.startsWith("//")
+      ? `${url.pathname}${url.search}${url.hash}`
+      : url.toString();
+  } catch {
+    return source;
+  }
+}
+
+export function getAssetImageProps(
+  asset?: Pick<Asset, "path" | "width" | "height">,
+  variant: Extract<AssetVariant, "s" | "m" | "l"> = "m",
+) {
+  const original = getAssetURL(asset?.path);
+  const src = getImageVariantURL(original, variant);
+  if (!src || src === original || !asset || !asset.width || !asset.height) {
+    return { src };
+  }
+
+  const edge = Math.max(asset.width, asset.height);
+  const seen = new Set<number>();
+  const candidates = (
+    [
+      ["s", 320],
+      ["m", 960],
+      ["l", 1920],
+    ] as const
+  ).flatMap(([preset, size]) => {
+    const width = Math.max(
+      1,
+      Math.floor(asset.width * Math.min(1, size / edge)),
+    );
+    if (seen.has(width)) {
+      return [];
+    }
+
+    seen.add(width);
+
+    return [`${getAssetURL(asset.path, preset)} ${width}w`];
+  });
+
+  return { src, srcSet: candidates.join(", ") };
 }

@@ -13,6 +13,7 @@ import type {
   AccountEmailPasswordResetBody,
   AccountEmailUpdateOKResponse,
   AccountEmailVerifiedStatusUpdateBody,
+  AccountGetAvatarParams,
   AccountGetAvatarResponse,
   AccountGetOKResponse,
   AccountListOKResponse,
@@ -1566,6 +1567,11 @@ export type accountGetAvatarResponse200 = {
   status: 200;
 };
 
+export type accountGetAvatarResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
 export type accountGetAvatarResponse401 = {
   data: UnauthorisedResponse;
   status: 401;
@@ -1578,13 +1584,14 @@ export type accountGetAvatarResponse404 = {
 
 export type accountGetAvatarResponseDefault = {
   data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 401 | 404>;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 404>;
 };
 
 export type accountGetAvatarResponseSuccess = accountGetAvatarResponse200 & {
   headers: Headers;
 };
 export type accountGetAvatarResponseError = (
+  | accountGetAvatarResponse400
   | accountGetAvatarResponse401
   | accountGetAvatarResponse404
   | accountGetAvatarResponseDefault
@@ -1592,8 +1599,23 @@ export type accountGetAvatarResponseError = (
   headers: Headers;
 };
 
-export const getAccountGetAvatarUrl = (accountHandle: string) => {
-  return `/accounts/${accountHandle}/avatar`;
+export const getAccountGetAvatarUrl = (
+  accountHandle: string,
+  params?: AccountGetAvatarParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/accounts/${accountHandle}/avatar?${stringifiedParams}`
+    : `/accounts/${accountHandle}/avatar`;
 };
 
 /**
@@ -1601,10 +1623,11 @@ export const getAccountGetAvatarUrl = (accountHandle: string) => {
  */
 export const accountGetAvatar = async (
   accountHandle: string,
+  params?: AccountGetAvatarParams,
   options?: Parameters<typeof fetcher>[1],
 ): Promise<accountGetAvatarResponseSuccess> => {
   return fetcher<accountGetAvatarResponseSuccess>(
-    getAccountGetAvatarUrl(accountHandle),
+    getAccountGetAvatarUrl(accountHandle, params),
     {
       ...options,
       method: "GET",

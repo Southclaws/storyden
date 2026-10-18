@@ -1,6 +1,10 @@
 import Image from "next/image";
 
-import { Identifier, ProfileReference } from "@/api/openapi-schema";
+import {
+  AssetVariant,
+  Identifier,
+  ProfileReference,
+} from "@/api/openapi-schema";
 import { API_ADDRESS } from "@/config";
 import { css } from "@/styled-system/css";
 import { Box } from "@/styled-system/jsx";
@@ -18,7 +22,14 @@ export type Props = {
 };
 
 export function MemberAvatar({ profile, size, editable }: Props) {
-  const avatarURL = getAvatarURL(profile.handle);
+  const avatarURL = getAvatarURL(
+    profile.handle,
+    size === "xs" || size === "sm"
+      ? "thumb_s"
+      : size === "md"
+        ? "thumb_m"
+        : "thumb_l",
+  );
 
   const { width, height } = avatarSize(size);
 
@@ -36,10 +47,10 @@ export function MemberAvatar({ profile, size, editable }: Props) {
   );
 }
 
-export function getAvatarURL(id: Identifier): string {
+export function getAvatarURL(id: Identifier, variant?: AssetVariant): string {
   const [path] = [`/accounts/${id}/avatar`] as const;
 
-  return `${API_ADDRESS}/api${path}`;
+  return `${API_ADDRESS}/api${path}${variant ? `?variant=${variant}` : ""}`;
 }
 
 export function avatarSize(size: Props["size"]) {

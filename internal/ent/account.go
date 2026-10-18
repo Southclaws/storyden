@@ -35,6 +35,8 @@ type Account struct {
 	Name string `json:"name,omitempty"`
 	// Bio holds the value of the "bio" field.
 	Bio string `json:"bio,omitempty"`
+	// AvatarAssetID holds the value of the "avatar_asset_id" field.
+	AvatarAssetID *xid.ID `json:"avatar_asset_id,omitempty"`
 	// Signature holds the value of the "signature" field.
 	Signature *string `json:"signature,omitempty"`
 	// Kind holds the value of the "kind" field.
@@ -641,7 +643,7 @@ func (*Account) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case account.FieldInvitedByID:
+		case account.FieldAvatarAssetID, account.FieldInvitedByID:
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case account.FieldLinks, account.FieldMetadata:
 			values[i] = new([]byte)
@@ -717,6 +719,13 @@ func (_m *Account) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field bio", values[i])
 			} else if value.Valid {
 				_m.Bio = value.String
+			}
+		case account.FieldAvatarAssetID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field avatar_asset_id", values[i])
+			} else if value.Valid {
+				_m.AvatarAssetID = new(xid.ID)
+				*_m.AvatarAssetID = *value.S.(*xid.ID)
 			}
 		case account.FieldSignature:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -1086,6 +1095,11 @@ func (_m *Account) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("bio=")
 	builder.WriteString(_m.Bio)
+	builder.WriteString(", ")
+	if v := _m.AvatarAssetID; v != nil {
+		builder.WriteString("avatar_asset_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	if v := _m.Signature; v != nil {
 		builder.WriteString("signature=")

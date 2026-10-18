@@ -32,6 +32,13 @@ func getAuthStateCacheControl(ctx context.Context, rest string) string {
 	}
 }
 
+func aliasCacheControl(ctx context.Context, pending bool) string {
+	if pending {
+		return getAuthStateCacheControl(ctx, "no-cache")
+	}
+	return getAuthStateCacheControl(ctx, "max-age=60")
+}
+
 func serialiseAccount(acc *account.AccountWithEdges) openapi.Account {
 	invitedBy := opt.Map(acc.InvitedBy, func(ib account.Account) openapi.ProfileReference {
 		return serialiseProfileReferenceFromAccount(ib)

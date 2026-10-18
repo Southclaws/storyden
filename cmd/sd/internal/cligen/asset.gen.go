@@ -92,6 +92,18 @@ func newApiAssetUploadCommand(apiAssetUpload ApiAssetUploadHandler) *cobra.Comma
 	return cmd
 }
 
+type ApiAssetGetVariant string
+
+const (
+	ApiAssetGetVariantOriginal ApiAssetGetVariant = "original"
+	ApiAssetGetVariantS        ApiAssetGetVariant = "s"
+	ApiAssetGetVariantM        ApiAssetGetVariant = "m"
+	ApiAssetGetVariantL        ApiAssetGetVariant = "l"
+	ApiAssetGetVariantThumbS   ApiAssetGetVariant = "thumb_s"
+	ApiAssetGetVariantThumbM   ApiAssetGetVariant = "thumb_m"
+	ApiAssetGetVariantThumbL   ApiAssetGetVariant = "thumb_l"
+)
+
 type ApiAssetGetOutput string
 
 const (
@@ -101,6 +113,8 @@ const (
 
 type ApiAssetGetParams struct {
 	Context       string
+	Variant       ApiAssetGetVariant
+	VariantSet    bool
 	Output        ApiAssetGetOutput
 	OutputFile    string
 	Timeout       string
@@ -112,11 +126,13 @@ func newApiAssetGetCommand(apiAssetGet ApiAssetGetHandler) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "download <asset-filename>",
 		Short:   "Download an asset by its filename.",
-		Long:    "# Download an asset by its filename\n\nDownload an asset by its filename.\n\nInspect the local request and response contract with `sd api schema\nAssetGet`. This calls `GET /assets/{asset_filename}` using the selected\naccount. The server enforces permissions.\n\n## Output and automation\n\nThe default `--output json` preserves the complete server response,\nincluding nested fields and pagination metadata. Empty responses print\n`null`; HEAD responses contain `status` and `headers`. Errors go to stderr\nand return a nonzero exit status. This command sends one request; it does\nnot automatically traverse pages or cursors. Save downloads with\n`--output-file PATH` or use `--output raw`; binary responses cannot be\nprinted as JSON.\n",
+		Long:    "# Download an asset by its filename\n\nDownload an asset by its filename.\n\nUse `--variant` to request an image preset. Omit it to download the\noriginal file.\n\nInspect the local request and response contract with `sd api schema\nAssetGet`. This calls `GET /assets/{asset_filename}` using the selected\naccount. The server enforces permissions.\n\n## Output and automation\n\nThe default `--output json` preserves the complete server response,\nincluding nested fields and pagination metadata. Empty responses print\n`null`; HEAD responses contain `status` and `headers`. Errors go to stderr\nand return a nonzero exit status. This command sends one request; it does\nnot automatically traverse pages or cursors. Save downloads with\n`--output-file PATH` or use `--output raw`; binary responses cannot be\nprinted as JSON.\n",
 		Example: `  sd asset download ASSET_FILENAME --output-file asset.bin`,
 		Args:    rangeArgs(1, 1),
 	}
 
+	var rawVariant string
+	cmd.Flags().StringVar(&rawVariant, "variant", "", "Image preset to download; omit for the original file.")
 	var rawOutput string
 	cmd.Flags().StringVarP(&rawOutput, "output", "o", "json", "Response format: json (default) or raw bytes. Empty JSON responses print null; HEAD prints status and headers.")
 	var rawOutputFile string
@@ -125,7 +141,29 @@ func newApiAssetGetCommand(apiAssetGet ApiAssetGetHandler) *cobra.Command {
 	cmd.Flags().StringVar(&rawTimeout, "timeout", "60s", "Request timeout including response reads, such as 60s. Use 0s for no deadline.")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		variantSet := cmd.Flags().Changed("variant")
 		rawContext, _ := cmd.Flags().GetString("context")
+		var variant ApiAssetGetVariant
+		if rawVariant != "" {
+			switch rawVariant {
+			case "original":
+				variant = ApiAssetGetVariantOriginal
+			case "s":
+				variant = ApiAssetGetVariantS
+			case "m":
+				variant = ApiAssetGetVariantM
+			case "l":
+				variant = ApiAssetGetVariantL
+			case "thumb_s":
+				variant = ApiAssetGetVariantThumbS
+			case "thumb_m":
+				variant = ApiAssetGetVariantThumbM
+			case "thumb_l":
+				variant = ApiAssetGetVariantThumbL
+			default:
+				return fmt.Errorf("invalid --variant %q: must be one of original, s, m, l, thumb_s, thumb_m, thumb_l", rawVariant)
+			}
+		}
 		var output ApiAssetGetOutput
 		if rawOutput != "" {
 			switch rawOutput {
@@ -141,6 +179,8 @@ func newApiAssetGetCommand(apiAssetGet ApiAssetGetHandler) *cobra.Command {
 
 		p := ApiAssetGetParams{
 			Context:       rawContext,
+			Variant:       variant,
+			VariantSet:    variantSet,
 			Output:        output,
 			OutputFile:    rawOutputFile,
 			Timeout:       rawTimeout,

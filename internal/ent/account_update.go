@@ -170,6 +170,26 @@ func (_u *AccountUpdate) ClearBio() *AccountUpdate {
 	return _u
 }
 
+// SetAvatarAssetID sets the "avatar_asset_id" field.
+func (_u *AccountUpdate) SetAvatarAssetID(v xid.ID) *AccountUpdate {
+	_u.mutation.SetAvatarAssetID(v)
+	return _u
+}
+
+// SetNillableAvatarAssetID sets the "avatar_asset_id" field if the given value is not nil.
+func (_u *AccountUpdate) SetNillableAvatarAssetID(v *xid.ID) *AccountUpdate {
+	if v != nil {
+		_u.SetAvatarAssetID(*v)
+	}
+	return _u
+}
+
+// ClearAvatarAssetID clears the value of the "avatar_asset_id" field.
+func (_u *AccountUpdate) ClearAvatarAssetID() *AccountUpdate {
+	_u.mutation.ClearAvatarAssetID()
+	return _u
+}
+
 // SetSignature sets the "signature" field.
 func (_u *AccountUpdate) SetSignature(v string) *AccountUpdate {
 	_u.mutation.SetSignature(v)
@@ -2239,6 +2259,12 @@ func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.BioCleared() {
 		_spec.ClearField(account.FieldBio, field.TypeString)
+	}
+	if value, ok := _u.mutation.AvatarAssetID(); ok {
+		_spec.SetField(account.FieldAvatarAssetID, field.TypeString, value)
+	}
+	if _u.mutation.AvatarAssetIDCleared() {
+		_spec.ClearField(account.FieldAvatarAssetID, field.TypeString)
 	}
 	if value, ok := _u.mutation.Signature(); ok {
 		_spec.SetField(account.FieldSignature, field.TypeString, value)
@@ -4733,6 +4759,26 @@ func (_u *AccountUpdateOne) ClearBio() *AccountUpdateOne {
 	return _u
 }
 
+// SetAvatarAssetID sets the "avatar_asset_id" field.
+func (_u *AccountUpdateOne) SetAvatarAssetID(v xid.ID) *AccountUpdateOne {
+	_u.mutation.SetAvatarAssetID(v)
+	return _u
+}
+
+// SetNillableAvatarAssetID sets the "avatar_asset_id" field if the given value is not nil.
+func (_u *AccountUpdateOne) SetNillableAvatarAssetID(v *xid.ID) *AccountUpdateOne {
+	if v != nil {
+		_u.SetAvatarAssetID(*v)
+	}
+	return _u
+}
+
+// ClearAvatarAssetID clears the value of the "avatar_asset_id" field.
+func (_u *AccountUpdateOne) ClearAvatarAssetID() *AccountUpdateOne {
+	_u.mutation.ClearAvatarAssetID()
+	return _u
+}
+
 // SetSignature sets the "signature" field.
 func (_u *AccountUpdateOne) SetSignature(v string) *AccountUpdateOne {
 	_u.mutation.SetSignature(v)
@@ -6832,6 +6878,12 @@ func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err er
 	}
 	if _u.mutation.BioCleared() {
 		_spec.ClearField(account.FieldBio, field.TypeString)
+	}
+	if value, ok := _u.mutation.AvatarAssetID(); ok {
+		_spec.SetField(account.FieldAvatarAssetID, field.TypeString, value)
+	}
+	if _u.mutation.AvatarAssetIDCleared() {
+		_spec.ClearField(account.FieldAvatarAssetID, field.TypeString)
 	}
 	if value, ok := _u.mutation.Signature(); ok {
 		_spec.SetField(account.FieldSignature, field.TypeString, value)

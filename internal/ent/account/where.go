@@ -91,6 +91,11 @@ func Bio(v string) predicate.Account {
 	return predicate.Account(sql.FieldEQ(FieldBio, v))
 }
 
+// AvatarAssetID applies equality check predicate on the "avatar_asset_id" field. It's identical to AvatarAssetIDEQ.
+func AvatarAssetID(v xid.ID) predicate.Account {
+	return predicate.Account(sql.FieldEQ(FieldAvatarAssetID, v))
+}
+
 // Signature applies equality check predicate on the "signature" field. It's identical to SignatureEQ.
 func Signature(v string) predicate.Account {
 	return predicate.Account(sql.FieldEQ(FieldSignature, v))
@@ -489,6 +494,86 @@ func BioEqualFold(v string) predicate.Account {
 // BioContainsFold applies the ContainsFold predicate on the "bio" field.
 func BioContainsFold(v string) predicate.Account {
 	return predicate.Account(sql.FieldContainsFold(FieldBio, v))
+}
+
+// AvatarAssetIDEQ applies the EQ predicate on the "avatar_asset_id" field.
+func AvatarAssetIDEQ(v xid.ID) predicate.Account {
+	return predicate.Account(sql.FieldEQ(FieldAvatarAssetID, v))
+}
+
+// AvatarAssetIDNEQ applies the NEQ predicate on the "avatar_asset_id" field.
+func AvatarAssetIDNEQ(v xid.ID) predicate.Account {
+	return predicate.Account(sql.FieldNEQ(FieldAvatarAssetID, v))
+}
+
+// AvatarAssetIDIn applies the In predicate on the "avatar_asset_id" field.
+func AvatarAssetIDIn(vs ...xid.ID) predicate.Account {
+	return predicate.Account(sql.FieldIn(FieldAvatarAssetID, vs...))
+}
+
+// AvatarAssetIDNotIn applies the NotIn predicate on the "avatar_asset_id" field.
+func AvatarAssetIDNotIn(vs ...xid.ID) predicate.Account {
+	return predicate.Account(sql.FieldNotIn(FieldAvatarAssetID, vs...))
+}
+
+// AvatarAssetIDGT applies the GT predicate on the "avatar_asset_id" field.
+func AvatarAssetIDGT(v xid.ID) predicate.Account {
+	return predicate.Account(sql.FieldGT(FieldAvatarAssetID, v))
+}
+
+// AvatarAssetIDGTE applies the GTE predicate on the "avatar_asset_id" field.
+func AvatarAssetIDGTE(v xid.ID) predicate.Account {
+	return predicate.Account(sql.FieldGTE(FieldAvatarAssetID, v))
+}
+
+// AvatarAssetIDLT applies the LT predicate on the "avatar_asset_id" field.
+func AvatarAssetIDLT(v xid.ID) predicate.Account {
+	return predicate.Account(sql.FieldLT(FieldAvatarAssetID, v))
+}
+
+// AvatarAssetIDLTE applies the LTE predicate on the "avatar_asset_id" field.
+func AvatarAssetIDLTE(v xid.ID) predicate.Account {
+	return predicate.Account(sql.FieldLTE(FieldAvatarAssetID, v))
+}
+
+// AvatarAssetIDContains applies the Contains predicate on the "avatar_asset_id" field.
+func AvatarAssetIDContains(v xid.ID) predicate.Account {
+	vc := v.String()
+	return predicate.Account(sql.FieldContains(FieldAvatarAssetID, vc))
+}
+
+// AvatarAssetIDHasPrefix applies the HasPrefix predicate on the "avatar_asset_id" field.
+func AvatarAssetIDHasPrefix(v xid.ID) predicate.Account {
+	vc := v.String()
+	return predicate.Account(sql.FieldHasPrefix(FieldAvatarAssetID, vc))
+}
+
+// AvatarAssetIDHasSuffix applies the HasSuffix predicate on the "avatar_asset_id" field.
+func AvatarAssetIDHasSuffix(v xid.ID) predicate.Account {
+	vc := v.String()
+	return predicate.Account(sql.FieldHasSuffix(FieldAvatarAssetID, vc))
+}
+
+// AvatarAssetIDIsNil applies the IsNil predicate on the "avatar_asset_id" field.
+func AvatarAssetIDIsNil() predicate.Account {
+	return predicate.Account(sql.FieldIsNull(FieldAvatarAssetID))
+}
+
+// AvatarAssetIDNotNil applies the NotNil predicate on the "avatar_asset_id" field.
+func AvatarAssetIDNotNil() predicate.Account {
+	return predicate.Account(sql.FieldNotNull(FieldAvatarAssetID))
+}
+
+// AvatarAssetIDEqualFold applies the EqualFold predicate on the "avatar_asset_id" field.
+func AvatarAssetIDEqualFold(v xid.ID) predicate.Account {
+	vc := v.String()
+	return predicate.Account(sql.FieldEqualFold(FieldAvatarAssetID, vc))
+}
+
+// AvatarAssetIDContainsFold applies the ContainsFold predicate on the "avatar_asset_id" field.
+func AvatarAssetIDContainsFold(v xid.ID) predicate.Account {
+	vc := v.String()
+	return predicate.Account(sql.FieldContainsFold(FieldAvatarAssetID, vc))
 }
 
 // SignatureEQ applies the EQ predicate on the "signature" field.

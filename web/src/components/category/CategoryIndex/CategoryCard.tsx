@@ -21,7 +21,7 @@ type CategoryCardProps = {
 };
 
 export function CategoryCard({ category, showChildren }: CategoryCardProps) {
-  const coverImage = getAssetURL(category.cover_image?.path);
+  const coverImage = getAssetURL(category.cover_image?.path, "m");
 
   const hasSubcategories = category.children.length > 0;
 

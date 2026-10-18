@@ -4,12 +4,14 @@ package ent
 
 import (
 	"context"
+	"encoding/json/jsontext"
 	"errors"
 	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
@@ -92,8 +94,14 @@ func (_u *AssetUpdate) SetNillableMimeType(v *string) *AssetUpdate {
 }
 
 // SetMetadata sets the "metadata" field.
-func (_u *AssetUpdate) SetMetadata(v map[string]interface{}) *AssetUpdate {
+func (_u *AssetUpdate) SetMetadata(v jsontext.Value) *AssetUpdate {
 	_u.mutation.SetMetadata(v)
+	return _u
+}
+
+// AppendMetadata appends value to the "metadata" field.
+func (_u *AssetUpdate) AppendMetadata(v jsontext.Value) *AssetUpdate {
+	_u.mutation.AppendMetadata(v)
 	return _u
 }
 
@@ -479,6 +487,11 @@ func (_u *AssetUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(asset.FieldMetadata, field.TypeJSON, value)
+	}
+	if value, ok := _u.mutation.AppendedMetadata(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, asset.FieldMetadata, value)
+		})
 	}
 	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(asset.FieldMetadata, field.TypeJSON)
@@ -889,8 +902,14 @@ func (_u *AssetUpdateOne) SetNillableMimeType(v *string) *AssetUpdateOne {
 }
 
 // SetMetadata sets the "metadata" field.
-func (_u *AssetUpdateOne) SetMetadata(v map[string]interface{}) *AssetUpdateOne {
+func (_u *AssetUpdateOne) SetMetadata(v jsontext.Value) *AssetUpdateOne {
 	_u.mutation.SetMetadata(v)
+	return _u
+}
+
+// AppendMetadata appends value to the "metadata" field.
+func (_u *AssetUpdateOne) AppendMetadata(v jsontext.Value) *AssetUpdateOne {
+	_u.mutation.AppendMetadata(v)
 	return _u
 }
 
@@ -1306,6 +1325,11 @@ func (_u *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error)
 	}
 	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(asset.FieldMetadata, field.TypeJSON, value)
+	}
+	if value, ok := _u.mutation.AppendedMetadata(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, asset.FieldMetadata, value)
+		})
 	}
 	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(asset.FieldMetadata, field.TypeJSON)

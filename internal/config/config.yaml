@@ -622,6 +622,30 @@
       description: |-
         The secret key for the S3-compatible storage provider.
 
+- section: Image processing
+  description: Asynchronous image variants. Limits apply per API process.
+  fields:
+    - env: "IMAGE_WORKERS"
+      name: ImageWorkers
+      type: int
+      default: "1"
+      description: Maximum simultaneously active image jobs per process.
+    - env: "IMAGE_MEMORY_BUDGET"
+      name: ImageMemoryBudget
+      type: int64
+      default: "268435456"
+      description: Admission budget in bytes for image work, separate from application memory. This is not a process RSS limit.
+    - env: "IMAGE_MAX_SOURCE_BYTES"
+      name: ImageMaxSourceBytes
+      type: int64
+      default: "33554432"
+      description: Largest encoded image to optimize. Larger originals remain downloadable.
+    - env: "IMAGE_MAX_SOURCE_PIXELS"
+      name: ImageMaxSourcePixels
+      type: int64
+      default: "12000000"
+      description: Maximum source pixel count admitted before decoding.
+
 - section: Cache
   description: |-
     Configuration for cachine. Caching is optional in Storyden, but is recommended for larger deployments to reduce process memory usage.

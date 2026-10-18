@@ -8,11 +8,36 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_ref"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
+	"github.com/Southclaws/storyden/app/resources/background_job"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 )
+
+// -
+// Background jobs
+// -
+
+type CommandAttemptBackgroundJob struct {
+	ID xid.ID
+}
+
+type EventBackgroundJobStateChanged struct {
+	ID             xid.ID
+	Kind           string
+	Revision       int64
+	PreviousStatus background_job.Status
+	Status         background_job.Status
+	Attempts       int
+	Reason         string
+}
+
+type EventBackgroundJobCompleted struct {
+	ID       xid.ID
+	Kind     string
+	Revision int64
+}
 
 // -
 // Indexing commands

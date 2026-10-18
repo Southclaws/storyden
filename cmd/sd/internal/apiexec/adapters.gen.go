@@ -1401,6 +1401,9 @@ func Build() fx.Option {
 		func(e *Executor) cligen.ApiAssetGetHandler {
 			return func(ctx context.Context, cmd *cobra.Command, streams cligen.IO, p cligen.ApiAssetGetParams) error {
 				query := url.Values{}
+				if p.VariantSet {
+					query.Set("variant", string(p.Variant))
+				}
 				return e.Run(ctx, streams, Request{Operation: "AssetGet", Query: query, Output: string(p.Output), OutputFile: p.OutputFile, Timeout: p.Timeout, Path: map[string]string{"asset_filename": p.AssetFilename}})
 			}
 		},

@@ -15,9 +15,11 @@ import type { SWRMutationConfiguration } from "swr/mutation";
 import { fetcher } from "../client";
 import type {
   AssetGetOKResponse,
+  AssetGetParams,
   AssetUploadBody,
   AssetUploadOKResponse,
   AssetUploadParams,
+  BadRequestResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
   UnauthorisedResponse,
@@ -123,8 +125,23 @@ export const useAssetUpload = <
     ...query,
   };
 };
-export const getAssetGetUrl = (assetFilename: string) => {
-  return `/assets/${assetFilename}`;
+export const getAssetGetUrl = (
+  assetFilename: string,
+  params?: AssetGetParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/assets/${assetFilename}?${stringifiedParams}`
+    : `/assets/${assetFilename}`;
 };
 
 /**
@@ -132,16 +149,19 @@ export const getAssetGetUrl = (assetFilename: string) => {
  */
 export const assetGet = async (
   assetFilename: string,
+  params?: AssetGetParams,
   options?: Parameters<typeof fetcher>[1],
 ): Promise<AssetGetOKResponse> => {
-  return fetcher<AssetGetOKResponse>(getAssetGetUrl(assetFilename), {
+  return fetcher<AssetGetOKResponse>(getAssetGetUrl(assetFilename, params), {
     ...options,
     method: "GET",
   });
 };
 
-export const getAssetGetKey = (assetFilename: string) =>
-  [`/assets/${assetFilename}`] as const;
+export const getAssetGetKey = (
+  assetFilename: string,
+  params?: AssetGetParams,
+) => [`/assets/${assetFilename}`, ...(params ? [params] : [])] as const;
 
 export type AssetGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof assetGet>>
@@ -149,11 +169,13 @@ export type AssetGetQueryResult = NonNullable<
 
 export const useAssetGet = <
   TError =
+    | BadRequestResponse
     | UnauthorisedResponse
     | NotFoundResponse
     | InternalServerErrorResponse,
 >(
   assetFilename: string,
+  params?: AssetGetParams,
   options?: {
     swr?: SWRConfiguration<Awaited<ReturnType<typeof assetGet>>, TError> & {
       swrKey?: Key;
@@ -170,8 +192,8 @@ export const useAssetGet = <
     assetFilename !== undefined;
   const swrKey =
     swrOptions?.swrKey ??
-    (() => (isEnabled ? getAssetGetKey(assetFilename) : null));
-  const swrFn = () => assetGet(assetFilename, requestOptions);
+    (() => (isEnabled ? getAssetGetKey(assetFilename, params) : null));
+  const swrFn = () => assetGet(assetFilename, params, requestOptions);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

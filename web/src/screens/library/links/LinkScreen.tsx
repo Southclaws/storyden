@@ -30,7 +30,7 @@ export function LinkScreen(props: Props) {
   const descriptionLabel =
     link.description || "No description was found at this link's site.";
 
-  const mainImage = getAssetURL(link.primary_image?.path);
+  const mainImage = getAssetURL(link.primary_image?.path, "l");
 
   const domainSearch = `/links?q=${link.domain}`;
 

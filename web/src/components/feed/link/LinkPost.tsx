@@ -23,7 +23,7 @@ export function LinkPost(props: Props) {
         <Box flexGrow="1" flexShrink="0" width="32">
           {asset ? (
             <styled.img
-              src={getAssetURL(asset.path)}
+              src={getAssetURL(asset.path, "m")}
               height="full"
               width="full"
               objectPosition="center"

@@ -13,6 +13,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_account "github.com/Southclaws/storyden/internal/ent/account"
@@ -154,6 +155,16 @@ func SetLinks(links []account.ExternalLink) Mutation {
 func SetMetadata(m map[string]any) Mutation {
 	return func(u *ent.AccountUpdateOne) {
 		u.SetMetadata(m)
+	}
+}
+
+func SetAvatarAssetID(id opt.Optional[asset.AssetID]) Mutation {
+	return func(u *ent.AccountUpdateOne) {
+		if value, ok := id.Get(); ok {
+			u.SetAvatarAssetID(value)
+		} else {
+			u.ClearAvatarAssetID()
+		}
 	}
 }
 

@@ -75,6 +75,7 @@ export const ThreadReferenceCard = memo(
       ? undefined
       : getAssetURL(
           thread.assets?.[0]?.path ?? thread.link?.primary_image?.path,
+          "m",
         );
 
     return (

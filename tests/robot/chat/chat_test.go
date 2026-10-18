@@ -177,8 +177,12 @@ func uploadChatImage(
 	var encoded bytes.Buffer
 	require.NoError(t, png.Encode(&encoded, imageData))
 
+	accountID, err := authsession.GetAccountID(ctx)
+	require.NoError(t, err)
+
 	uploaded, err := uploader.Upload(
 		ctx,
+		accountID,
 		bytes.NewReader(encoded.Bytes()),
 		int64(encoded.Len()),
 		asset.NewFilename(name),

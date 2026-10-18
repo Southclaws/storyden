@@ -235,6 +235,7 @@ func TestOAuthRegistrationApproval(t *testing.T) {
 				require.Nil(t, client.DcrIatID)
 				bot, err := db.Account.Get(root, *client.AccountID)
 				require.NoError(t, err)
+				require.NotNil(t, bot.AvatarAssetID)
 				require.False(t, bot.Admin)
 				require.Equal(t, entaccount.KindBot, bot.Kind)
 				require.NotNil(t, record(t, code).ConsumedAt)

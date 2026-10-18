@@ -1,6 +1,8 @@
-import { expect, test } from "@playwright/test";
+import { Page, expect, test } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 
+import type { Asset } from "../../src/api/openapi-schema";
+import { API_ADDRESS } from "../../src/config";
 import {
   createAdmin,
   getAdminAccessKey,
@@ -26,7 +28,7 @@ test("Library keeps its cover visible while the cropper loads, and saves croppin
     return canvas.toDataURL("image/png").split(",")[1]!;
   });
   const uploaded = await page.request.post(
-    "http://localhost:8001/api/assets?filename=library-cover.png",
+    `${API_ADDRESS}/api/assets?filename=library-cover.png`,
     {
       headers: {
         Authorization: `Bearer ${getAdminAccessKey()}`,
@@ -37,6 +39,26 @@ test("Library keeps its cover visible while the cropper loads, and saves croppin
   );
   expect(uploaded.ok()).toBe(true);
   const asset = await uploaded.json();
+  const variantURL = `${API_ADDRESS}${asset.path}?variant=l`;
+  const cold = await page.request.get(variantURL);
+  expect(cold.headers()["cache-control"]).toContain("no-cache");
+  await expect
+    .poll(async () => {
+      const response = await page.request.get(variantURL);
+      return response.headers()["cache-control"];
+    })
+    .toContain("86400");
+  const warm = await page.request.get(variantURL);
+  expect(warm.headers()["content-type"]).toBe("image/webp");
+  const originalBytes = Buffer.from(image, "base64").length;
+  const warmBytes = (await warm.body()).length;
+  expect(warmBytes).toBeLessThan(originalBytes);
+  expect(warm.headers()["cache-control"]).toContain("86400");
+  await test.info().attach("image-transfer", {
+    body: JSON.stringify({ originalBytes, warmBytes }),
+    contentType: "application/json",
+  });
+
   const node = await withAdminAccessKey(({ nodeCreate }) =>
     nodeCreate({
       name: `Readable Library ${seed}`,
@@ -58,6 +80,13 @@ test("Library keeps its cover visible while the cropper loads, and saves croppin
   await page.goto(`/l/${node.slug}`, { waitUntil: "networkidle" });
   const main = page.getByRole("main");
   await expect(main.locator('[data-outline-block="cover"] img')).toBeVisible();
+  const coverSource = await main
+    .locator('[data-outline-block="cover"] img')
+    .evaluate((image) => (image as HTMLImageElement).currentSrc);
+  expect(["s", "m", "l"]).toContain(
+    new URL(coverSource).searchParams.get("variant"),
+  );
+
   await expect(main.locator(".advanced-cropper")).toHaveCount(0);
 
   await page.getByRole("button", { name: "Edit", exact: true }).click();
@@ -86,32 +115,11 @@ test("Library keeps its cover visible while the cropper loads, and saves croppin
   const cropper = page.locator(
     "#block-cover_container:visible .advanced-cropper",
   );
-  await expect(cropper).toBeVisible();
-  await expect(cropper.locator("img").first()).toBeVisible();
-  const box = await cropper.boundingBox();
-  expect(box).not.toBeNull();
-  const cropped = page.waitForResponse(
-    (response) =>
-      new URL(response.url()).pathname === "/api/assets" &&
-      new URL(response.url()).searchParams.get("filename") ===
-        "cropped-cover" &&
-      response.request().method() === "POST",
-  );
-  await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(
-    box!.x + box!.width / 2,
-    box!.y + box!.height / 2 + 40,
-    { steps: 8 },
-  );
-  await page.mouse.up();
-  const cropResponse = await cropped;
-  expect(cropResponse.ok()).toBe(true);
-  const croppedAsset = await cropResponse.json();
-  expect(croppedAsset.parent.id).toBe(asset.id);
+  const croppedAsset = await dragCover(page, 40);
+  expect(croppedAsset.parent?.id).toBe(asset.id);
   const saved = () =>
     page.request
-      .get(`http://localhost:8001/api/nodes/${node.slug}`)
+      .get(`${API_ADDRESS}/api/nodes/${node.slug}`)
       .then((response) => response.json());
   await expect
     .poll(async () => (await saved()).primary_image?.id)
@@ -124,6 +132,31 @@ test("Library keeps its cover visible while the cropper loads, and saves croppin
     .poll(() => new URL(page.url()).searchParams.get("edit"))
     .toBeNull();
 
+  await expectVariant(page, asset, "s", 320, 160);
+  await expectVariant(page, croppedAsset, "s", 320, 80);
+
+  await page.reload({ waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Edit", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Quick edit", exact: true }).click();
+  await expect(cropper).toBeVisible();
+  await expect(cropper.locator("img").first()).toHaveAttribute(
+    "src",
+    `${API_ADDRESS}${asset.path}`,
+  );
+  const recropped = await dragCover(page, -40);
+  expect(recropped.id).not.toBe(croppedAsset.id);
+  expect(recropped.parent?.id).toBe(asset.id);
+  await expect
+    .poll(async () => (await saved()).primary_image?.id)
+    .toBe(recropped.id);
+  const original = await page.request.get(`${API_ADDRESS}${asset.path}`);
+  expect(await original.body()).toEqual(Buffer.from(image, "base64"));
+  await expectVariant(page, recropped, "s", 320, 80);
+  await page.getByRole("button", { name: "View", exact: true }).click();
+  await expect
+    .poll(() => new URL(page.url()).searchParams.get("edit"))
+    .toBeNull();
+
   const noJS = await browser.newContext({ javaScriptEnabled: false });
   try {
     const reader = await noJS.newPage();
@@ -132,7 +165,7 @@ test("Library keeps its cover visible while the cropper loads, and saves croppin
     // The existing loading.tsx boundary can keep streamed content hidden without JS.
     // Assert the actual SSR elements rather than embedded RSC JSON.
     await expect(cover).toHaveCount(1);
-    await expect(cover).toHaveAttribute("src", new RegExp(croppedAsset.id));
+    await expect(cover).toHaveAttribute("src", new RegExp(recropped.id));
     await expect(reader.locator("body")).toContainText(
       "Content stays readable before editing.",
     );
@@ -140,3 +173,120 @@ test("Library keeps its cover visible while the cropper loads, and saves croppin
     await noJS.close();
   }
 });
+
+test("a cover uploaded in quick edit keeps its original when cropped", async ({
+  page,
+}) => {
+  const seed = randomUUID().slice(0, 8);
+  const admin = `cover-upload-${seed}`;
+  await createAdmin(page.context(), admin, "TestPassword123!");
+  await login(page, admin, "TestPassword123!");
+  const node = await withAdminAccessKey(({ nodeCreate }) =>
+    nodeCreate({
+      name: `Cover upload ${seed}`,
+      slug: `cover-upload-${seed}`,
+      visibility: "published",
+      meta: { layout: { blocks: [{ type: "title" }, { type: "cover" }] } },
+    }),
+  );
+  await page.goto(`/l/${node.slug}`, { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Edit", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Quick edit", exact: true }).click();
+
+  const image = await page.evaluate(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1800;
+    canvas.height = 900;
+    const context = canvas.getContext("2d")!;
+    context.fillStyle = "#2255aa";
+    context.fillRect(0, 0, 1800, 900);
+    return canvas.toDataURL("image/png").split(",")[1]!;
+  });
+  const uploaded = page.waitForResponse(
+    (response) =>
+      new URL(response.url()).pathname === "/api/assets" &&
+      response.request().method() === "POST",
+  );
+  const chooser = page.waitForEvent("filechooser");
+  await page
+    .getByRole("button", { name: "Upload cover image", exact: true })
+    .click();
+  await (
+    await chooser
+  ).setFiles({
+    name: "cover.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(image, "base64"),
+  });
+  const uploadResponse = await uploaded;
+  expect(uploadResponse.ok()).toBe(true);
+  const original: Asset = await uploadResponse.json();
+  const crop = await dragCover(page, 40);
+  expect(crop.parent?.id).toBe(original.id);
+  await expect
+    .poll(async () => {
+      const response = await page.request.get(
+        `${API_ADDRESS}/api/nodes/${node.slug}`,
+      );
+      return (await response.json()).primary_image?.id;
+    })
+    .toBe(crop.id);
+  await expectVariant(page, original, "s", 320, 160);
+  await expectVariant(page, crop, "s", 320, 80);
+});
+
+async function dragCover(page: Page, distance: number): Promise<Asset> {
+  const cropper = page.locator(
+    "#block-cover_container:visible .advanced-cropper",
+  );
+  await expect(cropper).toBeVisible();
+  await expect(cropper.locator("img").first()).toBeVisible();
+  const box = await cropper.boundingBox();
+  expect(box).not.toBeNull();
+  const response = page.waitForResponse(
+    (response) =>
+      new URL(response.url()).pathname === "/api/assets" &&
+      new URL(response.url()).searchParams.get("filename") ===
+        "cropped-cover" &&
+      response.request().method() === "POST",
+  );
+  const x = box!.x + box!.width / 2;
+  const y = box!.y + box!.height / 2;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x, y + distance, { steps: 8 });
+  await page.mouse.up();
+  const uploaded = await response;
+  expect(uploaded.ok()).toBe(true);
+  return uploaded.json();
+}
+
+async function expectVariant(
+  page: Page,
+  asset: Asset,
+  preset: string,
+  width: number,
+  height: number,
+) {
+  const url = `${API_ADDRESS}${asset.path}?variant=${preset}`;
+  await expect
+    .poll(async () => {
+      const response = await page.request.get(url);
+      return response.headers()["cache-control"];
+    })
+    .toContain("86400");
+  const response = await page.request.get(url);
+  expect(response.headers()["content-type"]).toBe("image/webp");
+  const dimensions = await page.evaluate(
+    async (bytes) => {
+      const bitmap = await createImageBitmap(
+        new Blob([new Uint8Array(bytes)], { type: "image/webp" }),
+      );
+      const size = { width: bitmap.width, height: bitmap.height };
+      bitmap.close();
+      return size;
+    },
+    Array.from(await response.body()),
+  );
+  expect(dimensions).toEqual({ width, height });
+}

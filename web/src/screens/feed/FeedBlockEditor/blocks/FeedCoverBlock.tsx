@@ -17,7 +17,7 @@ export function FeedCoverBlock() {
             objectFit: "cover",
           })
         }
-        src={getBannerURL()}
+        src={getBannerURL("l")}
         alt=""
         fill
         sizes="(max-width: 768px) 100vw, 960px"

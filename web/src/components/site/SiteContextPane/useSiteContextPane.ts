@@ -52,7 +52,7 @@ export function useSiteContextPane({ session, initialSettings }: Props) {
     };
   }
 
-  const iconURL = getIconURL("512x512");
+  const iconURL = getIconURL("120x120");
 
   const isEditingEnabled = hasPermission(session, Permission.MANAGE_SETTINGS);
   const isAdmin = hasPermission(session, Permission.ADMINISTRATOR);

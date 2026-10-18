@@ -4,7 +4,7 @@ import { Styles, css } from "@/styled-system/css";
 import { getIconURL } from "@/utils/icon";
 
 export function SiteIcon(props: Styles) {
-  const src = getIconURL("512x512");
+  const src = getIconURL("120x120");
 
   const imageStyles = css(props);
 

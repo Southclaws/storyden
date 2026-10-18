@@ -51,6 +51,7 @@ type Error struct {
 }
 
 type Service struct {
+	logger    *slog.Logger
 	cfg       config.Config
 	settings  *settings.SettingsRepository
 	clients   *oauth_querier.Querier
@@ -87,12 +88,13 @@ func New(
 
 	if !cfg.OAuthEnabled {
 		service := &Service{
+			logger:    logger,
 			cfg:       cfg,
 			settings:  settings,
-			avatars:   avatars,
 			clients:   clients,
 			tokens:    tokens,
 			account:   account,
+			avatars:   avatars,
 			issuer:    issuer,
 			cimdCache: newCIMDCache(),
 			cache:     cache,
@@ -133,12 +135,13 @@ func New(
 	}
 
 	service := &Service{
+		logger:    logger,
 		cfg:       cfg,
 		settings:  settings,
-		avatars:   avatars,
 		clients:   clients,
 		tokens:    tokens,
 		account:   account,
+		avatars:   avatars,
 		signer:    pk,
 		kid:       kid,
 		issuer:    issuer,

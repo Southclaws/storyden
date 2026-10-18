@@ -10,12 +10,14 @@ import (
 	"github.com/Southclaws/storyden/app/services/account/register"
 	"github.com/Southclaws/storyden/app/services/admin/settings_manager"
 	"github.com/Southclaws/storyden/app/services/asset"
+	"github.com/Southclaws/storyden/app/services/asset/asset_migration"
 	"github.com/Southclaws/storyden/app/services/audit/audit_logger"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/oauthremote"
 	"github.com/Southclaws/storyden/app/services/authentication/oauthremotetoken"
 	"github.com/Southclaws/storyden/app/services/avatar"
 	"github.com/Southclaws/storyden/app/services/avatar_gen"
+	"github.com/Southclaws/storyden/app/services/background_job"
 	"github.com/Southclaws/storyden/app/services/beacon_listener"
 	"github.com/Southclaws/storyden/app/services/branding"
 	"github.com/Southclaws/storyden/app/services/category"
@@ -73,6 +75,8 @@ func Build() fx.Option {
 		search_indexer.Build(),
 		avatar.Build(),
 		asset.Build(),
+		background_job.Build(),
+		asset_migration.Build(),
 		thread_mark.Build(),
 		collection.Build(),
 		library.Build(),

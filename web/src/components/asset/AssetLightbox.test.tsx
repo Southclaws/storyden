@@ -16,6 +16,28 @@ const asset: Asset = {
 };
 
 describe("AssetLightbox", () => {
+  test("loads a selected crop at full resolution without selecting its parent", () => {
+    const crop: Asset = {
+      ...asset,
+      id: "crop",
+      path: "/api/assets/crop.png",
+      parent: asset,
+    };
+    const { container } = render(
+      <AssetLightbox asset={crop} present onClose={vi.fn()} />,
+      { wrapper: withNuqsTestingAdapter() },
+    );
+
+    const images = container.ownerDocument.querySelectorAll("img");
+    expect(images).toHaveLength(2);
+    for (const image of images) {
+      const src = new URL(image.src);
+      const original = new URL(src.searchParams.get("url") ?? image.src);
+      expect(original.pathname).toBe("/api/assets/crop.png");
+      expect(original.searchParams.has("variant")).toBe(false);
+    }
+  });
+
   test("Escape closes only the visible lightbox", () => {
     const onClose = vi.fn();
     const onHiddenClose = vi.fn();

@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 
+import { API_ADDRESS } from "../../src/config";
 import { registerUser } from "../access_key_admin_assignment";
 
 test("opens the avatar editor on demand and saves an uploaded image", async ({
@@ -59,4 +60,15 @@ test("opens the avatar editor on demand and saves an uploaded image", async ({
   await expect(dialog.locator("canvas")).toBeVisible();
   await dialog.getByRole("button", { name: "Close", exact: true }).click();
   await expect(dialog).toBeHidden();
+
+  const thumbnailURL = `${API_ADDRESS}/api/accounts/${handle}/avatar?variant=thumb_s`;
+  await expect
+    .poll(async () => {
+      const response = await page.request.get(thumbnailURL);
+      return response.headers()["content-type"];
+    })
+    .toBe("image/webp");
+  const thumbnail = await page.request.get(thumbnailURL);
+  expect(thumbnail.ok()).toBe(true);
+  expect((await thumbnail.body()).length).toBeLessThan(10_000);
 });

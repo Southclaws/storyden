@@ -1,6 +1,7 @@
 package oauth
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -13,6 +14,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/roboticon"
 	"github.com/alexedwards/argon2id"
 	"github.com/go-jose/go-jose/v4"
 	"github.com/rs/xid"
@@ -302,22 +304,27 @@ func (s *Service) provisionClientRegistration(ctx context.Context, configuration
 	}, nil, nil
 }
 
-func (s *Service) provisionAgentClient(ctx context.Context, handle string, input oauth_writer.ClientCreate) (*oauthresource.Client, error) {
+func (s *Service) provisionAgentClient(
+	ctx context.Context,
+	handle string,
+	input oauth_writer.ClientCreate,
+) (*oauthresource.Client, error) {
 	id := account.AccountID(xid.New())
-	if err := s.avatars.SetRobot(ctx, id); err != nil {
+
+	var avatarPNG bytes.Buffer
+	robot := roboticon.Generate(id.String())
+	if err := robot.RenderPNG(&avatarPNG, 256); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	input.AccountID = opt.New(id)
 	client, err := s.tokens.CreateAgentClient(ctx, handle, input)
 	if err != nil {
-		cleanupCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 10*time.Second)
-		defer cancel()
-		if cleanupErr := s.avatars.Delete(cleanupCtx, id); cleanupErr != nil {
-			return nil, fault.Wrap(errors.Join(err, cleanupErr), fctx.With(ctx))
-		}
-
 		return nil, err
+	}
+
+	if err := s.avatars.Set(ctx, id, &avatarPNG, int64(avatarPNG.Len())); err != nil {
+		s.logger.WarnContext(ctx, "failed to store generated agent avatar", "account_id", id.String(), "error", err)
 	}
 
 	return client, nil

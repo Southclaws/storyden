@@ -1258,6 +1258,70 @@ The access key for the S3-compatible storage provider.
 
 The secret key for the S3-compatible storage provider.
 
+## Image processing
+
+Asynchronous image variants. Limits apply per API process.
+
+### `IMAGE_WORKERS`
+
+<table>
+  <tr>
+    <td>type</td>
+    <td>`integer` (number without decimal point)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`1`</td>
+  </tr>
+</table>
+
+Maximum simultaneously active image jobs per process.
+
+### `IMAGE_MEMORY_BUDGET`
+
+<table>
+  <tr>
+    <td>type</td>
+    <td>integer (e.g. `1`, `2`, `3`)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`268435456`</td>
+  </tr>
+</table>
+
+Admission budget in bytes for image work, separate from application memory. This is not a process RSS limit.
+
+### `IMAGE_MAX_SOURCE_BYTES`
+
+<table>
+  <tr>
+    <td>type</td>
+    <td>integer (e.g. `1`, `2`, `3`)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`33554432`</td>
+  </tr>
+</table>
+
+Largest encoded image to optimize. Larger originals remain downloadable.
+
+### `IMAGE_MAX_SOURCE_PIXELS`
+
+<table>
+  <tr>
+    <td>type</td>
+    <td>integer (e.g. `1`, `2`, `3`)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`12000000`</td>
+  </tr>
+</table>
+
+Maximum source pixel count admitted before decoding.
+
 ## Cache
 
 Configuration for cachine. Caching is optional in Storyden, but is recommended for larger deployments to reduce process memory usage.

@@ -390,6 +390,19 @@ type Config struct {
 	S3SecretKey string `envconfig:"S3_SECRET_KEY"`
 
 	// -
+	// Image processing
+	// -
+
+	// Maximum simultaneously active image jobs per process.
+	ImageWorkers int `default:"1" envconfig:"IMAGE_WORKERS"`
+	// Admission budget in bytes for image work, separate from application memory. This is not a process RSS limit.
+	ImageMemoryBudget int64 `default:"268435456" envconfig:"IMAGE_MEMORY_BUDGET"`
+	// Largest encoded image to optimize. Larger originals remain downloadable.
+	ImageMaxSourceBytes int64 `default:"33554432" envconfig:"IMAGE_MAX_SOURCE_BYTES"`
+	// Maximum source pixel count admitted before decoding.
+	ImageMaxSourcePixels int64 `default:"12000000" envconfig:"IMAGE_MAX_SOURCE_PIXELS"`
+
+	// -
 	// Cache
 	// -
 

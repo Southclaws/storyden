@@ -8,8 +8,10 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/branding/banner"
@@ -94,7 +96,7 @@ func (i Info) IconGet(ctx context.Context, request openapi.IconGetRequestObject)
 			ContentType:   a.MIME.String(),
 			ContentLength: int64(a.Size),
 			Headers: openapi.AssetGetOKResponseHeaders{
-				CacheControl: ptr("public, max-age=31536000"),
+				CacheControl: ptr("public, max-age=60"),
 			},
 		},
 	}, nil
@@ -110,7 +112,15 @@ func (i Info) IconUpload(ctx context.Context, request openapi.IconUploadRequestO
 }
 
 func (i Info) BannerGet(ctx context.Context, request openapi.BannerGetRequestObject) (openapi.BannerGetResponseObject, error) {
-	a, r, err := i.os.Get(ctx)
+	variant := asset.Variant("banner")
+	if v, ok := opt.NewPtr(request.Params.Variant).Get(); ok {
+		var err error
+		variant, err = asset.ParseVariant(string(v))
+		if err != nil {
+			return nil, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
+		}
+	}
+	a, r, pending, err := i.os.GetVariant(ctx, variant)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -121,7 +131,7 @@ func (i Info) BannerGet(ctx context.Context, request openapi.BannerGetRequestObj
 			ContentType:   a.MIME.String(),
 			ContentLength: int64(a.Size),
 			Headers: openapi.AssetGetOKResponseHeaders{
-				CacheControl: ptr("public, max-age=3600"),
+				CacheControl: ptr(aliasCacheControl(ctx, pending)),
 			},
 		},
 	}, nil

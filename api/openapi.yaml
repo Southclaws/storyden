@@ -233,8 +233,11 @@ paths:
       description: Get the banner image.
       security: []
       tags: [misc]
+      parameters:
+        - $ref: "#/components/parameters/AssetVariantQuery"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
         "200": { $ref: "#/components/responses/AssetGetOK" }
     post:
       operationId: BannerUpload
@@ -2372,9 +2375,12 @@ paths:
       operationId: AccountGetAvatar
       description: Get an avatar for the specified account.
       tags: [accounts]
-      parameters: [$ref: "#/components/parameters/AccountHandleParam"]
+      parameters:
+        - $ref: "#/components/parameters/AccountHandleParam"
+        - $ref: "#/components/parameters/AssetVariantQuery"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AccountGetAvatar" }
@@ -3083,9 +3089,12 @@ paths:
       operationId: AssetGet
       description: Download an asset by its filename.
       tags: [assets]
-      parameters: [$ref: "#/components/parameters/AssetPathParam"]
+      parameters:
+        - $ref: "#/components/parameters/AssetPathParam"
+        - $ref: "#/components/parameters/AssetVariantQuery"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AssetGetOK" }
@@ -5476,6 +5485,13 @@ components:
       schema:
         type: string
 
+    AssetVariantQuery:
+      name: variant
+      in: query
+      required: false
+      description: Image preset. Missing variants are queued and return the best available image with revalidation. Other file types return their original bytes.
+      schema: { $ref: "#/components/schemas/AssetVariant" }
+
     AssetNameQuery:
       description: The client-provided file name for the asset.
       name: filename
@@ -6803,7 +6819,7 @@ components:
       description: OK
       headers: { <<: *cache_response_headers }
       content:
-        image/png:
+        "*/*":
           schema:
             type: string
             format: binary
@@ -11801,6 +11817,10 @@ components:
     AssetList:
       type: array
       items: { $ref: "#/components/schemas/Asset" }
+
+    AssetVariant:
+      type: string
+      enum: [original, s, m, l, thumb_s, thumb_m, thumb_l]
 
     Asset:
       type: object

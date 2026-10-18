@@ -3,6 +3,8 @@ package mime
 import (
 	"bytes"
 	"io"
+	"mime"
+	"strings"
 
 	"github.com/gabriel-vasile/mimetype"
 )
@@ -11,23 +13,24 @@ const DefaultMIME = "application/octet-stream"
 
 // Type represents a MIME type for asset file format identification.
 type Type struct {
-	mt mimetype.MIME
+	mt string
 }
 
 func (t Type) String() string {
-	return t.mt.String()
+	return t.mt
 }
 
 func New(s string) Type {
 	m := mimetype.Lookup(s)
-	if m == nil {
-		return Type{
-			mt: *mimetype.Lookup(DefaultMIME),
-		}
+	if m != nil {
+		return Type{mt: m.String()}
 	}
-	return Type{
-		mt: *m,
+
+	mediaType, _, err := mime.ParseMediaType(s)
+	if err != nil || !strings.Contains(mediaType, "/") {
+		return Type{mt: DefaultMIME}
 	}
+	return Type{mt: mediaType}
 }
 
 func Detect(input io.Reader) (*Type, io.Reader, error) {
@@ -41,7 +44,7 @@ func Detect(input io.Reader) (*Type, io.Reader, error) {
 	recycled := io.MultiReader(header, input)
 
 	mt := &Type{
-		mt: *mtype,
+		mt: mtype.String(),
 	}
 
 	return mt, recycled, err

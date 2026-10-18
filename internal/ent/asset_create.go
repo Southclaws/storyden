@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"encoding/json/jsontext"
 	"errors"
 	"fmt"
 	"time"
@@ -77,7 +78,7 @@ func (_c *AssetCreate) SetMimeType(v string) *AssetCreate {
 }
 
 // SetMetadata sets the "metadata" field.
-func (_c *AssetCreate) SetMetadata(v map[string]interface{}) *AssetCreate {
+func (_c *AssetCreate) SetMetadata(v jsontext.Value) *AssetCreate {
 	_c.mutation.SetMetadata(v)
 	return _c
 }
@@ -610,7 +611,7 @@ func (u *AssetUpsert) UpdateMimeType() *AssetUpsert {
 }
 
 // SetMetadata sets the "metadata" field.
-func (u *AssetUpsert) SetMetadata(v map[string]interface{}) *AssetUpsert {
+func (u *AssetUpsert) SetMetadata(v jsontext.Value) *AssetUpsert {
 	u.Set(asset.FieldMetadata, v)
 	return u
 }
@@ -772,7 +773,7 @@ func (u *AssetUpsertOne) UpdateMimeType() *AssetUpsertOne {
 }
 
 // SetMetadata sets the "metadata" field.
-func (u *AssetUpsertOne) SetMetadata(v map[string]interface{}) *AssetUpsertOne {
+func (u *AssetUpsertOne) SetMetadata(v jsontext.Value) *AssetUpsertOne {
 	return u.Update(func(s *AssetUpsert) {
 		s.SetMetadata(v)
 	})
@@ -1109,7 +1110,7 @@ func (u *AssetUpsertBulk) UpdateMimeType() *AssetUpsertBulk {
 }
 
 // SetMetadata sets the "metadata" field.
-func (u *AssetUpsertBulk) SetMetadata(v map[string]interface{}) *AssetUpsertBulk {
+func (u *AssetUpsertBulk) SetMetadata(v jsontext.Value) *AssetUpsertBulk {
 	return u.Update(func(s *AssetUpsert) {
 		s.SetMetadata(v)
 	})

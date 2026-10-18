@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_assign"
 	"github.com/Southclaws/storyden/app/resources/account/warning"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
@@ -606,17 +607,22 @@ func (i *Accounts) AccountGetAvatar(ctx context.Context, request openapi.Account
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	r, size, err := i.avatarService.Get(ctx, id)
+	variant, err := asset.ParseVariant(string(opt.NewPtr(request.Params.Variant).Or(openapi.Original)))
+	if err != nil {
+		return nil, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
+	}
+	a, r, pending, err := i.avatarService.GetVariant(ctx, id, variant)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.AccountGetAvatar200ImagepngResponse{
-		AccountGetAvatarImagepngResponse: openapi.AccountGetAvatarImagepngResponse{
+	return openapi.AccountGetAvatar200AsteriskResponse{
+		AccountGetAvatarAsteriskResponse: openapi.AccountGetAvatarAsteriskResponse{
 			Body:          r,
-			ContentLength: size,
+			ContentLength: int64(a.Size),
+			ContentType:   a.MIME.String(),
 			Headers: openapi.AccountGetAvatarResponseHeaders{
-				CacheControl: ptr("public, max-age=3600"),
+				CacheControl: ptr(aliasCacheControl(ctx, pending)),
 			},
 		},
 	}, nil

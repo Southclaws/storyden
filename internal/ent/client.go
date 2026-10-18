@@ -22,6 +22,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/auditlog"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
+	"github.com/Southclaws/storyden/internal/ent/backgroundjob"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
@@ -99,6 +100,8 @@ type Client struct {
 	AuditLog *AuditLogClient
 	// Authentication is the client for interacting with the Authentication builders.
 	Authentication *AuthenticationClient
+	// BackgroundJob is the client for interacting with the BackgroundJob builders.
+	BackgroundJob *BackgroundJobClient
 	// Category is the client for interacting with the Category builders.
 	Category *CategoryClient
 	// Collection is the client for interacting with the Collection builders.
@@ -228,6 +231,7 @@ func (c *Client) init() {
 	c.Asset = NewAssetClient(c.config)
 	c.AuditLog = NewAuditLogClient(c.config)
 	c.Authentication = NewAuthenticationClient(c.config)
+	c.BackgroundJob = NewBackgroundJobClient(c.config)
 	c.Category = NewCategoryClient(c.config)
 	c.Collection = NewCollectionClient(c.config)
 	c.CollectionNode = NewCollectionNodeClient(c.config)
@@ -382,6 +386,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Asset:                                NewAssetClient(cfg),
 		AuditLog:                             NewAuditLogClient(cfg),
 		Authentication:                       NewAuthenticationClient(cfg),
+		BackgroundJob:                        NewBackgroundJobClient(cfg),
 		Category:                             NewCategoryClient(cfg),
 		Collection:                           NewCollectionClient(cfg),
 		CollectionNode:                       NewCollectionNodeClient(cfg),
@@ -463,6 +468,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Asset:                                NewAssetClient(cfg),
 		AuditLog:                             NewAuditLogClient(cfg),
 		Authentication:                       NewAuthenticationClient(cfg),
+		BackgroundJob:                        NewBackgroundJobClient(cfg),
 		Category:                             NewCategoryClient(cfg),
 		Collection:                           NewCollectionClient(cfg),
 		CollectionNode:                       NewCollectionNodeClient(cfg),
@@ -549,11 +555,11 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.AuditLog,
-		c.Authentication, c.Category, c.Collection, c.CollectionNode, c.CollectionPost,
-		c.Email, c.EmailQueue, c.Event, c.EventParticipant, c.Invitation, c.LikePost,
-		c.Link, c.MentionProfile, c.ModerationNote, c.Node, c.NodeVersion,
-		c.Notification, c.OAuthAuthorisationCode, c.OAuthAuthorisationRequest,
-		c.OAuthClient, c.OAuthDeviceAuthorisation,
+		c.Authentication, c.BackgroundJob, c.Category, c.Collection, c.CollectionNode,
+		c.CollectionPost, c.Email, c.EmailQueue, c.Event, c.EventParticipant,
+		c.Invitation, c.LikePost, c.Link, c.MentionProfile, c.ModerationNote, c.Node,
+		c.NodeVersion, c.Notification, c.OAuthAuthorisationCode,
+		c.OAuthAuthorisationRequest, c.OAuthClient, c.OAuthDeviceAuthorisation,
 		c.OAuthDynamicRegistrationAccessTokens, c.OAuthRefreshToken,
 		c.OAuthRegistrationApproval, c.OAuthRemoteAuthorisationFlow,
 		c.OAuthRemoteConnection, c.Plugin, c.Post, c.PostRead, c.Property,
@@ -573,11 +579,11 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.AuditLog,
-		c.Authentication, c.Category, c.Collection, c.CollectionNode, c.CollectionPost,
-		c.Email, c.EmailQueue, c.Event, c.EventParticipant, c.Invitation, c.LikePost,
-		c.Link, c.MentionProfile, c.ModerationNote, c.Node, c.NodeVersion,
-		c.Notification, c.OAuthAuthorisationCode, c.OAuthAuthorisationRequest,
-		c.OAuthClient, c.OAuthDeviceAuthorisation,
+		c.Authentication, c.BackgroundJob, c.Category, c.Collection, c.CollectionNode,
+		c.CollectionPost, c.Email, c.EmailQueue, c.Event, c.EventParticipant,
+		c.Invitation, c.LikePost, c.Link, c.MentionProfile, c.ModerationNote, c.Node,
+		c.NodeVersion, c.Notification, c.OAuthAuthorisationCode,
+		c.OAuthAuthorisationRequest, c.OAuthClient, c.OAuthDeviceAuthorisation,
 		c.OAuthDynamicRegistrationAccessTokens, c.OAuthRefreshToken,
 		c.OAuthRegistrationApproval, c.OAuthRemoteAuthorisationFlow,
 		c.OAuthRemoteConnection, c.Plugin, c.Post, c.PostRead, c.Property,
@@ -607,6 +613,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.AuditLog.mutate(ctx, m)
 	case *AuthenticationMutation:
 		return c.Authentication.mutate(ctx, m)
+	case *BackgroundJobMutation:
+		return c.BackgroundJob.mutate(ctx, m)
 	case *CategoryMutation:
 		return c.Category.mutate(ctx, m)
 	case *CollectionMutation:
@@ -2575,6 +2583,139 @@ func (c *AuthenticationClient) mutate(ctx context.Context, m *AuthenticationMuta
 		return (&AuthenticationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Authentication mutation op: %q", m.Op())
+	}
+}
+
+// BackgroundJobClient is a client for the BackgroundJob schema.
+type BackgroundJobClient struct {
+	config
+}
+
+// NewBackgroundJobClient returns a client for the BackgroundJob from the given config.
+func NewBackgroundJobClient(c config) *BackgroundJobClient {
+	return &BackgroundJobClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `backgroundjob.Hooks(f(g(h())))`.
+func (c *BackgroundJobClient) Use(hooks ...Hook) {
+	c.hooks.BackgroundJob = append(c.hooks.BackgroundJob, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `backgroundjob.Intercept(f(g(h())))`.
+func (c *BackgroundJobClient) Intercept(interceptors ...Interceptor) {
+	c.inters.BackgroundJob = append(c.inters.BackgroundJob, interceptors...)
+}
+
+// Create returns a builder for creating a BackgroundJob entity.
+func (c *BackgroundJobClient) Create() *BackgroundJobCreate {
+	mutation := newBackgroundJobMutation(c.config, OpCreate)
+	return &BackgroundJobCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of BackgroundJob entities.
+func (c *BackgroundJobClient) CreateBulk(builders ...*BackgroundJobCreate) *BackgroundJobCreateBulk {
+	return &BackgroundJobCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *BackgroundJobClient) MapCreateBulk(slice any, setFunc func(*BackgroundJobCreate, int)) *BackgroundJobCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &BackgroundJobCreateBulk{err: fmt.Errorf("calling to BackgroundJobClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*BackgroundJobCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &BackgroundJobCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for BackgroundJob.
+func (c *BackgroundJobClient) Update() *BackgroundJobUpdate {
+	mutation := newBackgroundJobMutation(c.config, OpUpdate)
+	return &BackgroundJobUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BackgroundJobClient) UpdateOne(_m *BackgroundJob) *BackgroundJobUpdateOne {
+	mutation := newBackgroundJobMutation(c.config, OpUpdateOne, withBackgroundJob(_m))
+	return &BackgroundJobUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BackgroundJobClient) UpdateOneID(id xid.ID) *BackgroundJobUpdateOne {
+	mutation := newBackgroundJobMutation(c.config, OpUpdateOne, withBackgroundJobID(id))
+	return &BackgroundJobUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for BackgroundJob.
+func (c *BackgroundJobClient) Delete() *BackgroundJobDelete {
+	mutation := newBackgroundJobMutation(c.config, OpDelete)
+	return &BackgroundJobDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *BackgroundJobClient) DeleteOne(_m *BackgroundJob) *BackgroundJobDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *BackgroundJobClient) DeleteOneID(id xid.ID) *BackgroundJobDeleteOne {
+	builder := c.Delete().Where(backgroundjob.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BackgroundJobDeleteOne{builder}
+}
+
+// Query returns a query builder for BackgroundJob.
+func (c *BackgroundJobClient) Query() *BackgroundJobQuery {
+	return &BackgroundJobQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeBackgroundJob},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a BackgroundJob entity by its id.
+func (c *BackgroundJobClient) Get(ctx context.Context, id xid.ID) (*BackgroundJob, error) {
+	return c.Query().Where(backgroundjob.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BackgroundJobClient) GetX(ctx context.Context, id xid.ID) *BackgroundJob {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *BackgroundJobClient) Hooks() []Hook {
+	return c.hooks.BackgroundJob
+}
+
+// Interceptors returns the client interceptors.
+func (c *BackgroundJobClient) Interceptors() []Interceptor {
+	return c.inters.BackgroundJob
+}
+
+func (c *BackgroundJobClient) mutate(ctx context.Context, m *BackgroundJobMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&BackgroundJobCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&BackgroundJobUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&BackgroundJobUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&BackgroundJobDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown BackgroundJob mutation op: %q", m.Op())
 	}
 }
 
@@ -12459,34 +12600,35 @@ func (c *WarningClient) mutate(ctx context.Context, m *WarningMutation) (Value, 
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication, Category,
-		Collection, CollectionNode, CollectionPost, Email, EmailQueue, Event,
-		EventParticipant, Invitation, LikePost, Link, MentionProfile, ModerationNote,
-		Node, NodeVersion, Notification, OAuthAuthorisationCode,
-		OAuthAuthorisationRequest, OAuthClient, OAuthDeviceAuthorisation,
-		OAuthDynamicRegistrationAccessTokens, OAuthRefreshToken,
-		OAuthRegistrationApproval, OAuthRemoteAuthorisationFlow, OAuthRemoteConnection,
-		Plugin, Post, PostRead, Property, PropertySchema, PropertySchemaField, React,
-		Report, Robot, RobotMCPServer, RobotMCPTool, RobotMemory, RobotProviderModel,
-		RobotSession, RobotSessionInput, RobotSessionMessage, RobotSessionTurn,
-		RobotSessionView, RobotToolset, RobotWorkspace, RobotWorkspaceInstance, Role,
-		Session, Setting, Tag, Trail, TrailAction, TrailActionRun, TrailRun,
-		TrailSchedulerLease, Warning []ent.Hook
+		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication,
+		BackgroundJob, Category, Collection, CollectionNode, CollectionPost, Email,
+		EmailQueue, Event, EventParticipant, Invitation, LikePost, Link,
+		MentionProfile, ModerationNote, Node, NodeVersion, Notification,
+		OAuthAuthorisationCode, OAuthAuthorisationRequest, OAuthClient,
+		OAuthDeviceAuthorisation, OAuthDynamicRegistrationAccessTokens,
+		OAuthRefreshToken, OAuthRegistrationApproval, OAuthRemoteAuthorisationFlow,
+		OAuthRemoteConnection, Plugin, Post, PostRead, Property, PropertySchema,
+		PropertySchemaField, React, Report, Robot, RobotMCPServer, RobotMCPTool,
+		RobotMemory, RobotProviderModel, RobotSession, RobotSessionInput,
+		RobotSessionMessage, RobotSessionTurn, RobotSessionView, RobotToolset,
+		RobotWorkspace, RobotWorkspaceInstance, Role, Session, Setting, Tag, Trail,
+		TrailAction, TrailActionRun, TrailRun, TrailSchedulerLease, Warning []ent.Hook
 	}
 	inters struct {
-		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication, Category,
-		Collection, CollectionNode, CollectionPost, Email, EmailQueue, Event,
-		EventParticipant, Invitation, LikePost, Link, MentionProfile, ModerationNote,
-		Node, NodeVersion, Notification, OAuthAuthorisationCode,
-		OAuthAuthorisationRequest, OAuthClient, OAuthDeviceAuthorisation,
-		OAuthDynamicRegistrationAccessTokens, OAuthRefreshToken,
-		OAuthRegistrationApproval, OAuthRemoteAuthorisationFlow, OAuthRemoteConnection,
-		Plugin, Post, PostRead, Property, PropertySchema, PropertySchemaField, React,
-		Report, Robot, RobotMCPServer, RobotMCPTool, RobotMemory, RobotProviderModel,
-		RobotSession, RobotSessionInput, RobotSessionMessage, RobotSessionTurn,
-		RobotSessionView, RobotToolset, RobotWorkspace, RobotWorkspaceInstance, Role,
-		Session, Setting, Tag, Trail, TrailAction, TrailActionRun, TrailRun,
-		TrailSchedulerLease, Warning []ent.Interceptor
+		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication,
+		BackgroundJob, Category, Collection, CollectionNode, CollectionPost, Email,
+		EmailQueue, Event, EventParticipant, Invitation, LikePost, Link,
+		MentionProfile, ModerationNote, Node, NodeVersion, Notification,
+		OAuthAuthorisationCode, OAuthAuthorisationRequest, OAuthClient,
+		OAuthDeviceAuthorisation, OAuthDynamicRegistrationAccessTokens,
+		OAuthRefreshToken, OAuthRegistrationApproval, OAuthRemoteAuthorisationFlow,
+		OAuthRemoteConnection, Plugin, Post, PostRead, Property, PropertySchema,
+		PropertySchemaField, React, Report, Robot, RobotMCPServer, RobotMCPTool,
+		RobotMemory, RobotProviderModel, RobotSession, RobotSessionInput,
+		RobotSessionMessage, RobotSessionTurn, RobotSessionView, RobotToolset,
+		RobotWorkspace, RobotWorkspaceInstance, Role, Session, Setting, Tag, Trail,
+		TrailAction, TrailActionRun, TrailRun, TrailSchedulerLease,
+		Warning []ent.Interceptor
 	}
 )
 

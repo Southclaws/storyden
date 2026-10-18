@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"encoding/json"
+
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
@@ -27,7 +29,7 @@ func (Asset) Fields() []ent.Field {
 		field.String("mime_type").
 			Annotations(entsql.Default("application/octet-stream")),
 
-		field.JSON("metadata", map[string]any{}).Optional(),
+		field.JSON("metadata", json.RawMessage{}).Optional(),
 
 		// Edges
 		field.String("account_id").GoType(xid.ID{}),

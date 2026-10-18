@@ -16,6 +16,7 @@ func NewID() AssetID {
 
 type Asset struct {
 	ID       AssetID
+	OwnerID  xid.ID
 	Name     Filename
 	Size     int
 	MIME     mime.Type
@@ -27,7 +28,8 @@ func Map(a *ent.Asset) *Asset {
 	parent := opt.NewPtrMap(a.Edges.Parent, func(a ent.Asset) Asset { return *Map(&a) })
 
 	return &Asset{
-		ID: AssetID(a.ID),
+		ID:      AssetID(a.ID),
+		OwnerID: a.AccountID,
 		Name: Filename{
 			id:    opt.New(a.ID),
 			name:  a.Filename,
@@ -35,37 +37,7 @@ func Map(a *ent.Asset) *Asset {
 		},
 		Size:     a.Size,
 		MIME:     mime.New(a.MimeType),
-		Metadata: a.Metadata,
+		Metadata: Metadata{RawMessage: a.Metadata},
 		Parent:   parent,
 	}
-}
-
-type Metadata map[string]any
-
-func (m Metadata) GetWidth() float64 {
-	v, ok := m["width"]
-	if !ok {
-		return 0.0
-	}
-
-	s, ok := v.(float64)
-	if !ok {
-		return 0.0
-	}
-
-	return s
-}
-
-func (m Metadata) GetHeight() float64 {
-	v, ok := m["height"]
-	if !ok {
-		return 0.0
-	}
-
-	s, ok := v.(float64)
-	if !ok {
-		return 0.0
-	}
-
-	return s
 }

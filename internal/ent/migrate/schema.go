@@ -19,6 +19,7 @@ var (
 		{Name: "handle", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "bio", Type: field.TypeString, Nullable: true},
+		{Name: "avatar_asset_id", Type: field.TypeString, Nullable: true},
 		{Name: "signature", Type: field.TypeString, Nullable: true},
 		{Name: "kind", Type: field.TypeEnum, Enums: []string{"human", "bot"}, Default: "human"},
 		{Name: "verified_status", Type: field.TypeEnum, Enums: []string{"none", "email", "manual"}, Default: "none"},
@@ -35,7 +36,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "accounts_invitations_invited",
-				Columns:    []*schema.Column{AccountsColumns[14]},
+				Columns:    []*schema.Column{AccountsColumns[15]},
 				RefColumns: []*schema.Column{InvitationsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -216,6 +217,41 @@ var (
 				Name:    "authentication_token_type_identifier_account_authentication",
 				Unique:  true,
 				Columns: []*schema.Column{AuthenticationsColumns[4], AuthenticationsColumns[5], AuthenticationsColumns[10]},
+			},
+		},
+	}
+	// BackgroundJobsColumns holds the columns for the "background_jobs" table.
+	BackgroundJobsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "kind", Type: field.TypeString},
+		{Name: "key", Type: field.TypeString},
+		{Name: "payload", Type: field.TypeJSON},
+		{Name: "revision", Type: field.TypeInt64, Default: 0},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending", "processing", "skipped", "failed", "complete"}, Default: "pending"},
+		{Name: "attempts", Type: field.TypeInt, Default: 0},
+		{Name: "reason", Type: field.TypeString, Default: ""},
+		{Name: "lease_token", Type: field.TypeString, Default: ""},
+		{Name: "lease_until", Type: field.TypeTime},
+		{Name: "dispatch_until", Type: field.TypeTime},
+		{Name: "available_at", Type: field.TypeTime},
+	}
+	// BackgroundJobsTable holds the schema information for the "background_jobs" table.
+	BackgroundJobsTable = &schema.Table{
+		Name:       "background_jobs",
+		Columns:    BackgroundJobsColumns,
+		PrimaryKey: []*schema.Column{BackgroundJobsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "backgroundjob_kind_status_available_at_dispatch_until",
+				Unique:  false,
+				Columns: []*schema.Column{BackgroundJobsColumns[3], BackgroundJobsColumns[7], BackgroundJobsColumns[13], BackgroundJobsColumns[12]},
+			},
+			{
+				Name:    "backgroundjob_kind_key",
+				Unique:  true,
+				Columns: []*schema.Column{BackgroundJobsColumns[3], BackgroundJobsColumns[4]},
 			},
 		},
 	}
@@ -2530,6 +2566,7 @@ var (
 		AssetsTable,
 		AuditLogsTable,
 		AuthenticationsTable,
+		BackgroundJobsTable,
 		CategoriesTable,
 		CollectionsTable,
 		CollectionNodesTable,
