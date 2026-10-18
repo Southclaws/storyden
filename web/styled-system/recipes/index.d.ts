@@ -22,6 +22,7 @@ export * from './date-picker';
 export * from './drag-tree';
 export * from './file-upload';
 export * from './floating-panel';
+export * from './image-cropper';
 export * from './input-group';
 export * from './menu';
 export * from './number-input';

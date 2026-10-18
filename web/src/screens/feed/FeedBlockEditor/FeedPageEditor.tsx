@@ -4,18 +4,34 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ReactNode, useCallback, useState } from "react";
+import debounce from "lodash/debounce";
+import {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
-import { BannerEditor } from "@/components/admin/BrandSettings/BannerEditor/BannerEditor";
+import { handle } from "@/api/client";
+import { assetUpload } from "@/api/openapi-client/assets";
+import type { Asset } from "@/api/openapi-schema";
 import * as BlockEditor from "@/components/ui/block-editor";
 import { Button } from "@/components/ui/button";
 import { HeadingInput } from "@/components/ui/heading-input";
 import { AddIcon } from "@/components/ui/icons/Add";
+import {
+  ImageCropper,
+  type ImageCropperCoordinates,
+  type ImageCropperRef,
+} from "@/components/ui/image-cropper";
 import { Input } from "@/components/ui/input";
 import { DragItemFeedBlock } from "@/lib/dragdrop/provider";
 import { useFeedBlockEvent } from "@/lib/feed/events";
 import { FeedBlock, FeedBlockType } from "@/lib/settings/feed";
 import { LStack } from "@/styled-system/jsx";
+import { getAssetURL } from "@/utils/asset";
 
 import { BlockMenu } from "./BlockMenu";
 import { useFeedBlockEditor } from "./Context";
@@ -133,12 +149,121 @@ function FeedBlockEditableContent({ block }: { block: FeedBlock }) {
       content = <FeedSubtitleBlockEditor />;
       break;
     case "cover":
-      content = <BannerEditor />;
+      content = <FeedCoverBlockEditor block={block} />;
       break;
     default:
       return <FeedBlockRender block={block} />;
   }
   return <FeedBlockRender block={block}>{content}</FeedBlockRender>;
+}
+
+function FeedCoverBlockEditor({
+  block,
+}: {
+  block: Extract<FeedBlock, { type: "cover" }>;
+}) {
+  const { overwriteBlock } = useFeedBlockEditor();
+  const cropperRef = useRef<ImageCropperRef>(null);
+  const sourceRef = useRef(block.asset?.parent ?? block.asset);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const saveImage = useCallback(
+    async (
+      image: Blob,
+      source: Pick<Asset, "id" | "path">,
+      crop: ImageCropperCoordinates,
+    ) => {
+      setSaving(true);
+      setSaved(false);
+
+      await handle(
+        async () => {
+          const asset = await assetUpload(image, {
+            filename: "feed-cover",
+            parent_asset_id: source.id,
+          });
+
+          await overwriteBlock({
+            ...block,
+            asset: { id: asset.id, path: asset.path, parent: source },
+            crop,
+          });
+
+          setSaved(true);
+        },
+        {
+          cleanup: async () => {
+            setSaving(false);
+          },
+        },
+      );
+    },
+    [block, overwriteBlock],
+  );
+
+  const save = useMemo(() => debounce(saveImage, 500), [saveImage]);
+
+  useEffect(() => {
+    return () => {
+      void save.flush();
+    };
+  }, [save]);
+
+  async function handleFileChange(file: File) {
+    save.cancel();
+    setSaving(true);
+    setSaved(false);
+
+    const asset = await assetUpload(file, { filename: file.name }).finally(
+      () => {
+        setSaving(false);
+      },
+    );
+
+    sourceRef.current = { id: asset.id, path: asset.path };
+  }
+
+  async function handleChange() {
+    await handle(async () => {
+      const source = sourceRef.current;
+      const crop = cropperRef.current?.getCoordinates();
+      if (!source || !crop) {
+        return;
+      }
+
+      const image = await cropperRef.current?.getCroppedImage();
+      if (image) {
+        void save(image, source, crop);
+      }
+    });
+  }
+
+  async function handleRemove() {
+    save.cancel();
+    setSaving(true);
+    setSaved(false);
+
+    await overwriteBlock({ type: "cover" }).finally(() => setSaving(false));
+    sourceRef.current = undefined;
+  }
+
+  return (
+    <LStack width="full">
+      <ImageCropper
+        ref={cropperRef}
+        src={getAssetURL(block.asset?.parent?.path ?? block.asset?.path)}
+        width={1920}
+        height={480}
+        disabled={saving}
+        saving={saving}
+        saved={saved}
+        defaultCoordinates={block.crop}
+        onFileChange={handleFileChange}
+        onRemove={handleRemove}
+        onChange={handleChange}
+      />
+    </LStack>
+  );
 }
 
 function FeedTitleBlockEditor() {

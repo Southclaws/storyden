@@ -1,12 +1,22 @@
 import Image from "next/image";
 
+import { FeedBlock } from "@/lib/settings/feed";
 import { css } from "@/styled-system/css";
 import { Box } from "@/styled-system/jsx";
-import { getBannerURL } from "@/utils/icon";
+import { getAssetURL } from "@/utils/asset";
 
-export function FeedCoverBlock() {
+export function FeedCoverBlock({
+  block,
+}: {
+  block: Extract<FeedBlock, { type: "cover" }>;
+}) {
+  const src = getAssetURL(block.asset?.path, "l");
+  if (!src) {
+    return null;
+  }
+
   return (
-    <Box className="feed-cover" width="full" height="64" position="relative">
+    <Box className="feed-cover" width="full" aspectRatio={4} position="relative">
       <Image
         className={
           "feed-cover__image " +
@@ -17,7 +27,7 @@ export function FeedCoverBlock() {
             objectFit: "cover",
           })
         }
-        src={getBannerURL("l")}
+        src={src}
         alt=""
         fill
         sizes="(max-width: 768px) 100vw, 960px"

@@ -226,3 +226,37 @@ test("blocks can be replaced and removed without changing their neighbours", () 
   ]);
   assert.strictEqual(removeFeedBlock(feed, "cover"), feed);
 });
+
+test("cover assets survive unrelated feed edits and reloading", () => {
+  const feed = FeedConfigSchema.parse({
+    blocks: [
+      {
+        type: "cover",
+        asset: {
+          id: "cover-id",
+          path: "/api/assets/cover-id-image",
+          parent: { id: "source-id", path: "/api/assets/source-id-image" },
+        },
+        crop: { left: 0, top: 120, width: 1920, height: 480 },
+      },
+      { type: "categories", layout: "list" },
+    ],
+  });
+
+  const updated = replaceFeedBlock(feed, {
+    type: "categories",
+    layout: "grid",
+  });
+  const serialized = JSON.stringify(updated);
+  const reloaded = FeedConfigSchema.parse(JSON.parse(serialized));
+
+  assert.deepStrictEqual(reloaded.blocks[0], {
+    type: "cover",
+    asset: {
+      id: "cover-id",
+      path: "/api/assets/cover-id-image",
+      parent: { id: "source-id", path: "/api/assets/source-id-image" },
+    },
+    crop: { left: 0, top: 120, width: 1920, height: 480 },
+  });
+});

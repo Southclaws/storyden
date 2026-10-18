@@ -39,7 +39,10 @@ export function BannerEditor() {
       return;
     }
 
-    const canvas = cropperRef.current.getCanvas();
+    const canvas = cropperRef.current.getCanvas({
+      width: CROP_STENCIL_WIDTH,
+      height: CROP_STENCIL_HEIGHT,
+    });
     if (!canvas) {
       throw new Error("An unexpected error occurred with the image editor.");
     }

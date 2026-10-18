@@ -39,7 +39,7 @@ function FeedBlockViewContent({ block }: { block: FeedBlock }) {
     case "content":
       return <FeedContentBlock />;
     case "cover":
-      return <FeedCoverBlock />;
+      return <FeedCoverBlock block={block} />;
     case "categories":
       return <FeedCategoriesBlock block={block} />;
     case "threads":

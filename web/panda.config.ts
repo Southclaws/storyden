@@ -16,6 +16,7 @@ import { fileUpload } from "@/components/ui/file-upload/FileUpload.recipe";
 import { floatingPanel } from "@/components/ui/floating-panel/FloatingPanel.recipe";
 import { group } from "@/components/ui/group/Group.recipe";
 import { headingInput } from "@/components/ui/heading-input/HeadingInput.recipe";
+import { imageCropper } from "@/components/ui/image-cropper/ImageCropper.recipe";
 import { inputGroup } from "@/components/ui/input-group/InputGroup.recipe";
 import { input } from "@/components/ui/input/Input.recipe";
 import { menu } from "@/components/ui/menu/Menu.recipe";
@@ -232,6 +233,7 @@ export default defineConfig({
         contentOutline: contentOutline,
         menu: menu,
         fileUpload: fileUpload,
+        imageCropper: imageCropper,
         floatingPanel: floatingPanel,
         popover: popover,
         progress: progress,
@@ -250,6 +252,9 @@ export default defineConfig({
       semanticTokens,
       tokens: tokens,
       keyframes: {
+        spin: {
+          to: { transform: "rotate(360deg)" },
+        },
         slideFadeIn: {
           from: {
             opacity: "0.8",
@@ -263,6 +268,10 @@ export default defineConfig({
         },
         fadeOut: {
           from: { opacity: "1" },
+          to: { opacity: "0" },
+        },
+        imageCropperSaved: {
+          from: { opacity: "full" },
           to: { opacity: "0" },
         },
         shimmer: {

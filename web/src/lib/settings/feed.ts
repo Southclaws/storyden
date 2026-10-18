@@ -26,6 +26,26 @@ const FeedContentBlockSchema = z.object({
 
 const FeedCoverBlockSchema = z.object({
   type: z.literal("cover"),
+  asset: z.optional(
+    z.object({
+      id: z.string(),
+      path: z.string(),
+      parent: z.optional(
+        z.object({
+          id: z.string(),
+          path: z.string(),
+        }),
+      ),
+    }),
+  ),
+  crop: z.optional(
+    z.object({
+      left: z.number(),
+      top: z.number(),
+      width: z.number(),
+      height: z.number(),
+    }),
+  ),
 });
 
 const FeedCategoriesBlockSchema = z.object({
