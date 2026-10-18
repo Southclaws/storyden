@@ -18,13 +18,13 @@ test("Library keeps its cover visible while the cropper loads, and saves croppin
   // A non-square image makes moving the fixed 4:1 cover crop meaningful.
   const image = await page.evaluate(() => {
     const canvas = document.createElement("canvas");
-    canvas.width = 1800;
-    canvas.height = 900;
+    canvas.width = 1600;
+    canvas.height = 800;
     const ctx = canvas.getContext("2d")!;
     ctx.fillStyle = "#2255aa";
-    ctx.fillRect(0, 0, 1800, 450);
+    ctx.fillRect(0, 0, 1600, 400);
     ctx.fillStyle = "#cc5533";
-    ctx.fillRect(0, 450, 1800, 450);
+    ctx.fillRect(0, 400, 1600, 400);
     return canvas.toDataURL("image/png").split(",")[1]!;
   });
   const uploaded = await page.request.post(
@@ -195,11 +195,11 @@ test("a cover uploaded in quick edit keeps its original when cropped", async ({
 
   const image = await page.evaluate(() => {
     const canvas = document.createElement("canvas");
-    canvas.width = 1800;
-    canvas.height = 900;
+    canvas.width = 1600;
+    canvas.height = 800;
     const context = canvas.getContext("2d")!;
     context.fillStyle = "#2255aa";
-    context.fillRect(0, 0, 1800, 900);
+    context.fillRect(0, 0, 1600, 800);
     return canvas.toDataURL("image/png").split(",")[1]!;
   });
   const uploaded = page.waitForResponse(
