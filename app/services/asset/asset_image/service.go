@@ -41,13 +41,7 @@ func New(
 	cfg config.Config,
 ) (*Processor, error) {
 	if cfg.ImageMemoryBudget <= 0 {
-		cfg.ImageMemoryBudget = 256 << 20
-	}
-	if cfg.ImageMaxSourceBytes <= 0 {
-		cfg.ImageMaxSourceBytes = 32 << 20
-	}
-	if cfg.ImageMaxSourcePixels <= 0 {
-		cfg.ImageMaxSourcePixels = 12000000
+		return nil, errors.New("IMAGE_MEMORY_BUDGET must be positive")
 	}
 
 	p := &Processor{
@@ -58,7 +52,7 @@ func New(
 		cfg:     cfg,
 	}
 
-	err := runner.Register(jobs.Kind, max(1, cfg.ImageWorkers), background_job.Handler[jobs.Payload]{
+	err := runner.Register(jobs.Kind, cfg.ImageWorkers, background_job.Handler[jobs.Payload]{
 		Run:      p.run,
 		Complete: jobs.Payload.IsComplete,
 	})
