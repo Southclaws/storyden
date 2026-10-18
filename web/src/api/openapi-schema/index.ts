@@ -380,6 +380,7 @@ export * from "./linkReferenceProps";
 export * from "./linkSlug";
 export * from "./linkTitle";
 export * from "./mark";
+export * from "./mediaServiceSettings";
 export * from "./mediaType";
 export * from "./memberJoinedDate";
 export * from "./memberSuspendedDate";

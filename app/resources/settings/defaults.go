@@ -30,6 +30,10 @@ var DefaultSettings = Settings{
 	AuthenticationMode: opt.New(authentication.ModeHandle),
 	RegistrationMode:   opt.New(RegistrationModePublic),
 	Services: opt.New(ServiceSettings{
+		Media: opt.New(MediaServiceSettings{
+			ImageMaxSize:   opt.New[int64](8 << 20),
+			ImageMaxPixels: opt.New[int64](1500000),
+		}),
 		Discovery: opt.New(DiscoveryServiceSettings{
 			SearchIndexing:   opt.New(true),
 			TrainingCrawling: opt.New(false),

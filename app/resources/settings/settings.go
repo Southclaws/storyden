@@ -85,12 +85,18 @@ type MessageOfTheDay struct {
 }
 
 type ServiceSettings struct {
+	Media      opt.Optional[MediaServiceSettings]
 	ClientIP   opt.Optional[ClientIPServiceSettings]
 	RateLimit  opt.Optional[RateLimitServiceSettings]
 	Discovery  opt.Optional[DiscoveryServiceSettings]
 	Moderation opt.Optional[ModerationServiceSettings]
 	Robots     opt.Optional[RobotServiceSettings]
 	OAuth      opt.Optional[OAuthServiceSettings]
+}
+
+type MediaServiceSettings struct {
+	ImageMaxSize   opt.Optional[int64]
+	ImageMaxPixels opt.Optional[int64]
 }
 
 type ClientIPServiceSettings struct {

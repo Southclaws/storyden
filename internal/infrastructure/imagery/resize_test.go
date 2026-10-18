@@ -138,10 +138,26 @@ func TestEagerVariantMemoryAdmission(t *testing.T) {
 		Size:   8 << 20,
 	}
 
-	const budget int64 = 768 << 20
-	require.Less(t, Estimate(source, 320, 320), budget)
-	require.Equal(t, Estimate(source, 320, 320), Estimate(portrait, 320, 320))
-	require.Greater(t, Estimate(thin, 320, 320), budget)
+	const budget int64 = 256 << 20
+	landscapeEstimate, err := Estimate(source, 320, 320, FitMode)
+	require.NoError(t, err)
+	require.Greater(t, landscapeEstimate.Total(), budget)
+
+	smaller := &Source{
+		Config: image.Config{Width: 1600, Height: 800},
+		Size:   1 << 20,
+	}
+	smallEstimate, err := Estimate(smaller, 320, 320, FitMode)
+	require.NoError(t, err)
+	require.Less(t, smallEstimate.Total(), budget)
+
+	portraitEstimate, err := Estimate(portrait, 320, 320, FitMode)
+	require.NoError(t, err)
+	require.Equal(t, landscapeEstimate.Total(), portraitEstimate.Total())
+
+	thinEstimate, err := Estimate(thin, 320, 320, FitMode)
+	require.NoError(t, err)
+	require.Greater(t, thinEstimate.Total(), budget)
 }
 
 func TestEstimateCoversMeasuredMemory(t *testing.T) {
@@ -186,9 +202,10 @@ func TestEstimateCoversMeasuredMemory(t *testing.T) {
 				Size:   test.encoded,
 			}
 
-			estimate := Estimate(source, test.target, test.target)
-			require.Greater(t, estimate, test.measured)
-			require.Less(t, estimate, int64(768<<20))
+			estimate, err := Estimate(source, test.target, test.target, FitMode)
+			require.NoError(t, err)
+			require.Greater(t, estimate.Total(), test.measured)
+			require.Less(t, estimate.Total(), int64(768<<20))
 		})
 	}
 }

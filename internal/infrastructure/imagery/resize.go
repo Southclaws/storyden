@@ -7,30 +7,51 @@ import (
 	"golang.org/x/image/draw"
 )
 
+type ResizeMode uint8
+
+const (
+	FitMode ResizeMode = iota
+	ThumbnailMode
+	FillMode
+)
+
 func Resize(src image.Image, width, height int, square bool) *image.NRGBA {
-	bounds := src.Bounds()
-	if bounds.Empty() || width <= 0 || height <= 0 {
-		return &image.NRGBA{}
-	}
-
+	mode := FitMode
 	if square {
-		size := min(width, height, bounds.Dx(), bounds.Dy())
-		return Fill(src, size, size)
+		mode = ThumbnailMode
 	}
 
-	scale := min(1, float64(width)/float64(bounds.Dx()), float64(height)/float64(bounds.Dy()))
-	width = max(1, int(float64(bounds.Dx())*scale))
-	height = max(1, int(float64(bounds.Dy())*scale))
-
-	dst := image.NewNRGBA(image.Rect(0, 0, width, height))
-	draw.CatmullRom.Scale(dst, dst.Bounds(), src, bounds, draw.Src, nil)
-	return dst
+	return resize(src, width, height, mode)
 }
 
 func Fill(src image.Image, width, height int) *image.NRGBA {
+	return resize(src, width, height, FillMode)
+}
+
+func resize(src image.Image, width, height int, mode ResizeMode) *image.NRGBA {
 	bounds := src.Bounds()
 	if bounds.Empty() || width <= 0 || height <= 0 {
 		return &image.NRGBA{}
+	}
+
+	crop, destination := resizeGeometry(bounds, width, height, mode)
+	dst := image.NewNRGBA(destination)
+	draw.CatmullRom.Scale(dst, destination, src, crop, draw.Src, nil)
+	return dst
+}
+
+func resizeGeometry(bounds image.Rectangle, width, height int, mode ResizeMode) (image.Rectangle, image.Rectangle) {
+	if mode == FitMode {
+		scale := min(1, float64(width)/float64(bounds.Dx()), float64(height)/float64(bounds.Dy()))
+		width = max(1, int(float64(bounds.Dx())*scale))
+		height = max(1, int(float64(bounds.Dy())*scale))
+
+		return bounds, image.Rect(0, 0, width, height)
+	}
+
+	if mode == ThumbnailMode {
+		size := min(width, height, bounds.Dx(), bounds.Dy())
+		width, height = size, size
 	}
 
 	cropWidth, cropHeight := bounds.Dx(), bounds.Dy()
@@ -46,7 +67,5 @@ func Fill(src image.Image, width, height int) *image.NRGBA {
 	top := bounds.Min.Y + (bounds.Dy()-cropHeight)/2
 	crop := image.Rect(left, top, left+cropWidth, top+cropHeight)
 
-	dst := image.NewNRGBA(image.Rect(0, 0, width, height))
-	draw.CatmullRom.Scale(dst, dst.Bounds(), src, crop, draw.Src, nil)
-	return dst
+	return crop, image.Rect(0, 0, width, height)
 }

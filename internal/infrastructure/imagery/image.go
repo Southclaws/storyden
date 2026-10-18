@@ -165,41 +165,6 @@ func (s *Source) Close() {
 	os.Remove(s.File.Name())
 }
 
-func Estimate(s *Source, width, height int) int64 {
-	// Account for orientation/conversion, one output, codec scratch and encoded copies.
-	const sourcePixelBytes = 16
-	const outputPixelBytes = 24
-	const codecOverhead = 16 << 20
-	const resizePixelBytes = 4 * 8
-	const contributionSourceBytes = 4 * 16
-	const contributionOutputBytes = 8 * 16
-
-	sourceBytes := int64(s.Config.Width) * int64(s.Config.Height) * sourcePixelBytes
-	outputBytes := int64(width) * int64(height) * outputPixelBytes
-	encodedBytes := s.Size * 2
-
-	// Bound Catmull-Rom's float64 workspace for fit/fill and either EXIF orientation.
-	sourceWidth, sourceHeight := int64(s.Config.Width), int64(s.Config.Height)
-	resizePixels := max(
-		sourceWidth,
-		sourceHeight,
-		min(int64(width)*sourceHeight, int64(height)*sourceWidth),
-		min(int64(width)*sourceWidth, int64(height)*sourceHeight),
-	)
-	resizeBytes := (resizePixels + int64(width)) * resizePixelBytes
-
-	// Catmull-Rom also allocates contribution tables for both axes. These matter
-	// for very tall or wide images even when the pixel count is small.
-	contributionBytes := (sourceWidth + sourceHeight) * contributionSourceBytes
-	contributionBytes += int64(width+height) * contributionOutputBytes
-	workingBytes := sourceBytes + outputBytes + encodedBytes + codecOverhead
-	workingBytes += resizeBytes + contributionBytes
-
-	// The Go encoder grows and copies its backing memory. Corpus measurements also
-	// include unreclaimed intermediates between sequential variants.
-	return workingBytes + workingBytes/2
-}
-
 func Encode(w io.Writer, img image.Image, pngOutput bool) error {
 	if pngOutput {
 		return png.Encode(w, img)

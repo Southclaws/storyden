@@ -10,24 +10,24 @@ CGO_ENABLED=0 go test -tags nodynamic ./internal/infrastructure/imagery \
 The benchmark refuses the dynamic encoder. CI runs it on Linux, macOS and Windows.
 Each workload runs in a fresh copy of the test binary, decodes once, then writes
 variants sequentially to temporary files, matching the worker's image operations.
-There are four workloads: eager thumbnails and S, M alone, L alone, and all six
-presets together. Measurements include opening the encoded source, decoding,
+There are five workloads: eager thumbnails and S, M alone, L alone, all six
+WebP presets together, and the PNG branding icons plus the 1200 × 630 banner. Measurements include opening the encoded source, decoding,
 orientation, resizing, and encoding. Fixture generation happens in the parent
 process and is excluded.
 
 The committed corpus contains existing Storyden images:
 
-| Fixture | Dimensions | Copied from |
-| --- | --- | --- |
-| `avatar.png` | 513 × 513 | `app/services/branding/icon/embed/default_icon.png` |
-| `mountains.png` | 1200 × 600 | `app/services/branding/banner/storyden-mountains-1200x600.png` |
-| `screenshot.png` | 1469 × 961 | `home/public/2026_app_screenshot.png` |
-| `screenshot.webp` | 1024 × 670 | `home/public/2026_app_screenshot_1024.webp` |
+| Fixture           | Dimensions | Copied from                                                    |
+| ----------------- | ---------- | -------------------------------------------------------------- |
+| `avatar.png`      | 513 × 513  | `app/services/branding/icon/embed/default_icon.png`            |
+| `mountains.png`   | 1200 × 600 | `app/services/branding/banner/storyden-mountains-1200x600.png` |
+| `screenshot.png`  | 1469 × 961 | `home/public/2026_app_screenshot.png`                          |
+| `screenshot.webp` | 1024 × 670 | `home/public/2026_app_screenshot_1024.webp`                    |
 
 Generated fixtures add landscape, portrait, square, undersized, panoramic,
 transparent, EXIF-rotated, and extreme-aspect-ratio images. JPEG and transparent
 PNG fixtures also exercise the 12-million-pixel source limit. Together these give
-56 fixture/workload combinations. Generated patterns are repeatable, not a
+70 fixture/workload combinations. Generated patterns are repeatable, not a
 substitute for photographs with different compression characteristics.
 
 To include real uploads, put copies of eligible static JPEG, PNG or WebP files in
@@ -64,11 +64,11 @@ bound for other runtime settings, future codecs, or every accepted input.
 
 On macOS, the three real uploads rejected during frontend profiling measured:
 
-| Source | Dimensions | Previous estimate for L | Observed runtime increase for L | Process peak RSS |
-| --- | --- | --- | --- | --- |
-| Common Voice JPEG, 1.68 MB | 3072 × 1536 | 265.6 MiB | 158.8 MiB | 169.8 MiB |
-| Untitled PNG, 1.23 MB | 3024 × 1964 | 308.5 MiB | 208.8 MiB | 220.2 MiB |
-| Screenshot PNG, 1.23 MB | 2902 × 1620 | 269.4 MiB | 174.7 MiB | 185.7 MiB |
+| Source                     | Dimensions  | Previous estimate for L | Observed runtime increase for L | Process peak RSS |
+| -------------------------- | ----------- | ----------------------- | ------------------------------- | ---------------- |
+| Common Voice JPEG, 1.68 MB | 3072 × 1536 | 265.6 MiB               | 158.8 MiB                       | 169.8 MiB        |
+| Untitled PNG, 1.23 MB      | 3024 × 1964 | 308.5 MiB               | 208.8 MiB                       | 220.2 MiB        |
+| Screenshot PNG, 1.23 MB    | 2902 × 1620 | 269.4 MiB               | 174.7 MiB                       | 185.7 MiB        |
 
 RSS was measured separately with macOS `/usr/bin/time -l` around an individual
 child test process. It includes the executable and runtime baseline, unlike the
@@ -83,16 +83,47 @@ estimate. A medium WebP workload also exceeded its estimate.
 
 `Estimate` now includes Catmull-Rom contribution tables and a 50% allowance for
 encoder backing-buffer growth and unreclaimed intermediate allocations. The
-default admission budget is 768 MiB, with one active worker per process. This
-permits the corpus's ordinary large sources while retaining a rejection boundary
-for expensive extreme dimensions. The original square output allowance remains
-conservative; reducing it needs an estimate that distinguishes fitted output
-from fixed-size branding output.
+default admission budget is 256 MiB, with one active worker per process. Set
+`IMAGE_MEMORY_BUDGET` to override it. Upload defaults are 1.5 MP / 8 MiB; the
+square-image advisory fits within this budget. The corpus also measures larger
+workloads in isolation even when the default upload policy or worker would reject
+them.
 
-After calibration, all 56 combinations passed on macOS and Linux arm64. Three
-macOS repetitions gave 168 observations. The smallest estimate/peak ratio was
+Before the geometry correction below, all 56 WebP combinations passed on macOS
+and Linux arm64. Three macOS repetitions gave 168 observations. The smallest estimate/peak ratio was
 1.163 on macOS and 1.164 on Linux; the largest estimate was 711.3 MiB. Windows
 amd64 was cross-compiled locally; its measurements run in CI.
+
+## Transform geometry and estimate components
+
+`Estimate` takes an explicit resize mode: fitted, thumbnail, or fixed-size fill.
+It shares geometry calculations with the actual resizer, including aspect ratio,
+center cropping, and the different upscaling rules. It evaluates both possible
+EXIF dimension orders and selects the more expensive complete estimate.
+
+Catmull-Rom in the pinned `x/image/draw` v0.47.0 implementation scales horizontally
+first. Its intermediate allocation is `32 × output width × cropped source height`
+bytes. The estimate uses that geometry directly. Dimension and arithmetic errors,
+including the resampler's int32 indexing limit, reject admission before decoding.
+
+The returned `MemoryEstimate` separates source, output, encoded copies, resize
+workspace, contribution tables, codec overhead, and safety allowance. Budget
+rejections log these components. The benchmark reports each component alongside
+observed heap and runtime memory. Runtime samples are collected in isolated child
+processes; application-wide memory counters cannot reliably attribute allocations
+to one job in a running server.
+
+The 16 bytes per source pixel, 24 bytes per output pixel, and 50% safety
+allowance are unchanged. After the geometry correction, four corpus runs passed
+but one WebP estimate was only 2.6% above observed runtime memory. The fixed codec
+allowance is now 24 MiB rather than 16 MiB to retain room for allocator variation.
+A multi-variant job reserves the maximum complete estimate among its admitted
+variants; the sequential workloads check retained intermediates.
+
+With the updated codec allowance, all 70 combinations passed three macOS arm64
+runs (210 observations). The smallest estimate/runtime-peak ratio was 1.113.
+Linux arm64 and Windows amd64 test binaries also cross-compiled with CGO disabled;
+the corrected estimator has not been measured natively on those platforms yet.
 
 ## Portable memory controls
 

@@ -20,21 +20,59 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type memoryVariant struct {
+	Width  int        `json:"width"`
+	Height int        `json:"height"`
+	Mode   ResizeMode `json:"mode"`
+}
+
 type memoryWorkload struct {
-	Path    string `json:"path"`
-	Sizes   []int  `json:"sizes"`
-	Results string `json:"results"`
+	Path     string          `json:"path"`
+	Variants []memoryVariant `json:"variants"`
+	Results  string          `json:"results"`
 }
 
 type memoryMeasurement struct {
-	Estimate     int64  `json:"estimate"`
-	PeakHeap     uint64 `json:"peak_heap"`
-	PeakRuntime  uint64 `json:"peak_runtime"`
-	Allocated    uint64 `json:"allocated"`
-	EncodedBytes int64  `json:"encoded_bytes"`
-	OutputBytes  int64  `json:"output_bytes"`
-	Width        int    `json:"width"`
-	Height       int    `json:"height"`
+	Breakdown    MemoryEstimate `json:"breakdown"`
+	Estimate     int64          `json:"estimate"`
+	PeakHeap     uint64         `json:"peak_heap"`
+	PeakRuntime  uint64         `json:"peak_runtime"`
+	Allocated    uint64         `json:"allocated"`
+	EncodedBytes int64          `json:"encoded_bytes"`
+	OutputBytes  int64          `json:"output_bytes"`
+	Width        int            `json:"width"`
+	Height       int            `json:"height"`
+}
+
+var memoryScenarios = []struct {
+	name     string
+	variants []memoryVariant
+}{
+	{name: "eager", variants: []memoryVariant{
+		{64, 64, ThumbnailMode},
+		{128, 128, ThumbnailMode},
+		{256, 256, ThumbnailMode},
+		{320, 320, FitMode},
+	}},
+	{name: "medium", variants: []memoryVariant{{960, 960, FitMode}}},
+	{name: "large", variants: []memoryVariant{{1920, 1920, FitMode}}},
+	{name: "all", variants: []memoryVariant{
+		{64, 64, ThumbnailMode},
+		{128, 128, ThumbnailMode},
+		{256, 256, ThumbnailMode},
+		{320, 320, FitMode},
+		{960, 960, FitMode},
+		{1920, 1920, FitMode},
+	}},
+	{name: "branding", variants: []memoryVariant{
+		{32, 32, FillMode},
+		{120, 120, FillMode},
+		{152, 152, FillMode},
+		{167, 167, FillMode},
+		{180, 180, FillMode},
+		{512, 512, FillMode},
+		{1200, 630, FillMode},
+	}},
 }
 
 func BenchmarkEstimate(b *testing.B) {
@@ -63,17 +101,9 @@ func BenchmarkEstimate(b *testing.B) {
 
 	for _, path := range paths {
 		b.Run(filepath.Base(path), func(b *testing.B) {
-			for _, workload := range []struct {
-				name  string
-				sizes []int
-			}{
-				{name: "eager", sizes: []int{64, 128, 256, 320}},
-				{name: "medium", sizes: []int{960}},
-				{name: "large", sizes: []int{1920}},
-				{name: "all", sizes: []int{64, 128, 256, 320, 960, 1920}},
-			} {
+			for _, workload := range memoryScenarios {
 				b.Run(workload.name, func(b *testing.B) {
-					request := memoryWorkload{Path: path, Sizes: workload.sizes}
+					request := memoryWorkload{Path: path, Variants: workload.variants}
 					benchmarkMemory(b, request)
 				})
 			}
@@ -102,6 +132,13 @@ func benchmarkMemory(b *testing.B, workload memoryWorkload) {
 		require.GreaterOrEqual(b, result.Estimate, int64(result.PeakRuntime))
 
 		b.ReportMetric(float64(result.Estimate), "estimate-B")
+		b.ReportMetric(float64(result.Breakdown.Source), "source-B")
+		b.ReportMetric(float64(result.Breakdown.Output), "output-B")
+		b.ReportMetric(float64(result.Breakdown.Encoded), "encoded-B")
+		b.ReportMetric(float64(result.Breakdown.Resize), "resize-B")
+		b.ReportMetric(float64(result.Breakdown.Contributions), "contributions-B")
+		b.ReportMetric(float64(result.Breakdown.Codec), "codec-B")
+		b.ReportMetric(float64(result.Breakdown.Safety), "safety-B")
 		b.ReportMetric(float64(result.PeakHeap), "peak-heap-B")
 		b.ReportMetric(float64(result.PeakRuntime), "peak-runtime-B")
 		b.ReportMetric(float64(result.Allocated), "allocated-B")
@@ -136,23 +173,28 @@ func TestMeasureImageMemory(t *testing.T) {
 	require.NoError(t, err)
 	defer source.Close()
 
-	var estimate int64
-	for _, size := range workload.Sizes {
-		estimate = max(estimate, Estimate(source, size, size))
+	var estimate MemoryEstimate
+	for _, variant := range workload.Variants {
+		candidate, err := Estimate(source, variant.Width, variant.Height, variant.Mode)
+		require.NoError(t, err)
+		if candidate.Total() > estimate.Total() {
+			estimate = candidate
+		}
 	}
 
 	decoded, err := source.Decode()
 	require.NoError(t, err)
 
 	var outputBytes int64
-	for _, size := range workload.Sizes {
-		outputBytes = max(outputBytes, measureImageOutput(t, decoded, size))
+	for _, variant := range workload.Variants {
+		outputBytes = max(outputBytes, measureImageOutput(t, decoded, variant))
 	}
 	runtime.KeepAlive(decoded)
 
 	close(stop)
 	result := <-measurements
-	result.Estimate = estimate
+	result.Estimate = estimate.Total()
+	result.Breakdown = estimate
 	result.EncodedBytes = source.Size
 	result.OutputBytes = outputBytes
 	result.Width = source.Config.Width
@@ -194,15 +236,20 @@ func sampleImageMemory(before runtime.MemStats, stop <-chan struct{}, results ch
 	}
 }
 
-func measureImageOutput(t *testing.T, source image.Image, size int) int64 {
+func measureImageOutput(t *testing.T, source image.Image, variant memoryVariant) int64 {
 	t.Helper()
 
-	resized := Resize(source, size, size, size <= 256)
+	var resized *image.NRGBA
+	if variant.Mode == FillMode {
+		resized = Fill(source, variant.Width, variant.Height)
+	} else {
+		resized = Resize(source, variant.Width, variant.Height, variant.Mode == ThumbnailMode)
+	}
 	output, err := os.CreateTemp(t.TempDir(), "variant-*")
 	require.NoError(t, err)
 	defer output.Close()
 
-	require.NoError(t, Encode(output, resized, false))
+	require.NoError(t, Encode(output, resized, variant.Mode == FillMode))
 	info, err := output.Stat()
 	require.NoError(t, err)
 	require.NoError(t, output.Close())

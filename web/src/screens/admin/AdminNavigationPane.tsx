@@ -18,6 +18,7 @@ import { ColourPipetteIcon } from "@/components/ui/icons/Colour";
 import { InboxIcon } from "@/components/ui/icons/Inbox";
 import { LayoutIcon } from "@/components/ui/icons/Layout";
 import { LinkIcon } from "@/components/ui/icons/Link";
+import { MediaIcon } from "@/components/ui/icons/Media";
 import { RobotIcon } from "@/components/ui/icons/Robot";
 import { SearchIcon } from "@/components/ui/icons/Search";
 import { SystemIcon } from "@/components/ui/icons/System";
@@ -32,6 +33,7 @@ const sectionIcons: Record<AdminSectionID, ReactNode> = {
   interface: <LayoutIcon />,
   theme: <ColourPipetteIcon />,
   moderation: <BanIcon />,
+  media: <MediaIcon />,
   system: <SystemIcon />,
   discovery: <SearchIcon />,
   audit_log: <ArchiveIcon />,

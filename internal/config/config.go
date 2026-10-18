@@ -397,10 +397,6 @@ type Config struct {
 	ImageWorkers int `default:"1" envconfig:"IMAGE_WORKERS"`
 	// Admission budget in bytes for image work, separate from application memory. This is not a process RSS limit.
 	ImageMemoryBudget int64 `default:"268435456" envconfig:"IMAGE_MEMORY_BUDGET"`
-	// Largest encoded image to optimize. Larger originals remain downloadable.
-	ImageMaxSourceBytes int64 `default:"33554432" envconfig:"IMAGE_MAX_SOURCE_BYTES"`
-	// Maximum source pixel count admitted before decoding.
-	ImageMaxSourcePixels int64 `default:"12000000" envconfig:"IMAGE_MAX_SOURCE_PIXELS"`
 
 	// -
 	// Cache
@@ -585,3 +581,6 @@ type Config struct {
 	// Same as above, but for the region. As with any third party providers, it's recommended to choose the region closest to both your Storyden deployment and your community members for best performance and experience.
 	PineconeRegion string `envconfig:"PINECONE_REGION"`
 }
+
+const DefaultImageWorkers int = 1
+const DefaultImageMemoryBudget int64 = 268435456

@@ -13,6 +13,7 @@ export type AdminSectionID =
   | "brand"
   | "interface"
   | "theme"
+  | "media"
   | "moderation"
   | "system"
   | "discovery"
@@ -121,6 +122,12 @@ export function getAdminSectionGroups(
     {
       label: "Operations",
       items: [
+        {
+          id: "media",
+          href: "/admin/media",
+          label: "Media",
+          description: "Image uploads and optimization",
+        },
         {
           id: "system",
           href: "/admin/system",

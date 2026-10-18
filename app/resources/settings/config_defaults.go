@@ -18,8 +18,25 @@ func (d *SettingsRepository) hydrateConfigDefaults(in *ent.Setting) (*Settings, 
 	d.hydrateClientIPDefaults(settings)
 	d.hydrateRateLimitDefaults(settings)
 	d.hydrateOAuthDefaults(settings)
+	d.hydrateMediaDefaults(settings)
 
 	return settings, nil
+}
+
+func (d *SettingsRepository) hydrateMediaDefaults(settings *Settings) {
+	services := settings.Services.OrZero()
+	media := services.Media.OrZero()
+	defaults := DefaultSettings.Services.OrZero().Media.OrZero()
+
+	if !media.ImageMaxSize.Ok() {
+		media.ImageMaxSize = defaults.ImageMaxSize
+	}
+	if !media.ImageMaxPixels.Ok() {
+		media.ImageMaxPixels = defaults.ImageMaxPixels
+	}
+
+	services.Media = opt.New(media)
+	settings.Services = opt.New(services)
 }
 
 func (d *SettingsRepository) hydrateClientIPDefaults(settings *Settings) {

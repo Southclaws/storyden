@@ -42,6 +42,60 @@ To arrange the home feed and navigation, return to the community and choose **Ed
   an issue](https://github.com/Southclaws/storyden/issues).
 </Callout>
 
+## Media
+
+**Operations → Media** controls image upload limits for attachments, avatars, and branding. Saved changes take effect without restarting Storyden.
+
+| Setting                  | Default        | What it controls                                 |
+| ------------------------ | -------------- | ------------------------------------------------ |
+| Maximum image size       | 8 MiB          | The uploaded image file size.                    |
+| Maximum image resolution | 1.5 megapixels | Width multiplied by height, before any resizing. |
+
+Both limits must be satisfied. They do not limit documents, archives, or other non-image uploads. The pixel limit applies to JPEG, PNG, WebP, and GIF images. Vector images have no pixel count to check.
+
+Calculate megapixels as `width × height ÷ 1,000,000`. For example, 1920 × 1080 is 2.0736 MP, so a limit of **2.1 MP** allows that resolution with a little headroom. This is a total pixel limit, not separate width and height limits: a different aspect ratio with the same pixel count also fits.
+
+Storyden preserves accepted originals and creates optimized versions of static JPEG, PNG, and WebP images in the background. Animations, SVGs, and unsupported image formats keep their original files. Accepting an upload and creating optimized versions are separate decisions: an image can fit the upload policy but exceed the worker's memory budget. In that case, the original remains available, while some or all optimized versions may be skipped. If no sufficiently large optimized version is ready, Storyden displays the original.
+
+### Example: allow Full HD images
+
+To allow images such as **1920 × 1080** and give the worker room to generate their optimized versions:
+
+1. Open **Operations → Media**.
+2. Set **Maximum image resolution** to **2.1 megapixels**.
+3. Set **Maximum image size** to **8 MiB** and save.
+4. Set these environment variables in your deployment, then restart Storyden:
+
+   ```dotenv
+   IMAGE_MEMORY_BUDGET=536870912
+   IMAGE_WORKERS=1
+   ```
+
+`536870912` bytes is **512 MiB**. The image file must still fit the 8 MiB limit; dimensions alone do not determine file size. Storyden does not resize an oversized upload to make it fit these limits.
+
+### Starting points for other image sizes
+
+These are rough starting points for ordinary landscape, portrait, and square images with one background worker. The suggested budgets allow room to generate large optimized images as well as thumbnails.
+
+| Example source | Maximum resolution | Maximum image size | `IMAGE_MEMORY_BUDGET` |
+| -------------- | ------------------ | ------------------ | --------------------- |
+| 1920 × 1080    | 2.1 MP             | 8 MiB              | `536870912` (512 MiB) |
+| 2560 × 1440    | 4 MP               | 16 MiB             | `536870912` (512 MiB) |
+| 3840 × 2160    | 8.5 MP             | 32 MiB             | `1073741824` (1 GiB)  |
+| 4000 × 3000    | 12 MP              | 32 MiB             | `1073741824` (1 GiB)  |
+
+The deployment defaults are **1.5 MP, 8 MiB uploads, a 256 MiB processing budget, and one worker**. They allow images such as **1600 × 900** and keep the estimated processing requirement below the default budget, without an immediate warning in Media settings. Full-size phone and camera photos usually need resizing before upload, or higher upload limits and a larger worker budget. The examples above show starting points for larger images. Allowing a 4K upload preserves its original resolution; the largest fitted variant still fits within 1920 × 1920.
+
+Extremely wide or tall images can need more memory than these examples. Use the advisory in Media settings to compare your saved limits with the configured budget. It estimates a square image at those limits and is guidance, not a guarantee for every image or format.
+
+### Server memory and background processing
+
+[`IMAGE_MEMORY_BUDGET`](/docs/reference/configuration#image_memory_budget) controls how much memory Storyden reserves for image processing on each running server. Storyden uses this budget to decide which images it can process. Your server or container also needs memory for normal requests and the rest of the application, so allow additional memory beyond this budget.
+
+[`IMAGE_WORKERS`](/docs/reference/configuration#image_workers) defaults to `1`. Increasing it lets Storyden process more images at once. All workers share the same memory budget. If you run multiple Storyden servers, each has its own workers and budget.
+
+Environment changes require a restart. Increasing the budget does not automatically retry variants that were already marked as skipped; verify the new policy with a new upload.
+
 ## Discovery
 
 **Operations → Discovery** controls how search engines and other tools discover your site. Changes take effect without restarting Storyden.

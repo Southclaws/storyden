@@ -1260,7 +1260,7 @@ The secret key for the S3-compatible storage provider.
 
 ## Image processing
 
-Asynchronous image variants. Limits apply per API process.
+Asynchronous image variants. Worker limits apply per API process. Configure image upload size and resolution in **Admin → Operations → Media**. See [Media settings](/docs/reference/settings#media) for worked examples pairing upload limits with processing budgets.
 
 ### `IMAGE_WORKERS`
 
@@ -1291,36 +1291,6 @@ Maximum simultaneously active image jobs per process.
 </table>
 
 Admission budget in bytes for image work, separate from application memory. This is not a process RSS limit.
-
-### `IMAGE_MAX_SOURCE_BYTES`
-
-<table>
-  <tr>
-    <td>type</td>
-    <td>integer (e.g. `1`, `2`, `3`)</td>
-  </tr>
-  <tr>
-    <td>default</td>
-    <td>`33554432`</td>
-  </tr>
-</table>
-
-Largest encoded image to optimize. Larger originals remain downloadable.
-
-### `IMAGE_MAX_SOURCE_PIXELS`
-
-<table>
-  <tr>
-    <td>type</td>
-    <td>integer (e.g. `1`, `2`, `3`)</td>
-  </tr>
-  <tr>
-    <td>default</td>
-    <td>`12000000`</td>
-  </tr>
-</table>
-
-Maximum source pixel count admitted before decoding.
 
 ## Cache
 

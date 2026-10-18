@@ -40,6 +40,7 @@ type ConfigOption struct {
 	Type              string  `yaml:"type"`
 	Required          bool    `yaml:"required"`
 	Default           *string `yaml:"default"`
+	ExportDefault     bool    `yaml:"export_default"`
 	DocumentedDefault *string `yaml:"documented_default"`
 }
 
@@ -142,6 +143,24 @@ The term "Settings" is distinct from these and refers to runtime-configurable va
 			}
 		}
 	})
+
+	for _, section := range sections {
+		for _, option := range section.Fields {
+			if !option.ExportDefault {
+				continue
+			}
+			if option.Default == nil {
+				return fmt.Errorf("%s exports a default but has no default value", option.Name)
+			}
+
+			switch option.Type {
+			case "int", "int64":
+				f.Const().Id("Default" + option.Name).Id(option.Type).Op("=").Id(*option.Default)
+			default:
+				return fmt.Errorf("%s: exporting defaults is unsupported for %s", option.Name, option.Type)
+			}
+		}
+	}
 
 	// Generate the markdown documentation
 	docFile, err := os.Create(outputDocFile)

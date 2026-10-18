@@ -39,6 +39,10 @@ func (m *Manager) Set(ctx context.Context, s settings.Settings) (*settings.Setti
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := s.Services.OrZero().Media.OrZero().Validate(); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	updated, err := m.repo.Set(ctx, s)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

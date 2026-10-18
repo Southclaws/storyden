@@ -14,6 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset/asset_querier"
 	"github.com/Southclaws/storyden/app/resources/asset/asset_writer"
 	job_resource "github.com/Southclaws/storyden/app/resources/background_job"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/background_job"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -23,11 +24,12 @@ import (
 )
 
 type Processor struct {
-	jobs    *jobs.Repository
-	assets  *asset_querier.Querier
-	objects object.Storer
-	logger  *slog.Logger
-	cfg     config.Config
+	jobs     *jobs.Repository
+	assets   *asset_querier.Querier
+	objects  object.Storer
+	logger   *slog.Logger
+	cfg      config.Config
+	settings *settings.SettingsRepository
 
 	memory atomic.Int64
 }
@@ -39,17 +41,15 @@ func New(
 	runner *background_job.Runner,
 	logger *slog.Logger,
 	cfg config.Config,
+	settings *settings.SettingsRepository,
 ) (*Processor, error) {
-	if cfg.ImageMemoryBudget <= 0 {
-		return nil, errors.New("IMAGE_MEMORY_BUDGET must be positive")
-	}
-
 	p := &Processor{
-		jobs:    imageJobs,
-		assets:  assets,
-		objects: objects,
-		logger:  logger,
-		cfg:     cfg,
+		jobs:     imageJobs,
+		assets:   assets,
+		objects:  objects,
+		logger:   logger,
+		cfg:      cfg,
+		settings: settings,
 	}
 
 	err := runner.Register(jobs.Kind, cfg.ImageWorkers, background_job.Handler[jobs.Payload]{
@@ -94,12 +94,21 @@ func closeReader(reader io.Reader) {
 var errMemoryBusy = errors.New("image processing memory is currently reserved")
 
 func (p *Processor) process(ctx context.Context, job *job_resource.Job[jobs.Payload]) error {
+	configured, err := p.settings.Get(ctx)
+	if err != nil {
+		return err
+	}
+	limits, err := configured.ImageLimits()
+	if err != nil {
+		return err
+	}
+
 	source, err := p.assets.GetByID(ctx, job.ID)
 	if err != nil {
 		return err
 	}
 
-	img, reserved, admitted, err := p.decode(ctx, source, job.Payload.Requested & ^job.Payload.Completed)
+	img, reserved, admitted, err := p.decode(ctx, source, job.Payload.Requested & ^job.Payload.Completed, limits)
 	if err != nil {
 		return err
 	}
@@ -122,7 +131,7 @@ func (p *Processor) process(ctx context.Context, job *job_resource.Job[jobs.Payl
 		if err = ctx.Err(); err != nil {
 			return err
 		}
-		if err = p.generate(ctx, job, source, img, preset); err != nil {
+		if err = p.generate(ctx, job, source, img, preset, limits.MaxSize); err != nil {
 			return err
 		}
 	}
@@ -133,6 +142,7 @@ func (p *Processor) decode(
 	ctx context.Context,
 	source *asset.Asset,
 	requested int64,
+	limits settings.ImageLimits,
 ) (image.Image, int64, int64, error) {
 	r, _, err := p.objects.Read(ctx, asset.BuildAssetPath(source.Name))
 	if err != nil {
@@ -140,46 +150,49 @@ func (p *Processor) decode(
 	}
 	defer closeReader(r)
 
-	input, err := imagery.Open(r, p.cfg.ImageMaxSourceBytes, p.cfg.ImageMaxSourcePixels)
+	input, err := imagery.Open(r, limits.MaxSize, limits.MaxPixels)
 	if err != nil {
 		return nil, 0, 0, err
 	}
 	defer input.Close()
 
-	width, height := 0, 0
-	var admitted int64
+	var reserved, admitted int64
 	for _, preset := range asset.ImagePresets {
 		if requested&preset.Bit == 0 {
 			continue
 		}
 
-		estimate := imagery.Estimate(input, preset.Width, preset.Height)
-		if estimate > p.cfg.ImageMemoryBudget {
+		estimate, err := imagery.Estimate(input, preset.Width, preset.Height, resizeMode(preset))
+		if err != nil {
+			return nil, 0, 0, err
+		}
+		if estimate.Total() > p.cfg.ImageMemoryBudget {
+			p.logger.Warn("image variant exceeds memory budget",
+				slog.Any("asset_id", source.ID),
+				slog.Any("preset", preset.Name),
+				slog.Int64("budget", p.cfg.ImageMemoryBudget),
+				slog.Any("estimate", estimate),
+			)
 			continue
 		}
 
 		admitted |= preset.Bit
-		width = max(width, preset.Width)
-		height = max(height, preset.Height)
+		reserved = max(reserved, estimate.Total())
 	}
 
 	if admitted == 0 {
 		return nil, 0, 0, imagery.ErrTooLarge
 	}
-	estimate := imagery.Estimate(input, width, height)
-	if estimate > p.cfg.ImageMemoryBudget {
-		return nil, 0, 0, imagery.ErrTooLarge
-	}
-	if !p.reserve(estimate) {
+	if !p.reserve(reserved) {
 		return nil, 0, 0, errMemoryBusy
 	}
 
 	img, err := input.Decode()
 	if err != nil {
-		p.memory.Add(-estimate)
+		p.memory.Add(-reserved)
 		return nil, 0, 0, errors.Join(imagery.ErrUnsupported, err)
 	}
-	return img, estimate, admitted, nil
+	return img, reserved, admitted, nil
 }
 
 func (p *Processor) generate(
@@ -188,6 +201,7 @@ func (p *Processor) generate(
 	source *asset.Asset,
 	img image.Image,
 	preset asset.ImagePreset,
+	maxSize int64,
 ) error {
 	var resized *image.NRGBA
 	if preset.PNG {
@@ -211,7 +225,7 @@ func (p *Processor) generate(
 	if err != nil {
 		return err
 	}
-	if size > p.cfg.ImageMaxSourceBytes {
+	if size > maxSize {
 		return imagery.ErrTooLarge
 	}
 	if _, err = out.Seek(0, io.SeekStart); err != nil {
@@ -255,4 +269,15 @@ func (p *Processor) generate(
 	}
 	p.logger.Debug("image variant generated", "asset_id", source.ID, "preset", preset.Name, "bytes", size)
 	return nil
+}
+
+func resizeMode(preset asset.ImagePreset) imagery.ResizeMode {
+	if preset.PNG {
+		return imagery.FillMode
+	}
+	if preset.Square {
+		return imagery.ThumbnailMode
+	}
+
+	return imagery.FitMode
 }

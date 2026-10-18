@@ -40,6 +40,7 @@ func New(
 }
 
 type Info struct {
+	Media            MediaServiceInfo
 	Settings         *settings.Settings
 	OnboardingStatus *onboarding.Status
 	Capabilities     Capabilities
@@ -56,6 +57,11 @@ func (p *Provider) Get(ctx context.Context) (*Info, error) {
 	settings, err = p.selfHeal(ctx, settings)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to self-heal malformed settings"))
+	}
+
+	limits, err := settings.ImageLimits()
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	status, err := p.onboarding.GetOnboardingStatus(ctx)
@@ -96,6 +102,10 @@ func (p *Provider) Get(ctx context.Context) (*Info, error) {
 	}
 
 	return &Info{
+		Media: MediaServiceInfo{
+			ImageMemoryBudget:    p.config.ImageMemoryBudget,
+			ImageEstimatedMemory: estimateImageMemory(limits),
+		},
 		Settings:         settings,
 		OnboardingStatus: status,
 		Capabilities:     caps,

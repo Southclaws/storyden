@@ -229,6 +229,8 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 			})
 		}
 
+		media := opt.Map(opt.NewPtr(request.Body.Services.Media), deserialiseMediaServiceSettings)
+
 		discovery := opt.Map(opt.NewPtr(request.Body.Services.Discovery), deserialiseDiscoveryServiceSettings)
 
 		var moderation opt.Optional[settings.ModerationServiceSettings]
@@ -267,8 +269,11 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		if clientIP.Ok() || rateLimit.Ok() || discovery.Ok() || moderation.Ok() || robots.Ok() || oauth.Ok() {
+		hasServices := clientIP.Ok() || rateLimit.Ok() || discovery.Ok() || media.Ok()
+		hasServices = hasServices || moderation.Ok() || robots.Ok() || oauth.Ok()
+		if hasServices {
 			services = opt.New(settings.ServiceSettings{
+				Media:      media,
 				OAuth:      oauth,
 				ClientIP:   clientIP,
 				RateLimit:  rateLimit,
@@ -921,6 +926,12 @@ func optionalOAuthScopePolicy(in *openapi.OAuthClientScopePolicy) opt.Optional[o
 }
 
 func serialiseSettings(in *instance_info.Info, headers *openapi.NetworkHeadersSample) openapi.AdminSettingsProps {
+	services := serialiseServiceSettings(in.Settings.Services.OrZero())
+	if services.Media != nil {
+		services.Media.ImageMemoryBudget = &in.Media.ImageMemoryBudget
+		services.Media.ImageEstimatedMemory = &in.Media.ImageEstimatedMemory
+	}
+
 	return openapi.AdminSettingsProps{
 		AccentColour:       in.Settings.AccentColour.OrZero(),
 		Description:        in.Settings.Description.OrZero(),
@@ -930,7 +941,7 @@ func serialiseSettings(in *instance_info.Info, headers *openapi.NetworkHeadersSa
 		RegistrationMode:   openapi.RegistrationMode(in.Settings.RegistrationMode.Or(settings.RegistrationModePublic).String()),
 		WebAddress:         in.WebAddress.String(),
 		ApiAddress:         in.APIAddress.String(),
-		Services:           opt.Map(in.Settings.Services, serialiseServiceSettings).Ptr(),
+		Services:           &services,
 		Metadata:           (*openapi.Metadata)(in.Settings.Metadata.Ptr()),
 		Motd:               opt.Map(in.Settings.Motd, serialiseMOTD).Ptr(),
 		Headers:            headers,
@@ -948,6 +959,7 @@ func serialiseMOTD(in settings.MessageOfTheDay) openapi.MessageOfTheDay {
 
 func serialiseServiceSettings(in settings.ServiceSettings) openapi.AdminSettingsServiceProps {
 	return openapi.AdminSettingsServiceProps{
+		Media:        opt.Map(in.Media, serialiseMediaServiceSettings).Ptr(),
 		Oauth:        opt.Map(in.OAuth, serialiseOAuthServiceSettings).Ptr(),
 		ClientIp:     opt.Map(in.ClientIP, serialiseClientIPSettings).Ptr(),
 		RateLimiting: opt.Map(in.RateLimit, serialiseRateLimitSettings).Ptr(),
@@ -1197,5 +1209,19 @@ func metadataString(metadata map[string]any, key string) string {
 		return v.String()
 	default:
 		return fmt.Sprint(v)
+	}
+}
+
+func deserialiseMediaServiceSettings(in openapi.MediaServiceSettings) settings.MediaServiceSettings {
+	return settings.MediaServiceSettings{
+		ImageMaxSize:   opt.NewPtr(in.ImageMaxSize),
+		ImageMaxPixels: opt.NewPtr(in.ImageMaxPixels),
+	}
+}
+
+func serialiseMediaServiceSettings(in settings.MediaServiceSettings) openapi.MediaServiceSettings {
+	return openapi.MediaServiceSettings{
+		ImageMaxSize:   in.ImageMaxSize.Ptr(),
+		ImageMaxPixels: in.ImageMaxPixels.Ptr(),
 	}
 }

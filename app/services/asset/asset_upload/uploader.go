@@ -3,10 +3,12 @@ package asset_upload
 import (
 	"context"
 	"io"
+	"math"
 	"strings"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
@@ -14,12 +16,14 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/asset/asset_writer"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/background_job/job_dispatcher"
 	"github.com/Southclaws/storyden/internal/infrastructure/object"
 	"github.com/Southclaws/storyden/internal/mime"
 )
 
 type Uploader struct {
+	settings   *settings.SettingsRepository
 	assets     *asset_writer.Writer
 	objects    object.Storer
 	dispatcher job_dispatcher.Dispatcher
@@ -29,8 +33,10 @@ func New(
 	assets *asset_writer.Writer,
 	objects object.Storer,
 	dispatcher job_dispatcher.Dispatcher,
+	settings *settings.SettingsRepository,
 ) *Uploader {
 	return &Uploader{
+		settings:   settings,
 		assets:     assets,
 		objects:    objects,
 		dispatcher: dispatcher,
@@ -55,7 +61,9 @@ func (s *Uploader) UploadImage(
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 	if !strings.HasPrefix(mediaType.String(), "image/") {
-		return nil, fault.Wrap(fault.New("image required"), ftag.With(ftag.InvalidArgument))
+		return nil, fault.Wrap(errInvalidUpload,
+			fmsg.WithDesc("non-image uploaded to image endpoint", "Please upload an image file."),
+			ftag.With(ftag.InvalidArgument))
 	}
 
 	return s.Upload(ctx, accountID, reader, size, name, opts)
@@ -74,10 +82,29 @@ func (s *Uploader) Upload(
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	var limits settings.ImageLimits
+	isImage := strings.HasPrefix(mediaType.String(), "image/")
+	if isImage {
+		limits, err = s.imageUploadLimits(ctx, size)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+		if limits.MaxSize < math.MaxInt64 {
+			reader = io.LimitReader(reader, limits.MaxSize+1)
+		}
+	}
+
 	counter := &countingReader{reader: reader}
 
 	if err := s.objects.Write(ctx, asset.BuildAssetPath(name), counter, size); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if isImage {
+		if err := s.validateImage(ctx, name, mediaType.String(), counter.bytesRead, limits); err != nil {
+			s.objects.Delete(context.WithoutCancel(ctx), asset.BuildAssetPath(name))
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 	}
 
 	stored := int(counter.bytesRead)
