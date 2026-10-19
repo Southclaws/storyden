@@ -40,7 +40,10 @@ export function Timestamp(props: Props & JsxStyleProps) {
           className="timestamp__time"
           dateTime={createdDate.toISOString()}
         >
-          {createdAt}
+          <span aria-hidden="true">{createdAt}</span>
+          <styled.span srOnly>
+            Posted {timestamp(createdDate, false)}
+          </styled.span>
         </styled.time>
       )}
     </styled.span>
