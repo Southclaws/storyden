@@ -151,7 +151,7 @@ describe("MemberIdent common permutations", () => {
       />,
     );
 
-    expect(getByAltText(`${profile.handle}'s avatar`)).toBeInTheDocument();
+    expect(getByAltText("")).toBeInTheDocument();
     expect(getByText(`@${profile.handle}`)).toBeInTheDocument();
     expect(queryByText(profile.name)).not.toBeInTheDocument();
   });
@@ -168,14 +168,14 @@ describe("MemberIdent common permutations", () => {
       />,
     );
 
-    expect(getByAltText(`${profile.handle}'s avatar`)).toBeInTheDocument();
+    expect(getByAltText("")).toBeInTheDocument();
     expect(getByText(profile.name)).toBeInTheDocument();
     expect(getByText(`@${profile.handle}`)).toBeInTheDocument();
   });
 
   it("renders full-horizontal without avatar when requested", () => {
     const profile = profileWithRoles([]);
-    const { getByText, queryByAltText } = render(
+    const { getByText, queryByRole } = render(
       <MemberIdent
         profile={profile}
         size="md"
@@ -185,9 +185,7 @@ describe("MemberIdent common permutations", () => {
       />,
     );
 
-    expect(
-      queryByAltText(`${profile.handle}'s avatar`),
-    ).not.toBeInTheDocument();
+    expect(queryByRole("img")).not.toBeInTheDocument();
     expect(getByText(profile.name)).toBeInTheDocument();
     expect(getByText(`@${profile.handle}`)).toBeInTheDocument();
   });

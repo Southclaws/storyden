@@ -29,7 +29,13 @@ export function MemberIdent({
       overflow="hidden"
       gap={size === "lg" ? "2" : "1"}
     >
-      {avatar === "visible" && <MemberAvatar profile={profile} size={size} />}
+      {avatar === "visible" && (
+        <MemberAvatar
+          profile={profile}
+          size={size}
+          alt={name === "hidden" ? undefined : ""}
+        />
+      )}
       <MemberName
         profile={profile}
         size={size}

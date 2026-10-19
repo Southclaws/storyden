@@ -19,9 +19,10 @@ export type Props = {
   profile: ProfileReference;
   size?: "xs" | "sm" | "md" | "lg";
   editable?: boolean;
+  alt?: string;
 };
 
-export function MemberAvatar({ profile, size, editable }: Props) {
+export function MemberAvatar({ profile, size, editable, alt }: Props) {
   const avatarURL = getAvatarURL(
     profile.handle,
     size === "xs" || size === "sm"
@@ -39,7 +40,7 @@ export function MemberAvatar({ profile, size, editable }: Props) {
       <Image
         className={avatarStyles}
         src={avatarURL}
-        alt={`${profile.handle}'s avatar`}
+        alt={alt ?? `Avatar of ${profile.name || profile.handle}`}
         width={width}
         height={height}
       />
