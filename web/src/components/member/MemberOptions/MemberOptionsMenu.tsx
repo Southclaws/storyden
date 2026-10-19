@@ -55,6 +55,7 @@ export function MemberOptionsMenu({
     <Menu.Root onSelect={handleSelect}>
       <Menu.Trigger
         className="member-options-menu__trigger"
+        aria-label={`Member options for ${profile.name === profile.handle ? `@${profile.handle}` : `${profile.name} (@${profile.handle})`}`}
         maxW="full"
         cursor="pointer"
         asChild={props.asChild}
