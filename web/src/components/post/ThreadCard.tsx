@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { memo } from "react";
 
 import {
@@ -56,7 +55,7 @@ export const ThreadReferenceCard = memo(
     const replyCountLabel = `${replyCount} ${pluralise(replyCount, "reply", "replies")}`;
 
     const replyStatusLabel = hasReplied
-      ? `${replyCountLabel} (including you!)`
+      ? `${replyCountLabel}. You've participated.`
       : replyCountLabel;
 
     const newRepliesCount = thread.read_status?.replies_since ?? 0;
@@ -112,6 +111,7 @@ export const ThreadReferenceCard = memo(
                   initialSession={session}
                   thread={thread}
                   showCount
+                  label={`Like ${title}`}
                 />
                 {session && (
                   <CollectionMenu account={session} thread={thread} />
@@ -123,7 +123,6 @@ export const ThreadReferenceCard = memo(
         }
       >
         <Byline
-          href={permalink}
           author={thread.author}
           time={new Date(thread.createdAt)}
           updated={new Date(thread.updatedAt)}
@@ -133,32 +132,32 @@ export const ThreadReferenceCard = memo(
               flexShrink="0"
               overflow="hidden"
             >
-              <Link
-                className="thread-byline__anchor"
-                href={permalink}
-                prefetch={false}
-                title={replyStatusLabel}
+              <styled.span srOnly>
+                {isDraft ? "Draft. " : isPinned ? "Pinned discussion. " : ""}
+              </styled.span>
+              <styled.span
+                className="thread-byline__reply-status-label"
+                color="text.muted"
+                display="flex"
+                gap="0.5"
+                alignItems="center"
               >
-                <styled.span
-                  className="thread-byline__reply-status-label"
-                  color="text.subtle"
-                  display="flex"
-                  gap="0.5"
-                  alignItems="center"
-                >
-                  {hasReplied ? (
-                    <DiscussionParticipatingIcon width="4" />
-                  ) : (
-                    <DiscussionIcon width="4" />
-                  )}
-                  {replyCount}
-                  {newRepliesCount > 0 && (
-                    <Text as="span" variant="metadata" title={newRepliesLabel}>
-                      +{newRepliesCount}
-                    </Text>
-                  )}
-                </styled.span>
-              </Link>
+                {hasReplied ? (
+                  <DiscussionParticipatingIcon width="4" aria-hidden="true" />
+                ) : (
+                  <DiscussionIcon width="4" aria-hidden="true" />
+                )}
+                <span aria-hidden="true">{replyCount}</span>
+                <styled.span srOnly>{replyStatusLabel}</styled.span>
+                {newRepliesCount > 0 && (
+                  <Text as="span" variant="metadata" title={newRepliesLabel}>
+                    <span aria-hidden="true">+{newRepliesCount}</span>
+                    <styled.span srOnly>
+                      {newRepliesLabel || `${newRepliesCount} new replies`}
+                    </styled.span>
+                  </Text>
+                )}
+              </styled.span>
             </Box>
           }
         />
