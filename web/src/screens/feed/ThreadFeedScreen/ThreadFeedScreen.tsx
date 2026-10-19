@@ -8,7 +8,7 @@ import { PaginationControls } from "@/components/site/PaginationControls/Paginat
 import { Unready } from "@/components/site/Unready";
 import { type Settings } from "@/lib/settings/settings";
 import { cx } from "@/styled-system/css";
-import { LStack, VStack } from "@/styled-system/jsx";
+import { LStack, VStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 import { Props, useThreadFeedScreen } from "./useThreadFeedScreen";
@@ -78,15 +78,19 @@ export function ThreadFeed(props: Props & { hideCategoryBadge?: boolean }) {
           onClick={handlePageChange}
         />
       )}
-      <ol className={cx("thread-feed__list", lstack({ gap: "4" }))}>
+      <ol
+        aria-label="Discussions"
+        className={cx("thread-feed__list", lstack({ gap: "4" }))}
+      >
         {data.threads.map((t) => {
           return (
-            <ThreadReferenceCard
-              key={t.slug}
-              initialSession={props.initialSession}
-              thread={t}
-              hideCategoryBadge={props.hideCategoryBadge}
-            />
+            <styled.li key={t.slug} width="full">
+              <ThreadReferenceCard
+                initialSession={props.initialSession}
+                thread={t}
+                hideCategoryBadge={props.hideCategoryBadge}
+              />
+            </styled.li>
           );
         })}
       </ol>
