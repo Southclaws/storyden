@@ -5,7 +5,6 @@ import { format } from "date-fns/format";
 
 import { DatagraphItemKind } from "@/api/openapi-schema";
 import { CategoryMoveMenu } from "@/components/category/CategoryMoveMenu/CategoryMoveMenu";
-import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { ReportPostMenuItem } from "@/components/report/ReportPostMenuItem";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { MoreAction } from "@/components/site/Action/More";
@@ -42,28 +41,19 @@ export function ThreadMenu(props: Props) {
       lazyMount
     >
       <Menu.Trigger asChild>
-        <MoreAction variant="subtle" />
+        <MoreAction
+          variant="subtle"
+          aria-label={`More options for ${thread.title || thread.link?.title || "Untitled post"}`}
+        />
       </Menu.Trigger>
 
       <Portal>
         <Menu.Positioner>
           <Menu.Content minW="36">
             <Menu.ItemGroup id="group">
-              <Menu.ItemGroupLabel
-                display="flex"
-                flexDir="column"
-                userSelect="none"
-              >
-                <span>{`Post by ${thread.author.name}`}</span>
-
-                <MemberBadge
-                  profile={thread.author}
-                  size="sm"
-                  name="full-vertical"
-                />
-
-                <styled.time fontWeight="normal">
-                  {format(new Date(thread.createdAt), "yyyy-MM-dd")}
+              <Menu.ItemGroupLabel userSelect="none">
+                <styled.time dateTime={thread.createdAt} fontWeight="normal">
+                  Posted {format(new Date(thread.createdAt), "d MMMM yyyy")}
                 </styled.time>
               </Menu.ItemGroupLabel>
 
