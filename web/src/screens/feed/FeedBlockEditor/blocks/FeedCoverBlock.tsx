@@ -16,7 +16,12 @@ export function FeedCoverBlock({
   }
 
   return (
-    <Box className="feed-cover" width="full" aspectRatio={4} position="relative">
+    <Box
+      className="feed-cover"
+      width="full"
+      aspectRatio={4}
+      position="relative"
+    >
       <Image
         className={
           "feed-cover__image " +
@@ -29,6 +34,7 @@ export function FeedCoverBlock({
         }
         src={src}
         alt=""
+        loading="eager"
         fill
         sizes="(max-width: 768px) 100vw, 960px"
       />
