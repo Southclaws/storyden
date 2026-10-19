@@ -108,6 +108,7 @@ export const richCard = defineSlotRecipe({
 
     footerContainer: {
       display: "flex",
+      alignItems: "center",
       justifyContent: "start",
       width: "full",
       minWidth: "0",
@@ -267,6 +268,9 @@ export const richCard = defineSlotRecipe({
           gridRow: "header-start / header-end",
           alignSelf: "start",
           justifySelf: "end",
+          _containerSmall: {
+            gridColumn: "content-start / content-end",
+          },
           "&[data-header=absent]": {
             alignSelf: "center",
             gridRow: "title-start / title-end",
