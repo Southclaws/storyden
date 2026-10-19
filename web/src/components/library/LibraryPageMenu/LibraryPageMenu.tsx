@@ -26,6 +26,7 @@ type InteractOutsideEvent = PointerDownOutsideEvent | FocusOutsideEvent;
 type LibraryPageMenuProps = Props &
   ButtonProps & {
     onOpenChange?: (details: MenuOpenChangeDetails) => void;
+    onMove?: () => void;
     onInteractOutside?: (event: InteractOutsideEvent) => void;
   };
 
@@ -35,6 +36,7 @@ export function LibraryPageMenu({
   open,
   onClose,
   onOpenChange,
+  onMove,
   onInteractOutside,
   children,
   ...props
@@ -71,7 +73,9 @@ export function LibraryPageMenu({
       open={open}
       lazyMount
       positioning={{ placement: "right-start", gutter: -2 }}
-      onSelect={handlers.handleSelect}
+      onSelect={(details) =>
+        details.value === "move" ? onMove?.() : handlers.handleSelect(details)
+      }
       onOpenChange={handleOpenChange}
       onInteractOutside={onInteractOutside}
     >
@@ -104,6 +108,10 @@ export function LibraryPageMenu({
               </Menu.ItemGroupLabel>
 
               <Menu.Separator />
+
+              {isManager && onMove && (
+                <Menu.Item value="move">Move or reorder…</Menu.Item>
+              )}
 
               {availableOperations.map((op) => (
                 <Menu.Item

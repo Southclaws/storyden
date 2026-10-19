@@ -11,7 +11,7 @@ export type DragTreeVariantProps = {
 
 export type DragTreeVariantMap = RecipeVariantMap<DragTreeVariant>
 
-export type DragTreeSlot = "branch" | "branchContent" | "branchControl" | "branchIndentGuide" | "branchIndicator" | "branchText" | "branchTrigger" | "item" | "itemIndicator" | "itemText" | "label" | "nodeCheckbox" | "nodeRenameInput" | "root" | "tree" | "actions" | "link" | "row" | "dropIndicator" | "dropIndicatorLine"
+export type DragTreeSlot = "branch" | "branchContent" | "branchControl" | "branchIndentGuide" | "branchIndicator" | "branchText" | "branchTrigger" | "item" | "itemIndicator" | "itemText" | "label" | "nodeCheckbox" | "nodeRenameInput" | "root" | "tree" | "actions" | "link" | "row" | "dropIndicator" | "dropIndicatorLine" | "instructions" | "movePreview" | "moveTitle" | "moveHelp" | "moveError"
 
 export type DragTreeRecipe = SlotRecipeRuntimeFn<DragTreeSlot, DragTreeVariantProps, DragTreeVariantMap>
 

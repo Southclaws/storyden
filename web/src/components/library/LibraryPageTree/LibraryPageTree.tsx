@@ -6,6 +6,7 @@ import { DraftIcon } from "@/components/ui/icons/Draft";
 import { ReviewIcon, UnlistedIcon } from "@/components/ui/icons/Visibility";
 import { DragTree } from "@/components/ui/tree-view";
 import { DragItemDivider, DragItemNode } from "@/lib/dragdrop/provider";
+import { useLibraryMutation } from "@/lib/library/library";
 import { visibilityColour } from "@/lib/library/visibilityColours";
 import { css } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
@@ -50,6 +51,7 @@ export function LibraryPageTree({
   currentPath,
   canManageLibrary,
 }: LibraryPageTreeProps) {
+  const { moveNode, revalidate } = useLibraryMutation();
   const sortedNodes = useMemo(
     () =>
       [...nodes].sort(
@@ -96,6 +98,18 @@ export function LibraryPageTree({
             context: "sidebar",
           }) satisfies DragItemDivider,
       }}
+      move={{
+        onMove: async ({ node, target, parent, oldParent, placement }) => {
+          await moveNode(
+            node.id,
+            target.id,
+            placement,
+            parent?.id ?? null,
+            oldParent?.id,
+          );
+        },
+        onSettled: revalidate,
+      }}
       getLabelClassName={({ node, isRoot }) =>
         isRoot ? undefined : getVisibilityClassName(node)
       }
@@ -119,7 +133,7 @@ export function LibraryPageTree({
           </HStack>
         );
       }}
-      renderActions={({ node, tabIndex }) => (
+      renderActions={({ node, tabIndex, startMove }) => (
         <Fragment>
           {canManageLibrary && (
             <CreatePageAction
@@ -130,7 +144,12 @@ export function LibraryPageTree({
               tabIndex={tabIndex}
             />
           )}
-          <LibraryPageMenu variant="plain" node={node} tabIndex={tabIndex} />
+          <LibraryPageMenu
+            variant="plain"
+            node={node}
+            tabIndex={tabIndex}
+            onMove={startMove}
+          />
         </Fragment>
       )}
     />

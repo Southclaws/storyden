@@ -5,6 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
+  '@zag-js/menu@1.43.3': dabdcf16a6a706e3a391aa82c63deb35c68ed5ccb38c78269c6d0dd694566362
   '@zag-js/tree-view@1.43.3': 606a6f00785b4a2fcef860f00fdd43e1a410101b61e3d586cf790b15f1e9a05c
 
 importers:
@@ -5084,7 +5085,7 @@ snapshots:
       '@zag-js/json-tree-utils': 1.43.3
       '@zag-js/listbox': 1.43.3
       '@zag-js/marquee': 1.43.3
-      '@zag-js/menu': 1.43.3
+      '@zag-js/menu': 1.43.3(patch_hash=dabdcf16a6a706e3a391aa82c63deb35c68ed5ccb38c78269c6d0dd694566362)
       '@zag-js/navigation-menu': 1.43.3
       '@zag-js/number-input': 1.43.3
       '@zag-js/pagination': 1.43.3
@@ -7445,7 +7446,7 @@ snapshots:
       '@zag-js/types': 1.43.3
       '@zag-js/utils': 1.43.3
 
-  '@zag-js/menu@1.43.3':
+  '@zag-js/menu@1.43.3(patch_hash=dabdcf16a6a706e3a391aa82c63deb35c68ed5ccb38c78269c6d0dd694566362)':
     dependencies:
       '@zag-js/anatomy': 1.43.3
       '@zag-js/core': 1.43.3

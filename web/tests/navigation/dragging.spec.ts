@@ -14,7 +14,7 @@ test("library sidebar separates disclosure, destination, and page actions for ke
   const { parent, child, sibling } = await withAdminAccessKey(
     async ({ nodeCreate }) => {
       const parent = await nodeCreate({
-        name: `About the handbook ${seed}`,
+        name: `About${seed} handbook`,
         visibility: "published",
       });
       const child = await nodeCreate({
@@ -86,20 +86,41 @@ test("library sidebar separates disclosure, destination, and page actions for ke
   await page.keyboard.press("ArrowUp");
   await expect(childLink).toBeFocused();
   await page.keyboard.press("Home");
-  await expect(destination).toBeFocused();
+  await expect(
+    navigation.locator("a[data-tree-node-id]:visible").first(),
+  ).toBeFocused();
   await page.keyboard.press("End");
-  await expect(siblingLink).toBeFocused();
-  await page.keyboard.type("abo");
+  await expect(
+    navigation.locator("a[data-tree-node-id]:visible").last(),
+  ).toBeFocused();
+  await page.keyboard.type(`About${seed}`);
   await expect(destination).toBeFocused();
   await page.keyboard.press("ArrowRight");
   await expect(childLink).toBeFocused();
   await expect(childLink).toHaveAttribute("aria-current", "page");
+  const moveHint = page
+    .getByRole("tooltip")
+    .filter({ hasText: "Move or reorder:" });
+  await expect(moveHint).toBeVisible();
+  await page.keyboard.press("Shift+Tab");
+  await expect
+    .poll(() =>
+      navigation.evaluate((element) =>
+        element.contains(document.activeElement),
+      ),
+    )
+    .toBe(false);
+  await expect(moveHint).toBeHidden();
+  await page.keyboard.press("Tab");
+  await expect(childLink).toBeFocused();
+  await expect(moveHint).toBeVisible();
   await page.keyboard.press("Tab");
   const create = navigation.getByRole("button", {
     name: `Create page under ${child.name}`,
   });
   await expect(create).toBeFocused();
   await expect(create).toBeVisible();
+  await expect(moveHint).toBeHidden();
   await expect(create).toHaveCSS("outline-style", "solid");
   await expect(create).toHaveCSS("outline-width", "2px");
   await expect(currentRow).toHaveCSS("outline-style", "none");

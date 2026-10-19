@@ -1,3 +1,4 @@
+import { createTreeCollection } from "@ark-ui/react/tree-view";
 import {
   DndContext,
   MouseSensor,
@@ -7,11 +8,13 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { Fragment, type ReactNode } from "react";
+import { Fragment, type ReactNode, useState } from "react";
 
 import { IconButton } from "@/components/ui/icon-button";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { MoreIcon } from "@/components/ui/icons/More";
+import * as MenuPrimitive from "@/components/ui/menu";
+import { Menu } from "@/components/ui/menu/Menu";
 import { styled } from "@/styled-system/jsx";
 
 import { DragTree } from ".";
@@ -205,4 +208,108 @@ export const LongLabels: Story = {
       />
     </DragTreeStoryContext>
   ),
+};
+
+function KeyboardMovingExample({
+  variant,
+  fail = false,
+}: {
+  variant: "clamped" | "scrollable";
+  fail?: boolean;
+}) {
+  const [nodes, setNodes] = useState(demoNodes);
+  return (
+    <DragTreeStoryContext>
+      <DragTree
+        id="story-keyboard-moving"
+        label="Documentation"
+        nodes={nodes}
+        variant={variant}
+        getId={getId}
+        getLabel={getLabel}
+        getChildren={getChildren}
+        getHref={getHref}
+        isSelected={(node) => node.id === "theming"}
+        defaultExpandedIds={["documentation", "guides", "community"]}
+        drag={{
+          enabled: true,
+          getNodeData: ({ node }) => ({ type: "story-node", node }),
+          getDividerData: ({ node, direction }) => ({
+            type: "story-divider",
+            node,
+            direction,
+          }),
+        }}
+        move={{
+          onMove: async ({ node, target, placement }) => {
+            if (fail) throw new Error("Example persistence failure");
+            const collection = createTreeCollection({
+              rootNode: { children: nodes } as DemoNode,
+              nodeToValue: getId,
+              nodeToString: getLabel,
+              nodeToChildren: getChildren,
+            });
+            const without = collection.remove([
+              collection.getIndexPath(node.id)!,
+            ]);
+            const path = without.getIndexPath(target.id)!;
+            const result =
+              placement === "inside"
+                ? without.replace(path, {
+                    ...target,
+                    children: [...target.children, node],
+                  })
+                : placement === "above"
+                  ? without.insertBefore(path, [node])!
+                  : without.insertAfter(path, [node])!;
+            setNodes(result.rootNode.children);
+          },
+        }}
+        renderActions={({ node, tabIndex, startMove }) => (
+          <Menu
+            onSelect={({ value }) => {
+              if (value === "move") startMove?.();
+            }}
+            trigger={
+              <IconButton
+                variant="plain"
+                tabIndex={tabIndex}
+                aria-label={`Actions for ${node.label}`}
+              >
+                <MoreIcon />
+              </IconButton>
+            }
+          >
+            <MenuPrimitive.Item value="move">
+              Move or reorder…
+            </MenuPrimitive.Item>
+          </Menu>
+        )}
+      />
+    </DragTreeStoryContext>
+  );
+}
+
+export const KeyboardMoving: Story = {
+  render: (args) => <KeyboardMovingExample variant={args.variant} />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Focus a node with the keyboard to discover Alt+Shift+M (Option+Shift+M on Mac), or choose Move or reorder in its menu. The node and its descendants are carried together. Arrows, Home/End, and typeahead browse destinations; Space cycles before/inside/after. Enter saves the placement, Escape restores the original position, and Tab cancels without trapping focus. Before/after uses the same focus-coloured divider as pointer sorting, without outlining the destination row. Before/after a root node returns the carried node to the top level. The source stays in place until confirmation. The shortcut hint closes when focus leaves the tree, including Shift+Tab back to the preceding control. The preview respects reduced motion. This example persists moves in local state.",
+      },
+    },
+  },
+};
+
+export const MoveFailure: Story = {
+  render: (args) => <KeyboardMovingExample variant={args.variant} fail />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "An unsuccessful move retains the carried node and destination for retry. The inline error remains available to assistive technology. Escape still cancels and returns focus to the source.",
+      },
+    },
+  },
 };

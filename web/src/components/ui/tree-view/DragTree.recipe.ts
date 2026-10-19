@@ -1,6 +1,8 @@
 import { treeViewAnatomy } from "@ark-ui/react";
 import { defineSlotRecipe } from "@pandacss/dev";
 
+import { floatingOverlayStyles } from "@/theme/semantic/overlay";
+
 export const dragTree = defineSlotRecipe({
   className: "dragTree",
   slots: [
@@ -10,9 +12,41 @@ export const dragTree = defineSlotRecipe({
     "row",
     "dropIndicator",
     "dropIndicatorLine",
+    "instructions",
+    "movePreview",
+    "moveTitle",
+    "moveHelp",
+    "moveError",
   ],
   jsx: ["DragTree"],
   base: {
+    instructions: { srOnly: true },
+    movePreview: {
+      ...floatingOverlayStyles,
+      position: "fixed",
+      insetBlockStart: "0",
+      insetInlineStart: "0",
+      zIndex: "tooltip",
+      pointerEvents: "none",
+      display: "flex",
+      flexDirection: "column",
+      gap: "1",
+      p: "2",
+      borderRadius: "sm",
+      fontSize: "xs",
+      lineHeight: "1.125rem",
+      rotate: "-1.5deg",
+      transition: "translate 160ms cubic-bezier(0.16, 1, 0.3, 1)",
+      _motionReduce: { transition: "none", rotate: "none" },
+    },
+    moveTitle: {
+      display: "block",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+    },
+    moveHelp: { color: "text.muted" },
+    moveError: { color: "status.danger.content", fontSize: "xs", p: "2" },
     root: {
       width: "full",
     },
@@ -53,10 +87,20 @@ export const dragTree = defineSlotRecipe({
         outlineStyle: "dashed",
         outlineWidth: "thin",
       },
-      "&:has(> a:focus-visible)": {
-        outline: "2px solid",
-        outlineColor: "var(--sd-color-focus-ring, var(--colors-border-strong))",
-        outlineOffset: "-2px",
+      '&[data-carried="true"]': {
+        outline: "1px dashed",
+        outlineColor: "border.strong",
+        outlineOffset: "-1px",
+      },
+      '&:has(> a:focus-visible):not([data-move-target="above"]):not([data-move-target="below"])':
+        {
+          outline: "2px solid",
+          outlineColor:
+            "var(--sd-color-focus-ring, var(--colors-border-strong))",
+          outlineOffset: "-2px",
+        },
+      '&[data-move-target="inside"]': {
+        background: "interactive.emphasized.surface",
       },
     },
     branchControl: {
@@ -206,9 +250,10 @@ export const dragTree = defineSlotRecipe({
       transitionProperty: "background, opacity",
       transitionTimingFunction: "default",
       '&[data-active="true"]': {
-        background: "selection.background",
+        background: "var(--sd-color-focus-ring, var(--colors-border-strong))",
         opacity: "100",
       },
+      _motionReduce: { transition: "none" },
     },
     tree: {
       display: "flex",

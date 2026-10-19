@@ -20,6 +20,8 @@ const router = vi.hoisted(() => ({ prefetch: vi.fn() }));
 
 vi.mock("next/navigation", () => ({
   useRouter: () => router,
+  usePathname: () => "/l",
+  useParams: () => ({}),
 }));
 
 const dnd = vi.hoisted(() => ({
@@ -31,7 +33,8 @@ const api = vi.hoisted(() => ({
   useNodeList: vi.fn(),
 }));
 
-vi.mock("@/api/openapi-client/nodes", () => ({
+vi.mock("@/api/openapi-client/nodes", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/api/openapi-client/nodes")>()),
   useNodeList: api.useNodeList,
 }));
 

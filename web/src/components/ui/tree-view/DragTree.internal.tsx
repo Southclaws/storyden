@@ -21,8 +21,14 @@ import {
 
 import { BulletIcon } from "@/components/ui/icons/Bullet";
 import { ChevronRightIcon } from "@/components/ui/icons/Chevron";
+import { Tooltip } from "@/components/ui/tooltip/Tooltip";
 import { cx } from "@/styled-system/css";
 import { type DragTreeVariantProps, dragTree } from "@/styled-system/recipes";
+
+import { DragTreeMovePreview } from "./DragTreeMovePreview";
+import { type DragTreeMoveConfig, useDragTreeMove } from "./useDragTreeMove";
+
+export type { DragTreeMove, DragTreeMoveConfig } from "./useDragTreeMove";
 
 export type DragTreePosition = "top" | "in" | "bottom" | "only";
 export type DragTreeDirection = "above" | "below";
@@ -40,6 +46,7 @@ type DragTreeDividerContext<TNode> = DragTreeNodeContext<TNode> & {
 type DragTreeActionContext<TNode> = DragTreeNodeContext<TNode> & {
   /** Only the focused node's actions belong in the Tab order. */
   tabIndex: 0 | -1;
+  startMove?: () => void;
 };
 
 export type DragTreeDragConfig<TNode> = {
@@ -58,6 +65,7 @@ export type DragTreeProps<TNode> = DragTreeVariantProps & {
   getLabel: (node: TNode) => string;
   defaultExpandedIds?: string[];
   drag?: DragTreeDragConfig<TNode>;
+  move?: DragTreeMoveConfig<TNode>;
   getLabelClassName?: (
     context: DragTreeNodeContext<TNode>,
   ) => string | undefined;
@@ -92,6 +100,7 @@ export function DragTree<TNode>({
   getLabel,
   defaultExpandedIds = [],
   drag,
+  move,
   getLabelClassName,
   isSelected,
   renderActions,
@@ -132,6 +141,14 @@ export function DragTree<TNode>({
       current.includes(nodeId) ? current : [...current, nodeId],
     );
   }, []);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const keyboardMove = useDragTreeMove({
+    rootRef,
+    collection,
+    config: move,
+    enabled: !!drag?.enabled,
+    expand: handleExpandNode,
+  });
 
   const rootNodes = nodes;
 
@@ -139,6 +156,7 @@ export function DragTree<TNode>({
 
   return (
     <ArkTreeView.Root
+      ref={rootRef}
       className={styles.root}
       collection={collection}
       expandedValue={expandedValue}
@@ -146,6 +164,28 @@ export function DragTree<TNode>({
       selectedValue={selectedValue}
       defaultFocusedValue={selectedValue[0] ?? (nodes[0] && getId(nodes[0]))}
       expandOnClick={false}
+      onKeyDownCapture={keyboardMove.onKeyDown}
+      onPointerDownCapture={() => {
+        keyboardMove.setKeyboard(false);
+        keyboardMove.cancel(false);
+      }}
+      onFocusCapture={(event) => {
+        const element = event.target as HTMLElement;
+        if (element.dataset["treeNodeId"]) {
+          keyboardMove.setFocusedId(element.dataset["treeNodeId"]);
+          keyboardMove.setKeyboard(element.matches(":focus-visible"));
+        } else keyboardMove.setKeyboard(false);
+      }}
+      onBlurCapture={(event) => {
+        if (
+          event.relatedTarget &&
+          event.currentTarget.contains(event.target as Node) &&
+          !event.currentTarget.contains(event.relatedTarget as Node | null)
+        ) {
+          keyboardMove.setKeyboard(false);
+          keyboardMove.cancel(false);
+        }
+      }}
     >
       <ArkTreeView.Label asChild className={styles.label}>
         <p>{label}</p>
@@ -176,6 +216,8 @@ export function DragTree<TNode>({
                 getId={getId}
                 getLabel={getLabel}
                 drag={drag}
+                keyboardMove={keyboardMove}
+                moveEnabled={!!move && !!drag?.enabled}
                 getLabelClassName={getLabelClassName}
                 handleExpandNode={handleExpandNode}
                 isSelected={isSelected}
@@ -186,6 +228,34 @@ export function DragTree<TNode>({
           );
         })}
       </ArkTreeView.Tree>
+      <p id={`${id}-move-instructions`} className={styles.instructions}>
+        Alt+Shift+M picks up a node. Use arrows and typeahead to browse
+        destinations. Space cycles before, inside, and after. Enter places;
+        Escape cancels. Tab cancels and leaves move mode.
+      </p>
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className={styles.instructions}
+      >
+        {keyboardMove.status}
+      </div>
+      {keyboardMove.error && (
+        <p role="alert" className={styles.moveError}>
+          {keyboardMove.error}
+        </p>
+      )}
+      {keyboardMove.source && (
+        <DragTreeMovePreview
+          rootRef={rootRef}
+          focusedId={keyboardMove.focusedId}
+          label={getLabel(keyboardMove.source)}
+          preview={keyboardMove.preview}
+          pending={keyboardMove.pending}
+          styles={styles}
+        />
+      )}
     </ArkTreeView.Root>
   );
 }
@@ -202,6 +272,8 @@ type DragTreeNodeProps<TNode> = {
   getId: (node: TNode) => string;
   getLabel: (node: TNode) => string;
   drag?: DragTreeDragConfig<TNode>;
+  keyboardMove: ReturnType<typeof useDragTreeMove<TNode>>;
+  moveEnabled: boolean;
   getLabelClassName?: (
     context: DragTreeNodeContext<TNode>,
   ) => string | undefined;
@@ -223,6 +295,8 @@ function DragTreeNode<TNode>({
   getId,
   getLabel,
   drag,
+  keyboardMove,
+  moveEnabled,
   getLabelClassName,
   handleExpandNode,
   isSelected,
@@ -255,7 +329,7 @@ function DragTreeNode<TNode>({
   } = useDraggable({
     id: nodeId,
     data: nodeData,
-    disabled: !drag?.enabled,
+    disabled: !drag?.enabled || !!keyboardMove.sourceId,
   });
   // The row contains links, disclosure buttons, and action controls. Let those
   // controls own keyboard input while retaining mouse and touch row dragging.
@@ -275,7 +349,7 @@ function DragTreeNode<TNode>({
   const { setNodeRef: setDroppableNodeRef } = useDroppable({
     id: nodeId,
     data: nodeData,
-    disabled: !drag?.enabled || invalidTarget,
+    disabled: !drag?.enabled || invalidTarget || !!keyboardMove.sourceId,
     resizeObserverConfig: {
       updateMeasurementsFor: [],
     },
@@ -317,21 +391,31 @@ function DragTreeNode<TNode>({
     nodeId,
   ]);
 
+  const keyboardTarget =
+    !!keyboardMove.sourceId &&
+    keyboardMove.focusedId === nodeId &&
+    !keyboardMove.invalid;
   const showTopDivider =
-    overMetadata?.treeId === treeId &&
-    overMetadata.kind === "divider" &&
-    overMetadata.nodeId === nodeId &&
-    overMetadata.direction === "above";
+    (keyboardTarget && keyboardMove.placement === "above") ||
+    (overMetadata?.treeId === treeId &&
+      overMetadata.kind === "divider" &&
+      overMetadata.nodeId === nodeId &&
+      overMetadata.direction === "above");
   const showBottomDivider =
-    overMetadata?.treeId === treeId &&
-    overMetadata.kind === "divider" &&
-    overMetadata.nodeId === nodeId &&
-    overMetadata.direction === "below";
-  const actions = renderActions?.({ ...context, tabIndex: focused ? 0 : -1 });
+    (keyboardTarget && keyboardMove.placement === "below") ||
+    (overMetadata?.treeId === treeId &&
+      overMetadata.kind === "divider" &&
+      overMetadata.nodeId === nodeId &&
+      overMetadata.direction === "below");
+  const actions = renderActions?.({
+    ...context,
+    tabIndex: focused && !keyboardMove.sourceId ? 0 : -1,
+    startMove: moveEnabled ? () => keyboardMove.start(nodeId) : undefined,
+  });
   const selected = isSelected?.(node) ?? false;
 
   function preventNavigationWhileDragging(event: React.SyntheticEvent) {
-    if (isDragging) {
+    if (isDragging || keyboardMove.sourceId) {
       event.preventDefault();
       event.stopPropagation();
     }
@@ -341,6 +425,9 @@ function DragTreeNode<TNode>({
   const link = (
     <Link
       ref={linkRef}
+      data-tree-node-id={nodeId}
+      aria-keyshortcuts={moveEnabled ? "Alt+Shift+M" : undefined}
+      aria-describedby={moveEnabled ? `${treeId}-move-instructions` : undefined}
       aria-current={selected ? "page" : undefined}
       aria-expanded={children.length > 0 ? expanded : undefined}
       className={cx(
@@ -357,13 +444,111 @@ function DragTreeNode<TNode>({
     </Link>
   );
 
+  const row = (
+    <div
+      {...(keyboardMove.sourceId ? undefined : pointerListeners)}
+      ref={setDraggableNodeRef}
+      className={cx("group", styles.row)}
+      data-drag-over={isDraggingOver}
+      data-selected={selected}
+      data-depth={depth}
+      data-carried={keyboardMove.sourceId === nodeId}
+      data-move-target={keyboardTarget ? keyboardMove.placement : undefined}
+      style={{
+        opacity: isDragging ? 0.5 : 1,
+        pointerEvents: isDragging ? "none" : undefined,
+        transform: CSS.Translate.toString(transform),
+      }}
+    >
+      {children.length > 0 ? (
+        <ArkTreeView.BranchTrigger
+          asChild
+          aria-expanded={expanded}
+          className={styles.branchControl}
+          tabIndex={-1}
+          onPointerDown={(event) => event.stopPropagation()}
+          onMouseDown={(event) => event.stopPropagation()}
+          onTouchStart={(event) => event.stopPropagation()}
+        >
+          <button type="button" aria-label={`Toggle ${getLabel(node)}`}>
+            <ArkTreeView.BranchIndicator className={styles.branchIndicator}>
+              <ChevronRightIcon />
+            </ArkTreeView.BranchIndicator>
+          </button>
+        </ArkTreeView.BranchTrigger>
+      ) : (
+        <span aria-hidden="true" className={styles.branchControl}>
+          <span className={styles.branchIndicator}>
+            <BulletIcon />
+          </span>
+        </span>
+      )}
+
+      {children.length > 0 ? (
+        <ArkTreeView.BranchControl asChild role="link">
+          {link}
+        </ArkTreeView.BranchControl>
+      ) : (
+        <ArkTreeView.Item asChild>{link}</ArkTreeView.Item>
+      )}
+
+      {actions && (
+        // oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- Delegate child control events without letting them reach the tree's keyboard or drag handlers.
+        <div
+          role="group"
+          aria-label={`${getLabel(node)} actions`}
+          className={styles.actions}
+          inert={!!keyboardMove.sourceId}
+          onPointerDown={(event) => event.stopPropagation()}
+          onMouseDown={(event) => event.stopPropagation()}
+          onTouchStart={(event) => event.stopPropagation()}
+          onKeyDown={(event) => {
+            event.stopPropagation();
+            if (
+              event.key === "Escape" &&
+              !event.defaultPrevented &&
+              event.currentTarget.contains(event.target as Node)
+            ) {
+              event.preventDefault();
+              linkRef.current?.focus();
+            }
+          }}
+        >
+          {actions}
+        </div>
+      )}
+      {moveEnabled && (
+        <Tooltip
+          open={
+            keyboardMove.hintId === nodeId && focused && !keyboardMove.sourceId
+          }
+          positioning={{
+            placement: "right-start",
+            gutter: 12,
+            getAnchorRect: () =>
+              linkRef.current?.parentElement?.getBoundingClientRect() ?? null,
+          }}
+          content={
+            <span>Move or reorder: Alt+Shift+M (Option+Shift+M on Mac)</span>
+          }
+          contentProps={{
+            _open: { animation: "[none]" },
+            _closed: { display: "none" },
+          }}
+        >
+          <span aria-hidden="true" className={styles.instructions} />
+        </Tooltip>
+      )}
+    </div>
+  );
+
   return (
     <ArkTreeView.NodeProvider node={node} indexPath={indexPath}>
       <DragTreeDropIndicator
         active={showTopDivider}
         context={context}
         direction="above"
-        disabled={invalidTarget}
+        disabled={invalidTarget || !!keyboardMove.sourceId}
         drag={drag}
         nodeId={nodeId}
         styles={styles}
@@ -377,76 +562,7 @@ function DragTreeNode<TNode>({
         aria-labelledby={children.length > 0 ? nodeState.id : undefined}
         style={{ "--depth": depth } as CSSProperties}
       >
-        <div
-          {...pointerListeners}
-          ref={setDraggableNodeRef}
-          className={cx("group", styles.row)}
-          data-drag-over={isDraggingOver}
-          data-selected={selected}
-          data-depth={depth}
-          style={{
-            opacity: isDragging ? 0.5 : 1,
-            pointerEvents: isDragging ? "none" : undefined,
-            transform: CSS.Translate.toString(transform),
-          }}
-        >
-          {children.length > 0 ? (
-            <ArkTreeView.BranchTrigger
-              asChild
-              aria-expanded={expanded}
-              className={styles.branchControl}
-              tabIndex={-1}
-              onPointerDown={(event) => event.stopPropagation()}
-              onMouseDown={(event) => event.stopPropagation()}
-              onTouchStart={(event) => event.stopPropagation()}
-            >
-              <button type="button" aria-label={`Toggle ${getLabel(node)}`}>
-                <ArkTreeView.BranchIndicator className={styles.branchIndicator}>
-                  <ChevronRightIcon />
-                </ArkTreeView.BranchIndicator>
-              </button>
-            </ArkTreeView.BranchTrigger>
-          ) : (
-            <span aria-hidden="true" className={styles.branchControl}>
-              <span className={styles.branchIndicator}>
-                <BulletIcon />
-              </span>
-            </span>
-          )}
-
-          {children.length > 0 ? (
-            <ArkTreeView.BranchControl asChild role="link">
-              {link}
-            </ArkTreeView.BranchControl>
-          ) : (
-            <ArkTreeView.Item asChild>{link}</ArkTreeView.Item>
-          )}
-
-          {actions && (
-            // oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- Delegate child control events without letting them reach the tree's keyboard or drag handlers.
-            <div
-              role="group"
-              aria-label={`${getLabel(node)} actions`}
-              className={styles.actions}
-              onPointerDown={(event) => event.stopPropagation()}
-              onMouseDown={(event) => event.stopPropagation()}
-              onTouchStart={(event) => event.stopPropagation()}
-              onKeyDown={(event) => {
-                event.stopPropagation();
-                if (
-                  event.key === "Escape" &&
-                  !event.defaultPrevented &&
-                  event.currentTarget.contains(event.target as Node)
-                ) {
-                  event.preventDefault();
-                  linkRef.current?.focus();
-                }
-              }}
-            >
-              {actions}
-            </div>
-          )}
-        </div>
+        {row}
 
         {children.length > 0 && (
           <ArkTreeView.BranchContent className={styles.branchContent}>
@@ -464,6 +580,8 @@ function DragTreeNode<TNode>({
                 getId={getId}
                 getLabel={getLabel}
                 drag={drag}
+                keyboardMove={keyboardMove}
+                moveEnabled={moveEnabled}
                 getLabelClassName={getLabelClassName}
                 handleExpandNode={handleExpandNode}
                 isSelected={isSelected}
@@ -475,12 +593,12 @@ function DragTreeNode<TNode>({
         )}
       </Branch>
 
-      {(position === "bottom" || position === "only") && (
+      {(position === "bottom" || position === "only" || showBottomDivider) && (
         <DragTreeDropIndicator
           active={showBottomDivider}
           context={context}
           direction="below"
-          disabled={invalidTarget}
+          disabled={invalidTarget || !!keyboardMove.sourceId}
           drag={drag}
           nodeId={nodeId}
           styles={styles}

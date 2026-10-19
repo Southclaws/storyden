@@ -144,12 +144,31 @@ export function CategoryListTree({
               parentID: parent?.id ?? null,
             }) satisfies DragItemCategoryDivider,
         }}
-        renderActions={({ node, tabIndex }) =>
+        move={{
+          onMove: async ({ node, target, parent, placement }) => {
+            const params: CategoryUpdatePositionBody =
+              placement === "inside"
+                ? { parent: target.id }
+                : {
+                    parent: parent?.id ?? null,
+                    ...(placement === "above"
+                      ? { before: target.id }
+                      : { after: target.id }),
+                  };
+            const response = await categoryUpdatePosition(node.slug, params);
+            await mutate(response, { revalidate: false });
+          },
+          onSettled: async () => {
+            await mutate();
+          },
+        }}
+        renderActions={({ node, tabIndex, startMove }) =>
           canManageCategories ? (
             <CategoryMenu
               category={node}
               initialSession={initialSession}
               triggerProps={{ variant: "plain", tabIndex }}
+              onMove={startMove}
             />
           ) : null
         }

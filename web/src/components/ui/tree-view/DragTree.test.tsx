@@ -1,10 +1,16 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import * as Menu from "../menu";
 
-import { DragTree, isDragTreeDescendant } from ".";
+import { DragTree, type DragTreeMove, isDragTreeDescendant } from ".";
 
 type Node = {
   id: string;
@@ -73,7 +79,13 @@ beforeEach(() => {
   dnd.onKeyDown.mockClear();
 });
 
-type FixtureOptions = { editable?: boolean; menuActions?: boolean };
+type FixtureOptions = {
+  treeNodes?: Node[];
+  editable?: boolean;
+  menuActions?: boolean;
+  onMove?: (move: DragTreeMove<Node>) => Promise<void>;
+  onSettled?: () => Promise<void>;
+};
 
 function renderTree(options?: FixtureOptions) {
   return render(<TreeFixture {...options} />);
@@ -84,12 +96,17 @@ function TreeFixture(options: FixtureOptions) {
     <DragTree
       id="documentation"
       label="Documentation"
-      nodes={nodes}
+      nodes={options.treeNodes ?? nodes}
       getId={getId}
       getLabel={getLabel}
       getHref={getHref}
       getChildren={getChildren}
       defaultExpandedIds={["root", "guides"]}
+      move={
+        options.onMove
+          ? { onMove: options.onMove, onSettled: options.onSettled }
+          : undefined
+      }
       isSelected={(node) => node.id === "start"}
       drag={
         options?.editable
@@ -109,9 +126,13 @@ function TreeFixture(options: FixtureOptions) {
             }
           : undefined
       }
-      renderActions={({ node, tabIndex }) =>
+      renderActions={({ node, tabIndex, startMove }) =>
         options.menuActions ? (
-          <Menu.Root>
+          <Menu.Root
+            onSelect={({ value }) => {
+              if (value === "move") startMove?.();
+            }}
+          >
             <Menu.Trigger asChild>
               <button type="button" tabIndex={tabIndex}>
                 Manage {node.label}
@@ -121,6 +142,9 @@ function TreeFixture(options: FixtureOptions) {
               <Menu.Positioner>
                 <Menu.Content>
                   <Menu.Item value="inspect">Inspect</Menu.Item>
+                  {startMove && (
+                    <Menu.Item value="move">Move or reorder…</Menu.Item>
+                  )}
                 </Menu.Content>
               </Menu.Positioner>
             </Portal>
@@ -136,6 +160,197 @@ function TreeFixture(options: FixtureOptions) {
 }
 
 describe("DragTree", () => {
+  test.each([
+    { spaces: 0, placement: "inside", parent: "root" },
+    { spaces: 1, placement: "below", parent: null },
+    { spaces: 2, placement: "above", parent: null },
+  ])(
+    "keyboard placement $placement preserves the source and uses the target parent",
+    async ({ spaces, placement, parent }) => {
+      const onMove = vi.fn(async () => {});
+      const onSettled = vi.fn(async () => {});
+      const user = userEvent.setup();
+      renderTree({ editable: true, onMove, onSettled });
+      const source = screen.getByRole("treeitem", { name: "About" });
+      source.focus();
+      fireEvent.keyDown(source, {
+        key: "M",
+        code: "KeyM",
+        altKey: true,
+        shiftKey: true,
+      });
+      await waitFor(() =>
+        expect(screen.getByRole("status")).toHaveTextContent("Carrying About"),
+      );
+      await user.keyboard("{Home}");
+      for (let n = 0; n < spaces; n++) await user.keyboard(" ");
+      expect(onMove).not.toHaveBeenCalled();
+      expect(source).toHaveAttribute("href", "/docs/about");
+      await user.keyboard("{Enter}");
+      await waitFor(() => expect(onMove).toHaveBeenCalledTimes(1));
+      expect(onMove).toHaveBeenCalledWith({
+        node: nodes[1],
+        oldParent: null,
+        target: nodes[0],
+        parent: parent ? nodes[0] : null,
+        placement,
+      });
+      await waitFor(() =>
+        expect(screen.getByRole("status")).toHaveTextContent("Moved About"),
+      );
+      expect(onSettled).toHaveBeenCalledTimes(1);
+      await waitFor(() => expect(source).toHaveFocus());
+    },
+  );
+
+  test("a carried branch cannot be placed in itself or any descendant, and Escape restores focus", async () => {
+    const onMove = vi.fn(async () => {});
+    const user = userEvent.setup();
+    renderTree({ editable: true, onMove });
+    const source = screen.getByRole("link", { name: "Guides" });
+    source.focus();
+    fireEvent.keyDown(source, {
+      key: "M",
+      code: "KeyM",
+      altKey: true,
+      shiftKey: true,
+    });
+    await user.keyboard("{Enter}{ArrowRight}{Enter} {Enter}{Escape}");
+    expect(onMove).not.toHaveBeenCalled();
+    await waitFor(() => expect(source).toHaveFocus());
+    expect(screen.getByRole("status")).toHaveTextContent("Move cancelled");
+    expect(
+      screen.getByRole("treeitem", { name: "Getting started" }),
+    ).toBeVisible();
+  });
+
+  test("a failed move is announced and can be retried without losing the carried node", async () => {
+    const onMove = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("Offline"))
+      .mockResolvedValueOnce(undefined);
+    const onSettled = vi.fn(async () => {});
+    const user = userEvent.setup();
+    renderTree({ editable: true, onMove, onSettled });
+    const source = screen.getByRole("treeitem", { name: "About" });
+    source.focus();
+    fireEvent.keyDown(source, {
+      key: "M",
+      code: "KeyM",
+      altKey: true,
+      shiftKey: true,
+    });
+    await user.keyboard("{Home}{Enter}");
+    await waitFor(() =>
+      expect(screen.getByRole("alert")).toHaveTextContent("Could not move"),
+    );
+    expect(screen.getByRole("status")).toHaveTextContent("Carrying About");
+    expect(screen.getByRole("link", { name: "Documentation" })).toHaveFocus();
+    await user.keyboard("{Enter}");
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent("Moved About"),
+    );
+    expect(onMove).toHaveBeenCalledTimes(2);
+    expect(onSettled).toHaveBeenCalledTimes(2);
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  test("pending placement ignores repeated confirmation and cancellation", async () => {
+    let resolveMove!: () => void;
+    const onMove = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveMove = resolve;
+        }),
+    );
+    const user = userEvent.setup();
+    renderTree({ editable: true, onMove });
+    const source = screen.getByRole("treeitem", { name: "About" });
+    source.focus();
+    fireEvent.keyDown(source, {
+      key: "M",
+      code: "KeyM",
+      altKey: true,
+      shiftKey: true,
+    });
+    await user.keyboard("{Home}{Enter}{Enter}{Escape}");
+    expect(onMove).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("status")).toHaveTextContent("Placing the node");
+    resolveMove();
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent("Moved About"),
+    );
+  });
+
+  test("focus falls back to a visible destination when it hides the moved child", async () => {
+    const onMove = vi.fn(async () => {
+      view.rerender(
+        <TreeFixture
+          editable
+          onMove={onMove}
+          treeNodes={[{ id: "root", label: "Documentation", children: [] }]}
+        />,
+      );
+    });
+    const view = renderTree({ editable: true, onMove });
+    const user = userEvent.setup();
+    const source = screen.getByRole("treeitem", { name: "About" });
+    source.focus();
+    fireEvent.keyDown(source, {
+      key: "M",
+      code: "KeyM",
+      altKey: true,
+      shiftKey: true,
+    });
+    await user.keyboard("{Home}{Enter}");
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "Moved About inside Documentation",
+      ),
+    );
+    await waitFor(() =>
+      expect(
+        screen.getByRole("treeitem", { name: "Documentation" }),
+      ).toHaveFocus(),
+    );
+    expect(
+      screen.queryByRole("treeitem", { name: "About" }),
+    ).not.toBeInTheDocument();
+  });
+
+  test("Tab cancels a move without trapping keyboard navigation", async () => {
+    const onMove = vi.fn(async () => {});
+    const user = userEvent.setup();
+    renderTree({ editable: true, onMove });
+    const source = screen.getByRole("treeitem", { name: "About" });
+    source.focus();
+    fireEvent.keyDown(source, {
+      key: "M",
+      code: "KeyM",
+      altKey: true,
+      shiftKey: true,
+    });
+    await user.keyboard("{Home}{Tab}");
+    expect(onMove).not.toHaveBeenCalled();
+    expect(screen.getByRole("status")).toHaveTextContent("Move cancelled");
+    expect(source).not.toHaveFocus();
+  });
+
+  test("the modified shortcut is unavailable to read-only users", async () => {
+    const onMove = vi.fn(async () => {});
+    renderTree({ onMove });
+    const source = screen.getByRole("treeitem", { name: "About" });
+    source.focus();
+    fireEvent.keyDown(source, {
+      key: "M",
+      code: "KeyM",
+      altKey: true,
+      shiftKey: true,
+    });
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
+    expect(source).not.toHaveAttribute("aria-keyshortcuts");
+    expect(onMove).not.toHaveBeenCalled();
+  });
   test("renders nested links, expansion, selection, and actions", async () => {
     const { container, rerender } = renderTree();
 
@@ -306,6 +521,38 @@ describe("DragTree", () => {
     expect(screen.getByRole("button", { name: "Manage About" })).toHaveFocus();
   });
 
+  test("Shift+Tab out of the tree dismisses its keyboard shortcut hint", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <button type="button">Before navigation</button>
+        <TreeFixture editable onMove={vi.fn(async () => {})} />
+      </>,
+    );
+    const before = screen.getByRole("button", { name: "Before navigation" });
+    await user.tab();
+    await user.tab();
+    await user.keyboard("{Shift}");
+    expect(
+      screen.getByRole("treeitem", { name: "Getting started" }),
+    ).toHaveFocus();
+    expect(await screen.findByRole("tooltip")).toBeVisible();
+
+    await user.tab({ shift: true });
+    expect(before).toHaveFocus();
+    await waitFor(() =>
+      expect(screen.queryByRole("tooltip")).not.toBeInTheDocument(),
+    );
+
+    // Leaving before the discovery delay must also cancel the pending hint.
+    await user.tab();
+    await user.keyboard("{Shift}");
+    await user.tab({ shift: true });
+    await new Promise((resolve) => setTimeout(resolve, 700));
+    expect(before).toHaveFocus();
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+  });
+
   test("Enter activates the native branch link without collapsing its children", async () => {
     const user = userEvent.setup();
     renderTree();
@@ -323,10 +570,17 @@ describe("DragTree", () => {
 
   test("Escape closes a portalled row menu before returning from its trigger to the tree", async () => {
     const user = userEvent.setup();
-    renderTree({ menuActions: true });
+    renderTree({
+      menuActions: true,
+      editable: true,
+      onMove: vi.fn(async () => {}),
+    });
     const node = screen.getByRole("treeitem", { name: "Getting started" });
     await user.tab();
     expect(node).toHaveFocus();
+    expect(await screen.findByRole("tooltip")).toHaveTextContent(
+      "Move or reorder",
+    );
     await user.tab();
     const trigger = screen.getByRole("button", {
       name: "Manage Getting started",
@@ -334,7 +588,19 @@ describe("DragTree", () => {
     expect(trigger).toHaveFocus();
     await user.keyboard("{Enter}");
     await waitFor(() => expect(screen.getByRole("menu")).toBeVisible());
+    await waitFor(() => expect(screen.getByRole("menu")).toHaveFocus());
+    // Arrow navigation queues a focus task. Escape must invalidate it before
+    // that frame runs, otherwise it steals focus back into the closing menu.
+    const frames: FrameRequestCallback[] = [];
+    const requestFrame = vi
+      .spyOn(window, "requestAnimationFrame")
+      .mockImplementation((callback) => frames.push(callback));
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "ArrowDown" });
     await user.keyboard("{Escape}");
+    await waitFor(() => expect(trigger).toHaveFocus());
+    requestFrame.mockRestore();
+    expect(frames.length).toBeGreaterThan(0);
+    act(() => frames.forEach((callback) => callback(performance.now())));
     await waitFor(() =>
       expect(screen.queryByRole("menu")).not.toBeInTheDocument(),
     );

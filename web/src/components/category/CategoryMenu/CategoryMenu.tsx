@@ -19,6 +19,7 @@ type Props = {
   category: Category;
   initialSession?: Account;
   triggerProps?: ButtonProps;
+  onMove?: () => void;
 };
 
 export function useCategoryMenu({ category, initialSession }: Props) {
@@ -78,10 +79,14 @@ export function CategoryMenu(props: Props) {
   const { isSharingEnabled, isEditingEnabled, handlers } =
     useCategoryMenu(props);
 
-  const { category, triggerProps } = props;
+  const { category, triggerProps, onMove } = props;
 
   return (
-    <Menu.Root onSelect={handlers.handleSelect}>
+    <Menu.Root
+      onSelect={(details) =>
+        details.value === "move" ? onMove?.() : handlers.handleSelect(details)
+      }
+    >
       <Menu.Trigger asChild>
         <MoreAction
           aria-label={`Category options for ${category.name}`}
@@ -117,6 +122,9 @@ export function CategoryMenu(props: Props) {
                 <Menu.Separator />
 
                 <Menu.ItemGroup id="manage">
+                  {onMove && (
+                    <Menu.Item value="move">Move or reorder…</Menu.Item>
+                  )}
                   <CategoryCreateMenuItem parentCategory={category} />
                   <CategoryEditMenuItem {...category} />
                   <CategoryDeleteMenuItem {...category} />

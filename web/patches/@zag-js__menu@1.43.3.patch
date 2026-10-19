@@ -1,0 +1,30 @@
+diff --git a/dist/menu.machine.js b/dist/menu.machine.js
+index f35618ace4d14616c45ea4d874c167fb8b9ca721..9c384efecf0d97f054af320f8158231d0e4711a5 100644
+--- a/dist/menu.machine.js
++++ b/dist/menu.machine.js
+@@ -762,8 +762,9 @@ var machine = (0, import_core.createMachine)({
+       clearHighlightedItem({ context }) {
+         context.set("highlightedValue", null);
+       },
+-      focusMenu({ scope }) {
++      focusMenu({ scope, state }) {
+         (0, import_dom_query.raf)(() => {
++          if (!state.hasTag("open")) return;
+           const contentEl = dom.getContentEl(scope);
+           const initialFocusEl = (0, import_dom_query.getInitialFocus)({
+             root: contentEl,
+diff --git a/dist/menu.machine.mjs b/dist/menu.machine.mjs
+index b8facff3003d0f0d72352b323352956a7e898853..a4fb3c2e5a14766496fe4b3356cef21d2b0e7d04 100644
+--- a/dist/menu.machine.mjs
++++ b/dist/menu.machine.mjs
+@@ -747,8 +747,9 @@ var machine = createMachine({
+       clearHighlightedItem({ context }) {
+         context.set("highlightedValue", null);
+       },
+-      focusMenu({ scope }) {
++      focusMenu({ scope, state }) {
+         raf(() => {
++          if (!state.hasTag("open")) return;
+           const contentEl = dom.getContentEl(scope);
+           const initialFocusEl = getInitialFocus({
+             root: contentEl,
