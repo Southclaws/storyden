@@ -10,10 +10,14 @@ export function LikeAction(props: Props) {
     <IconButton
       variant="subtle"
       aria-pressed={liked}
-      aria-label={liked ? "Unlike" : "Like"}
+      aria-label="Like"
       {...rest}
     >
-      {liked ? <LikeSavedIcon /> : <LikeIcon />}
+      {liked ? (
+        <LikeSavedIcon aria-hidden="true" />
+      ) : (
+        <LikeIcon aria-hidden="true" />
+      )}
     </IconButton>
   );
 }
