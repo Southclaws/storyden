@@ -64,7 +64,13 @@ for (const mode of ["richtext", "markdown"] as const) {
       await expect(
         plain.locator("h1").filter({ hasText: `Reading fixture ${seed}` }),
       ).toHaveCount(1);
-      await expect(plain.locator("h2")).toHaveText("Field notes");
+      await expect(
+        plain.getByRole("heading", {
+          name: "Field notes",
+          exact: true,
+          includeHidden: true,
+        }),
+      ).toHaveText("Field notes");
       await expect(plain.locator("strong")).toHaveText("Bold note");
       await expect(
         plain.locator('a[href="https://example.com/guide"]'),

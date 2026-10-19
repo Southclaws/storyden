@@ -163,7 +163,9 @@ test.describe("Thread Replies", () => {
 
     await expect(page.getByText("Replying to")).toBeVisible();
 
-    await page.getByRole("button", { name: "Clear reply-to" }).click();
+    await page
+      .getByRole("button", { name: "Clear reply-to", exact: true })
+      .click();
 
     await expect(page.getByText("Replying to")).not.toBeVisible();
   });
@@ -352,7 +354,7 @@ test.describe("Thread Editing", () => {
     await page.keyboard.press("Meta+a");
     await page.keyboard.type("This change should be discarded");
 
-    await page.getByRole("button", { name: "Discard" }).click();
+    await page.getByRole("button", { name: "Discard", exact: true }).click();
 
     await expect(
       page.getByRole("heading", { name: "Thread to Not Edit" }),
@@ -424,7 +426,10 @@ test.describe("Reply Editing", () => {
     await expect(editMenuItem).toBeVisible({ timeout: 5000 });
     await editMenuItem.click();
 
-    const discardButton = page.getByRole("button", { name: "Discard" });
+    const discardButton = page.getByRole("button", {
+      name: "Discard",
+      exact: true,
+    });
     await expect(discardButton).toBeVisible({ timeout: 10000 });
 
     const replyEditor = page
