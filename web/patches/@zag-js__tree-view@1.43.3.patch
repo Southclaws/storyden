@@ -1,0 +1,26 @@
+diff --git a/dist/tree-view.connect.js b/dist/tree-view.connect.js
+index 925b0d44b7205aad5b5251f4369ddb5f6baa1e12..60b0a06cfb8c80e5310eddce0ac92c13d621c7e3 100644
+--- a/dist/tree-view.connect.js
++++ b/dist/tree-view.connect.js
+@@ -254,7 +254,7 @@ function connect(service, normalize) {
+             }
+           };
+           const key = (0, import_dom_query.getEventKey)(event, { dir: prop("dir") });
+-          const exec = keyMap[key];
++          const exec = key === "a" && !event.metaKey ? undefined : keyMap[key];
+           if (exec) {
+             exec(event);
+             return;
+diff --git a/dist/tree-view.connect.mjs b/dist/tree-view.connect.mjs
+index 413d7e5a09655e342cc8a887da9cd32541db0ba4..486c91554f17b97267af7b06b13d550741cb4dd3 100644
+--- a/dist/tree-view.connect.mjs
++++ b/dist/tree-view.connect.mjs
+@@ -231,7 +231,7 @@ function connect(service, normalize) {
+             }
+           };
+           const key = getEventKey(event, { dir: prop("dir") });
+-          const exec = keyMap[key];
++          const exec = key === "a" && !event.metaKey ? undefined : keyMap[key];
+           if (exec) {
+             exec(event);
+             return;

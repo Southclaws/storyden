@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@zag-js/tree-view@1.43.3': 606a6f00785b4a2fcef860f00fdd43e1a410101b61e3d586cf790b15f1e9a05c
+
 importers:
 
   .:
@@ -5110,7 +5113,7 @@ snapshots:
       '@zag-js/toggle-group': 1.43.3
       '@zag-js/tooltip': 1.43.3
       '@zag-js/tour': 1.43.3
-      '@zag-js/tree-view': 1.43.3
+      '@zag-js/tree-view': 1.43.3(patch_hash=606a6f00785b4a2fcef860f00fdd43e1a410101b61e3d586cf790b15f1e9a05c)
       '@zag-js/types': 1.43.3
       '@zag-js/utils': 1.43.3
       react: 19.3.0
@@ -7729,7 +7732,7 @@ snapshots:
       '@zag-js/types': 1.43.3
       '@zag-js/utils': 1.43.3
 
-  '@zag-js/tree-view@1.43.3':
+  '@zag-js/tree-view@1.43.3(patch_hash=606a6f00785b4a2fcef860f00fdd43e1a410101b61e3d586cf790b15f1e9a05c)':
     dependencies:
       '@zag-js/anatomy': 1.43.3
       '@zag-js/collection': 1.43.3

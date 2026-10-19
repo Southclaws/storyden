@@ -7,3 +7,6 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
   "@parcel/watcher": true
+patchedDependencies:
+  # Keep plain "a" available for tree typeahead; covered by DragTree.test.tsx.
+  '@zag-js/tree-view@1.43.3': patches/@zag-js__tree-view@1.43.3.patch

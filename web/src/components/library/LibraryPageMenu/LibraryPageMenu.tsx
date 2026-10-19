@@ -76,7 +76,13 @@ export function LibraryPageMenu({
       onInteractOutside={onInteractOutside}
     >
       <Menu.Trigger asChild>
-        {children ?? <MoreAction variant="subtle" {...props} />}
+        {children ?? (
+          <MoreAction
+            variant="subtle"
+            aria-label={`Page options for ${node.name}`}
+            {...props}
+          />
+        )}
       </Menu.Trigger>
 
       <Portal>

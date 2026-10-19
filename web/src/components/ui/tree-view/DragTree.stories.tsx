@@ -72,12 +72,16 @@ function DragTreeStoryContext({ children }: { children: ReactNode }) {
 
 const meta = {
   title: "Components/Navigation/Drag Tree",
+  args: { variant: "clamped" as const },
+  argTypes: {
+    variant: { control: "select", options: ["clamped", "scrollable"] },
+  },
   parameters: {
     layout: "centered",
     docs: {
       description: {
         component:
-          "The draggable hierarchy used for Library and discussion navigation. Rows and drop indicators share the app's drag context; nested branches retain independent disclosure and link controls. Callers provide domain data, persistence, links, actions, and a route-agnostic selected matcher. Links navigate on activation without prefetching the hierarchy's destinations. Use Tree View when the hierarchy is read-only.",
+          "The draggable navigation hierarchy used for Library pages and discussion categories. Ark owns focus, hierarchy, and typeahead: Up/Down move between visible nodes; Right opens a branch or enters its first child; Left closes a branch or returns to its parent; Home/End jump to the first/last visible node. Typing a title prefix moves focus without navigating. Enter opens the focused destination. Clicking a title preserves branch expansion; the chevron toggles it separately. Tab reaches only the focused row's actions; Escape from those actions returns to its destination. Action renderers must forward the supplied tabIndex to each control, including menu triggers. The current destination uses aria-current=page. dnd-kit owns pointer dragging; its keyboard activator is excluded so tree navigation cannot start a drag. Callers provide domain data, persistence, links, actions, and a route-agnostic selected matcher. Links do not prefetch the hierarchy's destinations. Use Tree View's visual recipe for a static hierarchy without navigation or editing controls. Use the variant control to compare clamped and scrollable layouts.",
       },
     },
   },
@@ -88,16 +92,17 @@ const meta = {
       </styled.div>
     ),
   ],
-} satisfies Meta;
+} satisfies Meta<{ variant: "clamped" | "scrollable" }>;
 
 export default meta;
 
 type Story = StoryObj<typeof meta>;
 
 export const Nested: Story = {
-  render: () => (
+  render: (args) => (
     <DragTreeStoryContext>
       <DragTree
+        variant={args.variant}
         id="story-nested"
         label="Documentation"
         nodes={demoNodes}
@@ -113,9 +118,10 @@ export const Nested: Story = {
 };
 
 export const Editable: Story = {
-  render: () => (
+  render: (args) => (
     <DragTreeStoryContext>
       <DragTree
+        variant={args.variant}
         id="story-editable"
         label="Documentation"
         nodes={demoNodes}
@@ -124,6 +130,7 @@ export const Editable: Story = {
         getHref={getHref}
         getChildren={getChildren}
         defaultExpandedIds={["documentation", "guides", "community"]}
+        isSelected={(node) => node.id === "theming"}
         drag={{
           enabled: true,
           getNodeData: ({ node, parent }) => ({
@@ -138,15 +145,17 @@ export const Editable: Story = {
             direction,
           }),
         }}
-        renderActions={({ node }) => (
+        renderActions={({ node, tabIndex }) => (
           <Fragment>
             <IconButton
+              tabIndex={tabIndex}
               aria-label={`Add child to ${node.label}`}
               variant="plain"
             >
               <AddIcon />
             </IconButton>
             <IconButton
+              tabIndex={tabIndex}
               aria-label={`Actions for ${node.label}`}
               variant="plain"
             >
@@ -157,12 +166,21 @@ export const Editable: Story = {
       />
     </DragTreeStoryContext>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Themes and appearance is the current page. Arrow to another node to compare its full-row focus outline with the current page's persistent background. Tab into the focused row's actions to see each button's own focus indicator.",
+      },
+    },
+  },
 };
 
 export const LongLabels: Story = {
-  render: () => (
+  render: (args) => (
     <DragTreeStoryContext>
       <DragTree
+        variant={args.variant}
         id="story-long-labels"
         label="Documentation"
         nodes={[

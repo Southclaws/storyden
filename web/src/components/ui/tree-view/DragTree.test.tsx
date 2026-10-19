@@ -1,6 +1,8 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+
+import * as Menu from "../menu";
 
 import { DragTree, isDragTreeDescendant } from ".";
 
@@ -71,11 +73,13 @@ beforeEach(() => {
   dnd.onKeyDown.mockClear();
 });
 
-function renderTree(options?: { editable?: boolean }) {
+type FixtureOptions = { editable?: boolean; menuActions?: boolean };
+
+function renderTree(options?: FixtureOptions) {
   return render(<TreeFixture {...options} />);
 }
 
-function TreeFixture(options: { editable?: boolean }) {
+function TreeFixture(options: FixtureOptions) {
   return (
     <DragTree
       id="documentation"
@@ -105,58 +109,76 @@ function TreeFixture(options: { editable?: boolean }) {
             }
           : undefined
       }
-      renderActions={({ node }) => (
-        <button type="button">Manage {node.label}</button>
-      )}
+      renderActions={({ node, tabIndex }) =>
+        options.menuActions ? (
+          <Menu.Root>
+            <Menu.Trigger asChild>
+              <button type="button" tabIndex={tabIndex}>
+                Manage {node.label}
+              </button>
+            </Menu.Trigger>
+            <Portal>
+              <Menu.Positioner>
+                <Menu.Content>
+                  <Menu.Item value="inspect">Inspect</Menu.Item>
+                </Menu.Content>
+              </Menu.Positioner>
+            </Portal>
+          </Menu.Root>
+        ) : (
+          <button type="button" tabIndex={tabIndex}>
+            Manage {node.label}
+          </button>
+        )
+      }
     />
   );
 }
 
 describe("DragTree", () => {
-  test("renders nested links, expansion, selection, and actions", () => {
+  test("renders nested links, expansion, selection, and actions", async () => {
     const { container, rerender } = renderTree();
 
     expect(screen.getByRole("link", { name: "Documentation" })).toHaveAttribute(
       "href",
       "/docs/root",
     );
-    const selectedLink = screen.getByRole("link", {
+    const selectedLink = screen.getByRole("treeitem", {
       name: "Getting started",
     });
     expect(selectedLink).toHaveAttribute("href", "/docs/start");
     expect(selectedLink).toHaveAttribute("aria-current", "page");
-    expect(screen.getByRole("link", { name: "About" })).not.toHaveAttribute(
+    expect(screen.getByRole("treeitem", { name: "About" })).not.toHaveAttribute(
       "aria-current",
     );
     expect(
       screen.getByRole("button", { name: "Manage Getting started" }),
     ).toBeVisible();
+    expect(screen.getByRole("tree", { name: "Documentation" })).toBeVisible();
     expect(
-      screen
-        .getByRole("link", { name: "Documentation" })
-        .closest('[role="treeitem"]'),
-    ).toHaveAttribute("aria-expanded", "true");
-    expect(selectedLink.closest('[role="treeitem"]')).toHaveAttribute(
-      "aria-selected",
-      "true",
-    );
+      screen.getByRole("treeitem", { name: "Documentation" }),
+    ).toHaveAccessibleName("Documentation");
+    expect(selectedLink).not.toHaveAttribute("aria-expanded");
+    const toggle = screen.getByRole("button", { name: "Toggle Documentation" });
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(
+      screen.getByRole("treeitem", { name: "Documentation" }),
+    ).toContainElement(selectedLink);
+    expect(
+      screen.queryByRole("button", { name: "Toggle Getting started" }),
+    ).not.toBeInTheDocument();
     expect(container.querySelector('[data-part="drop-indicator"]')).toBeNull();
 
     fireEvent.click(
       screen.getByRole("button", { name: "Toggle Documentation" }),
     );
-    expect(
-      screen
-        .getByRole("link", { name: "Documentation" })
-        .closest('[role="treeitem"]'),
-    ).toHaveAttribute("aria-expanded", "false");
+    await waitFor(() =>
+      expect(toggle).toHaveAttribute("aria-expanded", "false"),
+    );
+    await waitFor(() => expect(selectedLink).not.toBeVisible());
 
     rerender(<TreeFixture />);
-    expect(
-      screen
-        .getByRole("link", { name: "Documentation" })
-        .closest('[role="treeitem"]'),
-    ).toHaveAttribute("aria-expanded", "false");
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
   });
 
   test("keeps disclosure keyboard input separate from drag activation", async () => {
@@ -165,17 +187,160 @@ describe("DragTree", () => {
     const toggle = screen.getByRole("button", {
       name: "Toggle Documentation",
     });
-    const treeItem = screen
-      .getByRole("link", { name: "Documentation" })
-      .closest('[role="treeitem"]');
 
     toggle.focus();
     await user.keyboard("{Enter}");
 
-    expect(treeItem).toHaveAttribute("aria-expanded", "false");
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(toggle).toHaveFocus();
     await user.keyboard(" ");
-    expect(treeItem).toHaveAttribute("aria-expanded", "true");
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(toggle).toHaveFocus();
     expect(dnd.onKeyDown).not.toHaveBeenCalled();
+  });
+
+  test("uses Ark arrow navigation, branch expansion, parent navigation, Home and End", async () => {
+    const user = userEvent.setup();
+    renderTree({ editable: true });
+    const documentation = screen.getByRole("link", { name: "Documentation" });
+    const guides = screen.getByRole("link", { name: "Guides" });
+    const start = screen.getByRole("treeitem", { name: "Getting started" });
+    const about = screen.getByRole("treeitem", { name: "About" });
+    await user.tab();
+    expect(start).toHaveFocus();
+    await user.keyboard("{ArrowUp}");
+    expect(guides).toHaveFocus();
+    await user.keyboard("{ArrowLeft}");
+    expect(guides).toHaveAttribute("aria-expanded", "false");
+    await waitFor(() => expect(start).not.toBeVisible());
+    await user.keyboard("{ArrowLeft}");
+    expect(documentation).toHaveFocus();
+    await user.keyboard("{ArrowRight}");
+    expect(guides).toHaveFocus();
+    await user.keyboard("{ArrowRight}");
+    expect(guides).toHaveAttribute("aria-expanded", "true");
+    expect(guides).toHaveFocus();
+    await user.keyboard("{ArrowRight}");
+    expect(start).toHaveFocus();
+    await user.keyboard("{ArrowDown}");
+    expect(about).toHaveFocus();
+    await user.keyboard("{ArrowDown}");
+    expect(about).toHaveFocus();
+    await user.keyboard("{Home}");
+    expect(documentation).toHaveFocus();
+    await user.keyboard("{End}");
+    expect(about).toHaveFocus();
+    expect(dnd.onKeyDown).not.toHaveBeenCalled();
+  });
+
+  test("typeahead accepts lowercase a without navigating or changing the current page", async () => {
+    const user = userEvent.setup();
+    renderTree();
+    await user.tab();
+    await user.keyboard("abo");
+    expect(screen.getByRole("treeitem", { name: "About" })).toHaveFocus();
+    expect(
+      screen.getByRole("treeitem", { name: "Getting started" }),
+    ).toHaveAttribute("aria-current", "page");
+  });
+
+  test("typeahead skips descendants of a collapsed branch", async () => {
+    const user = userEvent.setup();
+    renderTree();
+    const documentation = screen.getByRole("link", { name: "Documentation" });
+    documentation.focus();
+    await user.keyboard("{ArrowLeft}");
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("link", { name: "Guides" }),
+      ).not.toBeInTheDocument(),
+    );
+    await user.keyboard("gui");
+    expect(documentation).toHaveFocus();
+  });
+
+  test("does not announce an empty tree when there are no destinations", () => {
+    render(
+      <DragTree
+        id="empty"
+        label="Documentation"
+        nodes={[]}
+        getId={getId}
+        getLabel={getLabel}
+        getHref={getHref}
+        getChildren={getChildren}
+      />,
+    );
+    expect(screen.queryByRole("tree")).not.toBeInTheDocument();
+  });
+
+  test("Tab reaches only the focused row's actions and Escape returns to the node", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <TreeFixture editable />
+        <button type="button">After navigation</button>
+      </>,
+    );
+    await user.tab();
+    const start = screen.getByRole("treeitem", { name: "Getting started" });
+    expect(start).toHaveFocus();
+    await user.tab();
+    const action = screen.getByRole("button", {
+      name: "Manage Getting started",
+    });
+    expect(action).toHaveFocus();
+    await user.keyboard("{ArrowUp}");
+    expect(action).toHaveFocus();
+    await user.keyboard("{Escape}");
+    expect(start).toHaveFocus();
+    await user.keyboard("{ArrowDown}");
+    expect(screen.getByRole("treeitem", { name: "About" })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Manage About" })).toHaveFocus();
+    await user.tab();
+    expect(
+      screen.getByRole("button", { name: "After navigation" }),
+    ).toHaveFocus();
+    await user.tab({ shift: true });
+    expect(screen.getByRole("button", { name: "Manage About" })).toHaveFocus();
+  });
+
+  test("Enter activates the native branch link without collapsing its children", async () => {
+    const user = userEvent.setup();
+    renderTree();
+    const link = screen.getByRole("link", { name: "Documentation" });
+    const navigate = vi.fn((event: Event) => event.preventDefault());
+    link.addEventListener("click", navigate);
+    link.focus();
+    await user.keyboard("{Enter}");
+    expect(navigate).toHaveBeenCalledOnce();
+    expect(link).toHaveAttribute("aria-expanded", "true");
+    expect(
+      screen.getByRole("treeitem", { name: "Getting started" }),
+    ).toBeVisible();
+  });
+
+  test("Escape closes a portalled row menu before returning from its trigger to the tree", async () => {
+    const user = userEvent.setup();
+    renderTree({ menuActions: true });
+    const node = screen.getByRole("treeitem", { name: "Getting started" });
+    await user.tab();
+    expect(node).toHaveFocus();
+    await user.tab();
+    const trigger = screen.getByRole("button", {
+      name: "Manage Getting started",
+    });
+    expect(trigger).toHaveFocus();
+    await user.keyboard("{Enter}");
+    await waitFor(() => expect(screen.getByRole("menu")).toBeVisible());
+    await user.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(screen.queryByRole("menu")).not.toBeInTheDocument(),
+    );
+    await waitFor(() => expect(trigger).toHaveFocus());
+    await user.keyboard("{Escape}");
+    expect(node).toHaveFocus();
   });
 
   test("preserves caller drag payloads and renders one divider per insertion point", () => {
@@ -253,3 +418,4 @@ describe("DragTree", () => {
     ).toBe(false);
   });
 });
+import { Portal } from "@ark-ui/react";

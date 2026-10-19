@@ -2,13 +2,14 @@
 
 import {
   TreeView as ArkTreeView,
-  type TreeViewExpandedChangeDetails,
   createTreeCollection,
+  useTreeViewContext,
 } from "@ark-ui/react/tree-view";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
 import {
+  type CSSProperties,
   Fragment,
   type ReactNode,
   useCallback,
@@ -36,6 +37,11 @@ type DragTreeDividerContext<TNode> = DragTreeNodeContext<TNode> & {
   direction: DragTreeDirection;
 };
 
+type DragTreeActionContext<TNode> = DragTreeNodeContext<TNode> & {
+  /** Only the focused node's actions belong in the Tab order. */
+  tabIndex: 0 | -1;
+};
+
 export type DragTreeDragConfig<TNode> = {
   enabled: boolean;
   getNodeData: (context: DragTreeNodeContext<TNode>) => object;
@@ -56,7 +62,7 @@ export type DragTreeProps<TNode> = DragTreeVariantProps & {
     context: DragTreeNodeContext<TNode>,
   ) => string | undefined;
   isSelected?: (node: TNode) => boolean;
-  renderActions?: (context: DragTreeNodeContext<TNode>) => ReactNode;
+  renderActions?: (context: DragTreeActionContext<TNode>) => ReactNode;
   renderBefore?: (
     context: DragTreeNodeContext<TNode> & {
       index: number;
@@ -96,25 +102,19 @@ export function DragTree<TNode>({
   const collection = useMemo(
     () =>
       createTreeCollection<TNode>({
-        nodeToValue: (node) => (node ? getId(node) : ""),
-        nodeToString: (node) => (node ? getLabel(node) : ""),
-        nodeToChildren: (node) => (node ? getChildren(node) : []),
+        nodeToValue: getId,
+        nodeToString: getLabel,
+        nodeToChildren: getChildren,
         rootNode: { children: nodes } as TNode,
       }),
     [getChildren, getId, getLabel, nodes],
   );
+  const selectedValue = collection.getValues().filter((value) => {
+    const node = collection.findNode(value);
+    return node && isSelected?.(node);
+  });
   const [expandedValue, setExpandedValue] = useState(defaultExpandedIds);
   const previousDefaultExpandedIds = useRef(defaultExpandedIds);
-  const selectedValue = useMemo(
-    () =>
-      findTreeNodeIds(
-        nodes,
-        getId,
-        getChildren,
-        (node) => isSelected?.(node) ?? false,
-      ),
-    [getChildren, getId, isSelected, nodes],
-  );
 
   useEffect(() => {
     if (arraysEqual(previousDefaultExpandedIds.current, defaultExpandedIds)) {
@@ -127,38 +127,29 @@ export function DragTree<TNode>({
     ]);
   }, [defaultExpandedIds]);
 
-  const handleExpandedChange = useCallback(
-    (details: TreeViewExpandedChangeDetails) => {
-      setExpandedValue(details.expandedValue);
-    },
-    [],
-  );
-
   const handleExpandNode = useCallback((nodeId: string) => {
     setExpandedValue((current) =>
       current.includes(nodeId) ? current : [...current, nodeId],
     );
   }, []);
 
-  const handleToggleNode = useCallback((nodeId: string) => {
-    setExpandedValue((current) =>
-      current.includes(nodeId)
-        ? current.filter((id) => id !== nodeId)
-        : [...current, nodeId],
-    );
-  }, []);
-
   const rootNodes = nodes;
+
+  if (nodes.length === 0) return null;
 
   return (
     <ArkTreeView.Root
       className={styles.root}
       collection={collection}
       expandedValue={expandedValue}
-      onExpandedChange={handleExpandedChange}
+      onExpandedChange={(details) => setExpandedValue(details.expandedValue)}
       selectedValue={selectedValue}
+      defaultFocusedValue={selectedValue[0] ?? (nodes[0] && getId(nodes[0]))}
+      expandOnClick={false}
     >
-      <ArkTreeView.Label className={styles.label}>{label}</ArkTreeView.Label>
+      <ArkTreeView.Label asChild className={styles.label}>
+        <p>{label}</p>
+      </ArkTreeView.Label>
       <ArkTreeView.Tree className={styles.tree}>
         {rootNodes.map((node, index) => {
           const context = {
@@ -168,10 +159,11 @@ export function DragTree<TNode>({
             index,
             siblings: rootNodes,
           };
+          const before = renderBefore?.(context);
 
           return (
             <Fragment key={getId(node)}>
-              {renderBefore?.(context)}
+              {before}
               <DragTreeNode
                 treeId={id}
                 allNodes={nodes}
@@ -186,7 +178,6 @@ export function DragTree<TNode>({
                 drag={drag}
                 getLabelClassName={getLabelClassName}
                 handleExpandNode={handleExpandNode}
-                handleToggleNode={handleToggleNode}
                 isSelected={isSelected}
                 renderActions={renderActions}
                 styles={styles}
@@ -215,9 +206,8 @@ type DragTreeNodeProps<TNode> = {
     context: DragTreeNodeContext<TNode>,
   ) => string | undefined;
   handleExpandNode: (id: string) => void;
-  handleToggleNode: (id: string) => void;
   isSelected?: (node: TNode) => boolean;
-  renderActions?: (context: DragTreeNodeContext<TNode>) => ReactNode;
+  renderActions?: (context: DragTreeActionContext<TNode>) => ReactNode;
   styles: ReturnType<typeof dragTree>;
 };
 
@@ -235,13 +225,16 @@ function DragTreeNode<TNode>({
   drag,
   getLabelClassName,
   handleExpandNode,
-  handleToggleNode,
   isSelected,
   renderActions,
   styles,
 }: DragTreeNodeProps<TNode>) {
   const nodeId = getId(node);
   const children = getChildren(node);
+  const linkRef = useRef<HTMLAnchorElement>(null);
+  const tree = useTreeViewContext();
+  const nodeState = tree.getNodeState({ node, indexPath });
+  const { expanded, focused, depth } = nodeState;
   const isRoot = parent === null;
   const context = { node, parent, isRoot };
   const nodeData = {
@@ -334,7 +327,7 @@ function DragTreeNode<TNode>({
     overMetadata.kind === "divider" &&
     overMetadata.nodeId === nodeId &&
     overMetadata.direction === "below";
-  const actions = renderActions?.(context);
+  const actions = renderActions?.({ ...context, tabIndex: focused ? 0 : -1 });
   const selected = isSelected?.(node) ?? false;
 
   function preventNavigationWhileDragging(event: React.SyntheticEvent) {
@@ -343,6 +336,26 @@ function DragTreeNode<TNode>({
       event.stopPropagation();
     }
   }
+
+  const Branch = children.length > 0 ? ArkTreeView.Branch : "div";
+  const link = (
+    <Link
+      ref={linkRef}
+      aria-current={selected ? "page" : undefined}
+      aria-expanded={children.length > 0 ? expanded : undefined}
+      className={cx(
+        styles.branchText,
+        styles.link,
+        getLabelClassName?.(context),
+      )}
+      href={getHref(node)}
+      prefetch={false}
+      onClick={preventNavigationWhileDragging}
+      onTouchStart={preventNavigationWhileDragging}
+    >
+      {getLabel(node)}
+    </Link>
+  );
 
   return (
     <ArkTreeView.NodeProvider node={node} indexPath={indexPath}>
@@ -357,10 +370,12 @@ function DragTreeNode<TNode>({
         treeId={treeId}
       />
 
-      <ArkTreeView.Branch
+      <Branch
         ref={setDroppableNodeRef}
         className={styles.branch}
         data-position={position}
+        aria-labelledby={children.length > 0 ? nodeState.id : undefined}
+        style={{ "--depth": depth } as CSSProperties}
       >
         <div
           {...pointerListeners}
@@ -368,6 +383,7 @@ function DragTreeNode<TNode>({
           className={cx("group", styles.row)}
           data-drag-over={isDraggingOver}
           data-selected={selected}
+          data-depth={depth}
           style={{
             opacity: isDragging ? 0.5 : 1,
             pointerEvents: isDragging ? "none" : undefined,
@@ -375,87 +391,89 @@ function DragTreeNode<TNode>({
           }}
         >
           {children.length > 0 ? (
-            <button
-              aria-label={`Toggle ${getLabel(node)}`}
+            <ArkTreeView.BranchTrigger
+              asChild
+              aria-expanded={expanded}
               className={styles.branchControl}
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                handleToggleNode(nodeId);
-              }}
-              onKeyDown={(event) => {
-                event.stopPropagation();
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  handleToggleNode(nodeId);
-                }
-              }}
+              tabIndex={-1}
               onPointerDown={(event) => event.stopPropagation()}
+              onMouseDown={(event) => event.stopPropagation()}
               onTouchStart={(event) => event.stopPropagation()}
             >
-              <ArkTreeView.BranchIndicator className={styles.branchIndicator}>
-                <ChevronRightIcon />
-              </ArkTreeView.BranchIndicator>
-            </button>
+              <button type="button" aria-label={`Toggle ${getLabel(node)}`}>
+                <ArkTreeView.BranchIndicator className={styles.branchIndicator}>
+                  <ChevronRightIcon />
+                </ArkTreeView.BranchIndicator>
+              </button>
+            </ArkTreeView.BranchTrigger>
           ) : (
             <span aria-hidden="true" className={styles.branchControl}>
-              <ArkTreeView.BranchIndicator className={styles.branchIndicator}>
+              <span className={styles.branchIndicator}>
                 <BulletIcon />
-              </ArkTreeView.BranchIndicator>
+              </span>
             </span>
           )}
 
-          <ArkTreeView.BranchText
-            asChild
-            className={cx(styles.branchText, getLabelClassName?.(context))}
-          >
-            <Link
-              aria-current={selected ? "page" : undefined}
-              className={styles.link}
-              href={getHref(node)}
-              prefetch={false}
-              onClick={preventNavigationWhileDragging}
-              onTouchStart={preventNavigationWhileDragging}
-            >
-              {getLabel(node)}
-            </Link>
-          </ArkTreeView.BranchText>
+          {children.length > 0 ? (
+            <ArkTreeView.BranchControl asChild role="link">
+              {link}
+            </ArkTreeView.BranchControl>
+          ) : (
+            <ArkTreeView.Item asChild>{link}</ArkTreeView.Item>
+          )}
 
           {actions && (
+            // oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- Delegate child control events without letting them reach the tree's keyboard or drag handlers.
             <div
+              role="group"
+              aria-label={`${getLabel(node)} actions`}
               className={styles.actions}
-              onKeyDown={(event) => event.stopPropagation()}
+              onPointerDown={(event) => event.stopPropagation()}
+              onMouseDown={(event) => event.stopPropagation()}
+              onTouchStart={(event) => event.stopPropagation()}
+              onKeyDown={(event) => {
+                event.stopPropagation();
+                if (
+                  event.key === "Escape" &&
+                  !event.defaultPrevented &&
+                  event.currentTarget.contains(event.target as Node)
+                ) {
+                  event.preventDefault();
+                  linkRef.current?.focus();
+                }
+              }}
             >
               {actions}
             </div>
           )}
         </div>
 
-        <ArkTreeView.BranchContent className={styles.branchContent}>
-          {children.map((child, index) => (
-            <DragTreeNode
-              key={getId(child)}
-              treeId={treeId}
-              allNodes={allNodes}
-              node={child}
-              parent={node}
-              indexPath={[...indexPath, index]}
-              position={getDragTreePosition(children.length, index)}
-              getChildren={getChildren}
-              getHref={getHref}
-              getId={getId}
-              getLabel={getLabel}
-              drag={drag}
-              getLabelClassName={getLabelClassName}
-              handleExpandNode={handleExpandNode}
-              handleToggleNode={handleToggleNode}
-              isSelected={isSelected}
-              renderActions={renderActions}
-              styles={styles}
-            />
-          ))}
-        </ArkTreeView.BranchContent>
-      </ArkTreeView.Branch>
+        {children.length > 0 && (
+          <ArkTreeView.BranchContent className={styles.branchContent}>
+            {children.map((child, index) => (
+              <DragTreeNode
+                key={getId(child)}
+                treeId={treeId}
+                allNodes={allNodes}
+                node={child}
+                parent={node}
+                indexPath={[...indexPath, index]}
+                position={getDragTreePosition(children.length, index)}
+                getChildren={getChildren}
+                getHref={getHref}
+                getId={getId}
+                getLabel={getLabel}
+                drag={drag}
+                getLabelClassName={getLabelClassName}
+                handleExpandNode={handleExpandNode}
+                isSelected={isSelected}
+                renderActions={renderActions}
+                styles={styles}
+              />
+            ))}
+          </ArkTreeView.BranchContent>
+        )}
+      </Branch>
 
       {(position === "bottom" || position === "only") && (
         <DragTreeDropIndicator
@@ -593,23 +611,6 @@ function findTreeNode<TNode>(
     }
   }
   return null;
-}
-
-function findTreeNodeIds<TNode>(
-  nodes: TNode[],
-  getId: (node: TNode) => string,
-  getChildren: (node: TNode) => TNode[],
-  predicate: (node: TNode) => boolean,
-): string[] {
-  const ids: string[] = [];
-  const visit = (node: TNode) => {
-    if (predicate(node)) {
-      ids.push(getId(node));
-    }
-    getChildren(node).forEach(visit);
-  };
-  nodes.forEach(visit);
-  return ids;
 }
 
 function arraysEqual(left: string[], right: string[]) {

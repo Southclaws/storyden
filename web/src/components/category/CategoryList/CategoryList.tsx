@@ -144,12 +144,12 @@ export function CategoryListTree({
               parentID: parent?.id ?? null,
             }) satisfies DragItemCategoryDivider,
         }}
-        renderActions={({ node }) =>
+        renderActions={({ node, tabIndex }) =>
           canManageCategories ? (
             <CategoryMenu
               category={node}
               initialSession={initialSession}
-              triggerProps={{ variant: "plain" }}
+              triggerProps={{ variant: "plain", tabIndex }}
             />
           ) : null
         }

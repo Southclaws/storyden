@@ -53,6 +53,11 @@ export const dragTree = defineSlotRecipe({
         outlineStyle: "dashed",
         outlineWidth: "thin",
       },
+      "&:has(> a:focus-visible)": {
+        outline: "2px solid",
+        outlineColor: "var(--sd-color-focus-ring, var(--colors-border-strong))",
+        outlineOffset: "-2px",
+      },
     },
     branchControl: {
       alignItems: "center",
@@ -63,7 +68,7 @@ export const dragTree = defineSlotRecipe({
       "&:is(button)": {
         cursor: "pointer",
         _after: {
-          content: '\"\"',
+          content: '""',
           height: "6",
           left: "50%",
           position: "absolute",
@@ -73,7 +78,7 @@ export const dragTree = defineSlotRecipe({
         },
         _focusVisible: {
           outline: "2px solid",
-          outlineColor: "border.default",
+          outlineColor: "text.default",
           outlineOffset: "2px",
         },
         _hover: {
@@ -82,6 +87,7 @@ export const dragTree = defineSlotRecipe({
       },
     },
     branchIndicator: {
+      display: "inline-flex",
       color: "text.subtle",
       transformOrigin: "center",
       transitionDuration: "normal",
@@ -176,6 +182,9 @@ export const dragTree = defineSlotRecipe({
       userSelect: "none",
       WebkitTouchCallout: "none",
       whiteSpace: "nowrap",
+      _focusVisible: {
+        outline: "none",
+      },
       _hover: {
         textDecoration: "none",
       },

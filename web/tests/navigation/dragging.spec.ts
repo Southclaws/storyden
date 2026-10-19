@@ -7,6 +7,129 @@ import {
   withAdminAccessKey,
 } from "../access_key_admin_assignment";
 
+test("library sidebar separates disclosure, destination, and page actions for keyboard users", async ({
+  page,
+}) => {
+  const seed = randomUUID().slice(0, 8);
+  const { parent, child, sibling } = await withAdminAccessKey(
+    async ({ nodeCreate }) => {
+      const parent = await nodeCreate({
+        name: `About the handbook ${seed}`,
+        visibility: "published",
+      });
+      const child = await nodeCreate({
+        name: `Getting started ${seed}`,
+        parent: parent.slug,
+        visibility: "published",
+      });
+      const sibling = await nodeCreate({
+        name: `Reference ${seed}`,
+        parent: parent.slug,
+        visibility: "published",
+      });
+      return { parent, child, sibling };
+    },
+  );
+  const admin = `tree-keyboard-${seed}`;
+  await createAdmin(page.context(), admin, "TestPassword123!");
+  await login(page, admin, "TestPassword123!");
+  await page.goto(`/l/${child.slug}`);
+
+  const navigation = page.getByRole("tree", { name: "Library pages" });
+  const toggle = navigation.getByRole("button", {
+    name: `Toggle ${parent.name}`,
+  });
+  const destination = navigation.getByRole("link", {
+    name: parent.name,
+    exact: true,
+  });
+  const childLink = navigation.getByRole("treeitem", {
+    name: child.name,
+    exact: true,
+  });
+  await expect(childLink).toHaveAttribute("aria-current", "page");
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  const siblingLink = navigation.getByRole("treeitem", {
+    name: sibling.name,
+    exact: true,
+  });
+  const currentRow = childLink.locator("..");
+  const parentRow = destination.locator("..");
+  const currentBackground = await currentRow.evaluate(
+    (element) => getComputedStyle(element).backgroundColor,
+  );
+  await page.evaluate(() =>
+    document.documentElement.style.setProperty(
+      "--sd-color-focus-ring",
+      "rgb(171, 137, 255)",
+    ),
+  );
+  await childLink.focus();
+  await page.keyboard.press("ArrowLeft");
+  await expect(destination).toBeFocused();
+  await expect(parentRow).toHaveCSS("outline-style", "solid");
+  await expect(parentRow).toHaveCSS("outline-width", "2px");
+  await expect(parentRow).toHaveCSS("outline-color", "rgb(171, 137, 255)");
+  await expect(destination).toHaveCSS("outline-style", "none");
+  await expect(currentRow).toHaveCSS("background-color", currentBackground);
+  await page.keyboard.press("ArrowLeft");
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(childLink).toBeHidden();
+  await expect(destination).toBeFocused();
+  await page.keyboard.press("ArrowRight");
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expect(destination).toBeFocused();
+  await page.keyboard.press("ArrowRight");
+  await expect(childLink).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  await expect(siblingLink).toBeFocused();
+  await page.keyboard.press("ArrowUp");
+  await expect(childLink).toBeFocused();
+  await page.keyboard.press("Home");
+  await expect(destination).toBeFocused();
+  await page.keyboard.press("End");
+  await expect(siblingLink).toBeFocused();
+  await page.keyboard.type("abo");
+  await expect(destination).toBeFocused();
+  await page.keyboard.press("ArrowRight");
+  await expect(childLink).toBeFocused();
+  await expect(childLink).toHaveAttribute("aria-current", "page");
+  await page.keyboard.press("Tab");
+  const create = navigation.getByRole("button", {
+    name: `Create page under ${child.name}`,
+  });
+  await expect(create).toBeFocused();
+  await expect(create).toBeVisible();
+  await expect(create).toHaveCSS("outline-style", "solid");
+  await expect(create).toHaveCSS("outline-width", "2px");
+  await expect(currentRow).toHaveCSS("outline-style", "none");
+  await expect(parentRow).toHaveCSS("outline-style", "none");
+  await expect(currentRow).toHaveCSS("background-color", currentBackground);
+  await page.keyboard.press("Tab");
+  const options = navigation.getByRole("button", {
+    name: `Page options for ${child.name}`,
+  });
+  await expect(options).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("menu")).toBeVisible();
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByRole("menu")).toBeFocused();
+  await expect(page.getByRole("menu")).toHaveAttribute(
+    "aria-activedescendant",
+    /.+/,
+  );
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("menu")).toBeHidden();
+  await expect(options).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(childLink).toBeFocused();
+  await destination.focus();
+  await page.keyboard.press("Enter");
+  await page.waitForURL(`/l/${parent.slug}`);
+  await expect(destination).toHaveAttribute("aria-current", "page");
+  await expect(childLink).toBeVisible();
+});
+
 test("sidebar category and Library drags preserve nesting and disclosure", async ({
   page,
 }) => {
@@ -61,8 +184,8 @@ test("sidebar category and Library drags preserve nesting and disclosure", async
     },
   ]) {
     const tree = page.getByRole("tree", { name: item.tree });
-    const source = tree.getByRole("link", { name: item.source, exact: true });
-    const target = tree.getByRole("link", { name: item.target, exact: true });
+    const source = tree.locator("a").filter({ hasText: item.source });
+    const target = tree.locator("a").filter({ hasText: item.target });
     // Keep the drop target away from the auto-scroll edge so it does not move
     // out from under the measured mouse coordinates during the drag.
     await target.evaluate((element) =>
@@ -107,9 +230,7 @@ test("sidebar category and Library drags preserve nesting and disclosure", async
     // Disclosure and navigation stay separate after the hierarchy changes.
     const targetRow = target.locator("..");
     const sourceRow = source.locator("..");
-    if (
-      (await targetRow.locator("..").getAttribute("aria-expanded")) === "true"
-    ) {
+    if ((await toggle.getAttribute("aria-expanded")) === "true") {
       await toggle.click();
       await expect(source).toBeHidden();
     }

@@ -102,7 +102,7 @@ test("library cards prefetch only on intent and stop after warming the page", as
       const hoverCard = page.locator(`article[id="${nodes[0]!.id}"]`);
       const keyboardCard = page.locator(`article[id="${nodes[1]!.id}"]`);
       const hoverLink = hoverCard.getByRole("link", {
-        name: "Hover page content",
+        name: nodes[0]!.name,
       });
 
       const hoverPrefetch = waitForContentPrefetch(nodes[0]!.slug);
@@ -121,10 +121,20 @@ test("library cards prefetch only on intent and stop after warming the page", as
       await keyboardPrefetch;
       await page.waitForLoadState("networkidle");
 
-      await page.keyboard.press("Tab");
+      const keyboardLink = keyboardCard.getByRole("link", {
+        name: nodes[1]!.name,
+        exact: true,
+      });
+      await expect(keyboardLink).toHaveCount(1);
+      await expect(keyboardLink).toBeFocused();
       await expect(
-        keyboardCard.getByRole("link", { name: "Keyboard page content" }),
-      ).toBeFocused();
+        keyboardCard.getByText("Keyboard page content"),
+      ).toBeVisible();
+      expect(
+        await keyboardCard
+          .getByText("Keyboard page content")
+          .evaluate((element) => element.closest("a")),
+      ).toBeNull();
       await page.waitForLoadState("networkidle");
       expect(new Set(prefetches)).toEqual(
         new Set(nodes.map((node) => `/l/${node.slug}`)),

@@ -83,7 +83,10 @@ export function CategoryMenu(props: Props) {
   return (
     <Menu.Root onSelect={handlers.handleSelect}>
       <Menu.Trigger asChild>
-        <MoreAction {...triggerProps} />
+        <MoreAction
+          aria-label={`Category options for ${category.name}`}
+          {...triggerProps}
+        />
       </Menu.Trigger>
 
       <Portal>

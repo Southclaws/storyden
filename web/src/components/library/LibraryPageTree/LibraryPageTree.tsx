@@ -110,7 +110,7 @@ export function LibraryPageTree({
 
         return (
           <HStack mb="1">
-            <NavigationHeader href="/drafts">
+            <NavigationHeader href="/drafts" headingAs="h3">
               <HStack>
                 {visibilityIcons[node.visibility]}
                 {visibilityLabels[node.visibility]}
@@ -119,16 +119,18 @@ export function LibraryPageTree({
           </HStack>
         );
       }}
-      renderActions={({ node }) => (
+      renderActions={({ node, tabIndex }) => (
         <Fragment>
           {canManageLibrary && (
             <CreatePageAction
               variant="plain"
               hideLabel
               parentSlug={node.slug}
+              aria-label={`Create page under ${node.name}`}
+              tabIndex={tabIndex}
             />
           )}
-          <LibraryPageMenu variant="plain" node={node} />
+          <LibraryPageMenu variant="plain" node={node} tabIndex={tabIndex} />
         </Fragment>
       )}
     />

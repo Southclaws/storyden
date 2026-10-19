@@ -24,7 +24,13 @@ export function LibraryNavigationTree(props: Props) {
       <NavigationHeader
         href={LibraryRoute}
         controls={
-          canManageLibrary && <CreatePageAction variant="ghost" hideLabel />
+          canManageLibrary && (
+            <CreatePageAction
+              variant="ghost"
+              hideLabel
+              aria-label="Create library page"
+            />
+          )
         }
       >
         <HStack gap="1">

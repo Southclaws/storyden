@@ -22,7 +22,7 @@ test("the bookmark wrapper keeps the same height as the other card controls", as
   const bookmark = card.getByRole("button", { name: "Bookmark", exact: true });
   await expect(bookmark).toBeVisible();
   const likeHeight = await card
-    .getByRole("button", { name: "Like", exact: true })
+    .getByRole("button", { name: `Like ${thread.title}`, exact: true })
     .evaluate((element) => element.getBoundingClientRect().height);
   const wrapperHeight = await bookmark
     .locator("..")
@@ -39,8 +39,14 @@ test("the bookmark wrapper keeps the same height as the other card controls", as
     await anonymousPage.evaluate(() => document.fonts.ready);
     const anonymousCard = anonymousPage.locator(`[id="${thread.id}"]`);
     await expect(
-      anonymousCard.getByRole("button", { name: "Like", exact: true }),
-    ).toBeDisabled();
+      anonymousCard.getByRole("button", {
+        name: `Like ${thread.title}`,
+        exact: true,
+      }),
+    ).toHaveCount(0);
+    await expect(
+      anonymousCard.getByText("Sign in to like discussions.", { exact: false }),
+    ).toBeAttached();
     await expect(
       anonymousCard.getByRole("button", { name: "Bookmark", exact: true }),
     ).toHaveCount(0);

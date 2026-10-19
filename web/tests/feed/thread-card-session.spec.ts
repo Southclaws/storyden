@@ -49,7 +49,7 @@ for (const surface of ["home", "discussion", "category", "search"] as const) {
       // even when a streamed segment still needs JavaScript to reveal it.
       await expect(
         serverCard.getByRole("button", {
-          name: "Like",
+          name: `Like ${thread.title}`,
           exact: true,
           includeHidden: true,
         }),
@@ -74,16 +74,21 @@ for (const surface of ["home", "discussion", "category", "search"] as const) {
         await page.goto(path, { waitUntil: "domcontentloaded" });
         const card = page.locator(`[id="${thread.id}"]`);
         await expect(
-          card.getByRole("button", { name: "Like", exact: true }),
+          card.getByRole("button", {
+            name: `Like ${thread.title}`,
+            exact: true,
+          }),
         ).toBeEnabled();
         await expect(
           card.getByRole("button", { name: "Bookmark", exact: true }),
         ).toBeVisible();
-        const like = card.getByRole("button", { name: "Like", exact: true });
+        const like = card.getByRole("button", {
+          name: `Like ${thread.title}`,
+          exact: true,
+        });
+        await expect(like).toHaveAttribute("aria-pressed", "false");
         await like.click();
-        await expect(
-          card.getByRole("button", { name: "Unlike", exact: true }),
-        ).toBeEnabled();
+        await expect(like).toHaveAttribute("aria-pressed", "true");
       } finally {
         releaseAccount();
         await page.unrouteAll({ behavior: "wait" });
@@ -91,8 +96,8 @@ for (const surface of ["home", "discussion", "category", "search"] as const) {
       await expect(
         page
           .locator(`[id="${thread.id}"]`)
-          .getByRole("button", { name: "Unlike", exact: true }),
-      ).toBeEnabled();
+          .getByRole("button", { name: `Like ${thread.title}`, exact: true }),
+      ).toHaveAttribute("aria-pressed", "true");
     } finally {
       await context.close();
     }
