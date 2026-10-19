@@ -35,6 +35,26 @@ type HandleArgs<T> = {
   errorToast?: boolean;
 };
 
+/**
+ * Runs a UI action with shared error reporting and finally-style cleanup.
+ *
+ * Use `onError` for action-specific error handling and `cleanup` for work that
+ * must run after either success or failure, such as clearing pending state.
+ * These callbacks usually remove the need to wrap `handle` in another
+ * try/catch/finally block.
+ *
+ * In the default mode, action errors are passed to `onError`, shown in an error
+ * toast unless disabled, and handled by returning `undefined`. With
+ * `promiseToast`, the toast manages loading/success/error feedback and the
+ * returned promise rejects on failure; `onError` is not used in that mode.
+ *
+ * @param fn The asynchronous action to run.
+ * @param args Optional error handling, toast configuration, and cleanup.
+ * `cleanup` runs on both success and failure in either mode. Errors thrown by
+ * `onError` or `cleanup` are not swallowed by the default mode.
+ * @returns The action result on success, or `undefined` after a handled error
+ * in the default mode. Promise-toast failures reject instead.
+ */
 export async function handle<T>(
   fn: () => Promise<T>,
   args?: HandleArgs<T>,
