@@ -50,17 +50,13 @@ export function getAssetImageProps(
   }
 
   const edge = Math.max(asset.width, asset.height);
+  const sizes = { s: 320, m: 960, l: 1920 } as const;
+  const scale = Math.min(1, sizes[variant] / edge);
   const seen = new Set<number>();
-  const candidates = (
-    [
-      ["s", 320],
-      ["m", 960],
-      ["l", 1920],
-    ] as const
-  ).flatMap(([preset, size]) => {
+  const candidates = (["s", "m", "l"] as const).flatMap((preset) => {
     const width = Math.max(
       1,
-      Math.floor(asset.width * Math.min(1, size / edge)),
+      Math.floor(asset.width * Math.min(1, sizes[preset] / edge)),
     );
     if (seen.has(width)) {
       return [];
@@ -71,5 +67,10 @@ export function getAssetImageProps(
     return [`${getAssetURL(asset.path, preset)} ${width}w`];
   });
 
-  return { src, srcSet: candidates.join(", ") };
+  return {
+    src,
+    srcSet: candidates.join(", "),
+    width: Math.max(1, Math.floor(asset.width * scale)),
+    height: Math.max(1, Math.floor(asset.height * scale)),
+  };
 }

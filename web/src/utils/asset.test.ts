@@ -88,6 +88,24 @@ describe("asset image delivery", () => {
       src: "https://api.storyden.test/api/assets/crop.png?variant=l",
       srcSet:
         "https://api.storyden.test/api/assets/crop.png?variant=s 320w, https://api.storyden.test/api/assets/crop.png?variant=m 960w, https://api.storyden.test/api/assets/crop.png?variant=l 1536w",
+      width: 1536,
+      height: 384,
     });
   });
+
+  it.each([
+    [1536, 384, 960, 240],
+    [800, 1600, 480, 960],
+    [100, 50, 100, 50],
+  ])(
+    "fits %i x %i into the medium preset without upscaling",
+    (width, height, expectedWidth, expectedHeight) => {
+      const props = getAssetImageProps(
+        { path: "/api/assets/image.png", width, height },
+        "m",
+      );
+      expect(props.width).toBe(expectedWidth);
+      expect(props.height).toBe(expectedHeight);
+    },
+  );
 });

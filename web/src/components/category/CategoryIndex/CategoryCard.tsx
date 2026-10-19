@@ -10,7 +10,7 @@ import { categoryColourCSS } from "@/lib/category/colours";
 import { CategoryTree } from "@/lib/category/tree";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { linkOverlay } from "@/styled-system/patterns";
-import { getAssetURL } from "@/utils/asset";
+import { getAssetImageProps } from "@/utils/asset";
 import { pluralise } from "@/utils/text";
 
 import { CategoryMenu } from "../CategoryMenu/CategoryMenu";
@@ -21,7 +21,11 @@ type CategoryCardProps = {
 };
 
 export function CategoryCard({ category, showChildren }: CategoryCardProps) {
-  const coverImage = getAssetURL(category.cover_image?.path, "m");
+  const {
+    src: coverImage,
+    width,
+    height,
+  } = getAssetImageProps(category.cover_image, "m");
 
   const hasSubcategories = category.children.length > 0;
 
@@ -47,6 +51,8 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
         <img
           className="category-card__cover"
           src={coverImage}
+          width={width}
+          height={height}
           alt="" // No alt image, decorative
           aria-hidden="true"
         />
