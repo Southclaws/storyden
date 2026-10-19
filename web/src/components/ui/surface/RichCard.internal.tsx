@@ -2,10 +2,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Children,
-  DOMAttributes,
   PropsWithChildren,
   ReactNode,
   useEffect,
+  useId,
   useRef,
   useState,
 } from "react";
@@ -22,6 +22,7 @@ import {
 import { isExternalURL } from "@/utils/url";
 
 import { ContentComposer } from "../../content/ContentComposer/ContentComposer";
+import { Button } from "../button";
 
 export type CardItem = {
   id: string;
@@ -29,8 +30,11 @@ export type CardItem = {
   url: string;
   text?: string;
   titleIcon?: React.ReactNode;
+  titleStatus?: string;
+  headingAs?: "h2" | "h3" | "h4";
   content?: string;
   image?: string;
+  imageAlt?: string;
   header?: React.ReactNode;
   menu?: React.ReactNode;
   controls?: React.ReactNode;
@@ -46,8 +50,11 @@ export function Card({
   url,
   text,
   titleIcon,
+  titleStatus,
+  headingAs = "h2",
   content,
   image,
+  imageAlt = "",
   header,
   menu,
   controls,
@@ -58,37 +65,13 @@ export function Card({
   children,
 }: PropsWithChildren<Props>) {
   const router = useRouter();
+  const titleId = useId();
   const prefetchedURL = useRef<string | null>(null);
-  const hasImage = Boolean(image);
-  const textContainerRef = useRef<HTMLDivElement>(null);
   const [showingMore, setShowingMore] = useState(false);
-  const [showMore, setShowMore] = useState(false);
-
-  useEffect(() => {
-    if (!textContainerRef.current) return;
-
-    const rect = textContainerRef.current.getBoundingClientRect();
-
-    // 112 = "spacing.28" token * 4
-    if (rect.height >= 112) {
-      setShowMore(true);
-    } else {
-      setShowMore(false);
-    }
-  }, [showingMore, textContainerRef]);
-
-  function handleShowMore() {
-    setShowingMore(!showingMore);
-  }
 
   const styles = richCard({
     shape,
     backgroundColor,
-  });
-
-  const longContentStyles = css({
-    maxHeight: showingMore ? "full" : "28",
-    overflow: "hidden",
   });
 
   const externalURL = isExternalURL(url);
@@ -107,18 +90,37 @@ export function Card({
     router.prefetch(url);
   }
 
+  const preview = (
+    <>
+      {text && <p className={styles.text}>{text}</p>}
+      {content && (
+        <ContentComposer placeholder="" disabled initialValue={content} />
+      )}
+    </>
+  );
+
   return (
-    <styled.article id={id} className={styles.container}>
+    <styled.article
+      id={id}
+      aria-labelledby={title ? titleId : undefined}
+      className={styles.container}
+    >
       <div className={styles.root}>
         {image && (
           <>
             <div className={styles.mediaBackdropContainer}>
-              <styled.img className={styles.mediaBackdrop} src={image} />
+              <styled.img
+                className={styles.mediaBackdrop}
+                src={image}
+                alt=""
+                aria-hidden="true"
+              />
             </div>
             <div className={styles.mediaContainer}>
               <styled.img
                 className={styles.media}
                 src={image}
+                alt={imageAlt}
                 maxHeight={showingMore && shape !== "fill" ? "28" : "full"}
               />
             </div>
@@ -143,7 +145,7 @@ export function Card({
               </Box>
             )}
 
-            <styled.h1 className={styles.title}>
+            <styled.h2 as={headingAs} id={titleId} className={styles.title}>
               <Link
                 className={linkOverlay()}
                 href={url}
@@ -154,36 +156,39 @@ export function Card({
               >
                 {title}
               </Link>
-            </styled.h1>
+              {titleStatus && (
+                <>
+                  {" "}
+                  <styled.span srOnly>{titleStatus}</styled.span>
+                </>
+              )}
+            </styled.h2>
           </styled.div>
         )}
 
         <div className={styles.contentContainer}>
           <div className={styles.textArea}>
-            <div ref={textContainerRef} className={longContentStyles}>
-              <Link
-                href={url}
-                prefetch={false}
-                onMouseEnter={handlePrefetch}
-                onFocus={handlePrefetch}
-                className={linkOverlay()}
-                onClick={(e) => disableAnchors && e.preventDefault()}
-              >
-                {text && <p className={styles.text}>{text}</p>}
-                {content && (
-                  <>
-                    <ContentComposer
-                      placeholder=""
-                      disabled
-                      initialValue={content}
-                    />
-                  </>
-                )}
-              </Link>
-            </div>
-            {showMore && (
-              <ShowMore showingMore={showingMore} onClick={handleShowMore} />
-            )}
+            <ShowMore
+              showingMore={showingMore}
+              title={title}
+              onClick={() => setShowingMore(!showingMore)}
+            >
+              {title && shape !== "fill" ? (
+                preview
+              ) : (
+                <Link
+                  aria-label={title}
+                  href={url}
+                  prefetch={false}
+                  onMouseEnter={handlePrefetch}
+                  onFocus={handlePrefetch}
+                  className={linkOverlay()}
+                  onClick={(e) => disableAnchors && e.preventDefault()}
+                >
+                  {preview}
+                </Link>
+              )}
+            </ShowMore>
           </div>
         </div>
 
@@ -244,23 +249,56 @@ export function CardGrid(props: CardGroupProps) {
 
 function ShowMore({
   showingMore,
-  ...props
-}: { showingMore: boolean } & DOMAttributes<HTMLAnchorElement>) {
+  title,
+  onClick,
+  children,
+}: PropsWithChildren<{
+  showingMore: boolean;
+  title?: string;
+  onClick: () => void;
+}>) {
+  const contentId = useId();
+  const textContainerRef = useRef<HTMLDivElement>(null);
+  const [showMore, setShowMore] = useState(false);
+
+  useEffect(() => {
+    const element = textContainerRef.current;
+    if (!element) return;
+    const measure = () => setShowMore(element.scrollHeight > 112);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [children]);
+
+  const label = showingMore ? "Show less" : "Show more";
   return (
-    <styled.p display="flex" justifyContent="space-between">
-      <styled.span color="text.subtle">{showingMore || "..."}</styled.span>
-      <styled.a
-        fontSize="sm"
-        cursor="pointer"
-        color="accent.text"
-        _hover={{
-          textDecoration: "underline",
-        }}
-        onClick={(e) => e.preventDefault()}
-        {...props}
+    <>
+      <div
+        id={contentId}
+        ref={textContainerRef}
+        className={css({
+          maxHeight: showingMore ? "full" : "28",
+          overflow: "hidden",
+        })}
       >
-        {showingMore ? "hide" : "show more"}
-      </styled.a>
-    </styled.p>
+        {children}
+      </div>
+      {showMore && (
+        <Button
+          type="button"
+          variant="subtle"
+          size="sm"
+          position="relative"
+          zIndex="var(--card-content-index)"
+          aria-expanded={showingMore}
+          aria-controls={contentId}
+          aria-label={title ? `${label} of ${title}` : label}
+          onClick={onClick}
+        >
+          {label}
+        </Button>
+      )}
+    </>
   );
 }

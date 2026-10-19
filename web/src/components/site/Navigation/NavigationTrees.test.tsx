@@ -149,9 +149,12 @@ describe("sidebar navigation trees", () => {
     );
 
     expect(router.prefetch).not.toHaveBeenCalled();
-    fireEvent.mouseEnter(screen.getByRole("link", { name: "Preview" }));
+    expect(
+      screen.queryByRole("link", { name: "Preview" }),
+    ).not.toBeInTheDocument();
+    fireEvent.mouseEnter(screen.getByRole("link", { name: "Handbook" }));
     fireEvent.focus(screen.getByRole("link", { name: "Handbook" }));
-    fireEvent.mouseEnter(screen.getByRole("link", { name: "Preview" }));
+    fireEvent.mouseEnter(screen.getByRole("link", { name: "Handbook" }));
     expect(router.prefetch).toHaveBeenCalledExactlyOnceWith("/l/handbook");
 
     rerender(
