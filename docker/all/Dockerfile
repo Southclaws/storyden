@@ -33,6 +33,7 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /storyden
 
 COPY ./web/package.json ./web/pnpm-lock.yaml* ./web/pnpm-workspace.yaml ./
+COPY ./web/patches ./patches
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     corepack enable && \
     pnpm install --frozen-lockfile --ignore-scripts
