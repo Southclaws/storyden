@@ -6,7 +6,7 @@ import { MemberBadge } from "../member/MemberBadge/MemberBadge";
 import { DotSeparator } from "../site/Dot";
 
 type Props = {
-  href: string;
+  href?: string;
   author: ProfileReference;
   time: Date;
   updated: Date;
