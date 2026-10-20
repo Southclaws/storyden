@@ -160,5 +160,5 @@ func newExporter(ctx context.Context,
 }
 
 func (f factory) Build(lc fx.Lifecycle) Tracer {
-	return f.tracerProvider.Tracer("storyden")
+	return tracer{inner: f.tracerProvider.Tracer("storyden")}
 }
