@@ -160,6 +160,25 @@ function TreeFixture(options: FixtureOptions) {
 }
 
 describe("DragTree", () => {
+  test.each([false, true])(
+    "leaf tree items own their links and actions when editable is %s",
+    (editable) => {
+      renderTree({ editable, menuActions: true });
+      const item = screen.getByRole("treeitem", { name: "Getting started" });
+      const link = screen.getByRole("link", { name: "Getting started" });
+      expect(item).toContainElement(link);
+      expect(item).toContainElement(
+        screen.getByRole("button", { name: "Manage Getting started" }),
+      );
+      expect(item).toHaveAttribute("aria-level", "3");
+      expect(item).toHaveAttribute("aria-selected", "true");
+      expect(item).not.toHaveAttribute("aria-expanded");
+      expect(link).toHaveAttribute("aria-current", "page");
+      expect(link).not.toHaveAttribute("aria-level");
+      expect(link).not.toHaveAttribute("aria-selected");
+    },
+  );
+
   test.each([
     { spaces: 0, placement: "inside", parent: "root" },
     { spaces: 1, placement: "below", parent: null },
@@ -171,7 +190,7 @@ describe("DragTree", () => {
       const onSettled = vi.fn(async () => {});
       const user = userEvent.setup();
       renderTree({ editable: true, onMove, onSettled });
-      const source = screen.getByRole("treeitem", { name: "About" });
+      const source = screen.getByRole("link", { name: "About" });
       source.focus();
       fireEvent.keyDown(source, {
         key: "M",
@@ -219,9 +238,7 @@ describe("DragTree", () => {
     expect(onMove).not.toHaveBeenCalled();
     await waitFor(() => expect(source).toHaveFocus());
     expect(screen.getByRole("status")).toHaveTextContent("Move cancelled");
-    expect(
-      screen.getByRole("treeitem", { name: "Getting started" }),
-    ).toBeVisible();
+    expect(screen.getByRole("link", { name: "Getting started" })).toBeVisible();
   });
 
   test("a failed move is announced and can be retried without losing the carried node", async () => {
@@ -232,7 +249,7 @@ describe("DragTree", () => {
     const onSettled = vi.fn(async () => {});
     const user = userEvent.setup();
     renderTree({ editable: true, onMove, onSettled });
-    const source = screen.getByRole("treeitem", { name: "About" });
+    const source = screen.getByRole("link", { name: "About" });
     source.focus();
     fireEvent.keyDown(source, {
       key: "M",
@@ -265,7 +282,7 @@ describe("DragTree", () => {
     );
     const user = userEvent.setup();
     renderTree({ editable: true, onMove });
-    const source = screen.getByRole("treeitem", { name: "About" });
+    const source = screen.getByRole("link", { name: "About" });
     source.focus();
     fireEvent.keyDown(source, {
       key: "M",
@@ -294,7 +311,7 @@ describe("DragTree", () => {
     });
     const view = renderTree({ editable: true, onMove });
     const user = userEvent.setup();
-    const source = screen.getByRole("treeitem", { name: "About" });
+    const source = screen.getByRole("link", { name: "About" });
     source.focus();
     fireEvent.keyDown(source, {
       key: "M",
@@ -309,9 +326,7 @@ describe("DragTree", () => {
       ),
     );
     await waitFor(() =>
-      expect(
-        screen.getByRole("treeitem", { name: "Documentation" }),
-      ).toHaveFocus(),
+      expect(screen.getByRole("link", { name: "Documentation" })).toHaveFocus(),
     );
     expect(
       screen.queryByRole("treeitem", { name: "About" }),
@@ -322,7 +337,7 @@ describe("DragTree", () => {
     const onMove = vi.fn(async () => {});
     const user = userEvent.setup();
     renderTree({ editable: true, onMove });
-    const source = screen.getByRole("treeitem", { name: "About" });
+    const source = screen.getByRole("link", { name: "About" });
     source.focus();
     fireEvent.keyDown(source, {
       key: "M",
@@ -339,7 +354,7 @@ describe("DragTree", () => {
   test("the modified shortcut is unavailable to read-only users", async () => {
     const onMove = vi.fn(async () => {});
     renderTree({ onMove });
-    const source = screen.getByRole("treeitem", { name: "About" });
+    const source = screen.getByRole("link", { name: "About" });
     source.focus();
     fireEvent.keyDown(source, {
       key: "M",
@@ -358,12 +373,12 @@ describe("DragTree", () => {
       "href",
       "/docs/root",
     );
-    const selectedLink = screen.getByRole("treeitem", {
+    const selectedLink = screen.getByRole("link", {
       name: "Getting started",
     });
     expect(selectedLink).toHaveAttribute("href", "/docs/start");
     expect(selectedLink).toHaveAttribute("aria-current", "page");
-    expect(screen.getByRole("treeitem", { name: "About" })).not.toHaveAttribute(
+    expect(screen.getByRole("link", { name: "About" })).not.toHaveAttribute(
       "aria-current",
     );
     expect(
@@ -419,8 +434,8 @@ describe("DragTree", () => {
     renderTree({ editable: true });
     const documentation = screen.getByRole("link", { name: "Documentation" });
     const guides = screen.getByRole("link", { name: "Guides" });
-    const start = screen.getByRole("treeitem", { name: "Getting started" });
-    const about = screen.getByRole("treeitem", { name: "About" });
+    const start = screen.getByRole("link", { name: "Getting started" });
+    const about = screen.getByRole("link", { name: "About" });
     await user.tab();
     expect(start).toHaveFocus();
     await user.keyboard("{ArrowUp}");
@@ -453,9 +468,9 @@ describe("DragTree", () => {
     renderTree();
     await user.tab();
     await user.keyboard("abo");
-    expect(screen.getByRole("treeitem", { name: "About" })).toHaveFocus();
+    expect(screen.getByRole("link", { name: "About" })).toHaveFocus();
     expect(
-      screen.getByRole("treeitem", { name: "Getting started" }),
+      screen.getByRole("link", { name: "Getting started" }),
     ).toHaveAttribute("aria-current", "page");
   });
 
@@ -498,7 +513,7 @@ describe("DragTree", () => {
       </>,
     );
     await user.tab();
-    const start = screen.getByRole("treeitem", { name: "Getting started" });
+    const start = screen.getByRole("link", { name: "Getting started" });
     expect(start).toHaveFocus();
     await user.tab();
     const action = screen.getByRole("button", {
@@ -510,7 +525,7 @@ describe("DragTree", () => {
     await user.keyboard("{Escape}");
     expect(start).toHaveFocus();
     await user.keyboard("{ArrowDown}");
-    expect(screen.getByRole("treeitem", { name: "About" })).toHaveFocus();
+    expect(screen.getByRole("link", { name: "About" })).toHaveFocus();
     await user.tab();
     expect(screen.getByRole("button", { name: "Manage About" })).toHaveFocus();
     await user.tab();
@@ -533,9 +548,7 @@ describe("DragTree", () => {
     await user.tab();
     await user.tab();
     await user.keyboard("{Shift}");
-    expect(
-      screen.getByRole("treeitem", { name: "Getting started" }),
-    ).toHaveFocus();
+    expect(screen.getByRole("link", { name: "Getting started" })).toHaveFocus();
     expect(await screen.findByRole("tooltip")).toBeVisible();
 
     await user.tab({ shift: true });
@@ -563,9 +576,7 @@ describe("DragTree", () => {
     await user.keyboard("{Enter}");
     expect(navigate).toHaveBeenCalledOnce();
     expect(link).toHaveAttribute("aria-expanded", "true");
-    expect(
-      screen.getByRole("treeitem", { name: "Getting started" }),
-    ).toBeVisible();
+    expect(screen.getByRole("link", { name: "Getting started" })).toBeVisible();
   });
 
   test("Escape closes a portalled row menu before returning from its trigger to the tree", async () => {
@@ -575,7 +586,7 @@ describe("DragTree", () => {
       editable: true,
       onMove: vi.fn(async () => {}),
     });
-    const node = screen.getByRole("treeitem", { name: "Getting started" });
+    const node = screen.getByRole("link", { name: "Getting started" });
     await user.tab();
     expect(node).toHaveFocus();
     expect(await screen.findByRole("tooltip")).toHaveTextContent(
