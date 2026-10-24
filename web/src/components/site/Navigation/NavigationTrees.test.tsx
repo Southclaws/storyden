@@ -216,11 +216,11 @@ describe("sidebar navigation trees", () => {
       "href",
       "/d/engineering",
     );
-    expect(screen.getByRole("treeitem", { name: "Frontend" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Frontend" })).toHaveAttribute(
       "href",
       "/d/frontend",
     );
-    expect(screen.getByRole("treeitem", { name: "Frontend" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Frontend" })).toHaveAttribute(
       "aria-current",
       "page",
     );
@@ -283,11 +283,11 @@ describe("sidebar navigation trees", () => {
       "href",
       "/l/handbook",
     );
-    expect(screen.getByRole("treeitem", { name: "Frontend" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Frontend" })).toHaveAttribute(
       "href",
       "/l/frontend",
     );
-    expect(screen.getByRole("treeitem", { name: "Frontend" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Frontend" })).toHaveAttribute(
       "aria-current",
       "page",
     );
@@ -356,7 +356,7 @@ describe("sidebar navigation trees", () => {
     ).toBeVisible();
     expect(screen.queryByRole("heading", { level: 1 })).not.toBeInTheDocument();
     expect(
-      screen.getByRole("treeitem", { name: "Work in progress" }),
+      screen.getByRole("link", { name: "Work in progress" }),
     ).toHaveAttribute("href", "/l/work-in-progress");
     expect(api.useNodeList).toHaveBeenCalledWith(
       { visibility: libraryNavigationVisibility },

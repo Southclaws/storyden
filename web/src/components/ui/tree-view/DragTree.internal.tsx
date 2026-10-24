@@ -422,9 +422,19 @@ function DragTreeNode<TNode>({
   }
 
   const Branch = children.length > 0 ? ArkTreeView.Branch : "div";
+  // Ark's focus and keyboard props belong on the destination link. The outer
+  // tree item owns the hierarchy and selection state, including row actions.
+  const linkProps =
+    children.length > 0
+      ? tree.getBranchControlProps({ node, indexPath })
+      : tree.getItemProps({ node, indexPath });
   const link = (
     <Link
+      {...linkProps}
       ref={linkRef}
+      role="link"
+      aria-level={undefined}
+      aria-selected={undefined}
       data-tree-node-id={nodeId}
       aria-keyshortcuts={moveEnabled ? "Alt+Shift+M" : undefined}
       aria-describedby={moveEnabled ? `${treeId}-move-instructions` : undefined}
@@ -437,7 +447,12 @@ function DragTreeNode<TNode>({
       )}
       href={getHref(node)}
       prefetch={false}
-      onClick={preventNavigationWhileDragging}
+      onClick={(event) => {
+        preventNavigationWhileDragging(event);
+        if (!event.defaultPrevented) {
+          linkProps.onClick?.(event);
+        }
+      }}
       onTouchStart={preventNavigationWhileDragging}
     >
       {getLabel(node)}
@@ -484,13 +499,7 @@ function DragTreeNode<TNode>({
         </span>
       )}
 
-      {children.length > 0 ? (
-        <ArkTreeView.BranchControl asChild role="link">
-          {link}
-        </ArkTreeView.BranchControl>
-      ) : (
-        <ArkTreeView.Item asChild>{link}</ArkTreeView.Item>
-      )}
+      {link}
 
       {actions && (
         // oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- Delegate child control events without letting them reach the tree's keyboard or drag handlers.
@@ -559,7 +568,10 @@ function DragTreeNode<TNode>({
         ref={setDroppableNodeRef}
         className={styles.branch}
         data-position={position}
-        aria-labelledby={children.length > 0 ? nodeState.id : undefined}
+        role="treeitem"
+        aria-labelledby={nodeState.id}
+        aria-level={depth}
+        aria-selected={nodeState.selected}
         style={{ "--depth": depth } as CSSProperties}
       >
         {row}

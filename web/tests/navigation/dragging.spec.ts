@@ -43,13 +43,13 @@ test("library sidebar separates disclosure, destination, and page actions for ke
     name: parent.name,
     exact: true,
   });
-  const childLink = navigation.getByRole("treeitem", {
+  const childLink = navigation.getByRole("link", {
     name: child.name,
     exact: true,
   });
   await expect(childLink).toHaveAttribute("aria-current", "page");
   await expect(toggle).toHaveAttribute("aria-expanded", "true");
-  const siblingLink = navigation.getByRole("treeitem", {
+  const siblingLink = navigation.getByRole("link", {
     name: sibling.name,
     exact: true,
   });
