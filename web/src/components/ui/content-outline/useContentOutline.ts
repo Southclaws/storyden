@@ -4,6 +4,7 @@ import {
   type CollectOutlineEntries,
   type ContentOutlineEntry,
   getActiveOutlineKey,
+  getOutlineReadingHeight,
   getOutlineReadingLine,
 } from "./outline";
 
@@ -58,6 +59,7 @@ export function useContentOutline(
   const rootRef = useRef<HTMLDivElement>(null);
   const [entries, setEntries] = useState<ContentOutlineEntry[]>([]);
   const [activeKey, setActiveKey] = useState<string>();
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -78,6 +80,11 @@ export function useContentOutline(
 
       frame = requestAnimationFrame(() => {
         const next = desktop.matches ? collectEntries(root) : [];
+
+        setVisible(
+          next.length > 1 &&
+            getOutlineReadingHeight(root, next) >= 2 * window.innerHeight,
+        );
 
         setEntries((previous) => {
           if (sameEntries(previous, next)) {
@@ -138,7 +145,7 @@ export function useContentOutline(
       return;
     }
 
-    if (entries.length === 0) {
+    if (!visible) {
       return;
     }
 
@@ -166,7 +173,7 @@ export function useContentOutline(
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
     };
-  }, [disabled, entries]);
+  }, [disabled, entries, visible]);
 
-  return { rootRef, entries: disabled ? [] : entries, activeKey };
+  return { rootRef, entries, activeKey, visible: !disabled && visible };
 }

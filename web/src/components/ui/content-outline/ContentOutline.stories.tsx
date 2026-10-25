@@ -17,7 +17,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "A desktop reading aid for headings, page blocks and current-page replies. The quiet tick rail becomes prominent on hover or focus and opens a navigable outline. Clicking an open rail closes it; clicking or tapping a closed rail opens it. Overflowing ends fade as a scroll cue, and a small separator distinguishes replies from the original content. Reply rows pair author and relative date above a snippet. Screens provide rendered targets through a scoped collector. Use SectionNavigation for route navigation, TreeView for hierarchy browsing and Popover for generic supporting content. Do not use while editing, for embedded previews or on mobile. Keyboard users can press Enter to enter the outline; Escape restores focus and selecting a row focuses its destination.",
+          "A desktop reading aid for headings, page blocks and current-page replies. It appears only with at least two entries and reading content at least twice the viewport height. Short content keeps its full width and does not load the rail UI. The quiet tick rail becomes prominent on hover or focus and opens a navigable outline. Clicking an open rail closes it; clicking or tapping a closed rail opens it. Overflowing ends fade as a scroll cue, and a small separator distinguishes replies from the original content. Reply rows pair author and relative date above a snippet. Screens provide rendered targets through a scoped collector. Use SectionNavigation for route navigation, TreeView for hierarchy browsing and Popover for generic supporting content. Do not use while editing, for embedded previews or on mobile. Keyboard users can press Enter to enter the outline; Escape restores focus and selecting a row focuses its destination.",
       },
     },
   },
@@ -69,7 +69,7 @@ function collect(root: HTMLElement): ContentOutlineEntry[] {
 }
 
 function ReadingExample({
-  count = 5,
+  count = 8,
   replies = false,
   disabled = false,
 }: {
@@ -112,6 +112,10 @@ function ReadingExample({
 
 export const Page: Story = { render: () => <ReadingExample /> };
 export const Thread: Story = { render: () => <ReadingExample replies /> };
+export const ShortPage: Story = { render: () => <ReadingExample count={1} /> };
+export const ShortThread: Story = {
+  render: () => <ReadingExample count={2} replies />,
+};
 export const LongOutline: Story = {
   render: () => <ReadingExample count={80} />,
 };

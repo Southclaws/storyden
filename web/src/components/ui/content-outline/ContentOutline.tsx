@@ -1,12 +1,18 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import type { PropsWithChildren } from "react";
 
 import { contentOutline } from "@/styled-system/recipes";
 
-import { ContentOutlineRail } from "./ContentOutline.internal";
 import type { CollectOutlineEntries } from "./outline";
 import { useContentOutline } from "./useContentOutline";
+
+const ContentOutlineRail = dynamic(
+  () =>
+    import("./ContentOutline.internal").then((mod) => mod.ContentOutlineRail),
+  { ssr: false },
+);
 
 export type ContentOutlineProps = PropsWithChildren<{
   label: string;
@@ -20,12 +26,11 @@ export function ContentOutline({
   collectEntries,
   disabled = false,
 }: ContentOutlineProps) {
-  const { rootRef, entries, activeKey } = useContentOutline(
+  const { rootRef, entries, activeKey, visible } = useContentOutline(
     collectEntries,
     disabled,
   );
   const styles = contentOutline();
-  const visible = entries.length > 1;
 
   return (
     <div className={styles.root} data-visible={visible}>

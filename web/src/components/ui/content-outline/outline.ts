@@ -12,6 +12,34 @@ export type CollectOutlineEntries = (
   root: HTMLElement,
 ) => ContentOutlineEntry[];
 
+/** Measure reading sections without decorative blocks or the reply composer. */
+export function getOutlineReadingHeight(
+  root: HTMLElement,
+  entries: ContentOutlineEntry[],
+) {
+  const sections = entries.filter((entry) => entry.kind !== "heading");
+
+  if (sections.length === 0) {
+    return root.getBoundingClientRect().height;
+  }
+
+  let top = Infinity;
+  let bottom = -Infinity;
+
+  for (const { target } of sections) {
+    const rect = target.getBoundingClientRect();
+
+    if (rect.height <= 0) {
+      continue;
+    }
+
+    top = Math.min(top, rect.top);
+    bottom = Math.max(bottom, rect.bottom);
+  }
+
+  return Math.max(0, bottom - top);
+}
+
 /** Read only the content root supplied by the screen, never the whole page. */
 export function collectContentHeadings(root: HTMLElement, prefix: string) {
   const headings = root.querySelectorAll<HTMLElement>("h1, h2, h3, h4, h5, h6");

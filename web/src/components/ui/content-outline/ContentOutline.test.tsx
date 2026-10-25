@@ -1,5 +1,12 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ContentComposerMarkdown } from "@/components/content/ContentComposerMarkdown/ContentComposerMarkdown";
@@ -17,6 +24,7 @@ import {
 let desktop = true;
 let reducedMotion = false;
 let mediaChange: (() => void) | undefined;
+let resizeCallbacks: Map<Element, ResizeObserverCallback>;
 
 beforeEach(() => {
   vi.stubGlobal(
@@ -30,6 +38,19 @@ beforeEach(() => {
   desktop = true;
   reducedMotion = false;
   mediaChange = undefined;
+  resizeCallbacks = new Map();
+  vi.stubGlobal("innerHeight", 900);
+  vi.stubGlobal(
+    "ResizeObserver",
+    class {
+      constructor(private callback: ResizeObserverCallback) {}
+      observe(target: Element) {
+        resizeCallbacks.set(target, this.callback);
+      }
+      disconnect() {}
+      unobserve() {}
+    },
+  );
   vi.stubGlobal(
     "matchMedia",
     vi.fn((query: string) => ({
@@ -48,15 +69,20 @@ beforeEach(() => {
   ] as unknown as DOMRectList);
   vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
     function (this: HTMLElement) {
+      const top = Number(this.dataset["top"] ?? 100) - window.scrollY;
+      const height = Number(
+        this.dataset["height"] ??
+          (this.classList.contains("content-outline__body") ? 2000 : 20),
+      );
       return {
-        top: Number(this.dataset["top"] ?? 100),
-        height: Number(this.dataset["height"] ?? 20),
-        bottom: 120,
+        top,
+        height,
+        bottom: top + height,
         left: 0,
         right: 100,
         width: 100,
         x: 0,
-        y: 100,
+        y: top,
         toJSON() {},
       };
     },
@@ -93,6 +119,159 @@ function Example({
 }
 
 describe("ContentOutline", () => {
+  it.each([
+    [1799, false],
+    [1800, true],
+    [1801, true],
+  ])(
+    "requires two viewport heights (%ipx, visible=%s)",
+    async (height, visible) => {
+      const view = render(<Example />);
+      const body = view.container.querySelector<HTMLElement>(
+        ".content-outline__body",
+      )!;
+      body.dataset["height"] = String(height);
+      expect(view.container.firstChild).toHaveAttribute(
+        "data-visible",
+        "false",
+      );
+      await act(() => new Promise(requestAnimationFrame));
+      if (visible) {
+        await screen.findByRole("button", { name: "On this page" });
+      } else {
+        expect(
+          screen.queryByRole("button", { name: "On this page" }),
+        ).toBeNull();
+      }
+      expect(view.container.firstChild).toHaveAttribute(
+        "data-visible",
+        String(visible),
+      );
+    },
+  );
+
+  it("keeps reading content in server HTML without rendering a rail", () => {
+    const html = renderToString(<Example />);
+    expect(html).toContain("Introduction");
+    expect(html).toContain("Some content.");
+    expect(html).toContain('data-visible="false"');
+    expect(html).not.toContain("data-content-outline");
+  });
+
+  it("remeasures unchanged entries on viewport, content and late layout changes", async () => {
+    const view = render(<Example />);
+    await screen.findByRole("button", { name: "On this page" });
+    const body = view.container.querySelector<HTMLElement>(
+      ".content-outline__body",
+    )!;
+
+    vi.stubGlobal("innerHeight", 1200);
+    fireEvent.resize(window);
+    await waitFor(() =>
+      expect(view.container.firstChild).toHaveAttribute(
+        "data-visible",
+        "false",
+      ),
+    );
+
+    vi.stubGlobal("innerHeight", 900);
+    fireEvent.resize(window);
+    await screen.findByRole("button", { name: "On this page" });
+
+    body.dataset["height"] = "1500";
+    act(() => resizeCallbacks.get(body)!([], {} as ResizeObserver));
+    await waitFor(() =>
+      expect(view.container.firstChild).toHaveAttribute(
+        "data-visible",
+        "false",
+      ),
+    );
+
+    body.dataset["height"] = "2000";
+    body.querySelector("p")!.textContent = "More reading content.";
+    await screen.findByRole("button", { name: "On this page" });
+
+    body.dataset["height"] = "1200";
+    body.querySelector("p")!.textContent = "Shortened content.";
+    await waitFor(() =>
+      expect(view.container.firstChild).toHaveAttribute(
+        "data-visible",
+        "false",
+      ),
+    );
+  });
+
+  it("counts original content, replies and spacing, excluding the reply composer", async () => {
+    const view = render(
+      <ContentOutline
+        label="In this thread"
+        collectEntries={collectThreadOutline}
+      >
+        <div data-outline-original="" data-top="100" data-height="800">
+          Original content
+        </div>
+        <div
+          data-outline-reply=""
+          id="reply-1"
+          data-top="1000"
+          data-height="500"
+        />
+        <div data-top="1500" data-height="2000">
+          Reply composer
+        </div>
+      </ContentOutline>,
+    );
+    await act(() => new Promise(requestAnimationFrame));
+    expect(view.container.firstChild).toHaveAttribute("data-visible", "false");
+
+    const reply = view.container.querySelector<HTMLElement>(
+      "[data-outline-reply]",
+    )!;
+    reply.dataset["height"] = "900";
+    reply.textContent = "A longer reply.";
+    await screen.findByRole("button", { name: "In this thread" });
+    expect(view.container.firstChild).toHaveAttribute("data-visible", "true");
+
+    vi.spyOn(window, "scrollY", "get").mockReturnValue(300);
+    fireEvent.scroll(window);
+    fireEvent.resize(window);
+    await act(() => new Promise(requestAnimationFrame));
+    expect(view.container.firstChild).toHaveAttribute("data-visible", "true");
+  });
+
+  it("measures Library reading blocks without counting the cover or title", async () => {
+    const view = render(
+      <ContentOutline
+        label="On this page"
+        collectEntries={collectLibraryOutline}
+      >
+        <div data-outline-block="cover" data-top="0" data-height="2000">
+          Cover
+        </div>
+        <div data-outline-block="title" data-top="2000" data-height="100">
+          Title
+        </div>
+        <div data-outline-block="content" data-top="2100" data-height="800">
+          <h2>First section</h2>
+          <h3>Details</h3>
+        </div>
+        <div data-outline-block="directory" data-top="3000" data-height="300">
+          Directory
+        </div>
+      </ContentOutline>,
+    );
+    await act(() => new Promise(requestAnimationFrame));
+    expect(view.container.firstChild).toHaveAttribute("data-visible", "false");
+
+    const directory = view.container.querySelector<HTMLElement>(
+      '[data-outline-block="directory"]',
+    )!;
+    directory.dataset["height"] = "900";
+    directory.textContent = "More pages.";
+    await screen.findByRole("button", { name: "On this page" });
+    expect(view.container.firstChild).toHaveAttribute("data-visible", "true");
+  });
+
   it("marks only overflowing ends, including after scrolling and content resizing", async () => {
     render(<Example />);
     const trigger = await screen.findByRole("button", { name: "On this page" });
@@ -135,7 +314,9 @@ describe("ContentOutline", () => {
         label="In this thread"
         collectEntries={collectThreadOutline}
       >
-        <div data-outline-original="">Original content</div>
+        <div data-outline-original="" data-height="1800">
+          Original content
+        </div>
         <div
           data-outline-reply=""
           id="reply-1"
