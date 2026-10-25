@@ -2,6 +2,7 @@
 
 import {
   ComboboxValueChangeDetails,
+  Portal,
   createListCollection,
 } from "@ark-ui/react";
 import map from "lodash/fp/map";
@@ -100,6 +101,7 @@ function LibraryPageSelectCombobox({
       onOpenChange={handleOpenChange}
       onValueChange={handleChange}
       value={value ? [value] : []}
+      positioning={{ sameWidth: true, ...rest.positioning }}
       size="sm"
     >
       <Combobox.Control>
@@ -112,28 +114,34 @@ function LibraryPageSelectCombobox({
           </IconButton>
         </Combobox.Trigger>
       </Combobox.Control>
-      <Combobox.Positioner>
-        <Combobox.Content>
-          <Combobox.ItemGroup>
-            <Combobox.Item key="unset" item="unset">
-              <Combobox.ItemText>All root level pages</Combobox.ItemText>
-              <Combobox.ItemIndicator>
-                <CheckIcon />
-              </Combobox.ItemIndicator>
-            </Combobox.Item>
-          </Combobox.ItemGroup>
-          <Combobox.ItemGroup>
-            {collection.items.map((item) => (
-              <Combobox.Item key={item.value} item={item}>
-                <Combobox.ItemText>{item.label}</Combobox.ItemText>
+      <Portal>
+        <Combobox.Positioner>
+          <Combobox.Content
+            maxH="[min(24rem,var(--available-height))]"
+            overflowY="auto"
+            zIndex="[calc(var(--z-index-popover) + var(--layer-index, 0) + 1)]"
+          >
+            <Combobox.ItemGroup>
+              <Combobox.Item key="unset" item="unset">
+                <Combobox.ItemText>All root level pages</Combobox.ItemText>
                 <Combobox.ItemIndicator>
                   <CheckIcon />
                 </Combobox.ItemIndicator>
               </Combobox.Item>
-            ))}
-          </Combobox.ItemGroup>
-        </Combobox.Content>
-      </Combobox.Positioner>
+            </Combobox.ItemGroup>
+            <Combobox.ItemGroup>
+              {collection.items.map((item) => (
+                <Combobox.Item key={item.value} item={item}>
+                  <Combobox.ItemText>{item.label}</Combobox.ItemText>
+                  <Combobox.ItemIndicator>
+                    <CheckIcon />
+                  </Combobox.ItemIndicator>
+                </Combobox.Item>
+              ))}
+            </Combobox.ItemGroup>
+          </Combobox.Content>
+        </Combobox.Positioner>
+      </Portal>
     </Combobox.Root>
   );
 }

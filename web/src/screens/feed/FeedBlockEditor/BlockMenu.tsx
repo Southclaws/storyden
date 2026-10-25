@@ -186,7 +186,10 @@ function LibraryConfigMenu({
         </Menu.TriggerItem>
         <Portal>
           <Menu.Positioner>
-            <Menu.Content minW="64">
+            <Menu.Content
+              w="80"
+              maxW="[min(var(--available-width),calc(100vw - 2rem))]"
+            >
               <Box p="2">
                 <LibraryPageSelect
                   value={block.node}

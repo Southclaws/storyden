@@ -61,7 +61,9 @@ export const combobox = defineSlotRecipe({
       borderRadius: "xs",
       cursor: "pointer",
       display: "flex",
+      gap: "2",
       justifyContent: "space-between",
+      minWidth: "0",
       transitionDuration: "fast",
       transitionProperty: "background, color",
       transitionTimingFunction: "default",
@@ -79,6 +81,12 @@ export const combobox = defineSlotRecipe({
         },
       },
     },
+    itemText: {
+      minWidth: "0",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+    },
     list: {
       maxHeight: "64",
       overflowY: "auto",
@@ -90,6 +98,7 @@ export const combobox = defineSlotRecipe({
     },
     itemIndicator: {
       color: "colorPalette.solid",
+      flexShrink: "0",
     },
   },
   defaultVariants: {

@@ -22,8 +22,6 @@ const items = [
   { label: "Showcase", value: "showcase" },
 ];
 
-const collection = createListCollection({ items });
-
 type ComboboxStoryArgs = {
   size?: "sm" | "md" | "lg";
 };
@@ -50,13 +48,22 @@ export default meta;
 
 type Story = StoryObj<ComboboxStoryArgs>;
 
-function Example(props: ComboboxStoryArgs) {
+function Example({
+  size,
+  options = items,
+}: ComboboxStoryArgs & { options?: typeof items }) {
+  const collection = createListCollection({ items: options });
   return (
-    <Combobox.Root collection={collection} maxW="sm" size={props.size}>
+    <Combobox.Root
+      collection={collection}
+      maxW="sm"
+      positioning={{ sameWidth: true }}
+      size={size}
+    >
       <Combobox.Label>Category</Combobox.Label>
       <Combobox.Control>
         <Combobox.Input placeholder="Select a category" asChild>
-          <Input size={props.size} />
+          <Input size={size} />
         </Combobox.Input>
         <Combobox.Trigger asChild>
           <button type="button" aria-label="Open">
@@ -68,7 +75,7 @@ function Example(props: ComboboxStoryArgs) {
         <Combobox.Content>
           <Combobox.List>
             <Combobox.ItemGroup>
-              {items.map((item) => (
+              {options.map((item) => (
                 <Combobox.Item key={item.value} item={item}>
                   <Combobox.ItemText>{item.label}</Combobox.ItemText>
                   <Combobox.ItemIndicator>
@@ -93,6 +100,40 @@ export const Sizes: Story = {
     <LStack gap="4">
       {(["sm", "md", "lg"] as const).map((size) => (
         <Example key={size} size={size} />
+      ))}
+    </LStack>
+  ),
+};
+
+export const LongLabels: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Options stay on one line and truncate with an ellipsis when space is limited. The full label remains searchable and available to assistive technology, with room for the selected indicator at every size.",
+      },
+    },
+  },
+  render: () => (
+    <LStack gap="4" w="64" alignItems="stretch">
+      {(["sm", "md", "lg"] as const).map((size) => (
+        <Example
+          key={size}
+          size={size}
+          options={[
+            { label: "General", value: "general" },
+            {
+              label:
+                "Outline test — environment art notebook and field references",
+              value: "notebook",
+            },
+            {
+              label:
+                "AnUnbrokenPageNameThatMustNotOverflowTheOptionOrHideItsSelectedIndicator",
+              value: "unbroken",
+            },
+          ]}
+        />
       ))}
     </LStack>
   ),
