@@ -119,7 +119,6 @@ function LibraryPageSelectCombobox({
           <Combobox.Content
             maxH="[min(24rem,var(--available-height))]"
             overflowY="auto"
-            zIndex="[calc(var(--z-index-popover) + var(--layer-index, 0) + 1)]"
           >
             <Combobox.ItemGroup>
               <Combobox.Item key="unset" item="unset">

@@ -39,7 +39,9 @@ export const combobox = defineSlotRecipe({
       flexDirection: "column",
       maxHeight: "[min(24rem,calc(100vh-2rem))]",
       maxWidth: "[calc(100vw-2rem)]",
-      zIndex: "dropdown",
+      // Floating UI copies this elevation onto the portalled positioner.
+      // Keep nested pickers above their owning menus and popovers.
+      zIndex: "calc(var(--z-index-popover) + var(--layer-index, 0) + 1)",
       height: "fit-content",
       _hidden: {
         display: "none",
