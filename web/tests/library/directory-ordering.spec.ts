@@ -112,18 +112,21 @@ for (const layout of ["grid", "gallery"] as const) {
     await moved;
     await page.goto(`/l/${fixture.slug}`);
     await expect(list.locator(":scope > li")).toHaveCount(4);
-    const names = await list
-      .locator(":scope > li")
-      .evaluateAll((cards) =>
-        cards.map((card) =>
-          card.querySelector("a[aria-label]")?.getAttribute("aria-label"),
-        ),
-      );
-    expect(names).toEqual([
-      `Bravo ${seed}`,
-      `Alpha ${seed}`,
-      `Charlie ${seed}`,
-      `Delta ${seed}`,
-    ]);
+    await expect
+      .poll(() =>
+        list
+          .locator(":scope > li")
+          .evaluateAll((cards) =>
+            cards.map((card) =>
+              card.querySelector("a[aria-label]")?.getAttribute("aria-label"),
+            ),
+          ),
+      )
+      .toEqual([
+        `Bravo ${seed}`,
+        `Alpha ${seed}`,
+        `Charlie ${seed}`,
+        `Delta ${seed}`,
+      ]);
   });
 }

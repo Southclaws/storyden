@@ -7,7 +7,15 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderToString } from "react-dom/server";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 
 import { ContentComposerMarkdown } from "@/components/content/ContentComposerMarkdown/ContentComposerMarkdown";
 import { ContentComposerRich } from "@/components/content/ContentComposerRich/ContentComposerRich";
@@ -25,6 +33,11 @@ let desktop = true;
 let reducedMotion = false;
 let mediaChange: (() => void) | undefined;
 let resizeCallbacks: Map<Element, ResizeObserverCallback>;
+
+beforeAll(async () => {
+  // Keep the real rail, but load its dependencies outside assertion timeouts.
+  await import("./ContentOutline.internal");
+});
 
 beforeEach(() => {
   vi.stubGlobal(

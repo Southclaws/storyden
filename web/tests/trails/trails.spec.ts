@@ -122,9 +122,11 @@ test.describe("Trails", () => {
     await login(page, ADMIN_USERNAME, ADMIN_PASSWORD);
     await page.goto("/robots/trails/new");
 
-    await page.getByLabel("Name").fill(trailName);
     await page
-      .getByLabel("Description")
+      .getByRole("textbox", { name: "Name", exact: true })
+      .fill(trailName);
+    await page
+      .getByRole("textbox", { name: "Description", exact: true })
       .fill("A durable scheduled workflow exercised end to end.");
     const firstRobot = page.getByRole("combobox", {
       name: "Robot action 1",
