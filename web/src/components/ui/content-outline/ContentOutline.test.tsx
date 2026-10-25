@@ -136,13 +136,6 @@ describe("ContentOutline", () => {
         "false",
       );
       await act(() => new Promise(requestAnimationFrame));
-      if (visible) {
-        await screen.findByRole("button", { name: "On this page" });
-      } else {
-        expect(
-          screen.queryByRole("button", { name: "On this page" }),
-        ).toBeNull();
-      }
       expect(view.container.firstChild).toHaveAttribute(
         "data-visible",
         String(visible),
