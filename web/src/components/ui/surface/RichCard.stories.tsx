@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import type { ComponentProps } from "react";
 
+import { useSearchHighlights } from "@/components/search/useSearchHighlights";
 import { LStack, styled } from "@/styled-system/jsx";
 import { richCard } from "@/styled-system/recipes";
 import { pluralise } from "@/utils/text";
@@ -128,6 +129,30 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = { args: previewArgs };
+
+export const SearchMatches: Story = {
+  args: {
+    ...previewArgs,
+    text: "Field notes from the lake. ".repeat(60),
+    controls: <Badge>Field notes metadata stays unhighlighted</Badge>,
+  },
+  render: function SearchMatches(args) {
+    const ref = useSearchHighlights("field lake");
+    return (
+      <div ref={ref}>
+        <Card {...args} />
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Search highlighting paints literal query words in Card titles and plain-text previews. Metadata, controls, and preview clipping stay unchanged. Select text normally and check both themes. Cards do not highlight themselves: search containers opt in through useSearchHighlights. This is supplementary emphasis, not selected text, keyboard focus, or backend match evidence; unsupported browsers retain the original Card.",
+      },
+    },
+  },
+};
 
 export const Row: Story = {
   args: {

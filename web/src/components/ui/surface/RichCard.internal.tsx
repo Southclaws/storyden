@@ -92,7 +92,11 @@ export function Card({
 
   const preview = (
     <>
-      {text && <p className={styles.text}>{text}</p>}
+      {text && (
+        <p className={styles.text} data-search-highlight>
+          {text}
+        </p>
+      )}
       {content && (
         <ContentComposer placeholder="" disabled initialValue={content} />
       )}
@@ -147,6 +151,7 @@ export function Card({
 
             <styled.h2 as={headingAs} id={titleId} className={styles.title}>
               <Link
+                data-search-highlight
                 className={linkOverlay()}
                 href={url}
                 prefetch={false}

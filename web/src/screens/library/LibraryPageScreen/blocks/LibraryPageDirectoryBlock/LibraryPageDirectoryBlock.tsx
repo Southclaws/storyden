@@ -1,6 +1,7 @@
 import { ChangeEvent } from "react";
 
 import { NodeTree } from "@/api/openapi-schema";
+import { useSearchHighlights } from "@/components/search/useSearchHighlights";
 import { Unready } from "@/components/site/Unready";
 import { TagBadgeList } from "@/components/tag/TagBadgeList";
 import { IconButton } from "@/components/ui/icon-button";
@@ -8,6 +9,7 @@ import { AddIcon } from "@/components/ui/icons/Add";
 import { MenuIcon } from "@/components/ui/icons/Menu";
 import { Input } from "@/components/ui/input";
 import { Box, HStack, LStack, WStack } from "@/styled-system/jsx";
+import { pluralise } from "@/utils/text";
 
 import { useLibraryPageContext } from "../../Context";
 import { useWatch } from "../../store";
@@ -43,6 +45,7 @@ export function LibraryPageDirectoryBlockContents() {
   } = useDirectoryBlockContext();
   const { nodeID, initialChildren } = useLibraryPageContext();
   const { isDirectEditing } = useEditState();
+  const highlightRef = useSearchHighlights(searchQuery, !isDirectEditing);
 
   function handleSearchChange(event: ChangeEvent<HTMLInputElement>) {
     handleSearch(event.target.value);
@@ -61,7 +64,12 @@ export function LibraryPageDirectoryBlockContents() {
   }
 
   return (
-    <LStack w="full" gap="2">
+    <LStack ref={highlightRef} w="full" gap="2">
+      <Box srOnly role="status" aria-label="Directory results">
+        {searchQuery || tagFilters.length > 0
+          ? `${data.nodes.length} ${pluralise(data.nodes.length, "page")} in this directory.`
+          : ""}
+      </Box>
       <WStack bgColor="background.inset" borderRadius="sm" p="1">
         <TagBadgeList
           tags={tags}
@@ -74,6 +82,7 @@ export function LibraryPageDirectoryBlockContents() {
             variant="inset"
             background="background.inset"
             placeholder="Search..."
+            defaultValue={searchQuery}
             onChange={handleSearchChange}
             minW="20"
             maxW="min"

@@ -432,7 +432,10 @@ function Row({
               <Box minH="4">
                 {match(column.fid)
                   .with("fixed:name", () => (
-                    <Link href={column.href ?? "#"}>
+                    <Link
+                      data-search-highlight={column.value ? "" : undefined}
+                      href={column.href ?? "#"}
+                    >
                       {column.value || (
                         <styled.em color="text.subtle">
                           (untitled page)
