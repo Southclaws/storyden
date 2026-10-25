@@ -1,4 +1,4 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState } from "react";
 
 import { NodeTree } from "@/api/openapi-schema";
 import { useSearchHighlights } from "@/components/search/useSearchHighlights";
@@ -46,9 +46,18 @@ export function LibraryPageDirectoryBlockContents() {
   const { nodeID, initialChildren } = useLibraryPageContext();
   const { isDirectEditing } = useEditState();
   const highlightRef = useSearchHighlights(searchQuery, !isDirectEditing);
+  const [inputQuery, setInputQuery] = useState(searchQuery);
+  const [previousSearchQuery, setPreviousSearchQuery] = useState(searchQuery);
+
+  if (searchQuery !== previousSearchQuery) {
+    setPreviousSearchQuery(searchQuery);
+    setInputQuery(searchQuery);
+  }
 
   function handleSearchChange(event: ChangeEvent<HTMLInputElement>) {
-    handleSearch(event.target.value);
+    const query = event.target.value;
+    setInputQuery(query);
+    handleSearch(query);
   }
 
   const { data, hasChildren, error, tags } = useChildrenWithTags(
@@ -82,7 +91,7 @@ export function LibraryPageDirectoryBlockContents() {
             variant="inset"
             background="background.inset"
             placeholder="Search..."
-            defaultValue={searchQuery}
+            value={inputQuery}
             onChange={handleSearchChange}
             minW="20"
             maxW="min"

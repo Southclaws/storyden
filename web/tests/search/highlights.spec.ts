@@ -161,10 +161,29 @@ for (const layout of ["table", "grid", "grid-placeholder"] as const) {
         '[data-outline-block="directory"]:visible',
       );
       const input = directory.getByPlaceholder("Search...");
+      await expect(input).toHaveValue("");
+      // Keep an unfiltered entry so back/forward changes the query on this page.
+      await page.evaluate(() => {
+        window.history.pushState(null, "", window.location.href);
+      });
       await input.fill("garden tools");
+      await expect(input).toHaveValue("garden tools");
       await expect(directory.getByRole("status")).toHaveText(
         "1 page in this directory.",
       );
+      await expect
+        .poll(() => highlightedText(page))
+        .toEqual(["Garden", "tools"]);
+
+      await page.goBack();
+      await expect(input).toHaveValue("");
+      await expect.poll(() => highlightedText(page)).toEqual([]);
+      await expect(
+        directory.getByText("Harbour notes", { exact: true }),
+      ).toBeVisible();
+
+      await page.goForward();
+      await expect(input).toHaveValue("garden tools");
       await expect
         .poll(() => highlightedText(page))
         .toEqual(["Garden", "tools"]);
