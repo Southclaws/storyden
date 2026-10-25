@@ -3,6 +3,7 @@ import { MenuSelectionDetails, Portal } from "@ark-ui/react";
 import { LayoutIcon } from "@/components/ui/icons/Layout";
 import { LayoutGridIcon } from "@/components/ui/icons/LayoutGrid";
 import { LayoutTableIcon } from "@/components/ui/icons/LayoutTable";
+import { MediaIcon } from "@/components/ui/icons/Media";
 import * as Menu from "@/components/ui/menu";
 import {
   LibraryPageBlockTypeDirectoryConfig,
@@ -11,7 +12,6 @@ import {
 
 import { useLibraryPageContext } from "../../Context";
 
-import { getDefaultBlockConfig } from "./column";
 import { useDirectoryBlock } from "./useDirectoryBlock";
 
 export function LibraryPageDirectoryBlockMenuItems() {
@@ -64,6 +64,10 @@ function LayoutMenu() {
             <Menu.Item value="grid">
               <LayoutGridIcon />
               &nbsp;Grid
+            </Menu.Item>
+            <Menu.Item value="gallery">
+              <MediaIcon />
+              &nbsp;Gallery
             </Menu.Item>
           </Menu.Content>
         </Menu.Positioner>

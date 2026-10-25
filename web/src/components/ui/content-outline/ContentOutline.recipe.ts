@@ -39,9 +39,6 @@ export const contentOutline = defineSlotRecipe({
       gridTemplateColumns: "minmax(0, 1fr)",
       width: "full",
       minWidth: "0",
-      '&[data-visible="true"]': {
-        lg: { gridTemplateColumns: "minmax(0, 1fr) 2.5rem", gap: "3" },
-      },
     },
     body: { minWidth: "0" },
     rail: {
@@ -172,4 +169,49 @@ export const contentOutline = defineSlotRecipe({
       fontWeight: "normal",
     },
   },
+  variants: {
+    placement: {
+      inline: {
+        root: {
+          '&[data-visible="true"]': {
+            lg: { gridTemplateColumns: "minmax(0, 1fr) 2.5rem", gap: "3" },
+          },
+        },
+      },
+      gutter: {
+        root: { position: "relative" },
+        rail: {
+          // Use the space beyond the shell without reserving any page width.
+          position: "absolute",
+          insetBlock: "0",
+          insetInlineStart: "100%",
+          width:
+            "var(--content-outline-gutter-width, min(3rem, max(var(--navigation-shell-viewport-padding, 0px), calc((100vw - var(--navigation-shell-width, 100vw)) / 2))))",
+          height: "full",
+          alignSelf: "stretch",
+          top: "0",
+          transform: "none",
+          pointerEvents: "none",
+          containerType: "inline-size",
+          containerName: "content-outline-gutter",
+        },
+        trigger: {
+          display: "none",
+          position: "sticky",
+          top: "50dvh",
+          transform: "translateY(-50%)",
+          width: "8",
+          minHeight: "8",
+          padding: "1",
+          marginInline: "auto",
+          pointerEvents: "auto",
+          // Hide when the available space cannot fit the trigger.
+          "@container content-outline-gutter (min-width: 2rem)": {
+            display: "flex",
+          },
+        },
+      },
+    },
+  },
+  defaultVariants: { placement: "inline" },
 });

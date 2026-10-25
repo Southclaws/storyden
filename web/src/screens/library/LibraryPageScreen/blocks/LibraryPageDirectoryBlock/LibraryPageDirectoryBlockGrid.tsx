@@ -25,11 +25,10 @@ import { EmptyIcon } from "@/components/ui/icons/Empty";
 import * as Tooltip from "@/components/ui/tooltip";
 import { DragItemNode } from "@/lib/dragdrop/provider";
 import { visibilityColour } from "@/lib/library/visibilityColours";
-import { css, cx } from "@/styled-system/css";
+import { css, cx, sva } from "@/styled-system/css";
 import {
   Box,
   Center,
-  Grid,
   GridItem,
   HStack,
   LStack,
@@ -37,7 +36,6 @@ import {
 } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { linkDisabledProps } from "@/utils/anchor";
-import { getAssetURL } from "@/utils/asset";
 
 import { useLibraryPageContext } from "../../Context";
 import { useEditState } from "../../useEditState";
@@ -49,18 +47,21 @@ import {
   mergeFieldsAndProperties,
   mergeFieldsAndPropertySchema,
 } from "./column";
+import { getDirectoryImageProps } from "./media";
 import { useDirectoryBlock } from "./useDirectoryBlock";
 
 type Props = {
   nodes: NodeWithChildren[];
   block: ReturnType<typeof useDirectoryBlock>;
   currentChildPropertySchema: PropertySchemaList;
+  layout: "grid" | "gallery";
 };
 
 export function LibraryPageDirectoryBlockGrid({
   nodes,
   block,
   currentChildPropertySchema,
+  layout,
 }: Props) {
   const { nodeID, store } = useLibraryPageContext();
   const { sort, handleSort } = useSortIndicator();
@@ -116,10 +117,10 @@ export function LibraryPageDirectoryBlockGrid({
 
   return (
     <SortableContext items={items} strategy={rectSortingStrategy}>
-      <Grid
-        w="full"
-        gap="2"
-        gridTemplateColumns="repeat(auto-fill, minmax(200px, 1fr))"
+      <styled.ul
+        aria-label="Library pages"
+        data-layout={layout}
+        className={directoryGrid({ layout }).list}
       >
         {nodes.map((node) => {
           const columnValues = mergeFieldsAndProperties(
@@ -140,6 +141,7 @@ export function LibraryPageDirectoryBlockGrid({
           return (
             <GridCard
               key={node.id}
+              layout={layout}
               nodeID={nodeID}
               node={node}
               editing={isDirectEditing}
@@ -158,12 +160,13 @@ export function LibraryPageDirectoryBlockGrid({
             />
           );
         })}
-      </Grid>
+      </styled.ul>
     </SortableContext>
   );
 }
 
 type GridCardProps = {
+  layout: "grid" | "gallery";
   nodeID: Identifier;
   node: NodeWithChildren;
   editing: boolean;
@@ -186,6 +189,7 @@ type GridCardProps = {
 };
 
 function GridCard({
+  layout,
   nodeID,
   node,
   editing,
@@ -202,6 +206,10 @@ function GridCard({
   handleSort,
   onFieldValueChange,
 }: GridCardProps) {
+  const { objectFit, ...imageProps } = getDirectoryImageProps(
+    node.primary_image,
+    layout,
+  );
   const {
     attributes,
     listeners,
@@ -253,6 +261,7 @@ function GridCard({
 
   return (
     <GridItem
+      as="li"
       ref={setNodeRef}
       style={dragStyle}
       className={cx(visibilityStyles)}
@@ -260,6 +269,7 @@ function GridCard({
       borderRadius="md"
       bg="background.inset"
       display="flex"
+      width="full"
       flexDirection="column"
       justifyContent="space-between"
       overflow="hidden"
@@ -273,6 +283,7 @@ function GridCard({
           right="2"
           {...listeners}
           {...attributes}
+          aria-label={`Move ${node.name}`}
         >
           <Tooltip.Root
             openDelay={0}
@@ -294,6 +305,7 @@ function GridCard({
                   height="5"
                   padding="0"
                   onClick={handleMenuToggle}
+                  aria-label={`Page options for ${node.name}`}
                 >
                   <DragHandleIcon width="4" />
                 </IconButton>
@@ -342,13 +354,19 @@ function GridCard({
       )}
 
       {!coverImageHiddenState ? (
-        <Link {...linkDisabledProps(editing)} href={`/l/${node.slug}`}>
+        <Link
+          {...linkDisabledProps(editing)}
+          href={`/l/${node.slug}`}
+          aria-label={node.name}
+        >
           {node.primary_image ? (
             <styled.img
-              src={getAssetURL(node.primary_image.path, "m")}
-              objectFit="cover"
-              w="full"
-              h="32"
+              {...imageProps}
+              data-fit={objectFit}
+              className={directoryGrid({ layout }).image}
+              loading="lazy"
+              decoding="async"
+              alt=""
             />
           ) : (
             <Center h="32" p="2">
@@ -553,3 +571,45 @@ function GridCard({
     </GridItem>
   );
 }
+
+const directoryGrid = sva({
+  slots: ["list", "image"],
+  base: {
+    list: {
+      width: "full",
+      gap: "2",
+      "& > li": { minWidth: "0" },
+    },
+    image: {
+      width: "full",
+      objectFit: "cover",
+      '&[data-fit="contain"]': { objectFit: "contain" },
+    },
+  },
+  variants: {
+    layout: {
+      grid: {
+        list: {
+          display: "grid",
+          gridTemplateColumns:
+            "repeat(auto-fill, minmax(min(100%, 200px), 1fr))",
+        },
+        image: { aspectRatio: "4 / 3" },
+      },
+      gallery: {
+        list: {
+          display: "block",
+          columnWidth: "[200px]",
+          columnGap: "2",
+          columnFill: "balance",
+          "& > li": { breakInside: "avoid", marginBottom: "2" },
+        },
+        image: {
+          height: "auto",
+          minHeight: "8",
+          maxHeight: "[min(70svh,40rem)]",
+        },
+      },
+    },
+  },
+});

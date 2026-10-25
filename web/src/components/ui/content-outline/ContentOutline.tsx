@@ -18,6 +18,7 @@ export type ContentOutlineProps = PropsWithChildren<{
   label: string;
   collectEntries: CollectOutlineEntries;
   disabled?: boolean;
+  placement?: "inline" | "gutter";
 }>;
 
 export function ContentOutline({
@@ -25,21 +26,27 @@ export function ContentOutline({
   label,
   collectEntries,
   disabled = false,
+  placement = "inline",
 }: ContentOutlineProps) {
   const { rootRef, entries, activeKey, visible } = useContentOutline(
     collectEntries,
     disabled,
   );
-  const styles = contentOutline();
+  const styles = contentOutline({ placement });
 
   return (
-    <div className={styles.root} data-visible={visible}>
+    <div
+      className={styles.root}
+      data-visible={visible}
+      data-placement={placement}
+    >
       <div className={styles.body} ref={rootRef}>
         {children}
       </div>
 
       {visible && (
         <ContentOutlineRail
+          placement={placement}
           label={label}
           entries={entries}
           activeKey={activeKey}

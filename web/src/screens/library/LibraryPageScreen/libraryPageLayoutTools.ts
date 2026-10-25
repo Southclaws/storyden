@@ -287,11 +287,19 @@ export async function waitForLibraryPageLayoutSave(
     let settled = false;
 
     const finish = (error?: Error) => {
-      if (settled) return;
+      if (settled) {
+        return;
+      }
+
       settled = true;
       clearTimeout(timeout);
       unsubscribe();
-      error ? reject(error) : resolve();
+
+      if (error) {
+        reject(error);
+      } else {
+        resolve();
+      }
     };
 
     const unsubscribe = store.subscribe((state) => {

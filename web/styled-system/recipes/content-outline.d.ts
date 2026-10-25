@@ -1,7 +1,9 @@
 import type { ConditionalValue } from '../types/system';
 import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-export type ContentOutlineVariant = {}
+export type ContentOutlineVariant = {
+  placement?: "gutter" | "inline"
+}
 
 export type ContentOutlineVariantProps = {
   [K in keyof ContentOutlineVariant]?: ConditionalValue<ContentOutlineVariant[K]>

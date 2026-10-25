@@ -101,33 +101,38 @@ describe("Library page WebMCP tool implementations", () => {
     });
   });
 
-  it("updates directory presentation without exposing or discarding columns", async () => {
-    const store = createStore();
-    const tools = createLibraryPageLayoutToolImplementations(
-      store,
-      async () => {},
-    );
+  it.each(["grid", "gallery"] as const)(
+    "updates directory presentation to %s without exposing or discarding columns",
+    async (layout) => {
+      const store = createStore();
+      const tools = createLibraryPageLayoutToolImplementations(
+        store,
+        async () => {},
+      );
 
-    const output = await tools.library_page_block_directory_update({
-      layout: "grid",
-    });
+      const output = await tools.library_page_block_directory_update({
+        layout,
+      });
 
-    expect(output.layout.blocks[2]).toEqual({
-      type: "directory",
-      layout: "grid",
-    });
-    expect(
-      store
-        .getState()
-        .draft.meta.layout?.blocks.find((block) => block.type === "directory"),
-    ).toEqual({
-      type: "directory",
-      config: {
-        layout: "grid",
-        columns: [{ fid: "field-1", hidden: false }],
-      },
-    });
-  });
+      expect(output.layout.blocks[2]).toEqual({
+        type: "directory",
+        layout,
+      });
+      expect(
+        store
+          .getState()
+          .draft.meta.layout?.blocks.find(
+            (block) => block.type === "directory",
+          ),
+      ).toEqual({
+        type: "directory",
+        config: {
+          layout,
+          columns: [{ fid: "field-1", hidden: false }],
+        },
+      });
+    },
+  );
 
   it("returns actionable errors for invalid progressive changes", async () => {
     const tools = createTools();

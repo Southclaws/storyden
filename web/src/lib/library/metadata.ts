@@ -93,6 +93,7 @@ export type LibraryPageBlockTypeProperties = z.infer<
 export const LibraryPageBlockTypeDirectoryLayoutSchema = z.enum([
   "table",
   "grid",
+  "gallery",
 ]);
 export type LibraryPageBlockTypeDirectoryLayout = z.infer<
   typeof LibraryPageBlockTypeDirectoryLayoutSchema

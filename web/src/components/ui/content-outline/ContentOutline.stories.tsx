@@ -5,6 +5,7 @@ import { Box, styled } from "@/styled-system/jsx";
 import {
   ContentOutline,
   type ContentOutlineEntry,
+  type ContentOutlineProps,
   collectContentHeadings,
 } from ".";
 
@@ -17,7 +18,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "A desktop reading aid for headings, page blocks and current-page replies. It appears only with at least two entries and reading content at least twice the viewport height. Short content keeps its full width and does not load the rail UI. The quiet tick rail becomes prominent on hover or focus and opens a navigable outline. Clicking an open rail closes it; clicking or tapping a closed rail opens it. Overflowing ends fade as a scroll cue, and a small separator distinguishes replies from the original content. Reply rows pair author and relative date above a snippet. Screens provide rendered targets through a scoped collector. Use SectionNavigation for route navigation, TreeView for hierarchy browsing and Popover for generic supporting content. Do not use while editing, for embedded previews or on mobile. Keyboard users can press Enter to enter the outline; Escape restores focus and selecting a row focuses its destination.",
+          "A desktop reading aid for headings, page blocks and current-page replies. It appears only with at least two entries and reading content at least twice the viewport height. Short content keeps its full width and does not load the rail UI. Library pages use gutter placement: the rail sits outside the content on the right, stays with the viewport and hides when the available gutter is narrower than 2rem. Inline placement keeps a right-hand rail for threads. The quiet tick rail becomes prominent on hover or focus and opens a navigable outline. Clicking an open rail closes it; clicking or tapping a closed rail opens it. Overflowing ends fade as a scroll cue, and a small separator distinguishes replies from the original content. Reply rows pair author and relative date above a snippet. Screens provide rendered targets through a scoped collector. Use SectionNavigation for route navigation, TreeView for hierarchy browsing and Popover for generic supporting content. Do not use while editing, for embedded previews or on mobile. Keyboard users can press Enter to enter the outline; Escape restores focus and selecting a row focuses its destination.",
       },
     },
   },
@@ -72,10 +73,12 @@ function ReadingExample({
   count = 8,
   replies = false,
   disabled = false,
+  placement = "inline",
 }: {
   count?: number;
   replies?: boolean;
   disabled?: boolean;
+  placement?: ContentOutlineProps["placement"];
 }) {
   return (
     <Box maxW="5xl" mx="auto" p="6">
@@ -83,6 +86,7 @@ function ReadingExample({
         label={replies ? "In this thread" : "On this page"}
         collectEntries={collect}
         disabled={disabled}
+        placement={placement}
       >
         <styled.h1 fontSize="2xl" mb="6">
           Environment art field notes
@@ -112,6 +116,20 @@ function ReadingExample({
 
 export const Page: Story = { render: () => <ReadingExample /> };
 export const Thread: Story = { render: () => <ReadingExample replies /> };
+export const Gutter: Story = {
+  render: () => (
+    <Box css={{ "--content-outline-gutter-width": "3rem" }}>
+      <ReadingExample placement="gutter" />
+    </Box>
+  ),
+};
+export const NarrowGutter: Story = {
+  render: () => (
+    <Box css={{ "--content-outline-gutter-width": "1.5rem" }}>
+      <ReadingExample placement="gutter" />
+    </Box>
+  ),
+};
 export const ShortPage: Story = { render: () => <ReadingExample count={1} /> };
 export const ShortThread: Story = {
   render: () => <ReadingExample count={2} replies />,

@@ -25,7 +25,7 @@ definitions:
     properties:
       layout:
         type: string
-        enum: [table, grid]
+        enum: [table, grid, gallery]
     additionalProperties: false
 
   ToolLibraryPageBlockDirectoryUpdateOutput:

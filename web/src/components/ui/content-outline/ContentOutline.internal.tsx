@@ -8,6 +8,7 @@ import * as Popover from "@/components/ui/popover";
 import { RelativeTime } from "@/components/ui/relative-time";
 import { contentOutline } from "@/styled-system/recipes";
 
+import type { ContentOutlineProps } from "./ContentOutline";
 import type { ContentOutlineEntry } from "./outline";
 import { useContentOutlineRail } from "./useContentOutlineRail";
 
@@ -15,10 +16,16 @@ type Props = {
   label: string;
   entries: ContentOutlineEntry[];
   activeKey?: string;
+  placement: NonNullable<ContentOutlineProps["placement"]>;
 };
 
-export function ContentOutlineRail({ label, entries, activeKey }: Props) {
-  const styles = contentOutline();
+export function ContentOutlineRail({
+  label,
+  entries,
+  activeKey,
+  placement,
+}: Props) {
+  const styles = contentOutline({ placement });
   const { open, triggerRef, panelRef, ticksRef, menuScrollRef, handlers } =
     useContentOutlineRail(activeKey);
 
@@ -41,7 +48,10 @@ export function ContentOutlineRail({ label, entries, activeKey }: Props) {
         autoFocus={false}
         restoreFocus={false}
         modal={false}
-        positioning={{ placement: "left", gutter: 8 }}
+        positioning={{
+          placement: "left",
+          gutter: 8,
+        }}
         onOpenChange={handlers.handleOpenChange}
         onFocusOutside={handlers.handleFocusOutside}
         onEscapeKeyDown={handlers.handleEscapeKeyDown}

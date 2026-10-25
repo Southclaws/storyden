@@ -123,9 +123,11 @@ function LibraryPageDirectoryBlockLayout({ nodes }: { nodes: NodeTree }) {
 
   // Switch between different layout views
   switch (layout) {
+    case "gallery":
     case "grid":
       return (
         <LibraryPageDirectoryBlockGrid
+          layout={layout}
           nodes={nodes}
           block={block}
           currentChildPropertySchema={currentChildPropertySchema}

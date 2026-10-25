@@ -96,6 +96,7 @@ export function LibraryPage({ embedded = false }: { embedded?: boolean }) {
 
   return (
     <ContentOutline
+      placement="gutter"
       label="On this page"
       collectEntries={collectLibraryOutline}
       disabled={embedded || editing || Boolean(versionID)}

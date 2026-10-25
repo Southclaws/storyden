@@ -34,7 +34,7 @@ export async function GET() {
     const apiDocs = new URL(`/api${getGetDocsUrl()}`, api);
 
     const hasMCP = catalog?.entries.some(
-      (entry) => entry.type === "application/mcp-server-card+json"
+      (entry) => entry.type === "application/mcp-server-card+json",
     );
 
     let mcpSection = "";
@@ -85,7 +85,7 @@ MCP discovery: unavailable from this instance.
       `- [Storyden CLI](https://www.storyden.org/docs/introduction/cli):
   Install and use \`sd\` for command line based access.`,
       `- [OAuth and client registration](https://www.storyden.org/docs/introduction/oauth/client-registration):
-  Learn operator-controlled authorization options.`
+  Learn operator-controlled authorization options.`,
     );
 
     const body = `# ${info.title}

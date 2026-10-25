@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 
+import { handle } from "@/api/client";
 import {
   useNodeVersionDraftGet,
   useNodeVersionList,
@@ -29,7 +30,12 @@ import { Box, HStack, LStack, WStack } from "@/styled-system/jsx";
 
 import { useLibraryPath } from "../useLibraryPath";
 
+import { useLibraryPageContext } from "./Context";
 import { PageVersionStatusBadge } from "./PageVersionStatusBadge";
+import {
+  toWebMCPLayout,
+  waitForLibraryPageLayoutSave,
+} from "./libraryPageLayoutTools";
 import { useLibraryPagePermissions } from "./permissions";
 import { useEditState } from "./useEditState";
 
@@ -47,8 +53,15 @@ export function LibraryPageEditMenu({ node }: Props) {
     ...parseAsString,
     clearOnDefault: true,
   });
-  const { editing, saving, startDirectEdit, startProposalEdit, stopEditing } =
-    useEditState();
+  const {
+    editing,
+    isDirectEditing,
+    saving,
+    startDirectEdit,
+    startProposalEdit,
+    stopEditing,
+  } = useEditState();
+  const { store } = useLibraryPageContext();
   const { isAllowedToDirectEdit, isAllowedToEdit, isAllowedToProposeEdit } =
     useLibraryPagePermissions();
   const { data, mutate } = useNodeVersionList(node.id, undefined, {
@@ -93,7 +106,21 @@ export function LibraryPageEditMenu({ node }: Props) {
     setOpen(false);
   }
 
-  function handleViewPage() {
+  async function handleViewPage() {
+    if (isDirectEditing) {
+      // View revalidates the page; let the queued layout save finish first.
+      const saved = await handle(
+        async () => {
+          await waitForLibraryPageLayoutSave(
+            store,
+            toWebMCPLayout(store.getState().draft.meta.layout),
+          );
+          return true;
+        },
+        { errorToast: true },
+      );
+      if (!saved) return;
+    }
     stopEditing();
   }
 

@@ -65,7 +65,7 @@ export interface LibraryPageLayoutBlock {
   /**
    * Layout mode for an assets or directory block.
    */
-  layout?: "strip" | "grid" | "table";
+  layout?: "strip" | "grid" | "table" | "gallery";
   /**
    * Column count for an assets block using the grid layout.
    */
@@ -164,7 +164,7 @@ export interface LibraryPageBlockDirectoryUpdate {
   [k: string]: unknown;
 }
 export interface ToolLibraryPageBlockDirectoryUpdateInput {
-  layout: "table" | "grid";
+  layout: "table" | "grid" | "gallery";
 }
 export interface ToolLibraryPageBlockDirectoryUpdateOutput {
   /**
@@ -510,7 +510,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
                     "enum": [
                       "strip",
                       "grid",
-                      "table"
+                      "table",
+                      "gallery"
                     ],
                     "description": "Layout mode for an assets or directory block."
                   },
@@ -623,7 +624,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
                     "enum": [
                       "strip",
                       "grid",
-                      "table"
+                      "table",
+                      "gallery"
                     ],
                     "description": "Layout mode for an assets or directory block."
                   },
@@ -722,7 +724,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
                     "enum": [
                       "strip",
                       "grid",
-                      "table"
+                      "table",
+                      "gallery"
                     ],
                     "description": "Layout mode for an assets or directory block."
                   },
@@ -835,7 +838,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
                     "enum": [
                       "strip",
                       "grid",
-                      "table"
+                      "table",
+                      "gallery"
                     ],
                     "description": "Layout mode for an assets or directory block."
                   },
@@ -934,7 +938,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
                     "enum": [
                       "strip",
                       "grid",
-                      "table"
+                      "table",
+                      "gallery"
                     ],
                     "description": "Layout mode for an assets or directory block."
                   },
@@ -977,7 +982,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
           "type": "string",
           "enum": [
             "table",
-            "grid"
+            "grid",
+            "gallery"
           ]
         }
       },
@@ -1027,7 +1033,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
                     "enum": [
                       "strip",
                       "grid",
-                      "table"
+                      "table",
+                      "gallery"
                     ],
                     "description": "Layout mode for an assets or directory block."
                   },
