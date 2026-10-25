@@ -11,6 +11,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/reqinfo"
@@ -156,7 +157,13 @@ func (m *Middleware) WithRateLimit() func(next http.Handler) http.Handler {
 				key = r.RemoteAddr
 			}
 
-			isAuthenticated := session.GetOptAccountID(ctx).Ok()
+			session := session.GetOptAccountID(ctx)
+			isAuthenticated := session.Ok()
+
+			if isAuthenticated && isRateLimitExempt(ctx) {
+				next.ServeHTTP(w, r)
+				return
+			}
 
 			cost := m.getCost(ctx)
 
@@ -205,6 +212,14 @@ func (m *Middleware) WithRateLimit() func(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+func isRateLimitExempt(ctx context.Context) bool {
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+		return false
+	}
+
+	return true
 }
 
 func (m *Middleware) getCost(ctx context.Context) int {
