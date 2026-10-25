@@ -5,6 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
+  '@zag-js/combobox@1.43.3': 370959883cd9792b4e904c9d8bc1a9772aa5e8cc8d88d760bc27ac7d4f0dcc00
   '@zag-js/menu@1.43.3': dabdcf16a6a706e3a391aa82c63deb35c68ed5ccb38c78269c6d0dd694566362
   '@zag-js/tree-view@1.43.3': 606a6f00785b4a2fcef860f00fdd43e1a410101b61e3d586cf790b15f1e9a05c
 
@@ -5071,7 +5072,7 @@ snapshots:
       '@zag-js/collection': 1.43.3
       '@zag-js/color-picker': 1.43.3
       '@zag-js/color-utils': 1.43.3
-      '@zag-js/combobox': 1.43.3
+      '@zag-js/combobox': 1.43.3(patch_hash=370959883cd9792b4e904c9d8bc1a9772aa5e8cc8d88d760bc27ac7d4f0dcc00)
       '@zag-js/core': 1.43.3
       '@zag-js/date-input': 1.43.3(@internationalized/date@3.12.4)
       '@zag-js/date-picker': 1.43.3(@internationalized/date@3.12.4)
@@ -7280,7 +7281,7 @@ snapshots:
     dependencies:
       '@zag-js/utils': 1.43.3
 
-  '@zag-js/combobox@1.43.3':
+  '@zag-js/combobox@1.43.3(patch_hash=370959883cd9792b4e904c9d8bc1a9772aa5e8cc8d88d760bc27ac7d4f0dcc00)':
     dependencies:
       '@zag-js/anatomy': 1.43.3
       '@zag-js/collection': 1.43.3

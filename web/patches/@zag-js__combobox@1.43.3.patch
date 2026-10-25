@@ -1,0 +1,30 @@
+diff --git a/dist/combobox.machine.js b/dist/combobox.machine.js
+index 754a6313f52a07ec3531e70b5cbc9495a092c756..4444e7ba79a6030f64f28e508ad4f98439f92edf 100644
+--- a/dist/combobox.machine.js
++++ b/dist/combobox.machine.js
+@@ -826,8 +826,9 @@ var machine = createMachine({
+           dom.focusInputEl(scope);
+         });
+       },
+-      setFinalFocus({ scope }) {
++      setFinalFocus({ scope, state }) {
+         (0, import_dom_query.raf)(() => {
++          if (!state.hasTag("focused")) return;
+           const triggerEl = dom.getTriggerEl(scope);
+           if (triggerEl?.dataset.focusable == null) {
+             dom.focusInputEl(scope);
+diff --git a/dist/combobox.machine.mjs b/dist/combobox.machine.mjs
+index f3d8d0b4922094e13d4f4cb945b3f2b564f6081f..f12e266ebf300cf978c8cff2f485ec49470be1cc 100644
+--- a/dist/combobox.machine.mjs
++++ b/dist/combobox.machine.mjs
+@@ -804,8 +804,9 @@ var machine = createMachine({
+           dom.focusInputEl(scope);
+         });
+       },
+-      setFinalFocus({ scope }) {
++      setFinalFocus({ scope, state }) {
+         raf(() => {
++          if (!state.hasTag("focused")) return;
+           const triggerEl = dom.getTriggerEl(scope);
+           if (triggerEl?.dataset.focusable == null) {
+             dom.focusInputEl(scope);

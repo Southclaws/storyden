@@ -1,13 +1,19 @@
 import { createListCollection } from "@ark-ui/react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { useId } from "react";
+import { useForm } from "react-hook-form";
 
 import { LStack } from "@/styled-system/jsx";
 
+import { FormControl } from "../form-control";
+import { FormLabel } from "../form-label";
 import { CheckIcon } from "../icons/Check";
 import { SelectIcon } from "../icons/Select";
 import { Input } from "../input";
+import { Textarea } from "../textarea";
 
 import * as Combobox from ".";
+import { ComboboxField } from "./Combobox.field";
 
 const items = [
   { label: "General", value: "general" },
@@ -90,4 +96,40 @@ export const Sizes: Story = {
       ))}
     </LStack>
   ),
+};
+
+export const FollowingField: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Select a category, then Tab or click into the instructions. Closing the option list keeps focus on the following field once you have moved there.",
+      },
+    },
+  },
+  render: function FollowingField() {
+    const form = useForm({ defaultValues: { category: "", instruction: "" } });
+    const instructionID = useId();
+    return (
+      <LStack gap="4" maxW="sm" alignItems="stretch">
+        <FormControl>
+          <FormLabel>Category</FormLabel>
+          <ComboboxField
+            control={form.control}
+            name="category"
+            items={items}
+            placeholder="Select a category"
+            ariaLabel="Category"
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel id={instructionID}>Instructions</FormLabel>
+          <Textarea
+            aria-labelledby={instructionID}
+            {...form.register("instruction")}
+          />
+        </FormControl>
+      </LStack>
+    );
+  },
 };

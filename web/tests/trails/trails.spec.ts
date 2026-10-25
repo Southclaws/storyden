@@ -64,6 +64,56 @@ test.describe("Trails", () => {
     await unlink(scriptPath).catch(() => undefined);
   });
 
+  test("keeps instruction focus when Robot selection finishes closing", async ({
+    page,
+  }) => {
+    await login(page, ADMIN_USERNAME, ADMIN_PASSWORD);
+    await page.goto("/robots/trails/new");
+    const robot = page.getByRole("combobox", { name: "Robot action 1" });
+    await robot.fill(robotName);
+    await robot.press("ArrowDown");
+    await expect(robot).toHaveAttribute("aria-expanded", "true");
+
+    await page.evaluate(() => new Promise(requestAnimationFrame));
+
+    // Hold closing focus work until the user has moved to the instruction.
+    await page.evaluate(() => {
+      const requestFrame = window.requestAnimationFrame;
+      const cancelFrame = window.cancelAnimationFrame;
+      const frames = new Map<number, FrameRequestCallback>();
+      let frameID = 1_000_000;
+      window.requestAnimationFrame = (callback) => {
+        frames.set(++frameID, callback);
+        return frameID;
+      };
+      window.cancelAnimationFrame = (id) => {
+        if (!frames.delete(id)) cancelFrame.call(window, id);
+      };
+      (
+        window as Window & { flushSelectionFrames?: () => number }
+      ).flushSelectionFrames = () => {
+        window.requestAnimationFrame = requestFrame;
+        window.cancelAnimationFrame = cancelFrame;
+        for (const callback of frames.values()) callback(performance.now());
+        return frames.size;
+      };
+    });
+    await robot.press("Enter");
+    await expect(robot).toHaveAttribute("aria-expanded", "false");
+    const instruction = page.getByLabel("Unattended instruction 1");
+    await instruction.focus();
+    const frameCount = await page.evaluate(() => {
+      return (window as Window & { flushSelectionFrames?: () => number })
+        .flushSelectionFrames!();
+    });
+    expect(frameCount).toBeGreaterThan(0);
+    // Type into the focused control, as a keyboard user would.
+    await page.keyboard.insertText("complete trail action");
+    await expect(instruction).toBeFocused();
+    await expect(instruction).toHaveValue("complete trail action");
+    await expect(robot).toHaveValue(robotName);
+  });
+
   test("creates, previews, runs, records attention, and pauses a Trail", async ({
     page,
   }) => {

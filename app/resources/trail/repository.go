@@ -818,6 +818,10 @@ func (r *Repository) AggregateRun(ctx context.Context, actionRunID ActionRunID) 
 		case entactionrun.StatusCancelled:
 		}
 	}
+	update := r.db.TrailRun.Update().Where(
+		entrun.IDEQ(row.RunID),
+		entrun.StatusIn(entrun.StatusQueued, entrun.StatusRunning),
+	)
 	if !terminal {
 		status := entrun.StatusQueued
 		if hasRunning {
@@ -825,7 +829,10 @@ func (r *Repository) AggregateRun(ctx context.Context, actionRunID ActionRunID) 
 		} else if !hasQueued {
 			status = entrun.StatusRunning
 		}
-		_, err = r.db.TrailRun.UpdateOneID(row.RunID).SetStatus(status).ClearFinishedAt().Save(ctx)
+		if status == entrun.StatusQueued {
+			update.Where(entrun.StatusEQ(entrun.StatusQueued))
+		}
+		err = update.SetStatus(status).ClearFinishedAt().Exec(ctx)
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 	status := entrun.StatusCompleted
@@ -834,7 +841,7 @@ func (r *Repository) AggregateRun(ctx context.Context, actionRunID ActionRunID) 
 	} else if allCancelled {
 		status = entrun.StatusCancelled
 	}
-	_, err = r.db.TrailRun.UpdateOneID(row.RunID).SetStatus(status).SetFinishedAt(time.Now().UTC()).Save(ctx)
+	err = update.SetStatus(status).SetFinishedAt(time.Now().UTC()).Exec(ctx)
 	return fault.Wrap(err, fctx.With(ctx))
 }
 

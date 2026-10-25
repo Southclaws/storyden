@@ -8,6 +8,8 @@ allowBuilds:
   unrs-resolver: true
   "@parcel/watcher": true
 patchedDependencies:
+  # Do not restore combobox focus after the user has moved to another field.
+  '@zag-js/combobox@1.43.3': patches/@zag-js__combobox@1.43.3.patch
   # Prevent deferred focus from stealing focus after Escape closes a menu.
   '@zag-js/menu@1.43.3': patches/@zag-js__menu@1.43.3.patch
   # Keep plain "a" available for tree typeahead; covered by DragTree.test.tsx.
