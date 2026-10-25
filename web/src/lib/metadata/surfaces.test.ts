@@ -167,7 +167,8 @@ beforeEach(() => {
     }
 
     expect(request.headers.has("Authorization")).toBe(false);
-    expect(request.headers.has("x-forwarded-for")).toBe(false);
+    expect(request.headers.get("x-forwarded-for")).toBe("203.0.113.1");
+    expect(request.headers.get("x-storyden-ssr")).toBe("1");
     expect(request.cache).toBe("no-store");
 
     return Response.json(
