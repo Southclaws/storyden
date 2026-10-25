@@ -17,6 +17,7 @@ import { PageHeading } from "@/components/ui/page-heading";
 import { ToggleGroupField } from "@/components/ui/toggle-group";
 import { Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { vstack } from "@/styled-system/patterns";
+import { pluralise } from "@/utils/text";
 
 import { Props, useSearchScreen } from "./useSearch";
 
@@ -160,6 +161,12 @@ export function SearchScreen(props: Props) {
         </Flex>
       </LStack>
 
+      <styled.p srOnly role="status" aria-label="Search results">
+        {!isLoading && error === undefined && results
+          ? `${results.items.length} search ${pluralise(results.items.length, "result")} on this page.`
+          : ""}
+      </styled.p>
+
       {isLoading || error !== undefined ? (
         <UnreadyBanner error={error} />
       ) : results?.items.length ? (
@@ -171,7 +178,7 @@ export function SearchScreen(props: Props) {
             totalPages={results.total_pages}
             pageSize={results.page_size}
           />
-          <DatagraphSearchResults result={results} />
+          <DatagraphSearchResults result={results} query={query} />
         </>
       ) : (
         <EmptyState hideContributionLabel>

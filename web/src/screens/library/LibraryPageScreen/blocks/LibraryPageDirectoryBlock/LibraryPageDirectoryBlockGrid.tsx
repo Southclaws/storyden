@@ -372,6 +372,7 @@ function GridCard({
             <Center h="32" p="2">
               {coverImagePlaceholder ? (
                 <styled.span
+                  data-search-highlight
                   textAlign="center"
                   textWrap="balance"
                   color="text.subtle"
@@ -411,6 +412,7 @@ function GridCard({
             ) : (
               <Link href={`/l/${node.slug}`}>
                 <styled.div
+                  data-search-highlight
                   fontWeight="semibold"
                   lineClamp="1"
                   textOverflow="ellipsis"

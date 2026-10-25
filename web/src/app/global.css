@@ -1,5 +1,10 @@
 @layer reset, base, tokens, recipes, utilities;
 
+::highlight(storyden-search-match) {
+  background-color: var(--colors-accent-muted);
+  color: var(--colors-accent-text);
+}
+
 @layer base {
   *,
   *::before,
