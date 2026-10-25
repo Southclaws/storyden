@@ -1,3 +1,7 @@
 {
-  "pages": ["access_get", "get_config", "robot_run"]
+    "pages": [
+        "access_get",
+        "get_config",
+        "robot_run"
+    ]
 }
