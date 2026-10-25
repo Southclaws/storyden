@@ -86,8 +86,8 @@ export function HeroSection() {
             </Link>
           </HStack>
           <p className="hero-description">
-            An open-source forum and shared Library for communities that want
-            their conversations, discoveries, and knowledge to last.
+            An open-source forum and knowledgebase for communities that want
+            their conversations, discoveries, and wisdom to last.
           </p>
         </VStack>
       </GridItem>

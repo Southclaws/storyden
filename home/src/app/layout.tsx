@@ -74,7 +74,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://www.storyden.org"),
   title: "Storyden — A home for your people and what they know.",
   description:
-    "An open-source forum and shared Library for communities that want their conversations, discoveries, and knowledge to last. Self-hosted, extensible, with optional AI assistance.",
+    "An open-source forum and knowledgebase for communities that want their conversations, discoveries, and wisdom to last. Self-hosted, extensible, with optional AI assistance.",
   openGraph: {
     type: "website",
     locale: "en_GB",
