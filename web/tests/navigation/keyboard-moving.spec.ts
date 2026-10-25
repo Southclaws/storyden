@@ -161,6 +161,9 @@ test("moving into a page that hides children retains focus on the visible parent
   const destination = tree.locator("a").filter({ hasText: target.name });
   await carried.focus();
   await page.keyboard.press("Alt+Shift+KeyM");
+  await expect(tree.locator("..").getByRole("status")).toContainText(
+    `Carrying ${source.name}`,
+  );
   await page.keyboard.type(target.name);
   await expect(destination).toBeFocused();
   await page.keyboard.press("Enter");

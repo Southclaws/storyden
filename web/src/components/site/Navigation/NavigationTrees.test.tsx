@@ -63,6 +63,10 @@ vi.mock("@/auth", () => ({
   useSession: (initialSession?: Account) => initialSession,
 }));
 
+vi.mock("@/lib/settings/capabilities", () => ({
+  useCapability: () => false,
+}));
+
 vi.mock("@/lib/category/events", () => ({
   useCategoryEvent: vi.fn(),
 }));

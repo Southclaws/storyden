@@ -90,7 +90,6 @@ test("member decorations and navigation bullets resolve Panda tokens in CSS", as
   const bullet = page
     .getByRole("tree", { name: "Library pages" })
     .getByRole("treeitem", { name: node.name, exact: true })
-    .locator("..")
     .locator('svg:has(circle[r="2.5"])');
   await expect(bullet).toHaveCSS("fill", "rgb(12, 34, 56)");
   await expect(bullet).toHaveCSS("width", "16px");
