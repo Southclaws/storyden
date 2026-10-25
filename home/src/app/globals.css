@@ -1,7 +1,5 @@
 @layer reset, theme, base, panda_base, components, panda_tokens, panda_recipes, panda_utilities, utilities;
 
-@import "fumadocs-openapi/css/preset.css";
-
 *::selection {
   color: hsla(160, 9%, 92%, 1);
   background-color: hsla(0, 0%, 19%, 1);
@@ -83,6 +81,10 @@ body {
 #nd-home-layout {
   padding: 0;
   margin: 0;
+}
+
+#nd-nav {
+  --color-fd-muted-foreground: #666666;
 }
 
 details {

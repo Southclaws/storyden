@@ -1,8 +1,10 @@
 import { DocsLayout, DocsLayoutProps } from "fumadocs-ui/layouts/docs";
 import type { ReactNode } from "react";
 
-import { baseOptions } from "@/app/layout.config";
+import { baseOptions, githubLink } from "@/app/layout.config";
 import { source } from "@/lib/source";
+
+import "fumadocs-openapi/css/preset.css";
 
 const docsOptions: DocsLayoutProps = {
   ...baseOptions,
@@ -10,6 +12,7 @@ const docsOptions: DocsLayoutProps = {
   links: [
     { text: "Storyden home", url: "/" },
     { text: "Live demo", url: "https://makeroom.club", external: true },
+    githubLink,
   ],
 };
 

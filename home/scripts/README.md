@@ -9,3 +9,13 @@ Build hosts without tokei retain the last measured line count, with its measurem
 To refresh the checked-in measurements, install tokei, run `pnpm stats:refresh` from `home`, and include the updated snapshot in the change. This also refreshes the GitHub fallback values; it fails if any GitHub request fails rather than dating old values as new measurements.
 
 Run the loader's pagination and failure-handling tests with `pnpm exec tsx --test src/lib/home-stats.test.ts`.
+
+# Local fonts
+
+Run `uv run home/scripts/subset-fonts.py` from the repository root to regenerate
+the font files in `src/fonts/static/subsets`. The original files in `static`
+remain the source of truth. Subsets retain Latin and extended Latin characters,
+combining accents, punctuation, currencies, arrows and canonical compositions.
+They preserve the original glyph mappings and outlines. Other scripts use the
+site's system-font fallback. The generated files are checked in, so normal
+builds do not need Python or access to a font service.

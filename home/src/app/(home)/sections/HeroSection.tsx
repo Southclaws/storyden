@@ -1,9 +1,26 @@
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 
 import { cx } from "@/styled-system/css";
 import { Box, Grid, GridItem, HStack, VStack } from "@/styled-system/jsx";
 import { linkButton } from "@/styled-system/patterns";
+
+const { props: mobileLake } = getImageProps({
+  src: "/square-nice-lake.webp",
+  width: 1024,
+  height: 1024,
+  sizes: "100vw",
+  alt: "",
+});
+const { props: desktopLake } = getImageProps({
+  src: "/wide-nice-lake.webp",
+  width: 3456,
+  height: 1728,
+  sizes: "100vw",
+  alt: "",
+  loading: "eager",
+  fetchPriority: "high",
+});
 
 export function HeroSection() {
   return (
@@ -12,24 +29,19 @@ export function HeroSection() {
         <picture>
           <source
             media="(max-width: 767px)"
-            srcSet="square-nice-lake.webp"
+            srcSet={mobileLake.srcSet}
+            sizes="100vw"
             width={1024}
             height={1024}
           />
           <source
             media="(min-width: 768px)"
-            srcSet="wide-nice-lake.webp"
+            srcSet={desktopLake.srcSet}
+            sizes="100vw"
             width={3456}
             height={1728}
           />
-          <img
-            src="wide-nice-lake.webp"
-            role="presentation"
-            alt="A sun-lit lake sitting before tall snow-covered mountains in the distance."
-            width={3456}
-            height={1728}
-            fetchPriority="high"
-          />
+          <img {...desktopLake} alt="" />
         </picture>
       </GridItem>
 
@@ -43,12 +55,13 @@ export function HeroSection() {
         background="linear-gradient(180deg, rgba(59, 83, 111, 0) 49.48%, #000000 97.92%)"
       >
         <VStack gap="6" pt="16">
-          <Box width={[36, 40, 40, 48]}>
+          <Box as="h1" width={[36, 40, 40, 48]}>
             <Image
+              className="hero-logo"
               src="/brand/fullmark_newspaper_vertical_large.png"
               width="1790"
               height="1170"
-              alt="The Storyden logo"
+              alt="Storyden — A home for your people and what they know."
               sizes="(min-width: 1024px) 192px, (min-width: 640px) 160px, 144px"
               loading="eager"
             />
@@ -61,6 +74,7 @@ export function HeroSection() {
                 boxShadow: "xl",
               })}
               href="/docs/introduction"
+              prefetch={false}
             >
               Get Started
             </Link>

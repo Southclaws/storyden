@@ -140,11 +140,15 @@
   color: var(--story-ink);
   text-align: center;
 }
-.story-conversation h1 {
+.story-conversation h2 {
   font-size: clamp(2rem, 3.2vw, 2.875rem);
 }
-.story-conversation h1 span {
+.story-conversation h2 span {
   color: var(--story-forest);
+}
+.hero-logo {
+  filter: drop-shadow(0 2px 4px rgb(19 27 26 / 60%))
+    drop-shadow(0 8px 18px rgb(19 27 26 / 35%));
 }
 .hero-description {
   max-width: min(600px, calc(100vw - 48px));
@@ -1321,8 +1325,28 @@
 .milspec-section table {
   table-layout: fixed;
 }
-.milspec-section td {
+.milspec-section :is(td, th) {
   overflow-wrap: anywhere;
+}
+.milspec-section th {
+  font-weight: inherit;
+  text-align: inherit;
+}
+.milspec-caption {
+  border: 1px solid currentColor;
+  border-bottom: 0;
+}
+.deployment-links {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  border-top: 1px solid currentColor;
+}
+.deployment-links > a {
+  padding: 4px;
+  align-content: center;
+}
+.deployment-links > a + a {
+  border-left: 1px solid currentColor;
 }
 @media (max-width: 700px) {
   .milspec-section {
@@ -1335,7 +1359,7 @@
     font-size: 0.65rem;
     letter-spacing: 0;
   }
-  .milspec-section td {
+  .milspec-section :is(td, th) {
     padding: 6px;
   }
 }

@@ -36,11 +36,11 @@ export function ConversationChapter() {
       <div className="story-container">
         <div className="story-split conversation-layout">
           <div className="story-copy">
-            <h1 id="conversation-title">
+            <h2 id="conversation-title">
               Home for your people.
               <br />
               <span>And for what they know.</span>
-            </h1>
+            </h2>
             <p className="story-lead">Community you can come back to.</p>
             <p>
               A place for conversations to unfold, ideas to take root, and
@@ -235,7 +235,8 @@ export function OwnershipChapter() {
             Your integrations <ArrowRight size={16} aria-hidden="true" />
           </Link>
           <a href="https://github.com/Southclaws/storyden">
-            Everyone&apos;s source code <ExternalLink size={15} aria-hidden="true" />
+            Everyone&apos;s source code{" "}
+            <ExternalLink size={15} aria-hidden="true" />
           </a>
         </div>
       </div>
@@ -254,7 +255,7 @@ export function CommunityInvitation() {
         width={1024}
         height={1024}
         alt=""
-        sizes="(max-width: 760px) 180px, 300px"
+        sizes="(max-width: 700px) 150px, (max-width: 900px) 180px, 260px"
       />
       <div>
         <h2 id="invitation-title">
@@ -269,8 +270,7 @@ export function CommunityInvitation() {
         </p>
         <div className="story-actions">
           <Link className="story-button" href="https://makeroom.club">
-            Explore our community{" "}
-            <ArrowRight size={18} aria-hidden="true" />
+            Explore our community <ArrowRight size={18} aria-hidden="true" />
           </Link>
           <Link className="story-text-link" href="/docs/introduction">
             Start your own <ArrowRight size={17} aria-hidden="true" />

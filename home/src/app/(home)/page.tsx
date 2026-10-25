@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import { getHomeStats } from "@/lib/home-stats";
 
 import {
@@ -11,6 +13,10 @@ import {
 import { HeroSection } from "./sections/HeroSection";
 import { MilspecSection } from "./sections/MilspecSection";
 import { ScreenshotSection } from "./sections/ScreenshotSection";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "https://www.storyden.org/" },
+};
 
 export default async function Home() {
   const stats = await getHomeStats();

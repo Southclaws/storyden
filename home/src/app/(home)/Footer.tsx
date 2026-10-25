@@ -13,6 +13,7 @@ export function Footer() {
               alt="Storyden"
               width={225}
               height={53}
+              style={{ height: "auto" }}
             />
           </Link>
           <p>A modern love letter to the community-owned internet.</p>
@@ -79,7 +80,7 @@ function Twitter(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-function GitHub(props: SVGProps<SVGSVGElement>) {
+export function GitHub(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

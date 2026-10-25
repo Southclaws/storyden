@@ -1,4 +1,4 @@
-import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
+import type { BaseLayoutProps, MenuItemType } from "fumadocs-ui/layouts/shared";
 import {
   BracesIcon,
   HeartPlusIcon,
@@ -10,6 +10,67 @@ import Image from "next/image";
 import { Logo } from "@/components/Logo";
 import { css } from "@/styled-system/css";
 import { Box } from "@/styled-system/jsx";
+
+import { GitHub } from "./(home)/Footer";
+
+export const githubLink = {
+  type: "icon",
+  text: "GitHub",
+  label: "GitHub",
+  url: "https://github.com/Southclaws/storyden",
+  icon: <GitHub aria-hidden="true" />,
+} satisfies NonNullable<BaseLayoutProps["links"]>[number];
+
+const documentationQuickLinks = [
+  {
+    icon: <HeartPlusIcon />,
+    text: "What is Storyden?",
+    description: "Get to know your new favourite community + content platform.",
+    url: "/docs/introduction/what-is-storyden",
+    menu: {
+      className: css({
+        gridColumn: { md: "2" },
+        gridRow: { md: "1 / span 1" },
+      }),
+    },
+  },
+  {
+    icon: <MessageCircleHeartIcon />,
+    text: "For discussion",
+    description: "Conversations worth coming back to.",
+    url: "/docs/introduction/discussion",
+    menu: {
+      className: css({
+        gridColumn: { md: "2" },
+        gridRow: { md: "2 / span 1" },
+      }),
+    },
+  },
+  {
+    icon: <LibraryBigIcon />,
+    text: "Library",
+    description: "A shared home for the things your community knows.",
+    url: "/docs/introduction/library",
+    menu: {
+      className: css({
+        gridColumn: { md: "1", lg: "3" },
+        gridRow: { md: "3 / span 1", lg: "1 / span 1" },
+      }),
+    },
+  },
+  {
+    icon: <BracesIcon />,
+    text: "API",
+    description: "Browse the API reference and build something awesome.",
+    url: "/docs/api",
+    menu: {
+      className: css({
+        gridColumn: { md: "2", lg: "3" },
+        gridRow: { md: "3 / span 1", lg: "2 / span 1" },
+      }),
+    },
+  },
+] satisfies MenuItemType["items"];
 
 export const baseOptions: BaseLayoutProps = {
   themeSwitch: {
@@ -27,13 +88,18 @@ export const baseOptions: BaseLayoutProps = {
   },
   links: [
     {
-      text: "Why Storyden",
-      url: "/#conversations",
+      text: "Documentation",
+      url: "/docs/introduction",
+      on: "menu",
     },
+    ...documentationQuickLinks.map((item) => ({
+      ...item,
+      on: "menu" as const,
+    })),
     {
       type: "menu",
       text: "Documentation",
-      url: "/docs/introduction",
+      on: "nav",
       items: [
         {
           active: "nested-url",
@@ -71,55 +137,7 @@ export const baseOptions: BaseLayoutProps = {
           text: "Get started with Storyden",
           description: "Deploy a community in minutes",
         },
-        {
-          icon: <HeartPlusIcon />,
-          text: "What is Storyden?",
-          description:
-            "Get to know your new favourite community + content platform.",
-          url: "/docs/introduction/what-is-storyden",
-          menu: {
-            className: css({
-              gridColumn: { md: "2" },
-              gridRow: { md: "1 / span 1" },
-            }),
-          },
-        },
-        {
-          icon: <MessageCircleHeartIcon />,
-          text: "For discussion",
-          description: "Conversations worth coming back to.",
-          url: "/docs/introduction/discussion",
-          menu: {
-            className: css({
-              gridColumn: { md: "2" },
-              gridRow: { md: "2 / span 1" },
-            }),
-          },
-        },
-        {
-          icon: <LibraryBigIcon />,
-          text: "Library",
-          description: "A shared home for the things your community knows.",
-          url: "/docs/introduction/library",
-          menu: {
-            className: css({
-              gridColumn: { md: "1", lg: "3" },
-              gridRow: { md: "3 / span 1", lg: "1 / span 1" },
-            }),
-          },
-        },
-        {
-          icon: <BracesIcon />,
-          text: "API",
-          description: "Browse the API reference and build something awesome.",
-          url: "/docs/api",
-          menu: {
-            className: css({
-              gridColumn: { md: "2", lg: "3" },
-              gridRow: { md: "3 / span 1", lg: "2 / span 1" },
-            }),
-          },
-        },
+        ...documentationQuickLinks,
       ],
     },
     {
@@ -127,6 +145,6 @@ export const baseOptions: BaseLayoutProps = {
       url: "/blog",
       active: "nested-url",
     },
+    githubLink,
   ],
-  githubUrl: "https://github.com/Southclaws/storyden",
 };

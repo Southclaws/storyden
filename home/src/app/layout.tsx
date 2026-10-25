@@ -25,10 +25,6 @@ export default function Layout({ children }: { children: ReactNode }) {
       suppressHydrationWarning
     >
       <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width" />
-        <meta name="theme-color" content="#303030" />
-
         {/* Icons */}
         <link
           rel="apple-touch-icon"
@@ -42,7 +38,11 @@ export default function Layout({ children }: { children: ReactNode }) {
           href="/favicon-96x96.png"
         />
         <link rel="manifest" href="/site.webmanifest" />
-        <Script id="clarity-analytics" type="text/javascript">
+        <Script
+          id="clarity-analytics"
+          type="text/javascript"
+          strategy="lazyOnload"
+        >
           {`(function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
@@ -58,6 +58,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         }}
       >
         <RootProvider
+          search={{ preload: false }}
           theme={{
             defaultTheme: "light",
             enableSystem: false,
