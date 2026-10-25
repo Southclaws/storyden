@@ -9,6 +9,7 @@ import { MenuIcon } from "@/components/ui/icons/Menu";
 import { AccountMenu } from "../AccountMenu/AccountMenu";
 import { HomeAnchor } from "../Anchors/Home";
 import { LoginAnchor } from "../Anchors/Login";
+import { SearchAnchor } from "../Anchors/Search";
 
 type Props = {
   isOpen: boolean;
@@ -32,6 +33,7 @@ export function MobileCommandBar({ isOpen, onClose, onOpen }: Props) {
 
       <div className="navigation__mobile-commandbar-end">
         <HomeAnchor hideLabel size="sm" />
+        <SearchAnchor hideLabel size="sm" />
         {account ? (
           <AccountMenu account={account} size="sm" />
         ) : (

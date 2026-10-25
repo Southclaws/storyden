@@ -1,6 +1,7 @@
 import * as z from "@/lib/validation";
 
 export const BuiltInNavigationItemTypeSchema = z.enum([
+  "search",
   "compose",
   "categories",
   "library",
@@ -86,6 +87,7 @@ export const BuiltInNavigationItemName: Record<
   BuiltInNavigationItemType,
   string
 > = {
+  search: "Search",
   compose: "New thread",
   categories: "Discussion",
   library: "Library",

@@ -19,6 +19,7 @@ import { LinksAnchor } from "../Anchors/Link";
 import { MembersAnchor } from "../Anchors/Members";
 import { RobotsAnchor } from "../Anchors/Robots";
 import { RolesAnchor } from "../Anchors/Roles";
+import { SearchAnchor } from "../Anchors/Search";
 import { LibraryNavigationTree } from "../LibraryNavigationTree/LibraryNavigationTree";
 import { libraryNavigationVisibility } from "../LibraryNavigationTree/LibraryNavigationTree.constants";
 
@@ -36,6 +37,8 @@ export function NavigationItemContent({
   initialCategoryList?: CategoryListOKResponse;
 }) {
   switch (item.type) {
+    case "search":
+      return <SearchAnchor />;
     case "compose":
       return <ComposeAnchor label={BuiltInNavigationItemName.compose} />;
     case "categories":
