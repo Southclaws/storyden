@@ -25,7 +25,7 @@ import "react-advanced-cropper/dist/style.css";
 
 export const CROP_STENCIL_WIDTH = 1200;
 export const CROP_STENCIL_HEIGHT = 630;
-const ACCEPTED_BANNER_MIMES = ["image/png", "image/jpeg"] as const;
+const ACCEPTED_BANNER_MIMES = ["image/png", "image/jpeg", "image/webp"] as const;
 
 export function BannerEditor() {
   const [bannerURL, setBannerURL] = useState<string | undefined>(

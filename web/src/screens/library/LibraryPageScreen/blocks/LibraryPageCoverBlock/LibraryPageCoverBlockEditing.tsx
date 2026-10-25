@@ -50,7 +50,7 @@ export function LibraryPageCoverBlockEditing({
       <AssetUploadAction
         operation="add"
         onFinish={handleUploadCoverImage}
-        accept={["image/png", "image/jpeg", "image/gif"]}
+        accept={["image/png", "image/jpeg", "image/gif", "image/webp"]}
         w="full"
         variant="subtle"
       >
