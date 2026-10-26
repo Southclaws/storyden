@@ -276,10 +276,24 @@ async function saveLayout(
 export async function waitForLibraryPageLayoutSave(
   store: NodeStoreAPI,
   expected: LibraryPageLayout,
+  expectedImage?: {
+    id?: string;
+    block?: Extract<LibraryPageBlock, { type: "cover" }>;
+  },
 ): Promise<void> {
-  if (
-    deepEqual(toWebMCPLayout(store.getState().original.meta.layout), expected)
-  ) {
+  const isSaved = () => {
+    const original = store.getState().original;
+    return (
+      deepEqual(toWebMCPLayout(original.meta.layout), expected) &&
+      (!expectedImage ||
+        (original.primary_image?.id === expectedImage.id &&
+          deepEqual(
+            original.meta.layout?.blocks.find((b) => b.type === "cover"),
+            expectedImage.block,
+          )))
+    );
+  };
+  if (isSaved()) {
     return;
   }
 
@@ -302,8 +316,8 @@ export async function waitForLibraryPageLayoutSave(
       }
     };
 
-    const unsubscribe = store.subscribe((state) => {
-      if (deepEqual(toWebMCPLayout(state.original.meta.layout), expected)) {
+    const unsubscribe = store.subscribe(() => {
+      if (isSaved()) {
         finish();
       }
     });

@@ -10,6 +10,7 @@ import {
   login,
   withAdminAccessKey,
 } from "../access_key_admin_assignment";
+import { pinchOut } from "../touch";
 
 test("feed cover restores its source and crop without changing the social preview", async ({
   page,
@@ -401,6 +402,60 @@ test("feed cover restores its source and crop without changing the social previe
     for (const upload of cropUploads) {
       expect(upload.searchParams.get("parent_asset_id")).toBe(sourceAsset.id);
     }
+
+    const zoomed = page.waitForResponse(
+      (r) =>
+        r.request().method() === "POST" &&
+        new URL(r.url()).searchParams.get("filename") === "feed-cover",
+    );
+    const zoomBounds = (await cropArea.boundingBox())!;
+    await page.mouse.move(
+      zoomBounds.x + zoomBounds.width * 0.3,
+      zoomBounds.y + zoomBounds.height * 0.65,
+    );
+    await page.mouse.wheel(0, -240);
+    asset = await (await zoomed).json();
+    await expect
+      .poll(
+        async () =>
+          (await (await page.request.get(`${API_ADDRESS}/api/info`)).json())
+            .metadata.feed.blocks[0].asset.id,
+      )
+      .toBe(asset.id);
+    const wheelCrop = (
+      await (await page.request.get(`${API_ADDRESS}/api/info`)).json()
+    ).metadata.feed.blocks[0].crop;
+    expect(wheelCrop.width).toBeLessThan(1920);
+    expect(1920 / wheelCrop.width).toBeLessThan(1.04);
+    await expect(cropArea).toHaveAttribute("aria-disabled", "false");
+    const pinched = page.waitForResponse(
+      (r) =>
+        r.request().method() === "POST" &&
+        new URL(r.url()).searchParams.get("filename") === "feed-cover",
+    );
+    await pinchOut(page, cropArea);
+    asset = await (await pinched).json();
+    expect(asset.parent?.id).toBe(sourceAsset.id);
+    await expect
+      .poll(
+        async () =>
+          (await (await page.request.get(`${API_ADDRESS}/api/info`)).json())
+            .metadata.feed.blocks[0].asset.id,
+      )
+      .toBe(asset.id);
+    const pinchCrop = (
+      await (await page.request.get(`${API_ADDRESS}/api/info`)).json()
+    ).metadata.feed.blocks[0].crop;
+    expect(pinchCrop.width).toBeLessThan(wheelCrop.width);
+    const zoomBytes = await (
+      await page.request.get(`${API_ADDRESS}${asset.path}`)
+    ).body();
+    expect(zoomBytes.readUInt32BE(16)).toBe(1920);
+    expect(zoomBytes.readUInt32BE(20)).toBe(480);
+    expect((await cropArea.boundingBox())!.height).toBeCloseTo(
+      zoomBounds.height,
+      0,
+    );
 
     const unchangedSocial = await page.request.get(
       `${API_ADDRESS}/api/info/banner?variant=original`,

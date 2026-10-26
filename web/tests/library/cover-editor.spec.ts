@@ -113,7 +113,7 @@ test("Library keeps its cover visible while the cropper loads, and saves croppin
   }
   await page.unrouteAll({ behavior: "wait" });
   const cropper = page.locator(
-    "#block-cover_container:visible .advanced-cropper",
+    '[aria-label="Image cropper"] .advanced-cropper',
   );
   const croppedAsset = await dragCover(page, 40);
   expect(croppedAsset.parent?.id).toBe(asset.id);
@@ -209,7 +209,7 @@ test("a cover uploaded in quick edit keeps its original when cropped", async ({
   );
   const chooser = page.waitForEvent("filechooser");
   await page
-    .getByRole("button", { name: "Upload cover image", exact: true })
+    .getByRole("button", { name: "Upload main image", exact: true })
     .click();
   await (
     await chooser
@@ -236,10 +236,22 @@ test("a cover uploaded in quick edit keeps its original when cropped", async ({
 });
 
 async function dragCover(page: Page, distance: number): Promise<Asset> {
+  await page
+    .getByRole("button", { name: "Main image options", exact: true })
+    .click();
+  await page
+    .getByRole("menuitem", { name: "Page layout", exact: true })
+    .hover();
+  await page
+    .getByRole("menuitem", { name: "Banner · wide page header", exact: true })
+    .click();
   const cropper = page.locator(
-    "#block-cover_container:visible .advanced-cropper",
+    '[aria-label="Image cropper"] .advanced-cropper',
   );
   await expect(cropper).toBeVisible();
+  await expect(
+    page.getByRole("group", { name: "Crop area", exact: true }),
+  ).toHaveAttribute("aria-disabled", "false");
   await expect(cropper.locator("img").first()).toBeVisible();
   const box = await cropper.boundingBox();
   expect(box).not.toBeNull();

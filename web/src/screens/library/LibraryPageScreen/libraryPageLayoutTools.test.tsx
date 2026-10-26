@@ -3,10 +3,65 @@ import { describe, expect, it, vi } from "vitest";
 import { NodeWithChildren } from "@/api/openapi-schema";
 import { hydrateNode } from "@/lib/library/metadata";
 
-import { createLibraryPageLayoutToolImplementations } from "./libraryPageLayoutTools";
+import {
+  createLibraryPageLayoutToolImplementations,
+  toWebMCPLayout,
+  waitForLibraryPageLayoutSave,
+} from "./libraryPageLayoutTools";
 import { createNodeStore } from "./store";
 
 describe("Library page WebMCP tool implementations", () => {
+  it("waits for Main image config even when the WebMCP layout has not changed", async () => {
+    const store = createStore();
+    store.getState().addBlock("cover");
+    store.setState({ original: store.getState().draft });
+    const block = {
+      type: "cover" as const,
+      config: { layout: "image" as const },
+    };
+    store.getState().overwriteBlock(block);
+    const done = vi.fn();
+    const pending = waitForLibraryPageLayoutSave(
+      store,
+      toWebMCPLayout(store.getState().draft.meta.layout),
+      { block },
+    ).then(done);
+    await Promise.resolve();
+    expect(done).not.toHaveBeenCalled();
+    store.setState({ original: store.getState().draft });
+    await pending;
+    expect(done).toHaveBeenCalledOnce();
+  });
+
+  it("waits for restoring the original image even when block config is unchanged", async () => {
+    const store = createStore();
+    const asset = {
+      id: "original",
+      filename: "original.png",
+      path: "/api/assets/original.png",
+      mime_type: "image/png",
+      width: 1600,
+      height: 900,
+    };
+    store.getState().setPrimaryImage({
+      asset: { ...asset, id: "crop", parent: asset },
+      isReplacement: true,
+    });
+    store.setState({ original: store.getState().draft });
+    store.getState().setPrimaryImage({ asset, isReplacement: true });
+    const done = vi.fn();
+    const pending = waitForLibraryPageLayoutSave(
+      store,
+      toWebMCPLayout(store.getState().draft.meta.layout),
+      { id: "original" },
+    ).then(done);
+    await Promise.resolve();
+    expect(done).not.toHaveBeenCalled();
+    store.setState({ original: store.getState().draft });
+    await pending;
+    expect(done).toHaveBeenCalledOnce();
+  });
+
   it("gets the current layout in its frontend tool representation", async () => {
     const tools = createTools();
 
