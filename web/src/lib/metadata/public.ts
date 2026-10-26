@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
 
+import { RequestError } from "@/api/common";
 import { WEB_ADDRESS } from "@/config";
+
+export function isNotPublic(error: unknown): boolean {
+  return (
+    error instanceof RequestError && [401, 403, 404].includes(error.status)
+  );
+}
 
 export function canonicalPage(path: string, page = 1): string {
   const url = new URL(path, WEB_ADDRESS);

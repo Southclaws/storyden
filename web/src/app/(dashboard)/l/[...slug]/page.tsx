@@ -9,7 +9,12 @@ import {
   LibraryPageBlockTypeDirectory,
   parseNodeMetadata,
 } from "@/lib/library/metadata";
-import { canonicalPage, jsonLD, socialImage } from "@/lib/metadata/public";
+import {
+  canonicalPage,
+  isNotPublic,
+  jsonLD,
+  socialImage,
+} from "@/lib/metadata/public";
 import { getSettings } from "@/lib/settings/settings-server";
 import { LibraryPageScreen } from "@/screens/library/LibraryPageScreen/LibraryPageScreen";
 import { Params, ParamsSchema } from "@/screens/library/library-path";
@@ -29,8 +34,10 @@ const getPublicNode = cache(async (slug: string) => {
     if (data.visibility === "published") {
       return data;
     }
-  } catch {
-    // Public metadata is unavailable if the anonymous read fails.
+  } catch (error) {
+    if (!isNotPublic(error)) {
+      throw error;
+    }
   }
 
   return undefined;
@@ -60,7 +67,7 @@ export default async function Page(props: Props) {
   const children = await maybeGetChildren(data);
   const publicNode =
     data.visibility === "published"
-      ? await getPublicNode(targetSlug)
+      ? await getPublicNode(targetSlug).catch(() => undefined)
       : undefined;
   const structuredData = publicNode && {
     "@context": "https://schema.org",

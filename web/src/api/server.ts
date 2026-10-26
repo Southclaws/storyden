@@ -59,7 +59,7 @@ export const fetcher = async <T>(
       headers: response.headers,
     } as T;
   } catch (e) {
-    if (e instanceof RequestError && e.status === 404) {
+    if (e instanceof RequestError && e.status === 404 && !anonymous) {
       notFound();
     }
     throw e;

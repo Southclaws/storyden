@@ -5,6 +5,7 @@ import { UnreadyBanner } from "@/components/site/Unready";
 import { getCategoryThreadListParams } from "@/lib/feed/category";
 import {
   canonicalPage,
+  isNotPublic,
   jsonLD,
   pageLinks,
   socialImage,
@@ -93,7 +94,11 @@ export async function generateMetadata({
       }
 
       pagination = pageLinks("/", page, totalPages);
-    } catch {
+    } catch (error) {
+      if (!isNotPublic(error)) {
+        throw error;
+      }
+
       // Public site metadata remains available when the feed requires login.
       if (page > 1) {
         return {
