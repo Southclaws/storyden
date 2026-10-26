@@ -1,5 +1,5 @@
 import { JSDOM } from "jsdom";
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getIndexPage, sitemapIndexXML, urlsetXML } from "./public-index";
@@ -45,7 +45,6 @@ describe("anonymous sitemap source", () => {
     expect(request.headers.has("Cookie")).toBe(false);
     expect(request.headers.has("Authorization")).toBe(false);
     expect(cookies).not.toHaveBeenCalled();
-    expect(headers).not.toHaveBeenCalled();
   });
 
   it.each([

@@ -27,7 +27,7 @@ describe("server API requests", () => {
     expect(request.headers.get("x-storyden-ssr")).toBe("1");
   });
 
-  it("makes anonymous requests without credentials or request-context access", async () => {
+  it("makes anonymous requests without credentials", async () => {
     const fetchMock = vi
       .spyOn(globalThis, "fetch")
       .mockResolvedValue(Response.json({ ok: true }));
@@ -49,13 +49,27 @@ describe("server API requests", () => {
     expect(request.cache).toBe("no-store");
     expect(request.headers.has("Cookie")).toBe(false);
     expect(request.headers.has("Authorization")).toBe(false);
-    expect(request.headers.has("x-forwarded-for")).toBe(false);
-    expect(request.headers.has("x-storyden-ssr")).toBe(false);
+    expect(request.headers.get("x-forwarded-for")).toBe("203.0.113.1");
+    expect(request.headers.get("x-storyden-ssr")).toBe("1");
     expect(cookies).not.toHaveBeenCalled();
-    expect(headers).not.toHaveBeenCalled();
     expect(result).toMatchObject({ data: { ok: true }, status: 200 });
 
     controller.abort();
     expect(request.signal.aborted).toBe(true);
+  });
+
+  it("makes anonymous requests outside of a request scope", async () => {
+    vi.mocked(headers).mockRejectedValueOnce(
+      new Error("`headers` was called outside a request scope"),
+    );
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(Response.json({ ok: true }));
+
+    await fetcher("/nodes", { method: "GET", anonymous: true });
+
+    const request = fetchMock.mock.calls[0]![0] as Request;
+    expect(request.headers.has("x-forwarded-for")).toBe(false);
+    expect(request.headers.has("x-storyden-ssr")).toBe(false);
   });
 });

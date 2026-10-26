@@ -40,6 +40,9 @@ export const fetcher = async <T>(
   if (anonymous) {
     req.headers.delete("Cookie");
     req.headers.delete("Authorization");
+    // Without the visitor's address, every anonymous SSR read shares the
+    // frontend server's rate limit bucket and starves under crawler traffic.
+    await applyForwardedClientHeaders(req.headers).catch(() => {});
   } else {
     req.headers.set("Cookie", await getCookieHeader());
     await applyForwardedClientHeaders(req.headers);
