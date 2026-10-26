@@ -300,7 +300,7 @@ test.describe("Library page block editor", () => {
       .getByRole("menuitem", { name: "Add Block", exact: true })
       .click();
     await page
-      .getByRole("menuitem", { name: "Cover image", exact: true })
+      .getByRole("menuitem", { name: "Main image", exact: true })
       .click();
 
     await expect(page.locator("#block-cover_container:visible")).toBeVisible();

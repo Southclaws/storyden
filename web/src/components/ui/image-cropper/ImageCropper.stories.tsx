@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
+import * as Menu from "../menu";
+
 import { ImageCropper } from ".";
 
 const source = `data:image/svg+xml,${encodeURIComponent(
@@ -14,7 +16,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Choose and position an image inside a fixed crop. Focus the crop area and use arrow keys to reposition; hold Shift for larger adjustments. Loading, saving, success and image errors are announced. Saving fades the image and disables crop, replacement and removal actions. The caller can retain the selected file with onFileChange before the local preview opens. getCroppedImage() exports a PNG; getCoordinates() and defaultCoordinates preserve the crop between editing sessions. onChange fires after a local image loads and when a crop interaction ends. The caller owns saving, upload and persistence. File Upload selects files without cropping; AssetUploadEditor includes asset-specific upload behavior. Do not use this component for ordinary file uploads or image viewing.",
+          "Inline image cropping with a floating toolbar. Use it to edit pixels, not to define page layouts: the caller owns the surrounding frame, original asset, upload, debounced saving and persistence. Defaults retain the index cover interaction: a fixed viewport, exact width × height PNG export, collapsed tools and automatic cropping after upload. Opt into cropMode=resizable for drag handles and a Crop ratio submenu, toolbar=expanded for persistent controls, and maxOutputSize for proportional exports bounded in both dimensions. cropOnUpload=false leaves the uploaded original intact and requires the caller to update src. Keep frame dimensions tied to the original while editing, not the newly cropped output. getCrop() captures coordinates, original dimensions and an export that remains usable after unmount; getCoordinates()/getCroppedImage() remain available for existing callers. defaultCoordinates accepts pixel coordinates or a function of original dimensions. Children add caller-specific menu items. Fixed croppers support pinch and wheel zoom, with fine 2.5% wheel steps for trackpad precision; plus and minus keys provide keyboard zoom. Arrow keys move the image; Shift makes larger adjustments. Loading, saving, success and errors are announced. File Upload selects without cropping; AssetUploadEditor adds asset-specific behavior. Do not use this for ordinary file uploads or image viewing.",
       },
     },
   },
@@ -52,7 +54,7 @@ export const Removable: Story = {
     docs: {
       description: {
         story:
-          "Hover over the edit icon or activate it with the keyboard to reveal replacement and removal actions. The same toolbar shows a spinner until the source image is ready in the cropper and while saving changes.",
+          "Hover over the edit icon or activate it with the keyboard to reveal replacement and removal actions. Fixed crops zoom with pinch, wheel, or plus/minus keys. The same toolbar shows a spinner until the source image is ready in the cropper and while saving changes.",
       },
     },
   },
@@ -90,5 +92,87 @@ export const Saved: Story = {
           "A successful save briefly shows a checkmark, then fades away without moving the image or surrounding content.",
       },
     },
+  },
+};
+
+export const Resizable: Story = {
+  args: {
+    src: source,
+    width: 1600,
+    height: 900,
+    cropMode: "resizable",
+    toolbar: "expanded",
+    maxOutputSize: { width: 1920, height: 1920 },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Free selection with ratio choices in the floating menu. Changing the crop leaves the editing workspace stable; the caller persists onChange using getCrop().",
+      },
+    },
+  },
+};
+
+export const ExpandedArtwork: Story = {
+  args: {
+    src: source,
+    width: 1024,
+    height: 1024,
+    toolbar: "expanded",
+    style: { maxWidth: 320, marginInline: "auto" },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A square fixed viewport in a compact frame. It fills the final layout and offers no resizable selection or ratio choices.",
+      },
+    },
+  },
+};
+
+export const RestoredProportionalCrop: Story = {
+  args: {
+    src: source,
+    width: 1600,
+    height: 900,
+    cropMode: "resizable",
+    toolbar: "expanded",
+    maxOutputSize: { width: 1920, height: 1920 },
+    defaultCoordinates: (size) => ({
+      left: size.width * 0.25,
+      top: size.height * 0.25,
+      width: size.width * 0.5,
+      height: size.height * 0.5,
+    }),
+  },
+};
+
+export const AdditionalMenuItems: Story = {
+  args: {
+    src: source,
+    toolbar: "expanded",
+    children: <Menu.Item value="caption">Edit image caption</Menu.Item>,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Extend the floating menu with domain-specific controls. The shared cropper continues to own replacement, removal, ratio choices and export.",
+      },
+    },
+  },
+};
+
+export const ExtremePortrait: Story = {
+  args: {
+    src: `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1000"><rect width="1" height="1000" fill="#155e75"/></svg>')}`,
+    width: 1,
+    height: 1000,
+    cropMode: "resizable",
+    toolbar: "expanded",
+    style: { maxHeight: "min(70svh,40rem)", minHeight: 36 },
+    maxOutputSize: { width: 1920, height: 1920 },
   },
 };

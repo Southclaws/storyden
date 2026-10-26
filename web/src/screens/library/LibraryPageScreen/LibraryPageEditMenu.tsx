@@ -114,6 +114,12 @@ export function LibraryPageEditMenu({ node }: Props) {
           await waitForLibraryPageLayoutSave(
             store,
             toWebMCPLayout(store.getState().draft.meta.layout),
+            {
+              id: store.getState().draft.primary_image?.id,
+              block: store
+                .getState()
+                .draft.meta.layout?.blocks.find((b) => b.type === "cover"),
+            },
           );
           return true;
         },

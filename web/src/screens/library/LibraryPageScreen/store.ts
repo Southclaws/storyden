@@ -143,6 +143,12 @@ export const createNodeStore = (initState: State) => {
                 ...state.draft.meta,
                 coverImage: null,
               };
+              const cover = state.draft.meta.layout?.blocks.find(
+                (b) => b.type === "cover",
+              );
+              if (cover?.type === "cover" && cover.config) {
+                delete cover.config.crop;
+              }
             });
           } else {
             set((state) => {

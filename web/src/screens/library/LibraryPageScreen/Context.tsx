@@ -34,6 +34,8 @@ type LibraryPageContext = {
   initialChildren?: NodeListResult;
   store: NodeStoreAPI;
   saving: boolean;
+  imageSaving: boolean;
+  setImageSaving: Dispatch<SetStateAction<boolean>>;
   setSaving: Dispatch<SetStateAction<boolean>>;
   revalidate: (updated?: NodeWithChildren) => Promise<void>;
   suppressAutosave: (callback: () => void) => void;
@@ -64,6 +66,7 @@ export function LibraryPageProvider({
   children,
 }: PropsWithChildren<Props>) {
   const [saving, setSaving] = useState(false);
+  const [imageSaving, setImageSaving] = useState(false);
   const nodeWithMeta = useMemo(() => hydrateNode(node), [node]);
   const { revalidate } = useLibraryMutation(node);
   const suppressAutosaveRef = useRef(false);
@@ -158,6 +161,8 @@ export function LibraryPageProvider({
         store: storeRef.current,
         saving,
         setSaving,
+        imageSaving,
+        setImageSaving,
         revalidate,
         suppressAutosave,
         isAutosaveSuppressed,

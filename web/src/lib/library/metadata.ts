@@ -9,7 +9,7 @@ export type CoverImage = z.infer<typeof CoverImageSchema>;
 
 export const LibraryPageBlockName: Record<LibraryPageBlockType, string> = {
   title: "Title",
-  cover: "Cover image",
+  cover: "Main image",
   link: "External link",
   content: "Rich text content",
   assets: "Gallery",
@@ -43,6 +43,20 @@ export type LibraryPageBlockTypeTitle = z.infer<
 
 export const LibraryPageBlockTypeCoverSchema = z.object({
   type: z.literal("cover"),
+  config: z.optional(
+    z.object({
+      layout: z.optional(z.enum(["banner", "image", "artwork"])),
+      alt: z.optional(z.string()),
+      crop: z.optional(
+        z.object({
+          left: z.number().check(z.minimum(0), z.maximum(1)),
+          top: z.number().check(z.minimum(0), z.maximum(1)),
+          width: z.number().check(z.positive(), z.maximum(1)),
+          height: z.number().check(z.positive(), z.maximum(1)),
+        }),
+      ),
+    }),
+  ),
 });
 export type LibraryPageBlockTypeCover = z.infer<
   typeof LibraryPageBlockTypeCoverSchema

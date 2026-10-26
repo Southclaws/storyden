@@ -1,194 +1,108 @@
-import { useRef } from "react";
-import type { FixedCropperRef } from "react-advanced-cropper";
+import debounce from "lodash/debounce";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { handle } from "@/api/client";
 import { assetUpload } from "@/api/openapi-client/assets";
 import { Asset } from "@/api/openapi-schema";
-import { CoverImage } from "@/lib/library/metadata";
-import { getAssetURL } from "@/utils/asset";
+import type { ImageCropperRef } from "@/components/ui/image-cropper";
 
 import { useLibraryPageContext } from "../../Context";
 
-import { CROP_STENCIL_HEIGHT, CROP_STENCIL_WIDTH } from "./constants";
 import { useLibraryCoverEvent } from "./events";
 
 export function useLibraryPageCoverBlock() {
-  const { store } = useLibraryPageContext();
-  const { setPrimaryImage } = store.getState();
+  const { store, imageSaving, setImageSaving } = useLibraryPageContext();
+  const cropperRef = useRef<ImageCropperRef>(null);
 
-  const cropperRef = useRef<FixedCropperRef>(null);
-
-  // Listen for external cover image updates
+  // Imported and uploaded images remain whole until the author chooses a crop.
   useLibraryCoverEvent("library-cover:update-from-asset", (asset: Asset) => {
-    handleSetCoverFromAsset(asset);
+    store.getState().setPrimaryImage({ asset, isReplacement: true });
   });
 
-  async function handleSetCoverFromAsset(asset: Asset) {
-    await handle(
-      async () => {
-        const assetURL = getAssetURL(asset.path);
-        if (!assetURL) {
-          throw new Error("Asset URL could not be generated");
-        }
+  // Capture the pixels before debouncing so navigation cannot discard the ref.
+  function captureCrop() {
+    const crop = cropperRef.current?.getCrop();
+    const primary = store.getState().draft.primary_image;
+    if (!crop || !primary) return;
+    return { ...crop, source: primary.parent ?? primary };
+  }
 
-        const response = await fetch(assetURL);
-        if (!response.ok) {
-          throw new Error("Failed to download asset");
-        }
-
-        const blob = await response.blob();
-
-        const img = new Image();
-        const imageLoaded = new Promise<void>((resolve, reject) => {
-          img.onload = () => resolve();
-          img.onerror = () => reject(new Error("Failed to load image"));
-        });
-
-        img.src = URL.createObjectURL(blob);
-        await imageLoaded;
-
-        const aspectRatio = CROP_STENCIL_WIDTH / CROP_STENCIL_HEIGHT;
-        const imageAspectRatio = img.width / img.height;
-
-        let cropX = 0;
-        let cropY = 0;
-        let cropWidth = img.width;
-        let cropHeight = img.height;
-
-        if (imageAspectRatio > aspectRatio) {
-          cropWidth = img.height * aspectRatio;
-          cropX = (img.width - cropWidth) / 2;
-        } else {
-          cropHeight = img.width / aspectRatio;
-          cropY = (img.height - cropHeight) / 2;
-        }
-
-        const canvas = document.createElement("canvas");
-        canvas.width = CROP_STENCIL_WIDTH;
-        canvas.height = CROP_STENCIL_HEIGHT;
-        const ctx = canvas.getContext("2d");
-
-        if (!ctx) {
-          throw new Error("Failed to get canvas context");
-        }
-
-        ctx.drawImage(
-          img,
-          cropX,
-          cropY,
-          cropWidth,
-          cropHeight,
-          0,
-          0,
-          CROP_STENCIL_WIDTH,
-          CROP_STENCIL_HEIGHT,
-        );
-
-        const croppedBlob = await new Promise<Blob>((resolve, reject) => {
-          canvas.toBlob((blob) => {
-            if (blob == null) {
-              reject(new Error("Failed to create blob from canvas"));
-              return;
-            }
-            resolve(blob);
+  const uploadCrop = useCallback(
+    async (
+      snapshot: NonNullable<ReturnType<typeof captureCrop>>,
+    ): Promise<boolean> => {
+      const result = await handle(
+        async () => {
+          const { coordinates, imageSize, width, height, getBlob, source } =
+            snapshot;
+          const blob = await getBlob();
+          const uploaded = await assetUpload(blob, {
+            filename: "cropped-cover",
+            parent_asset_id: source.id,
           });
-        });
-
-        const croppedAsset = await assetUpload(croppedBlob, {
-          filename: "auto-cropped-cover",
-          parent_asset_id: asset.id,
-        });
-
-        const coordinates: CoverImage = {
-          left: cropX / img.width,
-          top: cropY / img.height,
-        };
-
-        setPrimaryImage({
-          isReplacement: false,
-          config: coordinates,
-          asset: croppedAsset,
-        });
-
-        URL.revokeObjectURL(img.src);
-      },
-      {
-        errorToast: true,
-      },
-    );
-  }
-
-  async function uploadCroppedImageState() {
-    if (!cropperRef.current) {
-      return;
-    }
-
-    const primaryImage = store.getState().draft.primary_image;
-
-    const canvas = cropperRef.current.getCanvas();
-    if (!canvas) {
-      throw new Error("An unexpected error occurred with the image editor.");
-    }
-
-    const coordinates =
-      cropperRef.current.getCoordinates() satisfies CoverImage | null;
-    if (!coordinates) {
-      throw new Error(
-        "An unexpected error occurred with the image editor: unable to get crop coordinates.",
+          // Dimensions are known locally before the variant job completes.
+          const asset = {
+            ...uploaded,
+            width,
+            height,
+          };
+          const state = store.getState();
+          const primary = state.draft.primary_image;
+          if ((primary?.parent ?? primary)?.id !== source.id) return false;
+          state.setPrimaryImage({
+            asset,
+            config: { left: coordinates.left, top: coordinates.top },
+            isReplacement: false,
+          });
+          const block = store
+            .getState()
+            .draft.meta.layout?.blocks.find((b) => b.type === "cover");
+          if (block?.type === "cover") {
+            state.overwriteBlock({
+              ...block,
+              config: {
+                ...block.config,
+                crop: {
+                  left: coordinates.left / imageSize.width,
+                  top: coordinates.top / imageSize.height,
+                  width: coordinates.width / imageSize.width,
+                  height: coordinates.height / imageSize.height,
+                },
+              },
+            });
+          }
+          return true;
+        },
+        {
+          errorToast: true,
+          cleanup: async () => {
+            setImageSaving(false);
+          },
+        },
       );
-    }
+      return result === true;
+    },
+    [store, setImageSaving],
+  );
 
-    const blob = await new Promise<Blob>((resolve, reject) => {
-      canvas.toBlob((blob) => {
-        if (blob == null) {
-          reject("An unexpected error occurred with the image editor.");
-          return;
-        }
+  const save = useMemo(() => debounce(uploadCrop, 500), [uploadCrop]);
+  useEffect(
+    () => () => {
+      void save.flush();
+    },
+    [save],
+  );
 
-        resolve(blob);
-      });
-    });
-
-    const parent_asset_id = primaryImage?.parent?.id ?? primaryImage?.id;
-
-    // The result of this is that when the asset revalidates, the original
-    // asset will be present in the primary image asset object. This means
-    // that users will always edit the originally uploaded image and when
-    // they stop editing, the saved asset will be the cropped version where
-    // the original is still present within the asset's parent property.
-    const asset = await assetUpload(blob, {
-      // TODO: Split filename from ID in API side (Marks) use original name.
-      filename: "cropped-cover",
-      parent_asset_id,
-    });
-
-    return {
-      isReplacement: false,
-      config: coordinates,
-      asset,
-    };
-  }
-
-  async function handleInteractionEnd() {
-    await handle(
-      async () => {
-        const result = await uploadCroppedImageState();
-        if (!result) {
-          throw new Error(
-            "An unexpected error occurred with the image editor.",
-          );
-        }
-
-        setPrimaryImage(result);
-      },
-      {
-        errorToast: true,
-      },
-    );
+  function handleInteractionEnd() {
+    const snapshot = captureCrop();
+    if (!snapshot) return;
+    setImageSaving(true);
+    void save(snapshot);
   }
 
   return {
     cropperRef,
     handleInteractionEnd,
+    busy: imageSaving,
   };
 }
