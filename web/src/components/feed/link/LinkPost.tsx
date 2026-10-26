@@ -1,10 +1,11 @@
 import { Link as LinkSchema, ThreadReference } from "@/api/openapi-schema";
+import { AssetImage } from "@/components/asset/AssetImage";
 import { Anchor } from "@/components/site/Anchor";
 import { Empty } from "@/components/site/Empty";
 import { Text } from "@/components/ui/text";
 import { Box, Flex, VStack, styled } from "@/styled-system/jsx";
 import { cardBox } from "@/styled-system/recipes";
-import { getAssetURL } from "@/utils/asset";
+import { token } from "@/styled-system/tokens";
 
 import { FeedItemByline } from "../FeedItemByline/FeedItemByline";
 
@@ -22,8 +23,10 @@ export function LinkPost(props: Props) {
       <Box display="flex" w="full" height="16">
         <Box flexGrow="1" flexShrink="0" width="32">
           {asset ? (
-            <styled.img
-              src={getAssetURL(asset.path, "m")}
+            <AssetImage
+              asset={asset}
+              variant="s"
+              sizes={token("sizes.32")}
               height="full"
               width="full"
               objectPosition="center"
