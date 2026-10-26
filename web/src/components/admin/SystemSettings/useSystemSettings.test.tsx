@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildClientIPSettingsPayload,
+  buildSystemSettingsPayload,
   parseTrustedProxyCidrs,
 } from "./useSystemSettings";
 
@@ -56,5 +57,23 @@ describe("useSystemSettings helpers", () => {
       client_ip_mode: "xff_trusted_proxies",
       trusted_proxy_cidrs: ["10.0.0.0/8", "172.16.0.0/12"],
     });
+  });
+
+  it("sends only rate limiting and client IP services", () => {
+    const payload = buildSystemSettingsPayload({
+      rate_limit: 100,
+      rate_limit_period: 60,
+      rate_limit_bucket: 10,
+      rate_limit_guest_cost: 2,
+      cost_overrides: { GetInfo: 0 },
+      client_ip_mode: "remote_addr",
+      client_ip_header: "X-Real-IP",
+      trusted_proxy_cidrs: "",
+    });
+
+    expect(Object.keys(payload.services).sort()).toEqual([
+      "client_ip",
+      "rate_limiting",
+    ]);
   });
 });
