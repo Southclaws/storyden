@@ -138,7 +138,7 @@ test("Main image presets preserve assets, match edit/view, and bound stress dime
         const bounds = (await frame.boundingBox())!;
         const pixels = (await image.boundingBox())!;
         expect(pixels.height).toBeLessThanOrEqual(
-          mode === "banner" ? viewport.width / 4 : 640,
+          mode === "Banner" ? viewport.width / 4 : 640,
         );
         expect(pixels.width).toBeLessThanOrEqual(bounds.width + 1);
         if (mode === "Banner")
@@ -551,6 +551,71 @@ for (const mode of ["Banner", "Artwork"] as const) {
     expect(zoomedOutCrop.width).toBeGreaterThan(pinchedCrop.width);
   });
 }
+
+test("uploading after removing a legacy banner does not reuse its crop", async ({
+  page,
+}) => {
+  const seed = randomUUID().slice(0, 8);
+  await createAdmin(page.context(), `legacy-main-${seed}`, "TestPassword123!");
+  await login(page, `legacy-main-${seed}`, "TestPassword123!");
+  const original = await upload(page, 1600, 900);
+  const replacement = await upload(page, 900, 600);
+  const bytes = await (
+    await page.request.get(`${API_ADDRESS}${replacement.path}`)
+  ).body();
+  const node = await withAdminAccessKey(({ nodeCreate }) =>
+    nodeCreate({
+      name: `Legacy banner ${seed}`,
+      slug: `legacy-main-${seed}`,
+      visibility: "published",
+      primary_image_asset_id: original.id,
+      meta: {
+        layout: {
+          blocks: [
+            { type: "title" },
+            {
+              type: "cover",
+              config: {
+                alt: "A changing landscape",
+                crop: { left: 0.25, top: 0.25, width: 0.5, height: 2 / 9 },
+              },
+            },
+          ],
+        },
+      },
+    }),
+  );
+  await page.goto(`/l/${node.slug}`);
+  await edit(page);
+  await page.getByRole("button", { name: "Remove image", exact: true }).click();
+  const chooser = page.waitForEvent("filechooser");
+  await page
+    .getByRole("button", { name: "Upload main image", exact: true })
+    .click();
+  await (
+    await chooser
+  ).setFiles({
+    name: "new-original.png",
+    mimeType: "image/png",
+    buffer: bytes,
+  });
+  await expect(
+    page.getByRole("group", { name: "Crop area", exact: true }),
+  ).toHaveAttribute("aria-disabled", "false");
+  await view(page);
+  await page.reload();
+  const persisted = await saved(page, node.slug);
+  expect(persisted.meta.layout.blocks[1].config).toEqual({
+    layout: "image",
+    alt: "A changing landscape",
+  });
+  expect(persisted.primary_image.parent).toBeUndefined();
+  const png = await (
+    await page.request.get(`${API_ADDRESS}${persisted.primary_image.path}`)
+  ).body();
+  expect(png.readUInt32BE(16)).toBe(900);
+  expect(png.readUInt32BE(20)).toBe(600);
+});
 
 test("Main image replacement keeps the whole original and removal preserves page layout", async ({
   page,

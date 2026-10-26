@@ -35,10 +35,13 @@ export function LibraryPageCoverBlockEditing(props: Props) {
   async function handleUpload(asset: Asset) {
     const empty = !store.getState().draft.primary_image;
     store.getState().setPrimaryImage({ asset, isReplacement: true });
-    if (empty && block && !block.config?.layout)
+    const current = store
+      .getState()
+      .draft.meta.layout?.blocks.find((b) => b.type === "cover");
+    if (empty && current?.type === "cover" && !current.config?.layout)
       store.getState().overwriteBlock({
-        ...block,
-        config: { ...block.config, layout: "image" },
+        ...current,
+        config: { ...current.config, layout: "image" },
       });
   }
 
