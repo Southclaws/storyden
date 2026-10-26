@@ -172,6 +172,13 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 			fmsg.WithDesc("failed to parse Keycloak token claims", "Unable to read authentication information. Please try again."))
 	}
 
+	if !claims.EmailVerified {
+		return nil, fault.New("keycloak email is not verified",
+			fctx.With(ctx),
+			ftag.With(ftag.PermissionDenied),
+			fmsg.WithDesc("unverified keycloak email", "Your Keycloak email address must be verified before you can sign in."))
+	}
+
 	handle := strings.ToLower(claims.PreferredUsername)
 	if handle == "" {
 		parts := strings.Split(claims.Email, "@")

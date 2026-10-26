@@ -138,6 +138,13 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 	handle := strings.ToLower(u.Username)
 	name := u.GlobalName
 
+	if !u.Verified {
+		return nil, fault.New("discord email is not verified",
+			fctx.With(ctx),
+			ftag.With(ftag.PermissionDenied),
+			fmsg.WithDesc("unverified discord email", "Your Discord email address must be verified before you can sign in."))
+	}
+
 	email, err := mail.ParseAddress(u.Email)
 	if err != nil {
 		return nil, fault.Wrap(err,
