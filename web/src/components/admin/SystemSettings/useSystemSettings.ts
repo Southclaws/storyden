@@ -63,6 +63,24 @@ export function buildClientIPSettingsPayload(
   return payload;
 }
 
+export function buildSystemSettingsPayload(data: Form) {
+  return {
+    services: {
+      rate_limiting: {
+        rate_limit: data.rate_limit,
+        rate_limit_bucket: data.rate_limit_bucket,
+        rate_limit_period: data.rate_limit_period,
+        rate_limit_guest_cost: data.rate_limit_guest_cost,
+        cost_overrides: data.cost_overrides,
+      },
+      client_ip: buildClientIPSettingsPayload(
+        data,
+        parseTrustedProxyCidrs(data.trusted_proxy_cidrs),
+      ),
+    },
+  };
+}
+
 export function useSystemSettings({ settings }: Props) {
   const { revalidate, updateSettings } = useSettingsMutation();
   const form = useForm<Form>({
@@ -92,24 +110,9 @@ export function useSystemSettings({ settings }: Props) {
   });
 
   const onSubmit = form.handleSubmit(async (data) => {
-    const trustedProxyCidrs = parseTrustedProxyCidrs(data.trusted_proxy_cidrs);
-    const clientIP = buildClientIPSettingsPayload(data, trustedProxyCidrs);
-
     await handle(
       async () => {
-        await updateSettings({
-          services: {
-            ...settings.services,
-            rate_limiting: {
-              rate_limit: data.rate_limit,
-              rate_limit_bucket: data.rate_limit_bucket,
-              rate_limit_period: data.rate_limit_period,
-              rate_limit_guest_cost: data.rate_limit_guest_cost,
-              cost_overrides: data.cost_overrides,
-            },
-            client_ip: clientIP,
-          },
-        });
+        await updateSettings(buildSystemSettingsPayload(data));
 
         form.reset(data);
         await revalidate();
