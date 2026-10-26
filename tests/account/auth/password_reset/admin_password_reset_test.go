@@ -109,6 +109,40 @@ func TestAdminPasswordResetTokenGet(t *testing.T) {
 				r.Equal(http.StatusForbidden, tokenResp.StatusCode())
 			})
 
+			t.Run("account_manager_cannot_get_token_for_administrator", func(t *testing.T) {
+				r := require.New(t)
+
+				adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+				adminSession := sh.WithSession(adminCtx)
+
+				role, err := cl.RoleCreateWithResponse(root, openapi.RoleCreateJSONRequestBody{
+					Name:        "account-manager-" + xid.New().String(),
+					Colour:      "blue",
+					Permissions: openapi.PermissionList{openapi.MANAGEACCOUNTS},
+				}, adminSession)
+				tests.Ok(t, err, role)
+
+				signup, err := cl.AuthEmailPasswordSignupWithResponse(root, nil, openapi.AuthEmailPasswordSignupJSONRequestBody{
+					Email:    xid.New().String() + "@storyden.org",
+					Password: "somepassword",
+				})
+				tests.Ok(t, err, signup)
+				managerSession := e2e.WithSessionFromHeader(t, root, signup.HTTPResponse.Header)
+
+				manager, err := cl.AccountGetWithResponse(root, managerSession)
+				tests.Ok(t, err, manager)
+
+				add, err := cl.AccountAddRoleWithResponse(root, manager.JSON200.Handle, role.JSON200.Id, adminSession)
+				tests.Ok(t, err, add)
+
+				odin, err := cl.AccountGetWithResponse(root, adminSession)
+				tests.Ok(t, err, odin)
+
+				tokenResp, err := cl.AccountPasswordResetTokenGetWithResponse(root, odin.JSON200.Id, managerSession)
+				r.NoError(err)
+				r.Equal(http.StatusForbidden, tokenResp.StatusCode())
+			})
+
 			t.Run("account_not_found", func(t *testing.T) {
 				r := require.New(t)
 

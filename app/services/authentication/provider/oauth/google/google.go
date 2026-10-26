@@ -136,6 +136,13 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 
 	name := fmt.Sprint(u.GivenName, " ", u.FamilyName)
 
+	if u.VerifiedEmail == nil || !*u.VerifiedEmail {
+		return nil, fault.New("google email is not verified",
+			fctx.With(ctx),
+			ftag.With(ftag.PermissionDenied),
+			fmsg.WithDesc("unverified google email", "Your Google email address must be verified before you can sign in."))
+	}
+
 	email, err := mail.ParseAddress(u.Email)
 	if err != nil {
 		return nil, fault.Wrap(err,
