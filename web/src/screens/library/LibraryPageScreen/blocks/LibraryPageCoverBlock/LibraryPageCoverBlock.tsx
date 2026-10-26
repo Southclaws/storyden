@@ -38,6 +38,7 @@ export function LibraryPageCoverBlock() {
             objectPosition: "center",
           })}
           src={imageProps.src}
+          unoptimized
           sizes="(max-width: 960px) 100vw, 1200px"
           loading="eager"
           alt=""

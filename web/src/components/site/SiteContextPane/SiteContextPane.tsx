@@ -53,6 +53,7 @@ export function SiteContextPane(props: Props) {
           })}
           alt="Icon"
           src={iconURL}
+          unoptimized
           width={32}
           height={32}
           title={
