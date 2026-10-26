@@ -9,6 +9,13 @@ export function SiteIcon(props: Styles) {
   const imageStyles = css(props);
 
   return (
-    <Image className={imageStyles} src={src} alt="" width={512} height={512} />
+    <Image
+      className={imageStyles}
+      src={src}
+      alt=""
+      width={512}
+      height={512}
+      unoptimized
+    />
   );
 }

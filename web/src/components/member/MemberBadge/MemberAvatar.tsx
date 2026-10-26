@@ -40,6 +40,7 @@ export function MemberAvatar({ profile, size, editable, alt }: Props) {
       <Image
         className={avatarStyles}
         src={avatarURL}
+        unoptimized
         alt={alt ?? `Avatar of ${profile.name || profile.handle}`}
         width={width}
         height={height}

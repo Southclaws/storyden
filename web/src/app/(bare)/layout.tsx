@@ -33,6 +33,7 @@ export default async function Layout({ children }: PropsWithChildren) {
             <Image
               className={css({ width: "24", borderRadius: "md" })}
               src={getIconURL("512x512")}
+              unoptimized
               width={512}
               height={512}
               alt={`The ${siteName} logo`}

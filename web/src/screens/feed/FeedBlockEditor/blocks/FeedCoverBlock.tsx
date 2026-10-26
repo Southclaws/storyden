@@ -33,6 +33,7 @@ export function FeedCoverBlock({
           })
         }
         src={src}
+        unoptimized
         alt=""
         loading="eager"
         fill

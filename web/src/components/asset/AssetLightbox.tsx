@@ -125,7 +125,13 @@ export function AssetLightbox({
       <Portal>
         <Box className={cx(overlayStyles, containerStyles)}>
           <Box className={cx(overlayStyles, backdropStyles)}>
-            <Image className={backdropImageStyles} src={url} fill alt="" />
+            <Image
+              className={backdropImageStyles}
+              src={url}
+              fill
+              alt=""
+              unoptimized
+            />
           </Box>
 
           <Center className={cx(overlayStyles, lightboxStyles)}>
@@ -145,6 +151,7 @@ export function AssetLightbox({
               <Image
                 className={imageStyles}
                 src={url}
+                unoptimized
                 width={2000}
                 height={2000}
                 alt=""

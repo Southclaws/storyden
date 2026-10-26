@@ -7,8 +7,9 @@ const nextConfig = {
   reactCompiler: true,
   images: {
     loader: "custom",
-    loaderFile: "./src/lib/asset/loader.js",
-    unoptimized: true,
+    loaderFile: "./src/lib/asset/loader.ts",
+    deviceSizes: [320, 960, 1920],
+    imageSizes: [],
   },
   logging: {
     fetches: {

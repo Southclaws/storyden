@@ -1,9 +1,13 @@
+import Image from "next/image";
+
 import { Link as LinkSchema, ThreadReference } from "@/api/openapi-schema";
 import { Anchor } from "@/components/site/Anchor";
 import { Empty } from "@/components/site/Empty";
 import { Text } from "@/components/ui/text";
+import { css } from "@/styled-system/css";
 import { Box, Flex, VStack, styled } from "@/styled-system/jsx";
 import { cardBox } from "@/styled-system/recipes";
+import { token } from "@/styled-system/tokens";
 import { getAssetURL } from "@/utils/asset";
 
 import { FeedItemByline } from "../FeedItemByline/FeedItemByline";
@@ -20,14 +24,17 @@ export function LinkPost(props: Props) {
   return (
     <styled.article className={cardBox({ kind: "edge" })}>
       <Box display="flex" w="full" height="16">
-        <Box flexGrow="1" flexShrink="0" width="32">
+        <Box position="relative" flexGrow="1" flexShrink="0" width="32">
           {asset ? (
-            <styled.img
-              src={getAssetURL(asset.path, "m")}
-              height="full"
-              width="full"
-              objectPosition="center"
-              objectFit="cover"
+            <Image
+              className={css({
+                objectPosition: "center",
+                objectFit: "cover",
+              })}
+              src={getAssetURL(asset.path)!}
+              alt=""
+              fill
+              sizes={token("sizes.32")}
             />
           ) : (
             <VStack justify="center" w="full" h="full">
