@@ -3,7 +3,12 @@ import type { Metadata } from "next";
 import { threadList } from "@/api/openapi-server/threads";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { getCategoryThreadListParams } from "@/lib/feed/category";
-import { canonicalPage, jsonLD, pageLinks } from "@/lib/metadata/public";
+import {
+  canonicalPage,
+  isNotPublic,
+  jsonLD,
+  pageLinks,
+} from "@/lib/metadata/public";
 import type { Settings } from "@/lib/settings/settings";
 import { getSettings } from "@/lib/settings/settings-server";
 import * as z from "@/lib/validation";
@@ -88,7 +93,11 @@ export async function generateMetadata({
       }
 
       pagination = pageLinks("/", page, totalPages);
-    } catch {
+    } catch (error) {
+      if (!isNotPublic(error)) {
+        throw error;
+      }
+
       // Public site metadata remains available when the feed requires login.
       if (page > 1) {
         return {

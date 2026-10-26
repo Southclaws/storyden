@@ -3,7 +3,9 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
 import CategoryPage from "@/app/(dashboard)/d/[category]/page";
-import LibraryPage from "@/app/(dashboard)/l/[...slug]/page";
+import LibraryPage, {
+  generateMetadata as libraryMetadata,
+} from "@/app/(dashboard)/l/[...slug]/page";
 import LibraryIndexPage from "@/app/(dashboard)/l/page";
 import ProfilePage from "@/app/(dashboard)/m/[handle]/page";
 import ThreadPage, {
@@ -475,6 +477,60 @@ it.each([401, 403, 404, 500])(
     for (const page of pages) {
       expect(structuredData(page)).toEqual([]);
     }
+  },
+);
+
+const metadataSurfaces = [
+  {
+    name: "library page",
+    metadata: () =>
+      libraryMetadata({
+        params: Promise.resolve({ slug: ["drawing-colour"] }),
+      }),
+    notFound: {
+      title: "Page not found",
+      description: "The page you are looking for does not exist.",
+      robots: { index: false, follow: false },
+    },
+  },
+  {
+    name: "thread",
+    metadata: () =>
+      threadMetadata({
+        params: Promise.resolve({ slug: thread.slug }),
+        searchParams: Promise.resolve({}),
+      }),
+    notFound: {
+      title: "Thread Not Found",
+      description: "The thread you are looking for does not exist.",
+      robots: { index: false, follow: false },
+    },
+  },
+];
+
+it.each(
+  metadataSurfaces.flatMap((surface) =>
+    [401, 403, 404].map((status) => ({ ...surface, status })),
+  ),
+)(
+  "marks the $name as not found when anonymous reads return $status",
+  async ({ metadata, notFound, status }) => {
+    publicStatus = status;
+
+    expect(await metadata()).toEqual(notFound);
+  },
+);
+
+it.each(
+  metadataSurfaces.flatMap((surface) =>
+    [429, 500].map((status) => ({ ...surface, status })),
+  ),
+)(
+  "does not mark the $name as not found when anonymous reads return $status",
+  async ({ metadata, status }) => {
+    publicStatus = status;
+
+    await expect(metadata()).rejects.toMatchObject({ status });
   },
 );
 
