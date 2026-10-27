@@ -2,7 +2,9 @@ package phone
 
 import (
 	"context"
+	"crypto/rand"
 	"crypto/subtle"
+	"encoding/hex"
 	"fmt"
 	"log/slog"
 	"time"
@@ -261,7 +263,12 @@ func (p *Provider) verifyCode(ctx context.Context, rec *authentication.Authentic
 		return mismatch
 	}
 
-	if _, err := p.auth.Update(ctx, rec.ID, authentication.WithToken(xid.New().String())); err != nil {
+	invalid := make([]byte, 32)
+	if _, err := rand.Read(invalid); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if _, err := p.auth.Update(ctx, rec.ID, authentication.WithToken(hex.EncodeToString(invalid))); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
