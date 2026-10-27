@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
+	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/infrastructure/cache/cachetest"
 )
 
@@ -19,7 +20,12 @@ type stubAuthRepo struct {
 }
 
 func (s *stubAuthRepo) Update(ctx context.Context, id authentication.ID, opts ...authentication.Option) (*authentication.Authentication, error) {
-	s.tokens[id] = "rotated-" + id.String()
+	m := &ent.AuthenticationMutation{}
+	for _, opt := range opts {
+		opt(m)
+	}
+	token, _ := m.Token()
+	s.tokens[id] = token
 	return nil, nil
 }
 
@@ -44,7 +50,10 @@ func TestVerifyCode(t *testing.T) {
 		rec := record("123456", 0)
 
 		require.NoError(t, p.verifyCode(ctx, rec, "123456"))
-		assert.Contains(t, repo.tokens, rec.ID)
+		rotated, ok := repo.tokens[rec.ID]
+		require.True(t, ok)
+		assert.NotEmpty(t, rotated)
+		assert.NotEqual(t, "123456", rotated)
 	})
 
 	t.Run("rejects an expired code", func(t *testing.T) {
