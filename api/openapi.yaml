@@ -8113,6 +8113,9 @@ components:
           $ref: "#/components/schemas/PostContent"
         accent_colour:
           type: string
+        banner_asset:
+          description: The assigned banner image, including its original parent when cropped.
+          $ref: "#/components/schemas/Asset"
         authentication_mode:
           $ref: "#/components/schemas/AuthMode"
         registration_mode:
@@ -8149,6 +8152,9 @@ components:
           $ref: "#/components/schemas/PostContent"
         accent_colour:
           type: string
+        banner_asset_id:
+          description: The exact image asset assigned to the installation banner.
+          $ref: "#/components/schemas/AssetID"
         authentication_mode:
           $ref: "#/components/schemas/AuthMode"
         registration_mode:

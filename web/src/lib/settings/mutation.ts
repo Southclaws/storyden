@@ -53,7 +53,12 @@ export function useSettingsMutation() {
           key: infoKey,
           optimistic: (current: Info | undefined) => {
             if (!current) return current;
-            const { services, motd, ...publicPatch } = patch;
+            const {
+              services,
+              motd,
+              banner_asset_id: _bannerAssetID,
+              ...publicPatch
+            } = patch;
 
             return {
               ...current,

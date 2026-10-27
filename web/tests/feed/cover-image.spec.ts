@@ -465,9 +465,20 @@ test("feed cover restores its source and crop without changing the social previe
     );
 
     await page.goto("/admin/brand");
+    const bannerEditor = page.getByRole("group", {
+      name: "Banner image",
+      exact: true,
+    });
+    const banner = page.waitForResponse((response) => {
+      return (
+        new URL(response.url()).pathname === "/api/admin" &&
+        response.request().method() === "PATCH" &&
+        Boolean(response.request().postDataJSON()?.banner_asset_id)
+      );
+    });
     const bannerChooser = page.waitForEvent("filechooser");
-    await page
-      .getByRole("button", { name: "Upload banner", exact: true })
+    await bannerEditor
+      .getByRole("button", { name: "Replace image", exact: true })
       .click();
     await (
       await bannerChooser
@@ -478,18 +489,12 @@ test("feed cover restores its source and crop without changing the social previe
     });
     await expect
       .poll(() =>
-        page
+        bannerEditor
           .locator(".advanced-cropper img")
           .first()
           .evaluate((image: HTMLImageElement) => image.naturalWidth),
       )
       .toBe(1920);
-    const banner = page.waitForResponse((response) => {
-      return (
-        new URL(response.url()).pathname === "/api/info/banner" &&
-        response.request().method() === "POST"
-      );
-    });
     await page
       .getByRole("button", { name: "Save banner", exact: true })
       .click();

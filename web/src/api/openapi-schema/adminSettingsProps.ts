@@ -8,6 +8,7 @@
  * OpenAPI spec version: v1.26.16-post
  */
 import type { AdminSettingsServiceProps } from "./adminSettingsServiceProps";
+import type { Asset } from "./asset";
 import type { AuthMode } from "./authMode";
 import type { InstanceCapabilityList } from "./instanceCapabilityList";
 import type { MessageOfTheDay } from "./messageOfTheDay";
@@ -24,6 +25,8 @@ export interface AdminSettingsProps {
   description: string;
   content: PostContent;
   accent_colour: string;
+  /** The assigned banner image, including its original parent when cropped. */
+  banner_asset?: Asset;
   authentication_mode: AuthMode;
   registration_mode: RegistrationMode;
   /** The public web frontend address for this Storyden instance. */

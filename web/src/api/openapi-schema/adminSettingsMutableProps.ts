@@ -9,6 +9,7 @@
  */
 import type { AdminSettingsServiceProps } from "./adminSettingsServiceProps";
 import type { AuthMode } from "./authMode";
+import type { Identifier } from "./identifier";
 import type { MessageOfTheDayMutableProps } from "./messageOfTheDayMutableProps";
 import type { Metadata } from "./metadata";
 import type { PostContent } from "./postContent";
@@ -19,6 +20,8 @@ export interface AdminSettingsMutableProps {
   description?: string;
   content?: PostContent;
   accent_colour?: string;
+  /** The exact image asset assigned to the installation banner. */
+  banner_asset_id?: Identifier;
   authentication_mode?: AuthMode;
   registration_mode?: RegistrationMode;
   services?: AdminSettingsServiceProps;

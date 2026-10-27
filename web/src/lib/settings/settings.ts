@@ -8,6 +8,7 @@ import {
 import * as z from "@/lib/validation";
 import { FALLBACK_COLOUR } from "@/utils/colour";
 
+import { BrandingSettingsSchema } from "./branding";
 import { EditorSettingsSchema } from "./editor";
 import { DefaultFeedConfig, FeedConfigSchema } from "./feed";
 import { DefaultNavigationConfig, NavigationConfigSchema } from "./navigation";
@@ -56,6 +57,7 @@ export const DefaultSettings = {
 // which is untyped on the backend so we provide a schema for validation here.
 export const FrontendConfigurationSchema = z._default(
   z.object({
+    branding: z.optional(z.catch(BrandingSettingsSchema, {})),
     feed: FeedConfigSchema,
     navigation: NavigationConfigSchema,
     editor: z._default(EditorSettingsSchema, DefaultEditorSettings),

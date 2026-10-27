@@ -12,6 +12,7 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/onboarding"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner"
@@ -48,13 +49,34 @@ type Info struct {
 	APIAddress       url.URL
 }
 
+type InfoWithAssets struct {
+	*Info
+	BannerAsset opt.Optional[asset.Asset]
+}
+
+func (p *Provider) GetWithAssets(ctx context.Context) (*InfoWithAssets, error) {
+	expanded, err := p.settings.GetWithAssets(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	info, err := p.get(ctx, expanded.Settings)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	return &InfoWithAssets{Info: info, BannerAsset: expanded.BannerAsset}, nil
+}
+
 func (p *Provider) Get(ctx context.Context) (*Info, error) {
 	settings, err := p.settings.Get(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	settings, err = p.selfHeal(ctx, settings)
+	return p.get(ctx, settings)
+}
+
+func (p *Provider) get(ctx context.Context, settings *settings.Settings) (*Info, error) {
+	settings, err := p.selfHeal(ctx, settings)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to self-heal malformed settings"))
 	}

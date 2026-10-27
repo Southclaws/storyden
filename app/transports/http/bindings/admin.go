@@ -120,7 +120,7 @@ func NewAdmin(
 }
 
 func (a *Admin) AdminSettingsGet(ctx context.Context, request openapi.AdminSettingsGetRequestObject) (openapi.AdminSettingsGetResponseObject, error) {
-	info, err := a.instanceInfo.Get(ctx)
+	info, err := a.instanceInfo.GetWithAssets(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -285,6 +285,7 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 	}
 
 	_, err = a.settingsManager.Set(ctx, settings.Settings{
+		BannerAssetID:      opt.NewPtrMap(request.Body.BannerAssetId, deserialiseAssetID),
 		Title:              opt.NewPtr(request.Body.Title),
 		Description:        opt.NewPtr(request.Body.Description),
 		Content:            content,
@@ -299,7 +300,7 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	info, err := a.instanceInfo.Get(ctx)
+	info, err := a.instanceInfo.GetWithAssets(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -925,7 +926,7 @@ func optionalOAuthScopePolicy(in *openapi.OAuthClientScopePolicy) opt.Optional[o
 	return opt.New(v)
 }
 
-func serialiseSettings(in *instance_info.Info, headers *openapi.NetworkHeadersSample) openapi.AdminSettingsProps {
+func serialiseSettings(in *instance_info.InfoWithAssets, headers *openapi.NetworkHeadersSample) openapi.AdminSettingsProps {
 	services := serialiseServiceSettings(in.Settings.Services.OrZero())
 	if services.Media != nil {
 		services.Media.ImageMemoryBudget = &in.Media.ImageMemoryBudget
@@ -933,6 +934,7 @@ func serialiseSettings(in *instance_info.Info, headers *openapi.NetworkHeadersSa
 	}
 
 	return openapi.AdminSettingsProps{
+		BannerAsset:        opt.Map(in.BannerAsset, serialiseAsset).Ptr(),
 		AccentColour:       in.Settings.AccentColour.OrZero(),
 		Description:        in.Settings.Description.OrZero(),
 		Content:            in.Settings.Content.OrZero().HTML(),
