@@ -2,8 +2,10 @@ package phone
 
 import (
 	"context"
+	"crypto/subtle"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -19,6 +21,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/account/register"
 	"github.com/Southclaws/storyden/app/services/authentication/provider"
+	"github.com/Southclaws/storyden/internal/infrastructure/cache"
 	"github.com/Southclaws/storyden/internal/infrastructure/sms"
 	"github.com/Southclaws/storyden/internal/otp"
 )
@@ -36,6 +39,12 @@ var (
 	tokenType    = authentication.TokenTypeNone
 )
 
+const (
+	codeLifespan    = 10 * time.Minute
+	maxCodeAttempts = 5
+	attemptsPrefix  = "phone:code_attempts:"
+)
+
 const template = `Your unique one-time login code is: %s`
 
 type Provider struct {
@@ -44,6 +53,7 @@ type Provider struct {
 	auth     authentication.Repository
 	account  *account_querier.Querier
 	register *register.Registrar
+	cache    cache.Store
 
 	sms sms.Sender
 }
@@ -54,6 +64,7 @@ func New(
 	auth authentication.Repository,
 	account *account_querier.Querier,
 	register *register.Registrar,
+	cache cache.Store,
 	sms sms.Sender,
 ) *Provider {
 	return &Provider{
@@ -62,6 +73,7 @@ func New(
 		auth:     auth,
 		account:  account,
 		register: register,
+		cache:    cache,
 		sms:      sms,
 	}
 }
@@ -215,13 +227,43 @@ func (p *Provider) Login(ctx context.Context, handle string, onetimecode string)
 		return nil, fault.Wrap(errNoPhoneAuth)
 	}
 
-	if phoneauth.Token != onetimecode {
-		return nil, fault.Wrap(errOneTimeCodeMismatch,
-			fctx.With(ctx),
-			ftag.With(ftag.PermissionDenied),
-			fmsg.WithDesc("mismatch", "The code did not match."),
-		)
+	if err := p.verifyCode(ctx, phoneauth, onetimecode); err != nil {
+		return nil, err
 	}
 
 	return &acc.Account, nil
+}
+
+func (p *Provider) verifyCode(ctx context.Context, rec *authentication.Authentication, submitted string) error {
+	mismatch := fault.Wrap(errOneTimeCodeMismatch,
+		fctx.With(ctx),
+		ftag.With(ftag.PermissionDenied),
+		fmsg.WithDesc("mismatch", "The code did not match."),
+	)
+
+	if time.Since(rec.Created) > codeLifespan {
+		return mismatch
+	}
+
+	key := attemptsPrefix + rec.ID.String()
+	attempts, err := p.cache.HIncrBy(ctx, key, "n", 1)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+	if err := p.cache.Expire(ctx, key, codeLifespan); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+	if attempts > maxCodeAttempts {
+		return mismatch
+	}
+
+	if subtle.ConstantTimeCompare([]byte(rec.Token), []byte(submitted)) != 1 {
+		return mismatch
+	}
+
+	if _, err := p.auth.Update(ctx, rec.ID, authentication.WithToken(xid.New().String())); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
 }
