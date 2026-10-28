@@ -10,6 +10,7 @@ import {
   authEmailPasswordSignin,
   authPasswordSignin,
 } from "@/api/openapi-client/auth";
+import { getSafeReturnPath } from "@/lib/auth/return-path";
 import {
   ExistingPasswordSchema,
   UsernameOrEmailSchema,
@@ -26,7 +27,7 @@ type Form = z.infer<typeof FormSchema>;
 export function useLoginEmailForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const returnURL = searchParams.get("return_url") ?? "/";
+  const returnURL = getSafeReturnPath(searchParams.get("return_url"));
 
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
