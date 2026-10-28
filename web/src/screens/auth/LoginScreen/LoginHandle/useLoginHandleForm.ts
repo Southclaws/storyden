@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { useAccountGet } from "@/api/openapi-client/accounts";
 import { authPasswordSignin } from "@/api/openapi-client/auth";
 import { APIError } from "@/api/openapi-schema";
+import { getSafeReturnPath } from "@/lib/auth/return-path";
 import { ExistingPasswordSchema, UsernameSchema } from "@/lib/auth/schemas";
 import * as z from "@/lib/validation";
 import { deriveError } from "@/utils/error";
@@ -32,7 +33,7 @@ export function useLoginHandleForm() {
   });
   const { push } = useRouter();
   const searchParams = useSearchParams();
-  const returnURL = searchParams.get("return_url") ?? "/";
+  const returnURL = getSafeReturnPath(searchParams.get("return_url"));
   const { mutate } = useAccountGet();
 
   async function handlePassword(payload: Form) {
