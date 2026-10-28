@@ -8,6 +8,7 @@ export const size = {
   height: 512,
 };
 export const contentType = "image/png";
+export const dynamic = "force-dynamic";
 
 export default async function Icon() {
   const src = await fetchImageDataURI(getIconURL("512x512"));
