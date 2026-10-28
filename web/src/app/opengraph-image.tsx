@@ -3,6 +3,7 @@ import { ImageResponse } from "next/og";
 
 import { getSettings } from "@/lib/settings/settings-server";
 import { getBannerURL, getIconURL } from "@/utils/icon";
+import { fetchImageDataURI } from "@/utils/image-data-uri";
 
 export const size = {
   width: 1200,
@@ -14,7 +15,7 @@ export const contentType = "image/png";
 export default async function Image() {
   const settings = await getSettings();
   const iconURL = getIconURL("512x512");
-  const backgroundImageURL = getBannerURL();
+  const backgroundImageURL = await fetchImageDataURI(getBannerURL());
 
   const { title, accent_colour } = settings;
 
