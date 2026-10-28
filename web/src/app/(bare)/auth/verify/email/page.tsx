@@ -4,7 +4,7 @@ import { EmailVerificationScreen } from "@/screens/auth/EmailVerificationScreen/
 
 type Props = {
   searchParams: Promise<{
-    returnURL?: string;
+    returnURL?: string | string[];
   }>;
 };
 
