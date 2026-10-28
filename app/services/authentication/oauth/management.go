@@ -83,6 +83,12 @@ func (s *Service) UpdateClientByAccount(ctx context.Context, accountID account.A
 		}
 	}
 
+	if uris, ok := input.RedirectURIs.Get(); ok {
+		if err := validateClientRedirectURIs(uris); err != nil {
+			return nil, nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+	}
+
 	client, err := s.tokens.UpdateClient(ctx, id, oauth_writer.ClientUpdate{
 		Name:          input.Name,
 		RedirectURIs:  input.RedirectURIs,

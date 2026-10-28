@@ -2,6 +2,7 @@ package oauth
 
 import (
 	"context"
+	"net/url"
 	"strings"
 
 	"github.com/Southclaws/fault"
@@ -74,6 +75,10 @@ func (s *Service) CreateClientForAccount(ctx context.Context, input ClientSelfCr
 
 	// Validate grant types
 	if err := validateGrantTypes(input.AllowedGrants); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	if err := validateClientRedirectURIs(input.RedirectURIs); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
@@ -168,6 +173,39 @@ func (s *Service) CreateClientForAccount(ctx context.Context, input ClientSelfCr
 		Client:       client,
 		ClientSecret: clientSecret,
 	}, nil
+}
+
+var unsafeRedirectSchemes = map[string]struct{}{
+	"javascript": {},
+	"data":       {},
+	"vbscript":   {},
+	"file":       {},
+	"blob":       {},
+	"about":      {},
+	"filesystem": {},
+}
+
+func validateClientRedirectURIs(uris []string) error {
+	for _, raw := range uris {
+		if strings.Contains(raw, "*") || strings.Contains(raw, "#") {
+			return fault.New("redirect uri must not contain wildcards or fragments")
+		}
+
+		u, err := url.Parse(raw)
+		if err != nil {
+			return fault.Wrap(err)
+		}
+
+		if !u.IsAbs() {
+			return fault.New("redirect uri must be absolute")
+		}
+
+		if _, unsafe := unsafeRedirectSchemes[strings.ToLower(u.Scheme)]; unsafe {
+			return fault.Newf("redirect uri scheme %q is not permitted", u.Scheme)
+		}
+	}
+
+	return nil
 }
 
 func validateGrantTypes(grants []string) error {
