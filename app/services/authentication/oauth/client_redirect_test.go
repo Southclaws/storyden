@@ -18,6 +18,8 @@ func TestValidateClientRedirectURIs(t *testing.T) {
 		"data:text/html,<script>alert(1)</script>",
 		"vbscript:x",
 		"/relative/path",
+		"https:callback",
+		"https:///cb",
 		"https://app.example.com/*",
 		"https://app.example.com/cb#frag",
 	}

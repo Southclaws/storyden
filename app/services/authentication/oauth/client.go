@@ -200,6 +200,10 @@ func validateClientRedirectURIs(uris []string) error {
 			return fault.New("redirect uri must be absolute")
 		}
 
+		if (u.Scheme == "http" || u.Scheme == "https") && (u.Opaque != "" || u.Hostname() == "") {
+			return fault.New("redirect uri must have a valid hostname")
+		}
+
 		if _, unsafe := unsafeRedirectSchemes[strings.ToLower(u.Scheme)]; unsafe {
 			return fault.Newf("redirect uri scheme %q is not permitted", u.Scheme)
 		}
