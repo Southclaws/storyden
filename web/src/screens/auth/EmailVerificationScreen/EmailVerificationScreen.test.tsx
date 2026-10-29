@@ -56,9 +56,10 @@ describe("email verification return link", () => {
     ).not.toBeInTheDocument();
   });
 
-  it.each([
+  it.each<[string | string[], string]>([
     ["https://example.com", "/"],
     ["/settings/account?tab=email", "/settings/account?tab=email"],
+    [["/settings", "/profile"], "/"],
   ])(
     "navigates safely after verifying with %j",
     async (returnURL, expected) => {
