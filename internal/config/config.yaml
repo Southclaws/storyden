@@ -857,6 +857,15 @@
       description: |-
         When `LANGUAGE_MODEL_PROVIDER` is set to `openai`, this is the API key for the OpenAI API.
 
+    - env: "ROBOT_MODEL_DEBUG_DUMP"
+      name: RobotModelDebugDump
+      type: bool
+      default: false
+      description: |-
+        Write a Markdown snapshot of each Robot model request after dynamic instructions, tools, and conversation history have been assembled. Includes the full system prompt, message parts, tool inputs and outputs, and tool declarations, without redaction or truncation. Dump metadata appears first, followed by tool declarations, system instructions, and messages.
+
+        Disabled by default. Snapshots use the configured object storage under `debug/model-requests/<session-id>/<timestamp>-<unique-id>.md`, so local storage writes beneath `ASSET_STORAGE_LOCAL_PATH` (normally `./data`) and S3 storage writes to the configured bucket. Each model call gets a separate snapshot, including multiple calls within a single conversation turn. Dumps capture the final ADK request before provider-specific conversion, not HTTP payloads. Callable-tool inventories and ADK request configuration are excluded. Section ordering follows the documented prompt-prefix layout; providers control the final model input.
+
 - section: Semdex
   description: |-
     The Semdex is a semantic index that provides vector-based storage of content. This is used for things like recommendations, search, etc.

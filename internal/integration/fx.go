@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -50,6 +51,12 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 	defaultConfig, err := config.ApplyDefaults(defaultConfig)
 	if err != nil {
 		t.Fatalf("failed to configure integration app: %v", err)
+	}
+	if value, ok := os.LookupEnv("ROBOT_MODEL_DEBUG_DUMP"); ok {
+		defaultConfig.RobotModelDebugDump, err = strconv.ParseBool(value)
+		if err != nil {
+			t.Fatalf("invalid ROBOT_MODEL_DEBUG_DUMP: %v", err)
+		}
 	}
 
 	if dbURL := os.Getenv("DATABASE_URL"); dbURL != "" {

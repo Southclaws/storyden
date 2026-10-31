@@ -35,6 +35,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry/pluginbuilder"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/llmprovider"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/mcpclient"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/model_debug_dump"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/tools"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_memory"
@@ -53,7 +54,7 @@ func Build() fx.Option {
 		workspaceprovider.Build(),
 		denbot.Build(),
 		pluginbuilder.Build(),
-		fx.Provide(agent_registry.New, NewSessionStorage, New, NewSessionNamer, NewWorkspaceManager, mcpclient.NewHTTPClient, mcpclient.New),
+		fx.Provide(agent_registry.New, NewSessionStorage, New, NewSessionNamer, NewWorkspaceManager, mcpclient.NewHTTPClient, mcpclient.New, model_debug_dump.New),
 	)
 }
 
@@ -151,6 +152,7 @@ func New(
 	toolProvider *tools.Registry,
 	toolsetRegistry *toolsets.Registry,
 	agentRegistry *agent_registry.Registry,
+	debugDump *model_debug_dump.Writer,
 ) (*Agent, error) {
 	artifactService := artifact.InMemoryService()
 
@@ -171,7 +173,7 @@ func New(
 			// We don't use streaming, it's cliche as fuck.
 			StreamingMode: agent.StreamingModeNone,
 		},
-		beforeModelCallbacks: []llmagent.BeforeModelCallback{agent_history.RepairInterruptedToolCallsBeforeModel(logger), normalizeClientToolResultsBeforeModel(logger, cfg.PublicWebAddress), projectMessageSpeakersBeforeModel(), tools.CaptureCallableTools(), logBeforeModel(logger)},
+		beforeModelCallbacks: []llmagent.BeforeModelCallback{agent_history.RepairInterruptedToolCallsBeforeModel(logger), normalizeClientToolResultsBeforeModel(logger, cfg.PublicWebAddress), projectMessageSpeakersBeforeModel(), tools.CaptureCallableTools(), logBeforeModel(logger), debugDump.BeforeModel},
 		afterModelCallbacks:  []llmagent.AfterModelCallback{logAfterModel(logger)},
 		beforeToolCallbacks:  []llmagent.BeforeToolCallback{logBeforeTool(logger)},
 		afterToolCallbacks:   []llmagent.AfterToolCallback{logAfterTool(logger)},
