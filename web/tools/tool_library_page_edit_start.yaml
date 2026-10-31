@@ -11,8 +11,12 @@ x-storyden-tool:
     untrustedContentHint: false
 title: library_page_edit_start
 description: >-
-  Enter quick edit mode for the current Library page so frontend-only layout
-  tools can make the immediate change the user requested. Use this only when
+  Enter quick edit mode for the Library page (node) currently displayed in the frontend.
+  When present, datagraph_item in <invocation-context-json> identifies the invocation's
+  page: kind is "node", id is the page ID, and slug is the page slug.
+  Opening a document with library_page_open does not change this target.
+  Inspect the page's layout before changing blocks. If the requested target is
+  a different page, ask the user to open it before proceeding. Use this only when
   the user clearly asked to edit the live page. If it is unclear whether they
   want a quick edit or a version draft, ask them before calling this tool.
 type: object

@@ -2,6 +2,7 @@ $schema: http://json-schema.org/draft-07/schema#
 $id: ToolToolGet
 x-storyden-tool:
   toolsets:
+    - system.discovery
     - system.robot_studio
   title: Get Tool
   role: USE_ROBOTS

@@ -30,7 +30,7 @@ func TestDefaultSearchesLoadsAndUsesCustomToolset(t *testing.T) {
 	t.Parallel()
 
 	integration.Test(t,
-		&config.Config{LanguageModelProvider: "mock"},
+		&config.Config{LanguageModelProvider: "mock", RobotModelDebugDump: true, AssetStorageLocalPath: "./data"},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelAck),
 		fx.Invoke(func(

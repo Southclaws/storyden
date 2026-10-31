@@ -14,6 +14,7 @@ import { FormErrorText } from "@/components/ui/form-error-text";
 import { Input } from "@/components/ui/input";
 import { PageHeading } from "@/components/ui/page-heading";
 import { PinInputField } from "@/components/ui/pin-input";
+import { getSafeReturnPath } from "@/lib/auth/return-path";
 import * as z from "@/lib/validation";
 import { vstack } from "@/styled-system/patterns";
 
@@ -32,6 +33,7 @@ type Props = {
 
 export function EmailVerificationScreen(props: Props) {
   const router = useRouter();
+  const returnURL = getSafeReturnPath(props.returnURL);
   const probablyEmail = props.initialAccount?.email_addresses.find(
     (e) => e.verified === false,
   );
@@ -51,7 +53,7 @@ export function EmailVerificationScreen(props: Props) {
           code: data.code,
         });
 
-        router.push(props.returnURL ?? "/");
+        router.push(returnURL);
       },
       {
         errorToast: false,
@@ -94,7 +96,7 @@ export function EmailVerificationScreen(props: Props) {
       <FormErrorText>{form.formState.errors["root"]?.message}</FormErrorText>
 
       {props.returnURL && (
-        <Link className="link" href={props.returnURL}>
+        <Link className="link" href={returnURL}>
           Back to previous page
         </Link>
       )}

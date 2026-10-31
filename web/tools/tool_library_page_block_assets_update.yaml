@@ -10,7 +10,9 @@ x-storyden-tool:
     openWorldHint: false
     untrustedContentHint: false
 title: library_page_block_assets_update
-description: Update the presentation of the visible assets block on the current Library page.
+description: >-
+  Update the presentation of the visible assets block on the Library page (node) currently displayed in the frontend.
+  Match the requested page to datagraph_item.id in invocation context when datagraph_item.kind is "node".
 type: object
 required: [input, output]
 properties:

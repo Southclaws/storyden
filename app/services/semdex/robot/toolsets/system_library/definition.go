@@ -4,5 +4,15 @@ const (
 	ID          = "system.library"
 	Name        = "Library management"
 	Description = "Search, read, create, and maintain structured Storyden Library pages and their property schemas."
-	Instruction = `Use the Library as the source of truth for durable, structured knowledge. Search or ask the user to select a page when the target is ambiguous. Read the current page or schema before changing it, preserve unrelated content and properties, and treat page, property, and schema mutations as side effects. Schema updates can remove omitted fields, so inspect first and change only what the task requires. Use library_pages_create for multiple pages and use ref with parent_ref to describe their hierarchy in one request. Use library_pages_update for multiple existing pages. Each batch commits all page and tag changes or none; on error, correct the reported item and resubmit the whole batch. Link enrichment occurs after page creation and can fail independently. Batches do not deduplicate repeated requests, so inspect the Library before resubmitting after a lost response. Tag names create missing tags automatically; updates replace the tag set, omission preserves it, and an empty array clears it. Report the pages affected and the substantive result.`
+	Instruction = `Use the Library for durable, structured community knowledge.
+
+Use a supplied page identifier for an explicit target. For references such as "this page", use datagraph_item in <invocation-context-json> when its kind is "node": id is the Library page ID and slug is its slug. Resolve the target before searching by keywords. Use library_page_get for metadata or library_page_open for content. If search finds no match, use a suitable direct lookup or visibility-filtered library_page_list before concluding that the page cannot be found. Request a page selection when the target remains ambiguous.
+
+Read the current content or schema when needed to preserve unrelated material. Schema updates can remove omitted fields, so inspect the schema before changing it.
+
+Use library_pages_create for multiple new pages and library_pages_update for multiple existing pages. Use parent_ref for parent-child relationships within a creation batch. Follow the tool descriptions for transaction, tag replacement, and retry behaviour.
+
+Providing a URL requests best-effort link enrichment. Page creation does not establish that enrichment succeeded; report it as confirmed only when the available result establishes it.
+
+Report the affected pages and the substantive changes.`
 )

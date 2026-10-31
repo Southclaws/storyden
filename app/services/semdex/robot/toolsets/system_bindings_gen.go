@@ -4,6 +4,7 @@ package toolsets
 
 import (
 	system_content_search "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_content_search"
+	system_discovery "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_discovery"
 	system_discussions "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_discussions"
 	system_documents "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_documents"
 	system_library "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_library"
@@ -23,6 +24,14 @@ func systemDefinitions() []Definition {
 			Description: system_content_search.Description,
 			Instruction: system_content_search.Instruction,
 			ToolNames:   append([]string(nil), system_content_search.ToolNames...),
+			Source:      SourceSystem,
+		},
+		{
+			ID:          system_discovery.ID,
+			Name:        system_discovery.Name,
+			Description: system_discovery.Description,
+			Instruction: system_discovery.Instruction,
+			ToolNames:   append([]string(nil), system_discovery.ToolNames...),
 			Source:      SourceSystem,
 		},
 		{

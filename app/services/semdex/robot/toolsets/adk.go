@@ -185,20 +185,10 @@ type runtimeIssuesOutput struct {
 	NextAction string         `json:"next_action"`
 }
 
-type SearchInput struct {
-	Query      string `json:"query" jsonschema:"What capability or task you need tools for"`
-	MaxResults int    `json:"max_results,omitempty" jsonschema:"Maximum Toolsets to return, from 1 to 20"`
-}
-
 type CatalogueItem struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
-}
-
-type SearchOutput struct {
-	Toolsets   []CatalogueItem `json:"toolsets"`
-	NextAction string          `json:"next_action"`
 }
 
 type LoadInput struct {
@@ -217,23 +207,6 @@ func (r *Registry) Discovery(ctx context.Context, baseRefs ...string) (tool.Tool
 		baseRefs:   uniqueStrings(baseRefs),
 		toolOwners: make(map[string]map[string]struct{}),
 		managed:    make(map[string]struct{}),
-	}
-
-	search, err := functiontool.New(functiontool.Config{
-		Name:        "toolset_search",
-		Description: "Search reusable Toolsets by the capability or task you need. Use this before loading tools that are not already available.",
-	}, func(ctx agent.Context, input SearchInput) (SearchOutput, error) {
-		definitions, err := r.Search(ctx, input.Query, input.MaxResults)
-		if err != nil {
-			return SearchOutput{}, err
-		}
-		return SearchOutput{
-			Toolsets:   catalogueItems(definitions),
-			NextAction: "Use toolset_get with a returned ID to inspect its tools and instruction before loading or assigning it.",
-		}, nil
-	})
-	if err != nil {
-		return nil, err
 	}
 
 	load, err := functiontool.New(functiontool.Config{
@@ -341,7 +314,7 @@ func (r *Registry) Discovery(ctx context.Context, baseRefs ...string) (tool.Tool
 		return nil, err
 	}
 
-	discovery.tools = []tool.Tool{search, load, loadTools, issues}
+	discovery.tools = []tool.Tool{load, loadTools, issues}
 	return discovery, nil
 }
 

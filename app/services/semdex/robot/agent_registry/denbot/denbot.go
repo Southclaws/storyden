@@ -7,11 +7,11 @@ import (
 
 	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_content_search"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_discovery"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_discussions"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_documents"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_library"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_memory"
-	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_robot_studio"
 )
 
 const (
@@ -42,12 +42,12 @@ func Definition() agent_registry.Definition {
 		AgentName:   AgentName,
 		Instruction: instruction,
 		ToolsetRefs: []string{
+			system_discovery.ID,
 			system_content_search.ID,
 			system_documents.ID,
 			system_discussions.ID,
 			system_library.ID,
 			system_memory.ID,
-			system_robot_studio.ID,
 		},
 		Capabilities: []string{"tool_search", "toolset_search", "robot_search", "delegation"},
 	}

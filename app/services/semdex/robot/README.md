@@ -74,13 +74,20 @@ Tool assignment is intentionally disjoint. Adding a Toolset removes direct
 tools already provided by that Toolset. Adding a direct tool already provided
 by an assigned Toolset is rejected with the owning Toolset's name.
 
-Denbot starts with the Library management, Discussion management, Content
-search, and Robot studio Toolsets. Plugin Studio is a prompt-bearing system
-Toolset, not a built-in Robot.
+Denbot starts with Capability discovery, Library management, Discussion
+management, Content search, Document exploration, and Knowledge graph memory.
+Robot studio is loaded on demand for Robot and Toolset configuration. Capability
+discovery keeps tool inspection and specialist Robot discovery available without
+loading Robot studio's authoring tools or instructions. Plugin Studio is a
+prompt-bearing system Toolset, not a built-in Robot.
 
 ### Toolset discovery and loading
 
-Denbot always receives `toolset_search`, `toolset_load`, and `tool_load`.
+Denbot's default Capability discovery Toolset supplies `tool_search`, `tool_get`,
+`toolset_search`, `toolset_get`, and `robot_search` through the registered tool
+implementations. `Registry.Discovery` supplies the runtime loading primitives
+`toolset_load` and `tool_load`, controls which tools are callable, and injects
+active Toolset instructions. It does not define a second set of search tools.
 `toolset_search` returns only Toolset ID, name, and description. The Robot uses
 `toolset_get` to inspect the selected bundle's tool IDs and instruction before
 loading it. Loading records active Toolset references in ADK session state and

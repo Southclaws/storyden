@@ -22,7 +22,9 @@ definitions:
       id:
         type: string
         minLength: 1
-        description: Library page ID or slug returned by Library discovery tools.
+        description: >-
+          Library page (node) ID or slug supplied by the user or a tool result.
+          For the page referenced by invocation context, use datagraph_item.id or datagraph_item.slug when datagraph_item.kind is "node".
     additionalProperties: false
   ToolLibraryPageOpenOutput:
     $ref: "../../common/RobotDocumentProjection.yaml"

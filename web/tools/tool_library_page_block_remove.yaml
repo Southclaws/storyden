@@ -10,7 +10,9 @@ x-storyden-tool:
     openWorldHint: false
     untrustedContentHint: false
 title: library_page_block_remove
-description: Remove a visible block from the current Library page without deleting its content.
+description: >-
+  Remove a visible block from the Library page (node) currently displayed in the frontend without deleting its content.
+  Match the requested page to datagraph_item.id in invocation context when datagraph_item.kind is "node".
 type: object
 required: [input, output]
 properties:

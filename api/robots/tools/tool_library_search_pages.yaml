@@ -12,7 +12,10 @@ x-storyden-tool:
     idempotentHint: false
     openWorldHint: false
 title: library_search_pages
-description: "Search for pages in the library wiki by relevance."
+description: >-
+  Search indexed Library pages by keyword relevance. Use this for discovery, not exact ID or slug lookup.
+  For a known page, use library_page_get or library_page_open; use library_page_list to browse by visibility.
+  An empty result does not establish that the page is absent or inaccessible.
 type: object
 required:
   - input

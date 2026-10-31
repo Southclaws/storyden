@@ -10,7 +10,9 @@ x-storyden-tool:
     openWorldHint: false
     untrustedContentHint: false
 title: library_page_block_directory_update
-description: Update the presentation of the visible directory block on the current Library page.
+description: >-
+  Update the presentation of the visible directory block on the Library page (node) currently displayed in the frontend.
+  Match the requested page to datagraph_item.id in invocation context when datagraph_item.kind is "node".
 type: object
 required: [input, output]
 properties:
@@ -26,6 +28,10 @@ definitions:
       layout:
         type: string
         enum: [table, grid, gallery]
+        description: >-
+          Directory presentation: table shows rows and columns; grid shows cards in regular columns with fixed-ratio images;
+          gallery uses a masonry-style arrangement with variable image heights.
+          When the user names a mode, select that exact value.
     additionalProperties: false
 
   ToolLibraryPageBlockDirectoryUpdateOutput:
