@@ -36,13 +36,14 @@ var ImagePresets = []ImagePreset{
 	{Name: "icon_152", Width: 152, Height: 152, Square: true, PNG: true, Bit: 1 << 8},
 	{Name: "icon_167", Width: 167, Height: 167, Square: true, PNG: true, Bit: 1 << 9},
 	{Name: "icon_180", Width: 180, Height: 180, Square: true, PNG: true, Bit: 1 << 10},
+	{Name: "icon_192", Width: 192, Height: 192, Square: true, PNG: true, Bit: 1 << 13},
 	{Name: "icon_512", Width: 512, Height: 512, Square: true, PNG: true, Bit: 1 << 11},
 	{Name: "banner", Width: 1200, Height: 630, PNG: true, Bit: 1 << 12},
 }
 
 const (
 	EagerImagePresets  int64 = 1 | 8 | 16 | 32
-	IconImagePresets   int64 = 64 | 128 | 256 | 512 | 1024 | 2048
+	IconImagePresets   int64 = 64 | 128 | 256 | 512 | 1024 | 2048 | 8192
 	BannerImagePresets int64 = 4096
 )
 

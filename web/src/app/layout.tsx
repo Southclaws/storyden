@@ -3,6 +3,7 @@ import { PropsWithChildren } from "react";
 
 import { inter, interItalic } from "@/app/fonts";
 import { serverEnvironment } from "@/config";
+import { socialImage } from "@/lib/metadata/public";
 import { resolveDiscoverySettings } from "@/lib/settings/discovery";
 import { getSettings } from "@/lib/settings/settings-server";
 import { getColourAsHex } from "@/utils/colour";
@@ -66,7 +67,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   const discovery = resolveDiscoverySettings(settings.discovery);
 
-  const iconURL = getIconURL("512x512");
+  const iconURL = getIconURL("32x32");
+  const touchIconURL = getIconURL("180x180");
 
   const canonical = WEB_ADDRESS;
 
@@ -78,19 +80,26 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(canonical),
     title: title,
     description: settings.description,
+    twitter: { card: "summary_large_image" },
+    openGraph: {
+      type: "website",
+      title: settings.title,
+      description: settings.description,
+      url: canonical,
+      images: [socialImage(undefined, settings.title)],
+    },
     robots: discovery.search_indexing
       ? undefined
       : { index: false, follow: false },
     icons: {
-      icon: iconURL,
+      icon: { url: iconURL, sizes: "32x32", type: "image/png" },
       shortcut: iconURL,
-      apple: iconURL,
+      apple: { url: touchIconURL, sizes: "180x180", type: "image/png" },
     },
     appleWebApp: {
       capable: true,
       title: title,
       statusBarStyle: "black-translucent",
-      startupImage: iconURL,
     },
   };
 }

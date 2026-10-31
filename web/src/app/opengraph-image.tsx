@@ -1,50 +1,9 @@
-/* eslint-disable jsx-a11y/alt-text, @next/next/no-img-element */
-import { ImageResponse } from "next/og";
+import { streamMetadataImage } from "@/lib/metadata/image-response";
 
-import { getSettings } from "@/lib/settings/settings-server";
-import { getBannerURL, getIconURL } from "@/utils/icon";
-import { fetchImageDataURI } from "@/utils/image-data-uri";
-
-export const size = {
-  width: 1200,
-  height: 630,
-};
-
+export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const dynamic = "force-dynamic";
 
 export default async function Image() {
-  const settings = await getSettings();
-  const iconURL = getIconURL("512x512");
-  const backgroundImageURL = await fetchImageDataURI(getBannerURL());
-
-  const { title, accent_colour } = settings;
-
-  return new ImageResponse(
-    <div
-      style={{
-        height: "100%",
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#fff",
-      }}
-    >
-      <img
-        src={backgroundImageURL}
-        width="100%"
-        height="100%"
-        style={{
-          objectPosition: "center",
-          objectFit: "cover",
-        }}
-      />
-    </div>,
-    {
-      ...size,
-      emoji: "fluent",
-    },
-  );
+  return streamMetadataImage("/info/banner");
 }

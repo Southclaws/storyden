@@ -5,12 +5,11 @@ import { NodeListResult, NodeWithChildren } from "@/api/openapi-schema";
 import { nodeGet, nodeListChildren } from "@/api/openapi-server/nodes";
 import { ServerRenderedContent } from "@/components/content/ContentRenderer/ServerRenderedContent";
 import { getTargetSlug } from "@/components/library/utils";
-import { WEB_ADDRESS } from "@/config";
 import {
   LibraryPageBlockTypeDirectory,
   parseNodeMetadata,
 } from "@/lib/library/metadata";
-import { canonicalPage, jsonLD } from "@/lib/metadata/public";
+import { canonicalPage, jsonLD, socialImage } from "@/lib/metadata/public";
 import { getSettings } from "@/lib/settings/settings-server";
 import { LibraryPageScreen } from "@/screens/library/LibraryPageScreen/LibraryPageScreen";
 import { Params, ParamsSchema } from "@/screens/library/library-path";
@@ -138,7 +137,10 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       // NOTE: Massive hack because Next.js still hasn't fixed a bug with
       // catch-all routes and opengraph-image route handlers.
       images: [
-        `${WEB_ADDRESS}/l/og?slug=${encodeURIComponent(data.slug)}&t=${encodeURIComponent(data.updatedAt)}`,
+        socialImage(
+          `/l/og?slug=${encodeURIComponent(data.slug)}&t=${encodeURIComponent(data.updatedAt)}`,
+          data.name,
+        ),
       ],
     },
   };

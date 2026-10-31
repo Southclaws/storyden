@@ -3,7 +3,12 @@ import type { Metadata } from "next";
 import { threadList } from "@/api/openapi-server/threads";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { getCategoryThreadListParams } from "@/lib/feed/category";
-import { canonicalPage, jsonLD, pageLinks } from "@/lib/metadata/public";
+import {
+  canonicalPage,
+  jsonLD,
+  pageLinks,
+  socialImage,
+} from "@/lib/metadata/public";
 import type { Settings } from "@/lib/settings/settings";
 import { getSettings } from "@/lib/settings/settings-server";
 import * as z from "@/lib/validation";
@@ -105,6 +110,7 @@ export async function generateMetadata({
     alternates: { canonical: url },
     pagination,
     openGraph: {
+      images: [socialImage(undefined, settings.title)],
       type: "website",
       title: settings.title,
       description: settings.description,

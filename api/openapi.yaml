@@ -4946,6 +4946,7 @@ components:
         type: string
         enum:
           - 512x512 # Generic big icon
+          - 192x192 # Installed web app icon
           - 32x32 # Generic small icon
           - 180x180 # iOS high DPI
           - 120x120 # iOS low DPI

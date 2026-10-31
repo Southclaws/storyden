@@ -1,9 +1,8 @@
 package icon
 
 import (
-	"bytes"
 	"context"
-	_ "embed"
+	"embed"
 	"fmt"
 	"io"
 
@@ -17,8 +16,8 @@ import (
 	"github.com/Southclaws/storyden/internal/mime"
 )
 
-//go:embed embed/default_icon.png
-var defaultIcon []byte
+//go:embed embed/default_icon*.png
+var defaultIcons embed.FS
 
 type Service interface {
 	Upload(context.Context, io.Reader) error
@@ -93,11 +92,24 @@ func (s *service) Get(ctx context.Context, size string) (*asset.Asset, io.Reader
 		}
 	}
 
+	path := fmt.Sprintf("embed/default_icon_%d.png", pixels)
+	if pixels == 512 {
+		path = "embed/default_icon.png"
+	}
+	file, err := defaultIcons.Open(path)
+	if err != nil {
+		return nil, nil, err
+	}
+	info, err := file.Stat()
+	if err != nil {
+		file.Close()
+		return nil, nil, err
+	}
 	icon := &asset.Asset{
 		Name: asset.NewFilepathFilename("default-icon.png"),
-		Size: len(defaultIcon),
+		Size: int(info.Size()),
 		MIME: mime.New("image/png"),
 	}
 
-	return icon, bytes.NewReader(defaultIcon), nil
+	return icon, file, nil
 }

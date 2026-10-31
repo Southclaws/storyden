@@ -2,8 +2,8 @@ import { ImageResponse } from "next/og";
 import { NextRequest, NextResponse } from "next/server";
 
 import { nodeGet } from "@/api/openapi-server/nodes";
+import { loadMetadataImage } from "@/lib/metadata/image-response";
 import { getSettings } from "@/lib/settings/settings-server";
-import { getAssetURL } from "@/utils/asset";
 
 const size = {
   width: 1200,
@@ -16,7 +16,17 @@ export async function GET(req: NextRequest) {
     return new NextResponse("No slug provided", { status: 400 });
   }
 
-  const { data } = await nodeGet(slug);
+  const { data } = await nodeGet(slug, undefined, {
+    anonymous: true,
+    cache: "no-store",
+    signal: req.signal,
+  });
+  if (data.visibility !== "published") {
+    return new NextResponse("Not Found", {
+      status: 404,
+      headers: { "Cache-Control": "no-store" },
+    });
+  }
 
   const { accent_colour } = await getSettings();
 
@@ -24,6 +34,13 @@ export async function GET(req: NextRequest) {
     data.primary_image?.parent ??
     data.link?.primary_image ??
     data.primary_image;
+
+  const imageData = image
+    ? await loadMetadataImage(
+        `/assets/${encodeURIComponent(image.filename)}?variant=l`,
+      )
+    : undefined;
+  if (imageData instanceof Response) return imageData;
 
   return new ImageResponse(
     <div
@@ -38,10 +55,12 @@ export async function GET(req: NextRequest) {
         fontSize: 16,
       }}
     >
-      {image ? (
+      {imageData ? (
         // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
         <img
-          src={getAssetURL(image.path)}
+          // Satori accepts binary image sources; React's DOM types only allow URLs.
+          // @ts-expect-error ArrayBuffer is supported by next/og.
+          src={imageData}
           width="100%"
           height="100%"
           style={{

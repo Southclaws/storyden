@@ -291,7 +291,14 @@ export const useGetInfo = <TError = InternalServerErrorResponse>(options?: {
   };
 };
 export const getIconGetUrl = (
-  iconSize: "512x512" | "32x32" | "180x180" | "120x120" | "167x167" | "152x152",
+  iconSize:
+    | "512x512"
+    | "192x192"
+    | "32x32"
+    | "180x180"
+    | "120x120"
+    | "167x167"
+    | "152x152",
 ) => {
   return `/info/icon/${iconSize}`;
 };
@@ -300,7 +307,14 @@ export const getIconGetUrl = (
  * Get the logo icon image.
  */
 export const iconGet = async (
-  iconSize: "512x512" | "32x32" | "180x180" | "120x120" | "167x167" | "152x152",
+  iconSize:
+    | "512x512"
+    | "192x192"
+    | "32x32"
+    | "180x180"
+    | "120x120"
+    | "167x167"
+    | "152x152",
   options?: Parameters<typeof fetcher>[1],
 ): Promise<AssetGetOKResponse> => {
   return fetcher<AssetGetOKResponse>(getIconGetUrl(iconSize), {
@@ -310,7 +324,14 @@ export const iconGet = async (
 };
 
 export const getIconGetKey = (
-  iconSize: "512x512" | "32x32" | "180x180" | "120x120" | "167x167" | "152x152",
+  iconSize:
+    | "512x512"
+    | "192x192"
+    | "32x32"
+    | "180x180"
+    | "120x120"
+    | "167x167"
+    | "152x152",
 ) => [`/info/icon/${iconSize}`] as const;
 
 export type IconGetQueryResult = NonNullable<
@@ -318,7 +339,14 @@ export type IconGetQueryResult = NonNullable<
 >;
 
 export const useIconGet = <TError = InternalServerErrorResponse>(
-  iconSize: "512x512" | "32x32" | "180x180" | "120x120" | "167x167" | "152x152",
+  iconSize:
+    | "512x512"
+    | "192x192"
+    | "32x32"
+    | "180x180"
+    | "120x120"
+    | "167x167"
+    | "152x152",
   options?: {
     swr?: SWRConfiguration<Awaited<ReturnType<typeof iconGet>>, TError> & {
       swrKey?: Key;

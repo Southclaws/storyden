@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"image"
 	"image/color"
 	"image/png"
@@ -200,14 +201,17 @@ func TestImageVariantsHTTP(t *testing.T) {
 				j, err := jobs.Get(ctx, configured.IconAssetID.OrZero())
 				return err == nil && j.Status == background_job.StatusComplete
 			}, 20*time.Second, 50*time.Millisecond)
-			iconAsset, iconReader, err := icons.Get(ctx, "512x512")
-			require.NoError(t, err)
-			require.Equal(t, "image/png", iconAsset.MIME.String())
-			iconImage, err := png.Decode(iconReader)
-			require.NoError(t, err)
-			require.Equal(t, image.Pt(512, 512), iconImage.Bounds().Size())
-			if c, ok := iconReader.(io.Closer); ok {
-				c.Close()
+			for _, pixels := range []int{192, 512} {
+				iconAsset, iconReader, err := icons.Get(ctx, fmt.Sprintf("%dx%d", pixels, pixels))
+				require.NoError(t, err)
+				require.NotEqual(t, asset.AssetID{}, iconAsset.ID)
+				require.Equal(t, "image/png", iconAsset.MIME.String())
+				iconImage, err := png.Decode(iconReader)
+				require.NoError(t, err)
+				require.Equal(t, image.Pt(pixels, pixels), iconImage.Bounds().Size())
+				if c, ok := iconReader.(io.Closer); ok {
+					c.Close()
+				}
 			}
 
 			svg := bytes.NewBufferString(`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"/>`)
