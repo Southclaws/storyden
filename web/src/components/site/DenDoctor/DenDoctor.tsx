@@ -7,13 +7,17 @@ import { WarningIcon } from "@/components/ui/icons/Warning";
 import { LinkButton } from "@/components/ui/link-button";
 import { Text } from "@/components/ui/text";
 import { API_ADDRESS, WEB_ADDRESS } from "@/config";
-import { diagnoseInstallation } from "@/lib/den-doctor/diagnostics";
+import {
+  ClientIPContext,
+  diagnoseInstallation,
+} from "@/lib/den-doctor/diagnostics";
 import { LStack, WStack, styled } from "@/styled-system/jsx";
 
 type Props = {
   apiAddress?: string;
   webAddress?: string;
   browserOrigin?: string;
+  clientIP?: ClientIPContext;
   showHealthy?: boolean;
 };
 
@@ -21,6 +25,7 @@ export function DenDoctor({
   apiAddress = API_ADDRESS,
   webAddress = WEB_ADDRESS,
   browserOrigin,
+  clientIP,
   showHealthy = false,
 }: Props) {
   const currentOrigin = useSyncExternalStore(
@@ -29,7 +34,7 @@ export function DenDoctor({
     () => undefined,
   );
   const origin = browserOrigin ?? currentOrigin;
-  const issues = diagnoseInstallation(apiAddress, webAddress, origin);
+  const issues = diagnoseInstallation(apiAddress, webAddress, origin, clientIP);
   const api = new URL(apiAddress);
   const web = new URL(webAddress);
   const tone = issues.some((issue) => issue.severity === "error")

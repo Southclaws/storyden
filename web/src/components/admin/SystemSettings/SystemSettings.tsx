@@ -3,7 +3,11 @@ import { useEffect, useState } from "react";
 import { useWatch } from "react-hook-form";
 
 import { adminSettingsGet } from "@/api/openapi-client/admin";
-import { getGetInfoKey, getSession } from "@/api/openapi-client/misc";
+import {
+  getGetInfoKey,
+  getSession,
+  useGetSession,
+} from "@/api/openapi-client/misc";
 import { ClientInfo, NetworkHeadersSample } from "@/api/openapi-schema";
 import { DenDoctor } from "@/components/site/DenDoctor/DenDoctor";
 import { InfoTip } from "@/components/site/InfoTip";
@@ -21,12 +25,14 @@ import { SelectField } from "@/components/ui/select";
 import { SliderField } from "@/components/ui/slider";
 import { Text } from "@/components/ui/text";
 import { API_ADDRESS } from "@/config";
+import { isLikelyInternalIP } from "@/lib/den-doctor/ip";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { formatSeconds } from "@/utils/date";
 import { deriveError } from "@/utils/error";
 
 import { OperationCostOverridesField } from "./OperationCostOverrides.field";
 import {
+  DEFAULT_CLIENT_IP_MODE,
   DEFAULT_RATE_LIMIT,
   DEFAULT_RATE_LIMIT_BUCKET,
   DEFAULT_RATE_LIMIT_GUEST_COST,
@@ -66,6 +72,8 @@ export function SystemSettingsForm(props: Props) {
     name: "rate_limit_guest_cost",
   });
   const clientIPMode = useWatch({ control, name: "client_ip_mode" });
+  const { data: session } = useGetSession();
+  const savedClientIP = props.settings.services?.client_ip;
 
   const guestRateLimit = Math.floor(
     (rateLimit ?? DEFAULT_RATE_LIMIT) /
@@ -125,7 +133,15 @@ export function SystemSettingsForm(props: Props) {
         </Admonition>
       )}
 
-      <DenDoctor showHealthy />
+      <DenDoctor
+        showHealthy
+        clientIP={{
+          mode: savedClientIP?.client_ip_mode ?? DEFAULT_CLIENT_IP_MODE,
+          trustedProxyCIDRs: savedClientIP?.trusted_proxy_cidrs ?? [],
+          forwardedFor: props.settings.headers?.headers?.["x-forwarded-for"],
+          resolvedAddress: session?.client?.ip_address,
+        }}
+      />
 
       <SectionHeading>Rate limits</SectionHeading>
 
@@ -575,38 +591,6 @@ function getClientIPWarnings(
   }
 
   return warnings;
-}
-
-function isLikelyInternalIP(ip: string): boolean {
-  const trimmed = ip.trim();
-  if (!trimmed) return false;
-
-  if (trimmed === "::1") return true;
-  if (trimmed.includes(":")) {
-    const lower = trimmed.toLowerCase();
-    return (
-      lower.startsWith("fc") ||
-      lower.startsWith("fd") ||
-      lower.startsWith("fe80:")
-    );
-  }
-
-  const parts = trimmed.split(".");
-  if (parts.length !== 4) return false;
-
-  const octets = parts.map((p) => Number.parseInt(p, 10));
-  if (octets.some((n) => Number.isNaN(n) || n < 0 || n > 255)) return false;
-
-  const a = octets[0] ?? -1;
-  const b = octets[1] ?? -1;
-  if (a === 10) return true;
-  if (a === 127) return true;
-  if (a === 192 && b === 168) return true;
-  if (a === 169 && b === 254) return true;
-  if (a === 172 && b >= 16 && b <= 31) return true;
-  if (a === 100 && b >= 64 && b <= 127) return true;
-
-  return false;
 }
 
 function RateLimitTester() {
