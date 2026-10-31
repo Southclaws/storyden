@@ -5,7 +5,12 @@ import { threadGet } from "@/api/openapi-server/threads";
 import { getServerSession } from "@/auth/server-session";
 import { ServerRenderedContent } from "@/components/content/ContentRenderer/ServerRenderedContent";
 import { getPermalinkForPost } from "@/components/thread/utils";
-import { canonicalPage, jsonLD, pageLinks } from "@/lib/metadata/public";
+import {
+  canonicalPage,
+  isNotPublic,
+  jsonLD,
+  pageLinks,
+} from "@/lib/metadata/public";
 import { getSettings } from "@/lib/settings/settings-server";
 import * as z from "@/lib/validation";
 import { ThreadScreen } from "@/screens/thread/ThreadScreen/ThreadScreen";
@@ -42,8 +47,10 @@ const getPublicThread = cache(async (slug: string, page: number) => {
     ) {
       return data;
     }
-  } catch {
-    // Public metadata is unavailable if the anonymous read fails.
+  } catch (error) {
+    if (!isNotPublic(error)) {
+      throw error;
+    }
   }
 
   return undefined;
@@ -57,7 +64,7 @@ export default async function Page(props: Props) {
   const settings = await getSettings();
   const publicThread =
     data.visibility === "published"
-      ? await getPublicThread(slug, page ?? 1)
+      ? await getPublicThread(slug, page ?? 1).catch(() => undefined)
       : undefined;
   const url = canonicalPage(`/t/${encodeURIComponent(data.slug)}`);
   const structuredData = publicThread && {
