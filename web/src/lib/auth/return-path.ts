@@ -1,7 +1,10 @@
-export function getSafeReturnPath(value: string | null | undefined): string {
-  // Keep post-auth navigation on this origin, including after URL parsing.
+/** Returns a safe origin-relative path, or the homepage for invalid input. */
+export function getSafeReturnPath(
+  value: string | string[] | null | undefined,
+): string {
   if (
-    !value?.startsWith("/") ||
+    typeof value !== "string" ||
+    !value.startsWith("/") ||
     value.startsWith("//") ||
     value.includes("\\") ||
     Array.from(value).some((char) => {

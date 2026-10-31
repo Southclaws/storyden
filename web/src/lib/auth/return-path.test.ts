@@ -3,6 +3,11 @@ import { describe, expect, it } from "vitest";
 import { getSafeReturnPath } from "./return-path";
 
 describe("getSafeReturnPath", () => {
+  it("rejects repeated query parameters", () => {
+    expect(getSafeReturnPath(["/settings", "/profile"])).toBe("/");
+    expect(getSafeReturnPath([])).toBe("/");
+  });
+
   it.each([
     "/",
     "/settings/account",

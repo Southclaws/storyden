@@ -28,7 +28,7 @@ export type Form = z.infer<typeof FormSchema>;
 
 type Props = {
   initialAccount?: Account;
-  returnURL?: string;
+  returnURL?: string | string[];
 };
 
 export function EmailVerificationScreen(props: Props) {
