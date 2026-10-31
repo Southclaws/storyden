@@ -6,23 +6,101 @@ import (
 	"iter"
 	"log/slog"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 	adkagent "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/model"
 	adksession "google.golang.org/adk/v2/session"
 	adktool "google.golang.org/adk/v2/tool"
 	"google.golang.org/adk/v2/tool/functiontool"
+	"google.golang.org/adk/v2/tool/toolconfirmation"
 	"google.golang.org/genai"
 
 	"github.com/Southclaws/storyden/app/resources/robot/robot_toolset"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry/denbot"
 	robottools "github.com/Southclaws/storyden/app/services/semdex/robot/tools"
 	robottoolsets "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_memory_management"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_robot_studio"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/lib/mcp"
 )
+
+func TestDenbotLoadsRobotStudioOnDemand(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		registry *robottoolsets.Registry,
+	) {
+		lc.Append(fx.StartHook(func() {
+			ctx := &discoveryAgentContext{parent: root, state: discoveryReadonlyState{}}
+			discovery, err := registry.Discovery(root, denbot.Definition().ToolsetRefs...)
+			require.NoError(t, err)
+			available, err := discovery.Tools(ctx)
+			require.NoError(t, err)
+			processor := discovery.(interface {
+				ProcessRequest(adkagent.Context, *model.LLMRequest) error
+			})
+			request := &model.LLMRequest{Tools: map[string]any{}}
+			for _, item := range available {
+				request.Tools[item.Name()] = item
+			}
+			require.NoError(t, processor.ProcessRequest(ctx, request))
+			for _, name := range []string{"tool_search", "tool_get", "toolset_search", "toolset_get", "toolset_load", "tool_load", "robot_search"} {
+				assert.Contains(t, request.Tools, name)
+			}
+			for _, name := range []string{"robot_create", "robot_update", "robot_delete", "toolset_create", "toolset_update", "toolset_delete"} {
+				assert.NotContains(t, request.Tools, name)
+			}
+			for _, part := range request.Config.SystemInstruction.Parts {
+				assert.NotContains(t, part.Text, system_robot_studio.Instruction)
+			}
+
+			loader := request.Tools["toolset_load"].(interface {
+				Run(adkagent.Context, any) (map[string]any, error)
+			})
+			_, err = loader.Run(ctx, map[string]any{"toolsets": []string{"system.robot_studio"}})
+			require.NoError(t, err)
+
+			request = &model.LLMRequest{Tools: map[string]any{}}
+			for _, item := range available {
+				request.Tools[item.Name()] = item
+			}
+			require.NoError(t, processor.ProcessRequest(ctx, request))
+			for _, name := range []string{"robot_create", "robot_update", "robot_delete", "toolset_create", "toolset_update", "toolset_delete"} {
+				assert.Contains(t, request.Tools, name)
+			}
+			var instructions string
+			for _, part := range request.Config.SystemInstruction.Parts {
+				instructions += part.Text
+			}
+			assert.Contains(t, instructions, system_robot_studio.Instruction)
+		}))
+	}))
+}
+
+type discoveryAgentContext struct {
+	adkagent.Context
+	parent context.Context
+	state  discoveryReadonlyState
+}
+
+func (c *discoveryAgentContext) Deadline() (time.Time, bool) { return c.parent.Deadline() }
+func (c *discoveryAgentContext) Done() <-chan struct{}       { return c.parent.Done() }
+func (c *discoveryAgentContext) Err() error                  { return c.parent.Err() }
+func (c *discoveryAgentContext) Value(key any) any           { return c.parent.Value(key) }
+func (c *discoveryAgentContext) State() adksession.State     { return c.state }
+func (c *discoveryAgentContext) ReadonlyState() adksession.ReadonlyState {
+	return c.state
+}
+func (c *discoveryAgentContext) ToolConfirmation() *toolconfirmation.ToolConfirmation {
+	return nil
+}
 
 func TestMemoryManagementToolsetIsDiscoverable(t *testing.T) {
 	integration.Test(t, nil, fx.Invoke(func(
@@ -136,6 +214,11 @@ func (c *discoveryReadonlyContext) SessionID() string                       { re
 func (c *discoveryReadonlyContext) Branch() string                          { return "" }
 
 type discoveryReadonlyState map[string]any
+
+func (s discoveryReadonlyState) Set(key string, value any) error {
+	s[key] = value
+	return nil
+}
 
 func (s discoveryReadonlyState) Get(key string) (any, error) {
 	value, ok := s[key]

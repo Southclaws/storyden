@@ -2700,7 +2700,9 @@ func (j *ToolLibraryPageListYaml) UnmarshalJSON(value []byte) error {
 }
 
 type ToolLibraryPageOpenInput struct {
-	// Library page ID or slug returned by Library discovery tools.
+	// Library page (node) ID or slug supplied by the user or a tool result. For the
+	// page referenced by invocation context, use datagraph_item.id or
+	// datagraph_item.slug when datagraph_item.kind is "node".
 	Id string `json:"id" yaml:"id" mapstructure:"id"`
 }
 
@@ -3854,7 +3856,10 @@ func (j *ToolLibrarySearchPagesOutput) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
-// Search for pages in the library wiki by relevance.
+// Search indexed Library pages by keyword relevance. Use this for discovery, not
+// exact ID or slug lookup. For a known page, use library_page_get or
+// library_page_open; use library_page_list to browse by visibility. An empty
+// result does not establish that the page is absent or inaccessible.
 type ToolLibrarySearchPagesYaml struct {
 	// Input corresponds to the JSON schema field "input".
 	Input ToolLibrarySearchPagesInput `json:"input" yaml:"input" mapstructure:"input"`

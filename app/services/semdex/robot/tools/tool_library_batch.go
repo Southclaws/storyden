@@ -116,7 +116,7 @@ func (lt *libraryTools) ExecuteLibraryPagesCreate(ctx context.Context, input mcp
 
 	return &mcp.ToolLibraryPagesCreateOutput{
 		Results:    lt.batchResults(refs, results, mcp.LibraryPageBatchResultYamlStatusCreated),
-		NextAction: "All pages were created. Report them using their browser URLs.",
+		NextAction: "The requested pages were created. This result does not confirm link enrichment.",
 	}, nil
 }
 
@@ -160,7 +160,7 @@ func (lt *libraryTools) ExecuteLibraryPagesUpdate(ctx context.Context, input mcp
 
 	return &mcp.ToolLibraryPagesUpdateOutput{
 		Results:    lt.batchResults(refs, results, mcp.LibraryPageBatchResultYamlStatusUpdated),
-		NextAction: "All pages were updated. Report them using their browser URLs.",
+		NextAction: "The requested page updates were saved. This result does not confirm link enrichment.",
 	}, nil
 }
 

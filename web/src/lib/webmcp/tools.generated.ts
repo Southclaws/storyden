@@ -24,7 +24,7 @@ export interface WebMCPTools {
   [k: string]: unknown;
 }
 /**
- * Enter quick edit mode for the current Library page so frontend-only layout tools can make the immediate change the user requested. Use this only when the user clearly asked to edit the live page. If it is unclear whether they want a quick edit or a version draft, ask them before calling this tool.
+ * Enter quick edit mode for the Library page (node) currently displayed in the frontend. When present, datagraph_item in <invocation-context-json> identifies the invocation's page: kind is "node", id is the page ID, and slug is the page slug. Opening a document with library_page_open does not change this target. Inspect the page's layout before changing blocks. If the requested target is a different page, ask the user to open it before proceeding. Use this only when the user clearly asked to edit the live page. If it is unclear whether they want a quick edit or a version draft, ask them before calling this tool.
  */
 export interface LibraryPageEditStart {
   input: ToolLibraryPageEditStartInput;
@@ -39,7 +39,7 @@ export interface ToolLibraryPageEditStartOutput {
   message: string;
 }
 /**
- * Retrieve the block layout of the current Library page.
+ * Retrieve the block layout of the Library page (node) currently displayed in the frontend. Match the requested page to datagraph_item.id in invocation context when datagraph_item.kind is "node".
  */
 export interface LibraryPageLayoutGet {
   input: ToolLibraryPageLayoutGetInput;
@@ -72,7 +72,7 @@ export interface LibraryPageLayoutBlock {
   grid_size?: number;
 }
 /**
- * Add a currently hidden block to the current Library page.
+ * Add a currently hidden block to the Library page (node) currently displayed in the frontend. Match the requested page to datagraph_item.id in invocation context when datagraph_item.kind is "node".
  */
 export interface LibraryPageBlockAdd {
   input: ToolLibraryPageBlockAddInput;
@@ -94,7 +94,7 @@ export interface ToolLibraryPageBlockAddOutput {
   layout: LibraryPageLayout;
 }
 /**
- * Remove a visible block from the current Library page without deleting its content.
+ * Remove a visible block from the Library page (node) currently displayed in the frontend without deleting its content. Match the requested page to datagraph_item.id in invocation context when datagraph_item.kind is "node".
  */
 export interface LibraryPageBlockRemove {
   input: ToolLibraryPageBlockRemoveInput;
@@ -112,7 +112,7 @@ export interface ToolLibraryPageBlockRemoveOutput {
   layout: LibraryPageLayout;
 }
 /**
- * Move a visible block within the current Library page layout.
+ * Move a visible block within the layout of the Library page (node) currently displayed in the frontend. Match the requested page to datagraph_item.id in invocation context when datagraph_item.kind is "node".
  */
 export interface LibraryPageBlockMove {
   input: ToolLibraryPageBlockMoveInput;
@@ -134,7 +134,7 @@ export interface ToolLibraryPageBlockMoveOutput {
   layout: LibraryPageLayout;
 }
 /**
- * Update the presentation of the visible assets block on the current Library page.
+ * Update the presentation of the visible assets block on the Library page (node) currently displayed in the frontend. Match the requested page to datagraph_item.id in invocation context when datagraph_item.kind is "node".
  */
 export interface LibraryPageBlockAssetsUpdate {
   input: ToolLibraryPageBlockAssetsUpdateInput;
@@ -156,7 +156,7 @@ export interface ToolLibraryPageBlockAssetsUpdateOutput {
   layout: LibraryPageLayout;
 }
 /**
- * Update the presentation of the visible directory block on the current Library page.
+ * Update the presentation of the visible directory block on the Library page (node) currently displayed in the frontend. Match the requested page to datagraph_item.id in invocation context when datagraph_item.kind is "node".
  */
 export interface LibraryPageBlockDirectoryUpdate {
   input: ToolLibraryPageBlockDirectoryUpdateInput;
@@ -164,6 +164,9 @@ export interface LibraryPageBlockDirectoryUpdate {
   [k: string]: unknown;
 }
 export interface ToolLibraryPageBlockDirectoryUpdateInput {
+  /**
+   * Directory presentation: table shows rows and columns; grid shows cards in regular columns with fixed-ratio images; gallery uses a masonry-style arrangement with variable image heights. When the user names a mode, select that exact value.
+   */
   layout: "table" | "grid" | "gallery";
 }
 export interface ToolLibraryPageBlockDirectoryUpdateOutput {
@@ -429,7 +432,7 @@ export const WEBMCP_TOOL_DEFINITIONS = {
   "library_page_edit_start": {
     "name": "library_page_edit_start",
     "title": "Start Library Page Quick Edit",
-    "description": "Enter quick edit mode for the current Library page so frontend-only layout tools can make the immediate change the user requested. Use this only when the user clearly asked to edit the live page. If it is unclear whether they want a quick edit or a version draft, ask them before calling this tool.",
+    "description": "Enter quick edit mode for the Library page (node) currently displayed in the frontend. When present, datagraph_item in <invocation-context-json> identifies the invocation's page: kind is \"node\", id is the page ID, and slug is the page slug. Opening a document with library_page_open does not change this target. Inspect the page's layout before changing blocks. If the requested target is a different page, ask the user to open it before proceeding. Use this only when the user clearly asked to edit the live page. If it is unclear whether they want a quick edit or a version draft, ask them before calling this tool.",
     "inputSchema": {
       "type": "object",
       "properties": {},
@@ -460,7 +463,7 @@ export const WEBMCP_TOOL_DEFINITIONS = {
   "library_page_layout_get": {
     "name": "library_page_layout_get",
     "title": "Get Library Page Layout",
-    "description": "Retrieve the block layout of the current Library page.",
+    "description": "Retrieve the block layout of the Library page (node) currently displayed in the frontend. Match the requested page to datagraph_item.id in invocation context when datagraph_item.kind is \"node\".",
     "inputSchema": {
       "type": "object",
       "properties": {},
@@ -543,7 +546,7 @@ export const WEBMCP_TOOL_DEFINITIONS = {
   "library_page_block_add": {
     "name": "library_page_block_add",
     "title": "Add Library Page Block",
-    "description": "Add a currently hidden block to the current Library page.",
+    "description": "Add a currently hidden block to the Library page (node) currently displayed in the frontend. Match the requested page to datagraph_item.id in invocation context when datagraph_item.kind is \"node\".",
     "inputSchema": {
       "type": "object",
       "required": [
@@ -657,7 +660,7 @@ export const WEBMCP_TOOL_DEFINITIONS = {
   "library_page_block_remove": {
     "name": "library_page_block_remove",
     "title": "Remove Library Page Block",
-    "description": "Remove a visible block from the current Library page without deleting its content.",
+    "description": "Remove a visible block from the Library page (node) currently displayed in the frontend without deleting its content. Match the requested page to datagraph_item.id in invocation context when datagraph_item.kind is \"node\".",
     "inputSchema": {
       "type": "object",
       "required": [
@@ -757,7 +760,7 @@ export const WEBMCP_TOOL_DEFINITIONS = {
   "library_page_block_move": {
     "name": "library_page_block_move",
     "title": "Move Library Page Block",
-    "description": "Move a visible block within the current Library page layout.",
+    "description": "Move a visible block within the layout of the Library page (node) currently displayed in the frontend. Match the requested page to datagraph_item.id in invocation context when datagraph_item.kind is \"node\".",
     "inputSchema": {
       "type": "object",
       "required": [
@@ -871,7 +874,7 @@ export const WEBMCP_TOOL_DEFINITIONS = {
   "library_page_block_assets_update": {
     "name": "library_page_block_assets_update",
     "title": "Update Library Page Assets Block",
-    "description": "Update the presentation of the visible assets block on the current Library page.",
+    "description": "Update the presentation of the visible assets block on the Library page (node) currently displayed in the frontend. Match the requested page to datagraph_item.id in invocation context when datagraph_item.kind is \"node\".",
     "inputSchema": {
       "type": "object",
       "required": [
@@ -971,7 +974,7 @@ export const WEBMCP_TOOL_DEFINITIONS = {
   "library_page_block_directory_update": {
     "name": "library_page_block_directory_update",
     "title": "Update Library Page Directory Block",
-    "description": "Update the presentation of the visible directory block on the current Library page.",
+    "description": "Update the presentation of the visible directory block on the Library page (node) currently displayed in the frontend. Match the requested page to datagraph_item.id in invocation context when datagraph_item.kind is \"node\".",
     "inputSchema": {
       "type": "object",
       "required": [
@@ -984,7 +987,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
             "table",
             "grid",
             "gallery"
-          ]
+          ],
+          "description": "Directory presentation: table shows rows and columns; grid shows cards in regular columns with fixed-ratio images; gallery uses a masonry-style arrangement with variable image heights. When the user names a mode, select that exact value."
         }
       },
       "additionalProperties": false
