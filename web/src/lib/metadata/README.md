@@ -16,7 +16,9 @@ are fixed API endpoints, redirects are rejected, and failures are not converted
 into successful blank images. No cookies or authorization are forwarded.
 
 Composed previews can still use `ImageResponse`, as the Library preview does.
-`loadMetadataImage` supplies bounded binary image data from the configured API;
+`loadMetadataImage` supplies up to 8 MiB of binary image data from the configured API,
+matching the default API upload budget. This input budget is separate from the
+social platform's final image size limit;
 it does not allow Satori to fetch arbitrary URLs or introduce another base64
 representation. Compositing necessarily buffers and decodes an image. Future
 fonts and layouts belong in that rendering path. If composition becomes expensive,

@@ -159,13 +159,25 @@ describe("images used in composed previews", () => {
     );
   });
 
+  it("accepts a source above 5 MB within the API's default upload budget", async () => {
+    const bytes = new Uint8Array(5_688_566);
+    bytes[bytes.length - 1] = 255;
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(bytes, { headers: { "Content-Type": "image/png" } }),
+    );
+    const image = await loadMetadataImage("/assets/legacy-cover.png?variant=l");
+    expect(image).toBeInstanceOf(ArrayBuffer);
+    expect((image as ArrayBuffer).byteLength).toBe(bytes.length);
+    expect(new Uint8Array(image as ArrayBuffer).at(-1)).toBe(255);
+  });
+
   it("limits chunked input even without a Content-Length", async () => {
     const cancel = vi.fn();
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(
         new ReadableStream({
           start(controller) {
-            controller.enqueue(new Uint8Array(5_000_001));
+            controller.enqueue(new Uint8Array(8_388_609));
           },
           cancel,
         }),

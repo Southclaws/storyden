@@ -16,7 +16,8 @@ const RESPONSE_HEADERS = [
   "ETag",
   "Last-Modified",
 ];
-const MAX_RENDER_IMAGE_BYTES = 5_000_000;
+// Match the default API upload budget; source bytes can exceed the final OG PNG.
+const MAX_RENDER_IMAGE_BYTES = 8 * 1024 * 1024;
 
 export async function streamMetadataImage(path: ImagePath): Promise<Response> {
   const signal = AbortSignal.timeout(10_000);
@@ -32,7 +33,7 @@ export async function streamMetadataImage(path: ImagePath): Promise<Response> {
           Accept: "image/png,image/jpeg,image/webp,image/gif",
           "Accept-Encoding": "identity",
         },
-      }
+      },
     );
     const contentType = response.headers
       .get("Content-Type")
@@ -69,7 +70,7 @@ export async function streamMetadataImage(path: ImagePath): Promise<Response> {
 }
 
 export async function loadMetadataImage(
-  path: `/assets/${string}`
+  path: `/assets/${string}`,
 ): Promise<ArrayBuffer | Response> {
   const response = await streamMetadataImage(path);
   if (!response.ok) return response;

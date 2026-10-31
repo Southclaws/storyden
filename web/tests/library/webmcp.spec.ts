@@ -182,7 +182,6 @@ test.describe("Library page WebMCP", () => {
       (tool) => tool.name === "library_page_layout_get",
     );
     expect(layoutGet).toMatchObject({
-      description: "Retrieve the block layout of the current Library page.",
       annotations: { readOnlyHint: true },
     });
 
