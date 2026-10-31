@@ -12,6 +12,19 @@ export function canonicalPage(path: string, page = 1): string {
   return url.toString();
 }
 
+export function socialImage(
+  path = "/opengraph-image",
+  alt = "Community preview",
+) {
+  return {
+    url: new URL(path, WEB_ADDRESS).toString(),
+    width: 1200,
+    height: 630,
+    type: "image/png",
+    alt,
+  };
+}
+
 export function pageLinks(
   path: string,
   page: number,

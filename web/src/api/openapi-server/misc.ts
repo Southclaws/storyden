@@ -264,7 +264,14 @@ export type iconGetResponseError = iconGetResponseDefault & {
 };
 
 export const getIconGetUrl = (
-  iconSize: "512x512" | "32x32" | "180x180" | "120x120" | "167x167" | "152x152",
+  iconSize:
+    | "512x512"
+    | "192x192"
+    | "32x32"
+    | "180x180"
+    | "120x120"
+    | "167x167"
+    | "152x152",
 ) => {
   return `/info/icon/${iconSize}`;
 };
@@ -273,7 +280,14 @@ export const getIconGetUrl = (
  * Get the logo icon image.
  */
 export const iconGet = async (
-  iconSize: "512x512" | "32x32" | "180x180" | "120x120" | "167x167" | "152x152",
+  iconSize:
+    | "512x512"
+    | "192x192"
+    | "32x32"
+    | "180x180"
+    | "120x120"
+    | "167x167"
+    | "152x152",
   options?: Parameters<typeof fetcher>[1],
 ): Promise<iconGetResponseSuccess> => {
   return fetcher<iconGetResponseSuccess>(getIconGetUrl(iconSize), {

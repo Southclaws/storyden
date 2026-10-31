@@ -1,6 +1,8 @@
 import { API_ADDRESS } from "@/config";
 
-export function getIconURL(size: "32x32" | "120x120" | "512x512") {
+export function getIconURL(
+  size: "32x32" | "120x120" | "180x180" | "192x192" | "512x512",
+) {
   return `${API_ADDRESS}/api/info/icon/${size}`;
 }
 

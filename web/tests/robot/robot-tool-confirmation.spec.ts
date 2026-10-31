@@ -50,6 +50,22 @@ test.describe("Robot Chat — tool confirmation", () => {
       contains: "delete the victim"
     respond:
       tool_calls:
+        - id: call_inspect_robot_studio
+          name: toolset_get
+          args:
+            id: system.robot_studio
+  - match:
+      tool_result: toolset_get
+    respond:
+      tool_calls:
+        - id: call_load_robot_studio
+          name: toolset_load
+          args:
+            toolsets: [system.robot_studio]
+  - match:
+      tool_result: toolset_load
+    respond:
+      tool_calls:
         - id: call_delete_1
           name: robot_delete
           args:
@@ -147,6 +163,22 @@ test.describe("Robot Chat — tool confirmation", () => {
           `steps:
   - match:
       contains: "create a robot"
+    respond:
+      tool_calls:
+        - id: call_inspect_robot_studio
+          name: toolset_get
+          args:
+            id: system.robot_studio
+  - match:
+      tool_result: toolset_get
+    respond:
+      tool_calls:
+        - id: call_load_robot_studio
+          name: toolset_load
+          args:
+            toolsets: [system.robot_studio]
+  - match:
+      tool_result: toolset_load
     respond:
       tool_calls:
         - id: call_create_1
@@ -261,6 +293,22 @@ test.describe("Robot Chat — tool confirmation", () => {
           `steps:
   - match:
       contains: "delete both victims"
+    respond:
+      tool_calls:
+        - id: call_inspect_robot_studio
+          name: toolset_get
+          args:
+            id: system.robot_studio
+  - match:
+      tool_result: toolset_get
+    respond:
+      tool_calls:
+        - id: call_load_robot_studio
+          name: toolset_load
+          args:
+            toolsets: [system.robot_studio]
+  - match:
+      tool_result: toolset_load
     respond:
       tool_calls:
         - id: call_delete_1

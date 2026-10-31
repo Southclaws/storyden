@@ -5,7 +5,12 @@ import { threadGet } from "@/api/openapi-server/threads";
 import { getServerSession } from "@/auth/server-session";
 import { ServerRenderedContent } from "@/components/content/ContentRenderer/ServerRenderedContent";
 import { getPermalinkForPost } from "@/components/thread/utils";
-import { canonicalPage, jsonLD, pageLinks } from "@/lib/metadata/public";
+import {
+  canonicalPage,
+  jsonLD,
+  pageLinks,
+  socialImage,
+} from "@/lib/metadata/public";
 import { getSettings } from "@/lib/settings/settings-server";
 import * as z from "@/lib/validation";
 import { ThreadScreen } from "@/screens/thread/ThreadScreen/ThreadScreen";
@@ -153,6 +158,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     alternates: { canonical: url },
     pagination: pageLinks(path, page, totalPages),
     openGraph: {
+      images: [socialImage(undefined, settings.title)],
       type: "article",
       title: thread.title,
       description: thread.description,

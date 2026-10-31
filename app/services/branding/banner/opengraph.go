@@ -1,9 +1,9 @@
 package banner
 
 import (
-	"bytes"
 	"context"
 	"io"
+	"strings"
 
 	"github.com/Southclaws/opt"
 	"go.uber.org/fx"
@@ -96,5 +96,5 @@ func (s *service) GetVariant(ctx context.Context, variant asset.Variant) (*asset
 		MIME: mime.New("image/png"),
 	}
 
-	return banner, bytes.NewReader(defaultBanner), true, nil
+	return banner, strings.NewReader(defaultBanner), true, nil
 }

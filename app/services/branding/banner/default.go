@@ -2,5 +2,8 @@ package banner
 
 import _ "embed"
 
-//go:embed storyden-mountains-1200x600.png
-var defaultBanner []byte
+// A string keeps the immutable PNG in read-only storage; strings.NewReader
+// reads its binary bytes without copying the image.
+//
+//go:embed storyden-mountains-1200x630.png
+var defaultBanner string
