@@ -265,7 +265,7 @@ func (s *RedisSearcher) buildDocument(item datagraph.Item) Document {
 		Name:        item.GetName(),
 		Slug:        item.GetSlug(),
 		Description: item.GetDesc(),
-		Content:     item.GetContent().Plaintext(),
+		Content:     searcher.SearchableText(item),
 		CreatedAt:   item.GetCreated().Unix(),
 	}
 
