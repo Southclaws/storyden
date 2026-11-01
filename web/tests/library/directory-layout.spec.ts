@@ -357,7 +357,7 @@ test("Directory Gallery keeps mixed image dimensions bounded, preserves source o
   await page.getByRole("menuitem", { name: "Quick edit", exact: true }).click();
   await page.locator('[id="block-directory_gutter-drag-handle"]').click();
   await page.getByRole("menuitem", { name: "Layout", exact: true }).hover();
-  await page.getByRole("menuitem", { name: "Grid", exact: true }).click();
+  await page.getByRole("menuitemradio", { name: "Grid", exact: true }).click();
   await page.getByRole("button", { name: "View", exact: true }).click();
   await page.waitForURL((url) => !url.searchParams.has("edit"));
   await expect(grid).toHaveAttribute("data-layout", "grid");

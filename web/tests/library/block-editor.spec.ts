@@ -290,7 +290,9 @@ test.describe("Library page block editor", () => {
 
     await directoryHandle.click();
     await page.getByRole("menuitem", { name: "Layout", exact: true }).click();
-    await page.getByRole("menuitem", { name: "Grid", exact: true }).click();
+    await page
+      .getByRole("menuitemradio", { name: "Grid", exact: true })
+      .click();
     await expect(
       page.getByRole("menuitem", { name: "Layout", exact: true }),
     ).toBeHidden();
