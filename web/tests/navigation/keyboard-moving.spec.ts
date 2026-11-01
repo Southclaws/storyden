@@ -206,8 +206,15 @@ test("a page menu starts a move and a failed request remains available for retry
   const options = tree.getByRole("button", {
     name: `Page options for ${source.name}`,
   });
-  await carried.focus();
-  await expect(create).toHaveAttribute("tabindex", "0");
+  // The server-rendered link can receive focus before the tree hydrates.
+  // Wait for a focus transition to activate the row's keyboard controls.
+  await expect
+    .poll(async () => {
+      await carried.blur();
+      await carried.focus();
+      return create.getAttribute("tabindex");
+    })
+    .toBe("0");
   await page.keyboard.press("Tab");
   await expect(create).toBeFocused();
   await page.keyboard.press("Tab");
