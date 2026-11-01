@@ -47,6 +47,10 @@ type ClientSelfCreateResult struct {
 }
 
 func (s *Service) CreateClient(ctx context.Context, input ClientCreate) (*oauthresource.Client, error) {
+	if err := validateClientRedirectURIs(input.RedirectURIs); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
 	if err := validatePermissionScopes(strings.Join(input.AllowedScopes, " "), input.AccountPermissions); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.PermissionDenied))
 	}
@@ -74,6 +78,10 @@ func (s *Service) CreateClientForAccount(ctx context.Context, input ClientSelfCr
 
 	// Validate grant types
 	if err := validateGrantTypes(input.AllowedGrants); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	if err := validateClientRedirectURIs(input.RedirectURIs); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 

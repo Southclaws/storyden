@@ -58,6 +58,12 @@ func (s *Service) GetClientByAccount(ctx context.Context, accountID account.Acco
 }
 
 func (s *Service) UpdateClient(ctx context.Context, id oauthresource.ClientID, input ClientUpdate) (*oauthresource.Client, error) {
+	if uris, ok := input.RedirectURIs.Get(); ok {
+		if err := validateClientRedirectURIs(uris); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+	}
+
 	return s.tokens.UpdateClient(ctx, id, oauth_writer.ClientUpdate{
 		Name:             input.Name,
 		ClientSecretHash: input.ClientSecretHash,
@@ -80,6 +86,12 @@ func (s *Service) UpdateClientByAccount(ctx context.Context, accountID account.A
 		}
 		if err := validatePermissionScopes(strings.Join(scopes, " "), input.AccountPermissions); err != nil {
 			return nil, nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.PermissionDenied))
+		}
+	}
+
+	if uris, ok := input.RedirectURIs.Get(); ok {
+		if err := validateClientRedirectURIs(uris); err != nil {
+			return nil, nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 		}
 	}
 

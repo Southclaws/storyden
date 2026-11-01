@@ -315,7 +315,7 @@ func validateClientMetadata(doc *clientMetadataDocument, docURL string) error {
 		return fault.New("cimd document must declare at least one redirect_uri")
 	}
 	for _, ru := range doc.RedirectURIs {
-		if err := validateDCRRedirectURI(ru); err != nil {
+		if err := validateRedirectURI(ru); err != nil {
 			return fault.New("cimd document redirect_uri is invalid")
 		}
 	}

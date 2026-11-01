@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"net"
 	"net/url"
 	"strings"
 	"time"
@@ -492,8 +491,8 @@ func validateDCRRedirectURIs(redirectURIs []string, grantTypes []string) ([]stri
 			continue
 		}
 
-		if err := validateDCRRedirectURI(raw); err != nil {
-			return nil, oauthError("invalid_redirect_uri", "Invalid redirect_uri: must be an absolute HTTPS URI (or HTTP for loopback)")
+		if err := validateRedirectURI(raw); err != nil {
+			return nil, oauthError("invalid_redirect_uri", "Invalid redirect_uri: "+err.Error())
 		}
 
 		// Deduplicate
@@ -511,65 +510,6 @@ func validateDCRRedirectURIs(redirectURIs []string, grantTypes []string) ([]stri
 	}
 
 	return out, nil
-}
-
-func validateDCRRedirectURI(raw string) error {
-	if raw == "" {
-		return fault.New("empty redirect uri")
-	}
-
-	if strings.Contains(raw, "*") {
-		return fault.New("wildcard redirect uri")
-	}
-
-	u, err := url.Parse(raw)
-	if err != nil {
-		return err
-	}
-
-	if !u.IsAbs() {
-		return fault.New("redirect uri must be absolute")
-	}
-
-	// Reject opaque URIs like "https:callback" that have no authority/hostname
-	if u.Opaque != "" || u.Hostname() == "" {
-		return fault.New("redirect uri must have a valid hostname")
-	}
-
-	if u.Fragment != "" || strings.Contains(raw, "#") {
-		return fault.New("redirect uri must not contain a fragment")
-	}
-
-	switch u.Scheme {
-	case "https":
-		return nil
-	case "http":
-		// Loopback redirect URIs are permitted for native/dev clients per the
-		// OAuth security best current practice.
-		if isLoopbackHost(u.Hostname()) {
-			return nil
-		}
-
-		return fault.New("http redirect uri only allowed for loopback hosts")
-	default:
-		return fault.New("redirect uri must use https")
-	}
-}
-
-func isLoopbackHost(host string) bool {
-	// Handle "localhost" as a special case
-	if host == "localhost" {
-		return true
-	}
-
-	// Parse as IP and check if it's a loopback address
-	// Covers 127.0.0.0/8 for IPv4 and ::1/128 for IPv6
-	ip := net.ParseIP(host)
-	if ip == nil {
-		return false
-	}
-
-	return ip.IsLoopback()
 }
 
 func resolveDCRScopes(scope string) ([]string, *Error) {
