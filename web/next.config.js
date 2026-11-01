@@ -18,6 +18,14 @@ const nextConfig = {
   experimental: {
     turbopackFileSystemCacheForDev: true,
   },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        { source: "/t/:slug.md", destination: "/markdown/t/:slug" },
+        { source: "/l/:slug(.*).md", destination: "/markdown/l/:slug" },
+      ],
+    };
+  },
 };
 
 module.exports = nextConfig;
