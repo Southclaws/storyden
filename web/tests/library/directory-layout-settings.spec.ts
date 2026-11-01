@@ -59,7 +59,7 @@ test("Directory layouts save without changing the visible fields", async ({
       .click();
     await page.locator('[id="block-directory_gutter-drag-handle"]').click();
     await page.getByRole("menuitem", { name: "Layout", exact: true }).hover();
-    await page.getByRole("menuitem", { name: mode, exact: true }).click();
+    await page.getByRole("menuitemradio", { name: mode, exact: true }).click();
     // Exit immediately: the selected layout must survive the pending debounce.
     await page.getByRole("button", { name: "View", exact: true }).click();
     await expect(

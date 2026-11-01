@@ -100,7 +100,9 @@ test.describe("Homepage Library block layout", () => {
         expect(control.x + control.width).toBeLessThanOrEqual(viewport.width);
       }
       await page.setViewportSize({ width: 1440, height: 900 });
-      expect((await popup.boundingBox())!.width).toBeGreaterThan(280);
+      await expect
+        .poll(async () => (await popup.boundingBox())?.width ?? 0)
+        .toBeGreaterThan(280);
       const option = page.getByRole("option", { name, exact: true });
       await option.scrollIntoViewIfNeeded();
       const label = option.locator(".combobox__itemText");
