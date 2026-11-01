@@ -25,11 +25,19 @@ import {
 import { useSession } from "@/auth";
 
 export function useThreadMutations(
-  thread: ThreadReference,
+  thread: ThreadReference | ThreadGetResponse,
   currentPage?: number,
   totalPages?: number,
   initialSession?: Account,
 ) {
+  // SWR renders fallbackData without placing it in the shared cache.
+  // Reactions can start during that window, or when the client refresh fails.
+  let initialThread: ThreadGetResponse | undefined;
+
+  if ("replies" in thread) {
+    initialThread = thread;
+  }
+
   const sessionInitial = useSession(initialSession);
   const sessionRef = useRef(sessionInitial);
   useEffect(() => {
@@ -42,13 +50,18 @@ export function useThreadMutations(
     page: (currentPage ?? 1).toString(),
   });
   const key = (key: Arguments) => {
-    if (!Array.isArray(key)) return false;
+    if (!Array.isArray(key)) {
+      return false;
+    }
 
     const path = key[0];
     const params = key.length > 1 ? (key[1] as ThreadGetParams) : undefined;
 
     const pathMatch = path === threadGetKey[0];
-    if (!pathMatch) return false;
+
+    if (!pathMatch) {
+      return false;
+    }
 
     // Default to page 1 for comparison.
     const paramsMatch =
@@ -69,7 +82,9 @@ export function useThreadMutations(
       const mutator: MutatorCallback<ThreadGetResponse> = (data) => {
         const session = sessionRef.current;
 
-        if (!data || !session) return;
+        if (!data || !session) {
+          return;
+        }
 
         const newReply = {
           id: uniqueId("optimistic_reply_"),
@@ -111,7 +126,9 @@ export function useThreadMutations(
 
   const updateReply = async (id: Identifier, updated: PostMutableProps) => {
     const mutator: MutatorCallback<ThreadGetResponse> = (data) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       const newData = {
         ...data,
@@ -135,7 +152,9 @@ export function useThreadMutations(
 
   const deleteReply = async (id: Identifier) => {
     const mutator = (data?: ThreadGetResponse) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       const newData: ThreadGetResponse = {
         ...data,
@@ -157,7 +176,10 @@ export function useThreadMutations(
 
   const reactionAdd = async (replyID: Identifier, emoji: string) => {
     const session = sessionRef.current;
-    if (!session) return;
+
+    if (!session) {
+      return;
+    }
 
     const optimisticReaction = {
       id: uniqueId("optimistic_reply_update_"),
@@ -165,8 +187,12 @@ export function useThreadMutations(
       author: session,
     } satisfies React;
 
-    const mutator: MutatorCallback<ThreadGetResponse> = (data) => {
-      if (!data) return;
+    const mutator: MutatorCallback<ThreadGetResponse> = (
+      data = initialThread,
+    ) => {
+      if (!data) {
+        return;
+      }
 
       const newData = {
         ...data,
@@ -197,8 +223,10 @@ export function useThreadMutations(
 
       await mutate(
         key,
-        (data?: ThreadGetResponse) => {
-          if (!data) return;
+        (data: ThreadGetResponse | undefined = initialThread) => {
+          if (!data) {
+            return;
+          }
 
           return {
             ...data,
@@ -224,8 +252,10 @@ export function useThreadMutations(
     } catch (error) {
       await mutate(
         key,
-        (data?: ThreadGetResponse) => {
-          if (!data) return;
+        (data: ThreadGetResponse | undefined = initialThread) => {
+          if (!data) {
+            return;
+          }
 
           return {
             ...data,
@@ -257,13 +287,20 @@ export function useThreadMutations(
     }
 
     const session = sessionRef.current;
-    if (!session) return;
+
+    if (!session) {
+      return;
+    }
 
     let removedReaction: React | undefined;
     let removedIndex = -1;
 
-    const mutator: MutatorCallback<ThreadGetResponse> = (data) => {
-      if (!data) return;
+    const mutator: MutatorCallback<ThreadGetResponse> = (
+      data = initialThread,
+    ) => {
+      if (!data) {
+        return;
+      }
 
       const newData = {
         ...data,
@@ -277,6 +314,7 @@ export function useThreadMutations(
             const index = reply.reacts.findIndex(
               (reaction) => reaction.id === reactID,
             );
+
             if (index === -1) {
               return reply;
             }
@@ -308,8 +346,10 @@ export function useThreadMutations(
       if (reaction) {
         await mutate(
           key,
-          (data?: ThreadGetResponse) => {
-            if (!data) return;
+          (data: ThreadGetResponse | undefined = initialThread) => {
+            if (!data) {
+              return;
+            }
 
             return {
               ...data,
@@ -338,13 +378,16 @@ export function useThreadMutations(
           { revalidate: false },
         );
       }
+
       throw error;
     }
   };
 
   const updateCategory = async (categoryID: Identifier) => {
     const mutator: MutatorCallback<ThreadGetResponse> = (data) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       const newData = {
         ...data,

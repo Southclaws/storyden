@@ -259,14 +259,16 @@ test.describe("Thread Reactions", () => {
       contentType: "image/png",
     });
     await login(page, peer);
-    // The server-rendered account must suffice if client session fetching fails.
+    // Server-rendered account and thread data must suffice if refreshes fail.
     await page.route("**/api/accounts", (route) => route.abort());
+    await page.route("**/api/threads/*", (route) => route.abort());
     await navigateToThread(page, threadUrl);
     await expect(count.locator("..")).toHaveAttribute("aria-pressed", "false");
     await count.locator("..").click();
     await expect(count).toHaveText("2");
     await expect(count.locator("..")).toHaveAttribute("aria-pressed", "true");
     await page.unroute("**/api/accounts");
+    await page.unroute("**/api/threads/*");
     await expect(count.locator("..")).not.toHaveCSS(
       "background-color",
       normalBackground,

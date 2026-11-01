@@ -20,7 +20,7 @@ const sessionQuery = vi.hoisted(() => ({
   account: undefined as Account | undefined,
 }));
 
-let cachedThread: ThreadGetResponse;
+let cachedThread: ThreadGetResponse | undefined;
 let serverThread: ThreadGetResponse;
 
 const mutate = vi.fn(async (_key, updater, _options) => {
@@ -76,7 +76,7 @@ function threadResponse(reactions: Reaction[] = []): ThreadGetResponse {
 }
 
 function cachedReactions() {
-  return cachedThread.replies.replies[0]!.reacts;
+  return cachedThread!.replies.replies[0]!.reacts;
 }
 
 function deferred<T>() {
@@ -98,6 +98,42 @@ describe("reaction mutations", () => {
     mutate.mockClear();
     cachedThread = threadResponse();
     serverThread = cachedThread;
+  });
+
+  test("uses the rendered thread before the client cache has data", async () => {
+    const initialThread = threadResponse([
+      {
+        ...reaction("other-reaction"),
+        author: { id: "other" },
+      } as Reaction,
+    ]);
+    const created = reaction("server-reaction");
+    const request = deferred<Reaction>();
+    api.postReactAdd.mockReturnValue(request.promise);
+    cachedThread = undefined;
+    const { result } = renderHook(() =>
+      useThreadMutations(initialThread as Thread),
+    );
+
+    let operation!: Promise<Reaction | undefined>;
+    act(() => {
+      operation = result.current.reactionAdd("reply", "🔥");
+    });
+
+    await waitFor(() => {
+      expect(cachedThread?.replies.replies[0]?.reacts).toHaveLength(2);
+    });
+    expect(cachedReactions()[1]?.author.id).toBe("current");
+
+    await act(async () => {
+      request.resolve(created);
+      await operation;
+    });
+
+    expect(cachedReactions()).toEqual([
+      initialThread.replies.replies[0]!.reacts[0],
+      created,
+    ]);
   });
 
   test("adds a reaction before the client session fetch completes", async () => {
