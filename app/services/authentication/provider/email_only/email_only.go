@@ -32,7 +32,7 @@ var (
 
 var (
 	requiredMode = authentication.ModeEmail
-	service      = authentication.ServiceEmailVerify
+	service      = authentication.AuthServiceEmailVerify
 	tokenType    = authentication.TokenTypeNone
 )
 
