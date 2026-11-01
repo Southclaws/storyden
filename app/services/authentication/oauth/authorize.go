@@ -70,6 +70,9 @@ func (s *Service) Authorise(ctx context.Context, input AuthoriseRequest) (*Autho
 		return nil, oauthErr, nil
 	}
 
+	if err := validateRedirectURI(input.RedirectURI); err != nil {
+		return nil, oauthError("invalid_request", "Invalid redirect URI"), nil
+	}
 	if !contains(cl.RedirectURIs, input.RedirectURI) {
 		return nil, oauthError("invalid_request", "Redirect URI is not registered for this client"), nil
 	}
@@ -224,6 +227,9 @@ func (s *Service) getPendingAuthorisationRequest(ctx context.Context, accountID 
 
 	if rec.AccountID != accountID || rec.ExpiresAt.Before(time.Now()) || rec.ApprovedAt.Ok() || rec.DeniedAt.Ok() {
 		return nil, oauthError("invalid_request", "Request is invalid, expired, or already processed"), nil
+	}
+	if err := validateRedirectURI(rec.RedirectURI); err != nil {
+		return nil, oauthError("invalid_request", "Request has an invalid redirect URI"), nil
 	}
 
 	return rec, nil, nil

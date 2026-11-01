@@ -187,6 +187,8 @@ See [Device Flow: Refreshing an access token](/docs/introduction/oauth/device-fl
 
 Authorization code clients must be registered before they can initiate this flow, and the client must be allowed to use the `authorization_code` grant. If the client needs refresh tokens, it must also be allowed to use the `refresh_token` grant. The `redirect_uri` values sent at authorization time are validated against the list of URIs registered with the client. Any mismatch is rejected.
 
+Web callbacks must use HTTPS, or HTTP on loopback. Native apps can also register app-scheme callbacks such as `com.example.app:/callback`. See the [redirect URI policy](/docs/introduction/oauth/clients#redirect-uri-policy).
+
 See [Clients](/docs/introduction/oauth/clients) for how to register one.
 
 ## Public vs confidential clients

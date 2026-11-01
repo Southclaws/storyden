@@ -17,6 +17,17 @@ An OAuth client represents an application that can initiate authorization flows 
 
 Use a confidential client for server-side web applications. Use a public client for everything else.
 
+## Redirect URI policy
+
+All OAuth client registration and update methods use the same redirect URI policy:
+
+- HTTP(S) URLs must have a hostname. Opaque web forms such as `https:callback` are rejected.
+- HTTP URLs are accepted only for loopback destinations: `localhost`, IPv4 loopback addresses, and `::1`.
+- Embedded credentials, fragments, wildcards, and relative URLs are rejected.
+- Native clients can use app schemes such as `com.example.app:/callback`. Browser-executable and local-resource schemes (`javascript`, `data`, `vbscript`, `file`, `blob`, `about`, and `filesystem`) are rejected.
+
+Authorization requests must exactly match a registered redirect URI. Storyden also checks the redirect policy before starting authorization or handling consent, so an unsafe URI stored by an older version cannot be used for a redirect.
+
 ## Registering a client
 
 OAuth client management is an administrator-controlled feature. Members need the `USE_OAUTH_CLIENTS` [permission](/docs/introduction/members/permissions) to approve OAuth consent requests, but creating and managing OAuth clients requires `ADMINISTRATOR`.
