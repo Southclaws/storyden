@@ -471,7 +471,7 @@ test.describe("Thread Pagination", () => {
       await replyEditor.click();
       await replyEditor.fill(`Reply number ${i} for pagination test.`);
       await replyForm.getByRole("button", { name: "Post" }).click();
-      await page.waitForTimeout(200);
+      await expect(replyEditor).toHaveText("");
     }
 
     await navigateToThread(page, threadUrl);

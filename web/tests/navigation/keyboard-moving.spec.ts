@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { type Locator, expect, test } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 
 import {
@@ -6,6 +6,18 @@ import {
   login,
   withAdminAccessKey,
 } from "../access_key_admin_assignment";
+
+async function focusTreeNode(node: Locator) {
+  // The server-rendered link can receive focus before the tree hydrates.
+  // Wait for a focus transition to activate the row's keyboard controls.
+  await expect
+    .poll(async () => {
+      await node.blur();
+      await node.focus();
+      return node.getAttribute("tabindex");
+    })
+    .toBe("0");
+}
 
 for (const kind of ["Library", "Category"] as const) {
   test(`${kind} keyboard moves nest, sort, return to root, and persist without navigating`, async ({
@@ -52,7 +64,7 @@ for (const kind of ["Library", "Category"] as const) {
         patches.push(request.postDataJSON());
     });
 
-    await carried.focus();
+    await focusTreeNode(carried);
     await page.keyboard.press("Alt+Shift+KeyM");
     await expect(root.getByRole("status")).toContainText(
       `Carrying ${source.name}`,
@@ -125,7 +137,7 @@ for (const kind of ["Library", "Category"] as const) {
     expect(await carried.locator("..").getAttribute("data-depth")).toBe("1");
     const titles = await tree.locator("a[data-tree-node-id]").allTextContents();
     expect(titles.indexOf(source.name)).toBe(titles.indexOf(target.name) + 1);
-    await carried.focus();
+    await focusTreeNode(carried);
     await page.keyboard.press("Alt+Shift+KeyM");
     await page.keyboard.press("ArrowUp");
     await page.keyboard.press("Escape");
@@ -159,7 +171,7 @@ test("moving into a page that hides children retains focus on the visible parent
   const tree = page.getByRole("tree", { name: "Library pages" });
   const carried = tree.locator("a").filter({ hasText: source.name });
   const destination = tree.locator("a").filter({ hasText: target.name });
-  await carried.focus();
+  await focusTreeNode(carried);
   await page.keyboard.press("Alt+Shift+KeyM");
   await expect(tree.locator("..").getByRole("status")).toContainText(
     `Carrying ${source.name}`,
@@ -206,15 +218,8 @@ test("a page menu starts a move and a failed request remains available for retry
   const options = tree.getByRole("button", {
     name: `Page options for ${source.name}`,
   });
-  // The server-rendered link can receive focus before the tree hydrates.
-  // Wait for a focus transition to activate the row's keyboard controls.
-  await expect
-    .poll(async () => {
-      await carried.blur();
-      await carried.focus();
-      return create.getAttribute("tabindex");
-    })
-    .toBe("0");
+  await focusTreeNode(carried);
+  await expect(create).toHaveAttribute("tabindex", "0");
   await page.keyboard.press("Tab");
   await expect(create).toBeFocused();
   await page.keyboard.press("Tab");
