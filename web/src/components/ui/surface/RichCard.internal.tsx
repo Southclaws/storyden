@@ -2,14 +2,17 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Children,
+  Fragment,
   PropsWithChildren,
   ReactNode,
+  isValidElement,
   useEffect,
   useId,
   useRef,
   useState,
 } from "react";
 
+import { isContentEmpty } from "@/lib/content/content";
 import { css } from "@/styled-system/css";
 import { Box, LStack, styled } from "@/styled-system/jsx";
 import { linkOverlay } from "@/styled-system/patterns";
@@ -24,17 +27,20 @@ import { isExternalURL } from "@/utils/url";
 import { ContentComposer } from "../../content/ContentComposer/ContentComposer";
 import { Button } from "../button";
 
-export type CardItem = {
+import { CardMedia, CardMediaOptions } from "./RichCardMedia";
+
+export type CardItem = CardMediaOptions & {
   id: string;
   title?: string;
+  label?: string;
+  titleContent?: ReactNode;
   url: string;
   text?: string;
   titleIcon?: React.ReactNode;
   titleStatus?: string;
   headingAs?: "h2" | "h3" | "h4";
   content?: string;
-  image?: string;
-  imageAlt?: string;
+  body?: ReactNode;
   header?: React.ReactNode;
   menu?: React.ReactNode;
   controls?: React.ReactNode;
@@ -42,11 +48,13 @@ export type CardItem = {
   prefetchOnIntent?: boolean;
 };
 
-export type Props = CardItem & RichCardVariantProps;
+export type Props = CardItem & Omit<RichCardVariantProps, "hasMedia">;
 
 export function Card({
   id,
   title,
+  label,
+  titleContent,
   url,
   text,
   titleIcon,
@@ -55,6 +63,11 @@ export function Card({
   content,
   image,
   imageAlt = "",
+  imageAspectRatio,
+  imageFit,
+  imageProps,
+  imageFallback,
+  body,
   header,
   menu,
   controls,
@@ -69,12 +82,31 @@ export function Card({
   const prefetchedURL = useRef<string | null>(null);
   const [showingMore, setShowingMore] = useState(false);
 
+  const hasMedia = Boolean(image) || hasSlotContent(imageFallback);
   const styles = richCard({
     shape,
     backgroundColor,
+    hasMedia,
   });
 
   const externalURL = isExternalURL(url);
+  const hasRichContent = !isContentEmpty(content);
+  const hasPreview = Boolean(text) || hasRichContent;
+  const hasBody = hasSlotContent(body);
+  const hasHeader = hasSlotContent(header);
+  const hasMenu = hasSlotContent(menu);
+  const hasTitleContent = hasSlotContent(titleContent);
+  const hasFooter = hasSlotContent(children) || hasSlotContent(controls);
+  let navigationClass: string | undefined;
+  let showBackdrop = Boolean(image);
+
+  if (!disableAnchors && shape !== "minimal") {
+    navigationClass = linkOverlay();
+  }
+
+  if (shape === "minimal") {
+    showBackdrop = false;
+  }
 
   function handlePrefetch() {
     if (
@@ -97,70 +129,113 @@ export function Card({
           {text}
         </p>
       )}
-      {content && (
+      {hasRichContent && (
         <ContentComposer placeholder="" disabled initialValue={content} />
       )}
     </>
   );
+  const contentLink = (
+    <Link
+      aria-label={title || label}
+      href={url}
+      prefetch={false}
+      onMouseEnter={handlePrefetch}
+      onFocus={handlePrefetch}
+      className={navigationClass}
+      onClick={(e) => disableAnchors && e.preventDefault()}
+    >
+      {preview}
+    </Link>
+  );
+  let standaloneContentLink: ReactNode;
+  let needsStandaloneLink = !title && !hasTitleContent;
+
+  if (shape === "fill") {
+    needsStandaloneLink = true;
+  }
+
+  if (hasPreview || shape === "minimal") {
+    needsStandaloneLink = false;
+  }
+
+  if (needsStandaloneLink) {
+    standaloneContentLink = contentLink;
+  }
 
   return (
     <styled.article
       id={id}
-      aria-labelledby={title ? titleId : undefined}
+      aria-labelledby={title && !hasTitleContent ? titleId : undefined}
+      aria-label={label ?? title}
       className={styles.container}
     >
       <div className={styles.root}>
-        {image && (
-          <>
-            <div className={styles.mediaBackdropContainer}>
-              <styled.img
-                className={styles.mediaBackdrop}
-                src={image}
-                alt=""
-                aria-hidden="true"
-              />
-            </div>
-            <div className={styles.mediaContainer}>
-              <styled.img
-                className={styles.media}
-                src={image}
-                alt={imageAlt}
-                maxHeight={showingMore && shape !== "fill" ? "28" : "full"}
-              />
-            </div>
-          </>
+        {showBackdrop && (
+          <div className={styles.mediaBackdropContainer}>
+            <styled.img
+              className={styles.mediaBackdrop}
+              src={image}
+              alt=""
+              aria-hidden="true"
+            />
+          </div>
+        )}
+        {hasMedia && (
+          <CardMedia
+            image={image}
+            imageAlt={imageAlt}
+            imageAspectRatio={imageAspectRatio}
+            imageFit={imageFit}
+            imageProps={imageProps}
+            imageFallback={imageFallback}
+            styles={styles}
+            url={url}
+            label={label ?? title}
+            linked={shape === "minimal" && !disableAnchors}
+            collapseImage={showingMore && shape !== "fill"}
+          />
         )}
 
-        {header && <div className={styles.headerContainer}>{header}</div>}
-        {menu && (
+        {hasHeader && <div className={styles.headerContainer}>{header}</div>}
+        {hasMenu && (
           <div
             className={styles.menuContainer}
-            data-header={header ? "present" : "absent"}
+            data-header={hasHeader ? "present" : "absent"}
           >
             {menu}
           </div>
         )}
 
-        {title && (
+        {(title || hasTitleContent) && (
           <styled.div className={styles.titleContainer}>
-            {titleIcon && (
+            {hasSlotContent(titleIcon) && (
               <Box className={styles.titleIcon} aria-hidden="true">
                 {titleIcon}
               </Box>
             )}
 
-            <styled.h2 as={headingAs} id={titleId} className={styles.title}>
-              <Link
-                data-search-highlight
-                className={linkOverlay()}
-                href={url}
-                prefetch={false}
-                onMouseEnter={handlePrefetch}
-                onFocus={handlePrefetch}
-                onClick={(e) => disableAnchors && e.preventDefault()}
-              >
-                {title}
-              </Link>
+            <styled.h2
+              as={headingAs}
+              id={titleId}
+              className={styles.title}
+              flex={hasTitleContent ? "1" : undefined}
+              minW="0"
+            >
+              {hasTitleContent ? (
+                titleContent
+              ) : (
+                <Link
+                  data-search-highlight
+                  className={navigationClass}
+                  href={url}
+                  prefetch={false}
+                  onMouseEnter={handlePrefetch}
+                  onFocus={handlePrefetch}
+                  onClick={(e) => disableAnchors && e.preventDefault()}
+                >
+                  {title}
+                </Link>
+              )}
               {titleStatus && (
                 <>
                   {" "}
@@ -171,38 +246,46 @@ export function Card({
           </styled.div>
         )}
 
-        <div className={styles.contentContainer}>
-          <div className={styles.textArea}>
-            <ShowMore
-              showingMore={showingMore}
-              title={title}
-              onClick={() => setShowingMore(!showingMore)}
-            >
-              {title && shape !== "fill" ? (
-                preview
-              ) : (
-                <Link
-                  aria-label={title}
-                  href={url}
-                  prefetch={false}
-                  onMouseEnter={handlePrefetch}
-                  onFocus={handlePrefetch}
-                  className={linkOverlay()}
-                  onClick={(e) => disableAnchors && e.preventDefault()}
+        {(hasPreview || hasBody) && (
+          <div className={styles.contentContainer}>
+            {hasPreview && (
+              <div className={styles.textArea}>
+                <ShowMore
+                  showingMore={showingMore}
+                  title={title}
+                  onClick={() => setShowingMore(!showingMore)}
                 >
-                  {preview}
-                </Link>
-              )}
-            </ShowMore>
+                  {title && shape !== "fill" ? preview : contentLink}
+                </ShowMore>
+              </div>
+            )}
+            {hasBody && body}
           </div>
-        </div>
+        )}
 
-        <div className={styles.footerContainer}>
-          {children} {controls}
-        </div>
+        {standaloneContentLink}
+
+        {hasFooter && (
+          <div className={styles.footerContainer}>
+            {children}
+            {controls}
+          </div>
+        )}
       </div>
     </styled.article>
   );
+}
+
+function hasSlotContent(value: ReactNode): boolean {
+  return Children.toArray(value).some((child) => {
+    if (
+      isValidElement<{ children?: ReactNode }>(child) &&
+      child.type === Fragment
+    ) {
+      return hasSlotContent(child.props.children);
+    }
+    return typeof child === "string" ? child.trim().length > 0 : Boolean(child);
+  });
 }
 
 export type CardGroupProps =
@@ -268,7 +351,11 @@ function ShowMore({
 
   useEffect(() => {
     const element = textContainerRef.current;
-    if (!element) return;
+
+    if (!element) {
+      return;
+    }
+
     const measure = () => setShowMore(element.scrollHeight > 112);
     measure();
     const observer = new ResizeObserver(measure);
@@ -292,8 +379,12 @@ function ShowMore({
       {showMore && (
         <Button
           type="button"
-          variant="subtle"
+          variant="plain"
           size="sm"
+          data-text-link=""
+          fontSize="inherit"
+          fontWeight="normal"
+          lineHeight="inherit"
           position="relative"
           zIndex="var(--card-content-index)"
           aria-expanded={showingMore}

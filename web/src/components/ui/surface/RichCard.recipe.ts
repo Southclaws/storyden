@@ -106,6 +106,14 @@ export const richCard = defineSlotRecipe({
       contain: "size",
     },
 
+    mediaMissing: {
+      display: "grid",
+      placeItems: "center",
+      height: "full",
+      padding: "2",
+      color: "text.subtle",
+    },
+
     footerContainer: {
       display: "flex",
       alignItems: "center",
@@ -113,6 +121,7 @@ export const richCard = defineSlotRecipe({
       width: "full",
       minWidth: "0",
       gap: "2",
+      marginTop: "2",
     },
 
     mediaBackdropContainer: {
@@ -140,15 +149,17 @@ export const richCard = defineSlotRecipe({
       overflowClipMargin: "unset",
     },
 
-    textArea: {
-      mb: "2",
-    },
+    textArea: {},
 
     text: {
       lineClamp: "1",
     },
   },
   variants: {
+    hasMedia: {
+      true: {},
+      false: {},
+    },
     backgroundColor: {
       default: {
         root: {
@@ -167,6 +178,82 @@ export const richCard = defineSlotRecipe({
       },
     },
     shape: {
+      minimal: {
+        root: {
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1fr)",
+          gridTemplateRows: "auto auto auto 1fr auto",
+          gridTemplateAreas: '"header" "media" "title" "content" "footer"',
+          borderWidth: "0",
+          borderRadius: "md",
+          boxShadow: "none",
+        },
+        headerContainer: {
+          gridArea: "header",
+          padding: "2",
+        },
+        menuContainer: {
+          position: "absolute",
+          top: "2",
+          right: "2",
+        },
+        titleContainer: {
+          gridArea: "title",
+          paddingX: "2",
+          "& input": { fontSize: "inherit" },
+          "&:last-child": { paddingBottom: "2" },
+        },
+        title: {
+          fontSize: "md",
+          lineHeight: "inherit",
+        },
+        contentContainer: {
+          gridArea: "content",
+          paddingX: "2",
+          paddingBottom: "2",
+          "&:has(~ .rich-card__footerContainer)": { paddingBottom: "0" },
+          height: "auto",
+          fontSize: "sm",
+          "& input": { fontSize: "inherit" },
+        },
+        mediaContainer: {
+          gridArea: "media",
+          contain: "none",
+          minWidth: "0",
+          overflow: "hidden",
+          // Headers are above media even though they follow it in the DOM.
+          "&:has(~ .rich-card__titleContainer), &:has(~ .rich-card__contentContainer)":
+            {
+              marginBottom: "2",
+            },
+        },
+        media: {
+          display: "block",
+          height: "auto",
+          minHeight: "8",
+          maxHeight: "[min(70svh,40rem)]",
+          "[data-aspect-ratio=true] > &": {
+            height: "full",
+            minHeight: "0",
+            maxHeight: "none",
+          },
+        },
+        mediaMissing: {
+          display: "grid",
+          placeItems: "center",
+          height: "32",
+          padding: "2",
+          color: "text.subtle",
+          textAlign: "center",
+          textWrap: "balance",
+        },
+        mediaBackdropContainer: { display: "none" },
+        footerContainer: {
+          gridArea: "footer",
+          padding: "2",
+          paddingTop: "0",
+        },
+      },
       row: {
         root: {
           gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [media-start] minmax(0, 25cqw) [media-end] 0.5rem [edge-end]`,
@@ -233,10 +320,6 @@ export const richCard = defineSlotRecipe({
         // Non-container slots.
         // -
 
-        mediaMissing: {
-          display: "none",
-        },
-
         mediaBackdrop: {
           // This blends the backdrop image horizontally so the backdrop doesn't
           // cover the entire row and potentially make it too attention-seeking.
@@ -296,6 +379,7 @@ export const richCard = defineSlotRecipe({
             gridRow: "media-start / media-end",
             minHeight: "64",
             marginBottom: "2",
+            "&:has(~ .rich-card__footerContainer)": { marginBottom: "0" },
             aspectRatio: "auto",
             height: "unset",
           },
@@ -337,9 +421,6 @@ export const richCard = defineSlotRecipe({
           },
         },
 
-        mediaMissing: {
-          display: "none",
-        },
         text: {},
       },
       box: {
@@ -384,7 +465,6 @@ export const richCard = defineSlotRecipe({
 
         mediaContainer: {
           gridArea: "media",
-          marginBottom: "2",
           minHeight: "64",
         },
 
@@ -407,15 +487,6 @@ export const richCard = defineSlotRecipe({
           borderRadius: "sm",
         },
 
-        mediaMissing: {
-          gridRow: "1 / 2",
-          gridColumn: "1 / 2",
-          height: "full",
-          // NOTE: This padding is to center the Empty component. It's not
-          // really perfect but close enough! It's a bit of a hack.
-          paddingBottom: "3lh",
-        },
-
         text: {
           _containerSmall: {
             display: "none",
@@ -423,9 +494,19 @@ export const richCard = defineSlotRecipe({
         },
       },
       fill: {
+        container: {
+          borderRadius: "lg",
+          boxShadow: "surface",
+        },
         root: {
+          // Chrome can composite backdrop-filter past a rounded overflow clip.
+          // Mask the complete card; its shadow lives on the unmasked container.
+          maskImage: "linear-gradient(black, black)",
+          boxShadow: "none",
+          // Keep the frosted lower panel above the image and below its content.
+          "--card-backdrop-index": "3",
           gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [edge-end]`,
-          gridTemplateRows: `[edge-start] 0.5rem [header-start] min-content [header-end] 300px [content-start] min-content [footer-start] min-content [edge-end]`,
+          gridTemplateRows: `[edge-start] 0.5rem [header-start] min-content [header-end] minmax(300px, 1fr) [content-start] min-content [footer-start] min-content [edge-end]`,
         },
 
         // -
@@ -433,6 +514,7 @@ export const richCard = defineSlotRecipe({
         // -
 
         headerContainer: {
+          zIndex: "var(--card-content-index)",
           gridColumn: "content-start / content-end",
           gridRow: "header-start / header-end",
           borderRadius: "sm",
@@ -455,6 +537,7 @@ export const richCard = defineSlotRecipe({
         },
 
         contentContainer: {
+          zIndex: "var(--card-content-index)",
           gridRow: "content-start / footer-start",
           gridColumn: "edge-start / edge-end",
           padding: "2",
@@ -462,12 +545,14 @@ export const richCard = defineSlotRecipe({
         },
 
         mediaContainer: {
+          zIndex: "var(--card-media-index)",
           gridRow: "edge-start / edge-end",
           gridColumn: "edge-start / edge-end",
           minHeight: "64",
         },
 
         footerContainer: {
+          zIndex: "var(--card-content-index)",
           gridRow: "footer-start / edge-end",
           gridColumn: "edge-start / edge-end",
           paddingTop: "0",
@@ -476,6 +561,7 @@ export const richCard = defineSlotRecipe({
         },
 
         mediaBackdropContainer: {
+          zIndex: "var(--card-backdrop-index)",
           gridRow: "content-start / edge-end",
           gridColumn: "edge-start / edge-end",
           background: "background.canvas/90",
@@ -494,10 +580,6 @@ export const richCard = defineSlotRecipe({
 
         media: {
           objectPosition: "top",
-          // NOTE: This solves a small rendering issue on Chrome where the image
-          // ever so slightly overflows the border radius. The cause looks like
-          // it's due to a combination of the overflow hidden and object-fit.
-          borderBottomRadius: "calc(var(--card-border-radius) + 3px)",
         },
         text: {
           _containerSmall: {
@@ -507,7 +589,27 @@ export const richCard = defineSlotRecipe({
       },
     },
   },
-  compoundVariants: [],
+  compoundVariants: [
+    {
+      shape: "minimal",
+      backgroundColor: "default",
+      css: {
+        root: { backgroundColor: "background.inset" },
+      },
+    },
+    {
+      shape: ["row", "responsive"],
+      hasMedia: false,
+      css: {
+        root: {
+          gridTemplateColumns: `[edge-start] 0.5rem [content-start] minmax(0, 1fr) [content-end media-start media-end] 0.5rem [edge-end]`,
+        },
+        menuContainer: {
+          gridColumn: "content-start / content-end",
+        },
+      },
+    },
+  ],
   defaultVariants: {
     shape: "row",
     backgroundColor: "default",

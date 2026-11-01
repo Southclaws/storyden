@@ -106,6 +106,7 @@ export type LibraryPageBlockTypeProperties = z.infer<
 
 export const LibraryPageBlockTypeDirectoryLayoutSchema = z.enum([
   "table",
+  "rows",
   "grid",
   "gallery",
 ]);
@@ -116,6 +117,9 @@ export type LibraryPageBlockTypeDirectoryLayout = z.infer<
 export const LibraryPageBlockTypeDirectoryColumnSchema = z.object({
   fid: z.string(),
   hidden: z._default(z.boolean(), false),
+  placement: z.optional(
+    z.enum(["header", "details", "footer-start", "footer-end"]),
+  ),
 });
 export type LibraryPageBlockTypeDirectoryColumn = z.infer<
   typeof LibraryPageBlockTypeDirectoryColumnSchema
@@ -124,6 +128,8 @@ export type LibraryPageBlockTypeDirectoryColumn = z.infer<
 export const LibraryPageBlockTypeDirectoryConfigSchema = z.object({
   layout: LibraryPageBlockTypeDirectoryLayoutSchema,
   columns: z.array(LibraryPageBlockTypeDirectoryColumnSchema),
+  card_style: z.optional(z.enum(["minimal", "row", "box", "fill"])),
+  show_content: z.optional(z.boolean()),
 });
 export type LibraryPageBlockTypeDirectoryConfig = z.infer<
   typeof LibraryPageBlockTypeDirectoryConfigSchema

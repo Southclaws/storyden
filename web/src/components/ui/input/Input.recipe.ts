@@ -45,11 +45,17 @@ export const inputSizeVariants = {
 export const inputVariantVariants = {
   outline: {},
   ghost: {
+    background: "transparent",
     borderColor: "transparent",
     px: "0",
     _focus: {
       borderColor: "transparent",
       boxShadow: "0 0 0 0px var(--colors-color-palette-solid)",
+    },
+    _focusVisible: {
+      outline: "2px solid",
+      outlineColor: "colorPalette.text",
+      outlineOffset: "2px",
     },
   },
   inset: {

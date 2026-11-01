@@ -22,7 +22,7 @@ definitions:
         $ref: "#/definitions/LibraryPageLayoutBlockType"
       layout:
         type: string
-        enum: [strip, grid, table, gallery]
+        enum: [strip, grid, table, rows, gallery]
         description: Layout mode for an assets or directory block.
       grid_size:
         type: integer

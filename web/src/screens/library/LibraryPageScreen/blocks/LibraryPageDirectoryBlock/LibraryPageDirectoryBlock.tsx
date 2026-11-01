@@ -79,26 +79,25 @@ export function LibraryPageDirectoryBlockContents() {
           ? `${data.nodes.length} ${pluralise(data.nodes.length, "page")} in this directory.`
           : ""}
       </Box>
-      <WStack bgColor="background.inset" borderRadius="sm" p="1">
+      <WStack
+        bgColor="background.inset"
+        borderRadius="sm"
+        p="1"
+        alignItems="stretch"
+      >
         <TagBadgeList
           tags={tags}
           type="button"
           onClick={handleTagFilter}
           highlightedTags={highlightedTags}
         />
-        <HStack gap="1" alignItems="end" flexWrap="wrap-reverse" justify="end">
-          <Input
-            variant="inset"
-            background="background.inset"
-            placeholder="Search..."
-            value={inputQuery}
-            onChange={handleSearchChange}
-            minW="20"
-            maxW="min"
-            px="2"
-            flexShrink="1"
-          />
-
+        <LStack
+          gap="1"
+          w="auto"
+          alignItems="end"
+          justifyContent="space-between"
+          flexShrink="0"
+        >
           {isDirectEditing && (
             <HStack gap="1">
               <AddPropertyMenu unavailable={!hasChildren}>
@@ -108,13 +107,27 @@ export function LibraryPageDirectoryBlockContents() {
               </AddPropertyMenu>
 
               <PropertyListMenu>
-                <IconButton variant="ghost">
+                <IconButton
+                  variant="ghost"
+                  aria-label="Directory display and properties"
+                >
                   <MenuIcon />
                 </IconButton>
               </PropertyListMenu>
             </HStack>
           )}
-        </HStack>
+          <Input
+            variant="inset"
+            background="background.inset"
+            placeholder="Search..."
+            value={inputQuery}
+            onChange={handleSearchChange}
+            minW="20"
+            maxW="min"
+            px="2"
+            mt="auto"
+          />
+        </LStack>
       </WStack>
 
       <LibraryPageDirectoryBlockLayout nodes={data.nodes} />
@@ -141,6 +154,7 @@ function LibraryPageDirectoryBlockLayout({ nodes }: { nodes: NodeTree }) {
 
   // Switch between different layout views
   switch (layout) {
+    case "rows":
     case "gallery":
     case "grid":
       return (

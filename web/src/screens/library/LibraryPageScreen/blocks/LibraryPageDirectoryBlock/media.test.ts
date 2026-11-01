@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/config", () => ({ API_ADDRESS: "https://api.storyden.test" }));
 
-import { getDirectoryImageProps } from "./media";
+import { getDirectoryCardImage, getDirectoryImageProps } from "./media";
 
 describe("Directory image presentation", () => {
   it.each([
@@ -44,5 +44,58 @@ describe("Directory image presentation", () => {
     expect(props.src).toBe(
       "https://api.storyden.test/api/assets/new?variant=m",
     );
+  });
+});
+
+describe("Directory image props for Surface", () => {
+  const image = {
+    id: "portrait",
+    path: "/api/assets/portrait",
+    filename: "portrait.png",
+    mime_type: "image/png",
+    width: 400,
+    height: 1600,
+  };
+
+  it("supplies responsive sources and natural sizing for Minimal Gallery", () => {
+    const props = getDirectoryCardImage(image, "gallery", "minimal");
+
+    expect(props.image).toBe(
+      "https://api.storyden.test/api/assets/portrait?variant=m",
+    );
+    expect(props.imageAspectRatio).toBeUndefined();
+    expect(props.imageFit).toBe("contain");
+    expect(props.imageProps).toEqual({
+      srcSet:
+        "https://api.storyden.test/api/assets/portrait?variant=s 80w, https://api.storyden.test/api/assets/portrait?variant=m 240w, https://api.storyden.test/api/assets/portrait?variant=l 400w",
+      sizes: "408px",
+      width: 400,
+      height: 1600,
+      loading: "lazy",
+      decoding: "async",
+    });
+  });
+
+  it("keeps Minimal Grid cropped to 4:3", () => {
+    const props = getDirectoryCardImage(image, "grid", "minimal");
+
+    expect(props.imageAspectRatio).toBeCloseTo(4 / 3);
+    expect(props.imageFit).toBe("cover");
+  });
+
+  it("preserves the existing image path and sizing for Editorial", () => {
+    expect(getDirectoryCardImage(image, "gallery", "box")).toEqual({
+      image: "https://api.storyden.test/api/assets/portrait?variant=m",
+      imageAspectRatio: 0.25,
+    });
+  });
+
+  it("does not invent an image or ratio when a cover is missing or hidden", () => {
+    const props = getDirectoryCardImage(undefined, "grid", "minimal");
+
+    expect(props.image).toBeUndefined();
+    expect(props.imageAspectRatio).toBeUndefined();
+    expect(props.imageProps?.width).toBeUndefined();
+    expect(props.imageProps?.srcSet).toBeUndefined();
   });
 });

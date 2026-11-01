@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { LStack, styled } from "@/styled-system/jsx";
 
+import { CardBox } from "../card-box";
+
 import { Input, InputPrefix } from ".";
 
 const meta = {
@@ -37,6 +39,39 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
+
+export const InlineEditing: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Ghost fields blend into the surrounding surface while idle. Focus a field to reveal its editing outline. Use outline inputs when a persistent field boundary is needed.",
+      },
+    },
+  },
+  render: () => (
+    <CardBox maxW="sm" p="4">
+      <LStack gap="3">
+        <Input
+          aria-label="Page name"
+          variant="ghost"
+          defaultValue="Departure Mono"
+          fontWeight="semibold"
+        />
+        <Input
+          aria-label="Page description"
+          variant="ghost"
+          defaultValue="A free monospaced pixel font."
+        />
+        <Input
+          aria-label="Page URL"
+          variant="ghost"
+          defaultValue="https://departuremono.com/"
+        />
+      </LStack>
+    </CardBox>
+  ),
+};
 
 export const Sizes: Story = {
   render: () => (

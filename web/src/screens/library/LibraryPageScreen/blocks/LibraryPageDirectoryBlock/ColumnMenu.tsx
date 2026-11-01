@@ -80,6 +80,7 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
             {!column.fixed && (
               <Menu.ItemGroup pl="2" py="2">
                 <Input
+                  aria-label={`Name for ${column.name}`}
                   size="sm"
                   value={column.name}
                   onChange={handleColumnNameChange}

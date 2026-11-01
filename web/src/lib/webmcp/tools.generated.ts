@@ -65,7 +65,7 @@ export interface LibraryPageLayoutBlock {
   /**
    * Layout mode for an assets or directory block.
    */
-  layout?: "strip" | "grid" | "table" | "gallery";
+  layout?: "strip" | "grid" | "table" | "rows" | "gallery";
   /**
    * Column count for an assets block using the grid layout.
    */
@@ -165,9 +165,9 @@ export interface LibraryPageBlockDirectoryUpdate {
 }
 export interface ToolLibraryPageBlockDirectoryUpdateInput {
   /**
-   * Directory presentation: table shows rows and columns; grid shows cards in regular columns with fixed-ratio images; gallery uses a masonry-style arrangement with variable image heights. When the user names a mode, select that exact value.
+   * Directory presentation: table shows rows and columns; rows shows compact image-capable cards; grid shows cards in regular columns with fixed-ratio images; gallery uses a masonry-style arrangement with variable image heights. When the user names a mode, select that exact value.
    */
-  layout: "table" | "grid" | "gallery";
+  layout: "table" | "rows" | "grid" | "gallery";
 }
 export interface ToolLibraryPageBlockDirectoryUpdateOutput {
   /**
@@ -514,6 +514,7 @@ export const WEBMCP_TOOL_DEFINITIONS = {
                       "strip",
                       "grid",
                       "table",
+                      "rows",
                       "gallery"
                     ],
                     "description": "Layout mode for an assets or directory block."
@@ -628,6 +629,7 @@ export const WEBMCP_TOOL_DEFINITIONS = {
                       "strip",
                       "grid",
                       "table",
+                      "rows",
                       "gallery"
                     ],
                     "description": "Layout mode for an assets or directory block."
@@ -728,6 +730,7 @@ export const WEBMCP_TOOL_DEFINITIONS = {
                       "strip",
                       "grid",
                       "table",
+                      "rows",
                       "gallery"
                     ],
                     "description": "Layout mode for an assets or directory block."
@@ -842,6 +845,7 @@ export const WEBMCP_TOOL_DEFINITIONS = {
                       "strip",
                       "grid",
                       "table",
+                      "rows",
                       "gallery"
                     ],
                     "description": "Layout mode for an assets or directory block."
@@ -942,6 +946,7 @@ export const WEBMCP_TOOL_DEFINITIONS = {
                       "strip",
                       "grid",
                       "table",
+                      "rows",
                       "gallery"
                     ],
                     "description": "Layout mode for an assets or directory block."
@@ -985,10 +990,11 @@ export const WEBMCP_TOOL_DEFINITIONS = {
           "type": "string",
           "enum": [
             "table",
+            "rows",
             "grid",
             "gallery"
           ],
-          "description": "Directory presentation: table shows rows and columns; grid shows cards in regular columns with fixed-ratio images; gallery uses a masonry-style arrangement with variable image heights. When the user names a mode, select that exact value."
+          "description": "Directory presentation: table shows rows and columns; rows shows compact image-capable cards; grid shows cards in regular columns with fixed-ratio images; gallery uses a masonry-style arrangement with variable image heights. When the user names a mode, select that exact value."
         }
       },
       "additionalProperties": false
@@ -1038,6 +1044,7 @@ export const WEBMCP_TOOL_DEFINITIONS = {
                       "strip",
                       "grid",
                       "table",
+                      "rows",
                       "gallery"
                     ],
                     "description": "Layout mode for an assets or directory block."

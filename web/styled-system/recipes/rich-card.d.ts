@@ -3,11 +3,12 @@ import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type RichCardVariant = {
   backgroundColor?: "accent" | "default" | "emphasized"
-  shape?: "box" | "fill" | "responsive" | "row"
+  hasMedia?: boolean
+  shape?: "box" | "fill" | "minimal" | "responsive" | "row"
 }
 
 export type RichCardVariantProps = {
-  [K in keyof RichCardVariant]?: ConditionalValue<RichCardVariant[K]>
+  [K in keyof RichCardVariant]?: RichCardVariant[K] | undefined
 }
 
 export type RichCardVariantMap = RecipeVariantMap<RichCardVariant>

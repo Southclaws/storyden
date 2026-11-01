@@ -85,4 +85,38 @@ describe("useDirectoryBlock", () => {
 
     expect(overwriteBlock).not.toHaveBeenCalled();
   });
+
+  it("preserves card style and property placement while repairing a changed schema", async () => {
+    blockMock = {
+      type: "directory",
+      config: {
+        layout: "rows",
+        card_style: "fill",
+        columns: [
+          { fid: "p1", hidden: false, placement: "footer-start" },
+          { fid: "removed-property", hidden: false },
+        ],
+      },
+    };
+
+    renderHook(() => useDirectoryBlock());
+    await act(async () => {
+      vi.runOnlyPendingTimers();
+    });
+
+    expect(overwriteBlock).toHaveBeenCalledWith({
+      type: "directory",
+      config: {
+        layout: "rows",
+        card_style: "fill",
+        columns: [
+          { fid: "fixed:name", hidden: true },
+          { fid: "fixed:link", hidden: true },
+          { fid: "fixed:description", hidden: true },
+          { fid: "fixed:primary_image", hidden: true },
+          { fid: "p1", hidden: false, placement: "footer-start" },
+        ],
+      },
+    });
+  });
 });

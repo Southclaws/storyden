@@ -216,6 +216,18 @@ body {
   * custom nodes (NodeViews.) To use, set data-no-typography on the component.
   */
 
+/* Inline disclosures share link styling while retaining button semantics. */
+.typography a:not([data-no-typography] *),
+button[data-text-link] {
+  color: var(--colors-blue-9);
+}
+
+.typography a:not([data-no-typography] *):hover,
+button[data-text-link]:hover {
+  color: var(--colors-blue-10);
+  text-decoration: underline;
+}
+
 .typography {
   width: 100%;
 
@@ -225,13 +237,6 @@ body {
     margin-bottom: 0.5rem;
   }
 
-  a:not([data-no-typography] *) {
-    color: var(--colors-blue-9);
-  }
-  a:not([data-no-typography] *):hover {
-    color: var(--colors-blue-10);
-    text-decoration: underline;
-  }
   a:not([data-no-typography] *):visited {
     color: var(--colors-blue-11);
   }

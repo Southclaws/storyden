@@ -27,9 +27,9 @@ definitions:
     properties:
       layout:
         type: string
-        enum: [table, grid, gallery]
+        enum: [table, rows, grid, gallery]
         description: >-
-          Directory presentation: table shows rows and columns; grid shows cards in regular columns with fixed-ratio images;
+          Directory presentation: table shows rows and columns; rows shows compact image-capable cards; grid shows cards in regular columns with fixed-ratio images;
           gallery uses a masonry-style arrangement with variable image heights.
           When the user names a mode, select that exact value.
     additionalProperties: false

@@ -10,6 +10,7 @@ import {
 } from "@/api/openapi-schema";
 import {
   LibraryPageBlockTypeDirectory,
+  LibraryPageBlockTypeDirectoryColumn,
   LibraryPageBlockTypeDirectoryConfig,
   LibraryPageBlockTypeDirectoryLayout,
 } from "@/lib/library/metadata";
@@ -19,6 +20,7 @@ export type ColumnDefinitionCommon = {
   name: PropertyName;
   type: PropertyType;
   hidden: boolean;
+  placement?: LibraryPageBlockTypeDirectoryColumn["placement"];
 };
 
 export type ColumnDefinitionProperty = ColumnDefinitionCommon & {
@@ -106,6 +108,7 @@ export function processBlockConfig(
         name: column.fid.replace("fixed:", "") as MappableNodeField,
         type: "text" as const, // Fixed fields are always text for now
         hidden: column.hidden,
+        placement: column.placement,
         _fixedFieldName: column.fid.replace("fixed:", "") as MappableNodeField,
       } satisfies ColumnDefinitionFixed;
 
@@ -123,6 +126,7 @@ export function processBlockConfig(
       name: schema.name,
       type: schema.type as PropertyType,
       hidden: column.hidden ?? false,
+      placement: column.placement,
     } satisfies ColumnDefinitionProperty;
 
     return [...prev, next];

@@ -11,6 +11,7 @@
     "no-unreachable": "error",
     "no-unsafe-finally": "error",
     "no-unsafe-optional-chaining": "error",
+    "curly": "warn",
     "array-callback-return": "warn",
     "react/rules-of-hooks": "error",
     "react/jsx-no-duplicate-props": "error",

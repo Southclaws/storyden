@@ -7,8 +7,18 @@ import {
   withAdminAccessKey,
 } from "../access_key_admin_assignment";
 
-for (const layout of ["grid", "gallery"] as const) {
-  test(`Directory ${layout} filters entries and persists a drag reorder`, async ({
+const presentations = [
+  { layout: "grid", card_style: "minimal" },
+  { layout: "gallery", card_style: "minimal" },
+  { layout: "rows", card_style: "row" },
+  { layout: "grid", card_style: "row" },
+  { layout: "grid", card_style: "box" },
+  { layout: "grid", card_style: "fill" },
+  { layout: "gallery", card_style: "box" },
+] as const;
+
+for (const { layout, card_style } of presentations) {
+  test(`Directory ${layout} ${card_style} filters entries and persists a drag reorder`, async ({
     page,
   }) => {
     const seed = randomUUID().slice(0, 8);
@@ -26,6 +36,7 @@ for (const layout of ["grid", "gallery"] as const) {
                 type: "directory",
                 config: {
                   layout,
+                  card_style,
                   columns: [
                     { fid: "fixed:name", hidden: false },
                     { fid: "fixed:description", hidden: false },
@@ -117,8 +128,12 @@ for (const layout of ["grid", "gallery"] as const) {
         list
           .locator(":scope > li")
           .evaluateAll((cards) =>
-            cards.map((card) =>
-              card.querySelector("a[aria-label]")?.getAttribute("aria-label"),
+            cards.map(
+              (card) =>
+                card
+                  .querySelector("a[aria-label]")
+                  ?.getAttribute("aria-label") ??
+                card.querySelector('a[href^="/l/"]')?.textContent,
             ),
           ),
       )
@@ -130,3 +145,98 @@ for (const layout of ["grid", "gallery"] as const) {
       ]);
   });
 }
+
+test("Directory display controls save Rows, card style, and badge placement", async ({
+  page,
+}) => {
+  const seed = randomUUID().slice(0, 8);
+  const parent = await withAdminAccessKey(async ({ nodeCreate }) => {
+    const parent = await nodeCreate({
+      name: `Directory display ${seed}`,
+      slug: `directory-display-${seed}`,
+      visibility: "published",
+      meta: {
+        layout: {
+          blocks: [
+            { type: "title" },
+            {
+              type: "directory",
+              config: {
+                layout: "table",
+                columns: [
+                  { fid: "fixed:name", hidden: false },
+                  { fid: "fixed:description", hidden: false },
+                  { fid: "fixed:link", hidden: true },
+                  { fid: "fixed:primary_image", hidden: false },
+                ],
+              },
+            },
+          ],
+        },
+      },
+    });
+    await nodeCreate({
+      name: `Reference ${seed}`,
+      parent: parent.id,
+      visibility: "published",
+      properties: [
+        {
+          name: "Status",
+          type: "text",
+          sort: "0",
+          value: "Open for contributions",
+        },
+      ],
+    });
+    return parent;
+  });
+  const handle = `directory_display_${seed}`;
+  await createAdmin(page.context(), handle, "TestPassword123!");
+  await login(page, handle, "TestPassword123!");
+  await page.goto(`/l/${parent.slug}`);
+  await page.getByRole("button", { name: "Edit", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Quick edit", exact: true }).click();
+  const display = page.getByRole("button", {
+    name: "Directory display and properties",
+    exact: true,
+  });
+  await display.click();
+  await page.getByRole("menuitem", { name: "Layout", exact: true }).hover();
+  await page.getByRole("menuitemradio", { name: "Rows", exact: true }).click();
+  await expect(
+    page.getByRole("list", { name: "Library pages" }),
+  ).toHaveAttribute("data-layout", "rows");
+  await page.keyboard.press("Escape");
+  await page.keyboard.press("Escape");
+  await display.click();
+  await page.getByRole("menuitem", { name: "Status", exact: true }).hover();
+  await page
+    .getByRole("menuitemradio", { name: "Bottom-left badge", exact: true })
+    .click();
+  await page.keyboard.press("Escape");
+  await page.keyboard.press("Escape");
+  await display.click();
+  await page.getByRole("menuitem", { name: "Layout", exact: true }).hover();
+  await page.getByRole("menuitemradio", { name: "Grid", exact: true }).click();
+  await page.keyboard.press("Escape");
+  await page.keyboard.press("Escape");
+  await display.click();
+  await page.getByRole("menuitem", { name: "Card style", exact: true }).hover();
+  const saved = page.waitForResponse(
+    (response) =>
+      response.request().method() === "PATCH" &&
+      response.url().endsWith(`/nodes/${parent.id}`) &&
+      response.ok(),
+  );
+  await page
+    .getByRole("menuitemradio", { name: "Editorial", exact: true })
+    .click();
+  await saved;
+  await page.goto(`/l/${parent.slug}`);
+  const list = page.getByRole("list", { name: "Library pages" });
+  await expect(list).toHaveAttribute("data-layout", "grid");
+  await expect(
+    list.getByRole("article", { name: `Reference ${seed}` }),
+  ).toBeVisible();
+  await expect(list.getByTitle("Status: Open for contributions")).toBeVisible();
+});
