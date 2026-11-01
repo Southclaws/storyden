@@ -20,6 +20,10 @@ import (
 )
 
 func TestAdminSettingsRateLimitRecovery(t *testing.T) {
+	if tests.IsSharedPostgresDatabase() {
+		t.Skip("rate-limit recovery requires stable instance-wide rate-limit settings")
+	}
+
 	t.Parallel()
 
 	integration.Test(t, &config.Config{
