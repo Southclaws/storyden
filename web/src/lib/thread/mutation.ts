@@ -11,6 +11,7 @@ import {
 import { replyCreate } from "@/api/openapi-client/replies";
 import { getThreadGetKey, threadUpdate } from "@/api/openapi-client/threads";
 import {
+  Account,
   Identifier,
   PostMutableProps,
   React,
@@ -27,8 +28,9 @@ export function useThreadMutations(
   thread: ThreadReference,
   currentPage?: number,
   totalPages?: number,
+  initialSession?: Account,
 ) {
-  const sessionInitial = useSession();
+  const sessionInitial = useSession(initialSession);
   const sessionRef = useRef(sessionInitial);
   useEffect(() => {
     sessionRef.current = sessionInitial;

@@ -24,6 +24,8 @@ export function useReactionList({
   const { reactionAdd, reactionRemove } = useThreadMutations(
     thread,
     currentPage,
+    undefined,
+    initialSession,
   );
   const pendingRef = useRef(new Set<string>());
   const [pendingEmojis, setPendingEmojis] = useState<ReadonlySet<string>>(

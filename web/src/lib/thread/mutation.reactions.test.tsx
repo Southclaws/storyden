@@ -16,6 +16,10 @@ const api = vi.hoisted(() => ({
   postReactRemove: vi.fn(),
 }));
 
+const sessionQuery = vi.hoisted(() => ({
+  account: undefined as Account | undefined,
+}));
+
 let cachedThread: ThreadGetResponse;
 let serverThread: ThreadGetResponse;
 
@@ -33,7 +37,8 @@ vi.mock("swr", () => ({
 }));
 
 vi.mock("@/auth", () => ({
-  useSession: () => ({ id: "current" }) as Account,
+  useSession: (initialSession?: Account) =>
+    sessionQuery.account ?? initialSession,
 }));
 
 vi.mock("@/api/openapi-client/posts", () => ({
@@ -87,11 +92,29 @@ function deferred<T>() {
 
 describe("reaction mutations", () => {
   beforeEach(() => {
+    sessionQuery.account = { id: "current" } as Account;
     api.postReactAdd.mockReset();
     api.postReactRemove.mockReset();
     mutate.mockClear();
     cachedThread = threadResponse();
     serverThread = cachedThread;
+  });
+
+  test("adds a reaction before the client session fetch completes", async () => {
+    sessionQuery.account = undefined;
+    const account = { id: "current" } as Account;
+    const created = reaction("server-reaction");
+    api.postReactAdd.mockResolvedValue(created);
+    const { result } = renderHook(() =>
+      useThreadMutations(cachedThread as Thread, undefined, undefined, account),
+    );
+
+    await act(async () => {
+      await result.current.reactionAdd("reply", "🔥");
+    });
+
+    expect(api.postReactAdd).toHaveBeenCalledWith("reply", { emoji: "🔥" });
+    expect(cachedReactions()).toEqual([created]);
   });
 
   test("keeps an optimistic add during latency then replaces it with the server reaction", async () => {
