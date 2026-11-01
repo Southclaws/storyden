@@ -110,7 +110,8 @@ func TestResourceProfileReferencesIncludeRoles(t *testing.T) {
 				_, _ = w.Write([]byte(`<!doctype html><html><head><title>Role Link Test</title></head><body>ok</body></html>`))
 			}))
 			t.Cleanup(linkServer.Close)
-			linkURL := linkServer.URL + "/sprites-dev"
+			// Link slugs omit the port, so each run needs a unique path.
+			linkURL := linkServer.URL + "/sprites-dev-" + xid.New().String()
 
 			threadWithLink := tests.AssertRequest(cl.ThreadCreateWithResponse(authorCtx, openapi.ThreadInitialProps{
 				Title:      "thread-with-link-and-roles-" + xid.New().String(),
