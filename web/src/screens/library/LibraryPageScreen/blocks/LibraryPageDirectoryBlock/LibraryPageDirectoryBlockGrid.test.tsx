@@ -18,6 +18,7 @@ import {
 
 import { NodeStoreAPI, createNodeStore } from "../../store";
 
+import { DirectoryRichCard } from "./DirectoryRichCard";
 import { LibraryPageDirectoryBlockGrid } from "./LibraryPageDirectoryBlockGrid";
 
 let store: NodeStoreAPI;
@@ -79,6 +80,48 @@ describe("Directory card draft editing", () => {
     });
     vi.spyOn(console, "debug").mockImplementation(() => {});
   });
+
+  it.each(["minimal", "row", "box", "fill"] as const)(
+    "limits directory highlight targets to names in %s cards",
+    (card_style) => {
+      const { container } = render(
+        <DirectoryRichCard
+          node={{
+            ...child,
+            primary_image: {
+              id: "cover",
+              path: "/assets/font.png",
+              filename: "font.png",
+              mime_type: "image/png",
+              width: 1200,
+              height: 800,
+            },
+          }}
+          layout="grid"
+          config={{
+            layout: "grid",
+            card_style,
+            columns: [
+              { fid: "fixed:name", hidden: false },
+              { fid: "fixed:description", hidden: false },
+            ],
+          }}
+          columns={[]}
+          values={{}}
+          editing={false}
+          onFieldValueChange={vi.fn()}
+        />,
+      );
+
+      const description = screen.getByText("A test font");
+      expect(description.closest("[data-search-highlight]")).toBeNull();
+      expect(
+        Array.from(container.querySelectorAll("[data-search-highlight]")).map(
+          (element) => element.textContent,
+        ),
+      ).toEqual(["Test font"]);
+    },
+  );
 
   it.each(["rows", "grid", "gallery"] as const)(
     "keeps badge typing in the %s card while the server snapshot is unchanged",

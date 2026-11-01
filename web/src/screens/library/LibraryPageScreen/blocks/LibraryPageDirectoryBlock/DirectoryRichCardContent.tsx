@@ -145,19 +145,14 @@ function RichCardDescription({
 
   if (minimal) {
     return (
-      <styled.p
-        fontSize="sm"
-        color="text.subtle"
-        lineClamp={1}
-        data-search-highlight
-      >
+      <styled.p fontSize="sm" color="text.subtle" lineClamp={1}>
         {node.description}
       </styled.p>
     );
   }
 
   return (
-    <Text as="p" variant="supporting" lineClamp={2} data-search-highlight>
+    <Text as="p" variant="supporting" lineClamp={2}>
       {node.description}
     </Text>
   );
