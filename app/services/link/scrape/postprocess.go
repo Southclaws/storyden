@@ -15,10 +15,17 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
+const scrapeMaxBytes = 8 * 1024 * 1024
+
+var errBodyTooLarge = fault.New("scraped page exceeds maximum size")
+
 func (s *webScraper) postprocess(ctx context.Context, addr url.URL, r io.Reader) (*WebContent, error) {
-	buf, err := io.ReadAll(r)
+	buf, err := io.ReadAll(io.LimitReader(r, scrapeMaxBytes+1))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if len(buf) > scrapeMaxBytes {
+		return nil, fault.Wrap(errBodyTooLarge, fctx.With(ctx))
 	}
 
 	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(buf))
