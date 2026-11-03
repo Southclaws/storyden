@@ -40,12 +40,8 @@ export function useNotificationScreen(props: Props) {
     };
   }
 
-  function handleToggleStatus() {
-    setStatus(
-      status === NotificationStatus.unread
-        ? NotificationStatus.read
-        : NotificationStatus.unread,
-    );
+  function handleToggleStatus({ checked }: { checked: boolean }) {
+    setStatus(checked ? NotificationStatus.read : NotificationStatus.unread);
   }
 
   return {
@@ -81,7 +77,7 @@ export function NotificationScreen(props: Props) {
           <Switch
             size="sm"
             checked={showingArchived}
-            onClick={handlers.handleToggleStatus}
+            onCheckedChange={handlers.handleToggleStatus}
           >
             Archived
           </Switch>
