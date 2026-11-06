@@ -37,6 +37,10 @@ docker run -p 8000:8000 ghcr.io/southclaws/storyden
 
 ![A screenshot of a Storyden instance](home/public/2026_app_screenshot.png)
 
+## One-Click Deploy
+
+[![Deploy on RepoCloud](https://d16t0pc4846x52.cloudfront.net/deploylobe.svg)](https://repocloud.io/details/Storyden/)
+
 ## Releases and versions
 
 Storyden releases tagged versions using a simple version number which applies to the product _as a whole_ not the API surface. For this reason, we do not use "semantic versioning" and breaking API changes are avoided as much as possible. Sometimes breaking changes may occur but these will always be documented and called out in release notes as well as in a separate list of just breaking changes.
