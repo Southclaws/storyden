@@ -19,9 +19,6 @@ const nextConfig = {
   experimental: {
     turbopackFileSystemCacheForDev: true,
   },
-  deprecated: {
-    looseRouteMatching: true,
-  },
 
   async headers() {
     return [
