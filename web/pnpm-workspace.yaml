@@ -5,7 +5,6 @@ minimumReleaseAge: 10080
 allowBuilds:
   esbuild: true
   sharp: true
-  unrs-resolver: true
   "@parcel/watcher": true
 patchedDependencies:
   # Do not restore combobox focus after the user has moved to another field.
