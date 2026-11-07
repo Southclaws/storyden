@@ -1,5 +1,6 @@
 import { Unready } from "@/components/site/Unready";
 import { Button } from "@/components/ui/button";
+import { CheckboxField } from "@/components/ui/checkbox";
 import { FormControl } from "@/components/ui/form-control";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
@@ -55,6 +56,16 @@ export function MemberInterfaceSettings(props: Props) {
         <FormHelperText>
           Choose your preferred editor style for composing threads, replies and
           pages.
+        </FormHelperText>
+      </FormControl>
+
+      <FormControl>
+        <CheckboxField control={control} name="markReadOnClick">
+          Mark notifications as read when opened
+        </CheckboxField>
+        <FormHelperText>
+          Turn this off to keep notifications unread until you mark them as read
+          yourself.
         </FormHelperText>
       </FormControl>
     </styled.form>

@@ -86,9 +86,7 @@ export function NotificationsMenu(props: Props) {
                           justify: "space-between",
                         })}
                         href={notification.url}
-                        onClick={() =>
-                          handlers.handleMarkAs(notification.id, "read")
-                        }
+                        onClick={() => handlers.handleOpen(notification.id)}
                       >
                         <NotificationAvatar notification={notification} />
                         <LStack gap="0" minW="0">

@@ -14,6 +14,7 @@ import {
   NotificationStatus,
 } from "@/api/openapi-schema";
 import { formatNotification } from "@/lib/notification";
+import { useSession } from "@/auth";
 
 import { NotificationItem } from "./item";
 
@@ -23,6 +24,7 @@ export type Props = {
 };
 
 export function useNotifications(props: Props) {
+  const session = useSession();
   const filterByStatus = filterStatus(props.status);
   const processNotifications = flow(filterByStatus, mapToItems);
 
@@ -51,7 +53,7 @@ export function useNotifications(props: Props) {
   const notifications = processNotifications(data.notifications);
 
   async function handleMarkAs(id: string, status: NotificationStatus) {
-    handle(async () => {
+    await handle(async () => {
       await notificationUpdate(id, { status });
 
       if (data) {
@@ -71,7 +73,7 @@ export function useNotifications(props: Props) {
   }
 
   async function handleMarkAllAsRead() {
-    handle(async () => {
+    await handle(async () => {
       if (!data) {
         return;
       }
@@ -97,6 +99,14 @@ export function useNotifications(props: Props) {
     });
   }
 
+  async function handleOpen(id: string) {
+    if (!session?.meta.notifications.markReadOnClick) {
+      return;
+    }
+
+    await handleMarkAs(id, "read");
+  }
+
   return {
     ready: true as const,
     data: {
@@ -104,6 +114,7 @@ export function useNotifications(props: Props) {
       notifications,
     },
     handlers: {
+      handleOpen,
       handleMarkAs,
       handleMarkAllAsRead,
     },
