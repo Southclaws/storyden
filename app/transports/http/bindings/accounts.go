@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/moderation_note"
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_assign"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/account/warning"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
@@ -55,6 +56,7 @@ type Accounts struct {
 	accountModerationNote *account_moderation_note.Manager
 	settingsRepo          *settings.SettingsRepository
 	roleAssign            *account_role_assign.Manager
+	roleQuerier           *role_querier.Querier
 	warnings              *warning_manager.Manager
 	tokenProvider         *password_reset.TokenProvider
 	emailResetter         *password_reset.EmailResetter
@@ -75,6 +77,7 @@ func NewAccounts(
 	accountModerationNote *account_moderation_note.Manager,
 	settingsRepo *settings.SettingsRepository,
 	roleAssign *account_role_assign.Manager,
+	roleQuerier *role_querier.Querier,
 	warnings *warning_manager.Manager,
 	tokenProvider *password_reset.TokenProvider,
 	emailResetter *password_reset.EmailResetter,
@@ -92,6 +95,7 @@ func NewAccounts(
 		accountModerationNote: accountModerationNote,
 		settingsRepo:          settingsRepo,
 		roleAssign:            roleAssign,
+		roleQuerier:           roleQuerier,
 		warnings:              warnings,
 		tokenProvider:         tokenProvider,
 		emailResetter:         emailResetter,
@@ -708,6 +712,17 @@ func (h *Accounts) AccountAddRole(ctx context.Context, request openapi.AccountAd
 	}
 	if roleID == role.DefaultRoleMemberID {
 		return nil, fault.Wrap(ErrEveryoneRole, fctx.With(ctx))
+	}
+
+	assignedRole, err := h.roleQuerier.Get(ctx, roleID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if assignedRole.Permissions.HasAny(rbac.PermissionAdministrator) {
+		if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 	}
 
 	err = h.roleAssign.UpdateRoles(ctx, acc.ID, role_assign.Add(roleID))
