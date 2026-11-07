@@ -112,7 +112,7 @@ func TestNotificationPushDelivery(t *testing.T) {
 	err = notifier.Send(root,
 		owner.ID,
 		opt.NewEmpty[account.AccountID](),
-		notification.EventFollow,
+		notification.EventThreadReply,
 		nil,
 	)
 	r.NoError(err)
@@ -208,15 +208,13 @@ func TestNotificationPushPreferences(t *testing.T) {
 		}, 5*time.Second, 10*time.Millisecond)
 	}
 
-	setPreferences := func(enabled bool, events map[string]bool) {
+	setPreferences := func(enabled bool, events map[string]account.NotificationEventSettings) {
 		t.Helper()
 
 		_, err := updater.Update(root, owner.ID, account_update.Partial{
 			NotificationSettings: opt.New(account.NotificationPreferences{
-				Push: account.PushNotificationPreferences{
-					Enabled: enabled,
-					Events:  events,
-				},
+				Events: events,
+				Push:   account.PushNotificationPreferences{Enabled: enabled},
 			}),
 		})
 		r.NoError(err)
@@ -227,7 +225,7 @@ func TestNotificationPushPreferences(t *testing.T) {
 		return deliveryCount() == 1
 	}, 5*time.Second, 10*time.Millisecond)
 
-	setPreferences(true, map[string]bool{"thread_reply": false})
+	setPreferences(true, map[string]account.NotificationEventSettings{"thread_reply": {Inbox: true, Push: false}})
 	send(notification.EventThreadReply, 2)
 	a.Never(func() bool {
 		return deliveryCount() != 1
@@ -238,16 +236,39 @@ func TestNotificationPushPreferences(t *testing.T) {
 		return deliveryCount() == 2
 	}, 5*time.Second, 10*time.Millisecond)
 
-	setPreferences(false, map[string]bool{"thread_reply": true})
+	setPreferences(true, map[string]account.NotificationEventSettings{"thread_reply": {Inbox: false, Push: false}})
+	send(notification.EventThreadReply, 3)
+	a.Never(func() bool {
+		count, err := db.Notification.Query().
+			Where(entnotification.OwnerAccountIDEQ(xid.ID(owner.ID))).
+			Count(root)
+		return err != nil || count != 3 || deliveryCount() != 2
+	}, 200*time.Millisecond, 10*time.Millisecond)
+
+	setPreferences(false, map[string]account.NotificationEventSettings{"thread_reply": {Inbox: true, Push: true}})
 	send(notification.EventThreadReply, 4)
 	a.Never(func() bool {
 		return deliveryCount() != 2
 	}, 200*time.Millisecond, 10*time.Millisecond)
 
-	setPreferences(true, map[string]bool{"thread_reply": true})
+	setPreferences(true, map[string]account.NotificationEventSettings{"thread_reply": {Inbox: true, Push: true}})
 	send(notification.EventThreadReply, 5)
 	r.Eventually(func() bool {
 		return deliveryCount() == 3
+	}, 5*time.Second, 10*time.Millisecond)
+
+	send(notification.EventPostLike, 5)
+	a.Never(func() bool {
+		count, err := db.Notification.Query().
+			Where(entnotification.OwnerAccountIDEQ(xid.ID(owner.ID))).
+			Count(root)
+		return err != nil || count != 5 || deliveryCount() != 3
+	}, 200*time.Millisecond, 10*time.Millisecond)
+
+	setPreferences(true, map[string]account.NotificationEventSettings{"post_like": {Inbox: true, Push: true}})
+	send(notification.EventPostLike, 6)
+	r.Eventually(func() bool {
+		return deliveryCount() == 4
 	}, 5*time.Second, 10*time.Millisecond)
 
 	remaining, err := subscriptions.List(root, owner.ID)
@@ -258,7 +279,7 @@ func TestNotificationPushPreferences(t *testing.T) {
 		Where(entnotification.OwnerAccountIDEQ(xid.ID(owner.ID))).
 		All(root)
 	r.NoError(err)
-	r.Len(inbox, 5)
+	r.Len(inbox, 6)
 
 	for _, item := range inbox {
 		a.False(item.Read)

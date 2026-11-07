@@ -7,8 +7,13 @@
  *
  * OpenAPI spec version: v1.26.16-post
  */
+import type { NotificationEventSettings } from "./notificationEventSettings";
 
 /**
- * Overrides keyed by NotificationEvent. Unknown event names are rejected.
+ * Overrides keyed by NotificationEvent. Direct interactions and
+ * actionable updates are enabled by default; likes, follows, and
+ * attendance activity are disabled. Unknown event names are rejected.
  */
-export type PushNotificationSettingsEvents = { [key: string]: boolean };
+export type NotificationSettingsEvents = {
+  [key: string]: NotificationEventSettings;
+};

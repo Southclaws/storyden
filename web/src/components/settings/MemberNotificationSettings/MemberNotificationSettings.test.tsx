@@ -40,32 +40,41 @@ const account: Account = {
 
 const settings = { ...DefaultSettings, web_push_public_key: "public-key" };
 
+const events = {
+  thread_reply: { inbox: true, push: true },
+  reply_to_reply: { inbox: true, push: true },
+  follow: { inbox: false, push: false },
+};
+
+const notificationSettings = { push: { enabled: true }, events };
+
 describe("MemberNotificationSettings", () => {
   beforeEach(() => {
     update.mockResolvedValue(account);
     mutate.mockResolvedValue(account);
   });
 
-  it("saves grouped controls as event overrides and preserves other preferences", async () => {
+  it("saves both channels and preserves unrelated settings", async () => {
     const user = userEvent.setup();
     const session = parseMemberSettings({
       ...account,
-      notification_settings: {
-        push: { enabled: true, events: { follow: false } },
-      },
+      notification_settings: notificationSettings,
     });
 
     render(
       <MemberNotificationSettings session={session} settings={settings} />,
     );
 
-    await user.click(screen.getByRole("checkbox", { name: "Replies" }));
+    await user.click(screen.getByRole("button", { name: "Replies: Inbox" }));
     await user.click(
       screen.getByRole("checkbox", {
         name: "Mark notifications as read when opened",
       }),
     );
 
+    expect(
+      screen.getByRole("button", { name: "Replies: Push" }),
+    ).toHaveAttribute("aria-pressed", "false");
     expect(update).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole("button", { name: "Save" }));
@@ -78,13 +87,11 @@ describe("MemberNotificationSettings", () => {
           notifications: { markReadOnClick: false },
         },
         notification_settings: {
-          push: {
-            enabled: true,
-            events: {
-              follow: false,
-              thread_reply: false,
-              reply_to_reply: false,
-            },
+          push: { enabled: true },
+          events: {
+            follow: { inbox: false, push: false },
+            thread_reply: { inbox: false, push: false },
+            reply_to_reply: { inbox: false, push: false },
           },
         },
       });
@@ -92,18 +99,16 @@ describe("MemberNotificationSettings", () => {
     });
   });
 
-  it("preserves mixed event overrides when saving an unrelated control", async () => {
+  it("enables Inbox with Push and preserves Inbox when Push is turned off", async () => {
     const user = userEvent.setup();
     const session = parseMemberSettings({
       ...account,
       notification_settings: {
-        push: {
-          enabled: true,
-          events: {
-            thread_reply: false,
-            reply_to_reply: true,
-            post_like: false,
-          },
+        push: { enabled: true },
+        events: {
+          ...events,
+          thread_reply: { inbox: false, push: false },
+          reply_to_reply: { inbox: false, push: false },
         },
       },
     });
@@ -112,11 +117,56 @@ describe("MemberNotificationSettings", () => {
       <MemberNotificationSettings session={session} settings={settings} />,
     );
 
+    const inbox = screen.getByRole("button", { name: "Replies: Inbox" });
+    const push = screen.getByRole("button", { name: "Replies: Push" });
+
+    await user.click(push);
+    expect(inbox).toHaveAttribute("aria-pressed", "true");
+    expect(push).toHaveAttribute("aria-pressed", "true");
+
+    await user.click(push);
+    expect(inbox).toHaveAttribute("aria-pressed", "true");
+    expect(push).toHaveAttribute("aria-pressed", "false");
+
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
     await waitFor(() => {
-      expect(
-        screen.getByRole("checkbox", { name: "Replies" }),
-      ).toBePartiallyChecked();
+      expect(update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          notification_settings: {
+            push: { enabled: true },
+            events: {
+              ...events,
+              thread_reply: { inbox: true, push: false },
+              reply_to_reply: { inbox: true, push: false },
+            },
+          },
+        }),
+      );
     });
+  });
+
+  it("preserves mixed per-event choices until the group is changed", async () => {
+    const user = userEvent.setup();
+    const session = parseMemberSettings({
+      ...account,
+      notification_settings: {
+        push: { enabled: true },
+        events: {
+          ...events,
+          thread_reply: { inbox: false, push: false },
+        },
+      },
+    });
+
+    render(
+      <MemberNotificationSettings session={session} settings={settings} />,
+    );
+
+    const inbox = screen.getByRole("button", { name: "Replies: Inbox" });
+    const push = screen.getByRole("button", { name: "Replies: Push" });
+    expect(inbox).toHaveAttribute("aria-pressed", "mixed");
+    expect(push).toHaveAttribute("aria-pressed", "mixed");
 
     await user.click(screen.getByRole("button", { name: "Save" }));
 
@@ -127,15 +177,26 @@ describe("MemberNotificationSettings", () => {
         }),
       );
     });
+
+    await user.click(push);
+    expect(inbox).toHaveAttribute("aria-pressed", "true");
+    expect(push).toHaveAttribute("aria-pressed", "true");
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          notification_settings: notificationSettings,
+        }),
+      );
+    });
   });
 
-  it("pauses push without clearing event preferences", async () => {
+  it("pauses push without clearing choices or disabling Inbox controls", async () => {
     const user = userEvent.setup();
     const session = parseMemberSettings({
       ...account,
-      notification_settings: {
-        push: { enabled: true, events: { thread_reply: false } },
-      },
+      notification_settings: notificationSettings,
     });
 
     render(
@@ -146,7 +207,12 @@ describe("MemberNotificationSettings", () => {
       screen.getByRole("checkbox", { name: "Receive push notifications" }),
     );
 
-    expect(screen.getByRole("checkbox", { name: "Replies" })).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: "Replies: Push" }),
+    ).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: "Replies: Inbox" }),
+    ).toBeEnabled();
 
     await user.click(screen.getByRole("button", { name: "Save" }));
 
@@ -154,53 +220,8 @@ describe("MemberNotificationSettings", () => {
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           notification_settings: {
-            push: {
-              enabled: false,
-              events: { thread_reply: false },
-            },
-          },
-        }),
-      );
-    });
-  });
-
-  it("changes all events in a mixed group without changing other events", async () => {
-    const user = userEvent.setup();
-    const session = parseMemberSettings({
-      ...account,
-      notification_settings: {
-        push: {
-          enabled: true,
-          events: { thread_reply: false, reply_to_reply: true, follow: false },
-        },
-      },
-    });
-
-    render(
-      <MemberNotificationSettings session={session} settings={settings} />,
-    );
-
-    const replies = screen.getByRole("checkbox", { name: "Replies" });
-
-    await waitFor(() => {
-      expect(replies).toBePartiallyChecked();
-    });
-
-    await user.click(replies);
-    await user.click(screen.getByRole("button", { name: "Save" }));
-
-    await waitFor(() => {
-      expect(update).toHaveBeenCalledWith(
-        expect.objectContaining({
-          notification_settings: {
-            push: {
-              enabled: true,
-              events: {
-                thread_reply: true,
-                reply_to_reply: true,
-                follow: false,
-              },
-            },
+            events,
+            push: { enabled: false },
           },
         }),
       );
@@ -232,14 +253,14 @@ describe("MemberNotificationSettings", () => {
     );
 
     expect(
-      screen.getByRole("checkbox", { name: "Library contributions" }),
-    ).toBeChecked();
+      screen.getByRole("button", { name: "Library contributions: Inbox" }),
+    ).toBeEnabled();
     expect(
-      screen.getByRole("checkbox", { name: "Trail alerts" }),
-    ).toBeChecked();
+      screen.getByRole("button", { name: "Trail alerts: Inbox" }),
+    ).toBeEnabled();
   });
 
-  it("does not expose unavailable features or legacy notification types", () => {
+  it("does not expose unavailable features or legacy event types", () => {
     render(
       <MemberNotificationSettings
         session={parseMemberSettings(account)}
@@ -247,37 +268,57 @@ describe("MemberNotificationSettings", () => {
       />,
     );
 
-    const labels = screen
-      .getAllByRole("checkbox")
-      .map(
-        (control) =>
-          control.getAttribute("aria-label") ??
-          control.closest("label")?.textContent,
-      );
+    const names = screen
+      .getAllByRole("button", { pressed: false })
+      .map((control) => control.getAttribute("aria-label"));
 
-    expect(labels).toEqual([
-      "Mark notifications as read when opened",
-      "Receive push notifications",
-      "Replies",
-      "Reports and moderation",
+    expect(names).toEqual([
+      "Replies: Inbox",
+      "Replies: Push",
+      "Reports and moderation: Inbox",
+      "Reports and moderation: Push",
     ]);
   });
 
-  it("keeps inbox settings available when push is disabled on the site", () => {
+  it("keeps Inbox filtering available when push is disabled on the site", async () => {
+    const user = userEvent.setup();
+    const session = parseMemberSettings({
+      ...account,
+      notification_settings: notificationSettings,
+    });
+
     render(
       <MemberNotificationSettings
-        session={parseMemberSettings(account)}
+        session={session}
         settings={DefaultSettings}
       />,
     );
 
     expect(
-      screen.getByRole("checkbox", {
-        name: "Mark notifications as read when opened",
-      }),
-    ).toBeChecked();
-    expect(
       screen.queryByRole("checkbox", { name: "Receive push notifications" }),
     ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Replies: Push" }),
+    ).toBeDisabled();
+    await user.click(screen.getByRole("button", { name: "Replies: Inbox" }));
+    expect(
+      screen.getByRole("button", { name: "Replies: Push" }),
+    ).toHaveAttribute("aria-pressed", "false");
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    await waitFor(() => {
+      expect(update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          notification_settings: {
+            push: { enabled: true },
+            events: {
+              ...events,
+              thread_reply: { inbox: false, push: false },
+              reply_to_reply: { inbox: false, push: false },
+            },
+          },
+        }),
+      );
+    });
   });
 });

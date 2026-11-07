@@ -1,10 +1,17 @@
+import { useId } from "react";
+
 import { Button } from "@/components/ui/button";
-import { Checkbox, CheckboxField } from "@/components/ui/checkbox";
+import { CheckboxField } from "@/components/ui/checkbox";
 import { FormControl } from "@/components/ui/form-control";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { PageHeading } from "@/components/ui/page-heading";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Text } from "@/components/ui/text";
+import {
+  ToggleMatrix,
+  type ToggleMatrixValue,
+  type ToggleMatrixValueChangeDetails,
+} from "@/components/ui/toggle-matrix";
 import type { Member } from "@/lib/settings/member-settings";
 import {
   getNotificationGroupState,
@@ -21,8 +28,30 @@ type Props = {
 };
 
 export function MemberNotificationSettings({ session, settings }: Props) {
+  const descriptionId = useId();
   const form = useMemberNotificationSettings(session);
   const groups = getNotificationGroups(session, settings);
+  const value: ToggleMatrixValue = {};
+
+  for (const group of groups) {
+    value[group.id] = {
+      inbox: getNotificationGroupState(form.events, group.events, "inbox"),
+      push: getNotificationGroupState(form.events, group.events, "push"),
+    };
+  }
+
+  function handleValueChange({
+    row,
+    column,
+    pressed,
+  }: ToggleMatrixValueChangeDetails) {
+    const group = groups.find((group) => group.id === row);
+    if (!group || (column !== "inbox" && column !== "push")) {
+      return;
+    }
+
+    form.setGroupEnabled(group.events, column, pressed);
+  }
 
   return (
     <styled.form
@@ -40,7 +69,7 @@ export function MemberNotificationSettings({ session, settings }: Props) {
           </Button>
         </WStack>
         <Text variant="supporting">
-          Choose how notifications behave and which ones reach your devices.
+          Choose which notifications reach your inbox and devices.
         </Text>
       </LStack>
 
@@ -59,49 +88,45 @@ export function MemberNotificationSettings({ session, settings }: Props) {
 
       <LStack gap="3">
         <LStack gap="1">
-          <SectionHeading>Push notifications</SectionHeading>
-          <Text variant="supporting">
-            These preferences apply to all your devices. Your browser must also
-            allow notifications. Your inbox is unaffected.
+          <SectionHeading>Notification delivery</SectionHeading>
+          <Text variant="supporting" id={descriptionId}>
+            Push also enables Inbox; turning Inbox off turns Push off.
           </Text>
         </LStack>
 
         {settings.web_push_public_key ? (
-          <>
-            <FormControl>
-              <CheckboxField control={form.control} name="pushEnabled">
-                Receive push notifications
-              </CheckboxField>
-            </FormControl>
-
-            <LStack gap="3" pt="1">
-              <SectionHeading as="h3" fontSize="sm">
-                Notify me about
-              </SectionHeading>
-              {groups.map((group) => (
-                <FormControl key={group.id}>
-                  <Checkbox
-                    checked={getNotificationGroupState(
-                      form.events,
-                      group.events,
-                    )}
-                    disabled={!form.pushEnabled}
-                    onCheckedChange={({ checked }) => {
-                      form.setGroupEnabled(group.events, checked === true);
-                    }}
-                  >
-                    {group.label}
-                  </Checkbox>
-                  <FormHelperText>{group.description}</FormHelperText>
-                </FormControl>
-              ))}
-            </LStack>
-          </>
+          <FormControl>
+            <CheckboxField control={form.control} name="pushEnabled">
+              Receive push notifications
+            </CheckboxField>
+            <FormHelperText>
+              Applies to all your devices. Your browser must also allow
+              notifications.
+            </FormHelperText>
+          </FormControl>
         ) : (
           <Text variant="supporting">
             Push notifications are not enabled on this site.
           </Text>
         )}
+
+        <ToggleMatrix
+          label="Notification delivery"
+          aria-describedby={descriptionId}
+          rowHeading="Notify me about"
+          rows={groups.map((group) => ({ ...group, value: group.id }))}
+          columns={[
+            { value: "inbox", label: "Inbox" },
+            {
+              value: "push",
+              label: "Push",
+              disabled: !settings.web_push_public_key || !form.pushEnabled,
+            },
+          ]}
+          value={value}
+          onValueChange={handleValueChange}
+          disabled={form.formState.isSubmitting}
+        />
       </LStack>
     </styled.form>
   );

@@ -11,6 +11,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_querier"
 	"github.com/Southclaws/storyden/app/resources/account/notification/push_subscription"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
@@ -76,7 +77,7 @@ func (s *Service) Register(
 }
 
 func (s *Service) deliver(ctx context.Context, event *rpc.EventNotificationCreated) error {
-	owner, err := s.accounts.GetByID(ctx, event.AccountID)
+	settings, err := s.accounts.GetNotificationSettings(ctx, event.AccountID)
 	if err != nil {
 		s.logger.Error("failed to load push preferences",
 			slog.String("notification_id", event.ID.String()),
@@ -85,11 +86,11 @@ func (s *Service) deliver(ctx context.Context, event *rpc.EventNotificationCreat
 		return nil
 	}
 
-	if !owner.NotificationSettings.Push.Enabled {
+	if !settings.Push.Enabled {
 		return nil
 	}
 
-	notification, err := s.notifications.GetRef(ctx, event.AccountID, event.ID)
+	item, err := s.notifications.GetRef(ctx, event.AccountID, event.ID)
 	if err != nil {
 		s.logger.Error("failed to load push notification",
 			slog.String("notification_id", event.ID.String()),
@@ -98,8 +99,8 @@ func (s *Service) deliver(ctx context.Context, event *rpc.EventNotificationCreat
 		return nil
 	}
 
-	enabled, overridden := owner.NotificationSettings.Push.Events[notification.Event.String()]
-	if overridden && !enabled {
+	eventSettings := notification.SettingsForEvent(settings.Events, item.Event)
+	if !eventSettings.Inbox || !eventSettings.Push {
 		return nil
 	}
 

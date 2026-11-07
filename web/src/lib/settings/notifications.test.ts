@@ -2,27 +2,48 @@ import { describe, expect, it } from "vitest";
 
 import { getNotificationGroupState } from "./notifications";
 
-describe("getNotificationGroupState", () => {
-  it("enables events without overrides", () => {
-    expect(
-      getNotificationGroupState(undefined, ["thread_reply", "reply_to_reply"]),
-    ).toBe(true);
-  });
+const events = {
+  thread_reply: { inbox: true, push: false },
+  reply_to_reply: { inbox: true, push: true },
+};
 
-  it("shows mixed state for independently configured events", () => {
+describe("getNotificationGroupState", () => {
+  it("resolves each delivery channel independently", () => {
     expect(
-      getNotificationGroupState({ thread_reply: false }, [
-        "thread_reply",
-        "reply_to_reply",
-      ]),
-    ).toBe("indeterminate");
+      getNotificationGroupState(
+        events,
+        ["thread_reply", "reply_to_reply"],
+        "inbox",
+      ),
+    ).toBe(true);
+    expect(
+      getNotificationGroupState(
+        events,
+        ["thread_reply", "reply_to_reply"],
+        "push",
+      ),
+    ).toBe("mixed");
   });
 
   it("disables the group only when all its events are disabled", () => {
     expect(
       getNotificationGroupState(
-        { thread_reply: false, reply_to_reply: false },
+        {
+          thread_reply: { inbox: false, push: false },
+          reply_to_reply: { inbox: false, push: false },
+        },
         ["thread_reply", "reply_to_reply"],
+        "inbox",
+      ),
+    ).toBe(false);
+  });
+
+  it("does not invent defaults for missing events", () => {
+    expect(
+      getNotificationGroupState(
+        {},
+        ["thread_reply", "reply_to_reply"],
+        "inbox",
       ),
     ).toBe(false);
   });

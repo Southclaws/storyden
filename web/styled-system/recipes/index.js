@@ -40,5 +40,6 @@ export * from './switch-recipe';
 export * from './table';
 export * from './tabs';
 export * from './toggle-group';
+export * from './toggle-matrix';
 export * from './tooltip';
 export * from './tree-view';

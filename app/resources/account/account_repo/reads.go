@@ -57,6 +57,18 @@ func (r *Repository) GetByID(ctx context.Context, id account.AccountID) (*accoun
 	return acc, nil
 }
 
+func (r *Repository) GetNotificationSettings(ctx context.Context, id account.AccountID) (account.NotificationPreferences, error) {
+	row, err := r.db.Account.Query().
+		Where(account_ent.ID(xid.ID(id))).
+		Select(account_ent.FieldNotificationSettings).
+		Only(ctx)
+	if err != nil {
+		return account.NotificationPreferences{}, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return account.MapNotificationSettings(row.NotificationSettings), nil
+}
+
 func (r *Repository) LookupByHandle(ctx context.Context, handle string) (*account.AccountWithEdges, bool, error) {
 	ctx, span := r.ins.Instrument(ctx, kv.String("handle", handle))
 	defer span.End()

@@ -1,8 +1,8 @@
 import {
   type Account,
   NotificationEvent,
+  type NotificationSettings,
   Permission,
-  type PushNotificationSettings,
 } from "@/api/openapi-schema";
 import { hasPermission } from "@/utils/permissions";
 
@@ -78,11 +78,12 @@ export function getNotificationGroups(
 }
 
 export function getNotificationGroupState(
-  overrides: PushNotificationSettings["events"],
+  overrides: NotificationSettings["events"],
   events: NotificationEvent[],
-): boolean | "indeterminate" {
+  channel: "inbox" | "push",
+): boolean | "mixed" {
   const enabledCount = events.filter(
-    (event) => overrides?.[event] !== false,
+    (event) => overrides[event]?.[channel] === true,
   ).length;
 
   if (enabledCount === events.length) {
@@ -93,5 +94,5 @@ export function getNotificationGroupState(
     return false;
   }
 
-  return "indeterminate";
+  return "mixed";
 }

@@ -10,7 +10,10 @@ import * as z from "@/lib/validation";
 const FormSchema = z.object({
   markReadOnClick: z.boolean(),
   pushEnabled: z.boolean(),
-  events: z.record(z.string(), z.boolean()),
+  events: z.record(
+    z.string(),
+    z.object({ inbox: z.boolean(), push: z.boolean() }),
+  ),
 });
 
 type Form = z.infer<typeof FormSchema>;
@@ -22,17 +25,34 @@ export function useMemberNotificationSettings(session: Member) {
     defaultValues: {
       markReadOnClick: session.meta.notifications.markReadOnClick,
       pushEnabled: session.notification_settings?.push.enabled ?? true,
-      events: session.notification_settings?.push.events ?? {},
+      events: session.notification_settings?.events ?? {},
     },
   });
   const events = useWatch({ control: form.control, name: "events" });
   const pushEnabled = useWatch({ control: form.control, name: "pushEnabled" });
 
-  function setGroupEnabled(groupEvents: NotificationEvent[], enabled: boolean) {
+  function setGroupEnabled(
+    groupEvents: NotificationEvent[],
+    channel: "inbox" | "push",
+    enabled: boolean,
+  ) {
     const overrides = { ...form.getValues("events") };
 
     for (const event of groupEvents) {
-      overrides[event] = enabled;
+      const settings = {
+        ...(overrides[event] ?? { inbox: false, push: false }),
+        [channel]: enabled,
+      };
+
+      if (channel === "push" && enabled) {
+        settings.inbox = true;
+      }
+
+      if (channel === "inbox" && !enabled) {
+        settings.push = false;
+      }
+
+      overrides[event] = settings;
     }
 
     form.setValue("events", overrides, { shouldDirty: true });
@@ -51,9 +71,9 @@ export function useMemberNotificationSettings(session: Member) {
           },
           notification_settings: {
             ...session.notification_settings,
+            events: data.events,
             push: {
               enabled: data.pushEnabled,
-              events: data.events,
             },
           },
         });

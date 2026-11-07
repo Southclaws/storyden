@@ -7,13 +7,11 @@
  *
  * OpenAPI spec version: v1.26.16-post
  */
-import type { PushNotificationSettingsEvents } from "./pushNotificationSettingsEvents";
 
 /**
- * Push delivery preferences. Replacing this object replaces its event overrides. Events without an override are enabled. These preferences do not affect the notification inbox.
+ * Push delivery preferences. Disabling push retains inbox notifications
+ * and browser subscriptions.
  */
 export interface PushNotificationSettings {
   enabled: boolean;
-  /** Overrides keyed by NotificationEvent. Unknown event names are rejected. */
-  events?: PushNotificationSettingsEvents;
 }

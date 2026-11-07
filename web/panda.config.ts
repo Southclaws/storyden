@@ -41,6 +41,7 @@ import { tabs } from "@/components/ui/tabs/Tabs.recipe";
 import { text } from "@/components/ui/text/Text.recipe";
 import { textarea } from "@/components/ui/textarea/Textarea.recipe";
 import { toggleGroup } from "@/components/ui/toggle-group/ToggleGroup.recipe";
+import { toggleMatrix } from "@/components/ui/toggle-matrix/ToggleMatrix.recipe";
 import { tooltip } from "@/components/ui/tooltip/Tooltip.recipe";
 import { dragTree } from "@/components/ui/tree-view/DragTree.recipe";
 import { treeView } from "@/components/ui/tree-view/TreeView.recipe";
@@ -247,6 +248,7 @@ export default defineConfig({
         switchRecipe: switchRecipe,
         treeView: treeView,
         toggleGroup: toggleGroup,
+        toggleMatrix: toggleMatrix,
         tooltip: tooltip,
       },
       semanticTokens,

@@ -11,6 +11,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_writer"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -22,6 +23,7 @@ import (
 type Notifier struct {
 	bus          *pubsub.Bus
 	notifyWriter *notify_writer.Writer
+	accounts     *account_querier.Querier
 }
 
 func New(
@@ -30,10 +32,12 @@ func New(
 	logger *slog.Logger,
 	bus *pubsub.Bus,
 	notifyWriter *notify_writer.Writer,
+	accounts *account_querier.Querier,
 ) *Notifier {
 	n := &Notifier{
 		bus:          bus,
 		notifyWriter: notifyWriter,
+		accounts:     accounts,
 	}
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
@@ -84,6 +88,15 @@ func (s *Notifier) notify(ctx context.Context,
 	item *datagraph.Ref,
 	target opt.Optional[string],
 ) error {
+	settings, err := s.accounts.GetNotificationSettings(ctx, targetID)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if !notification.SettingsForEvent(settings.Events, event).Inbox {
+		return nil
+	}
+
 	itemref := opt.Map(opt.NewPtr(item), func(i datagraph.Ref) datagraph.ItemRef {
 		return &i
 	})

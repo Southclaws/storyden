@@ -22,12 +22,17 @@ type ExternalLink struct {
 }
 
 type NotificationSettings struct {
-	Push PushNotificationSettings `json:"push"`
+	Events map[string]NotificationEventSettings `json:"events,omitempty"`
+	Push   PushNotificationSettings             `json:"push"`
+}
+
+type NotificationEventSettings struct {
+	Inbox bool `json:"inbox"`
+	Push  bool `json:"push"`
 }
 
 type PushNotificationSettings struct {
-	Enabled bool            `json:"enabled"`
-	Events  map[string]bool `json:"events,omitempty"`
+	Enabled bool `json:"enabled"`
 }
 
 func (Account) Fields() []ent.Field {

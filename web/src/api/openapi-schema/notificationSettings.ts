@@ -7,8 +7,20 @@
  *
  * OpenAPI spec version: v1.26.16-post
  */
+import type { NotificationSettingsEvents } from "./notificationSettingsEvents";
 import type { PushNotificationSettings } from "./pushNotificationSettings";
 
+/**
+ * Notification preferences. Replacing this object replaces its event
+ * overrides. Disabling Inbox also prevents Push for that event. Existing
+ * notifications are retained.
+ */
 export interface NotificationSettings {
+  /**
+   * Overrides keyed by NotificationEvent. Direct interactions and
+   * actionable updates are enabled by default; likes, follows, and
+   * attendance activity are disabled. Unknown event names are rejected.
+   */
+  events: NotificationSettingsEvents;
   push: PushNotificationSettings;
 }

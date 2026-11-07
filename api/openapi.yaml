@@ -10775,28 +10775,43 @@ components:
 
     NotificationSettings:
       type: object
-      required: [push]
+      required: [events, push]
+      description: |
+        Notification preferences. Replacing this object replaces its event
+        overrides. Disabling Inbox also prevents Push for that event. Existing
+        notifications are retained.
       properties:
+        events:
+          type: object
+          description: |
+            Overrides keyed by NotificationEvent. Direct interactions and
+            actionable updates are enabled by default; likes, follows, and
+            attendance activity are disabled. Unknown event names are rejected.
+          additionalProperties:
+            $ref: "#/components/schemas/NotificationEventSettings"
         push:
           $ref: "#/components/schemas/PushNotificationSettings"
+
+    NotificationEventSettings:
+      type: object
+      required: [inbox, push]
+      description: |
+        Delivery settings for one notification event. Push requires Inbox.
+      properties:
+        inbox:
+          type: boolean
+        push:
+          type: boolean
 
     PushNotificationSettings:
       type: object
       required: [enabled]
       description: |
-        Push delivery preferences. Replacing this object replaces its event 
-        overrides. Events without an override are enabled. These preferences
-        do not affect the notification inbox.
+        Push delivery preferences. Disabling push retains inbox notifications
+        and browser subscriptions.
       properties:
         enabled:
           type: boolean
-        events:
-          type: object
-          description: |
-            Overrides keyed by NotificationEvent.
-            Unknown event names are rejected.
-          additionalProperties:
-            type: boolean
 
     AccountManageInitialProps:
       type: object

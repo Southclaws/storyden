@@ -22,8 +22,11 @@ var errSuspended = fault.Wrap(fault.New("suspended"), ftag.With(ftag.PermissionD
 
 type AccountID = account_ref.ID
 
-type PushNotificationPreferences = schema.PushNotificationSettings
-type NotificationPreferences = schema.NotificationSettings
+type (
+	PushNotificationPreferences = schema.PushNotificationSettings
+	NotificationPreferences     = schema.NotificationSettings
+	NotificationEventSettings   = schema.NotificationEventSettings
+)
 
 type Account struct {
 	ID        AccountID

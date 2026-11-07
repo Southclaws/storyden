@@ -51,9 +51,13 @@ type Partial struct {
 }
 
 func ValidateNotificationPreferences(preferences account.NotificationPreferences) error {
-	for event := range preferences.Push.Events {
+	for event, settings := range preferences.Events {
 		if _, err := notification.NewEvent(event); err != nil {
 			return fault.Wrap(err, ftag.With(ftag.InvalidArgument))
+		}
+
+		if settings.Push && !settings.Inbox {
+			return fault.Wrap(fault.New("push notifications require inbox notifications"), ftag.With(ftag.InvalidArgument))
 		}
 	}
 

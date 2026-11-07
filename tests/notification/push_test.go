@@ -254,7 +254,7 @@ func TestNotificationCreatedEvent(t *testing.T) {
 	err = notifier.Send(root,
 		owner.ID,
 		opt.NewEmpty[account.AccountID](),
-		notification.EventFollow,
+		notification.EventThreadReply,
 		nil,
 	)
 	r.NoError(err)
@@ -264,7 +264,7 @@ func TestNotificationCreatedEvent(t *testing.T) {
 		row, err := db.Notification.Get(root, event.ID)
 		r.NoError(err, "event must reference a persisted notification")
 		a.Equal(owner.ID.String(), row.OwnerAccountID.String())
-		a.Equal("follow", row.EventType)
+		a.Equal("thread_reply", row.EventType)
 
 	case <-time.After(5 * time.Second):
 		t.Fatal("notification creation event was not delivered")
