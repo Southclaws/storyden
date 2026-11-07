@@ -125,7 +125,7 @@
   },
   "packageManager": "pnpm@11.28.10+sha512.672216f06e15c109b85471d49d3fbed17e6f03ead258df08c2bf5b4a5c33321ebfbf59476bce81325efada16ace0ac78548fd0bfcd7a51369e939182a3dd50e4",
   "engines": {
-    "node": ">=24.22.1 <25"
+    "node": ">=26.13.0 <27"
   },
   "browserslist": [
     "defaults and supports es6-module",

@@ -32,7 +32,11 @@ jobs:
           cache: true
           cache-dependency-path: "**/go.sum"
 
-      - run: corepack enable
+      - name: Enable pinned package manager
+        run: |
+          npm install --global --ignore-scripts corepack@0.36.0
+          corepack install --global "$(node -p 'require("./web/package.json").packageManager')"
+          corepack enable
 
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
@@ -56,7 +60,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('web/pnpm-lock.yaml') }}-
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile --config.minimumReleaseAgeStrict=true
         working-directory: web
 
       - run: npx playwright install --with-deps

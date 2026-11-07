@@ -48,11 +48,11 @@ inspection. Otherwise validate with the static build.
 
 ## Frontend Commands
 
-Use Node 24 for frontend work:
+Use the Node version pinned in the repository's `.nvmrc`:
 
 ```sh
 eval "$(fnm env --shell zsh)"
-fnm use 24
+fnm use
 ```
 
 Use the package scripts for validation:

@@ -21,7 +21,9 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=cache,target="/root/.cache/go-build" \
     CGO_ENABLED=0 GOOS=linux go build -o /server/storyden-api ./cmd/backend
 
-FROM docker.io/node:24.22.1-alpine3.24 AS base
+FROM docker.io/node:26.13.0-alpine3.24 AS base
+
+RUN npm install --global --ignore-scripts corepack@0.36.0 && corepack enable
 
 #
 # DEPENDENCIES LAYER
@@ -35,8 +37,7 @@ WORKDIR /storyden
 COPY ./web/package.json ./web/pnpm-lock.yaml* ./web/pnpm-workspace.yaml ./
 COPY ./web/patches ./patches
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    corepack enable && \
-    pnpm install --frozen-lockfile --ignore-scripts
+    pnpm install --frozen-lockfile --ignore-scripts --config.minimumReleaseAgeStrict=true
 
 #
 # BUILDER LAYER
@@ -55,7 +56,6 @@ ENV NEXT_BUILD_STANDALONE=true
 # page. But we don't want to constantly be adding force-dynamic to every page so
 # this ensures no SSG runs during the Docker build.
 RUN --mount=type=cache,target=/storyden/.next/cache \
-    corepack enable && \
     pnpm build:worker && \
     pnpm next build --experimental-build-mode=compile
 
