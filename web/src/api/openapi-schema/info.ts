@@ -35,4 +35,9 @@ export interface Info {
   api_address: string;
   metadata?: Metadata;
   motd?: MessageOfTheDay;
+  /**
+   * Present when Web Push is enabled on the instance. Unpadded
+   * base64url-encoded VAPID public key for `PushManager.subscribe()`.
+   */
+  web_push_public_key?: string;
 }

@@ -161,6 +161,7 @@ func serialiseInfo(info *instance_info.Info) openapi.Info {
 		ApiAddress:         info.APIAddress.String(),
 		Metadata:           (*openapi.Metadata)(info.Settings.Metadata.Ptr()),
 		Motd:               opt.Map(info.Settings.Motd, serialiseMOTD).Ptr(),
+		WebPushPublicKey:   info.WebPushPublicKey.Ptr(),
 	}
 }
 

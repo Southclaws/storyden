@@ -475,7 +475,8 @@
           "EventActivityUpdated",
           "EventActivityDeleted",
           "EventActivityPublished",
-          "EventSettingsUpdated"
+          "EventSettingsUpdated",
+          "EventNotificationCreated"
         ],
         "type": "string"
       },

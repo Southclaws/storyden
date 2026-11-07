@@ -4,7 +4,6 @@ import { ArchiveIcon } from "@/components/ui/icons/Archive";
 import { InboxIcon } from "@/components/ui/icons/Inbox";
 import { Card, CardRows } from "@/components/ui/surface";
 import { Text } from "@/components/ui/text";
-import { getCommonProperties } from "@/lib/datagraph/item";
 import { Center, HStack, LStack, WStack } from "@/styled-system/jsx";
 import { timestamp } from "@/utils/date";
 
@@ -31,19 +30,13 @@ export function NotificationCardList({ notifications, onMove }: Props) {
   return (
     <CardRows>
       {notifications.map((n) => {
-        const properties = n.item && getCommonProperties(n.item);
-
-        const title = properties?.description
-          ? `${n.description} "${properties?.description}"`
-          : n.description;
-
         return (
           <Card
             key={n.id}
             id={n.id}
             shape="row"
             title={timestamp(n.createdAt, false)}
-            text={title}
+            text={n.body}
             url={n.url}
             // controls={}
           >

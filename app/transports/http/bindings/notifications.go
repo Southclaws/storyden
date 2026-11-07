@@ -10,23 +10,74 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_querier"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_writer"
+	"github.com/Southclaws/storyden/app/resources/account/notification/push_subscription"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/app/services/notification/push"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/internal/infrastructure/webpush"
 )
 
 type Notifications struct {
 	notifyReader *notify_querier.Querier
 	notifyWriter *notify_writer.Writer
+	push         *push.Service
+	pushRepo     *push_subscription.Repository
 }
 
 func NewNotifications(
 	notifyReader *notify_querier.Querier,
 	notifyWriter *notify_writer.Writer,
+	push *push.Service,
+	pushRepo *push_subscription.Repository,
 ) Notifications {
 	return Notifications{
 		notifyReader: notifyReader,
 		notifyWriter: notifyWriter,
+		push:         push,
+		pushRepo:     pushRepo,
 	}
+}
+
+func (h *Notifications) PushSubscriptionUpsert(
+	ctx context.Context,
+	request openapi.PushSubscriptionUpsertRequestObject,
+) (openapi.PushSubscriptionUpsertResponseObject, error) {
+	owner, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	subscription, err := h.push.Register(ctx, owner, webpush.SubscriptionInput{
+		Endpoint: request.Body.Endpoint,
+		P256DH:   request.Body.Keys.P256dh,
+		Auth:     request.Body.Keys.Auth,
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.PushSubscriptionUpsert200JSONResponse{
+		NotificationPushSubscriptionUpsertOKJSONResponse: openapi.NotificationPushSubscriptionUpsertOKJSONResponse{
+			Id:       subscription.ID.String(),
+			Endpoint: subscription.Endpoint.String(),
+		},
+	}, nil
+}
+
+func (h *Notifications) PushSubscriptionDelete(
+	ctx context.Context,
+	request openapi.PushSubscriptionDeleteRequestObject,
+) (openapi.PushSubscriptionDeleteResponseObject, error) {
+	owner, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := h.pushRepo.Delete(ctx, owner, openapi.ParseID(request.PushSubscriptionId)); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.PushSubscriptionDelete204Response{}, nil
 }
 
 func (h *Notifications) NotificationList(ctx context.Context, request openapi.NotificationListRequestObject) (openapi.NotificationListResponseObject, error) {

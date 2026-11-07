@@ -151,6 +151,8 @@ var (
 	OperationIDInvitationDelete                               = OperationID{`InvitationDelete`}
 	OperationIDNotificationList                               = OperationID{`NotificationList`}
 	OperationIDNotificationUpdateMany                         = OperationID{`NotificationUpdateMany`}
+	OperationIDPushSubscriptionUpsert                         = OperationID{`PushSubscriptionUpsert`}
+	OperationIDPushSubscriptionDelete                         = OperationID{`PushSubscriptionDelete`}
 	OperationIDNotificationUpdate                             = OperationID{`NotificationUpdate`}
 	OperationIDReportCreate                                   = OperationID{`ReportCreate`}
 	OperationIDReportList                                     = OperationID{`ReportList`}
@@ -599,6 +601,10 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDNotificationList, nil
 	case string(`NotificationUpdateMany`):
 		return OperationIDNotificationUpdateMany, nil
+	case string(`PushSubscriptionUpsert`):
+		return OperationIDPushSubscriptionUpsert, nil
+	case string(`PushSubscriptionDelete`):
+		return OperationIDPushSubscriptionDelete, nil
 	case string(`NotificationUpdate`):
 		return OperationIDNotificationUpdate, nil
 	case string(`ReportCreate`):

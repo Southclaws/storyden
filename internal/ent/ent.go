@@ -50,6 +50,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/property"
 	"github.com/Southclaws/storyden/internal/ent/propertyschema"
 	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
+	"github.com/Southclaws/storyden/internal/ent/pushsubscription"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/report"
 	"github.com/Southclaws/storyden/internal/ent/robot"
@@ -173,6 +174,7 @@ func checkColumn(t, c string) error {
 			property.Table:                             property.ValidColumn,
 			propertyschema.Table:                       propertyschema.ValidColumn,
 			propertyschemafield.Table:                  propertyschemafield.ValidColumn,
+			pushsubscription.Table:                     pushsubscription.ValidColumn,
 			react.Table:                                react.ValidColumn,
 			report.Table:                               report.ValidColumn,
 			robot.Table:                                robot.ValidColumn,

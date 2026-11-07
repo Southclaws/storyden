@@ -47,3 +47,5 @@ test-results/
 
 # Unlighthouse
 .unlighthouse/
+
+/public/sw.js

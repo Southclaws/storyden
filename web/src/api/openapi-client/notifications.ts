@@ -8,21 +8,26 @@
  * OpenAPI spec version: v1.26.16-post
  */
 import useSwr from "swr";
-import type { Key, SWRConfiguration } from "swr";
+import type { Arguments, Key, SWRConfiguration } from "swr";
 import useSWRMutation from "swr/mutation";
 import type { SWRMutationConfiguration } from "swr/mutation";
 
 import { fetcher } from "../client";
 import type {
   BadRequestResponse,
+  ConflictResponse,
+  ForbiddenResponse,
+  Identifier,
   InternalServerErrorResponse,
   NotFoundResponse,
   NotificationListOKResponse,
   NotificationListParams,
+  NotificationPushSubscriptionUpsertOKResponse,
   NotificationUpdateBody,
   NotificationUpdateManyBody,
   NotificationUpdateManyOKResponse,
   NotificationUpdateOKResponse,
+  PushSubscriptionInput,
   UnauthorisedResponse,
 } from "../openapi-schema";
 
@@ -189,6 +194,167 @@ export const useNotificationUpdateMany = <
 
   const swrKey = swrOptions?.swrKey ?? getNotificationUpdateManyMutationKey();
   const swrFn = getNotificationUpdateManyMutationFetcher(requestOptions);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getPushSubscriptionUpsertUrl = () => {
+  return `/notifications/push/subscriptions`;
+};
+
+/**
+ * Register or refresh the authenticated account's browser push
+ * subscription. Web Push must be enabled on the instance.
+ */
+export const pushSubscriptionUpsert = async (
+  pushSubscriptionInput: PushSubscriptionInput,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<NotificationPushSubscriptionUpsertOKResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return fetcher<NotificationPushSubscriptionUpsertOKResponse>(
+    getPushSubscriptionUpsertUrl(),
+    {
+      ...options,
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(pushSubscriptionInput),
+    },
+  );
+};
+
+export const getPushSubscriptionUpsertMutationFetcher = (
+  options?: SecondParameter<typeof fetcher>,
+) => {
+  return (_: Key, { arg }: { arg: PushSubscriptionInput }) => {
+    return pushSubscriptionUpsert(arg, options);
+  };
+};
+export const getPushSubscriptionUpsertMutationKey = () =>
+  [`/notifications/push/subscriptions`] as const;
+
+export type PushSubscriptionUpsertMutationResult = NonNullable<
+  Awaited<ReturnType<typeof pushSubscriptionUpsert>>
+>;
+
+export const usePushSubscriptionUpsert = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | ConflictResponse
+    | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof pushSubscriptionUpsert>>,
+    TError,
+    Key,
+    PushSubscriptionInput,
+    Awaited<ReturnType<typeof pushSubscriptionUpsert>>
+  > & { swrKey?: string };
+  request?: SecondParameter<typeof fetcher>;
+}) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getPushSubscriptionUpsertMutationKey();
+  const swrFn = getPushSubscriptionUpsertMutationFetcher(requestOptions);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getPushSubscriptionDeleteUrl = (
+  pushSubscriptionId: Identifier,
+) => {
+  return `/notifications/push/subscriptions/${pushSubscriptionId}`;
+};
+
+/**
+ * Remove a browser push subscription owned by the authenticated account.
+ * Available even when Web Push is disabled.
+ */
+export const pushSubscriptionDelete = async (
+  pushSubscriptionId: Identifier,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<void> => {
+  return fetcher<void>(getPushSubscriptionDeleteUrl(pushSubscriptionId), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getPushSubscriptionDeleteMutationFetcher = (
+  pushSubscriptionId: Identifier,
+  options?: SecondParameter<typeof fetcher>,
+) => {
+  return (_: Key, __: { arg: Arguments }) => {
+    return pushSubscriptionDelete(pushSubscriptionId, options);
+  };
+};
+export const getPushSubscriptionDeleteMutationKey = (
+  pushSubscriptionId: Identifier,
+) => [`/notifications/push/subscriptions/${pushSubscriptionId}`] as const;
+
+export type PushSubscriptionDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof pushSubscriptionDelete>>
+>;
+
+export const usePushSubscriptionDelete = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  pushSubscriptionId: Identifier,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof pushSubscriptionDelete>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof pushSubscriptionDelete>>
+    > & { swrKey?: string };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ??
+    getPushSubscriptionDeleteMutationKey(pushSubscriptionId);
+  const swrFn = getPushSubscriptionDeleteMutationFetcher(
+    pushSubscriptionId,
+    requestOptions,
+  );
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

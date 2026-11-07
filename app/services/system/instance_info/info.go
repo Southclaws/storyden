@@ -47,6 +47,7 @@ type Info struct {
 	Capabilities     Capabilities
 	WebAddress       url.URL
 	APIAddress       url.URL
+	WebPushPublicKey opt.Optional[string]
 }
 
 type InfoWithAssets struct {
@@ -133,6 +134,9 @@ func (p *Provider) get(ctx context.Context, settings *settings.Settings) (*Info,
 		Capabilities:     caps,
 		WebAddress:       p.config.PublicWebAddress,
 		APIAddress:       p.config.PublicAPIAddress,
+		WebPushPublicKey: opt.NewIf(p.config.WebPushVAPIDPublicKey, func(string) bool {
+			return p.config.WebPushEnabled
+		}),
 	}, nil
 }
 

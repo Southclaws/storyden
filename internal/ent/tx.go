@@ -90,6 +90,8 @@ type Tx struct {
 	PropertySchema *PropertySchemaClient
 	// PropertySchemaField is the client for interacting with the PropertySchemaField builders.
 	PropertySchemaField *PropertySchemaFieldClient
+	// PushSubscription is the client for interacting with the PushSubscription builders.
+	PushSubscription *PushSubscriptionClient
 	// React is the client for interacting with the React builders.
 	React *ReactClient
 	// Report is the client for interacting with the Report builders.
@@ -309,6 +311,7 @@ func (tx *Tx) init() {
 	tx.Property = NewPropertyClient(tx.config)
 	tx.PropertySchema = NewPropertySchemaClient(tx.config)
 	tx.PropertySchemaField = NewPropertySchemaFieldClient(tx.config)
+	tx.PushSubscription = NewPushSubscriptionClient(tx.config)
 	tx.React = NewReactClient(tx.config)
 	tx.Report = NewReportClient(tx.config)
 	tx.Robot = NewRobotClient(tx.config)

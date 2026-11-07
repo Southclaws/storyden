@@ -136,7 +136,8 @@ export type Event =
   | "EventActivityUpdated"
   | "EventActivityDeleted"
   | "EventActivityPublished"
-  | "EventSettingsUpdated";
+  | "EventSettingsUpdated"
+  | "EventNotificationCreated";
 
 
 // Emitted when a thread is visible as published, either on create or after a visibility change.
@@ -535,6 +536,15 @@ export interface EventSettingsUpdated {
   settings: Record<string, unknown>;
 }
 
+// Emitted after an account notification is created.
+export interface EventNotificationCreated {
+  event: "EventNotificationCreated";
+  // Notification recipient account ID
+  account_id: string;
+  // Notification ID
+  id: string;
+}
+
 export type EventPayload =
   | EventThreadPublished
   | EventThreadUnpublished
@@ -577,7 +587,8 @@ export type EventPayload =
   | EventActivityUpdated
   | EventActivityDeleted
   | EventActivityPublished
-  | EventSettingsUpdated;
+  | EventSettingsUpdated
+  | EventNotificationCreated;
 
 export function isEventThreadPublished(value: EventPayload): value is EventThreadPublished {
   return value.event === "EventThreadPublished";
@@ -745,6 +756,10 @@ export function isEventActivityPublished(value: EventPayload): value is EventAct
 
 export function isEventSettingsUpdated(value: EventPayload): value is EventSettingsUpdated {
   return value.event === "EventSettingsUpdated";
+}
+
+export function isEventNotificationCreated(value: EventPayload): value is EventNotificationCreated {
+  return value.event === "EventNotificationCreated";
 }
 
 export interface JsonRpcRequest {

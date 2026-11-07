@@ -1,6 +1,7 @@
 import { LogoutIcon } from "@/components/ui/icons/Logout";
 import { Item } from "@/components/ui/menu";
 import { API_ADDRESS } from "@/config";
+import { clearWebPush } from "@/lib/webpush/client";
 
 // NOTE:
 //
@@ -35,7 +36,20 @@ export function LogoutMenuItem() {
   return (
     <>
       {/* NOTE: we use hidden form for proper HTML POST+redirect semantics. */}
-      <form id={LogoutMenuFormID} action={LogoutAction} method="POST" hidden />
+      <form
+        id={LogoutMenuFormID}
+        action={LogoutAction}
+        method="POST"
+        hidden
+        onSubmit={(event) => {
+          event.preventDefault();
+          const form = event.currentTarget;
+
+          void clearWebPush()
+            .catch((error) => console.warn("Web Push cleanup failed", error))
+            .finally(() => form.submit());
+        }}
+      />
 
       <Item value={LogoutID} asChild>
         <button type="submit" form={LogoutMenuFormID} title={LogoutLabel}>

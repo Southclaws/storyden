@@ -138,6 +138,7 @@ class Event(str, Enum):
     EVENTACTIVITYDELETED = "EventActivityDeleted"
     EVENTACTIVITYPUBLISHED = "EventActivityPublished"
     EVENTSETTINGSUPDATED = "EventSettingsUpdated"
+    EVENTNOTIFICATIONCREATED = "EventNotificationCreated"
 
 
 """Emitted when a thread is visible as published, either on create or after a visibility change."""
@@ -619,8 +620,19 @@ class EventSettingsUpdated(BaseModel):
     """Settings object"""
     settings: Dict[str, Any]
 
+
+"""Emitted after an account notification is created."""
+
+class EventNotificationCreated(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    event: Literal["EventNotificationCreated"]
+    """Notification recipient account ID"""
+    account_id: str
+    """Notification ID"""
+    id: str
+
 EventPayload = Annotated[
-    Union[EventThreadPublished, EventThreadUnpublished, EventThreadUpdated, EventThreadDeleted, EventThreadReplyCreated, EventThreadReplyDeleted, EventThreadReplyUpdated, EventThreadReplyPublished, EventThreadReplyUnpublished, EventPostLiked, EventPostUnliked, EventPostReacted, EventPostUnreacted, EventCategoryUpdated, EventCategoryDeleted, EventMemberMentioned, EventNodeCreated, EventNodeUpdated, EventNodeDeleted, EventNodePublished, EventNodeSubmittedForReview, EventNodeUnpublished, EventNodeVersionDraftCreated, EventNodeVersionDraftUpdated, EventNodeVersionDraftDeleted, EventNodeVersionDraftApplied, EventAccountCreated, EventAccountUpdated, EventAccountSuspended, EventAccountUnsuspended, EventModerationNoteCreated, EventModerationNoteDeleted, EventAccountWarned, EventAccountWarningUpdated, EventAccountWarningDeleted, EventReportCreated, EventReportUpdated, EventActivityCreated, EventActivityUpdated, EventActivityDeleted, EventActivityPublished, EventSettingsUpdated],
+    Union[EventThreadPublished, EventThreadUnpublished, EventThreadUpdated, EventThreadDeleted, EventThreadReplyCreated, EventThreadReplyDeleted, EventThreadReplyUpdated, EventThreadReplyPublished, EventThreadReplyUnpublished, EventPostLiked, EventPostUnliked, EventPostReacted, EventPostUnreacted, EventCategoryUpdated, EventCategoryDeleted, EventMemberMentioned, EventNodeCreated, EventNodeUpdated, EventNodeDeleted, EventNodePublished, EventNodeSubmittedForReview, EventNodeUnpublished, EventNodeVersionDraftCreated, EventNodeVersionDraftUpdated, EventNodeVersionDraftDeleted, EventNodeVersionDraftApplied, EventAccountCreated, EventAccountUpdated, EventAccountSuspended, EventAccountUnsuspended, EventModerationNoteCreated, EventModerationNoteDeleted, EventAccountWarned, EventAccountWarningUpdated, EventAccountWarningDeleted, EventReportCreated, EventReportUpdated, EventActivityCreated, EventActivityUpdated, EventActivityDeleted, EventActivityPublished, EventSettingsUpdated, EventNotificationCreated],
     Field(discriminator="event"),
 ]
 

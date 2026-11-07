@@ -385,3 +385,12 @@ func (p *Plugin) OnSettingsUpdated(handler func(context.Context, *rpc.EventSetti
 		return nil
 	})
 }
+
+func (p *Plugin) OnNotificationCreated(handler func(context.Context, *rpc.EventNotificationCreated) error) {
+	p.On("EventNotificationCreated", func(ctx context.Context, event rpc.EventPayload) error {
+		if e, ok := event.EventPayloadUnion.(*rpc.EventNotificationCreated); ok {
+			return handler(ctx, e)
+		}
+		return nil
+	})
+}

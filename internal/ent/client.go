@@ -54,6 +54,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/property"
 	"github.com/Southclaws/storyden/internal/ent/propertyschema"
 	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
+	"github.com/Southclaws/storyden/internal/ent/pushsubscription"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/report"
 	"github.com/Southclaws/storyden/internal/ent/robot"
@@ -164,6 +165,8 @@ type Client struct {
 	PropertySchema *PropertySchemaClient
 	// PropertySchemaField is the client for interacting with the PropertySchemaField builders.
 	PropertySchemaField *PropertySchemaFieldClient
+	// PushSubscription is the client for interacting with the PushSubscription builders.
+	PushSubscription *PushSubscriptionClient
 	// React is the client for interacting with the React builders.
 	React *ReactClient
 	// Report is the client for interacting with the Report builders.
@@ -263,6 +266,7 @@ func (c *Client) init() {
 	c.Property = NewPropertyClient(c.config)
 	c.PropertySchema = NewPropertySchemaClient(c.config)
 	c.PropertySchemaField = NewPropertySchemaFieldClient(c.config)
+	c.PushSubscription = NewPushSubscriptionClient(c.config)
 	c.React = NewReactClient(c.config)
 	c.Report = NewReportClient(c.config)
 	c.Robot = NewRobotClient(c.config)
@@ -418,6 +422,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Property:                             NewPropertyClient(cfg),
 		PropertySchema:                       NewPropertySchemaClient(cfg),
 		PropertySchemaField:                  NewPropertySchemaFieldClient(cfg),
+		PushSubscription:                     NewPushSubscriptionClient(cfg),
 		React:                                NewReactClient(cfg),
 		Report:                               NewReportClient(cfg),
 		Robot:                                NewRobotClient(cfg),
@@ -500,6 +505,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Property:                             NewPropertyClient(cfg),
 		PropertySchema:                       NewPropertySchemaClient(cfg),
 		PropertySchemaField:                  NewPropertySchemaFieldClient(cfg),
+		PushSubscription:                     NewPushSubscriptionClient(cfg),
 		React:                                NewReactClient(cfg),
 		Report:                               NewReportClient(cfg),
 		Robot:                                NewRobotClient(cfg),
@@ -563,8 +569,8 @@ func (c *Client) Use(hooks ...Hook) {
 		c.OAuthDynamicRegistrationAccessTokens, c.OAuthRefreshToken,
 		c.OAuthRegistrationApproval, c.OAuthRemoteAuthorisationFlow,
 		c.OAuthRemoteConnection, c.Plugin, c.Post, c.PostRead, c.Property,
-		c.PropertySchema, c.PropertySchemaField, c.React, c.Report, c.Robot,
-		c.RobotMCPServer, c.RobotMCPTool, c.RobotMemory, c.RobotProviderModel,
+		c.PropertySchema, c.PropertySchemaField, c.PushSubscription, c.React, c.Report,
+		c.Robot, c.RobotMCPServer, c.RobotMCPTool, c.RobotMemory, c.RobotProviderModel,
 		c.RobotSession, c.RobotSessionInput, c.RobotSessionMessage, c.RobotSessionTurn,
 		c.RobotSessionView, c.RobotToolset, c.RobotWorkspace, c.RobotWorkspaceInstance,
 		c.Role, c.Session, c.Setting, c.Tag, c.Trail, c.TrailAction, c.TrailActionRun,
@@ -587,8 +593,8 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.OAuthDynamicRegistrationAccessTokens, c.OAuthRefreshToken,
 		c.OAuthRegistrationApproval, c.OAuthRemoteAuthorisationFlow,
 		c.OAuthRemoteConnection, c.Plugin, c.Post, c.PostRead, c.Property,
-		c.PropertySchema, c.PropertySchemaField, c.React, c.Report, c.Robot,
-		c.RobotMCPServer, c.RobotMCPTool, c.RobotMemory, c.RobotProviderModel,
+		c.PropertySchema, c.PropertySchemaField, c.PushSubscription, c.React, c.Report,
+		c.Robot, c.RobotMCPServer, c.RobotMCPTool, c.RobotMemory, c.RobotProviderModel,
 		c.RobotSession, c.RobotSessionInput, c.RobotSessionMessage, c.RobotSessionTurn,
 		c.RobotSessionView, c.RobotToolset, c.RobotWorkspace, c.RobotWorkspaceInstance,
 		c.Role, c.Session, c.Setting, c.Tag, c.Trail, c.TrailAction, c.TrailActionRun,
@@ -677,6 +683,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.PropertySchema.mutate(ctx, m)
 	case *PropertySchemaFieldMutation:
 		return c.PropertySchemaField.mutate(ctx, m)
+	case *PushSubscriptionMutation:
+		return c.PushSubscription.mutate(ctx, m)
 	case *ReactMutation:
 		return c.React.mutate(ctx, m)
 	case *ReportMutation:
@@ -881,6 +889,22 @@ func (c *AccountClient) QueryEmails(_m *Account) *EmailQuery {
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(email.Table, email.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.EmailsTable, account.EmailsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPushSubscriptions queries the push_subscriptions edge of a Account.
+func (c *AccountClient) QueryPushSubscriptions(_m *Account) *PushSubscriptionQuery {
+	query := (&PushSubscriptionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(pushsubscription.Table, pushsubscription.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.PushSubscriptionsTable, account.PushSubscriptionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -8408,6 +8432,155 @@ func (c *PropertySchemaFieldClient) mutate(ctx context.Context, m *PropertySchem
 	}
 }
 
+// PushSubscriptionClient is a client for the PushSubscription schema.
+type PushSubscriptionClient struct {
+	config
+}
+
+// NewPushSubscriptionClient returns a client for the PushSubscription from the given config.
+func NewPushSubscriptionClient(c config) *PushSubscriptionClient {
+	return &PushSubscriptionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `pushsubscription.Hooks(f(g(h())))`.
+func (c *PushSubscriptionClient) Use(hooks ...Hook) {
+	c.hooks.PushSubscription = append(c.hooks.PushSubscription, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `pushsubscription.Intercept(f(g(h())))`.
+func (c *PushSubscriptionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.PushSubscription = append(c.inters.PushSubscription, interceptors...)
+}
+
+// Create returns a builder for creating a PushSubscription entity.
+func (c *PushSubscriptionClient) Create() *PushSubscriptionCreate {
+	mutation := newPushSubscriptionMutation(c.config, OpCreate)
+	return &PushSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of PushSubscription entities.
+func (c *PushSubscriptionClient) CreateBulk(builders ...*PushSubscriptionCreate) *PushSubscriptionCreateBulk {
+	return &PushSubscriptionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *PushSubscriptionClient) MapCreateBulk(slice any, setFunc func(*PushSubscriptionCreate, int)) *PushSubscriptionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &PushSubscriptionCreateBulk{err: fmt.Errorf("calling to PushSubscriptionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*PushSubscriptionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &PushSubscriptionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for PushSubscription.
+func (c *PushSubscriptionClient) Update() *PushSubscriptionUpdate {
+	mutation := newPushSubscriptionMutation(c.config, OpUpdate)
+	return &PushSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PushSubscriptionClient) UpdateOne(_m *PushSubscription) *PushSubscriptionUpdateOne {
+	mutation := newPushSubscriptionMutation(c.config, OpUpdateOne, withPushSubscription(_m))
+	return &PushSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PushSubscriptionClient) UpdateOneID(id xid.ID) *PushSubscriptionUpdateOne {
+	mutation := newPushSubscriptionMutation(c.config, OpUpdateOne, withPushSubscriptionID(id))
+	return &PushSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for PushSubscription.
+func (c *PushSubscriptionClient) Delete() *PushSubscriptionDelete {
+	mutation := newPushSubscriptionMutation(c.config, OpDelete)
+	return &PushSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PushSubscriptionClient) DeleteOne(_m *PushSubscription) *PushSubscriptionDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PushSubscriptionClient) DeleteOneID(id xid.ID) *PushSubscriptionDeleteOne {
+	builder := c.Delete().Where(pushsubscription.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PushSubscriptionDeleteOne{builder}
+}
+
+// Query returns a query builder for PushSubscription.
+func (c *PushSubscriptionClient) Query() *PushSubscriptionQuery {
+	return &PushSubscriptionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypePushSubscription},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a PushSubscription entity by its id.
+func (c *PushSubscriptionClient) Get(ctx context.Context, id xid.ID) (*PushSubscription, error) {
+	return c.Query().Where(pushsubscription.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PushSubscriptionClient) GetX(ctx context.Context, id xid.ID) *PushSubscription {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAccount queries the account edge of a PushSubscription.
+func (c *PushSubscriptionClient) QueryAccount(_m *PushSubscription) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(pushsubscription.Table, pushsubscription.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, pushsubscription.AccountTable, pushsubscription.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *PushSubscriptionClient) Hooks() []Hook {
+	return c.hooks.PushSubscription
+}
+
+// Interceptors returns the client interceptors.
+func (c *PushSubscriptionClient) Interceptors() []Interceptor {
+	return c.inters.PushSubscription
+}
+
+func (c *PushSubscriptionClient) mutate(ctx context.Context, m *PushSubscriptionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PushSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PushSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PushSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PushSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown PushSubscription mutation op: %q", m.Op())
+	}
+}
+
 // ReactClient is a client for the React schema.
 type ReactClient struct {
 	config
@@ -12608,8 +12781,8 @@ type (
 		OAuthDeviceAuthorisation, OAuthDynamicRegistrationAccessTokens,
 		OAuthRefreshToken, OAuthRegistrationApproval, OAuthRemoteAuthorisationFlow,
 		OAuthRemoteConnection, Plugin, Post, PostRead, Property, PropertySchema,
-		PropertySchemaField, React, Report, Robot, RobotMCPServer, RobotMCPTool,
-		RobotMemory, RobotProviderModel, RobotSession, RobotSessionInput,
+		PropertySchemaField, PushSubscription, React, Report, Robot, RobotMCPServer,
+		RobotMCPTool, RobotMemory, RobotProviderModel, RobotSession, RobotSessionInput,
 		RobotSessionMessage, RobotSessionTurn, RobotSessionView, RobotToolset,
 		RobotWorkspace, RobotWorkspaceInstance, Role, Session, Setting, Tag, Trail,
 		TrailAction, TrailActionRun, TrailRun, TrailSchedulerLease, Warning []ent.Hook
@@ -12623,8 +12796,8 @@ type (
 		OAuthDeviceAuthorisation, OAuthDynamicRegistrationAccessTokens,
 		OAuthRefreshToken, OAuthRegistrationApproval, OAuthRemoteAuthorisationFlow,
 		OAuthRemoteConnection, Plugin, Post, PostRead, Property, PropertySchema,
-		PropertySchemaField, React, Report, Robot, RobotMCPServer, RobotMCPTool,
-		RobotMemory, RobotProviderModel, RobotSession, RobotSessionInput,
+		PropertySchemaField, PushSubscription, React, Report, Robot, RobotMCPServer,
+		RobotMCPTool, RobotMemory, RobotProviderModel, RobotSession, RobotSessionInput,
 		RobotSessionMessage, RobotSessionTurn, RobotSessionView, RobotToolset,
 		RobotWorkspace, RobotWorkspaceInstance, Role, Session, Setting, Tag, Trail,
 		TrailAction, TrailActionRun, TrailRun, TrailSchedulerLease,

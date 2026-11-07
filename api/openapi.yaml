@@ -2559,6 +2559,45 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/NotificationUpdateManyOK" }
 
+  /notifications/push/subscriptions:
+    put:
+      operationId: PushSubscriptionUpsert
+      description: |
+        Register or refresh the authenticated account's browser push
+        subscription. Web Push must be enabled on the instance.
+      tags: [notifications]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PushSubscriptionInput" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "200":
+          $ref: "#/components/responses/NotificationPushSubscriptionUpsertOK"
+
+  /notifications/push/subscriptions/{push_subscription_id}:
+    delete:
+      operationId: PushSubscriptionDelete
+      description: |
+        Remove a browser push subscription owned by the authenticated account.
+        Available even when Web Push is disabled.
+      tags: [notifications]
+      parameters:
+        - name: push_subscription_id
+          in: path
+          required: true
+          schema: { $ref: "#/components/schemas/Identifier" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "204": { description: Push subscription removed. }
+
   /notifications/{notification_id}:
     patch:
       operationId: NotificationUpdate
@@ -6867,6 +6906,12 @@ components:
           schema:
             $ref: "#/components/schemas/NotificationListResult"
 
+    NotificationPushSubscriptionUpsertOK:
+      description: Registered push subscription.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/PushSubscription" }
+
     ReportCreateOK:
       description: OK
       content:
@@ -7694,6 +7739,11 @@ components:
           $ref: "#/components/schemas/Metadata"
         motd:
           $ref: "#/components/schemas/MessageOfTheDay"
+        web_push_public_key:
+          type: string
+          description: |
+            Present when Web Push is enabled on the instance. Unpadded
+            base64url-encoded VAPID public key for `PushManager.subscribe()`.
 
     ThemeAsset:
       type: object
@@ -8081,6 +8131,33 @@ components:
         minimum: -31
         maximum: 31
         not: { const: 0 }
+
+    PushSubscriptionInput:
+      type: object
+      description: Browser PushSubscription.toJSON() data. The browser's optional expirationTime is accepted but not used; expired subscriptions are removed when rejected by the push service.
+      required: [endpoint, keys]
+      properties:
+        endpoint:
+          type: string
+          format: uri
+          maxLength: 4096
+        keys:
+          type: object
+          required: [p256dh, auth]
+          properties:
+            p256dh:
+              type: string
+              maxLength: 128
+            auth:
+              type: string
+              maxLength: 64
+
+    PushSubscription:
+      type: object
+      required: [id, endpoint]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        endpoint: { type: string, format: uri }
 
     #
     #        d8888      888               d8b

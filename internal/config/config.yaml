@@ -238,6 +238,42 @@
       description: |-
         When `OTEL_PROVIDER` is set to `sentry`, this is the DSN for the Sentry project.
 
+- section: Web Push
+  description: |-
+    Optional browser push delivery for account notifications. Browser permission and a registered push subscription are required.
+  fields:
+    - env: "WEB_PUSH_ENABLED"
+      name: WebPushEnabled
+      type: bool
+      default: "false"
+      description: |-
+        Enable Web Push delivery and subscription registration. When false, all other Web Push configuration is ignored.
+
+    - env: "WEB_PUSH_MAX_SUBSCRIPTIONS"
+      name: WebPushMaxSubscriptions
+      type: int
+      default: "5"
+      description: |-
+        Maximum push subscriptions per account. Registering a new endpoint at the limit silently removes the oldest subscription. Updating an existing endpoint does not change its age. Must be positive when Web Push is enabled; ignored otherwise.
+
+    - env: "WEB_PUSH_VAPID_PUBLIC_KEY"
+      name: WebPushVAPIDPublicKey
+      type: string
+      description: |-
+        Unpadded base64url-encoded uncompressed P-256 public key. Required when Web Push is enabled. Keep the key pair stable across restarts; replacing it requires browsers to subscribe again.
+
+    - env: "WEB_PUSH_VAPID_PRIVATE_KEY"
+      name: WebPushVAPIDPrivateKey
+      type: string
+      description: |-
+        Unpadded base64url-encoded 32-byte P-256 private key matching the public key. Required when Web Push is enabled. Keep this secret.
+
+    - env: "WEB_PUSH_VAPID_SUBJECT"
+      name: WebPushVAPIDSubject
+      type: string
+      description: |-
+        Contact URI for the instance operator, such as mailto:admin@example.com or https://example.com/contact. Required when Web Push is enabled.
+
 - section: Email
   description: |-
     Email sending configuration. This must be enabled in order to enable email-based authentication and password reset functionality.

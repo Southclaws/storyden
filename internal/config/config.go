@@ -190,6 +190,21 @@ type Config struct {
 	SentryDSN string `default:"" envconfig:"SENTRY_DSN"`
 
 	// -
+	// Web Push
+	// -
+
+	// Enable Web Push delivery and subscription registration. When false, all other Web Push configuration is ignored.
+	WebPushEnabled bool `default:"false" envconfig:"WEB_PUSH_ENABLED"`
+	// Maximum push subscriptions per account. Registering a new endpoint at the limit silently removes the oldest subscription. Updating an existing endpoint does not change its age. Must be positive when Web Push is enabled; ignored otherwise.
+	WebPushMaxSubscriptions int `default:"5" envconfig:"WEB_PUSH_MAX_SUBSCRIPTIONS"`
+	// Unpadded base64url-encoded uncompressed P-256 public key. Required when Web Push is enabled. Keep the key pair stable across restarts; replacing it requires browsers to subscribe again.
+	WebPushVAPIDPublicKey string `envconfig:"WEB_PUSH_VAPID_PUBLIC_KEY"`
+	// Unpadded base64url-encoded 32-byte P-256 private key matching the public key. Required when Web Push is enabled. Keep this secret.
+	WebPushVAPIDPrivateKey string `envconfig:"WEB_PUSH_VAPID_PRIVATE_KEY"`
+	// Contact URI for the instance operator, such as mailto:admin@example.com or https://example.com/contact. Required when Web Push is enabled.
+	WebPushVAPIDSubject string `envconfig:"WEB_PUSH_VAPID_SUBJECT"`
+
+	// -
 	// Email
 	// -
 

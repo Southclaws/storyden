@@ -1,4 +1,5 @@
-import { DatagraphItem, DatagraphItemKind } from "@/api/openapi-schema";
+import type { DatagraphItem } from "@/api/openapi-schema/datagraphItem";
+import { DatagraphItemKind } from "@/api/openapi-schema/datagraphItemKind";
 
 export function getCommonProperties(item: DatagraphItem) {
   switch (item.kind) {

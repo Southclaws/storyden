@@ -49,6 +49,7 @@ $defs:
       - EventActivityDeleted
       - EventActivityPublished
       - EventSettingsUpdated
+      - EventNotificationCreated
 
   EventPayload:
     type: object
@@ -95,6 +96,22 @@ $defs:
       - $ref: "#/$defs/EventActivityDeleted"
       - $ref: "#/$defs/EventActivityPublished"
       - $ref: "#/$defs/EventSettingsUpdated"
+      - $ref: "#/$defs/EventNotificationCreated"
+
+  EventNotificationCreated:
+    type: object
+    description: "Emitted after an account notification is created."
+    required: ["event", "id", "account_id"]
+    properties:
+      event: { type: string, const: "EventNotificationCreated" }
+      id:
+        type: string
+        format: xid
+        description: "Notification ID"
+      account_id:
+        type: string
+        format: accountID
+        description: "Notification recipient account ID"
 
   # Thread events
 
@@ -617,7 +634,15 @@ $defs:
   EventAccountWarningUpdated:
     type: object
     description: "Emitted when a moderation warning is edited."
-    required: ["event", "account_id", "author_id", "warning_id", "previous_reason", "reason"]
+    required:
+      [
+        "event",
+        "account_id",
+        "author_id",
+        "warning_id",
+        "previous_reason",
+        "reason",
+      ]
     properties:
       event: { type: string, const: "EventAccountWarningUpdated" }
       account_id:

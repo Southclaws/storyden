@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/moderation_note/moderation_note_writer"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_querier"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_writer"
+	"github.com/Southclaws/storyden/app/resources/account/notification/push_subscription"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_assign"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
@@ -124,6 +125,7 @@ func Build() fx.Option {
 			category_cache.New,
 			notify_querier.New,
 			notify_writer.New,
+			push_subscription.New,
 			warning_repo.New,
 			tag_querier.New,
 			tag_writer.New,

@@ -142,6 +142,8 @@ type OperationPermissions interface {
 	InvitationDelete() (bool, *rbac.Permission)
 	NotificationList() (bool, *rbac.Permission)
 	NotificationUpdateMany() (bool, *rbac.Permission)
+	PushSubscriptionUpsert() (bool, *rbac.Permission)
+	PushSubscriptionDelete() (bool, *rbac.Permission)
 	NotificationUpdate() (bool, *rbac.Permission)
 	ReportCreate() (bool, *rbac.Permission)
 	ReportList() (bool, *rbac.Permission)
@@ -555,6 +557,10 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.NotificationList()
 	case "NotificationUpdateMany":
 		return optable.NotificationUpdateMany()
+	case "PushSubscriptionUpsert":
+		return optable.PushSubscriptionUpsert()
+	case "PushSubscriptionDelete":
+		return optable.PushSubscriptionDelete()
 	case "NotificationUpdate":
 		return optable.NotificationUpdate()
 	case "ReportCreate":

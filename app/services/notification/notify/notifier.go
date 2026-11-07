@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 type Notifier struct {
@@ -87,10 +88,15 @@ func (s *Notifier) notify(ctx context.Context,
 		return &i
 	})
 
-	_, err := s.notifyWriter.Notification(ctx, targetID, event, itemref, sourceID, target)
+	notification, err := s.notifyWriter.Notification(ctx, targetID, event, itemref, sourceID, target)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
+
+	s.bus.Publish(ctx, &rpc.EventNotificationCreated{
+		ID:        notification.ID,
+		AccountID: targetID,
+	})
 
 	return nil
 }

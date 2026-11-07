@@ -206,6 +206,7 @@ const (
 	EventEventActivityDeleted         Event = "EventActivityDeleted"
 	EventEventActivityPublished       Event = "EventActivityPublished"
 	EventEventSettingsUpdated         Event = "EventSettingsUpdated"
+	EventEventNotificationCreated     Event = "EventNotificationCreated"
 )
 
 var EventValues = []Event{
@@ -251,6 +252,7 @@ var EventValues = []Event{
 	EventEventActivityDeleted,
 	EventEventActivityPublished,
 	EventEventSettingsUpdated,
+	EventEventNotificationCreated,
 }
 
 type EventPayloadUnion interface {
@@ -372,6 +374,8 @@ func (w *EventPayload) UnmarshalJSON(data []byte) error {
 		v = &EventActivityPublished{}
 	case "EventSettingsUpdated":
 		v = &EventSettingsUpdated{}
+	case "EventNotificationCreated":
+		v = &EventNotificationCreated{}
 	default:
 		return fmt.Errorf("EventPayload: unknown type %q", peek.Type)
 	}
@@ -947,6 +951,19 @@ type EventSettingsUpdated struct {
 func (EventSettingsUpdated) isEventPayload() {}
 
 func (EventSettingsUpdated) EventPayloadType() string { return "EventSettingsUpdated" }
+
+// Emitted after an account notification is created.
+type EventNotificationCreated struct {
+	// Notification recipient account ID
+	AccountID account.AccountID `json:"account_id"`
+	Event     string            `json:"event"`
+	// Notification ID
+	ID xid.ID `json:"id"`
+}
+
+func (EventNotificationCreated) isEventPayload() {}
+
+func (EventNotificationCreated) EventPayloadType() string { return "EventNotificationCreated" }
 
 type JsonRpcRequest struct {
 	ID      xid.ID `json:"id"`

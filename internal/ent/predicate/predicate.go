@@ -120,6 +120,9 @@ type PropertySchema func(*sql.Selector)
 // PropertySchemaField is the predicate function for propertyschemafield builders.
 type PropertySchemaField func(*sql.Selector)
 
+// PushSubscription is the predicate function for pushsubscription builders.
+type PushSubscription func(*sql.Selector)
+
 // React is the predicate function for react builders.
 type React func(*sql.Selector)
 
