@@ -123,7 +123,7 @@
     "vitest": "5.0.3",
     "yaml": "2.9.0"
   },
-  "packageManager": "pnpm@11.28.11+sha512.740184d10f81f5d5b165be88560ee7ba62406c4134896abc27a580109eec2f47c1e41d91251c944c2cababcb1c22461799ebb72de2ec625af2030b0e36c735a3",
+  "packageManager": "pnpm@11.28.10+sha512.672216f06e15c109b85471d49d3fbed17e6f03ead258df08c2bf5b4a5c33321ebfbf59476bce81325efada16ace0ac78548fd0bfcd7a51369e939182a3dd50e4",
   "engines": {
     "node": ">=24.22.1 <25"
   },
