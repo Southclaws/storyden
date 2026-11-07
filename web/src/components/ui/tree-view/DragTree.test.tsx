@@ -602,16 +602,30 @@ describe("DragTree", () => {
     await waitFor(() => expect(screen.getByRole("menu")).toHaveFocus());
     // Arrow navigation queues a focus task. Escape must invalidate it before
     // that frame runs, otherwise it steals focus back into the closing menu.
-    const frames: FrameRequestCallback[] = [];
+    const frames = new Map<number, FrameRequestCallback>();
+    let frameID = 0;
     const requestFrame = vi
       .spyOn(window, "requestAnimationFrame")
-      .mockImplementation((callback) => frames.push(callback));
+      .mockImplementation((callback) => {
+        frames.set(++frameID, callback);
+        return frameID;
+      });
+    const cancelFrame = vi
+      .spyOn(window, "cancelAnimationFrame")
+      .mockImplementation((id) => {
+        frames.delete(id);
+      });
     fireEvent.keyDown(screen.getByRole("menu"), { key: "ArrowDown" });
+    await waitFor(() => expect(frames.size).toBeGreaterThan(0));
     await user.keyboard("{Escape}");
     await waitFor(() => expect(trigger).toHaveFocus());
     requestFrame.mockRestore();
-    expect(frames.length).toBeGreaterThan(0);
-    act(() => frames.forEach((callback) => callback(performance.now())));
+    cancelFrame.mockRestore();
+    act(() => {
+      for (const callback of frames.values()) {
+        callback(performance.now());
+      }
+    });
     await waitFor(() =>
       expect(screen.queryByRole("menu")).not.toBeInTheDocument(),
     );

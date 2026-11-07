@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@ai-sdk/react": "4.0.163",
-    "@ark-ui/react": "5.39.2",
+    "@ark-ui/react": "5.40.0",
     "@dnd-kit/core": "6.3.1",
     "@dnd-kit/sortable": "10.0.0",
     "@dnd-kit/utilities": "3.2.2",
@@ -48,7 +48,7 @@
     "@tiptap/static-renderer": "3.32.2",
     "@tiptap/suggestion": "3.32.2",
     "@use-gesture/react": "10.3.1",
-    "@zag-js/popper": "1.44.0",
+    "@zag-js/popper": "1.47.0",
     "ai": "7.0.159",
     "babel-plugin-react-compiler": "1.0.0",
     "chroma-js": "3.2.0",
