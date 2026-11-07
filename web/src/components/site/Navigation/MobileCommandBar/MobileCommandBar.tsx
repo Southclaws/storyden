@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession } from "@/auth";
+import { NotificationsMenu } from "@/components/notifications/NotificationsMenu";
 import type { ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { CloseIcon } from "@/components/ui/icons/Close";
@@ -35,7 +36,10 @@ export function MobileCommandBar({ isOpen, onClose, onOpen }: Props) {
         <HomeAnchor hideLabel size="sm" />
         <SearchAnchor hideLabel size="sm" />
         {account ? (
-          <AccountMenu account={account} size="sm" />
+          <>
+            <NotificationsMenu status="unread" />
+            <AccountMenu account={account} size="sm" />
+          </>
         ) : (
           <LoginAnchor />
         )}
