@@ -2,7 +2,7 @@ type Options = RequestInit & { apiAddress?: string };
 
 export const fetcher = async <T>(
   url: string,
-  { apiAddress, ...options }: Options
+  { apiAddress, ...options }: Options,
 ): Promise<T> => {
   if (!apiAddress) {
     throw new Error("Worker API requests require the public API address");
