@@ -1438,6 +1438,29 @@ var (
 			},
 		},
 	}
+	// PushSubscriptionsColumns holds the columns for the "push_subscriptions" table.
+	PushSubscriptionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "endpoint", Type: field.TypeString, Unique: true},
+		{Name: "p256dh", Type: field.TypeString},
+		{Name: "auth", Type: field.TypeString},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+	}
+	// PushSubscriptionsTable holds the schema information for the "push_subscriptions" table.
+	PushSubscriptionsTable = &schema.Table{
+		Name:       "push_subscriptions",
+		Columns:    PushSubscriptionsColumns,
+		PrimaryKey: []*schema.Column{PushSubscriptionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "push_subscriptions_accounts_push_subscriptions",
+				Columns:    []*schema.Column{PushSubscriptionsColumns[5]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// ReactsColumns holds the columns for the "reacts" table.
 	ReactsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -2597,6 +2620,7 @@ var (
 		PropertiesTable,
 		PropertySchemasTable,
 		PropertySchemaFieldsTable,
+		PushSubscriptionsTable,
 		ReactsTable,
 		ReportsTable,
 		RobotsTable,
@@ -2707,6 +2731,7 @@ func init() {
 	PropertiesTable.ForeignKeys[0].RefTable = NodesTable
 	PropertiesTable.ForeignKeys[1].RefTable = PropertySchemaFieldsTable
 	PropertySchemaFieldsTable.ForeignKeys[0].RefTable = PropertySchemasTable
+	PushSubscriptionsTable.ForeignKeys[0].RefTable = AccountsTable
 	ReactsTable.ForeignKeys[0].RefTable = AccountsTable
 	ReactsTable.ForeignKeys[1].RefTable = PostsTable
 	ReportsTable.ForeignKeys[0].RefTable = AccountsTable

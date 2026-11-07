@@ -732,6 +732,22 @@ var eventDefinitions = map[Event]EventDefinition{
 			},
 		},
 	},
+	EventEventNotificationCreated: {
+		Name:        EventEventNotificationCreated,
+		Description: "Emitted after an account notification is created.",
+		Fields: []EventFieldDefinition{
+			{
+				Name:        "id",
+				Description: "Notification ID",
+				Required:    true,
+			},
+			{
+				Name:        "account_id",
+				Description: "Notification recipient account ID",
+				Required:    true,
+			},
+		},
+	},
 }
 
 func LookupEventDefinition(event Event) (EventDefinition, bool) {

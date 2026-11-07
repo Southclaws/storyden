@@ -44,6 +44,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/property"
 	"github.com/Southclaws/storyden/internal/ent/propertyschema"
 	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
+	"github.com/Southclaws/storyden/internal/ent/pushsubscription"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/report"
 	"github.com/Southclaws/storyden/internal/ent/robot"
@@ -1652,6 +1653,49 @@ func init() {
 	// propertyschemafield.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	propertyschemafield.IDValidator = func() func(string) error {
 		validators := propertyschemafieldDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	pushsubscriptionMixin := schema.PushSubscription{}.Mixin()
+	pushsubscriptionMixinFields0 := pushsubscriptionMixin[0].Fields()
+	_ = pushsubscriptionMixinFields0
+	pushsubscriptionMixinFields1 := pushsubscriptionMixin[1].Fields()
+	_ = pushsubscriptionMixinFields1
+	pushsubscriptionFields := schema.PushSubscription{}.Fields()
+	_ = pushsubscriptionFields
+	// pushsubscriptionDescCreatedAt is the schema descriptor for created_at field.
+	pushsubscriptionDescCreatedAt := pushsubscriptionMixinFields1[0].Descriptor()
+	// pushsubscription.DefaultCreatedAt holds the default value on creation for the created_at field.
+	pushsubscription.DefaultCreatedAt = pushsubscriptionDescCreatedAt.Default.(func() time.Time)
+	// pushsubscriptionDescEndpoint is the schema descriptor for endpoint field.
+	pushsubscriptionDescEndpoint := pushsubscriptionFields[1].Descriptor()
+	// pushsubscription.EndpointValidator is a validator for the "endpoint" field. It is called by the builders before save.
+	pushsubscription.EndpointValidator = pushsubscriptionDescEndpoint.Validators[0].(func(string) error)
+	// pushsubscriptionDescP256dh is the schema descriptor for p256dh field.
+	pushsubscriptionDescP256dh := pushsubscriptionFields[2].Descriptor()
+	// pushsubscription.P256dhValidator is a validator for the "p256dh" field. It is called by the builders before save.
+	pushsubscription.P256dhValidator = pushsubscriptionDescP256dh.Validators[0].(func(string) error)
+	// pushsubscriptionDescAuth is the schema descriptor for auth field.
+	pushsubscriptionDescAuth := pushsubscriptionFields[3].Descriptor()
+	// pushsubscription.AuthValidator is a validator for the "auth" field. It is called by the builders before save.
+	pushsubscription.AuthValidator = pushsubscriptionDescAuth.Validators[0].(func(string) error)
+	// pushsubscriptionDescID is the schema descriptor for id field.
+	pushsubscriptionDescID := pushsubscriptionMixinFields0[0].Descriptor()
+	// pushsubscription.DefaultID holds the default value on creation for the id field.
+	pushsubscription.DefaultID = pushsubscriptionDescID.Default.(func() xid.ID)
+	// pushsubscription.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	pushsubscription.IDValidator = func() func(string) error {
+		validators := pushsubscriptionDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

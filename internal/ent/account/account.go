@@ -52,6 +52,8 @@ const (
 	EdgePlugins = "plugins"
 	// EdgeEmails holds the string denoting the emails edge name in mutations.
 	EdgeEmails = "emails"
+	// EdgePushSubscriptions holds the string denoting the push_subscriptions edge name in mutations.
+	EdgePushSubscriptions = "push_subscriptions"
 	// EdgeNotifications holds the string denoting the notifications edge name in mutations.
 	EdgeNotifications = "notifications"
 	// EdgeTriggeredNotifications holds the string denoting the triggered_notifications edge name in mutations.
@@ -173,6 +175,13 @@ const (
 	EmailsInverseTable = "emails"
 	// EmailsColumn is the table column denoting the emails relation/edge.
 	EmailsColumn = "account_id"
+	// PushSubscriptionsTable is the table that holds the push_subscriptions relation/edge.
+	PushSubscriptionsTable = "push_subscriptions"
+	// PushSubscriptionsInverseTable is the table name for the PushSubscription entity.
+	// It exists in this package in order to avoid circular dependency with the "pushsubscription" package.
+	PushSubscriptionsInverseTable = "push_subscriptions"
+	// PushSubscriptionsColumn is the table column denoting the push_subscriptions relation/edge.
+	PushSubscriptionsColumn = "account_id"
 	// NotificationsTable is the table that holds the notifications relation/edge.
 	NotificationsTable = "notifications"
 	// NotificationsInverseTable is the table name for the Notification entity.
@@ -737,6 +746,20 @@ func ByEmailsCount(opts ...sql.OrderTermOption) OrderOption {
 func ByEmails(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newEmailsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByPushSubscriptionsCount orders the results by push_subscriptions count.
+func ByPushSubscriptionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPushSubscriptionsStep(), opts...)
+	}
+}
+
+// ByPushSubscriptions orders the results by push_subscriptions terms.
+func ByPushSubscriptions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPushSubscriptionsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -1437,6 +1460,13 @@ func newEmailsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EmailsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, EmailsTable, EmailsColumn),
+	)
+}
+func newPushSubscriptionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PushSubscriptionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, PushSubscriptionsTable, PushSubscriptionsColumn),
 	)
 }
 func newNotificationsStep() *sqlgraph.Step {

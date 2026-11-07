@@ -13,7 +13,7 @@ import {
   NotificationListResult,
   NotificationStatus,
 } from "@/api/openapi-schema";
-import { getCommonProperties } from "@/lib/datagraph/item";
+import { formatNotification } from "@/lib/notification";
 
 import { NotificationItem } from "./item";
 
@@ -118,9 +118,9 @@ const filterUnread = filterStatus("unread");
 const mapToItems = map(mapToItem);
 
 function mapToItem(n: Notification): NotificationItem {
-  const content = getNotificationContent(n);
+  const content = formatNotification(n);
   const createdAt = new Date(n.created_at);
-  const title = n.source?.handle ?? "System";
+  const title = content.title;
   const isRead = n.status === "read";
 
   return {
@@ -128,64 +128,10 @@ function mapToItem(n: Notification): NotificationItem {
     createdAt,
     title,
     description: content.description,
+    body: content.body,
     url: content.url,
     isRead,
     source: n.source,
     item: n.item,
   };
-}
-
-function getNotificationContent(n: Notification) {
-  const p = n.item && getCommonProperties(n.item);
-  switch (n.event) {
-    case "trail_run_attention":
-      return {
-        description: "A Trail run needs your attention",
-        url: n.target
-          ? `/robots/trails?run=${encodeURIComponent(n.target)}`
-          : "/robots/trails/",
-      };
-    case "thread_reply":
-      return { description: "replied to your post", url: `/t/locate/${p?.id}` };
-    case "reply_to_reply":
-      return { description: "replied to you", url: `/t/locate/${p?.id}` };
-    case "post_like":
-      return { description: "liked your post", url: `/t/locate/${p?.id}` };
-    case "follow":
-      return { description: "followed you", url: `/m/${n.source?.handle}` };
-    case "profile_mention":
-      return { description: "mentioned you", url: `/t/locate/${p?.id}` };
-    case "event_host_added":
-      return { description: "added you as an event host", url: `#` }; // not implemented
-    case "member_attending_event":
-      return { description: "is attending your event", url: `#` }; // not implemented
-    case "member_declined_event":
-      return { description: "declined your event", url: `#` }; // not implemented
-    case "attendee_removed":
-      return { description: "removed you from their event", url: `#` }; // not implemented
-    case "report_submitted":
-      return { description: "submitted a report", url: `/reports` };
-    case "report_updated":
-      return { description: "report status updated", url: `/reports` };
-    case "warning_issued":
-      return {
-        description: "issued you a warning",
-        url: p?.slug ? `/m/${p.slug}` : "#",
-      };
-    case "node_version_created":
-      return {
-        description: "created a draft for your page",
-        url: p?.slug ? `/l/${p.slug}` : "#",
-      };
-    case "node_version_applied":
-      return {
-        description: "applied your draft",
-        url: p?.slug ? `/l/${p.slug}` : "#",
-      };
-    case "node_version_deleted":
-      return {
-        description: "discarded your draft",
-        url: p?.slug ? `/l/${p.slug}` : "#",
-      };
-  }
 }

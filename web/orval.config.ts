@@ -30,6 +30,27 @@ export default defineConfig({
       },
     },
   },
+  worker: {
+    input: {
+      ...input,
+      filters: { tags: ["accounts", "notifications"] },
+    },
+    output: {
+      ...common,
+      target: "src/api/openapi-worker",
+      schemas: "src/api/openapi-schema",
+      client: "fetch",
+      clean: false,
+      indexFiles: false,
+      override: {
+        fetch: { includeHttpResponseReturnType: true },
+        mutator: {
+          path: "./src/api/worker.ts",
+          name: "fetcher",
+        },
+      },
+    },
+  },
   server: {
     input,
     output: {

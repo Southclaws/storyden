@@ -40,6 +40,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
+	"github.com/Southclaws/storyden/internal/ent/pushsubscription"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/report"
 	"github.com/Southclaws/storyden/internal/ent/robot"
@@ -71,6 +72,7 @@ type AccountQuery struct {
 	withSessions                          *SessionQuery
 	withPlugins                           *PluginQuery
 	withEmails                            *EmailQuery
+	withPushSubscriptions                 *PushSubscriptionQuery
 	withNotifications                     *NotificationQuery
 	withTriggeredNotifications            *NotificationQuery
 	withFollowing                         *AccountFollowQuery
@@ -216,6 +218,28 @@ func (_q *AccountQuery) QueryEmails() *EmailQuery {
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(email.Table, email.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.EmailsTable, account.EmailsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPushSubscriptions chains the current query on the "push_subscriptions" edge.
+func (_q *AccountQuery) QueryPushSubscriptions() *PushSubscriptionQuery {
+	query := (&PushSubscriptionClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(pushsubscription.Table, pushsubscription.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.PushSubscriptionsTable, account.PushSubscriptionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -1496,6 +1520,7 @@ func (_q *AccountQuery) Clone() *AccountQuery {
 		withSessions:                          _q.withSessions.Clone(),
 		withPlugins:                           _q.withPlugins.Clone(),
 		withEmails:                            _q.withEmails.Clone(),
+		withPushSubscriptions:                 _q.withPushSubscriptions.Clone(),
 		withNotifications:                     _q.withNotifications.Clone(),
 		withTriggeredNotifications:            _q.withTriggeredNotifications.Clone(),
 		withFollowing:                         _q.withFollowing.Clone(),
@@ -1582,6 +1607,17 @@ func (_q *AccountQuery) WithEmails(opts ...func(*EmailQuery)) *AccountQuery {
 		opt(query)
 	}
 	_q.withEmails = query
+	return _q
+}
+
+// WithPushSubscriptions tells the query-builder to eager-load the nodes that are connected to
+// the "push_subscriptions" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithPushSubscriptions(opts ...func(*PushSubscriptionQuery)) *AccountQuery {
+	query := (&PushSubscriptionClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withPushSubscriptions = query
 	return _q
 }
 
@@ -2202,10 +2238,11 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = _q.querySpec()
-		loadedTypes = [52]bool{
+		loadedTypes = [53]bool{
 			_q.withSessions != nil,
 			_q.withPlugins != nil,
 			_q.withEmails != nil,
+			_q.withPushSubscriptions != nil,
 			_q.withNotifications != nil,
 			_q.withTriggeredNotifications != nil,
 			_q.withFollowing != nil,
@@ -2296,6 +2333,15 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := _q.loadEmails(ctx, query, nodes,
 			func(n *Account) { n.Edges.Emails = []*Email{} },
 			func(n *Account, e *Email) { n.Edges.Emails = append(n.Edges.Emails, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withPushSubscriptions; query != nil {
+		if err := _q.loadPushSubscriptions(ctx, query, nodes,
+			func(n *Account) { n.Edges.PushSubscriptions = []*PushSubscription{} },
+			func(n *Account, e *PushSubscription) {
+				n.Edges.PushSubscriptions = append(n.Edges.PushSubscriptions, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
@@ -2764,6 +2810,36 @@ func (_q *AccountQuery) loadEmails(ctx context.Context, query *EmailQuery, nodes
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadPushSubscriptions(ctx context.Context, query *PushSubscriptionQuery, nodes []*Account, init func(*Account), assign func(*Account, *PushSubscription)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(pushsubscription.FieldAccountID)
+	}
+	query.Where(predicate.PushSubscription(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.PushSubscriptionsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AccountID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

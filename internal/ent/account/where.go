@@ -870,6 +870,29 @@ func HasEmailsWith(preds ...predicate.Email) predicate.Account {
 	})
 }
 
+// HasPushSubscriptions applies the HasEdge predicate on the "push_subscriptions" edge.
+func HasPushSubscriptions() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PushSubscriptionsTable, PushSubscriptionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPushSubscriptionsWith applies the HasEdge predicate on the "push_subscriptions" edge with a given conditions (other predicates).
+func HasPushSubscriptionsWith(preds ...predicate.PushSubscription) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newPushSubscriptionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasNotifications applies the HasEdge predicate on the "notifications" edge.
 func HasNotifications() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {

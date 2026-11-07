@@ -52,6 +52,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/property"
 	"github.com/Southclaws/storyden/internal/ent/propertyschema"
 	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
+	"github.com/Southclaws/storyden/internal/ent/pushsubscription"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/report"
 	"github.com/Southclaws/storyden/internal/ent/robot"
@@ -128,6 +129,7 @@ const (
 	TypeProperty                             = "Property"
 	TypePropertySchema                       = "PropertySchema"
 	TypePropertySchemaField                  = "PropertySchemaField"
+	TypePushSubscription                     = "PushSubscription"
 	TypeReact                                = "React"
 	TypeReport                               = "Report"
 	TypeRobot                                = "Robot"
@@ -186,6 +188,9 @@ type AccountMutation struct {
 	emails                                      map[xid.ID]struct{}
 	removedemails                               map[xid.ID]struct{}
 	clearedemails                               bool
+	push_subscriptions                          map[xid.ID]struct{}
+	removedpush_subscriptions                   map[xid.ID]struct{}
+	clearedpush_subscriptions                   bool
 	notifications                               map[xid.ID]struct{}
 	removednotifications                        map[xid.ID]struct{}
 	clearednotifications                        bool
@@ -1261,6 +1266,60 @@ func (m *AccountMutation) ResetEmails() {
 	m.emails = nil
 	m.clearedemails = false
 	m.removedemails = nil
+}
+
+// AddPushSubscriptionIDs adds the "push_subscriptions" edge to the PushSubscription entity by ids.
+func (m *AccountMutation) AddPushSubscriptionIDs(ids ...xid.ID) {
+	if m.push_subscriptions == nil {
+		m.push_subscriptions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.push_subscriptions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearPushSubscriptions clears the "push_subscriptions" edge to the PushSubscription entity.
+func (m *AccountMutation) ClearPushSubscriptions() {
+	m.clearedpush_subscriptions = true
+}
+
+// PushSubscriptionsCleared reports if the "push_subscriptions" edge to the PushSubscription entity was cleared.
+func (m *AccountMutation) PushSubscriptionsCleared() bool {
+	return m.clearedpush_subscriptions
+}
+
+// RemovePushSubscriptionIDs removes the "push_subscriptions" edge to the PushSubscription entity by IDs.
+func (m *AccountMutation) RemovePushSubscriptionIDs(ids ...xid.ID) {
+	if m.removedpush_subscriptions == nil {
+		m.removedpush_subscriptions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.push_subscriptions, ids[i])
+		m.removedpush_subscriptions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedPushSubscriptions returns the removed IDs of the "push_subscriptions" edge to the PushSubscription entity.
+func (m *AccountMutation) RemovedPushSubscriptionsIDs() (ids []xid.ID) {
+	for id := range m.removedpush_subscriptions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// PushSubscriptionsIDs returns the "push_subscriptions" edge IDs in the mutation.
+func (m *AccountMutation) PushSubscriptionsIDs() (ids []xid.ID) {
+	for id := range m.push_subscriptions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetPushSubscriptions resets all changes to the "push_subscriptions" edge.
+func (m *AccountMutation) ResetPushSubscriptions() {
+	m.push_subscriptions = nil
+	m.clearedpush_subscriptions = false
+	m.removedpush_subscriptions = nil
 }
 
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by ids.
@@ -4304,7 +4363,7 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 52)
+	edges := make([]string, 0, 53)
 	if m.sessions != nil {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -4313,6 +4372,9 @@ func (m *AccountMutation) AddedEdges() []string {
 	}
 	if m.emails != nil {
 		edges = append(edges, account.EdgeEmails)
+	}
+	if m.push_subscriptions != nil {
+		edges = append(edges, account.EdgePushSubscriptions)
 	}
 	if m.notifications != nil {
 		edges = append(edges, account.EdgeNotifications)
@@ -4483,6 +4545,12 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 	case account.EdgeEmails:
 		ids := make([]ent.Value, 0, len(m.emails))
 		for id := range m.emails {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgePushSubscriptions:
+		ids := make([]ent.Value, 0, len(m.push_subscriptions))
+		for id := range m.push_subscriptions {
 			ids = append(ids, id)
 		}
 		return ids
@@ -4784,7 +4852,7 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 52)
+	edges := make([]string, 0, 53)
 	if m.removedsessions != nil {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -4793,6 +4861,9 @@ func (m *AccountMutation) RemovedEdges() []string {
 	}
 	if m.removedemails != nil {
 		edges = append(edges, account.EdgeEmails)
+	}
+	if m.removedpush_subscriptions != nil {
+		edges = append(edges, account.EdgePushSubscriptions)
 	}
 	if m.removednotifications != nil {
 		edges = append(edges, account.EdgeNotifications)
@@ -4960,6 +5031,12 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 	case account.EdgeEmails:
 		ids := make([]ent.Value, 0, len(m.removedemails))
 		for id := range m.removedemails {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgePushSubscriptions:
+		ids := make([]ent.Value, 0, len(m.removedpush_subscriptions))
+		for id := range m.removedpush_subscriptions {
 			ids = append(ids, id)
 		}
 		return ids
@@ -5257,7 +5334,7 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 52)
+	edges := make([]string, 0, 53)
 	if m.clearedsessions {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -5266,6 +5343,9 @@ func (m *AccountMutation) ClearedEdges() []string {
 	}
 	if m.clearedemails {
 		edges = append(edges, account.EdgeEmails)
+	}
+	if m.clearedpush_subscriptions {
+		edges = append(edges, account.EdgePushSubscriptions)
 	}
 	if m.clearednotifications {
 		edges = append(edges, account.EdgeNotifications)
@@ -5427,6 +5507,8 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearedplugins
 	case account.EdgeEmails:
 		return m.clearedemails
+	case account.EdgePushSubscriptions:
+		return m.clearedpush_subscriptions
 	case account.EdgeNotifications:
 		return m.clearednotifications
 	case account.EdgeTriggeredNotifications:
@@ -5552,6 +5634,9 @@ func (m *AccountMutation) ResetEdge(name string) error {
 		return nil
 	case account.EdgeEmails:
 		m.ResetEmails()
+		return nil
+	case account.EdgePushSubscriptions:
+		m.ResetPushSubscriptions()
 		return nil
 	case account.EdgeNotifications:
 		m.ResetNotifications()
@@ -44100,6 +44185,608 @@ func (m *PropertySchemaFieldMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown PropertySchemaField edge %s", name)
+}
+
+// PushSubscriptionMutation represents an operation that mutates the PushSubscription nodes in the graph.
+type PushSubscriptionMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *xid.ID
+	created_at     *time.Time
+	endpoint       *string
+	p256dh         *string
+	auth           *string
+	clearedFields  map[string]struct{}
+	account        *xid.ID
+	clearedaccount bool
+	done           bool
+	oldValue       func(context.Context) (*PushSubscription, error)
+	predicates     []predicate.PushSubscription
+}
+
+var _ ent.Mutation = (*PushSubscriptionMutation)(nil)
+
+// pushsubscriptionOption allows management of the mutation configuration using functional options.
+type pushsubscriptionOption func(*PushSubscriptionMutation)
+
+// newPushSubscriptionMutation creates new mutation for the PushSubscription entity.
+func newPushSubscriptionMutation(c config, op Op, opts ...pushsubscriptionOption) *PushSubscriptionMutation {
+	m := &PushSubscriptionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypePushSubscription,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withPushSubscriptionID sets the ID field of the mutation.
+func withPushSubscriptionID(id xid.ID) pushsubscriptionOption {
+	return func(m *PushSubscriptionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *PushSubscription
+		)
+		m.oldValue = func(ctx context.Context) (*PushSubscription, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().PushSubscription.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withPushSubscription sets the old PushSubscription of the mutation.
+func withPushSubscription(node *PushSubscription) pushsubscriptionOption {
+	return func(m *PushSubscriptionMutation) {
+		m.oldValue = func(context.Context) (*PushSubscription, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m PushSubscriptionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m PushSubscriptionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of PushSubscription entities.
+func (m *PushSubscriptionMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *PushSubscriptionMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *PushSubscriptionMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().PushSubscription.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *PushSubscriptionMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *PushSubscriptionMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the PushSubscription entity.
+// If the PushSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PushSubscriptionMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *PushSubscriptionMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetAccountID sets the "account_id" field.
+func (m *PushSubscriptionMutation) SetAccountID(x xid.ID) {
+	m.account = &x
+}
+
+// AccountID returns the value of the "account_id" field in the mutation.
+func (m *PushSubscriptionMutation) AccountID() (r xid.ID, exists bool) {
+	v := m.account
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccountID returns the old "account_id" field's value of the PushSubscription entity.
+// If the PushSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PushSubscriptionMutation) OldAccountID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccountID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccountID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccountID: %w", err)
+	}
+	return oldValue.AccountID, nil
+}
+
+// ResetAccountID resets all changes to the "account_id" field.
+func (m *PushSubscriptionMutation) ResetAccountID() {
+	m.account = nil
+}
+
+// SetEndpoint sets the "endpoint" field.
+func (m *PushSubscriptionMutation) SetEndpoint(s string) {
+	m.endpoint = &s
+}
+
+// Endpoint returns the value of the "endpoint" field in the mutation.
+func (m *PushSubscriptionMutation) Endpoint() (r string, exists bool) {
+	v := m.endpoint
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndpoint returns the old "endpoint" field's value of the PushSubscription entity.
+// If the PushSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PushSubscriptionMutation) OldEndpoint(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndpoint is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndpoint requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndpoint: %w", err)
+	}
+	return oldValue.Endpoint, nil
+}
+
+// ResetEndpoint resets all changes to the "endpoint" field.
+func (m *PushSubscriptionMutation) ResetEndpoint() {
+	m.endpoint = nil
+}
+
+// SetP256dh sets the "p256dh" field.
+func (m *PushSubscriptionMutation) SetP256dh(s string) {
+	m.p256dh = &s
+}
+
+// P256dh returns the value of the "p256dh" field in the mutation.
+func (m *PushSubscriptionMutation) P256dh() (r string, exists bool) {
+	v := m.p256dh
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldP256dh returns the old "p256dh" field's value of the PushSubscription entity.
+// If the PushSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PushSubscriptionMutation) OldP256dh(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldP256dh is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldP256dh requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldP256dh: %w", err)
+	}
+	return oldValue.P256dh, nil
+}
+
+// ResetP256dh resets all changes to the "p256dh" field.
+func (m *PushSubscriptionMutation) ResetP256dh() {
+	m.p256dh = nil
+}
+
+// SetAuth sets the "auth" field.
+func (m *PushSubscriptionMutation) SetAuth(s string) {
+	m.auth = &s
+}
+
+// Auth returns the value of the "auth" field in the mutation.
+func (m *PushSubscriptionMutation) Auth() (r string, exists bool) {
+	v := m.auth
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAuth returns the old "auth" field's value of the PushSubscription entity.
+// If the PushSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PushSubscriptionMutation) OldAuth(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAuth is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAuth requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAuth: %w", err)
+	}
+	return oldValue.Auth, nil
+}
+
+// ResetAuth resets all changes to the "auth" field.
+func (m *PushSubscriptionMutation) ResetAuth() {
+	m.auth = nil
+}
+
+// ClearAccount clears the "account" edge to the Account entity.
+func (m *PushSubscriptionMutation) ClearAccount() {
+	m.clearedaccount = true
+	m.clearedFields[pushsubscription.FieldAccountID] = struct{}{}
+}
+
+// AccountCleared reports if the "account" edge to the Account entity was cleared.
+func (m *PushSubscriptionMutation) AccountCleared() bool {
+	return m.clearedaccount
+}
+
+// AccountIDs returns the "account" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AccountID instead. It exists only for internal usage by the builders.
+func (m *PushSubscriptionMutation) AccountIDs() (ids []xid.ID) {
+	if id := m.account; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAccount resets all changes to the "account" edge.
+func (m *PushSubscriptionMutation) ResetAccount() {
+	m.account = nil
+	m.clearedaccount = false
+}
+
+// Where appends a list predicates to the PushSubscriptionMutation builder.
+func (m *PushSubscriptionMutation) Where(ps ...predicate.PushSubscription) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the PushSubscriptionMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *PushSubscriptionMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.PushSubscription, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *PushSubscriptionMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *PushSubscriptionMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (PushSubscription).
+func (m *PushSubscriptionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *PushSubscriptionMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.created_at != nil {
+		fields = append(fields, pushsubscription.FieldCreatedAt)
+	}
+	if m.account != nil {
+		fields = append(fields, pushsubscription.FieldAccountID)
+	}
+	if m.endpoint != nil {
+		fields = append(fields, pushsubscription.FieldEndpoint)
+	}
+	if m.p256dh != nil {
+		fields = append(fields, pushsubscription.FieldP256dh)
+	}
+	if m.auth != nil {
+		fields = append(fields, pushsubscription.FieldAuth)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *PushSubscriptionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case pushsubscription.FieldCreatedAt:
+		return m.CreatedAt()
+	case pushsubscription.FieldAccountID:
+		return m.AccountID()
+	case pushsubscription.FieldEndpoint:
+		return m.Endpoint()
+	case pushsubscription.FieldP256dh:
+		return m.P256dh()
+	case pushsubscription.FieldAuth:
+		return m.Auth()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *PushSubscriptionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case pushsubscription.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case pushsubscription.FieldAccountID:
+		return m.OldAccountID(ctx)
+	case pushsubscription.FieldEndpoint:
+		return m.OldEndpoint(ctx)
+	case pushsubscription.FieldP256dh:
+		return m.OldP256dh(ctx)
+	case pushsubscription.FieldAuth:
+		return m.OldAuth(ctx)
+	}
+	return nil, fmt.Errorf("unknown PushSubscription field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PushSubscriptionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case pushsubscription.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case pushsubscription.FieldAccountID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccountID(v)
+		return nil
+	case pushsubscription.FieldEndpoint:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEndpoint(v)
+		return nil
+	case pushsubscription.FieldP256dh:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetP256dh(v)
+		return nil
+	case pushsubscription.FieldAuth:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAuth(v)
+		return nil
+	}
+	return fmt.Errorf("unknown PushSubscription field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *PushSubscriptionMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *PushSubscriptionMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PushSubscriptionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown PushSubscription numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *PushSubscriptionMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *PushSubscriptionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *PushSubscriptionMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown PushSubscription nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *PushSubscriptionMutation) ResetField(name string) error {
+	switch name {
+	case pushsubscription.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case pushsubscription.FieldAccountID:
+		m.ResetAccountID()
+		return nil
+	case pushsubscription.FieldEndpoint:
+		m.ResetEndpoint()
+		return nil
+	case pushsubscription.FieldP256dh:
+		m.ResetP256dh()
+		return nil
+	case pushsubscription.FieldAuth:
+		m.ResetAuth()
+		return nil
+	}
+	return fmt.Errorf("unknown PushSubscription field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *PushSubscriptionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.account != nil {
+		edges = append(edges, pushsubscription.EdgeAccount)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *PushSubscriptionMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case pushsubscription.EdgeAccount:
+		if id := m.account; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *PushSubscriptionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *PushSubscriptionMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *PushSubscriptionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedaccount {
+		edges = append(edges, pushsubscription.EdgeAccount)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *PushSubscriptionMutation) EdgeCleared(name string) bool {
+	switch name {
+	case pushsubscription.EdgeAccount:
+		return m.clearedaccount
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *PushSubscriptionMutation) ClearEdge(name string) error {
+	switch name {
+	case pushsubscription.EdgeAccount:
+		m.ClearAccount()
+		return nil
+	}
+	return fmt.Errorf("unknown PushSubscription unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *PushSubscriptionMutation) ResetEdge(name string) error {
+	switch name {
+	case pushsubscription.EdgeAccount:
+		m.ResetAccount()
+		return nil
+	}
+	return fmt.Errorf("unknown PushSubscription edge %s", name)
 }
 
 // ReactMutation represents an operation that mutates the React nodes in the graph.

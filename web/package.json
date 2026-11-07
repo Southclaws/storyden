@@ -4,12 +4,12 @@
   "private": true,
   "scripts": {
     "prepare": "panda codegen",
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "pnpm build:worker && next dev",
+    "build": "pnpm build:worker && next build",
     "start": "next start",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --project src/workers/tsconfig.json",
     "openapi": "orval",
     "test": "vitest run",
     "test:ui": "vitest run --project ui",
@@ -19,7 +19,8 @@
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
     "format": "oxlint --config .oxlintrc.sort.json --disable-nested-config --fix . && oxfmt .",
-    "format:check": "oxlint --config .oxlintrc.sort.json --disable-nested-config . && oxfmt --check ."
+    "format:check": "oxlint --config .oxlintrc.sort.json --disable-nested-config . && oxfmt --check .",
+    "build:worker": "node tools/build-service-worker.mjs"
   },
   "dependencies": {
     "@ai-sdk/react": "4.0.130",
@@ -110,6 +111,7 @@
     "@types/react-avatar-editor": "13.0.4",
     "@types/turndown": "5.0.6",
     "ajv": "8.20.0",
+    "esbuild": "0.28.2",
     "jsdom": "30.1.1",
     "json-schema-to-typescript": "16.0.0",
     "orval": "8.39.0",

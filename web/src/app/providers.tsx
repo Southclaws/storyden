@@ -9,6 +9,7 @@ import { AuthProvider } from "@/auth/AuthProvider";
 import { ThemeEditorHost } from "@/components/site/ThemeEditor";
 import { DndProvider } from "@/lib/dragdrop/provider";
 import { ThemeRuntime } from "@/lib/theme/ThemeRuntime";
+import { WebPush } from "@/lib/webpush/WebPush";
 
 export function Providers({ children }: PropsWithChildren) {
   return (
@@ -22,6 +23,7 @@ export function Providers({ children }: PropsWithChildren) {
         >
           <DndProvider>
             <ThemeRuntime />
+            <WebPush />
             <Toaster />
 
             {/* -- */}

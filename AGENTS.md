@@ -33,6 +33,21 @@ Use this as an index, then open only the docs needed for the work at hand.
   - `api/openapi.yaml` as API contract source of truth.
   - `api/rpc/README.md` and `sdk/**/README.md` for transport/SDK usage.
 
+## Code Style and Readability
+
+Code is written for human maintainers, not for minimising tokens, characters, or lines of output.
+
+- **Never compress or minify code.** Do not sacrifice readability for brevity, even when the result is functionally equivalent.
+- **Always use braces** for `if`, `else`, `for`, `while`, and other control-flow statements, including single-line bodies.
+- **One statement per line.** Never combine multiple statements on the same line.
+- **Separate guard clauses** with line breaks. Do not collapse multiple guards into a single expression merely to shorten the code.
+- **Prefer named intermediate variables** over long boolean chains, nested ternaries, or deeply nested expressions.
+- **Use blank lines** to separate logical steps within functions, including between groups of guards, computations, mutations, and returns.
+- **Preserve existing formatting conventions.** When editing code, match the surrounding style rather than introducing a more compact alternative.
+- **Do not optimise for output token count.** Code clarity, maintainability, and reviewability take precedence over generation speed or response length.
+
+Before completing a change, review generated code for unnecessary compression and rewrite any dense or abbreviated constructs into clear, idiomatic code.
+
 ## Backend Task Routing (Go)
 
 Storyden backend is a Go application using Uber Fx dependency injection and a 3-layer app structure.
@@ -91,6 +106,7 @@ Storyden backend is a Go application using Uber Fx dependency injection and a 3-
 - Prefer targeted generation while iterating; run broader generation when cross-surface contracts change.
 
 - Common source-of-truth -> command mapping:
+
   - `cmd/sd/opencli.yaml` -> `task generate:cli` or `go generate ./cmd/sd`; validate with `task check:cli`
   - `internal/ent/schema/**` -> `task generate:db` or `go generate ./internal/ent`
   - `api/openapi.yaml`, `api/common/**`, `api/plugin.yaml`, `api/rpc/**` -> `task generate:openapi` or `task generate:mcp`

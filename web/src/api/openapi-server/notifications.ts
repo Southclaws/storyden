@@ -9,14 +9,19 @@
  */
 import type {
   BadRequestResponse,
+  ConflictResponse,
+  ForbiddenResponse,
+  Identifier,
   InternalServerErrorResponse,
   NotFoundResponse,
   NotificationListOKResponse,
   NotificationListParams,
+  NotificationPushSubscriptionUpsertOKResponse,
   NotificationUpdateBody,
   NotificationUpdateManyBody,
   NotificationUpdateManyOKResponse,
   NotificationUpdateOKResponse,
+  PushSubscriptionInput,
   UnauthorisedResponse,
 } from "../openapi-schema";
 import { fetcher } from "../server";
@@ -212,6 +217,152 @@ export const notificationUpdateMany = async (
         ...getHeaders(options?.headers),
       },
       body: JSON.stringify(notificationUpdateManyBody),
+    },
+  );
+};
+
+export type pushSubscriptionUpsertResponse200 = {
+  data: NotificationPushSubscriptionUpsertOKResponse;
+  status: 200;
+};
+
+export type pushSubscriptionUpsertResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type pushSubscriptionUpsertResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type pushSubscriptionUpsertResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type pushSubscriptionUpsertResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type pushSubscriptionUpsertResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 403 | 409>;
+};
+
+export type pushSubscriptionUpsertResponseSuccess =
+  pushSubscriptionUpsertResponse200 & {
+    headers: Headers;
+  };
+export type pushSubscriptionUpsertResponseError = (
+  | pushSubscriptionUpsertResponse400
+  | pushSubscriptionUpsertResponse401
+  | pushSubscriptionUpsertResponse403
+  | pushSubscriptionUpsertResponse409
+  | pushSubscriptionUpsertResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getPushSubscriptionUpsertUrl = () => {
+  return `/notifications/push/subscriptions`;
+};
+
+/**
+ * Register or refresh the authenticated account's browser push
+ * subscription. Web Push must be enabled on the instance.
+ */
+export const pushSubscriptionUpsert = async (
+  pushSubscriptionInput: PushSubscriptionInput,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<pushSubscriptionUpsertResponseSuccess> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return fetcher<pushSubscriptionUpsertResponseSuccess>(
+    getPushSubscriptionUpsertUrl(),
+    {
+      ...options,
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(pushSubscriptionInput),
+    },
+  );
+};
+
+export type pushSubscriptionDeleteResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type pushSubscriptionDeleteResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type pushSubscriptionDeleteResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type pushSubscriptionDeleteResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 204 | 401 | 404>;
+};
+
+export type pushSubscriptionDeleteResponseSuccess =
+  pushSubscriptionDeleteResponse204 & {
+    headers: Headers;
+  };
+export type pushSubscriptionDeleteResponseError = (
+  | pushSubscriptionDeleteResponse401
+  | pushSubscriptionDeleteResponse404
+  | pushSubscriptionDeleteResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getPushSubscriptionDeleteUrl = (
+  pushSubscriptionId: Identifier,
+) => {
+  return `/notifications/push/subscriptions/${pushSubscriptionId}`;
+};
+
+/**
+ * Remove a browser push subscription owned by the authenticated account.
+ * Available even when Web Push is disabled.
+ */
+export const pushSubscriptionDelete = async (
+  pushSubscriptionId: Identifier,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<pushSubscriptionDeleteResponseSuccess> => {
+  return fetcher<pushSubscriptionDeleteResponseSuccess>(
+    getPushSubscriptionDeleteUrl(pushSubscriptionId),
+    {
+      ...options,
+      method: "DELETE",
     },
   );
 };

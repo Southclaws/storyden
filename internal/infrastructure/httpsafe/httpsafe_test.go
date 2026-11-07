@@ -80,3 +80,76 @@ func TestGuardRejectsDisallowedLiteralHost(t *testing.T) {
 	_, err := Guard(resolve, nil)(context.Background(), "tcp", "169.254.169.254:80")
 	require.ErrorIs(t, err, ErrDisallowedHost)
 }
+
+func TestGuardRejectsLocalIPv6(t *testing.T) {
+	t.Parallel()
+
+	for _, host := range []string{
+		"64:ff9b:1::",
+		"64:ff9b:1::a00:1",
+		"64:ff9b:1:ffff:ffff:ffff:ffff:ffff",
+		"fec0::",
+		"fec0::1",
+		"feff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+		"fc00::1%en0",
+		"fec0::1%en0",
+	} {
+		t.Run(host, func(t *testing.T) {
+			t.Run("literal", func(t *testing.T) {
+				r := require.New(t)
+				a := assert.New(t)
+
+				dialed := false
+				dial := func(context.Context, string, string) (net.Conn, error) {
+					dialed = true
+					return nil, nil
+				}
+
+				_, err := Guard(nil, dial)(context.Background(), "tcp", net.JoinHostPort(host, "443"))
+				r.ErrorIs(err, ErrDisallowedHost)
+				a.False(dialed)
+			})
+
+			t.Run("dns", func(t *testing.T) {
+				r := require.New(t)
+				a := assert.New(t)
+
+				resolve := func(context.Context, string, string) ([]netip.Addr, error) {
+					return []netip.Addr{
+						netip.MustParseAddr("8.8.8.8"),
+						netip.MustParseAddr(host),
+					}, nil
+				}
+
+				dialed := false
+				dial := func(context.Context, string, string) (net.Conn, error) {
+					dialed = true
+					return nil, nil
+				}
+
+				_, err := Guard(resolve, dial)(context.Background(), "tcp", "push.example:443")
+				r.ErrorIs(err, ErrDisallowedAddress)
+				a.False(dialed)
+			})
+		})
+	}
+}
+
+func TestGuardRejectsInvalidResolution(t *testing.T) {
+	r := require.New(t)
+	a := assert.New(t)
+
+	resolve := func(context.Context, string, string) ([]netip.Addr, error) {
+		return []netip.Addr{{}}, nil
+	}
+
+	dialed := false
+	dial := func(context.Context, string, string) (net.Conn, error) {
+		dialed = true
+		return nil, nil
+	}
+
+	_, err := Guard(resolve, dial)(context.Background(), "tcp", "push.example:443")
+	r.ErrorIs(err, ErrDisallowedAddress)
+	a.False(dialed)
+}

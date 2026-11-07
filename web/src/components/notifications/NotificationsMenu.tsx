@@ -8,6 +8,7 @@ import { SettingsIcon } from "@/components/ui/icons/Settings";
 import { LinkButton } from "@/components/ui/link-button";
 import * as Menu from "@/components/ui/menu";
 import { Text } from "@/components/ui/text";
+import { useWebPushPermission } from "@/lib/webpush/useWebPushPermission";
 import { Center, LStack, WStack } from "@/styled-system/jsx";
 import { hstack } from "@/styled-system/patterns";
 import { deriveError } from "@/utils/error";
@@ -18,6 +19,7 @@ import { Props, useNotifications } from "./useNotifications";
 
 export function NotificationsMenu(props: Props) {
   const { ready, error, data, handlers } = useNotifications(props);
+  const requestPushPermission = useWebPushPermission();
   if (!ready) {
     return (
       <NotificationsTrigger
@@ -42,6 +44,7 @@ export function NotificationsMenu(props: Props) {
           size="sm"
           variant="ghost"
           unread={!isEmpty}
+          onClick={() => void requestPushPermission()}
         />
       </Menu.Trigger>
 
@@ -99,7 +102,7 @@ export function NotificationsMenu(props: Props) {
                             overflow="hidden"
                             maxW="full"
                           >
-                            {notification.source?.handle ?? "System"}
+                            {notification.title}
                           </Text>
                           <Text as="span" variant="supporting">
                             {notification.description}

@@ -43,6 +43,7 @@ export const pluginEventNames = [
   "EventActivityDeleted",
   "EventActivityPublished",
   "EventSettingsUpdated",
+  "EventNotificationCreated",
 ] as const;
 
 export type PluginEventName = (typeof pluginEventNames)[number];
@@ -273,6 +274,11 @@ export const events = [
     label: "Settings updated",
     description:
       "Emitted when site settings are updated via the admin settings manager.",
+  },
+  {
+    name: "EventNotificationCreated",
+    label: "Notification created",
+    description: "Emitted after an account notification is created.",
   },
 ] as const satisfies readonly {
   name: PluginEventName;

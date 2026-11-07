@@ -45,6 +45,7 @@ plugin_event_names = [
     "EventActivityDeleted",
     "EventActivityPublished",
     "EventSettingsUpdated",
+    "EventNotificationCreated",
 ]
 
 EventName: TypeAlias = Literal[
@@ -90,6 +91,7 @@ EventName: TypeAlias = Literal[
     "EventActivityDeleted",
     "EventActivityPublished",
     "EventSettingsUpdated",
+    "EventNotificationCreated",
 ]
 
 __all__ = ["EventName", "plugin_event_names"]

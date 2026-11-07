@@ -529,3 +529,15 @@ Payload fields:
 | `event` | `string, const EventSettingsUpdated` | Yes | - |
 | `settings` | `object` | Yes | Settings object |
 
+### EventNotificationCreated
+
+Emitted after an account notification is created.
+
+Payload fields:
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `event` | `string, const EventNotificationCreated` | Yes | - |
+| `account_id` | `string (accountID)` | Yes | Notification recipient account ID |
+| `id` | `string (xid)` | Yes | Notification ID |
+

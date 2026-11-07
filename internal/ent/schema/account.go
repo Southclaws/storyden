@@ -62,6 +62,9 @@ func (Account) Edges() []ent.Edge {
 		edge.To("emails", Email.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
+		edge.To("push_subscriptions", PushSubscription.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
 		edge.To("notifications", Notification.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 

@@ -56,6 +56,7 @@ ENV NEXT_BUILD_STANDALONE=true
 # this ensures no SSG runs during the Docker build.
 RUN --mount=type=cache,target=/storyden/.next/cache \
     corepack enable && \
+    pnpm build:worker && \
     pnpm next build --experimental-build-mode=compile
 
 #

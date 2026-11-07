@@ -5,6 +5,7 @@ export type NotificationItem = {
   createdAt: Date;
   title: string;
   description: string;
+  body: string;
   url: string;
   isRead: boolean;
   source?: ProfileReference;

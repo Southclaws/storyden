@@ -32,12 +32,14 @@ var disallowedPrefixes = []netip.Prefix{
 	netip.MustParsePrefix("::/128"),
 	netip.MustParsePrefix("::1/128"),
 	netip.MustParsePrefix("64:ff9b::/96"),
+	netip.MustParsePrefix("64:ff9b:1::/48"),
 	// 6to4 and teredo embed an arbitrary ipv4 address that would otherwise
 	// bypass the ipv4 checks above
 	netip.MustParsePrefix("2001::/32"),
 	netip.MustParsePrefix("2002::/16"),
 	netip.MustParsePrefix("fc00::/7"),
 	netip.MustParsePrefix("fe80::/10"),
+	netip.MustParsePrefix("fec0::/10"),
 }
 
 // resolveFunc matches net.Resolver.LookupNetIP so a stub can be injected in tests
@@ -48,6 +50,14 @@ type DialFunc func(ctx context.Context, network, address string) (net.Conn, erro
 
 // IsDisallowedAddr reports whether addr is unsafe to reach from the server
 func IsDisallowedAddr(addr netip.Addr) bool {
+	if !addr.IsValid() {
+		return true
+	}
+
+	if addr.Zone() != "" {
+		return true
+	}
+
 	addr = addr.Unmap()
 	if addr.IsLoopback() ||
 		addr.IsLinkLocalUnicast() ||

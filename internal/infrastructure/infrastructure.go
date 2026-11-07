@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/sms"
 	"github.com/Southclaws/storyden/internal/infrastructure/vector/pinecone"
 	"github.com/Southclaws/storyden/internal/infrastructure/webauthn"
+	"github.com/Southclaws/storyden/internal/infrastructure/webpush"
 )
 
 func Build() fx.Option {
@@ -38,5 +39,6 @@ func Build() fx.Option {
 		fx.Provide(ai.New),
 		jwt.Build(),
 		pubsub.Build(),
+		fx.Provide(webpush.New),
 	)
 }

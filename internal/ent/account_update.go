@@ -40,6 +40,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
+	"github.com/Southclaws/storyden/internal/ent/pushsubscription"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/report"
 	"github.com/Southclaws/storyden/internal/ent/robot"
@@ -345,6 +346,21 @@ func (_u *AccountUpdate) AddEmails(v ...*Email) *AccountUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.AddEmailIDs(ids...)
+}
+
+// AddPushSubscriptionIDs adds the "push_subscriptions" edge to the PushSubscription entity by IDs.
+func (_u *AccountUpdate) AddPushSubscriptionIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddPushSubscriptionIDs(ids...)
+	return _u
+}
+
+// AddPushSubscriptions adds the "push_subscriptions" edges to the PushSubscription entity.
+func (_u *AccountUpdate) AddPushSubscriptions(v ...*PushSubscription) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddPushSubscriptionIDs(ids...)
 }
 
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
@@ -1138,6 +1154,27 @@ func (_u *AccountUpdate) RemoveEmails(v ...*Email) *AccountUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveEmailIDs(ids...)
+}
+
+// ClearPushSubscriptions clears all "push_subscriptions" edges to the PushSubscription entity.
+func (_u *AccountUpdate) ClearPushSubscriptions() *AccountUpdate {
+	_u.mutation.ClearPushSubscriptions()
+	return _u
+}
+
+// RemovePushSubscriptionIDs removes the "push_subscriptions" edge to PushSubscription entities by IDs.
+func (_u *AccountUpdate) RemovePushSubscriptionIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemovePushSubscriptionIDs(ids...)
+	return _u
+}
+
+// RemovePushSubscriptions removes "push_subscriptions" edges to PushSubscription entities.
+func (_u *AccountUpdate) RemovePushSubscriptions(v ...*PushSubscription) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemovePushSubscriptionIDs(ids...)
 }
 
 // ClearNotifications clears all "notifications" edges to the Notification entity.
@@ -2426,6 +2463,51 @@ func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.PushSubscriptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PushSubscriptionsTable,
+			Columns: []string{account.PushSubscriptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pushsubscription.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedPushSubscriptionsIDs(); len(nodes) > 0 && !_u.mutation.PushSubscriptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PushSubscriptionsTable,
+			Columns: []string{account.PushSubscriptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pushsubscription.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PushSubscriptionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PushSubscriptionsTable,
+			Columns: []string{account.PushSubscriptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pushsubscription.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -4936,6 +5018,21 @@ func (_u *AccountUpdateOne) AddEmails(v ...*Email) *AccountUpdateOne {
 	return _u.AddEmailIDs(ids...)
 }
 
+// AddPushSubscriptionIDs adds the "push_subscriptions" edge to the PushSubscription entity by IDs.
+func (_u *AccountUpdateOne) AddPushSubscriptionIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddPushSubscriptionIDs(ids...)
+	return _u
+}
+
+// AddPushSubscriptions adds the "push_subscriptions" edges to the PushSubscription entity.
+func (_u *AccountUpdateOne) AddPushSubscriptions(v ...*PushSubscription) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddPushSubscriptionIDs(ids...)
+}
+
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
 func (_u *AccountUpdateOne) AddNotificationIDs(ids ...xid.ID) *AccountUpdateOne {
 	_u.mutation.AddNotificationIDs(ids...)
@@ -5727,6 +5824,27 @@ func (_u *AccountUpdateOne) RemoveEmails(v ...*Email) *AccountUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveEmailIDs(ids...)
+}
+
+// ClearPushSubscriptions clears all "push_subscriptions" edges to the PushSubscription entity.
+func (_u *AccountUpdateOne) ClearPushSubscriptions() *AccountUpdateOne {
+	_u.mutation.ClearPushSubscriptions()
+	return _u
+}
+
+// RemovePushSubscriptionIDs removes the "push_subscriptions" edge to PushSubscription entities by IDs.
+func (_u *AccountUpdateOne) RemovePushSubscriptionIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemovePushSubscriptionIDs(ids...)
+	return _u
+}
+
+// RemovePushSubscriptions removes "push_subscriptions" edges to PushSubscription entities.
+func (_u *AccountUpdateOne) RemovePushSubscriptions(v ...*PushSubscription) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemovePushSubscriptionIDs(ids...)
 }
 
 // ClearNotifications clears all "notifications" edges to the Notification entity.
@@ -7045,6 +7163,51 @@ func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.PushSubscriptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PushSubscriptionsTable,
+			Columns: []string{account.PushSubscriptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pushsubscription.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedPushSubscriptionsIDs(); len(nodes) > 0 && !_u.mutation.PushSubscriptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PushSubscriptionsTable,
+			Columns: []string{account.PushSubscriptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pushsubscription.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PushSubscriptionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PushSubscriptionsTable,
+			Columns: []string{account.PushSubscriptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pushsubscription.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
