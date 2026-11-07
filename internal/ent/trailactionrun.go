@@ -50,8 +50,6 @@ type TrailActionRun struct {
 	StartedAt *time.Time `json:"started_at,omitempty"`
 	// FinishedAt holds the value of the "finished_at" field.
 	FinishedAt *time.Time `json:"finished_at,omitempty"`
-	// NotifiedAt holds the value of the "notified_at" field.
-	NotifiedAt *time.Time `json:"notified_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TrailActionRunQuery when eager-loading is set.
 	Edges        TrailActionRunEdges `json:"edges"`
@@ -100,7 +98,7 @@ func (*TrailActionRun) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case trailactionrun.FieldKind, trailactionrun.FieldStatus, trailactionrun.FieldLeaseToken, trailactionrun.FieldErrorText:
 			values[i] = new(sql.NullString)
-		case trailactionrun.FieldCreatedAt, trailactionrun.FieldUpdatedAt, trailactionrun.FieldLeaseExpiresAt, trailactionrun.FieldStartedAt, trailactionrun.FieldFinishedAt, trailactionrun.FieldNotifiedAt:
+		case trailactionrun.FieldCreatedAt, trailactionrun.FieldUpdatedAt, trailactionrun.FieldLeaseExpiresAt, trailactionrun.FieldStartedAt, trailactionrun.FieldFinishedAt:
 			values[i] = new(sql.NullTime)
 		case trailactionrun.FieldID, trailactionrun.FieldRunID, trailactionrun.FieldActionID:
 			values[i] = new(xid.ID)
@@ -220,13 +218,6 @@ func (_m *TrailActionRun) assignValues(columns []string, values []any) error {
 				_m.FinishedAt = new(time.Time)
 				*_m.FinishedAt = value.Time
 			}
-		case trailactionrun.FieldNotifiedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field notified_at", values[i])
-			} else if value.Valid {
-				_m.NotifiedAt = new(time.Time)
-				*_m.NotifiedAt = value.Time
-			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -322,11 +313,6 @@ func (_m *TrailActionRun) String() string {
 	builder.WriteString(", ")
 	if v := _m.FinishedAt; v != nil {
 		builder.WriteString("finished_at=")
-		builder.WriteString(v.Format(time.ANSIC))
-	}
-	builder.WriteString(", ")
-	if v := _m.NotifiedAt; v != nil {
-		builder.WriteString("notified_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteByte(')')

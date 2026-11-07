@@ -845,35 +845,6 @@ func (r *Repository) AggregateRun(ctx context.Context, actionRunID ActionRunID) 
 	return fault.Wrap(err, fctx.With(ctx))
 }
 
-func (r *Repository) RecordAttentionNotification(ctx context.Context, id ActionRunID, creatorID xid.ID, target string) (bool, error) {
-	recorded := false
-	err := ent.WithTx(ctx, r.db, func(tx *ent.Tx) error {
-		updated, err := tx.TrailActionRun.Update().Where(
-			entactionrun.IDEQ(xid.ID(id)), entactionrun.NotifiedAtIsNil(),
-		).SetNotifiedAt(time.Now().UTC()).Save(ctx)
-		if err != nil {
-			return err
-		}
-		if updated == 0 {
-			return nil
-		}
-		if _, err := tx.Notification.Create().
-			SetOwnerID(creatorID).
-			SetEventType("trail_run_attention").
-			SetTarget(target).
-			SetRead(false).
-			Save(ctx); err != nil {
-			return err
-		}
-		recorded = true
-		return nil
-	})
-	if err != nil {
-		return false, fault.Wrap(err, fctx.With(ctx))
-	}
-	return recorded, nil
-}
-
 func mapTrail(row *ent.Trail) (*Trail, error) {
 	creator, err := account.MapRef(row.Edges.Creator)
 	if err != nil {
@@ -984,7 +955,6 @@ func mapActionRun(row *ent.TrailActionRun) (*ActionRun, error) {
 		ErrorText:      row.ErrorText,
 		StartedAt:      row.StartedAt,
 		FinishedAt:     row.FinishedAt,
-		NotifiedAt:     row.NotifiedAt,
 		CreatedAt:      row.CreatedAt,
 		UpdatedAt:      row.UpdatedAt,
 	}

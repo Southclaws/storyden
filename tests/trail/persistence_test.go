@@ -379,22 +379,6 @@ func TestTrailActionFanoutAndRecovery(t *testing.T) {
 				a.Equal("semantic failure", *finished.ActionRuns[1].ErrorText)
 			})
 
-			t.Run("attention_notification_is_deduplicated", func(t *testing.T) {
-				r := require.New(t)
-				a := assert.New(t)
-
-				failed := manual.ActionRuns[1]
-				target := manual.ID.String()
-
-				recorded, err := repository.RecordAttentionNotification(root, failed.ID, creatorID, target)
-				r.NoError(err)
-				a.True(recorded)
-
-				recorded, err = repository.RecordAttentionNotification(root, failed.ID, creatorID, target)
-				r.NoError(err)
-				a.False(recorded)
-			})
-
 			t.Run("all_cancelled_aggregates_cancelled", func(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)

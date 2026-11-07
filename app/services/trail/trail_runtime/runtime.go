@@ -8,6 +8,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/trail"
+	"github.com/Southclaws/storyden/app/services/notification/notify"
 	"github.com/Southclaws/storyden/app/services/trail/trail_action_registry"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
@@ -18,6 +19,7 @@ type Runtime struct {
 	logger     *slog.Logger
 	repository *trail.Repository
 	registry   *trail_action_registry.Registry
+	notifier   *notify.Notifier
 	bus        *pubsub.Bus
 
 	schedulerMu    sync.Mutex
@@ -35,6 +37,7 @@ func New(
 	logger *slog.Logger,
 	repository *trail.Repository,
 	registry *trail_action_registry.Registry,
+	notifier *notify.Notifier,
 	bus *pubsub.Bus,
 ) *Runtime {
 	runtimeCtx, cancel := context.WithCancel(ctx)
@@ -44,6 +47,7 @@ func New(
 		logger:             logger,
 		repository:         repository,
 		registry:           registry,
+		notifier:           notifier,
 		bus:                bus,
 		eventSubscriptions: map[trail.ID]eventSubscription{},
 	}

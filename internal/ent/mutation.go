@@ -64528,7 +64528,6 @@ type TrailActionRunMutation struct {
 	error_text       *string
 	started_at       *time.Time
 	finished_at      *time.Time
-	notified_at      *time.Time
 	clearedFields    map[string]struct{}
 	run              *xid.ID
 	clearedrun       bool
@@ -65285,55 +65284,6 @@ func (m *TrailActionRunMutation) ResetFinishedAt() {
 	delete(m.clearedFields, trailactionrun.FieldFinishedAt)
 }
 
-// SetNotifiedAt sets the "notified_at" field.
-func (m *TrailActionRunMutation) SetNotifiedAt(t time.Time) {
-	m.notified_at = &t
-}
-
-// NotifiedAt returns the value of the "notified_at" field in the mutation.
-func (m *TrailActionRunMutation) NotifiedAt() (r time.Time, exists bool) {
-	v := m.notified_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldNotifiedAt returns the old "notified_at" field's value of the TrailActionRun entity.
-// If the TrailActionRun object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TrailActionRunMutation) OldNotifiedAt(ctx context.Context) (v *time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldNotifiedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldNotifiedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldNotifiedAt: %w", err)
-	}
-	return oldValue.NotifiedAt, nil
-}
-
-// ClearNotifiedAt clears the value of the "notified_at" field.
-func (m *TrailActionRunMutation) ClearNotifiedAt() {
-	m.notified_at = nil
-	m.clearedFields[trailactionrun.FieldNotifiedAt] = struct{}{}
-}
-
-// NotifiedAtCleared returns if the "notified_at" field was cleared in this mutation.
-func (m *TrailActionRunMutation) NotifiedAtCleared() bool {
-	_, ok := m.clearedFields[trailactionrun.FieldNotifiedAt]
-	return ok
-}
-
-// ResetNotifiedAt resets all changes to the "notified_at" field.
-func (m *TrailActionRunMutation) ResetNotifiedAt() {
-	m.notified_at = nil
-	delete(m.clearedFields, trailactionrun.FieldNotifiedAt)
-}
-
 // ClearRun clears the "run" edge to the TrailRun entity.
 func (m *TrailActionRunMutation) ClearRun() {
 	m.clearedrun = true
@@ -65422,7 +65372,7 @@ func (m *TrailActionRunMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TrailActionRunMutation) Fields() []string {
-	fields := make([]string, 0, 15)
+	fields := make([]string, 0, 14)
 	if m.created_at != nil {
 		fields = append(fields, trailactionrun.FieldCreatedAt)
 	}
@@ -65465,9 +65415,6 @@ func (m *TrailActionRunMutation) Fields() []string {
 	if m.finished_at != nil {
 		fields = append(fields, trailactionrun.FieldFinishedAt)
 	}
-	if m.notified_at != nil {
-		fields = append(fields, trailactionrun.FieldNotifiedAt)
-	}
 	return fields
 }
 
@@ -65504,8 +65451,6 @@ func (m *TrailActionRunMutation) Field(name string) (ent.Value, bool) {
 		return m.StartedAt()
 	case trailactionrun.FieldFinishedAt:
 		return m.FinishedAt()
-	case trailactionrun.FieldNotifiedAt:
-		return m.NotifiedAt()
 	}
 	return nil, false
 }
@@ -65543,8 +65488,6 @@ func (m *TrailActionRunMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldStartedAt(ctx)
 	case trailactionrun.FieldFinishedAt:
 		return m.OldFinishedAt(ctx)
-	case trailactionrun.FieldNotifiedAt:
-		return m.OldNotifiedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown TrailActionRun field %s", name)
 }
@@ -65652,13 +65595,6 @@ func (m *TrailActionRunMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetFinishedAt(v)
 		return nil
-	case trailactionrun.FieldNotifiedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetNotifiedAt(v)
-		return nil
 	}
 	return fmt.Errorf("unknown TrailActionRun field %s", name)
 }
@@ -65710,9 +65646,6 @@ func (m *TrailActionRunMutation) ClearedFields() []string {
 	if m.FieldCleared(trailactionrun.FieldFinishedAt) {
 		fields = append(fields, trailactionrun.FieldFinishedAt)
 	}
-	if m.FieldCleared(trailactionrun.FieldNotifiedAt) {
-		fields = append(fields, trailactionrun.FieldNotifiedAt)
-	}
 	return fields
 }
 
@@ -65747,9 +65680,6 @@ func (m *TrailActionRunMutation) ClearField(name string) error {
 		return nil
 	case trailactionrun.FieldFinishedAt:
 		m.ClearFinishedAt()
-		return nil
-	case trailactionrun.FieldNotifiedAt:
-		m.ClearNotifiedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown TrailActionRun nullable field %s", name)
@@ -65800,9 +65730,6 @@ func (m *TrailActionRunMutation) ResetField(name string) error {
 		return nil
 	case trailactionrun.FieldFinishedAt:
 		m.ResetFinishedAt()
-		return nil
-	case trailactionrun.FieldNotifiedAt:
-		m.ResetNotifiedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown TrailActionRun field %s", name)

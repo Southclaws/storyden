@@ -6,9 +6,12 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/rs/xid"
+	"github.com/Southclaws/opt"
 
+	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/trail"
+	"github.com/Southclaws/storyden/app/services/notification/notify"
 	"github.com/Southclaws/storyden/app/services/trail/trail_action_registry"
 )
 
@@ -88,8 +91,13 @@ func (r *Runtime) finishAction(ctx context.Context, run *trail.ActionRun, result
 	}
 
 	if (result.Status == trail.ActionRunStatusBlocked || result.Status == trail.ActionRunStatusFailed) && run.Trail != nil {
-		target := run.RunID.String()
-		if _, err := r.repository.RecordAttentionNotification(ctx, run.ID, xid.ID(run.Trail.Creator.ID), target); err != nil {
+		if err := r.notifier.Send(ctx,
+			run.Trail.Creator.ID,
+			opt.NewEmpty[account.AccountID](),
+			notification.EventTrailRunAttention,
+			nil,
+			notify.WithTarget(run.RunID.String()),
+		); err != nil {
 			r.logger.Error("failed to notify Trail creator", slog.String("action_run_id", run.ID.String()), slog.String("error", err.Error()))
 		}
 	}

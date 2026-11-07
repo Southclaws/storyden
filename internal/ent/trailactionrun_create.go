@@ -167,20 +167,6 @@ func (_c *TrailActionRunCreate) SetNillableFinishedAt(v *time.Time) *TrailAction
 	return _c
 }
 
-// SetNotifiedAt sets the "notified_at" field.
-func (_c *TrailActionRunCreate) SetNotifiedAt(v time.Time) *TrailActionRunCreate {
-	_c.mutation.SetNotifiedAt(v)
-	return _c
-}
-
-// SetNillableNotifiedAt sets the "notified_at" field if the given value is not nil.
-func (_c *TrailActionRunCreate) SetNillableNotifiedAt(v *time.Time) *TrailActionRunCreate {
-	if v != nil {
-		_c.SetNotifiedAt(*v)
-	}
-	return _c
-}
-
 // SetID sets the "id" field.
 func (_c *TrailActionRunCreate) SetID(v xid.ID) *TrailActionRunCreate {
 	_c.mutation.SetID(v)
@@ -376,10 +362,6 @@ func (_c *TrailActionRunCreate) createSpec() (*TrailActionRun, *sqlgraph.CreateS
 	if value, ok := _c.mutation.FinishedAt(); ok {
 		_spec.SetField(trailactionrun.FieldFinishedAt, field.TypeTime, value)
 		_node.FinishedAt = &value
-	}
-	if value, ok := _c.mutation.NotifiedAt(); ok {
-		_spec.SetField(trailactionrun.FieldNotifiedAt, field.TypeTime, value)
-		_node.NotifiedAt = &value
 	}
 	if nodes := _c.mutation.RunIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -614,24 +596,6 @@ func (u *TrailActionRunUpsert) UpdateFinishedAt() *TrailActionRunUpsert {
 // ClearFinishedAt clears the value of the "finished_at" field.
 func (u *TrailActionRunUpsert) ClearFinishedAt() *TrailActionRunUpsert {
 	u.SetNull(trailactionrun.FieldFinishedAt)
-	return u
-}
-
-// SetNotifiedAt sets the "notified_at" field.
-func (u *TrailActionRunUpsert) SetNotifiedAt(v time.Time) *TrailActionRunUpsert {
-	u.Set(trailactionrun.FieldNotifiedAt, v)
-	return u
-}
-
-// UpdateNotifiedAt sets the "notified_at" field to the value that was provided on create.
-func (u *TrailActionRunUpsert) UpdateNotifiedAt() *TrailActionRunUpsert {
-	u.SetExcluded(trailactionrun.FieldNotifiedAt)
-	return u
-}
-
-// ClearNotifiedAt clears the value of the "notified_at" field.
-func (u *TrailActionRunUpsert) ClearNotifiedAt() *TrailActionRunUpsert {
-	u.SetNull(trailactionrun.FieldNotifiedAt)
 	return u
 }
 
@@ -870,27 +834,6 @@ func (u *TrailActionRunUpsertOne) UpdateFinishedAt() *TrailActionRunUpsertOne {
 func (u *TrailActionRunUpsertOne) ClearFinishedAt() *TrailActionRunUpsertOne {
 	return u.Update(func(s *TrailActionRunUpsert) {
 		s.ClearFinishedAt()
-	})
-}
-
-// SetNotifiedAt sets the "notified_at" field.
-func (u *TrailActionRunUpsertOne) SetNotifiedAt(v time.Time) *TrailActionRunUpsertOne {
-	return u.Update(func(s *TrailActionRunUpsert) {
-		s.SetNotifiedAt(v)
-	})
-}
-
-// UpdateNotifiedAt sets the "notified_at" field to the value that was provided on create.
-func (u *TrailActionRunUpsertOne) UpdateNotifiedAt() *TrailActionRunUpsertOne {
-	return u.Update(func(s *TrailActionRunUpsert) {
-		s.UpdateNotifiedAt()
-	})
-}
-
-// ClearNotifiedAt clears the value of the "notified_at" field.
-func (u *TrailActionRunUpsertOne) ClearNotifiedAt() *TrailActionRunUpsertOne {
-	return u.Update(func(s *TrailActionRunUpsert) {
-		s.ClearNotifiedAt()
 	})
 }
 
@@ -1296,27 +1239,6 @@ func (u *TrailActionRunUpsertBulk) UpdateFinishedAt() *TrailActionRunUpsertBulk 
 func (u *TrailActionRunUpsertBulk) ClearFinishedAt() *TrailActionRunUpsertBulk {
 	return u.Update(func(s *TrailActionRunUpsert) {
 		s.ClearFinishedAt()
-	})
-}
-
-// SetNotifiedAt sets the "notified_at" field.
-func (u *TrailActionRunUpsertBulk) SetNotifiedAt(v time.Time) *TrailActionRunUpsertBulk {
-	return u.Update(func(s *TrailActionRunUpsert) {
-		s.SetNotifiedAt(v)
-	})
-}
-
-// UpdateNotifiedAt sets the "notified_at" field to the value that was provided on create.
-func (u *TrailActionRunUpsertBulk) UpdateNotifiedAt() *TrailActionRunUpsertBulk {
-	return u.Update(func(s *TrailActionRunUpsert) {
-		s.UpdateNotifiedAt()
-	})
-}
-
-// ClearNotifiedAt clears the value of the "notified_at" field.
-func (u *TrailActionRunUpsertBulk) ClearNotifiedAt() *TrailActionRunUpsertBulk {
-	return u.Update(func(s *TrailActionRunUpsert) {
-		s.ClearNotifiedAt()
 	})
 }
 

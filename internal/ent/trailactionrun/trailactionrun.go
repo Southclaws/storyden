@@ -44,8 +44,6 @@ const (
 	FieldStartedAt = "started_at"
 	// FieldFinishedAt holds the string denoting the finished_at field in the database.
 	FieldFinishedAt = "finished_at"
-	// FieldNotifiedAt holds the string denoting the notified_at field in the database.
-	FieldNotifiedAt = "notified_at"
 	// EdgeRun holds the string denoting the run edge name in mutations.
 	EdgeRun = "run"
 	// EdgeAction holds the string denoting the action edge name in mutations.
@@ -85,7 +83,6 @@ var Columns = []string{
 	FieldErrorText,
 	FieldStartedAt,
 	FieldFinishedAt,
-	FieldNotifiedAt,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -199,11 +196,6 @@ func ByStartedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByFinishedAt orders the results by the finished_at field.
 func ByFinishedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldFinishedAt, opts...).ToFunc()
-}
-
-// ByNotifiedAt orders the results by the notified_at field.
-func ByNotifiedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldNotifiedAt, opts...).ToFunc()
 }
 
 // ByRunField orders the results by run field.

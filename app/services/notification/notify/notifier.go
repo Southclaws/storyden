@@ -50,13 +50,27 @@ func New(
 	return n
 }
 
-func (n *Notifier) Send(ctx context.Context, targetID account.AccountID, sourceID opt.Optional[account.AccountID], event notification.Event, item *datagraph.Ref) error {
-	if err := n.bus.SendCommand(ctx, &message.CommandSendNotification{
+type Option func(*message.CommandSendNotification)
+
+func WithTarget(target string) Option {
+	return func(cmd *message.CommandSendNotification) {
+		cmd.Target = opt.New(target)
+	}
+}
+
+func (n *Notifier) Send(ctx context.Context, targetID account.AccountID, sourceID opt.Optional[account.AccountID], event notification.Event, item *datagraph.Ref, opts ...Option) error {
+	cmd := &message.CommandSendNotification{
 		Event:    event,
 		Item:     item,
 		TargetID: targetID,
 		SourceID: sourceID,
-	}); err != nil {
+	}
+
+	for _, opt := range opts {
+		opt(cmd)
+	}
+
+	if err := n.bus.SendCommand(ctx, cmd); err != nil {
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to publish notification command"))
 	}
 	return nil

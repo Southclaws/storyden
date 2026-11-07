@@ -146,7 +146,6 @@ type ActionRun struct {
 	ErrorText      *string
 	StartedAt      *time.Time
 	FinishedAt     *time.Time
-	NotifiedAt     *time.Time
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	Run            *Run

@@ -2207,7 +2207,6 @@ var (
 		{Name: "error_text", Type: field.TypeString, Nullable: true},
 		{Name: "started_at", Type: field.TypeTime, Nullable: true},
 		{Name: "finished_at", Type: field.TypeTime, Nullable: true},
-		{Name: "notified_at", Type: field.TypeTime, Nullable: true},
 		{Name: "action_id", Type: field.TypeString, Size: 20},
 		{Name: "run_id", Type: field.TypeString, Size: 20},
 	}
@@ -2219,13 +2218,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "trail_action_runs_trail_actions_runs",
-				Columns:    []*schema.Column{TrailActionRunsColumns[14]},
+				Columns:    []*schema.Column{TrailActionRunsColumns[13]},
 				RefColumns: []*schema.Column{TrailActionsColumns[0]},
 				OnDelete:   schema.Restrict,
 			},
 			{
 				Symbol:     "trail_action_runs_trail_runs_action_runs",
-				Columns:    []*schema.Column{TrailActionRunsColumns[15]},
+				Columns:    []*schema.Column{TrailActionRunsColumns[14]},
 				RefColumns: []*schema.Column{TrailRunsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -2234,7 +2233,7 @@ var (
 			{
 				Name:    "trailactionrun_run_id_action_id",
 				Unique:  true,
-				Columns: []*schema.Column{TrailActionRunsColumns[15], TrailActionRunsColumns[14]},
+				Columns: []*schema.Column{TrailActionRunsColumns[14], TrailActionRunsColumns[13]},
 			},
 			{
 				Name:    "trailactionrun_status_lease_expires_at_created_at",

@@ -33,7 +33,6 @@ func (TrailActionRun) Fields() []ent.Field {
 		field.String("error_text").Optional().Nillable(),
 		field.Time("started_at").Optional().Nillable(),
 		field.Time("finished_at").Optional().Nillable(),
-		field.Time("notified_at").Optional().Nillable(),
 	}
 }
 

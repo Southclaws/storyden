@@ -187,26 +187,6 @@ func (_u *TrailActionRunUpdate) ClearFinishedAt() *TrailActionRunUpdate {
 	return _u
 }
 
-// SetNotifiedAt sets the "notified_at" field.
-func (_u *TrailActionRunUpdate) SetNotifiedAt(v time.Time) *TrailActionRunUpdate {
-	_u.mutation.SetNotifiedAt(v)
-	return _u
-}
-
-// SetNillableNotifiedAt sets the "notified_at" field if the given value is not nil.
-func (_u *TrailActionRunUpdate) SetNillableNotifiedAt(v *time.Time) *TrailActionRunUpdate {
-	if v != nil {
-		_u.SetNotifiedAt(*v)
-	}
-	return _u
-}
-
-// ClearNotifiedAt clears the value of the "notified_at" field.
-func (_u *TrailActionRunUpdate) ClearNotifiedAt() *TrailActionRunUpdate {
-	_u.mutation.ClearNotifiedAt()
-	return _u
-}
-
 // Mutation returns the TrailActionRunMutation object of the builder.
 func (_u *TrailActionRunUpdate) Mutation() *TrailActionRunMutation {
 	return _u.mutation
@@ -339,12 +319,6 @@ func (_u *TrailActionRunUpdate) sqlSave(ctx context.Context) (_node int, err err
 	}
 	if _u.mutation.FinishedAtCleared() {
 		_spec.ClearField(trailactionrun.FieldFinishedAt, field.TypeTime)
-	}
-	if value, ok := _u.mutation.NotifiedAt(); ok {
-		_spec.SetField(trailactionrun.FieldNotifiedAt, field.TypeTime, value)
-	}
-	if _u.mutation.NotifiedAtCleared() {
-		_spec.ClearField(trailactionrun.FieldNotifiedAt, field.TypeTime)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
@@ -524,26 +498,6 @@ func (_u *TrailActionRunUpdateOne) ClearFinishedAt() *TrailActionRunUpdateOne {
 	return _u
 }
 
-// SetNotifiedAt sets the "notified_at" field.
-func (_u *TrailActionRunUpdateOne) SetNotifiedAt(v time.Time) *TrailActionRunUpdateOne {
-	_u.mutation.SetNotifiedAt(v)
-	return _u
-}
-
-// SetNillableNotifiedAt sets the "notified_at" field if the given value is not nil.
-func (_u *TrailActionRunUpdateOne) SetNillableNotifiedAt(v *time.Time) *TrailActionRunUpdateOne {
-	if v != nil {
-		_u.SetNotifiedAt(*v)
-	}
-	return _u
-}
-
-// ClearNotifiedAt clears the value of the "notified_at" field.
-func (_u *TrailActionRunUpdateOne) ClearNotifiedAt() *TrailActionRunUpdateOne {
-	_u.mutation.ClearNotifiedAt()
-	return _u
-}
-
 // Mutation returns the TrailActionRunMutation object of the builder.
 func (_u *TrailActionRunUpdateOne) Mutation() *TrailActionRunMutation {
 	return _u.mutation
@@ -706,12 +660,6 @@ func (_u *TrailActionRunUpdateOne) sqlSave(ctx context.Context) (_node *TrailAct
 	}
 	if _u.mutation.FinishedAtCleared() {
 		_spec.ClearField(trailactionrun.FieldFinishedAt, field.TypeTime)
-	}
-	if value, ok := _u.mutation.NotifiedAt(); ok {
-		_spec.SetField(trailactionrun.FieldNotifiedAt, field.TypeTime, value)
-	}
-	if _u.mutation.NotifiedAtCleared() {
-		_spec.ClearField(trailactionrun.FieldNotifiedAt, field.TypeTime)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	_node = &TrailActionRun{config: _u.config}
