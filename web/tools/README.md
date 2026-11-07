@@ -24,3 +24,14 @@ The `useWebMCP` hooks own registration and unregister automatically when their
 React component unmounts. The polyfill supplies the same-document API when the
 browser has no native WebMCP implementation and leaves a native implementation
 untouched.
+
+The integration uses the standard `document.modelContext` API and upstream
+`webmcp-types` contracts. Tool execution passes an input object and receives a
+JSON string. Generated browser descriptors contain input schemas; output schemas
+remain the source for the generated implementation return types, since the
+standard browser API does not advertise `outputSchema` metadata.
+
+Tool callbacks return readable edit failures as JSON error results. Throwing
+those errors directly would cause the browser runtime to replace their useful
+messages with a generic execution failure. Cancellation still rejects through
+the execution `AbortSignal`.

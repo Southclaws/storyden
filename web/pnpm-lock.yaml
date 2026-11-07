@@ -47,11 +47,8 @@ importers:
         specifier: 3.12.4
         version: 3.12.4
       '@mcp-b/webmcp-polyfill':
-        specifier: 5.1.0
-        version: 5.1.0
-      '@mcp-b/webmcp-types':
-        specifier: 5.1.0
-        version: 5.1.0
+        specifier: 6.0.3
+        version: 6.0.3
       '@radix-ui/react-dialog':
         specifier: 1.3.1
         version: 1.3.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -191,11 +188,14 @@ importers:
         specifier: 5.2.0
         version: 5.2.0
       usewebmcp:
-        specifier: 5.1.0
-        version: 5.1.0(react@19.3.1)
+        specifier: 6.0.3
+        version: 6.0.3(react@19.3.1)
       vaul:
         specifier: 1.1.2
         version: 1.1.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      webmcp-types:
+        specifier: 0.1.9
+        version: 0.1.9
       yaml:
         specifier: 2.9.1
         version: 2.9.1
@@ -1159,12 +1159,8 @@ packages:
   '@jsdevtools/ono@7.1.3':
     resolution: {integrity: sha512-4JQNk+3mVzK3xh2rqd6RB4J46qUR19azEHBneZyTZM+c456qOrbbM/5xcR8huNCCcbVt7+UmizG6GuUvPvKUYg==}
 
-  '@mcp-b/webmcp-polyfill@5.1.0':
-    resolution: {integrity: sha512-KL09hniFssPY8HBO3qzurWPqm+1JYRwV3wx6x2XSySgo+6BL1XHGsHGIoAO7U9zzigv7TA5keNBoZ+3P1jq18g==}
-    engines: {node: '>=20'}
-
-  '@mcp-b/webmcp-types@5.1.0':
-    resolution: {integrity: sha512-twOKDUr7al60K890HvRcNvoHSfQ2rnGeKJiQs6eUr+Leg+LQ6K+yz3F4K70jykMK1a09ZIgYb3Oc7mAypuKPig==}
+  '@mcp-b/webmcp-polyfill@6.0.3':
+    resolution: {integrity: sha512-pD8iKBXpDKLeYyqDcWPiNFI0JuK7/f+/RxspA6qW81kcDdabWUTt7A0fH+cJx6EIjpoHkk4o3QPci7yQPuHofA==}
     engines: {node: '>=20'}
 
   '@mdx-js/react@3.1.1':
@@ -4836,8 +4832,8 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
-  usewebmcp@5.1.0:
-    resolution: {integrity: sha512-iyp0v9f3HmWmfXVzvQt3IG4/DNlrjXd0DWXKzc692KSveVaSO8en5aanQlLYACEU9AS1BLAobQi17A4+rRKLzg==}
+  usewebmcp@6.0.3:
+    resolution: {integrity: sha512-HNpYoKbr9mwbeePQpQLOoeDt8bxlQYZ+FTZ2NF/ZAWHatKdWP1Kg4jdvR9WJ215jb3ahbXs/9NSbalA+TtbTLA==}
     engines: {node: '>=20'}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
@@ -4960,6 +4956,9 @@ packages:
   webidl-conversions@8.0.1:
     resolution: {integrity: sha512-BMhLD/Sw+GbJC21C/UgyaZX41nPt8bUTg+jWyDeg7e7YN4xOM05YPSIXceACnXVtqyEw/LMClUQMtMZ+PGGpqQ==}
     engines: {node: '>=20'}
+
+  webmcp-types@0.1.9:
+    resolution: {integrity: sha512-ibdkppgRDkQ/nvH541YS48kVt96OiuDr+d9JHnirAtI5k0coaFdo2QqCipbXyfwrteDC6xXwPoUGC9uS5ZGwfw==}
 
   webpack-virtual-modules@0.6.2:
     resolution: {integrity: sha512-66/V2i5hQanC51vBQKPH4aI8NMAcBW59FVBs+rC7eGHupMyfn34q7rZIE+ETlJ+XTevqfUhVVBgSUNSW2flEUQ==}
@@ -5746,14 +5745,9 @@ snapshots:
 
   '@jsdevtools/ono@7.1.3': {}
 
-  '@mcp-b/webmcp-polyfill@5.1.0':
+  '@mcp-b/webmcp-polyfill@6.0.3':
     dependencies:
-      '@mcp-b/webmcp-types': 5.1.0
-      '@standard-schema/spec': 1.1.0
-
-  '@mcp-b/webmcp-types@5.1.0':
-    dependencies:
-      '@modelcontextprotocol/server': 2.0.0
+      webmcp-types: 0.1.9
 
   '@mdx-js/react@3.1.1(@types/react@19.3.0)(react@19.3.1)':
     dependencies:
@@ -5768,11 +5762,13 @@ snapshots:
   '@modelcontextprotocol/core@2.0.0':
     dependencies:
       zod: 4.6.6
+    optional: true
 
   '@modelcontextprotocol/server@2.0.0':
     dependencies:
       '@modelcontextprotocol/core': 2.0.0
       zod: 4.6.6
+    optional: true
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     optional: true
@@ -9636,11 +9632,10 @@ snapshots:
     dependencies:
       react: 19.3.1
 
-  usewebmcp@5.1.0(react@19.3.1):
+  usewebmcp@6.0.3(react@19.3.1):
     dependencies:
-      '@mcp-b/webmcp-polyfill': 5.1.0
-      '@mcp-b/webmcp-types': 5.1.0
       react: 19.3.1
+      webmcp-types: 0.1.9
 
   vaul@1.1.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
     dependencies:
@@ -9737,6 +9732,8 @@ snapshots:
 
   webidl-conversions@8.0.1: {}
 
+  webmcp-types@0.1.9: {}
+
   webpack-virtual-modules@0.6.2: {}
 
   whatwg-mimetype@3.0.0: {}
@@ -9773,7 +9770,8 @@ snapshots:
 
   yoctocolors@2.2.0: {}
 
-  zod@4.6.6: {}
+  zod@4.6.6:
+    optional: true
 
   zod@4.6.7: {}
 

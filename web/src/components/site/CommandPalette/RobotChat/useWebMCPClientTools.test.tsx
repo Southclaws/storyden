@@ -72,9 +72,13 @@ describe("useWebMCPClientTools", () => {
     });
 
     expect(executeTool).toHaveBeenCalledOnce();
-    expect(executeTool).toHaveBeenCalledWith(tool, "{}", {
-      signal: undefined,
-    });
+    expect(executeTool).toHaveBeenCalledWith(
+      tool,
+      {},
+      {
+        signal: undefined,
+      },
+    );
     expect(submitOutput).toHaveBeenCalledWith({
       toolName: "library_page_layout_get",
       toolCallId: "call-1",

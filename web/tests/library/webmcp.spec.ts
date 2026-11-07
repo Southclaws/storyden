@@ -1,6 +1,7 @@
 import { Page, expect, test } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { unlink, writeFile } from "node:fs/promises";
+import type { WebMCP } from "webmcp-types";
 
 import {
   createAdmin,
@@ -28,12 +29,7 @@ const LIBRARY_TOOL_NAMES = [
   "library_page_block_directory_update",
 ] as const;
 
-type RegisteredWebMCPTool = {
-  name: string;
-  description: string;
-  inputSchema?: unknown;
-  annotations?: Record<string, unknown>;
-};
+type RegisteredWebMCPTool = WebMCP.RegisteredTool;
 
 type LibraryPageFixture = {
   id: string;
@@ -89,12 +85,11 @@ async function enterQuickEdit(page: Page, slug: string) {
 
 async function getLibraryTools(page: Page): Promise<RegisteredWebMCPTool[]> {
   return page.evaluate(async (prefix) => {
-    const modelContext = (
-      document as unknown as {
-        modelContext?: { getTools(): Promise<RegisteredWebMCPTool[]> };
-      }
-    ).modelContext;
-    if (!modelContext) return [];
+    const modelContext = document.modelContext;
+    if (!modelContext) {
+      return [];
+    }
+
     const tools = await modelContext.getTools();
     return tools.filter((tool) => tool.name.startsWith(prefix));
   }, "library_page_");
@@ -107,15 +102,7 @@ async function executeLibraryTool(
 ): Promise<Record<string, unknown>> {
   return page.evaluate(
     async ({ name, input }) => {
-      type Tool = { name: string };
-      const modelContext = (
-        document as unknown as {
-          modelContext?: {
-            getTools(): Promise<Tool[]>;
-            executeTool?: (tool: Tool, input: string) => Promise<string | null>;
-          };
-        }
-      ).modelContext;
+      const modelContext = document.modelContext;
       if (!modelContext?.executeTool) {
         throw new Error("WebMCP execution is unavailable");
       }
@@ -125,13 +112,7 @@ async function executeLibraryTool(
       if (!tool) {
         throw new Error(`WebMCP tool ${name} is not registered`);
       }
-      const result = await modelContext.executeTool(
-        tool,
-        JSON.stringify(input),
-      );
-      if (result === null) {
-        throw new Error(`WebMCP tool ${name} returned no result`);
-      }
+      const result = await modelContext.executeTool(tool, input);
       const parsed = JSON.parse(result) as Record<string, unknown>;
       if (parsed["isError"] === true) {
         const content = Array.isArray(parsed["content"])

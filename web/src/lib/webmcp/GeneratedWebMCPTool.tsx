@@ -1,28 +1,48 @@
 "use client";
 
-import type { ToolInputSchema } from "@mcp-b/webmcp-polyfill/schema";
-import type { JsonSchemaForInference } from "@mcp-b/webmcp-types";
 import { useCallback } from "react";
 import { type WebMCPConfig, useWebMCP } from "usewebmcp";
 
 import {
   WEBMCP_TOOL_DEFINITIONS,
   type WebMCPToolName,
+  type WebMCPToolOutputMap,
 } from "./tools.generated";
 import { waitForWebMCPTool } from "./waitForTool";
 
-type GeneratedWebMCPToolProps<
-  TInputSchema extends ToolInputSchema,
-  TOutputSchema extends JsonSchemaForInference | undefined,
-> = {
-  config: WebMCPConfig<TInputSchema, TOutputSchema>;
+type GeneratedWebMCPToolProps<TName extends WebMCPToolName> = {
+  config: WebMCPConfig<
+    (typeof WEBMCP_TOOL_DEFINITIONS)[TName]["inputSchema"],
+    WebMCPToolOutputMap[TName]
+  > & { name: TName };
 };
 
-export function GeneratedWebMCPTool<
-  TInputSchema extends ToolInputSchema,
-  TOutputSchema extends JsonSchemaForInference | undefined,
->({ config }: GeneratedWebMCPToolProps<TInputSchema, TOutputSchema>) {
-  useWebMCP(config);
+export function GeneratedWebMCPTool<TName extends WebMCPToolName>({
+  config,
+}: GeneratedWebMCPToolProps<TName>) {
+  useWebMCP({
+    ...config,
+    execute: async (input, options) => {
+      try {
+        return await config.execute(input, options);
+      } catch (error) {
+        if (options.signal.aborted) {
+          throw error;
+        }
+
+        // WebMCP hides thrown callback errors; return useful edit failures as JSON.
+        return {
+          isError: true,
+          content: [
+            {
+              type: "text",
+              text: error instanceof Error ? error.message : String(error),
+            },
+          ],
+        };
+      }
+    },
+  });
 
   return null;
 }

@@ -438,24 +438,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
       "properties": {},
       "additionalProperties": false
     },
-    "outputSchema": {
-      "type": "object",
-      "required": [
-        "message"
-      ],
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "Summary of the active edit mode."
-        }
-      },
-      "additionalProperties": false
-    },
     "annotations": {
       "readOnlyHint": false,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false,
       "untrustedContentHint": false
     },
     "pathPrefix": "/l/"
@@ -469,77 +453,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
       "properties": {},
       "additionalProperties": false
     },
-    "outputSchema": {
-      "type": "object",
-      "required": [
-        "message",
-        "layout"
-      ],
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "Summary of the retrieved layout."
-        },
-        "layout": {
-          "type": "object",
-          "required": [
-            "blocks"
-          ],
-          "properties": {
-            "blocks": {
-              "type": "array",
-              "description": "Blocks in their rendered order.",
-              "items": {
-                "type": "object",
-                "required": [
-                  "type"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "title",
-                      "cover",
-                      "link",
-                      "content",
-                      "assets",
-                      "properties",
-                      "directory",
-                      "tags"
-                    ]
-                  },
-                  "layout": {
-                    "type": "string",
-                    "enum": [
-                      "strip",
-                      "grid",
-                      "table",
-                      "rows",
-                      "gallery"
-                    ],
-                    "description": "Layout mode for an assets or directory block."
-                  },
-                  "grid_size": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 4,
-                    "description": "Column count for an assets block using the grid layout."
-                  }
-                },
-                "additionalProperties": false
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "additionalProperties": false
-    },
     "annotations": {
       "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false,
       "untrustedContentHint": false
     },
     "pathPrefix": "/l/"
@@ -584,77 +499,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
       },
       "additionalProperties": false
     },
-    "outputSchema": {
-      "type": "object",
-      "required": [
-        "message",
-        "layout"
-      ],
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "Summary of the added block."
-        },
-        "layout": {
-          "type": "object",
-          "required": [
-            "blocks"
-          ],
-          "properties": {
-            "blocks": {
-              "type": "array",
-              "description": "Blocks in their rendered order.",
-              "items": {
-                "type": "object",
-                "required": [
-                  "type"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "title",
-                      "cover",
-                      "link",
-                      "content",
-                      "assets",
-                      "properties",
-                      "directory",
-                      "tags"
-                    ]
-                  },
-                  "layout": {
-                    "type": "string",
-                    "enum": [
-                      "strip",
-                      "grid",
-                      "table",
-                      "rows",
-                      "gallery"
-                    ],
-                    "description": "Layout mode for an assets or directory block."
-                  },
-                  "grid_size": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 4,
-                    "description": "Column count for an assets block using the grid layout."
-                  }
-                },
-                "additionalProperties": false
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "additionalProperties": false
-    },
     "annotations": {
       "readOnlyHint": false,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false,
       "untrustedContentHint": false
     },
     "pathPrefix": "/l/"
@@ -685,77 +531,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
       },
       "additionalProperties": false
     },
-    "outputSchema": {
-      "type": "object",
-      "required": [
-        "message",
-        "layout"
-      ],
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "Summary of the removed block."
-        },
-        "layout": {
-          "type": "object",
-          "required": [
-            "blocks"
-          ],
-          "properties": {
-            "blocks": {
-              "type": "array",
-              "description": "Blocks in their rendered order.",
-              "items": {
-                "type": "object",
-                "required": [
-                  "type"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "title",
-                      "cover",
-                      "link",
-                      "content",
-                      "assets",
-                      "properties",
-                      "directory",
-                      "tags"
-                    ]
-                  },
-                  "layout": {
-                    "type": "string",
-                    "enum": [
-                      "strip",
-                      "grid",
-                      "table",
-                      "rows",
-                      "gallery"
-                    ],
-                    "description": "Layout mode for an assets or directory block."
-                  },
-                  "grid_size": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 4,
-                    "description": "Column count for an assets block using the grid layout."
-                  }
-                },
-                "additionalProperties": false
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "additionalProperties": false
-    },
     "annotations": {
       "readOnlyHint": false,
-      "destructiveHint": true,
-      "idempotentHint": true,
-      "openWorldHint": false,
       "untrustedContentHint": false
     },
     "pathPrefix": "/l/"
@@ -800,77 +577,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
       },
       "additionalProperties": false
     },
-    "outputSchema": {
-      "type": "object",
-      "required": [
-        "message",
-        "layout"
-      ],
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "Summary of the moved block."
-        },
-        "layout": {
-          "type": "object",
-          "required": [
-            "blocks"
-          ],
-          "properties": {
-            "blocks": {
-              "type": "array",
-              "description": "Blocks in their rendered order.",
-              "items": {
-                "type": "object",
-                "required": [
-                  "type"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "title",
-                      "cover",
-                      "link",
-                      "content",
-                      "assets",
-                      "properties",
-                      "directory",
-                      "tags"
-                    ]
-                  },
-                  "layout": {
-                    "type": "string",
-                    "enum": [
-                      "strip",
-                      "grid",
-                      "table",
-                      "rows",
-                      "gallery"
-                    ],
-                    "description": "Layout mode for an assets or directory block."
-                  },
-                  "grid_size": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 4,
-                    "description": "Column count for an assets block using the grid layout."
-                  }
-                },
-                "additionalProperties": false
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "additionalProperties": false
-    },
     "annotations": {
       "readOnlyHint": false,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false,
       "untrustedContentHint": false
     },
     "pathPrefix": "/l/"
@@ -901,77 +609,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
       },
       "additionalProperties": false
     },
-    "outputSchema": {
-      "type": "object",
-      "required": [
-        "message",
-        "layout"
-      ],
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "Summary of the updated assets block."
-        },
-        "layout": {
-          "type": "object",
-          "required": [
-            "blocks"
-          ],
-          "properties": {
-            "blocks": {
-              "type": "array",
-              "description": "Blocks in their rendered order.",
-              "items": {
-                "type": "object",
-                "required": [
-                  "type"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "title",
-                      "cover",
-                      "link",
-                      "content",
-                      "assets",
-                      "properties",
-                      "directory",
-                      "tags"
-                    ]
-                  },
-                  "layout": {
-                    "type": "string",
-                    "enum": [
-                      "strip",
-                      "grid",
-                      "table",
-                      "rows",
-                      "gallery"
-                    ],
-                    "description": "Layout mode for an assets or directory block."
-                  },
-                  "grid_size": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 4,
-                    "description": "Column count for an assets block using the grid layout."
-                  }
-                },
-                "additionalProperties": false
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "additionalProperties": false
-    },
     "annotations": {
       "readOnlyHint": false,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false,
       "untrustedContentHint": false
     },
     "pathPrefix": "/l/"
@@ -999,77 +638,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
       },
       "additionalProperties": false
     },
-    "outputSchema": {
-      "type": "object",
-      "required": [
-        "message",
-        "layout"
-      ],
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "Summary of the updated directory block."
-        },
-        "layout": {
-          "type": "object",
-          "required": [
-            "blocks"
-          ],
-          "properties": {
-            "blocks": {
-              "type": "array",
-              "description": "Blocks in their rendered order.",
-              "items": {
-                "type": "object",
-                "required": [
-                  "type"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "title",
-                      "cover",
-                      "link",
-                      "content",
-                      "assets",
-                      "properties",
-                      "directory",
-                      "tags"
-                    ]
-                  },
-                  "layout": {
-                    "type": "string",
-                    "enum": [
-                      "strip",
-                      "grid",
-                      "table",
-                      "rows",
-                      "gallery"
-                    ],
-                    "description": "Layout mode for an assets or directory block."
-                  },
-                  "grid_size": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 4,
-                    "description": "Column count for an assets block using the grid layout."
-                  }
-                },
-                "additionalProperties": false
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "additionalProperties": false
-    },
     "annotations": {
       "readOnlyHint": false,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false,
       "untrustedContentHint": false
     },
     "pathPrefix": "/l/"
@@ -1083,24 +653,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
       "properties": {},
       "additionalProperties": false
     },
-    "outputSchema": {
-      "type": "object",
-      "required": [
-        "message"
-      ],
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "Summary of the active edit mode."
-        }
-      },
-      "additionalProperties": false
-    },
     "annotations": {
       "readOnlyHint": false,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false,
       "untrustedContentHint": false
     },
     "pathPrefix": "/"
@@ -1114,84 +668,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
       "properties": {},
       "additionalProperties": false
     },
-    "outputSchema": {
-      "type": "object",
-      "required": [
-        "message",
-        "layout"
-      ],
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "Summary of the retrieved layout."
-        },
-        "layout": {
-          "type": "object",
-          "required": [
-            "blocks"
-          ],
-          "properties": {
-            "blocks": {
-              "type": "array",
-              "description": "Blocks in their rendered order.",
-              "items": {
-                "type": "object",
-                "required": [
-                  "type"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "title",
-                      "subtitle",
-                      "content",
-                      "cover",
-                      "categories",
-                      "threads",
-                      "quick-share",
-                      "library"
-                    ]
-                  },
-                  "layout": {
-                    "type": "string",
-                    "enum": [
-                      "list",
-                      "grid"
-                    ],
-                    "description": "Layout mode for a categories or Library block."
-                  },
-                  "source": {
-                    "type": "string",
-                    "enum": [
-                      "all",
-                      "uncategorised"
-                    ],
-                    "description": "Thread source for a threads block."
-                  },
-                  "show_category_select": {
-                    "type": "boolean",
-                    "description": "Whether a quick-share block shows its category picker."
-                  },
-                  "node_id": {
-                    "type": "string",
-                    "description": "Selected Library page ID for a library block; omitted for the Library root."
-                  }
-                },
-                "additionalProperties": false
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "additionalProperties": false
-    },
     "annotations": {
       "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false,
       "untrustedContentHint": false
     },
     "pathPrefix": "/"
@@ -1236,84 +714,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
       },
       "additionalProperties": false
     },
-    "outputSchema": {
-      "type": "object",
-      "required": [
-        "message",
-        "layout"
-      ],
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "Summary of the added block."
-        },
-        "layout": {
-          "type": "object",
-          "required": [
-            "blocks"
-          ],
-          "properties": {
-            "blocks": {
-              "type": "array",
-              "description": "Blocks in their rendered order.",
-              "items": {
-                "type": "object",
-                "required": [
-                  "type"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "title",
-                      "subtitle",
-                      "content",
-                      "cover",
-                      "categories",
-                      "threads",
-                      "quick-share",
-                      "library"
-                    ]
-                  },
-                  "layout": {
-                    "type": "string",
-                    "enum": [
-                      "list",
-                      "grid"
-                    ],
-                    "description": "Layout mode for a categories or Library block."
-                  },
-                  "source": {
-                    "type": "string",
-                    "enum": [
-                      "all",
-                      "uncategorised"
-                    ],
-                    "description": "Thread source for a threads block."
-                  },
-                  "show_category_select": {
-                    "type": "boolean",
-                    "description": "Whether a quick-share block shows its category picker."
-                  },
-                  "node_id": {
-                    "type": "string",
-                    "description": "Selected Library page ID for a library block; omitted for the Library root."
-                  }
-                },
-                "additionalProperties": false
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "additionalProperties": false
-    },
     "annotations": {
       "readOnlyHint": false,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false,
       "untrustedContentHint": false
     },
     "pathPrefix": "/"
@@ -1344,84 +746,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
       },
       "additionalProperties": false
     },
-    "outputSchema": {
-      "type": "object",
-      "required": [
-        "message",
-        "layout"
-      ],
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "Summary of the removed block."
-        },
-        "layout": {
-          "type": "object",
-          "required": [
-            "blocks"
-          ],
-          "properties": {
-            "blocks": {
-              "type": "array",
-              "description": "Blocks in their rendered order.",
-              "items": {
-                "type": "object",
-                "required": [
-                  "type"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "title",
-                      "subtitle",
-                      "content",
-                      "cover",
-                      "categories",
-                      "threads",
-                      "quick-share",
-                      "library"
-                    ]
-                  },
-                  "layout": {
-                    "type": "string",
-                    "enum": [
-                      "list",
-                      "grid"
-                    ],
-                    "description": "Layout mode for a categories or Library block."
-                  },
-                  "source": {
-                    "type": "string",
-                    "enum": [
-                      "all",
-                      "uncategorised"
-                    ],
-                    "description": "Thread source for a threads block."
-                  },
-                  "show_category_select": {
-                    "type": "boolean",
-                    "description": "Whether a quick-share block shows its category picker."
-                  },
-                  "node_id": {
-                    "type": "string",
-                    "description": "Selected Library page ID for a library block; omitted for the Library root."
-                  }
-                },
-                "additionalProperties": false
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "additionalProperties": false
-    },
     "annotations": {
       "readOnlyHint": false,
-      "destructiveHint": true,
-      "idempotentHint": true,
-      "openWorldHint": false,
       "untrustedContentHint": false
     },
     "pathPrefix": "/"
@@ -1466,84 +792,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
       },
       "additionalProperties": false
     },
-    "outputSchema": {
-      "type": "object",
-      "required": [
-        "message",
-        "layout"
-      ],
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "Summary of the moved block."
-        },
-        "layout": {
-          "type": "object",
-          "required": [
-            "blocks"
-          ],
-          "properties": {
-            "blocks": {
-              "type": "array",
-              "description": "Blocks in their rendered order.",
-              "items": {
-                "type": "object",
-                "required": [
-                  "type"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "title",
-                      "subtitle",
-                      "content",
-                      "cover",
-                      "categories",
-                      "threads",
-                      "quick-share",
-                      "library"
-                    ]
-                  },
-                  "layout": {
-                    "type": "string",
-                    "enum": [
-                      "list",
-                      "grid"
-                    ],
-                    "description": "Layout mode for a categories or Library block."
-                  },
-                  "source": {
-                    "type": "string",
-                    "enum": [
-                      "all",
-                      "uncategorised"
-                    ],
-                    "description": "Thread source for a threads block."
-                  },
-                  "show_category_select": {
-                    "type": "boolean",
-                    "description": "Whether a quick-share block shows its category picker."
-                  },
-                  "node_id": {
-                    "type": "string",
-                    "description": "Selected Library page ID for a library block; omitted for the Library root."
-                  }
-                },
-                "additionalProperties": false
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "additionalProperties": false
-    },
     "annotations": {
       "readOnlyHint": false,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false,
       "untrustedContentHint": false
     },
     "pathPrefix": "/"
@@ -1568,84 +818,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
       },
       "additionalProperties": false
     },
-    "outputSchema": {
-      "type": "object",
-      "required": [
-        "message",
-        "layout"
-      ],
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "Summary of the updated categories block."
-        },
-        "layout": {
-          "type": "object",
-          "required": [
-            "blocks"
-          ],
-          "properties": {
-            "blocks": {
-              "type": "array",
-              "description": "Blocks in their rendered order.",
-              "items": {
-                "type": "object",
-                "required": [
-                  "type"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "title",
-                      "subtitle",
-                      "content",
-                      "cover",
-                      "categories",
-                      "threads",
-                      "quick-share",
-                      "library"
-                    ]
-                  },
-                  "layout": {
-                    "type": "string",
-                    "enum": [
-                      "list",
-                      "grid"
-                    ],
-                    "description": "Layout mode for a categories or Library block."
-                  },
-                  "source": {
-                    "type": "string",
-                    "enum": [
-                      "all",
-                      "uncategorised"
-                    ],
-                    "description": "Thread source for a threads block."
-                  },
-                  "show_category_select": {
-                    "type": "boolean",
-                    "description": "Whether a quick-share block shows its category picker."
-                  },
-                  "node_id": {
-                    "type": "string",
-                    "description": "Selected Library page ID for a library block; omitted for the Library root."
-                  }
-                },
-                "additionalProperties": false
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "additionalProperties": false
-    },
     "annotations": {
       "readOnlyHint": false,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false,
       "untrustedContentHint": false
     },
     "pathPrefix": "/"
@@ -1670,84 +844,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
       },
       "additionalProperties": false
     },
-    "outputSchema": {
-      "type": "object",
-      "required": [
-        "message",
-        "layout"
-      ],
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "Summary of the updated threads block."
-        },
-        "layout": {
-          "type": "object",
-          "required": [
-            "blocks"
-          ],
-          "properties": {
-            "blocks": {
-              "type": "array",
-              "description": "Blocks in their rendered order.",
-              "items": {
-                "type": "object",
-                "required": [
-                  "type"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "title",
-                      "subtitle",
-                      "content",
-                      "cover",
-                      "categories",
-                      "threads",
-                      "quick-share",
-                      "library"
-                    ]
-                  },
-                  "layout": {
-                    "type": "string",
-                    "enum": [
-                      "list",
-                      "grid"
-                    ],
-                    "description": "Layout mode for a categories or Library block."
-                  },
-                  "source": {
-                    "type": "string",
-                    "enum": [
-                      "all",
-                      "uncategorised"
-                    ],
-                    "description": "Thread source for a threads block."
-                  },
-                  "show_category_select": {
-                    "type": "boolean",
-                    "description": "Whether a quick-share block shows its category picker."
-                  },
-                  "node_id": {
-                    "type": "string",
-                    "description": "Selected Library page ID for a library block; omitted for the Library root."
-                  }
-                },
-                "additionalProperties": false
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "additionalProperties": false
-    },
     "annotations": {
       "readOnlyHint": false,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false,
       "untrustedContentHint": false
     },
     "pathPrefix": "/"
@@ -1768,84 +866,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
       },
       "additionalProperties": false
     },
-    "outputSchema": {
-      "type": "object",
-      "required": [
-        "message",
-        "layout"
-      ],
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "Summary of the updated quick-share block."
-        },
-        "layout": {
-          "type": "object",
-          "required": [
-            "blocks"
-          ],
-          "properties": {
-            "blocks": {
-              "type": "array",
-              "description": "Blocks in their rendered order.",
-              "items": {
-                "type": "object",
-                "required": [
-                  "type"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "title",
-                      "subtitle",
-                      "content",
-                      "cover",
-                      "categories",
-                      "threads",
-                      "quick-share",
-                      "library"
-                    ]
-                  },
-                  "layout": {
-                    "type": "string",
-                    "enum": [
-                      "list",
-                      "grid"
-                    ],
-                    "description": "Layout mode for a categories or Library block."
-                  },
-                  "source": {
-                    "type": "string",
-                    "enum": [
-                      "all",
-                      "uncategorised"
-                    ],
-                    "description": "Thread source for a threads block."
-                  },
-                  "show_category_select": {
-                    "type": "boolean",
-                    "description": "Whether a quick-share block shows its category picker."
-                  },
-                  "node_id": {
-                    "type": "string",
-                    "description": "Selected Library page ID for a library block; omitted for the Library root."
-                  }
-                },
-                "additionalProperties": false
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "additionalProperties": false
-    },
     "annotations": {
       "readOnlyHint": false,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false,
       "untrustedContentHint": false
     },
     "pathPrefix": "/"
@@ -1884,84 +906,8 @@ export const WEBMCP_TOOL_DEFINITIONS = {
       },
       "additionalProperties": false
     },
-    "outputSchema": {
-      "type": "object",
-      "required": [
-        "message",
-        "layout"
-      ],
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "Summary of the updated Library block."
-        },
-        "layout": {
-          "type": "object",
-          "required": [
-            "blocks"
-          ],
-          "properties": {
-            "blocks": {
-              "type": "array",
-              "description": "Blocks in their rendered order.",
-              "items": {
-                "type": "object",
-                "required": [
-                  "type"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "title",
-                      "subtitle",
-                      "content",
-                      "cover",
-                      "categories",
-                      "threads",
-                      "quick-share",
-                      "library"
-                    ]
-                  },
-                  "layout": {
-                    "type": "string",
-                    "enum": [
-                      "list",
-                      "grid"
-                    ],
-                    "description": "Layout mode for a categories or Library block."
-                  },
-                  "source": {
-                    "type": "string",
-                    "enum": [
-                      "all",
-                      "uncategorised"
-                    ],
-                    "description": "Thread source for a threads block."
-                  },
-                  "show_category_select": {
-                    "type": "boolean",
-                    "description": "Whether a quick-share block shows its category picker."
-                  },
-                  "node_id": {
-                    "type": "string",
-                    "description": "Selected Library page ID for a library block; omitted for the Library root."
-                  }
-                },
-                "additionalProperties": false
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "additionalProperties": false
-    },
     "annotations": {
       "readOnlyHint": false,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false,
       "untrustedContentHint": false
     },
     "pathPrefix": "/"

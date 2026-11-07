@@ -97,11 +97,11 @@ describe("getWebMCPClientToolContext", () => {
           name: "library_page_block_add",
           title: "Add library block",
           description: "Add one block to the current library page.",
-          inputSchema: JSON.stringify({
+          inputSchema: {
             type: "object",
             properties: { block: { type: "string" } },
             required: ["block"],
-          }),
+          },
           annotations: {
             readOnlyHint: false,
             consequentialHint: true,
@@ -139,7 +139,7 @@ describe("getWebMCPClientToolContext", () => {
         {
           name: "broken_tool",
           description: "Cannot be declared.",
-          inputSchema: "not-json",
+          inputSchema: [],
         },
       ]),
     });
@@ -166,9 +166,13 @@ describe("executeWebMCPTool", () => {
     await expect(
       executeWebMCPTool("library_page_layout_get", {}),
     ).resolves.toEqual({ status: "completed", output: { blocks: [] } });
-    expect(executeTool).toHaveBeenCalledWith(tool, "{}", {
-      signal: undefined,
-    });
+    expect(executeTool).toHaveBeenCalledWith(
+      tool,
+      {},
+      {
+        signal: undefined,
+      },
+    );
   });
 
   it("unwraps structured content from the WebMCP result envelope", async () => {
@@ -191,6 +195,44 @@ describe("executeWebMCPTool", () => {
     await expect(
       executeWebMCPTool("library_page_layout_get", {}),
     ).resolves.toEqual({ status: "completed", output: { blocks: [] } });
+  });
+
+  it("passes object inputs and cancellation to the browser without encoding", async () => {
+    const tool = {
+      name: "library_page_block_add",
+      description: "Add a block.",
+    };
+    const input = { block: "assets", after_block: "content" };
+    const controller = new AbortController();
+    const executeTool = vi.fn().mockResolvedValue('{"added":true}');
+    installModelContext({
+      getTools: vi.fn().mockResolvedValue([tool]),
+      executeTool,
+    });
+
+    await expect(
+      executeWebMCPTool(tool.name, input, controller.signal),
+    ).resolves.toEqual({ status: "completed", output: { added: true } });
+    expect(executeTool).toHaveBeenCalledWith(tool, input, {
+      signal: controller.signal,
+    });
+  });
+
+  it.each(["{}", [], 1, true])("rejects non-object input %j", async (input) => {
+    const tool = {
+      name: "library_page_block_add",
+      description: "Add a block.",
+    };
+    const executeTool = vi.fn();
+    installModelContext({
+      getTools: vi.fn().mockResolvedValue([tool]),
+      executeTool,
+    });
+
+    await expect(executeWebMCPTool(tool.name, input)).rejects.toThrow(
+      "requires an input object",
+    );
+    expect(executeTool).not.toHaveBeenCalled();
   });
 
   it("surfaces a WebMCP error envelope as an execution failure", async () => {

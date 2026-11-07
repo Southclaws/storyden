@@ -102,9 +102,13 @@ function getToolEntries(schema, dereferencedSchema, schemaRefs) {
       title: metadata.title,
       description: definition.description,
       pathPrefix: metadata.path_prefix,
-      annotations: metadata.annotations,
+      annotations: {
+        readOnlyHint: metadata.annotations?.readOnlyHint,
+        untrustedContentHint: metadata.annotations?.untrustedContentHint,
+        consequentialHint: metadata.annotations?.consequentialHint,
+        debugging: metadata.annotations?.debugging,
+      },
       inputSchema: compactSchema(definition.properties.input),
-      outputSchema: compactSchema(definition.properties.output),
       inputType: referencedTypeName(toolSchema.properties.input, `${key}Input`),
       outputType: referencedTypeName(
         toolSchema.properties.output,
@@ -127,22 +131,13 @@ function generateRuntimeTypes(entries) {
     .join("\n");
   const definitions = Object.fromEntries(
     entries.map(
-      ({
-        name,
-        title,
-        description,
-        pathPrefix,
-        annotations,
-        inputSchema,
-        outputSchema,
-      }) => [
+      ({ name, title, description, pathPrefix, annotations, inputSchema }) => [
         name,
         {
           name,
           title,
           description,
           inputSchema,
-          outputSchema,
           annotations,
           pathPrefix,
         },

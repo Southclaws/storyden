@@ -1,5 +1,5 @@
-import { initializeWebMCPPolyfill } from "@mcp-b/webmcp-polyfill";
-import type { ChromeModelContext, RegisteredTool } from "@mcp-b/webmcp-types";
+import { installWebMCP } from "@mcp-b/webmcp-polyfill";
+import type { WebMCP } from "webmcp-types";
 
 import {
   RobotChatContext,
@@ -11,7 +11,7 @@ import { enableWebMCPTools } from "@/lib/webmcp/activation";
 import { waitForWebMCPTool } from "@/lib/webmcp/waitForTool";
 import { generateXid } from "@/utils/xid";
 
-initializeWebMCPPolyfill();
+installWebMCP();
 
 const CLIENT_ID_STORAGE_KEY = "storyden.webmcp.client-id";
 
@@ -52,7 +52,7 @@ export async function getWebMCPClientToolContext(
     return undefined;
   }
 
-  let registered: RegisteredTool[];
+  let registered: WebMCP.RegisteredTool[];
   try {
     registered = await modelContext.getTools();
   } catch (error) {
@@ -108,13 +108,12 @@ export async function executeWebMCPTool(
     throw new Error("This browser does not support WebMCP tool execution.");
   }
 
-  const encodedInput = JSON.stringify(input ?? {});
-  const result = await modelContext.executeTool(tool, encodedInput, { signal });
-  if (result === null) {
-    throw new Error(
-      `WebMCP tool "${name}" navigated without returning a result.`,
-    );
+  const toolInput = input ?? {};
+  if (typeof toolInput !== "object" || Array.isArray(toolInput)) {
+    throw new Error(`WebMCP tool "${name}" requires an input object.`);
   }
+
+  const result = await modelContext.executeTool(tool, toolInput, { signal });
 
   return { status: "completed", output: parseToolResult(result) };
 }
@@ -166,7 +165,7 @@ export function subscribeToWebMCPToolChanges(listener: () => void): () => void {
   return () => modelContext.removeEventListener("toolchange", eventListener);
 }
 
-function getBrowserModelContext(): ChromeModelContext | undefined {
+function getBrowserModelContext(): WebMCP.ModelContext | undefined {
   if (typeof document === "undefined") {
     return undefined;
   }
@@ -174,7 +173,7 @@ function getBrowserModelContext(): ChromeModelContext | undefined {
 }
 
 function normalizeRegisteredTool(
-  tool: RegisteredTool,
+  tool: WebMCP.RegisteredTool,
 ): RobotClientTool | undefined {
   const inputSchema = normalizeInputSchema(tool.inputSchema);
   if (!inputSchema) {
@@ -195,23 +194,16 @@ function normalizeRegisteredTool(
 }
 
 function normalizeInputSchema(
-  input: RegisteredTool["inputSchema"],
+  input: WebMCP.RegisteredTool["inputSchema"],
 ): Record<string, unknown> | undefined {
   if (input === undefined) {
     return { type: "object", properties: {} };
-  }
-  if (typeof input === "string") {
-    try {
-      return readObject(JSON.parse(input));
-    } catch {
-      return undefined;
-    }
   }
   return readObject(input);
 }
 
 function normalizeAnnotations(
-  input: RegisteredTool["annotations"],
+  input: WebMCP.RegisteredTool["annotations"],
 ): RobotClientToolAnnotations | undefined {
   const annotations: RobotClientToolAnnotations = {};
   for (const key of [
