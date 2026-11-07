@@ -195,7 +195,7 @@ $defs:
     type: string
     const: MANAGE_ROLES
     title: Manage roles
-    description: Create, edit and delete roles as well as assign and remove roles of other members.
+    description: Create, edit and delete roles as well as assign and remove roles of other members. Granting the Administrator permission to a role or assigning a role containing it requires Administrator permission.
 
   MANAGE_REPORTS:
     type: string

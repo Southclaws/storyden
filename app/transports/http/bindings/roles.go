@@ -2,6 +2,7 @@ package bindings
 
 import (
 	"context"
+	"slices"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -15,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_writer"
 	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -41,6 +43,12 @@ func (h *Roles) RoleCreate(ctx context.Context, request openapi.RoleCreateReques
 	perms, err := deserialisePermissionList(request.Body.Permissions)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if slices.Contains(perms, rbac.PermissionAdministrator) {
+		if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 	}
 
 	opts := []role_writer.Mutation{}
@@ -104,6 +112,12 @@ func (h *Roles) RoleUpdate(ctx context.Context, request openapi.RoleUpdateReques
 		perms, err := deserialisePermissionList(*request.Body.Permissions)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		if slices.Contains(perms, rbac.PermissionAdministrator) {
+			if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx))
+			}
 		}
 
 		opts = append(opts, role_writer.WithPermissions(perms))
