@@ -8,6 +8,7 @@ import { LStack } from "@/styled-system/jsx";
 import { ComposerTools } from "../ComposerTools";
 import { ContentDragOverlay } from "../ContentDragOverlay";
 import { ContentComposerProps } from "../composer-props";
+import { submitFormOnModEnter } from "../submitFormOnModEnter";
 
 import "./styles.css";
 
@@ -48,6 +49,7 @@ export function ContentComposerRich(props: ContentComposerProps) {
       w="full"
       gap="1"
       minHeight="8"
+      onKeyDownCapture={submitFormOnModEnter}
       onDragOver={handlers.handleDragOver}
       onDragEnter={handlers.handleDragEnter}
       onDragLeave={handlers.handleDragLeave}
