@@ -19,13 +19,14 @@ func TestSessionCookieTransport(t *testing.T) {
 		web        string
 		secure     bool
 		webCookies int
+		domain     string
 	}{
-		{"https", "https://example.com", "https://example.com", true, 1},
-		{"http", "http://example.com", "http://example.com", false, 1},
-		{"http_api", "http://example.com:8000", "https://example.com", false, 1},
-		{"http_web", "https://example.com", "http://example.com:3000", true, 0},
-		{"localhost", "http://localhost:8000", "http://localhost:3000", false, 1},
-		{"lan_ip", "http://192.168.1.10:8000", "http://192.168.1.10:3000", false, 1},
+		{"https", "https://example.com", "https://example.com", true, 1, "example.com"},
+		{"http", "http://example.com", "http://example.com", false, 1, "example.com"},
+		{"http_api", "http://example.com:8000", "https://example.com", false, 1, "example.com"},
+		{"http_web", "https://example.com", "http://example.com:3000", true, 0, "example.com"},
+		{"localhost", "http://localhost:8000", "http://localhost:3000", false, 1, ""},
+		{"lan_ip", "http://192.168.1.10:8000", "http://192.168.1.10:3000", false, 1, "192.168.1.10"},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			r := require.New(t)
@@ -41,6 +42,7 @@ func TestSessionCookieTransport(t *testing.T) {
 			r.Len(cookies, 1)
 			r.Equal(tt.secure, cookies[0].Secure)
 			r.True(cookies[0].HttpOnly)
+			r.Equal(tt.domain, cookies[0].Domain)
 
 			browser, err := cookiejar.New(nil)
 			r.NoError(err)
