@@ -34,6 +34,39 @@ describe.each([
     },
   );
 
+  it.each(["button", "input"])(
+    "skips disabled submit controls and activates the enabled %s",
+    async (control) => {
+      const onSubmit = vi.fn((event) => event.preventDefault());
+      render(
+        <form onSubmit={onSubmit}>
+          <Composer initialValue="<p>Example content</p>" />
+          <button type="submit" disabled>
+            Disabled button
+          </button>
+          <input type="submit" disabled value="Disabled input" />
+          <fieldset disabled>
+            <button type="submit">Disabled by fieldset</button>
+            <input type="submit" value="Also disabled by fieldset" />
+          </fieldset>
+          {control === "button" ? (
+            <button type="submit">Publish</button>
+          ) : (
+            <input type="submit" value="Publish" />
+          )}
+        </form>,
+      );
+
+      const editor = await screen.findByRole("textbox");
+      fireEvent.keyDown(editor, { key: "Enter", ctrlKey: true });
+
+      expect(onSubmit).toHaveBeenCalledOnce();
+      expect(onSubmit.mock.calls[0]![0].nativeEvent.submitter).toBe(
+        screen.getByRole("button", { name: "Publish" }),
+      );
+    },
+  );
+
   it("respects a disabled submit button and ignores held shortcut keys", async () => {
     const onSubmit = vi.fn((event) => event.preventDefault());
     render(
@@ -46,12 +79,16 @@ describe.each([
     );
 
     const editor = await screen.findByRole("textbox");
+    const onEditorKeyDown = vi.fn();
+    editor.addEventListener("keydown", onEditorKeyDown);
     fireEvent.keyDown(editor, { key: "Enter", metaKey: true });
     expect(onSubmit).not.toHaveBeenCalled();
+    expect(onEditorKeyDown).toHaveBeenCalledOnce();
 
     screen.getByRole("button", { name: "Post" }).removeAttribute("disabled");
     fireEvent.keyDown(editor, { key: "Enter", metaKey: true, repeat: true });
     expect(onSubmit).not.toHaveBeenCalled();
+    expect(onEditorKeyDown).toHaveBeenCalledOnce();
   });
 
   it("runs native form validation", async () => {

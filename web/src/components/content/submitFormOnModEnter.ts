@@ -33,7 +33,8 @@ export function submitFormOnModEnter(event: KeyboardEvent<HTMLElement>) {
     (element): element is HTMLButtonElement | HTMLInputElement =>
       (element instanceof HTMLButtonElement ||
         element instanceof HTMLInputElement) &&
-      element.type === "submit",
+      element.type === "submit" &&
+      !element.matches(":disabled"),
   );
 
   if (!submitter) {
