@@ -20,12 +20,13 @@ export function Tooltip({
   content,
   contentProps,
   portalled = true,
+  lazyMount = true,
   positionerProps,
   showArrow = true,
   ...rootProps
 }: TooltipProps) {
   return (
-    <TooltipPrimitive.Root {...rootProps}>
+    <TooltipPrimitive.Root {...rootProps} lazyMount={lazyMount}>
       <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
       <Portal disabled={!portalled}>
         <TooltipPrimitive.Positioner {...positionerProps}>
