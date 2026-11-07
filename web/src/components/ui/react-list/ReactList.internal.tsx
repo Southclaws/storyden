@@ -5,44 +5,13 @@ import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 import { Button } from "@/components/ui/button";
-import { IconButton } from "@/components/ui/icon-button";
 import { ReactionAddIcon } from "@/components/ui/icons/Reaction";
 import * as Popover from "@/components/ui/popover";
-import { css } from "@/styled-system/css";
 import { reactList } from "@/styled-system/recipes";
 import { useDisclosure } from "@/utils/useDisclosure";
 import { useHydrated } from "@/utils/useHydrated";
 
 const REACTION_THROTTLE = 180;
-
-const reactionStateStyles = css.raw({
-  _disabled: {
-    background: "colorPalette.3/80",
-    color: "text.muted",
-    cursor: "default",
-    _hover: {
-      background: "colorPalette.3/80",
-      color: "text.muted",
-    },
-  },
-  '&[aria-pressed="true"]': {
-    background: "interactive.selected.surface",
-    color: "interactive.selected.content",
-    boxShadow: "[inset 0 0 0 1px token(colors.interactive.selected.border)]",
-    _hover: {
-      background: "interactive.emphasized.surface",
-      color: "interactive.emphasized.content",
-    },
-    _disabled: {
-      background: "interactive.selected.surface",
-      color: "interactive.selected.content",
-      _hover: {
-        background: "interactive.selected.surface",
-        color: "interactive.selected.content",
-      },
-    },
-  },
-});
 
 const EmojiPicker = dynamic(() => import("./ReactionPicker"), { ssr: false });
 
@@ -88,12 +57,7 @@ export function ReactList({
         );
       })}
 
-      {isLoggedIn && (
-        <ReactionPickerTrigger
-          className={styles.picker}
-          onSelect={onReactPicker}
-        />
-      )}
+      {isLoggedIn && <ReactionPickerTrigger onSelect={onReactPicker} />}
     </div>
   );
 }
@@ -150,14 +114,13 @@ function ReactTrigger({
 
   return (
     <Button
-      className={styles.reaction}
-      variant="subtle"
+      unstyled
+      className={styles.trigger}
       disabled={disabled}
       aria-busy={pending || undefined}
       aria-pressed={reaction.hasReacted}
       onClick={handleClick}
       title={buttonLabel}
-      css={reactionStateStyles}
     >
       {reaction.emoji}
       <span
@@ -173,14 +136,11 @@ function ReactTrigger({
 }
 
 type ReactionPickerTriggerProps = {
-  className: string;
   onSelect: (emoji: string) => void | Promise<void>;
 };
 
-function ReactionPickerTrigger({
-  className,
-  onSelect,
-}: ReactionPickerTriggerProps) {
+function ReactionPickerTrigger({ onSelect }: ReactionPickerTriggerProps) {
+  const styles = reactList();
   const { isOpen, onToggle, onClose } = useDisclosure();
 
   function handleSelect(event: EmojiClickData) {
@@ -202,24 +162,21 @@ function ReactionPickerTrigger({
       onInteractOutside={onClose}
       onEscapeKeyDown={onClose}
     >
-      <Popover.Trigger
-        type="button"
-        cursor="pointer"
-        onClick={onToggle}
-        asChild
-      >
-        <IconButton
-          className={className}
-          variant="subtle"
+      <Popover.Trigger type="button" onClick={onToggle} asChild>
+        <Button
+          unstyled
+          className={styles.picker}
           aria-label="Add reaction"
+          title="Add reaction"
         >
           <ReactionAddIcon />
-        </IconButton>
+        </Button>
       </Popover.Trigger>
 
       <Portal>
         <Popover.Positioner minW="0">
           <Popover.Content
+            aria-label="Choose a reaction"
             padding="0"
             bgColor="transparent"
             border="none"

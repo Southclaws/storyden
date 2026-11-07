@@ -1,8 +1,19 @@
 import { defineSlotRecipe } from "@pandacss/dev";
 
+import { button } from "../button/Button.recipe";
+
+const reactionButtonStyles = {
+  ...button.base,
+  ...button.variants!.size.sm,
+  ...button.variants!.variant.subtle,
+  borderRadius: "md",
+  fontSize: "sm",
+  height: "7",
+};
+
 export const reactList = defineSlotRecipe({
-  className: "reactList",
-  slots: ["root", "reaction", "count", "picker"],
+  className: "reaction",
+  slots: ["root", "trigger", "count", "picker"],
   jsx: ["ReactList"],
   base: {
     root: {
@@ -10,17 +21,39 @@ export const reactList = defineSlotRecipe({
       flexWrap: "wrap",
       gap: "1",
     },
-    reaction: {
-      borderRadius: "md",
+    trigger: {
+      ...reactionButtonStyles,
       color: "text.muted",
-      fontSize: "sm",
       fontVariantNumeric: "tabular-nums",
-      gap: "0",
-      height: "7",
-      paddingX: "2",
+      _disabled: {
+        background: "colorPalette.3/80",
+        color: "text.muted",
+        cursor: "default",
+        _hover: {
+          background: "colorPalette.3/80",
+          color: "text.muted",
+        },
+      },
+      '&[aria-pressed="true"]': {
+        background: "interactive.selected.surface",
+        color: "interactive.selected.content",
+        boxShadow:
+          "[inset 0 0 0 1px token(colors.interactive.selected.border)]",
+        _hover: {
+          background: "interactive.emphasized.surface",
+          color: "interactive.emphasized.content",
+        },
+        _disabled: {
+          background: "interactive.selected.surface",
+          color: "interactive.selected.content",
+          _hover: {
+            background: "interactive.selected.surface",
+            color: "interactive.selected.content",
+          },
+        },
+      },
     },
     count: {
-      marginLeft: "2",
       display: "inline-block",
       "--slide-distance": "10px",
       '&[data-direction="-1"]': { "--slide-distance": "-10px" },
@@ -31,11 +64,8 @@ export const reactList = defineSlotRecipe({
       },
     },
     picker: {
-      borderRadius: "md",
+      ...reactionButtonStyles,
       color: "text.subtle",
-      fontSize: "sm",
-      height: "7",
-      paddingX: "2",
     },
   },
 });

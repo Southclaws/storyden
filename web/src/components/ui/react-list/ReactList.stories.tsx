@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Use ReactList for existing emoji reactions and an authenticated add-reaction picker. Your own reactions use the theme's selected surface and an inset border; aria-pressed exposes the same toggle state to assistive technology. Guest reactions retain their button fill while remaining disabled, and pending reactions preserve selection. Reaction buttons use system emoji characters; the native emoji picker loads when opened. Counts animate with CSS only when the user's motion preference allows it. Use IconButton for a single standalone action rather than reaction counts and selection.",
+          "Use ReactList for emoji reaction counts and an authenticated add-reaction picker. Your own reactions have a selected appearance; guest reactions remain visible but disabled. Pending reactions preserve selection, and count changes respect reduced motion. Use IconButton for a standalone action without reaction counts. Theme hooks: reaction__root, reaction__trigger, reaction__count, and reaction__picker.",
       },
     },
   },
@@ -45,7 +45,7 @@ export const Guest: Story = {
     docs: {
       description: {
         story:
-          "Guest reactions keep the same fill as unselected authenticated reactions. ReactList applies its disabled and selected state styles locally to Button, preserving the reaction appearance without changing global recipe layer order.",
+          "Guest reactions retain the same fill as unselected authenticated reactions while remaining disabled.",
       },
     },
   },

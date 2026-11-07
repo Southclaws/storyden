@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { Page, expect, test } from "@playwright/test";
 
 import { registerUser } from "../access_key_admin_assignment";
@@ -248,21 +249,72 @@ test.describe("Thread Reactions", () => {
       .filter({ hasText: "A reply to react to." });
     const reactionButton = reply.getByRole("button", { name: "Add reaction" });
     await expect(reactionButton).toBeVisible({ timeout: 10000 });
-    await reactionButton.click();
+    await reactionButton.focus();
+    await page.keyboard.press("Enter");
 
     const emojiPicker = page.locator(".EmojiPickerReact");
     await expect(emojiPicker).toBeVisible({ timeout: 10000 });
-    await emojiPicker.locator("button.epr-emoji").first().click();
+    const pickerDialog = page.getByRole("dialog", {
+      name: "Choose a reaction",
+    });
+    await expect(pickerDialog).toBeVisible();
+    const pickerAccessibility = await new AxeBuilder({ page })
+      .include('[data-scope="popover"][data-part="content"]')
+      .analyze();
+    await test.info().attach("Emoji picker axe report", {
+      body: JSON.stringify(pickerAccessibility, null, 2),
+      contentType: "application/json",
+    });
+    // v5.1.4 has a minor list/grid role best-practice warning. Preserve the
+    // complete report while requiring every WCAG check to pass.
+    const pickerWCAGViolations = pickerAccessibility.violations.filter(
+      (violation) => violation.tags.some((tag) => tag.startsWith("wcag")),
+    );
+    expect(pickerWCAGViolations).toEqual([]);
+    await page.keyboard.press("Escape");
+    await expect(emojiPicker).not.toBeVisible();
+    await expect(reactionButton).toBeFocused();
+    await page.keyboard.press("Space");
+    await expect(emojiPicker).toBeVisible();
+    await emojiPicker.locator("button.epr-emoji").first().focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(emojiPicker.locator("button.epr-emoji").nth(1)).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(emojiPicker).not.toBeVisible();
+    await expect(reactionButton).toBeFocused();
 
     await expect(
       reply.locator("button").filter({ hasText: /^\p{Emoji}.*\d$/u }),
     ).toBeVisible({ timeout: 5000 });
-    const count = reply.locator(".reactList__count");
+    const count = reply.locator(".reaction__count");
     await expect(count).toHaveText("1");
     await expect(count).toHaveCSS("animation-name", "slideFadeIn");
     await expect(count).toHaveCSS("animation-duration", "0.25s");
     await page.emulateMedia({ reducedMotion: "reduce" });
     await expect(count).toHaveCSS("animation-name", "none");
+    await expect
+      .poll(() =>
+        count.evaluate((element) => {
+          const emoji = document.createRange();
+          emoji.selectNodeContents(element.parentElement!.firstChild!);
+
+          return (
+            element.getBoundingClientRect().left -
+            emoji.getBoundingClientRect().right
+          );
+        }),
+      )
+      .toBeCloseTo(8, 1);
+    await expect(count.locator("..")).toHaveClass("reaction__trigger");
+    await expect(count.locator("..")).toHaveCSS("height", "28px");
+    await expect(reactionButton).toHaveClass(
+      "popover__trigger reaction__picker",
+    );
+    await expect(reactionButton).toHaveCSS("height", "28px");
+    const selectedAccessibility = await new AxeBuilder({ page })
+      .include(".reaction__root")
+      .analyze();
+    expect(selectedAccessibility.violations).toEqual([]);
     await logout(page);
     const peer = await registerUser(page, "reaction-peer", PASSWORD);
     await navigateToThread(page, threadUrl);
@@ -270,9 +322,17 @@ test.describe("Thread Reactions", () => {
     const normalBackground = await count
       .locator("..")
       .evaluate((element) => getComputedStyle(element).backgroundColor);
+    const unselectedAccessibility = await new AxeBuilder({ page })
+      .include(".reaction__root")
+      .analyze();
+    expect(unselectedAccessibility.violations).toEqual([]);
     await logout(page);
     await navigateToThread(page, threadUrl);
     await expect(count.locator("..")).toBeDisabled();
+    const guestAccessibility = await new AxeBuilder({ page })
+      .include(".reaction__root")
+      .analyze();
+    expect(guestAccessibility.violations).toEqual([]);
     await expect(count.locator("..")).toHaveCSS(
       "background-color",
       normalBackground,
@@ -292,7 +352,10 @@ test.describe("Thread Reactions", () => {
     await page.route("**/api/threads/*", (route) => route.abort());
     await navigateToThread(page, threadUrl);
     await expect(count.locator("..")).toHaveAttribute("aria-pressed", "false");
-    await count.locator("..").click();
+    await count.locator("..").focus();
+    await expect(count.locator("..")).toHaveCSS("outline-style", "solid");
+    await expect(count.locator("..")).toHaveCSS("outline-width", "2px");
+    await page.keyboard.press("Space");
     await expect(count).toHaveText("2");
     await expect(count.locator("..")).toHaveAttribute("aria-pressed", "true");
     await page.unroute("**/api/accounts");
@@ -311,7 +374,10 @@ test.describe("Thread Reactions", () => {
       new RegExp(`${author}.*${peer}|${peer}.*${author}`),
     );
     await expect(count.locator("..")).toBeEnabled();
-    await count.locator("..").focus();
+    await page.keyboard.press("Tab");
+    await expect(reactionButton).toBeFocused();
+    await page.keyboard.press("Shift+Tab");
+    await expect(count.locator("..")).toBeFocused();
     await page.keyboard.press("Enter");
     await expect(count).toHaveText("1");
     await expect(count.locator("..")).toHaveAttribute("aria-pressed", "false");

@@ -9,7 +9,7 @@ export type ReactListVariantProps = {
 
 export type ReactListVariantMap = RecipeVariantMap<ReactListVariant>
 
-export type ReactListSlot = "root" | "reaction" | "count" | "picker"
+export type ReactListSlot = "root" | "trigger" | "count" | "picker"
 
 export type ReactListRecipe = ConfigSlotRecipeRuntimeFn<ReactListSlot, ReactListVariantProps, ReactListVariantMap>
 
