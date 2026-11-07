@@ -20,6 +20,7 @@ import { markdownURLTransform, remarkLooseLists } from "@/utils/markdown";
 import { ComposerTools } from "../ComposerTools";
 import { ContentDragOverlay } from "../ContentDragOverlay";
 import { ContentComposerProps } from "../composer-props";
+import { submitFormOnModEnter } from "../submitFormOnModEnter";
 
 import { useContentComposerMarkdown } from "./useContentComposerMarkdown";
 
@@ -92,6 +93,7 @@ export function ContentComposerMarkdown(props: ContentComposerProps) {
       position="relative"
       minHeight="8"
       maxHeight="fit"
+      onKeyDownCapture={submitFormOnModEnter}
     >
       <ComposerTools
         enabled={!props.disabled}

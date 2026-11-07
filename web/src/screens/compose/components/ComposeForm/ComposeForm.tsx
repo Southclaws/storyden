@@ -45,6 +45,7 @@ export function ComposeForm(props: Props) {
 
           <HStack>
             <Button
+              type="button"
               variant="ghost"
               disabled={!form.formState.isValid || state.isSavingDraft}
               onClick={handlers.handleSaveDraft}

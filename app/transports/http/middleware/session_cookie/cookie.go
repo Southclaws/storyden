@@ -41,6 +41,10 @@ func New(cfg config.Config, v *session.Validator) (*Jar, error) {
 		return nil, fault.Wrap(err, fmsg.With("failed to parse domain from public API address"))
 	}
 
+	if domain == "localhost" {
+		domain = ""
+	}
+
 	return &Jar{
 		domain:           domain,
 		secure:           cfg.PublicAPIAddress.Scheme != "http",
