@@ -1,5 +1,5 @@
 import type { ConditionalValue } from '../types/system';
-import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigSlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type FloatingPanelVariant = {}
 
@@ -11,6 +11,6 @@ export type FloatingPanelVariantMap = RecipeVariantMap<FloatingPanelVariant>
 
 export type FloatingPanelSlot = "trigger" | "positioner" | "content" | "header" | "body" | "title" | "resizeTrigger" | "dragTrigger" | "stageTrigger" | "closeTrigger" | "control"
 
-export type FloatingPanelRecipe = SlotRecipeRuntimeFn<FloatingPanelSlot, FloatingPanelVariantProps, FloatingPanelVariantMap>
+export type FloatingPanelRecipe = ConfigSlotRecipeRuntimeFn<FloatingPanelSlot, FloatingPanelVariantProps, FloatingPanelVariantMap>
 
 export declare const floatingPanel: FloatingPanelRecipe;

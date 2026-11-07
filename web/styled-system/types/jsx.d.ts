@@ -47,17 +47,15 @@ export interface JsxFactoryOptions<TProps extends AnyProps, F extends string = s
   forwardProps?: readonly F[]
 }
 
-// Distributes over the few forwarded keys; never intersects the large key unions.
-type ForwardedStyleKeys<T extends ElementType, F extends string> = F extends keyof JsxStyleProps
-  ? F extends keyof ComponentProps<T> ? F : never
-  : never
+// Filters the few forwarded keys; a nested conditional here hits TS2590 on components with many props.
+type ForwardedStyleKeys<T extends ElementType, F extends string> = Extract<Extract<F, keyof JsxStyleProps>, keyof ComponentProps<T>>
 
 /** Props `S`, with each forwarded prop that shares a style prop's name typed from the component. */
 export type WithForwardedProps<S, T extends ElementType, F extends string> = [ForwardedStyleKeys<T, F>] extends [never]
   ? S
   : Assign<S, Pick<ComponentProps<T>, ForwardedStyleKeys<T, F>>>
 
-export type JsxRecipeProps<T extends ElementType, P extends AnyProps> = JsxHTMLProps<BaseComponentProps<T>, P>
+export type JsxRecipeProps<T extends ElementType, P extends AnyProps> = JsxHTMLProps<BaseComponentProps<T>, Assign<JsxStyleProps, P>>
 
 export type JsxElement<T extends ElementType, P extends AnyProps> = T extends StyledComponent<infer A, infer B>
   ? StyledComponent<A, Assign<B, P>>

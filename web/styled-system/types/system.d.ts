@@ -1,3 +1,4 @@
+import type { Registered } from './register';
 import type { TokenValue } from './tokens';
 
 export type Pretty<T> = { [K in keyof T]: T[K] } & {}
@@ -12,7 +13,7 @@ export type Assign<T, U> = {
   [K in keyof T]: K extends keyof U ? U[K] : T[K]
 } & U
 
-export interface Conditions {
+interface LocalConditions {
   "2xl": string
   "2xlDown": string
   "2xlOnly": string
@@ -164,7 +165,9 @@ export interface Conditions {
   "xlTo2xl": string
 }
 
-export interface Breakpoints {
+export interface Conditions extends Registered<"Conditions", LocalConditions> {}
+
+interface LocalBreakpoints {
   "base": string
   "sm": string
   "md": string
@@ -173,7 +176,9 @@ export interface Breakpoints {
   "2xl": string
 }
 
-export type ContainerName = AnyString
+export interface Breakpoints extends Registered<"Breakpoints", LocalBreakpoints> {}
+
+export type ContainerName = Registered<"ContainerName", AnyString>
 export type CssContainer = ContainerName | `${ContainerName} / inline-size` | `${ContainerName} / size` | AnyString
 
 export type Condition = keyof Conditions
@@ -713,6 +718,7 @@ export type PropertyValueMap = {
   backgroundRepeat: CssRepeatStyle
   backgroundSize: CssBgSize
   baselineShift: CssLength
+  baselineSource: CssGlobals | "auto" | "first" | "last" | (string & {})
   blockSize: CssLength
   borderBlockColor: CssColor
   borderBlockEndColor: CssColor
@@ -783,9 +789,27 @@ export type PropertyValueMap = {
   containIntrinsicWidth: CssLength
   containerType: CssGlobals | "inline-size" | "normal" | "scroll-state" | "size" | (string & {})
   content: CssGlobals | "close-quote" | "no-close-quote" | "no-open-quote" | "none" | "normal" | "open-quote" | (string & {})
+  cornerBlockEndShape: CssGlobals | "bevel" | "notch" | "round" | "scoop" | "square" | "squircle" | (string & {})
+  cornerBlockStartShape: PropertyValueMap["cornerBlockEndShape"]
+  cornerBottomLeftShape: PropertyValueMap["cornerBlockEndShape"]
+  cornerBottomRightShape: PropertyValueMap["cornerBlockEndShape"]
+  cornerBottomShape: PropertyValueMap["cornerBlockEndShape"]
+  cornerEndEndShape: PropertyValueMap["cornerBlockEndShape"]
+  cornerEndStartShape: PropertyValueMap["cornerBlockEndShape"]
+  cornerInlineEndShape: PropertyValueMap["cornerBlockEndShape"]
+  cornerInlineStartShape: PropertyValueMap["cornerBlockEndShape"]
+  cornerLeftShape: PropertyValueMap["cornerBlockEndShape"]
+  cornerRightShape: PropertyValueMap["cornerBlockEndShape"]
+  cornerShape: PropertyValueMap["cornerBlockEndShape"]
+  cornerStartEndShape: PropertyValueMap["cornerBlockEndShape"]
+  cornerStartStartShape: PropertyValueMap["cornerBlockEndShape"]
+  cornerTopLeftShape: PropertyValueMap["cornerBlockEndShape"]
+  cornerTopRightShape: PropertyValueMap["cornerBlockEndShape"]
+  cornerTopShape: PropertyValueMap["cornerBlockEndShape"]
   cursor: CssGlobals | "-moz-grab" | "-moz-zoom-in" | "-moz-zoom-out" | "-webkit-grab" | "-webkit-grabbing" | "-webkit-zoom-in" | "-webkit-zoom-out" | "alias" | "all-scroll" | "auto" | "cell" | "col-resize" | "context-menu" | "copy" | "crosshair" | "default" | "e-resize" | "ew-resize" | "grab" | "grabbing" | "help" | "move" | "n-resize" | "ne-resize" | "nesw-resize" | "no-drop" | "none" | "not-allowed" | "ns-resize" | "nw-resize" | "nwse-resize" | "pointer" | "progress" | "row-resize" | "s-resize" | "se-resize" | "sw-resize" | "text" | "vertical-text" | "w-resize" | "wait" | "zoom-in" | "zoom-out" | (string & {})
   display: CssGlobals | "-ms-flexbox" | "-ms-grid" | "-ms-inline-flexbox" | "-ms-inline-grid" | "-webkit-flex" | "-webkit-inline-flex" | "block" | "contents" | "flex" | "flow" | "flow-root" | "grid" | "inline" | "inline-block" | "inline-flex" | "inline-grid" | "inline-list-item" | "inline-table" | "list-item" | "none" | "ruby" | "ruby-base" | "ruby-base-container" | "ruby-text" | "ruby-text-container" | "run-in" | "table" | "table-caption" | "table-cell" | "table-column" | "table-column-group" | "table-footer-group" | "table-header-group" | "table-row" | "table-row-group" | (string & {})
   dominantBaseline: CssGlobals | "alphabetic" | "auto" | "central" | "hanging" | "ideographic" | "mathematical" | "middle" | "text-bottom" | "text-top"
+  dynamicRangeLimit: CssGlobals | "constrained" | "no-limit" | "standard" | (string & {})
   fieldSizing: CssGlobals | "content" | "fixed"
   flexBasis: CssLength
   flexFlow: CssGlobals | "column" | "column-reverse" | "nowrap" | "row" | "row-reverse" | "wrap" | "wrap-reverse" | (string & {})
@@ -971,7 +995,7 @@ export type PropertyValueMap = {
   zoom: CssNumeric
 }
 
-export interface SystemProperties {
+interface LocalSystemProperties {
   WebkitAppearance?: ConditionalValue<CssAny>
   WebkitBorderBefore?: ConditionalValue<CssAny>
   WebkitBorderBeforeColor?: ConditionalValue<CssAny>
@@ -1041,6 +1065,7 @@ export interface SystemProperties {
   backgroundRepeat?: ConditionalValue<BackgroundRepeatValue>
   backgroundSize?: ConditionalValue<BackgroundSizeValue>
   baselineShift?: ConditionalValue<PropertyValueMap["baselineShift"]>
+  baselineSource?: ConditionalValue<PropertyValueMap["baselineSource"]>
   blockSize?: ConditionalValue<BlockSizeValue>
   border?: ConditionalValue<BordersValue>
   borderBlock?: ConditionalValue<BordersValue>
@@ -1152,6 +1177,23 @@ export interface SystemProperties {
   containerType?: ConditionalValue<ContainerTypeValue>
   content?: ConditionalValue<PropertyValueMap["content"]>
   contentVisibility?: ConditionalValue<CssAny>
+  cornerBlockEndShape?: ConditionalValue<PropertyValueMap["cornerBlockEndShape"]>
+  cornerBlockStartShape?: ConditionalValue<PropertyValueMap["cornerBlockStartShape"]>
+  cornerBottomLeftShape?: ConditionalValue<PropertyValueMap["cornerBottomLeftShape"]>
+  cornerBottomRightShape?: ConditionalValue<PropertyValueMap["cornerBottomRightShape"]>
+  cornerBottomShape?: ConditionalValue<PropertyValueMap["cornerBottomShape"]>
+  cornerEndEndShape?: ConditionalValue<PropertyValueMap["cornerEndEndShape"]>
+  cornerEndStartShape?: ConditionalValue<PropertyValueMap["cornerEndStartShape"]>
+  cornerInlineEndShape?: ConditionalValue<PropertyValueMap["cornerInlineEndShape"]>
+  cornerInlineStartShape?: ConditionalValue<PropertyValueMap["cornerInlineStartShape"]>
+  cornerLeftShape?: ConditionalValue<PropertyValueMap["cornerLeftShape"]>
+  cornerRightShape?: ConditionalValue<PropertyValueMap["cornerRightShape"]>
+  cornerShape?: ConditionalValue<PropertyValueMap["cornerShape"]>
+  cornerStartEndShape?: ConditionalValue<PropertyValueMap["cornerStartEndShape"]>
+  cornerStartStartShape?: ConditionalValue<PropertyValueMap["cornerStartStartShape"]>
+  cornerTopLeftShape?: ConditionalValue<PropertyValueMap["cornerTopLeftShape"]>
+  cornerTopRightShape?: ConditionalValue<PropertyValueMap["cornerTopRightShape"]>
+  cornerTopShape?: ConditionalValue<PropertyValueMap["cornerTopShape"]>
   counterIncrement?: ConditionalValue<CssAny>
   counterReset?: ConditionalValue<CssAny>
   counterSet?: ConditionalValue<CssAny>
@@ -1162,6 +1204,7 @@ export interface SystemProperties {
   direction?: ConditionalValue<CssAny>
   display?: ConditionalValue<DisplayValue>
   dominantBaseline?: ConditionalValue<PropertyValueMap["dominantBaseline"] | AnyString>
+  dynamicRangeLimit?: ConditionalValue<PropertyValueMap["dynamicRangeLimit"]>
   emptyCells?: ConditionalValue<CssAny>
   fieldSizing?: ConditionalValue<PropertyValueMap["fieldSizing"] | AnyString>
   fill?: ConditionalValue<ColorsValue | WithEscapeHatch<"none">>
@@ -1728,6 +1771,8 @@ export interface SystemProperties {
   w?: ConditionalValue<WidthValue>
   z?: ConditionalValue<SpacingValue>
 }
+
+export interface SystemProperties extends Registered<"SystemProperties", LocalSystemProperties> {}
 
 export type CssVarValue = ConditionalValue<CssVars | AnyString | AnyNumber>
 

@@ -1,10 +1,9 @@
-import type { ConditionalValue } from '../types/system';
-import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigSlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type RichCardVariant = {
-  backgroundColor?: "accent" | "default" | "emphasized"
   hasMedia?: boolean
-  shape?: "box" | "fill" | "minimal" | "responsive" | "row"
+  backgroundColor?: "default" | "emphasized" | "accent"
+  shape?: "minimal" | "row" | "responsive" | "box" | "fill"
 }
 
 export type RichCardVariantProps = {
@@ -15,6 +14,6 @@ export type RichCardVariantMap = RecipeVariantMap<RichCardVariant>
 
 export type RichCardSlot = "container" | "root" | "headerContainer" | "menuContainer" | "titleContainer" | "titleIcon" | "title" | "contentContainer" | "mediaContainer" | "footerContainer" | "mediaBackdropContainer" | "mediaBackdrop" | "textArea" | "text" | "media" | "mediaMissing"
 
-export type RichCardRecipe = SlotRecipeRuntimeFn<RichCardSlot, RichCardVariantProps, RichCardVariantMap>
+export type RichCardRecipe = ConfigSlotRecipeRuntimeFn<RichCardSlot, RichCardVariantProps, RichCardVariantMap>
 
 export declare const richCard: RichCardRecipe;

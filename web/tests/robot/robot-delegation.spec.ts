@@ -238,9 +238,19 @@ ${specialistTranscript}
     const newMessages = page.getByRole("button", { name: "New messages" });
     await expect(newMessages).toBeVisible({ timeout: 15000 });
 
-    const viewportBox = await messageViewport.boundingBox();
-    const composerBox = await composer.boundingBox();
-    const newMessagesBox = await newMessages.boundingBox();
+    // Streaming can resize the viewport between separate browser calls.
+    const { viewportBox, composerBox, newMessagesBox } =
+      await messageViewport.evaluate(
+        (viewport, targets) => ({
+          viewportBox: viewport.getBoundingClientRect().toJSON(),
+          composerBox: targets.composer?.getBoundingClientRect().toJSON(),
+          newMessagesBox: targets.newMessages?.getBoundingClientRect().toJSON(),
+        }),
+        {
+          composer: await composer.elementHandle(),
+          newMessages: await newMessages.elementHandle(),
+        },
+      );
     expect(viewportBox).not.toBeNull();
     expect(composerBox).not.toBeNull();
     expect(newMessagesBox).not.toBeNull();

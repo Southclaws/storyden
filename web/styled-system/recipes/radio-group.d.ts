@@ -1,8 +1,8 @@
 import type { ConditionalValue } from '../types/system';
-import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigSlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type RadioGroupVariant = {
-  size?: "lg" | "md" | "sm"
+  size?: "sm" | "md" | "lg"
 }
 
 export type RadioGroupVariantProps = {
@@ -13,6 +13,6 @@ export type RadioGroupVariantMap = RecipeVariantMap<RadioGroupVariant>
 
 export type RadioGroupSlot = "root" | "label" | "item" | "itemText" | "itemControl" | "indicator"
 
-export type RadioGroupRecipe = SlotRecipeRuntimeFn<RadioGroupSlot, RadioGroupVariantProps, RadioGroupVariantMap>
+export type RadioGroupRecipe = ConfigSlotRecipeRuntimeFn<RadioGroupSlot, RadioGroupVariantProps, RadioGroupVariantMap>
 
 export declare const radioGroup: RadioGroupRecipe;

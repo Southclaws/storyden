@@ -1,4 +1,3 @@
-import type { PatternRuntimeConfig } from '../types/pattern';
 import type { TokenValue } from '../types/tokens';
 import type { ConditionalValue, SystemStyleObject } from '../types/system';
 

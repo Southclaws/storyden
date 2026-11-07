@@ -18,32 +18,6 @@ export const reactList = defineSlotRecipe({
       gap: "0",
       height: "7",
       paddingX: "2",
-      _disabled: {
-        background: "colorPalette.3/80",
-        color: "text.muted",
-        cursor: "default",
-        _hover: {
-          background: "colorPalette.3/80",
-          color: "text.muted",
-        },
-      },
-      '&[aria-pressed="true"]': {
-        background: "interactive.selected.surface",
-        color: "interactive.selected.content",
-        boxShadow: "inset 0 0 0 1px token(colors.interactive.selected.border)",
-        _hover: {
-          background: "interactive.emphasized.surface",
-          color: "interactive.emphasized.content",
-        },
-        _disabled: {
-          background: "interactive.selected.surface",
-          color: "interactive.selected.content",
-          _hover: {
-            background: "interactive.selected.surface",
-            color: "interactive.selected.content",
-          },
-        },
-      },
     },
     count: {
       marginLeft: "2",

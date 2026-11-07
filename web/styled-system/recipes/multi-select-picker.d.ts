@@ -1,8 +1,8 @@
 import type { ConditionalValue } from '../types/system';
-import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type MultiSelectPickerVariant = {
-  size?: "lg" | "md" | "sm"
+  size?: "sm" | "md" | "lg"
 }
 
 export type MultiSelectPickerVariantProps = {
@@ -11,6 +11,6 @@ export type MultiSelectPickerVariantProps = {
 
 export type MultiSelectPickerVariantMap = RecipeVariantMap<MultiSelectPickerVariant>
 
-export type MultiSelectPickerRecipe = RecipeRuntimeFn<MultiSelectPickerVariantProps, MultiSelectPickerVariantMap>
+export type MultiSelectPickerRecipe = ConfigRecipeRuntimeFn<MultiSelectPickerVariantProps, MultiSelectPickerVariantMap>
 
 export declare const multiSelectPicker: MultiSelectPickerRecipe;

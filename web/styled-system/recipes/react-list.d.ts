@@ -1,5 +1,5 @@
 import type { ConditionalValue } from '../types/system';
-import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigSlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type ReactListVariant = {}
 
@@ -11,6 +11,6 @@ export type ReactListVariantMap = RecipeVariantMap<ReactListVariant>
 
 export type ReactListSlot = "root" | "reaction" | "count" | "picker"
 
-export type ReactListRecipe = SlotRecipeRuntimeFn<ReactListSlot, ReactListVariantProps, ReactListVariantMap>
+export type ReactListRecipe = ConfigSlotRecipeRuntimeFn<ReactListSlot, ReactListVariantProps, ReactListVariantMap>
 
 export declare const reactList: ReactListRecipe;

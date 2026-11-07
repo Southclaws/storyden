@@ -1,8 +1,8 @@
 import type { ConditionalValue } from '../types/system';
-import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigSlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type InputGroupVariant = {
-  size?: "lg" | "md" | "sm"
+  size?: "sm" | "md" | "lg"
 }
 
 export type InputGroupVariantProps = {
@@ -13,6 +13,6 @@ export type InputGroupVariantMap = RecipeVariantMap<InputGroupVariant>
 
 export type InputGroupSlot = "root" | "element"
 
-export type InputGroupRecipe = SlotRecipeRuntimeFn<InputGroupSlot, InputGroupVariantProps, InputGroupVariantMap>
+export type InputGroupRecipe = ConfigSlotRecipeRuntimeFn<InputGroupSlot, InputGroupVariantProps, InputGroupVariantMap>
 
 export declare const inputGroup: InputGroupRecipe;

@@ -1,5 +1,5 @@
 import type { ConditionalValue } from '../types/system';
-import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigSlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type TreeViewVariant = {
   variant?: "clamped" | "scrollable"
@@ -13,6 +13,6 @@ export type TreeViewVariantMap = RecipeVariantMap<TreeViewVariant>
 
 export type TreeViewSlot = "branch" | "branchContent" | "branchControl" | "branchIndentGuide" | "branchIndicator" | "branchText" | "branchTrigger" | "item" | "itemIndicator" | "itemText" | "label" | "nodeCheckbox" | "nodeRenameInput" | "root" | "tree"
 
-export type TreeViewRecipe = SlotRecipeRuntimeFn<TreeViewSlot, TreeViewVariantProps, TreeViewVariantMap>
+export type TreeViewRecipe = ConfigSlotRecipeRuntimeFn<TreeViewSlot, TreeViewVariantProps, TreeViewVariantMap>
 
 export declare const treeView: TreeViewRecipe;

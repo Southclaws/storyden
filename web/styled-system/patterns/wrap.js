@@ -2,19 +2,19 @@ import { getPatternStyles, patternFns } from './runtime';
 import { memo } from '../helpers';
 import { css } from '../css/index';
 
-const wrapConfig = {transform(props) {
-	const { columnGap, rowGap, gap = columnGap || rowGap ? void 0 : "8px", align, justify, ...rest } = props;
-	return {
-		display: "flex",
-		flexWrap: "wrap",
-		alignItems: align,
-		justifyContent: justify,
-		gap,
-		columnGap,
-		rowGap,
-		...rest
-	};
-}}
+const wrapConfig = { transform(props) {
+  const { columnGap, rowGap, gap = columnGap || rowGap ? void 0 : "8px", align, justify, ...rest } = props;
+  return {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: align,
+    justifyContent: justify,
+    gap,
+    columnGap,
+    rowGap,
+    ...rest
+  };
+} }
 
 export function wrapRaw(styles) {
   const s = getPatternStyles(wrapConfig, styles || {})

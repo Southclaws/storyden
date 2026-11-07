@@ -1,4 +1,3 @@
-import type { PatternRuntimeConfig } from '../types/pattern';
 import type { SystemStyleObject } from '../types/system';
 
 export interface WstackProperties {}

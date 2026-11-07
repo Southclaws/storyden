@@ -1,8 +1,8 @@
 import type { ConditionalValue } from '../types/system';
-import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigSlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type SwitchRecipeVariant = {
-  size?: "lg" | "md" | "sm"
+  size?: "sm" | "md" | "lg"
 }
 
 export type SwitchRecipeVariantProps = {
@@ -13,6 +13,6 @@ export type SwitchRecipeVariantMap = RecipeVariantMap<SwitchRecipeVariant>
 
 export type SwitchRecipeSlot = "root" | "label" | "control" | "thumb"
 
-export type SwitchRecipeRecipe = SlotRecipeRuntimeFn<SwitchRecipeSlot, SwitchRecipeVariantProps, SwitchRecipeVariantMap>
+export type SwitchRecipeRecipe = ConfigSlotRecipeRuntimeFn<SwitchRecipeSlot, SwitchRecipeVariantProps, SwitchRecipeVariantMap>
 
 export declare const switchRecipe: SwitchRecipeRecipe;

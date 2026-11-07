@@ -1,9 +1,9 @@
 import type { ConditionalValue } from '../types/system';
-import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigSlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type ProgressVariant = {
   shape?: "circle" | "horizontal"
-  size?: "lg" | "md" | "sm"
+  size?: "sm" | "md" | "lg"
 }
 
 export type ProgressVariantProps = {
@@ -14,6 +14,6 @@ export type ProgressVariantMap = RecipeVariantMap<ProgressVariant>
 
 export type ProgressSlot = "root" | "label" | "track" | "range" | "valueText" | "view" | "circle" | "circleTrack" | "circleRange"
 
-export type ProgressRecipe = SlotRecipeRuntimeFn<ProgressSlot, ProgressVariantProps, ProgressVariantMap>
+export type ProgressRecipe = ConfigSlotRecipeRuntimeFn<ProgressSlot, ProgressVariantProps, ProgressVariantMap>
 
 export declare const progress: ProgressRecipe;

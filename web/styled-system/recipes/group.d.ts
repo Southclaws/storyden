@@ -1,9 +1,8 @@
-import type { ConditionalValue } from '../types/system';
-import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type GroupVariant = {
-  attached?: boolean
   orientation?: "horizontal" | "vertical"
+  attached?: boolean
 }
 
 export type GroupVariantProps = {
@@ -12,6 +11,6 @@ export type GroupVariantProps = {
 
 export type GroupVariantMap = RecipeVariantMap<GroupVariant>
 
-export type GroupRecipe = RecipeRuntimeFn<GroupVariantProps, GroupVariantMap>
+export type GroupRecipe = ConfigRecipeRuntimeFn<GroupVariantProps, GroupVariantMap>
 
 export declare const group: GroupRecipe;

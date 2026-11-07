@@ -1,5 +1,5 @@
 import type { ConditionalValue } from '../types/system';
-import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigSlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type AlertVariant = {
   tone?: "danger" | "info" | "success" | "warning"
@@ -13,6 +13,6 @@ export type AlertVariantMap = RecipeVariantMap<AlertVariant>
 
 export type AlertSlot = "root" | "content" | "description" | "icon" | "title"
 
-export type AlertRecipe = SlotRecipeRuntimeFn<AlertSlot, AlertVariantProps, AlertVariantMap>
+export type AlertRecipe = ConfigSlotRecipeRuntimeFn<AlertSlot, AlertVariantProps, AlertVariantMap>
 
 export declare const alert: AlertRecipe;

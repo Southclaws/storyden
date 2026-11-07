@@ -2,19 +2,19 @@ import { getPatternStyles, patternFns } from './runtime';
 import { memo } from '../helpers';
 import { css } from '../css/index';
 
-const containerConfig = {transform(props) {
-	return {
-		position: "relative",
-		maxWidth: "8xl",
-		mx: "auto",
-		px: {
-			base: "4",
-			md: "6",
-			lg: "8"
-		},
-		...props
-	};
-}}
+const containerConfig = { transform(props) {
+  return {
+    position: "relative",
+    maxWidth: "8xl",
+    mx: "auto",
+    px: {
+      base: "4",
+      md: "6",
+      lg: "8"
+    },
+    ...props
+  };
+} }
 
 export function containerRaw(styles) {
   const s = getPatternStyles(containerConfig, styles || {})

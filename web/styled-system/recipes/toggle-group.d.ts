@@ -1,9 +1,8 @@
-import type { ConditionalValue } from '../types/system';
-import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigSlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type ToggleGroupVariant = {
-  size?: "lg" | "md" | "sm" | "xs"
-  variant?: "ghost" | "outline"
+  variant?: "outline" | "ghost"
+  size?: "xs" | "sm" | "md" | "lg"
 }
 
 export type ToggleGroupVariantProps = {
@@ -14,6 +13,6 @@ export type ToggleGroupVariantMap = RecipeVariantMap<ToggleGroupVariant>
 
 export type ToggleGroupSlot = "root" | "item"
 
-export type ToggleGroupRecipe = SlotRecipeRuntimeFn<ToggleGroupSlot, ToggleGroupVariantProps, ToggleGroupVariantMap>
+export type ToggleGroupRecipe = ConfigSlotRecipeRuntimeFn<ToggleGroupSlot, ToggleGroupVariantProps, ToggleGroupVariantMap>
 
 export declare const toggleGroup: ToggleGroupRecipe;

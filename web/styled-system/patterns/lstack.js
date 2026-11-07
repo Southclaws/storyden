@@ -2,16 +2,16 @@ import { getPatternStyles, patternFns } from './runtime';
 import { memo } from '../helpers';
 import { css } from '../css/index';
 
-const lstackConfig = {transform(props) {
-	return {
-		display: "flex",
-		gap: "3",
-		flexDirection: "column",
-		width: "full",
-		alignItems: "start",
-		...props
-	};
-}}
+const lstackConfig = { transform(props) {
+  return {
+    display: "flex",
+    gap: "3",
+    flexDirection: "column",
+    width: "full",
+    alignItems: "start",
+    ...props
+  };
+} }
 
 export function lstackRaw(styles) {
   const s = getPatternStyles(lstackConfig, styles || {})

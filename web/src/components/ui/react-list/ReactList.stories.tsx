@@ -41,6 +41,14 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 
 export const Guest: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Guest reactions keep the same fill as unselected authenticated reactions. ReactList applies its disabled and selected state styles locally to Button, preserving the reaction appearance without changing global recipe layer order.",
+      },
+    },
+  },
   args: {
     isLoggedIn: false,
     reactions: meta.args.reactions.map((reaction) => ({

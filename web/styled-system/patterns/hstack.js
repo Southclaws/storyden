@@ -2,17 +2,20 @@ import { getPatternStyles, patternFns } from './runtime';
 import { memo } from '../helpers';
 import { css } from '../css/index';
 
-const hstackConfig = {transform(props) {
-	const { justify, gap, ...rest } = props;
-	return {
-		display: "flex",
-		alignItems: "center",
-		justifyContent: justify,
-		gap,
-		flexDirection: "row",
-		...rest
-	};
-},defaultValues:{gap:'8px'}}
+const hstackConfig = {
+  transform(props) {
+    const { justify, gap, ...rest } = props;
+    return {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: justify,
+      gap,
+      flexDirection: "row",
+      ...rest
+    };
+  },
+  defaultValues: { gap: "8px" }
+}
 
 export function hstackRaw(styles) {
   const s = getPatternStyles(hstackConfig, styles || {})

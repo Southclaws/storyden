@@ -2,16 +2,16 @@ import { getPatternStyles, patternFns } from './runtime';
 import { memo } from '../helpers';
 import { css } from '../css/index';
 
-const wstackConfig = {transform(props) {
-	return {
-		display: "flex",
-		flexDirection: "row",
-		gap: "3",
-		width: "full",
-		justifyContent: "space-between",
-		...props
-	};
-}}
+const wstackConfig = { transform(props) {
+  return {
+    display: "flex",
+    flexDirection: "row",
+    gap: "3",
+    width: "full",
+    justifyContent: "space-between",
+    ...props
+  };
+} }
 
 export function wstackRaw(styles) {
   const s = getPatternStyles(wstackConfig, styles || {})

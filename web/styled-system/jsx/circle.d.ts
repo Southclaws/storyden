@@ -3,6 +3,5 @@ import type { CircleProperties } from '../patterns/circle';
 import type { HTMLStyledProps } from '../types/jsx';
 import type { DistributiveOmit } from '../types/system';
 
-export interface CircleProps extends CircleProperties, DistributiveOmit<HTMLStyledProps<"div">, keyof CircleProperties> {}
-
-export declare const Circle: FunctionComponent<CircleProps>
+export interface CircleProps extends CircleProperties, DistributiveOmit<HTMLStyledProps<'div'>, keyof CircleProperties> {}
+export declare const Circle: FunctionComponent<CircleProps>;

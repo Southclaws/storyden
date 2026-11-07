@@ -1,5 +1,5 @@
 import type { ConditionalValue } from '../types/system';
-import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type HeadingInputVariant = {}
 
@@ -9,6 +9,6 @@ export type HeadingInputVariantProps = {
 
 export type HeadingInputVariantMap = RecipeVariantMap<HeadingInputVariant>
 
-export type HeadingInputRecipe = RecipeRuntimeFn<HeadingInputVariantProps, HeadingInputVariantMap>
+export type HeadingInputRecipe = ConfigRecipeRuntimeFn<HeadingInputVariantProps, HeadingInputVariantMap>
 
 export declare const headingInput: HeadingInputRecipe;

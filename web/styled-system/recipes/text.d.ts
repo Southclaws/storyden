@@ -1,8 +1,8 @@
 import type { ConditionalValue } from '../types/system';
-import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type TextVariant = {
-  variant?: "body" | "metadata" | "supporting"
+  variant?: "body" | "supporting" | "metadata"
 }
 
 export type TextVariantProps = {
@@ -11,6 +11,6 @@ export type TextVariantProps = {
 
 export type TextVariantMap = RecipeVariantMap<TextVariant>
 
-export type TextRecipe = RecipeRuntimeFn<TextVariantProps, TextVariantMap>
+export type TextRecipe = ConfigRecipeRuntimeFn<TextVariantProps, TextVariantMap>
 
 export declare const text: TextRecipe;

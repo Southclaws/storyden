@@ -1,5 +1,5 @@
 import type { ConditionalValue } from '../types/system';
-import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type CardRowsVariant = {}
 
@@ -9,6 +9,6 @@ export type CardRowsVariantProps = {
 
 export type CardRowsVariantMap = RecipeVariantMap<CardRowsVariant>
 
-export type CardRowsRecipe = RecipeRuntimeFn<CardRowsVariantProps, CardRowsVariantMap>
+export type CardRowsRecipe = ConfigRecipeRuntimeFn<CardRowsVariantProps, CardRowsVariantMap>
 
 export declare const cardRows: CardRowsRecipe;

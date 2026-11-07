@@ -159,7 +159,9 @@ test("creates invitations only on opening, supports retry and creates a fresh li
   await expect(
     dialog.getByText("Something went wrong while creating the invitation."),
   ).toBeVisible();
-  await dialog.getByRole("button", { name: "Try again" }).click();
+  const retryButton = dialog.getByRole("button", { name: "Try again" });
+  await expect(retryButton).toBeInViewport();
+  await retryButton.click();
   const link = dialog.getByRole("textbox", { name: "Invitation link" });
   await expect(link).toHaveValue(/\/invitation\/.+/);
   const first = await link.inputValue();

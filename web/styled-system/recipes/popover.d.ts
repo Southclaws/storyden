@@ -1,5 +1,5 @@
 import type { ConditionalValue } from '../types/system';
-import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigSlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type PopoverVariant = {}
 
@@ -11,6 +11,6 @@ export type PopoverVariantMap = RecipeVariantMap<PopoverVariant>
 
 export type PopoverSlot = "arrow" | "arrowTip" | "anchor" | "trigger" | "indicator" | "positioner" | "content" | "title" | "description" | "closeTrigger"
 
-export type PopoverRecipe = SlotRecipeRuntimeFn<PopoverSlot, PopoverVariantProps, PopoverVariantMap>
+export type PopoverRecipe = ConfigSlotRecipeRuntimeFn<PopoverSlot, PopoverVariantProps, PopoverVariantMap>
 
 export declare const popover: PopoverRecipe;

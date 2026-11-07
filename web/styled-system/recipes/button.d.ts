@@ -1,10 +1,10 @@
 import type { ConditionalValue } from '../types/system';
-import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type ButtonVariant = {
-  intent?: "destructive" | "success" | "warning"
-  size?: "lg" | "md" | "sm"
-  variant?: "ghost" | "outline" | "plain" | "solid" | "subtle"
+  size?: "sm" | "md" | "lg"
+  variant?: "solid" | "outline" | "ghost" | "subtle" | "plain"
+  intent?: "success" | "warning" | "destructive"
 }
 
 export type ButtonVariantProps = {
@@ -13,6 +13,6 @@ export type ButtonVariantProps = {
 
 export type ButtonVariantMap = RecipeVariantMap<ButtonVariant>
 
-export type ButtonRecipe = RecipeRuntimeFn<ButtonVariantProps, ButtonVariantMap>
+export type ButtonRecipe = ConfigRecipeRuntimeFn<ButtonVariantProps, ButtonVariantMap>
 
 export declare const button: ButtonRecipe;

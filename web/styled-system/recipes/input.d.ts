@@ -1,9 +1,8 @@
-import type { ConditionalValue } from '../types/system';
-import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type InputVariant = {
-  size?: "lg" | "md" | "sm"
-  variant?: "ghost" | "inset" | "outline"
+  size?: "sm" | "md" | "lg"
+  variant?: "outline" | "ghost" | "inset"
 }
 
 export type InputVariantProps = {
@@ -12,6 +11,6 @@ export type InputVariantProps = {
 
 export type InputVariantMap = RecipeVariantMap<InputVariant>
 
-export type InputRecipe = RecipeRuntimeFn<InputVariantProps, InputVariantMap>
+export type InputRecipe = ConfigRecipeRuntimeFn<InputVariantProps, InputVariantMap>
 
 export declare const input: InputRecipe;

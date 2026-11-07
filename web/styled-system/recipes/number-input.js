@@ -1,5 +1,5 @@
 import { createSlotRecipe } from './runtime';
 
-const numberInputConfig = {"name":"numberInput","className":"number-input","slots":["root","label","input","control","valueText","incrementTrigger","decrementTrigger","scrubber"],"defaultVariants":{"size":"sm","variant":"outline"},"variantMap":{"size":["lg","md","sm"],"variant":["ghost","outline"]}}
+const numberInputConfig = {"name":"numberInput","className":"number-input","slots":["root","label","input","control","valueText","incrementTrigger","decrementTrigger","scrubber"],"defaultVariants":{"size":"sm","variant":"outline"},"variantMap":{"variant":["outline","ghost"],"size":["sm","md","lg"]}}
 
 export const numberInput = /* @__PURE__ */ createSlotRecipe(numberInputConfig)

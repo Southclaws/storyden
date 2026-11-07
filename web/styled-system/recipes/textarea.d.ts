@@ -1,9 +1,8 @@
-import type { ConditionalValue } from '../types/system';
-import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type TextareaVariant = {
-  size?: "lg" | "md" | "sm"
-  variant?: "ghost" | "inset" | "outline"
+  size?: "sm" | "md" | "lg"
+  variant?: "outline" | "ghost" | "inset"
 }
 
 export type TextareaVariantProps = {
@@ -12,6 +11,6 @@ export type TextareaVariantProps = {
 
 export type TextareaVariantMap = RecipeVariantMap<TextareaVariant>
 
-export type TextareaRecipe = RecipeRuntimeFn<TextareaVariantProps, TextareaVariantMap>
+export type TextareaRecipe = ConfigRecipeRuntimeFn<TextareaVariantProps, TextareaVariantMap>
 
 export declare const textarea: TextareaRecipe;

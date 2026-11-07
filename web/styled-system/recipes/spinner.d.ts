@@ -1,8 +1,8 @@
 import type { ConditionalValue } from '../types/system';
-import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type SpinnerVariant = {
-  size?: "lg" | "md" | "sm"
+  size?: "sm" | "md" | "lg"
 }
 
 export type SpinnerVariantProps = {
@@ -11,6 +11,6 @@ export type SpinnerVariantProps = {
 
 export type SpinnerVariantMap = RecipeVariantMap<SpinnerVariant>
 
-export type SpinnerRecipe = RecipeRuntimeFn<SpinnerVariantProps, SpinnerVariantMap>
+export type SpinnerRecipe = ConfigRecipeRuntimeFn<SpinnerVariantProps, SpinnerVariantMap>
 
 export declare const spinner: SpinnerRecipe;

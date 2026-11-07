@@ -63,7 +63,9 @@ export function InvitationScreen({ onClose }: { onClose: () => void }) {
   const started = useRef(false);
 
   useEffect(() => {
-    if (started.current) return;
+    if (started.current) {
+      return;
+    }
     started.current = true;
     void createInvitation();
   }, [createInvitation]);
@@ -133,10 +135,10 @@ function InvitationModalContent({
         </LStack>
 
         <WStack>
-          <Button w="full" variant="outline" onClick={onClose}>
+          <Button flex="1" variant="outline" onClick={onClose}>
             Close
           </Button>
-          <Button w="full" onClick={onRetry}>
+          <Button flex="1" onClick={onRetry}>
             Try again
           </Button>
         </WStack>

@@ -1,5 +1,5 @@
 import type { ConditionalValue } from '../types/system';
-import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigSlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type ClipboardVariant = {}
 
@@ -11,6 +11,6 @@ export type ClipboardVariantMap = RecipeVariantMap<ClipboardVariant>
 
 export type ClipboardSlot = "root" | "control" | "trigger" | "indicator" | "input" | "label"
 
-export type ClipboardRecipe = SlotRecipeRuntimeFn<ClipboardSlot, ClipboardVariantProps, ClipboardVariantMap>
+export type ClipboardRecipe = ConfigSlotRecipeRuntimeFn<ClipboardSlot, ClipboardVariantProps, ClipboardVariantMap>
 
 export declare const clipboard: ClipboardRecipe;

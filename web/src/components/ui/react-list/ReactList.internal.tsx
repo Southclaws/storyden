@@ -8,11 +8,41 @@ import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { ReactionAddIcon } from "@/components/ui/icons/Reaction";
 import * as Popover from "@/components/ui/popover";
+import { css } from "@/styled-system/css";
 import { reactList } from "@/styled-system/recipes";
 import { useDisclosure } from "@/utils/useDisclosure";
 import { useHydrated } from "@/utils/useHydrated";
 
 const REACTION_THROTTLE = 180;
+
+const reactionStateStyles = css.raw({
+  _disabled: {
+    background: "colorPalette.3/80",
+    color: "text.muted",
+    cursor: "default",
+    _hover: {
+      background: "colorPalette.3/80",
+      color: "text.muted",
+    },
+  },
+  '&[aria-pressed="true"]': {
+    background: "interactive.selected.surface",
+    color: "interactive.selected.content",
+    boxShadow: "[inset 0 0 0 1px token(colors.interactive.selected.border)]",
+    _hover: {
+      background: "interactive.emphasized.surface",
+      color: "interactive.emphasized.content",
+    },
+    _disabled: {
+      background: "interactive.selected.surface",
+      color: "interactive.selected.content",
+      _hover: {
+        background: "interactive.selected.surface",
+        color: "interactive.selected.content",
+      },
+    },
+  },
+});
 
 const EmojiPicker = dynamic(() => import("./ReactionPicker"), { ssr: false });
 
@@ -127,6 +157,7 @@ function ReactTrigger({
       aria-pressed={reaction.hasReacted}
       onClick={handleClick}
       title={buttonLabel}
+      css={reactionStateStyles}
     >
       {reaction.emoji}
       <span

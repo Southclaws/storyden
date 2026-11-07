@@ -1,8 +1,8 @@
 import type { ConditionalValue } from '../types/system';
-import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
+import type { ConfigRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type AdmonitionVariant = {
-  kind?: "failure" | "neutral" | "success"
+  kind?: "neutral" | "success" | "failure"
 }
 
 export type AdmonitionVariantProps = {
@@ -11,6 +11,6 @@ export type AdmonitionVariantProps = {
 
 export type AdmonitionVariantMap = RecipeVariantMap<AdmonitionVariant>
 
-export type AdmonitionRecipe = RecipeRuntimeFn<AdmonitionVariantProps, AdmonitionVariantMap>
+export type AdmonitionRecipe = ConfigRecipeRuntimeFn<AdmonitionVariantProps, AdmonitionVariantMap>
 
 export declare const admonition: AdmonitionRecipe;

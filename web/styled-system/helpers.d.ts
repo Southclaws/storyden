@@ -10,7 +10,7 @@ export declare function stableStringify(value: any): string;
 
 export declare function toCssVar(path: string): string;
 
-export declare function colorMix(tokens: Record<string, string>, path: string): string | undefined;
+export declare function colorMix(tokens: Record<string, string>, path: string, resolveVar?: (path: string) => string): string | undefined;
 
 export declare function compact<T extends Record<string, unknown>>(v: T): Partial<T>;
 
@@ -54,10 +54,9 @@ export declare function hypenateProperty(property: string): string;
 
 export declare function splitProps<T extends Record<string, any>>(props: T, ...keys: Array<Array<keyof T> | ((key: keyof T) => boolean)>): any[];
 
-export declare function normalizeHTMLProps(props: Record<string, any>): Record<string, any>
-export declare namespace normalizeHTMLProps {
-  export const keys: string[]
-}
+export declare const normalizeHTMLProps: ((props: Record<string, any>) => Record<string, any>) & {
+  keys: string[];
+};
 
 export declare function uniq<T>(...items: Array<T[] | undefined>): T[];
 
