@@ -178,6 +178,7 @@ type AccountMutation struct {
 	links                                       *[]schema.ExternalLink
 	appendlinks                                 []schema.ExternalLink
 	metadata                                    *map[string]interface{}
+	notification_settings                       **schema.NotificationSettings
 	clearedFields                               map[string]struct{}
 	sessions                                    map[xid.ID]struct{}
 	removedsessions                             map[xid.ID]struct{}
@@ -1055,6 +1056,55 @@ func (m *AccountMutation) MetadataCleared() bool {
 func (m *AccountMutation) ResetMetadata() {
 	m.metadata = nil
 	delete(m.clearedFields, account.FieldMetadata)
+}
+
+// SetNotificationSettings sets the "notification_settings" field.
+func (m *AccountMutation) SetNotificationSettings(ss *schema.NotificationSettings) {
+	m.notification_settings = &ss
+}
+
+// NotificationSettings returns the value of the "notification_settings" field in the mutation.
+func (m *AccountMutation) NotificationSettings() (r *schema.NotificationSettings, exists bool) {
+	v := m.notification_settings
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNotificationSettings returns the old "notification_settings" field's value of the Account entity.
+// If the Account object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountMutation) OldNotificationSettings(ctx context.Context) (v *schema.NotificationSettings, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNotificationSettings is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNotificationSettings requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNotificationSettings: %w", err)
+	}
+	return oldValue.NotificationSettings, nil
+}
+
+// ClearNotificationSettings clears the value of the "notification_settings" field.
+func (m *AccountMutation) ClearNotificationSettings() {
+	m.notification_settings = nil
+	m.clearedFields[account.FieldNotificationSettings] = struct{}{}
+}
+
+// NotificationSettingsCleared returns if the "notification_settings" field was cleared in this mutation.
+func (m *AccountMutation) NotificationSettingsCleared() bool {
+	_, ok := m.clearedFields[account.FieldNotificationSettings]
+	return ok
+}
+
+// ResetNotificationSettings resets all changes to the "notification_settings" field.
+func (m *AccountMutation) ResetNotificationSettings() {
+	m.notification_settings = nil
+	delete(m.clearedFields, account.FieldNotificationSettings)
 }
 
 // SetInvitedByID sets the "invited_by_id" field.
@@ -3975,7 +4025,7 @@ func (m *AccountMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AccountMutation) Fields() []string {
-	fields := make([]string, 0, 15)
+	fields := make([]string, 0, 16)
 	if m.created_at != nil {
 		fields = append(fields, account.FieldCreatedAt)
 	}
@@ -4018,6 +4068,9 @@ func (m *AccountMutation) Fields() []string {
 	if m.metadata != nil {
 		fields = append(fields, account.FieldMetadata)
 	}
+	if m.notification_settings != nil {
+		fields = append(fields, account.FieldNotificationSettings)
+	}
 	if m.invited_by != nil {
 		fields = append(fields, account.FieldInvitedByID)
 	}
@@ -4057,6 +4110,8 @@ func (m *AccountMutation) Field(name string) (ent.Value, bool) {
 		return m.Links()
 	case account.FieldMetadata:
 		return m.Metadata()
+	case account.FieldNotificationSettings:
+		return m.NotificationSettings()
 	case account.FieldInvitedByID:
 		return m.InvitedByID()
 	}
@@ -4096,6 +4151,8 @@ func (m *AccountMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldLinks(ctx)
 	case account.FieldMetadata:
 		return m.OldMetadata(ctx)
+	case account.FieldNotificationSettings:
+		return m.OldNotificationSettings(ctx)
 	case account.FieldInvitedByID:
 		return m.OldInvitedByID(ctx)
 	}
@@ -4205,6 +4262,13 @@ func (m *AccountMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetMetadata(v)
 		return nil
+	case account.FieldNotificationSettings:
+		v, ok := value.(*schema.NotificationSettings)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNotificationSettings(v)
+		return nil
 	case account.FieldInvitedByID:
 		v, ok := value.(xid.ID)
 		if !ok {
@@ -4263,6 +4327,9 @@ func (m *AccountMutation) ClearedFields() []string {
 	if m.FieldCleared(account.FieldMetadata) {
 		fields = append(fields, account.FieldMetadata)
 	}
+	if m.FieldCleared(account.FieldNotificationSettings) {
+		fields = append(fields, account.FieldNotificationSettings)
+	}
 	if m.FieldCleared(account.FieldInvitedByID) {
 		fields = append(fields, account.FieldInvitedByID)
 	}
@@ -4300,6 +4367,9 @@ func (m *AccountMutation) ClearField(name string) error {
 		return nil
 	case account.FieldMetadata:
 		m.ClearMetadata()
+		return nil
+	case account.FieldNotificationSettings:
+		m.ClearNotificationSettings()
 		return nil
 	case account.FieldInvitedByID:
 		m.ClearInvitedByID()
@@ -4353,6 +4423,9 @@ func (m *AccountMutation) ResetField(name string) error {
 		return nil
 	case account.FieldMetadata:
 		m.ResetMetadata()
+		return nil
+	case account.FieldNotificationSettings:
+		m.ResetNotificationSettings()
 		return nil
 	case account.FieldInvitedByID:
 		m.ResetInvitedByID()

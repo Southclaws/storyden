@@ -10,6 +10,8 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/notification/notify_querier"
 	"github.com/Southclaws/storyden/app/resources/account/notification/push_subscription"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/internal/infrastructure/webpush"
@@ -17,9 +19,11 @@ import (
 )
 
 type Service struct {
-	repository *push_subscription.Repository
-	client     *webpush.Client
-	logger     *slog.Logger
+	repository    *push_subscription.Repository
+	accounts      *account_querier.Querier
+	notifications *notify_querier.Querier
+	client        *webpush.Client
+	logger        *slog.Logger
 }
 
 func Build() fx.Option {
@@ -46,12 +50,16 @@ func Build() fx.Option {
 func New(
 	logger *slog.Logger,
 	repository *push_subscription.Repository,
+	accounts *account_querier.Querier,
+	notifications *notify_querier.Querier,
 	client *webpush.Client,
 ) *Service {
 	return &Service{
-		repository: repository,
-		client:     client,
-		logger:     logger,
+		repository:    repository,
+		accounts:      accounts,
+		notifications: notifications,
+		client:        client,
+		logger:        logger,
 	}
 }
 
@@ -68,6 +76,33 @@ func (s *Service) Register(
 }
 
 func (s *Service) deliver(ctx context.Context, event *rpc.EventNotificationCreated) error {
+	owner, err := s.accounts.GetByID(ctx, event.AccountID)
+	if err != nil {
+		s.logger.Error("failed to load push preferences",
+			slog.String("notification_id", event.ID.String()),
+			slog.String("error", err.Error()),
+		)
+		return nil
+	}
+
+	if !owner.NotificationSettings.Push.Enabled {
+		return nil
+	}
+
+	notification, err := s.notifications.GetRef(ctx, event.AccountID, event.ID)
+	if err != nil {
+		s.logger.Error("failed to load push notification",
+			slog.String("notification_id", event.ID.String()),
+			slog.String("error", err.Error()),
+		)
+		return nil
+	}
+
+	enabled, overridden := owner.NotificationSettings.Push.Events[notification.Event.String()]
+	if overridden && !enabled {
+		return nil
+	}
+
 	subscriptions, err := s.repository.List(ctx, event.AccountID)
 	if err != nil {
 		s.logger.Error("failed to load push subscriptions",

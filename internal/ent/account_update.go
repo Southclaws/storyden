@@ -283,6 +283,18 @@ func (_u *AccountUpdate) ClearMetadata() *AccountUpdate {
 	return _u
 }
 
+// SetNotificationSettings sets the "notification_settings" field.
+func (_u *AccountUpdate) SetNotificationSettings(v *schema.NotificationSettings) *AccountUpdate {
+	_u.mutation.SetNotificationSettings(v)
+	return _u
+}
+
+// ClearNotificationSettings clears the value of the "notification_settings" field.
+func (_u *AccountUpdate) ClearNotificationSettings() *AccountUpdate {
+	_u.mutation.ClearNotificationSettings()
+	return _u
+}
+
 // SetInvitedByID sets the "invited_by_id" field.
 func (_u *AccountUpdate) SetInvitedByID(v xid.ID) *AccountUpdate {
 	_u.mutation.SetInvitedByID(v)
@@ -2334,6 +2346,12 @@ func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(account.FieldMetadata, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.NotificationSettings(); ok {
+		_spec.SetField(account.FieldNotificationSettings, field.TypeJSON, value)
+	}
+	if _u.mutation.NotificationSettingsCleared() {
+		_spec.ClearField(account.FieldNotificationSettings, field.TypeJSON)
 	}
 	if _u.mutation.SessionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -4953,6 +4971,18 @@ func (_u *AccountUpdateOne) ClearMetadata() *AccountUpdateOne {
 	return _u
 }
 
+// SetNotificationSettings sets the "notification_settings" field.
+func (_u *AccountUpdateOne) SetNotificationSettings(v *schema.NotificationSettings) *AccountUpdateOne {
+	_u.mutation.SetNotificationSettings(v)
+	return _u
+}
+
+// ClearNotificationSettings clears the value of the "notification_settings" field.
+func (_u *AccountUpdateOne) ClearNotificationSettings() *AccountUpdateOne {
+	_u.mutation.ClearNotificationSettings()
+	return _u
+}
+
 // SetInvitedByID sets the "invited_by_id" field.
 func (_u *AccountUpdateOne) SetInvitedByID(v xid.ID) *AccountUpdateOne {
 	_u.mutation.SetInvitedByID(v)
@@ -7034,6 +7064,12 @@ func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err er
 	}
 	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(account.FieldMetadata, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.NotificationSettings(); ok {
+		_spec.SetField(account.FieldNotificationSettings, field.TypeJSON, value)
+	}
+	if _u.mutation.NotificationSettingsCleared() {
+		_spec.ClearField(account.FieldNotificationSettings, field.TypeJSON)
 	}
 	if _u.mutation.SessionsCleared() {
 		edge := &sqlgraph.EdgeSpec{

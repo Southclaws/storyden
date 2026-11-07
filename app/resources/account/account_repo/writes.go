@@ -102,6 +102,12 @@ func WithMetadata(m map[string]any) Option {
 	}
 }
 
+func WithNotificationSettings(preferences account.NotificationPreferences) Option {
+	return func(a *ent.AccountMutation) {
+		a.SetNotificationSettings(&preferences)
+	}
+}
+
 type Mutation func(u *ent.AccountUpdateOne)
 
 func SetHandle(handle string) Mutation {
@@ -155,6 +161,12 @@ func SetLinks(links []account.ExternalLink) Mutation {
 func SetMetadata(m map[string]any) Mutation {
 	return func(u *ent.AccountUpdateOne) {
 		u.SetMetadata(m)
+	}
+}
+
+func SetNotificationSettings(preferences account.NotificationPreferences) Mutation {
+	return func(u *ent.AccountUpdateOne) {
+		u.SetNotificationSettings(&preferences)
 	}
 }
 

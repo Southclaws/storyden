@@ -44,6 +44,8 @@ const (
 	FieldLinks = "links"
 	// FieldMetadata holds the string denoting the metadata field in the database.
 	FieldMetadata = "metadata"
+	// FieldNotificationSettings holds the string denoting the notification_settings field in the database.
+	FieldNotificationSettings = "notification_settings"
 	// FieldInvitedByID holds the string denoting the invited_by_id field in the database.
 	FieldInvitedByID = "invited_by_id"
 	// EdgeSessions holds the string denoting the sessions edge name in mutations.
@@ -540,6 +542,7 @@ var Columns = []string{
 	FieldAdmin,
 	FieldLinks,
 	FieldMetadata,
+	FieldNotificationSettings,
 	FieldInvitedByID,
 }
 

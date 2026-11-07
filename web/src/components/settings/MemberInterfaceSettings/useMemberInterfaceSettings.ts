@@ -9,7 +9,6 @@ import * as z from "@/lib/validation";
 
 export const FormSchema = z.object({
   editorMode: z.enum(["richtext", "markdown"]),
-  markReadOnClick: z.boolean(),
 });
 export type Form = z.infer<typeof FormSchema>;
 
@@ -24,7 +23,6 @@ export function useMemberInterfaceSettings({ session }: Props) {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       editorMode: session.meta.editor.mode,
-      markReadOnClick: session.meta.notifications.markReadOnClick,
     },
   });
 
@@ -36,10 +34,6 @@ export function useMemberInterfaceSettings({ session }: Props) {
             ...session.meta,
             editor: {
               mode: data.editorMode,
-            },
-            notifications: {
-              ...session.meta.notifications,
-              markReadOnClick: data.markReadOnClick,
             },
           },
         });

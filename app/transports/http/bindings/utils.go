@@ -45,14 +45,20 @@ func serialiseAccount(acc *account.AccountWithEdges) openapi.Account {
 	})
 
 	return openapi.Account{
-		Id:             openapi.Identifier(acc.ID.String()),
-		Joined:         acc.CreatedAt,
-		Suspended:      acc.DeletedAt.Ptr(),
-		Handle:         acc.Handle,
-		Name:           acc.Name,
-		Bio:            acc.Bio.HTML(),
-		Signature:      opt.Map(acc.Signature, func(s datagraph.Content) string { return s.HTML() }).Ptr(),
-		Meta:           acc.Metadata,
+		Id:        openapi.Identifier(acc.ID.String()),
+		Joined:    acc.CreatedAt,
+		Suspended: acc.DeletedAt.Ptr(),
+		Handle:    acc.Handle,
+		Name:      acc.Name,
+		Bio:       acc.Bio.HTML(),
+		Signature: opt.Map(acc.Signature, func(s datagraph.Content) string { return s.HTML() }).Ptr(),
+		Meta:      acc.Metadata,
+		NotificationSettings: &openapi.NotificationSettings{
+			Push: openapi.PushNotificationSettings{
+				Enabled: acc.NotificationSettings.Push.Enabled,
+				Events:  &acc.NotificationSettings.Push.Events,
+			},
+		},
 		Links:          serialiseExternalLinks(acc.ExternalLinks),
 		CreatedAt:      acc.CreatedAt,
 		UpdatedAt:      acc.UpdatedAt,
@@ -75,6 +81,15 @@ func serialiseAccountVerifiedStatus(in account.VerifiedStatus) openapi.AccountVe
 		return openapi.AccountVerifiedStatusManual
 	default:
 		return openapi.AccountVerifiedStatusNone
+	}
+}
+
+func deserialiseNotificationPreferences(in openapi.NotificationSettings) account.NotificationPreferences {
+	return account.NotificationPreferences{
+		Push: account.PushNotificationPreferences{
+			Enabled: in.Push.Enabled,
+			Events:  opt.NewPtr(in.Push.Events).OrZero(),
+		},
 	}
 }
 

@@ -12,6 +12,7 @@ import {
 import { InboxIcon } from "@/components/ui/icons/Inbox";
 import { LayoutIcon } from "@/components/ui/icons/Layout";
 import { LinkIcon } from "@/components/ui/icons/Link";
+import { NotificationIcon } from "@/components/ui/icons/Notification";
 import { SettingsIcon } from "@/components/ui/icons/Settings";
 import { ToolIcon } from "@/components/ui/icons/Tool";
 import { useSettings } from "@/lib/settings/settings-client";
@@ -23,6 +24,7 @@ import {
 
 const sectionIcons: Record<SettingsSectionID, ReactNode> = {
   interface: <LayoutIcon />,
+  notifications: <NotificationIcon />,
   authentication: <SettingsIcon />,
   email: <InboxIcon />,
   access_keys: <ToolIcon />,

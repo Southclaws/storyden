@@ -10744,6 +10744,8 @@ components:
           $ref: "#/components/schemas/AccountEmailAddressList"
         auth_services:
           $ref: "#/components/schemas/AuthProviderIdentifierList"
+        notification_settings:
+          $ref: "#/components/schemas/NotificationSettings"
         notifications:
           $ref: "#/components/schemas/NotificationCount"
         admin:
@@ -10768,6 +10770,33 @@ components:
           $ref: "#/components/schemas/ProfileExternalLinkList"
         meta:
           $ref: "#/components/schemas/Metadata"
+        notification_settings:
+          $ref: "#/components/schemas/NotificationSettings"
+
+    NotificationSettings:
+      type: object
+      required: [push]
+      properties:
+        push:
+          $ref: "#/components/schemas/PushNotificationSettings"
+
+    PushNotificationSettings:
+      type: object
+      required: [enabled]
+      description: |
+        Push delivery preferences. Replacing this object replaces its event 
+        overrides. Events without an override are enabled. These preferences
+        do not affect the notification inbox.
+      properties:
+        enabled:
+          type: boolean
+        events:
+          type: object
+          description: |
+            Overrides keyed by NotificationEvent.
+            Unknown event names are rejected.
+          additionalProperties:
+            type: boolean
 
     AccountManageInitialProps:
       type: object

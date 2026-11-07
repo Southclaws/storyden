@@ -12,30 +12,32 @@ type (
 )
 
 var (
-	WithID              = account_repo.WithID
-	WithAdmin           = account_repo.WithAdmin
-	WithName            = account_repo.WithName
-	WithBioString       = account_repo.WithBioString
-	WithSignatureString = account_repo.WithSignatureString
-	WithKind            = account_repo.WithKind
-	WithVerifiedStatus  = account_repo.WithVerifiedStatus
-	WithBio             = account_repo.WithBio
-	WithSignature       = account_repo.WithSignature
-	WithInvitedBy       = account_repo.WithInvitedBy
-	WithInterests       = account_repo.WithInterests
-	WithLinks           = account_repo.WithLinks
-	WithMetadata        = account_repo.WithMetadata
+	WithID                   = account_repo.WithID
+	WithAdmin                = account_repo.WithAdmin
+	WithName                 = account_repo.WithName
+	WithBioString            = account_repo.WithBioString
+	WithSignatureString      = account_repo.WithSignatureString
+	WithKind                 = account_repo.WithKind
+	WithVerifiedStatus       = account_repo.WithVerifiedStatus
+	WithBio                  = account_repo.WithBio
+	WithSignature            = account_repo.WithSignature
+	WithInvitedBy            = account_repo.WithInvitedBy
+	WithInterests            = account_repo.WithInterests
+	WithLinks                = account_repo.WithLinks
+	WithMetadata             = account_repo.WithMetadata
+	WithNotificationSettings = account_repo.WithNotificationSettings
 
-	SetHandle         = account_repo.SetHandle
-	SetName           = account_repo.SetName
-	SetBio            = account_repo.SetBio
-	SetSignature      = account_repo.SetSignature
-	SetAdmin          = account_repo.SetAdmin
-	SetVerifiedStatus = account_repo.SetVerifiedStatus
-	SetInterests      = account_repo.SetInterests
-	SetLinks          = account_repo.SetLinks
-	SetMetadata       = account_repo.SetMetadata
-	SetDeleted        = account_repo.SetDeleted
+	SetHandle               = account_repo.SetHandle
+	SetName                 = account_repo.SetName
+	SetBio                  = account_repo.SetBio
+	SetSignature            = account_repo.SetSignature
+	SetAdmin                = account_repo.SetAdmin
+	SetVerifiedStatus       = account_repo.SetVerifiedStatus
+	SetInterests            = account_repo.SetInterests
+	SetLinks                = account_repo.SetLinks
+	SetMetadata             = account_repo.SetMetadata
+	SetNotificationSettings = account_repo.SetNotificationSettings
+	SetDeleted              = account_repo.SetDeleted
 )
 
 func New(repo *account_repo.Repository) *Writer {

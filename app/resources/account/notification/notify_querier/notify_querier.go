@@ -52,6 +52,20 @@ func New(
 	}
 }
 
+func (n *Querier) GetRef(ctx context.Context, owner account.AccountID, id xid.ID) (*notification.NotificationRef, error) {
+	row, err := n.db.Notification.Query().
+		Where(
+			entnotification.IDEQ(id),
+			entnotification.OwnerAccountIDEQ(xid.ID(owner)),
+		).
+		Only(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return notification.Map(row)
+}
+
 func (n *Querier) ListNotifications(ctx context.Context, accountID account.AccountID) (notification.Notifications, error) {
 	r, err := n.db.Notification.Query().
 		Where(entnotification.HasOwnerWith(entaccount.ID(xid.ID(accountID)))).

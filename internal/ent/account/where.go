@@ -721,6 +721,16 @@ func MetadataNotNil() predicate.Account {
 	return predicate.Account(sql.FieldNotNull(FieldMetadata))
 }
 
+// NotificationSettingsIsNil applies the IsNil predicate on the "notification_settings" field.
+func NotificationSettingsIsNil() predicate.Account {
+	return predicate.Account(sql.FieldIsNull(FieldNotificationSettings))
+}
+
+// NotificationSettingsNotNil applies the NotNil predicate on the "notification_settings" field.
+func NotificationSettingsNotNil() predicate.Account {
+	return predicate.Account(sql.FieldNotNull(FieldNotificationSettings))
+}
+
 // InvitedByIDEQ applies the EQ predicate on the "invited_by_id" field.
 func InvitedByIDEQ(v xid.ID) predicate.Account {
 	return predicate.Account(sql.FieldEQ(FieldInvitedByID, v))

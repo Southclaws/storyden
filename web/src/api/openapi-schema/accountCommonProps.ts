@@ -20,6 +20,7 @@ import type { MemberJoinedDate } from "./memberJoinedDate";
 import type { MemberSuspendedDate } from "./memberSuspendedDate";
 import type { Metadata } from "./metadata";
 import type { NotificationCount } from "./notificationCount";
+import type { NotificationSettings } from "./notificationSettings";
 import type { ProfileExternalLinkList } from "./profileExternalLinkList";
 import type { ProfileReference } from "./profileReference";
 
@@ -37,6 +38,7 @@ export interface AccountCommonProps {
   kind: AccountKind;
   email_addresses: AccountEmailAddressList;
   auth_services: AuthProviderIdentifierList;
+  notification_settings?: NotificationSettings;
   notifications?: NotificationCount;
   admin: boolean;
   invited_by?: ProfileReference;

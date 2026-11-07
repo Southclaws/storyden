@@ -21,6 +21,15 @@ type ExternalLink struct {
 	URL  string
 }
 
+type NotificationSettings struct {
+	Push PushNotificationSettings `json:"push"`
+}
+
+type PushNotificationSettings struct {
+	Enabled bool            `json:"enabled"`
+	Events  map[string]bool `json:"events,omitempty"`
+}
+
 func (Account) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("handle").Unique().NotEmpty(),
@@ -43,6 +52,7 @@ func (Account) Fields() []ent.Field {
 		field.Bool("admin").Default(false),
 		field.JSON("links", []ExternalLink{}).Optional(),
 		field.JSON("metadata", map[string]any{}).Optional(),
+		field.JSON("notification_settings", &NotificationSettings{}).Optional(),
 
 		field.String("invited_by_id").
 			GoType(xid.ID{}).

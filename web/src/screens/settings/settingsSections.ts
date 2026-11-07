@@ -6,6 +6,7 @@ export const DEFAULT_SETTINGS_SECTION = "interface";
 
 export type SettingsSectionID =
   | "interface"
+  | "notifications"
   | "authentication"
   | "email"
   | "access_keys"
@@ -28,6 +29,12 @@ export function getSettingsSections(
       href: "/settings/interface",
       label: "Interface",
       description: "Theme and display preferences",
+    },
+    {
+      id: "notifications",
+      href: "/settings/notifications",
+      label: "Notifications",
+      description: "Inbox behaviour and push notifications",
     },
     {
       id: "authentication",

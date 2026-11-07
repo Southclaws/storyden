@@ -49,6 +49,8 @@ type Account struct {
 	Links []schema.ExternalLink `json:"links,omitempty"`
 	// Metadata holds the value of the "metadata" field.
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	// NotificationSettings holds the value of the "notification_settings" field.
+	NotificationSettings *schema.NotificationSettings `json:"notification_settings,omitempty"`
 	// InvitedByID holds the value of the "invited_by_id" field.
 	InvitedByID *xid.ID `json:"invited_by_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -656,7 +658,7 @@ func (*Account) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case account.FieldAvatarAssetID, account.FieldInvitedByID:
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
-		case account.FieldLinks, account.FieldMetadata:
+		case account.FieldLinks, account.FieldMetadata, account.FieldNotificationSettings:
 			values[i] = new([]byte)
 		case account.FieldAdmin:
 			values[i] = new(sql.NullBool)
@@ -777,6 +779,14 @@ func (_m *Account) assignValues(columns []string, values []any) error {
 			} else if value != nil && len(*value) > 0 {
 				if err := json.Unmarshal(*value, &_m.Metadata); err != nil {
 					return fmt.Errorf("unmarshal field metadata: %w", err)
+				}
+			}
+		case account.FieldNotificationSettings:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field notification_settings", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &_m.NotificationSettings); err != nil {
+					return fmt.Errorf("unmarshal field notification_settings: %w", err)
 				}
 			}
 		case account.FieldInvitedByID:
@@ -1136,6 +1146,9 @@ func (_m *Account) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Metadata))
+	builder.WriteString(", ")
+	builder.WriteString("notification_settings=")
+	builder.WriteString(fmt.Sprintf("%v", _m.NotificationSettings))
 	builder.WriteString(", ")
 	if v := _m.InvitedByID; v != nil {
 		builder.WriteString("invited_by_id=")

@@ -234,6 +234,12 @@ func (_c *AccountCreate) SetMetadata(v map[string]interface{}) *AccountCreate {
 	return _c
 }
 
+// SetNotificationSettings sets the "notification_settings" field.
+func (_c *AccountCreate) SetNotificationSettings(v *schema.NotificationSettings) *AccountCreate {
+	_c.mutation.SetNotificationSettings(v)
+	return _c
+}
+
 // SetInvitedByID sets the "invited_by_id" field.
 func (_c *AccountCreate) SetInvitedByID(v xid.ID) *AccountCreate {
 	_c.mutation.SetInvitedByID(v)
@@ -1247,6 +1253,10 @@ func (_c *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Metadata(); ok {
 		_spec.SetField(account.FieldMetadata, field.TypeJSON, value)
 		_node.Metadata = value
+	}
+	if value, ok := _c.mutation.NotificationSettings(); ok {
+		_spec.SetField(account.FieldNotificationSettings, field.TypeJSON, value)
+		_node.NotificationSettings = value
 	}
 	if nodes := _c.mutation.SessionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -2354,6 +2364,24 @@ func (u *AccountUpsert) ClearMetadata() *AccountUpsert {
 	return u
 }
 
+// SetNotificationSettings sets the "notification_settings" field.
+func (u *AccountUpsert) SetNotificationSettings(v *schema.NotificationSettings) *AccountUpsert {
+	u.Set(account.FieldNotificationSettings, v)
+	return u
+}
+
+// UpdateNotificationSettings sets the "notification_settings" field to the value that was provided on create.
+func (u *AccountUpsert) UpdateNotificationSettings() *AccountUpsert {
+	u.SetExcluded(account.FieldNotificationSettings)
+	return u
+}
+
+// ClearNotificationSettings clears the value of the "notification_settings" field.
+func (u *AccountUpsert) ClearNotificationSettings() *AccountUpsert {
+	u.SetNull(account.FieldNotificationSettings)
+	return u
+}
+
 // SetInvitedByID sets the "invited_by_id" field.
 func (u *AccountUpsert) SetInvitedByID(v xid.ID) *AccountUpsert {
 	u.Set(account.FieldInvitedByID, v)
@@ -2651,6 +2679,27 @@ func (u *AccountUpsertOne) UpdateMetadata() *AccountUpsertOne {
 func (u *AccountUpsertOne) ClearMetadata() *AccountUpsertOne {
 	return u.Update(func(s *AccountUpsert) {
 		s.ClearMetadata()
+	})
+}
+
+// SetNotificationSettings sets the "notification_settings" field.
+func (u *AccountUpsertOne) SetNotificationSettings(v *schema.NotificationSettings) *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetNotificationSettings(v)
+	})
+}
+
+// UpdateNotificationSettings sets the "notification_settings" field to the value that was provided on create.
+func (u *AccountUpsertOne) UpdateNotificationSettings() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateNotificationSettings()
+	})
+}
+
+// ClearNotificationSettings clears the value of the "notification_settings" field.
+func (u *AccountUpsertOne) ClearNotificationSettings() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.ClearNotificationSettings()
 	})
 }
 
@@ -3121,6 +3170,27 @@ func (u *AccountUpsertBulk) UpdateMetadata() *AccountUpsertBulk {
 func (u *AccountUpsertBulk) ClearMetadata() *AccountUpsertBulk {
 	return u.Update(func(s *AccountUpsert) {
 		s.ClearMetadata()
+	})
+}
+
+// SetNotificationSettings sets the "notification_settings" field.
+func (u *AccountUpsertBulk) SetNotificationSettings(v *schema.NotificationSettings) *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetNotificationSettings(v)
+	})
+}
+
+// UpdateNotificationSettings sets the "notification_settings" field to the value that was provided on create.
+func (u *AccountUpsertBulk) UpdateNotificationSettings() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateNotificationSettings()
+	})
+}
+
+// ClearNotificationSettings clears the value of the "notification_settings" field.
+func (u *AccountUpsertBulk) ClearNotificationSettings() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.ClearNotificationSettings()
 	})
 }
 

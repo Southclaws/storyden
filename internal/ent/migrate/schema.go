@@ -26,6 +26,7 @@ var (
 		{Name: "admin", Type: field.TypeBool, Default: false},
 		{Name: "links", Type: field.TypeJSON, Nullable: true},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
+		{Name: "notification_settings", Type: field.TypeJSON, Nullable: true},
 		{Name: "invited_by_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// AccountsTable holds the schema information for the "accounts" table.
@@ -36,7 +37,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "accounts_invitations_invited",
-				Columns:    []*schema.Column{AccountsColumns[15]},
+				Columns:    []*schema.Column{AccountsColumns[16]},
 				RefColumns: []*schema.Column{InvitationsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

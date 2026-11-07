@@ -46,16 +46,17 @@ func New(
 }
 
 type InitialProps struct {
-	Handle         string
-	Name           opt.Optional[string]
-	Bio            opt.Optional[string]
-	Signature      opt.Optional[string]
-	Interests      opt.Optional[[]xid.ID]
-	Links          opt.Optional[[]account.ExternalLink]
-	Admin          opt.Optional[bool]
-	EmailAddress   opt.Optional[mail.Address]
-	VerifiedStatus opt.Optional[account.VerifiedStatus]
-	Meta           opt.Optional[map[string]any]
+	Handle               string
+	Name                 opt.Optional[string]
+	Bio                  opt.Optional[string]
+	Signature            opt.Optional[string]
+	Interests            opt.Optional[[]xid.ID]
+	Links                opt.Optional[[]account.ExternalLink]
+	Admin                opt.Optional[bool]
+	EmailAddress         opt.Optional[mail.Address]
+	VerifiedStatus       opt.Optional[account.VerifiedStatus]
+	Meta                 opt.Optional[map[string]any]
+	NotificationSettings opt.Optional[account.NotificationPreferences]
 }
 
 func (m *Manager) Create(ctx context.Context, props InitialProps) (*account.AccountWithEdges, error) {
@@ -97,6 +98,14 @@ func (m *Manager) Create(ctx context.Context, props InitialProps) (*account.Acco
 	}
 	if meta, ok := props.Meta.Get(); ok {
 		options = append(options, account_writer.WithMetadata(meta))
+	}
+
+	if preferences, ok := props.NotificationSettings.Get(); ok {
+		if err := account_update.ValidateNotificationPreferences(preferences); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		options = append(options, account_writer.WithNotificationSettings(preferences))
 	}
 
 	acc, err := m.accountWrite.Create(ctx, props.Handle, options...)

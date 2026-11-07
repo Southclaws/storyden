@@ -12,6 +12,7 @@ import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
 import type { AccountSignature } from "./accountSignature";
 import type { Metadata } from "./metadata";
+import type { NotificationSettings } from "./notificationSettings";
 import type { ProfileExternalLinkList } from "./profileExternalLinkList";
 import type { TagNameList } from "./tagNameList";
 
@@ -23,4 +24,5 @@ export interface AccountMutableProps {
   interests?: TagNameList;
   links?: ProfileExternalLinkList;
   meta?: Metadata;
+  notification_settings?: NotificationSettings;
 }

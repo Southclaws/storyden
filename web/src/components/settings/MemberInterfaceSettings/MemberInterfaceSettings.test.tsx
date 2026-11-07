@@ -54,38 +54,7 @@ describe("MemberInterfaceSettings", () => {
     revalidateAccount.mockResolvedValue(undefined);
   });
 
-  it("saves the preference with existing settings and refreshes the session", async () => {
-    const user = userEvent.setup();
-    const session = parseMemberSettings(account);
-
-    render(<MemberInterfaceSettings session={session} />);
-
-    const checkbox = screen.getByRole("checkbox", {
-      name: "Mark notifications as read when opened",
-    });
-
-    expect(checkbox).toBeChecked();
-
-    await user.click(checkbox);
-
-    expect(update).not.toHaveBeenCalled();
-
-    await user.click(screen.getByRole("button", { name: "Save" }));
-
-    await waitFor(() => {
-      expect(update).toHaveBeenCalledWith({
-        meta: {
-          editor: { mode: "markdown" },
-          notifications: { markReadOnClick: false },
-          custom: "keep",
-        },
-      });
-      expect(revalidateAccount).toHaveBeenCalledOnce();
-      expect(revalidate).toHaveBeenCalledOnce();
-    });
-  });
-
-  it("loads a saved disabled preference and allows enabling it again", async () => {
+  it("saves editor preferences without changing notification preferences", async () => {
     const user = userEvent.setup();
     const session = parseMemberSettings({
       ...account,
@@ -94,23 +63,22 @@ describe("MemberInterfaceSettings", () => {
 
     render(<MemberInterfaceSettings session={session} />);
 
-    const checkbox = screen.getByRole("checkbox", {
-      name: "Mark notifications as read when opened",
-    });
+    await user.click(screen.getByRole("radio", { name: "Rich text" }));
 
-    expect(checkbox).not.toBeChecked();
+    expect(update).not.toHaveBeenCalled();
 
-    await user.click(checkbox);
     await user.click(screen.getByRole("button", { name: "Save" }));
 
     await waitFor(() => {
       expect(update).toHaveBeenCalledWith({
         meta: {
-          editor: { mode: "markdown" },
-          notifications: { markReadOnClick: true },
+          editor: { mode: "richtext" },
+          notifications: { markReadOnClick: false },
           custom: "keep",
         },
       });
+      expect(revalidateAccount).toHaveBeenCalledOnce();
+      expect(revalidate).toHaveBeenCalledOnce();
     });
   });
 });
