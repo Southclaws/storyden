@@ -44,7 +44,6 @@ export function ThreadScreen(props: Props) {
     form,
     isEditing,
     isEmpty,
-    resetKey,
     isModerator,
     isConfirmingDelete,
     data,
@@ -175,7 +174,6 @@ export function ThreadScreen(props: Props) {
                 control={form.control}
                 name="body"
                 initialValue={thread.body}
-                resetKey={resetKey}
                 disabled={!isEditing}
                 onEmptyStateChange={handlers.handleEmptyStateChange}
               />

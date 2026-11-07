@@ -33,7 +33,7 @@ const valueStyles = cva({
 });
 
 export function ThreadScreenContextPane(props: Props) {
-  const { ready, error, form, isEditing, isEmpty, resetKey, data, handlers } =
+  const { ready, error, form, isEditing, isEmpty, data, handlers } =
     useThreadScreen(props);
   if (!ready) {
     return <Unready error={error} />;

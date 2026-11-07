@@ -57,7 +57,6 @@ export function useThreadScreen({
     defaultValue: false,
     clearOnDefault: true,
   });
-  const [resetKey, setResetKey] = useState("");
   const [isEmpty, setEmpty] = useState(
     !thread.body || thread.body.trim().length === 0,
   );
@@ -120,7 +119,6 @@ export function useThreadScreen({
       tags: thread.tags.map((t) => t.name),
     });
     setEditing(false);
-    setResetKey(Date.now().toString());
     setEmpty(!thread.body || thread.body.trim().length === 0);
   }
 
@@ -203,7 +201,6 @@ export function useThreadScreen({
     ready: true as const,
     isEditing: editing,
     isEmpty,
-    resetKey,
     form,
     isModerator,
     isConfirmingDelete,

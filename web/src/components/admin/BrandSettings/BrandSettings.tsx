@@ -47,7 +47,7 @@ export function BrandSettingsForm(props: Props) {
     onClearMotdDates,
     onClearMotd,
     motdContentInitialValue,
-    motdContentResetKey,
+    motdDraftKey,
     motdClearPending,
     canClearMotd,
   } = useBrandSettings(props);
@@ -203,7 +203,7 @@ export function BrandSettingsForm(props: Props) {
             control={control}
             name="motdContent"
             initialValue={motdContentInitialValue}
-            resetKey={motdContentResetKey}
+            key={motdDraftKey}
             placeholder="Optional site-wide announcement..."
           />
           <FormErrorText>{formState.errors.motdContent?.message}</FormErrorText>
@@ -240,7 +240,7 @@ export function BrandSettingsForm(props: Props) {
       <FormControl>
         <FormLabel>MOTD alert type</FormLabel>
         <SelectField<Form, (typeof MOTD_TYPE_COLLECTION.items)[number]>
-          key={`motd-type-${motdContentResetKey ?? "initial"}`}
+          key={`motd-type-${motdDraftKey}`}
           control={control}
           name="motdType"
           collection={MOTD_TYPE_COLLECTION}

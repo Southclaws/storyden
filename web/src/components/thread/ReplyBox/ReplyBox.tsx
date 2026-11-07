@@ -30,7 +30,7 @@ export function ReplyBox(props: Props) {
     isEmpty,
     isLoading,
     form,
-    resetKey,
+    draftKey,
     postedReply,
     handlers,
   } = useReplyBox(props);
@@ -153,7 +153,7 @@ export function ReplyBox(props: Props) {
             control={form.control}
             focusOnReady={focusOnReady || !!replyTo}
             onEmptyStateChange={handlers.handleEmptyStateChange}
-            resetKey={resetKey}
+            key={draftKey}
           />
         ) : (
           <Button

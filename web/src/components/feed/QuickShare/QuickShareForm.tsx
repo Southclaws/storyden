@@ -24,7 +24,7 @@ export function QuickShareForm(
 ) {
   const {
     form,
-    state: { hydratedLink, resetKey },
+    state: { hydratedLink, draftKey },
     handlers,
   } = useQuickShare(props);
 
@@ -53,7 +53,7 @@ export function QuickShareForm(
               focusOnReady={props.focusOnReady}
               name="body"
               placeholder="Share a thought, a link, something cool..."
-              resetKey={resetKey}
+              key={draftKey}
             />
           ) : (
             <Button
