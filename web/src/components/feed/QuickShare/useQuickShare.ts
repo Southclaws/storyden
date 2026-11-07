@@ -34,12 +34,12 @@ export function useQuickShare({ initialCategory }: Props) {
   const [hydratedLink, setHydratedLink] = useState<
     LinkReference | "loading" | null
   >(null);
-  const [resetKey, setResetKey] = useState("");
+  const [draftKey, setDraftKey] = useState("");
 
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      body: undefined,
+      body: "",
       category: initialCategory?.id,
     },
   });
@@ -115,13 +115,11 @@ export function useQuickShare({ initialCategory }: Props) {
           visibility: "published" as const,
         };
 
-        await createThread(newThread, linkAvailable);
-
-        // Awful hack to reset the rich text editor...
-        setResetKey(new Date().toISOString());
+        const { id } = await createThread(newThread, linkAvailable);
 
         // Only reset the body content, the member might want to post again.
         form.resetField("body");
+        setDraftKey(id);
 
         setHydratedLink(null);
       },
@@ -137,7 +135,7 @@ export function useQuickShare({ initialCategory }: Props) {
     form,
     state: {
       hydratedLink,
-      resetKey,
+      draftKey,
     },
     handlers: {
       handlePost,

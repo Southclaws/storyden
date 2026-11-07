@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
 
@@ -15,35 +15,17 @@ export function useLibraryPageContentBlock() {
   const { handleAssetUpload } = useAssets(nodeID);
   const content = useWatch((s) => s.draft.content);
   const { setContent } = store.getState();
-  const [generatedContent, setGeneratedContent] = useState<string | undefined>(
-    undefined,
-  );
+  const [contentRevision, setContentRevision] = useState(0);
 
   function handleChange(value: string) {
     setContent(value);
   }
 
-  function handleGeneratedContent(value: string) {
-    setGeneratedContent(value);
-    setContent(value);
-  }
-
-  useEffect(() => {
-    if (content && generatedContent) {
-      // if the content field changes, and it was previously using a controlled
-      // value, reset this controlled value to move it back to uncontrolled.
-      setGeneratedContent(undefined);
-    }
-  }, [content, generatedContent]);
-
-  // NOTE: We use events for external updates to content in order to side-step
-  // React's state management and keep the re-render logic really simple as this
-  // component is technically uncontrolled but flips into a controlled state on
-  // demand when an external update occurs such as from AI generated content.
   useLibraryContentEvent(
     "library-content:update-generated",
     (newContent: string) => {
-      handleGeneratedContent(newContent);
+      setContent(newContent);
+      setContentRevision((previous) => previous + 1);
     },
   );
 
@@ -51,7 +33,7 @@ export function useLibraryPageContentBlock() {
     editing,
     editorSourceKey,
     isProposalEditing,
-    generatedContent,
+    contentRevision,
     content,
     handleAssetUpload,
     handleChange,
@@ -63,7 +45,7 @@ export function LibraryPageContentBlock() {
     editing,
     editorSourceKey,
     isProposalEditing,
-    generatedContent,
+    contentRevision,
     content,
     handleAssetUpload,
     handleChange,
@@ -71,12 +53,11 @@ export function LibraryPageContentBlock() {
 
   return (
     <ContentComposer
-      key={`content:${editorSourceKey}`}
+      key={`content:${editorSourceKey}:${contentRevision}`}
       onChange={handleChange}
       disabled={!editing}
       onAssetUpload={isProposalEditing ? undefined : handleAssetUpload}
       initialValue={content}
-      value={generatedContent}
     />
   );
 }

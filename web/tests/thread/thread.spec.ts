@@ -106,6 +106,34 @@ test.describe("Thread Replies", () => {
     ).toBeVisible();
   });
 
+  test("preserves spaces and cursor position after repeated replies", async ({
+    page,
+  }) => {
+    await registerUser(page, "reply-spaces", PASSWORD);
+    await createThread(
+      page,
+      `Reply spaces ${Date.now()}`,
+      "Reply regression coverage.",
+    );
+    await postReply(page, "First reply before typing another draft.");
+
+    const form = page.getByRole("main").locator(".reply-composer__form");
+    const editor = form.getByRole("textbox", { name: "Rich text editor" });
+
+    for (let reply = 0; reply < 2; reply += 1) {
+      await expect(editor).toBeEmpty();
+      await editor.click();
+      await editor.pressSequentially("hello ");
+      await expect.poll(() => editor.textContent()).toBe("hello ");
+      await editor.press("ArrowLeft");
+      await editor.pressSequentially("X");
+      await editor.pressSequentially("Y");
+      await expect.poll(() => editor.textContent()).toBe("helloXY ");
+      await form.getByRole("button", { name: "Post", exact: true }).click();
+    }
+    await expect(editor).toBeEmpty();
+  });
+
   test("should reply to a specific reply", async ({ page }) => {
     await registerUser(page, "thread-author", PASSWORD);
     const threadUrl = await createThread(

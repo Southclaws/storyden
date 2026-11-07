@@ -1,5 +1,7 @@
 import { Locator, Page, expect, test } from "@playwright/test";
 
+import { registerUser } from "../access_key_admin_assignment";
+
 const PASSWORD = "TestPassword123!";
 const IMAGE_BYTES = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL3WQAAAABJRU5ErkJggg==",
@@ -43,6 +45,25 @@ async function pasteText(editor: Locator, text: string) {
 }
 
 test.describe("Content composer", () => {
+  test("preserves spaces after repeated quick shares", async ({ page }) => {
+    await registerUser(page, "share-spaces", PASSWORD);
+    await page.getByRole("link", { name: "Discussion", exact: true }).click();
+    await expect(page).toHaveURL("/d");
+    await page.locator(".quick-share").hover();
+    const form = page.locator(".quick-share__form");
+    const editor = form.getByRole("textbox", { name: "Rich text editor" });
+
+    for (let share = 0; share < 3; share += 1) {
+      await expect(editor).toBeEmpty();
+      await editor.click();
+      const text = `Quick share ${Date.now()} ${share} `;
+      await editor.pressSequentially(text);
+      await expect.poll(() => editor.textContent()).toBe(text);
+      await form.getByRole("button", { name: "Share", exact: true }).click();
+    }
+    await expect(editor).toBeEmpty();
+  });
+
   test("formats selected text through the selection menu", async ({ page }) => {
     const editor = await openComposer(page);
 

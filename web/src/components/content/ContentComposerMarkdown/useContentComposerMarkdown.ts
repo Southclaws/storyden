@@ -18,7 +18,16 @@ const ERROR_UNSUPPORTED_FILE_TYPE = "File type not supported";
 
 export function useContentComposerMarkdown(props: ContentComposerProps) {
   const { focusOnReady, disabled } = props;
-  const [value, setValue] = useState(() => getInitialMarkdownValue(props));
+  const [draftValue, setDraftValue] = useState(() =>
+    getMarkdownValue(props.initialValue, props.initialValueFormat),
+  );
+  let value = draftValue;
+  if (disabled) {
+    value = getMarkdownValue(
+      props.value ?? props.initialValue,
+      props.initialValueFormat,
+    );
+  }
   const { upload } = useImageUpload();
   const [previewHTML, setPreviewHTML] = useState<string>("");
   const [showPreview, setShowPreview] = useState(false);
@@ -36,26 +45,6 @@ export function useContentComposerMarkdown(props: ContentComposerProps) {
       textareaRef.current?.focus();
     }
   }, [focusOnReady, disabled, showPreview]);
-
-  useEffect(() => {
-    if (props.resetKey) {
-      setValue("");
-      setPreviewHTML("");
-    }
-  }, [props.resetKey]);
-
-  useEffect(() => {
-    if (!props.disabled) {
-      return;
-    }
-
-    setValue(getInitialMarkdownValue(props));
-  }, [
-    props.disabled,
-    props.initialValue,
-    props.initialValueFormat,
-    props.value,
-  ]);
 
   useEffect(() => {
     if (props.disabled || showPreview) return;
@@ -77,7 +66,7 @@ export function useContentComposerMarkdown(props: ContentComposerProps) {
   async function handleBufferChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     const markdownRaw = e.target.value;
 
-    setValue(markdownRaw);
+    setDraftValue(markdownRaw);
 
     const html = await markdownToHTML(markdownRaw);
 
@@ -159,7 +148,7 @@ export function useContentComposerMarkdown(props: ContentComposerProps) {
 
     const newValue =
       value.substring(0, start) + combinedPlaceholders + value.substring(end);
-    setValue(newValue);
+    setDraftValue(newValue);
 
     setTimeout(() => {
       textarea.focus();
@@ -188,7 +177,7 @@ export function useContentComposerMarkdown(props: ContentComposerProps) {
         const imageUrl = getAssetURL(asset.path);
         const markdownImage = `![${file.name}](${imageUrl})`;
 
-        setValue((currentValue) => {
+        setDraftValue((currentValue) => {
           const placeholderIndex = currentValue.indexOf(
             placeholder,
             insertPosition,
@@ -286,13 +275,17 @@ export function useContentComposerMarkdown(props: ContentComposerProps) {
   };
 }
 
-function getInitialMarkdownValue(props: ContentComposerProps) {
-  const value = props.value ?? props.initialValue;
+function getMarkdownValue(
+  value: string | undefined,
+  format: ContentComposerProps["initialValueFormat"],
+) {
   if (!value) {
     return "";
   }
 
-  return props.initialValueFormat === "markdown"
-    ? value
-    : htmlToMarkdown(value);
+  if (format === "markdown") {
+    return value;
+  }
+
+  return htmlToMarkdown(value);
 }

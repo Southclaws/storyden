@@ -43,7 +43,7 @@ export function useReplyBox({
     thread.replies.current_page,
     thread.replies.total_pages,
   );
-  const [resetKey, setResetKey] = useState("");
+  const [draftKey, setDraftKey] = useState("");
   const [isEmpty, setEmpty] = useState(true);
   const [postedReply, setPostedReply] = useState<ReplyLocationState | null>(
     null,
@@ -77,11 +77,8 @@ export function useReplyBox({
           console.warn("failed to send beacon:", error);
         }
 
-        // This is a little hack tbh, essentially if this prop for the
-        // ContentComposer component changes, its value is reset. Could have
-        // done it with a hook but... meh this is simpler (albeit not idiomatic)
-        setResetKey(new Date().toISOString());
-        form.reset();
+        form.reset({ body: "" });
+        setDraftKey(id);
         setEmpty(true);
         clearReplyTo();
 
@@ -109,7 +106,7 @@ export function useReplyBox({
     isLoggedIn: !!session,
     isEmpty,
     isLoading: form.formState.isSubmitting,
-    resetKey,
+    draftKey,
     postedReply,
     form,
     handlers: {

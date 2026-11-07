@@ -154,6 +154,16 @@ export function useContentComposer(props: ContentComposerProps) {
     },
     extensions,
     content: props.initialValue ?? "<p></p>",
+    onDestroy: () => {
+      for (const upload of activeUploadsRef.current.values()) {
+        if (upload.status !== "completed") {
+          upload.abortController.abort("editor destroyed");
+          URL.revokeObjectURL(upload.blobUrl);
+        }
+      }
+
+      activeUploadsRef.current.clear();
+    },
     onUpdate: ({ editor }) => {
       let html = editor.getHTML();
 
@@ -180,24 +190,6 @@ export function useContentComposer(props: ContentComposerProps) {
     }
   }, [editor, props.focusOnReady, props.disabled]);
 
-  // This is a huge hack but it means the composer doesn't need to be made into
-  // a controlled component. Baiscally, if the resetKey changes, we reset the
-  // content of the editor to the initial value or empty paragraph. Hacky? Yes.
-  useEffect(() => {
-    if (!editor) {
-      return;
-    }
-
-    if (!props.resetKey) {
-      if (props.value) {
-        editor.commands.setContent(props.value);
-      }
-      return;
-    }
-
-    editor.commands.setContent(props.initialValue ?? "<p></p>");
-  }, [editor, props.initialValue, props.value, props.resetKey]);
-
   useEffect(() => {
     if (!editor) {
       return;
@@ -215,8 +207,8 @@ export function useContentComposer(props: ContentComposerProps) {
     uploadId: string,
     percent: number,
   ) {
-    if (!view) {
-      throw new Error("Unable to access text editor state.");
+    if (view.isDestroyed) {
+      return;
     }
 
     const positionMap = uploadPositionsKey.getState(view.state);
@@ -240,6 +232,10 @@ export function useContentComposer(props: ContentComposerProps) {
   }
 
   function markUploadAsFailed(view: EditorView, uploadId: string) {
+    if (view.isDestroyed) {
+      return;
+    }
+
     const currentState = view.state;
 
     const positionMap = uploadPositionsKey.getState(view.state);
@@ -312,6 +308,10 @@ export function useContentComposer(props: ContentComposerProps) {
           undefined,
           abortController,
         );
+
+        if (abortController.signal.aborted) {
+          return;
+        }
 
         // we search for the node again because the position might have changed.
 
@@ -448,6 +448,10 @@ export function useContentComposer(props: ContentComposerProps) {
             undefined,
             abortController,
           );
+
+          if (abortController.signal.aborted) {
+            return;
+          }
 
           // Find the node with this upload-id and update it
           const currentState = view.state;

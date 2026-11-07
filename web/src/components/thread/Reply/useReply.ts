@@ -39,7 +39,6 @@ export function useReply({
     currentPage,
     undefined,
   );
-  const [resetKey, setResetKey] = useState("");
   const [isEditing, setEditing] = useState(false);
   const [isEditingInReview, setEditingInReview] = useState(false);
   const [isEmpty, setEmpty] = useState(true);
@@ -71,7 +70,6 @@ export function useReply({
     form.reset(reply);
     setEditing(false);
     setEditingInReview(false);
-    setResetKey(Date.now().toString());
   }
 
   function handleSetEditingInReview() {
@@ -151,7 +149,6 @@ export function useReply({
     isEditing,
     isEditingInReview,
     canManageReplies,
-    resetKey,
     form,
     isConfirmingDelete,
     handlers: {

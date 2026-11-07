@@ -22,6 +22,51 @@ vi.mock("@/components/asset/AssetThumbnailList", () => ({
 }));
 
 describe("RobotMessage", () => {
+  it.each(["text", "reasoning"] as const)(
+    "updates streamed %s through to the final response without remounting the renderer",
+    (type) => {
+      const { container, rerender } = render(
+        <RobotMessage
+          id="streamed-message"
+          role="assistant"
+          parts={[{ type, text: "First chunk", state: "streaming" }]}
+          assets={[]}
+        />,
+      );
+      const renderer = container.querySelector(".markdown-editor-readonly");
+      expect(renderer).toHaveTextContent("First chunk");
+
+      rerender(
+        <RobotMessage
+          id="streamed-message"
+          role="assistant"
+          parts={[
+            { type, text: "First chunk and more text", state: "streaming" },
+          ]}
+          assets={[]}
+        />,
+      );
+      expect(container.querySelector(".markdown-editor-readonly")).toBe(
+        renderer,
+      );
+      expect(renderer).toHaveTextContent("First chunk and more text");
+
+      rerender(
+        <RobotMessage
+          id="streamed-message"
+          role="assistant"
+          parts={[{ type, text: "The **complete** response", state: "done" }]}
+          assets={[]}
+        />,
+      );
+      expect(container.querySelector(".markdown-editor-readonly")).toBe(
+        renderer,
+      );
+      expect(renderer).toHaveTextContent("The complete response");
+      expect(renderer?.querySelector("strong")).toHaveTextContent("complete");
+    },
+  );
+
   it("renders every attached image in the message thumbnail list", () => {
     render(
       <RobotMessage

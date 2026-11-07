@@ -27,7 +27,6 @@ export function Reply(props: Props) {
     isEditing,
     isEditingInReview,
     canManageReplies,
-    resetKey,
     form,
     isConfirmingDelete,
     handlers,
@@ -113,7 +112,6 @@ export function Reply(props: Props) {
           control={form.control}
           name="body"
           initialValue={reply.body}
-          resetKey={resetKey}
           disabled={!isEditing}
           onEmptyStateChange={handlers.handleEmptyStateChange}
         />

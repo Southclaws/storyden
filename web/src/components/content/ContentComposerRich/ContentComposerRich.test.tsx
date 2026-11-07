@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
@@ -30,6 +30,58 @@ describe("ContentComposerRich", () => {
     expect(editor).toHaveAttribute("contenteditable", "true");
     expect(editor).toHaveClass("content-composer__editor");
     expect(editor).toHaveTextContent("Example content");
+  });
+
+  it("aborts pending uploads when a new draft replaces the editor", async () => {
+    const user = userEvent.setup();
+    const onAssetUpload = vi.fn();
+    let signal: AbortSignal;
+    let completeUpload: (asset: Asset) => void;
+    upload.mockImplementation(
+      (_file, _onProgress, _params, controller: AbortController) => {
+        signal = controller.signal;
+        return new Promise<Asset>((resolve) => {
+          completeUpload = resolve;
+        });
+      },
+    );
+    class TestURL extends URL {
+      static override createObjectURL = vi.fn(() => "blob:pending-draft");
+      static override revokeObjectURL = vi.fn();
+    }
+    vi.stubGlobal("URL", TestURL);
+
+    const { container, rerender } = render(
+      <ContentComposerRich key="first" onAssetUpload={onAssetUpload} />,
+    );
+    const input = await waitFor(() => {
+      const input =
+        container.querySelector<HTMLInputElement>('input[type="file"]');
+      expect(input).not.toBeNull();
+      return input!;
+    });
+    await user.upload(
+      input,
+      new File(["image"], "draft.png", { type: "image/png" }),
+    );
+    await screen.findByAltText("draft.png");
+
+    rerender(
+      <ContentComposerRich key="second" onAssetUpload={onAssetUpload} />,
+    );
+    await waitFor(() => {
+      expect(signal.aborted).toBe(true);
+    });
+    expect(TestURL.revokeObjectURL).toHaveBeenCalledWith("blob:pending-draft");
+
+    await act(async () => {
+      completeUpload({ path: "uploads/draft.png" } as Asset);
+    });
+    expect(onAssetUpload).not.toHaveBeenCalled();
+    expect(screen.queryByAltText("draft.png")).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("textbox", { name: "Rich text editor" }).textContent,
+    ).toBe("");
   });
 
   it("renders the image upload node view while pending and replaces it on success", async () => {

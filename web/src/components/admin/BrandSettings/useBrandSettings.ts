@@ -54,7 +54,7 @@ export function useBrandSettings({ settings }: Props) {
   const [motdContentInitialValue, setMotdContentInitialValue] = useState<
     string | undefined
   >(settings.motd?.content);
-  const [motdContentResetKey, setMotdContentResetKey] = useState<string>();
+  const [motdDraftKey, setMotdDraftKey] = useState(0);
   const [motdClearRequested, setMotdClearRequested] = useState(false);
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
@@ -194,7 +194,7 @@ export function useBrandSettings({ settings }: Props) {
     });
 
     setMotdContentInitialValue("");
-    setMotdContentResetKey(String(Date.now()));
+    setMotdDraftKey((previous) => previous + 1);
     setMotdClearRequested(true);
   };
 
@@ -210,7 +210,7 @@ export function useBrandSettings({ settings }: Props) {
     onClearMotdDates,
     onClearMotd,
     motdContentInitialValue,
-    motdContentResetKey,
+    motdDraftKey,
     motdClearPending,
     canClearMotd: hasMotdValue,
     contrast,

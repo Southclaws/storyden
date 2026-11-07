@@ -4,12 +4,11 @@ export type ContentComposerProps = {
   className?: string;
   disabled?: boolean;
   focusOnReady?: boolean;
-  resetKey?: string;
+  // Starting content for a new editor. Change the React key to start over.
   initialValue?: string;
   initialValueFormat?: "html" | "markdown";
 
-  // NOTE: This is not for making the editor controllable but for optimistic
-  // mutation/revalidation of disabled editors. Use with care!
+  // Current content for the read-only renderer.
   value?: string;
   placeholder?: string;
   onChange?: (value: string, isEmpty: boolean) => void;

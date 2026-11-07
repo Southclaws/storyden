@@ -16,6 +16,7 @@ import {
 
 import { LibraryPageProvider, useLibraryPageContext } from "./Context";
 import { LibraryPageBlocks } from "./blocks/LibraryPageBlocks";
+import { libraryContentBus } from "./blocks/LibraryPageContentBlock/events";
 import { NodeStoreAPI } from "./store";
 import { LibraryPageEditProvider, useEditState } from "./useEditState";
 
@@ -175,6 +176,38 @@ describe("LibraryPageScreen editor source identity", () => {
       "data-mount",
       "3",
     );
+  });
+
+  it("replaces the content editor for each generated document, including empty content", () => {
+    let store: NodeStoreAPI | undefined;
+    render(
+      <Harness node={node("root")} onStore={(value) => (store = value)} />,
+    );
+    const original = screen.getByTestId("content-composer");
+
+    act(() => {
+      libraryContentBus.emit(
+        "library-content:update-generated",
+        "<p>Generated</p>",
+      );
+    });
+
+    const generated = screen.getByTestId("content-composer");
+    expect(generated).not.toBe(original);
+    expect(generated).toHaveTextContent("Generated");
+    expect(store?.getState().draft.content).toBe("<p>Generated</p>");
+
+    act(() => {
+      store?.getState().setContent("<p>Generated and edited</p>");
+    });
+    expect(screen.getByTestId("content-composer")).toBe(generated);
+
+    act(() => {
+      libraryContentBus.emit("library-content:update-generated", "");
+    });
+    expect(screen.getByTestId("content-composer")).not.toBe(generated);
+    expect(screen.getByTestId("content-composer")).toBeEmptyDOMElement();
+    expect(store?.getState().draft.content).toBe("");
   });
 
   it("does not remount uncontrolled editors for ordinary draft field updates", async () => {
