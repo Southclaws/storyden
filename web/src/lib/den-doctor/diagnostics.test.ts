@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import { diagnoseInstallation } from "./diagnostics";
+import { ClientIPContext, diagnoseInstallation } from "./diagnostics";
 
 describe("Den Doctor address checks", () => {
   it.each([
@@ -143,5 +143,105 @@ describe("Den Doctor address checks", () => {
         severity: "error",
       }),
     ]);
+  });
+});
+
+describe("Den Doctor client IP checks", () => {
+  const api = "https://example.com";
+  const web = "https://example.com";
+
+  function codes(clientIP: ClientIPContext) {
+    return diagnoseInstallation(api, web, undefined, clientIP).map(
+      (i) => i.code,
+    );
+  }
+
+  it("accepts provider ranges that resolve the visitor's own address", () => {
+    expect(
+      codes({
+        mode: "xff_trusted_proxies",
+        trustedProxyCIDRs: ["172.16.0.0/16", "137.66.0.0/18", "2a09:8280::/29"],
+        forwardedFor: "62.64.177.182, 137.66.20.2",
+        resolvedAddress: "62.64.177.182",
+      }),
+    ).toEqual([]);
+  });
+
+  it("reports a visitor resolved to the last proxy hop", () => {
+    expect(
+      codes({
+        mode: "xff_trusted_proxies",
+        trustedProxyCIDRs: ["172.16.0.0/16"],
+        forwardedFor: "62.64.177.182, 137.66.20.2",
+        resolvedAddress: "137.66.20.2",
+      }),
+    ).toEqual(["client_ip_proxy_address"]);
+  });
+
+  it("does not treat a single-hop chain as a proxy address", () => {
+    expect(
+      codes({
+        mode: "xff_trusted_proxies",
+        trustedProxyCIDRs: ["10.0.0.0/8"],
+        forwardedFor: "62.64.177.182",
+        resolvedAddress: "62.64.177.182",
+      }),
+    ).toEqual([]);
+  });
+
+  it("warns about trusting single public proxy addresses", () => {
+    const issues = diagnoseInstallation(api, web, undefined, {
+      mode: "xff_trusted_proxies",
+      trustedProxyCIDRs: [
+        "172.16.0.0/16",
+        "10.0.0.5/32",
+        "213.188.222.247/32",
+        "137.66.5.219",
+        "2a09:8280:1::3:6ef5/128",
+      ],
+      forwardedFor: "62.64.237.14, 213.188.222.247",
+      resolvedAddress: "62.64.237.14",
+    });
+
+    expect(issues.map((i) => i.code)).toEqual(["client_ip_single_proxy_hosts"]);
+
+    const explanation = renderToStaticMarkup(issues[0]?.explanation);
+    expect(explanation).toContain("<code>213.188.222.247/32</code>");
+    expect(explanation).toContain("<code>137.66.5.219</code>");
+    expect(explanation).toContain("<code>2a09:8280:1::3:6ef5/128</code>");
+    expect(explanation).not.toContain("10.0.0.5/32");
+    expect(explanation).not.toContain("172.16.0.0/16");
+  });
+
+  it("warns when raw IP mode ignores a forwarding proxy", () => {
+    expect(
+      codes({
+        mode: "remote_addr",
+        trustedProxyCIDRs: [],
+        forwardedFor: "62.64.177.182, 137.66.20.2",
+        resolvedAddress: "172.16.9.194",
+      }),
+    ).toEqual(["client_ip_ignores_forwarding"]);
+  });
+
+  it("leaves direct raw IP deployments alone", () => {
+    expect(
+      codes({
+        mode: "remote_addr",
+        trustedProxyCIDRs: [],
+        resolvedAddress: "62.64.177.182",
+      }),
+    ).toEqual([]);
+  });
+
+  it("only checks forwarding chains in the modes that use them", () => {
+    expect(
+      codes({
+        mode: "single_header",
+        trustedProxyCIDRs: ["137.66.5.219/32"],
+        forwardedFor: "62.64.177.182, 137.66.20.2",
+        resolvedAddress: "137.66.20.2",
+      }),
+    ).toEqual([]);
   });
 });
