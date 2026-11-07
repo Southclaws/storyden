@@ -20,7 +20,6 @@ test.describe("Keyboard submission in WebKit", () => {
       }
 
       await page.goto("/new");
-      await page.locator("#title-input").fill(`Keyboard submission ${mode}`);
       const editor = page.getByRole("textbox", {
         name: mode === "markdown" ? "Markdown editor" : "Rich text editor",
       });
@@ -40,6 +39,9 @@ test.describe("Keyboard submission in WebKit", () => {
       }
 
       await expect(page).toHaveURL(/\/new$/);
+      const title = page.locator("#title-input");
+      await title.fill(`Keyboard submission ${mode}`);
+      await expect(title).toHaveText(`Keyboard submission ${mode}`);
       await editor.fill("A thread posted from the keyboard.");
       await expect(
         page.getByRole("button", { name: "Post", exact: true }),
@@ -54,6 +56,7 @@ test.describe("Keyboard submission in WebKit", () => {
       const form = page.getByRole("main").locator(".reply-composer__form");
       await form.getByRole("button", { name: "Write a reply" }).focus();
       const replyEditor = form.getByRole("textbox");
+      await replyEditor.focus();
       await expect(replyEditor).toBeFocused();
       await replyEditor.fill("A reply posted from the keyboard.");
       const post = form.getByRole("button", { name: "Post", exact: true });
