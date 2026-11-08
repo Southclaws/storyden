@@ -14,7 +14,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel/trace"
 
@@ -29,8 +29,8 @@ const UnknownTraceID = "unknown"
 // to HTTP status codes. This is achieved (currently) with the use of a library
 // called "ftag" which enables the decoration of error chains with a basic kind
 // of category which helps organise the kind of errors that occur within an app.
-func HTTPErrorHandler(logger *slog.Logger) func(err error, c echo.Context) {
-	return func(err error, c echo.Context) {
+func HTTPErrorHandler(logger *slog.Logger) echo.HTTPErrorHandler {
+	return func(c *echo.Context, err error) {
 		errmsg := err.Error()
 		errtag, status := categorise(err)
 		errctx := fctx.Unwrap(err)
@@ -122,9 +122,10 @@ func categorise(err error) (ftag.Kind, int) {
 	errtag := ftag.Get(err)
 	status := statusFromErrorKind(errtag)
 
-	var he *echo.HTTPError
-	if errors.As(err, &he) {
-		return errorKindFromStatus(he.Code), he.Code
+	var statusCoder echo.HTTPStatusCoder
+	if errors.As(err, &statusCoder) {
+		status := statusCoder.StatusCode()
+		return errorKindFromStatus(status), status
 	}
 
 	if errors.Is(err, context.Canceled) {

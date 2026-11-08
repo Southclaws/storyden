@@ -8,8 +8,8 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/getkin/kin-openapi/openapi3filter"
-	"github.com/labstack/echo/v4"
-	echomiddleware "github.com/oapi-codegen/echo-middleware"
+	"github.com/labstack/echo/v5"
+	echomiddleware "github.com/oapi-codegen/echo-v5-middleware"
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -105,7 +105,7 @@ func (i *Authorisation) validator(oapictx context.Context, ai *openapi3filter.Au
 		}
 	}
 
-	c := oapictx.Value(echomiddleware.EchoContextKey).(echo.Context)
+	c := oapictx.Value(echomiddleware.EchoContextKey).(*echo.Context)
 
 	// If the request was by an account, reject any requests if suspended. Yes
 	// they can log out to *view* content (if default/guest permissions allow)

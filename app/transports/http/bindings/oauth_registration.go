@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/Southclaws/opt"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 
 	oauthservice "github.com/Southclaws/storyden/app/services/authentication/oauth"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -15,7 +15,7 @@ import (
 type registrationAuthKey struct{}
 
 func oauthRegistrationAuth(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
+	return func(c *echo.Context) error {
 		if c.Path() == "/api/oauth/register" || (c.Path() == "/api/admin/oauth/registration-approvals" || c.Path() == "/api/admin/oauth/registration-approvals/verification") {
 			c.Response().Header().Set("Cache-Control", "no-store")
 		}

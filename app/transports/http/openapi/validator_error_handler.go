@@ -12,7 +12,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/getkin/kin-openapi/openapi3filter"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // ValidatorErrorHandler is an OpenAPI validator function for structured errors.
@@ -22,24 +22,18 @@ import (
 // or requests not satisfying the specification. The purpose of this function is
 // to process the various types of error that can occur and turn the errors into
 // structured errors which can be serialised properly with `fctx` for logging.
-func ValidatorErrorHandler() func(c echo.Context, err *echo.HTTPError) error {
+func ValidatorErrorHandler() func(c *echo.Context, err *echo.HTTPError) error {
 	var fn func(ctx context.Context, err error) error
 
 	fn = func(ctx context.Context, err error) error {
 		he := &echo.HTTPError{}
 		if errors.As(err, &he) {
-			if he.Internal == nil {
-				// if the wrapped error is nil, just return the error as-is.
-				message, ok := he.Message.(string)
-				if !ok {
-					return err
-				}
-
-				return fault.Wrap(err, fmsg.With(message))
+			if he.Unwrap() == nil {
+				return fault.Wrap(err, fmsg.With(he.Message))
 			}
 
 			// Most of the time, these errors contain a more detailed error.
-			return fn(ctx, he.Internal)
+			return fn(ctx, he.Unwrap())
 		}
 
 		// These occur when calling the wrong endpoint.
@@ -119,7 +113,7 @@ func ValidatorErrorHandler() func(c echo.Context, err *echo.HTTPError) error {
 		return fault.Wrap(err, ftag.With(ftag.InvalidArgument))
 	}
 
-	return func(c echo.Context, err *echo.HTTPError) error {
+	return func(c *echo.Context, err *echo.HTTPError) error {
 		return fn(c.Request().Context(), err)
 	}
 }

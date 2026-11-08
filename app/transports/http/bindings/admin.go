@@ -14,7 +14,7 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 	"github.com/rs/xid"
 
@@ -98,7 +98,7 @@ func NewAdmin(
 	}
 
 	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			if c.Path() != adminSettingsPath {
 				return next(c)
 			}

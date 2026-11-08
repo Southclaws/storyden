@@ -18,7 +18,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -52,7 +52,7 @@ func NewWebAuthn(
 	// in order to retain context across the credential request and creation,
 	// a session cookie is used which stores the webauthn session information.
 	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			if s, err := c.Cookie(cookieName); err == nil {
 
 				r := base64.NewDecoder(base64.URLEncoding, strings.NewReader(s.Value))

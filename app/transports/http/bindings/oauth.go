@@ -13,7 +13,7 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	oauthresource "github.com/Southclaws/storyden/app/resources/oauth"
@@ -56,7 +56,7 @@ var clientAuthKey = struct{}{}
 // for POST /api/oauth/token and stores them in the request context so the binding
 // can supply them to the service regardless of the generated request object shape.
 func oauthTokenClientAuth(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
+	return func(c *echo.Context) error {
 		if c.Request().Method != http.MethodPost {
 			return next(c)
 		}

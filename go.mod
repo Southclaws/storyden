@@ -74,7 +74,7 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/labstack/echo/v4 v4.16.3
+	github.com/labstack/echo/v5 v5.4.4
 	github.com/mazznoer/colorgrad v0.11.1
 	github.com/mazznoer/csscolorparser v0.2.0
 	github.com/microcosm-cc/bluemonday v1.0.27
@@ -83,12 +83,12 @@ require (
 	github.com/minio/minio-go/v7 v7.4.1
 	github.com/mocktools/go-smtp-mock/v2 v2.5.4
 	github.com/modelcontextprotocol/go-sdk v1.8.0
-	github.com/oapi-codegen/echo-middleware v1.2.1
+	github.com/oapi-codegen/echo-v5-middleware v0.3.0
 	github.com/oapi-codegen/nullable v1.2.0
 	github.com/oapi-codegen/runtime v1.8.0
 	github.com/oasdiff/yaml v0.1.3
 	github.com/openai/openai-go/v3 v3.96.0
-	github.com/pb33f/libopenapi v0.41.5
+	github.com/pb33f/libopenapi v0.42.4
 	github.com/philippgille/chromem-go v0.7.0
 	github.com/pinecone-io/go-pinecone/v7 v7.2.0
 	github.com/puzpuzpuz/xsync/v4 v4.5.0
@@ -196,7 +196,7 @@ require (
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
 	github.com/danieljoos/wincred v1.2.3 // indirect
 	github.com/dlclark/regexp2/v2 v2.13.0 // indirect
-	github.com/dprotaso/go-yit v0.0.0-20260623150633-6f1ed93922d1 // indirect
+	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936 // indirect
 	github.com/dvsekhvalnov/jose2go v1.11.0 // indirect
 	github.com/ebitengine/purego v0.11.3 // indirect
 	github.com/fatih/color v1.19.0 // indirect
@@ -242,7 +242,6 @@ require (
 	github.com/klauspost/compress v1.20.3 // indirect
 	github.com/klauspost/cpuid/v2 v2.4.2 // indirect
 	github.com/klauspost/crc32 v1.3.0 // indirect
-	github.com/labstack/gommon v0.5.0 // indirect
 	github.com/lithammer/shortuuid/v3 v3.0.7 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.1 // indirect
 	github.com/lufia/plan9stats v0.0.0-20261101121723-be84dd9509a0 // indirect
@@ -266,7 +265,7 @@ require (
 	github.com/muesli/roff v0.1.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/ncruces/go-strftime v1.1.0 // indirect
-	github.com/oapi-codegen/oapi-codegen/v2 v2.8.0 // indirect
+	github.com/oapi-codegen/oapi-codegen/v2 v2.8.2 // indirect
 	github.com/oasdiff/yaml3 v0.0.16 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/olekukonko/cat v0.0.0-20250911104152-50322a0618f6 // indirect
@@ -311,8 +310,6 @@ require (
 	github.com/tinylib/msgp v1.6.5 // indirect
 	github.com/tklauser/go-sysconf v0.4.0 // indirect
 	github.com/tklauser/numcpus v0.12.0 // indirect
-	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/vanng822/css v1.0.1 // indirect
 	github.com/vanng822/go-premailer v1.38.0 // indirect
 	github.com/vmware-labs/yaml-jsonpath v0.3.2 // indirect

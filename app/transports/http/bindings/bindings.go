@@ -37,8 +37,8 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/getkin/kin-openapi/openapi3filter"
-	"github.com/labstack/echo/v4"
-	oapi_middleware "github.com/oapi-codegen/echo-middleware"
+	"github.com/labstack/echo/v5"
+	oapi_middleware "github.com/oapi-codegen/echo-v5-middleware"
 	"github.com/samber/lo"
 	"go.uber.org/fx"
 
@@ -175,7 +175,7 @@ func mount(
 	}
 
 	// Skips validation for any paths not prefixed with "/api".
-	skipper := func(c echo.Context) bool {
+	skipper := func(c *echo.Context) bool {
 		if !strings.HasPrefix(c.Path(), apiPathPrefix) {
 			return true
 		}
@@ -216,13 +216,13 @@ func mount(
 		ErrorHandler: openapi.ValidatorErrorHandler(),
 	})
 
-	router.GET("/", func(c echo.Context) error {
+	router.GET("/", func(c *echo.Context) error {
 		return c.Stream(http.StatusOK, "text/html", easteregg())
 	})
 
 	openapi.RegisterHandlersWithBaseURL(router, openapi.NewStrictHandler(si, nil), apiPathPrefix)
 
-	router.GET("/.well-known/openid-configuration", func(c echo.Context) error {
+	router.GET("/.well-known/openid-configuration", func(c *echo.Context) error {
 		if !oauthBinding.oauth.Enabled() {
 			return oauthDisabledError(c.Request().Context())
 		}
@@ -235,7 +235,7 @@ func mount(
 		return c.JSON(http.StatusOK, metadata)
 	})
 
-	router.GET("/.well-known/oauth-authorization-server", func(c echo.Context) error {
+	router.GET("/.well-known/oauth-authorization-server", func(c *echo.Context) error {
 		if !oauthBinding.oauth.Enabled() {
 			return oauthDisabledError(c.Request().Context())
 		}
@@ -248,7 +248,7 @@ func mount(
 		return c.JSON(http.StatusOK, metadata)
 	})
 
-	router.GET("/.well-known/oauth-protected-resource", func(c echo.Context) error {
+	router.GET("/.well-known/oauth-protected-resource", func(c *echo.Context) error {
 		if !oauthBinding.oauth.Enabled() {
 			return oauthDisabledError(c.Request().Context())
 		}
@@ -258,7 +258,7 @@ func mount(
 		return c.JSON(http.StatusOK, oauthBinding.OAuthProtectedResourceMetadata(oauthBinding.Issuer()))
 	})
 
-	router.GET("/.well-known/oauth-protected-resource/*", func(c echo.Context) error {
+	router.GET("/.well-known/oauth-protected-resource/*", func(c *echo.Context) error {
 		if !oauthBinding.oauth.Enabled() {
 			return oauthDisabledError(c.Request().Context())
 		}
@@ -280,7 +280,7 @@ func mount(
 		return c.JSON(http.StatusOK, oauthBinding.OAuthProtectedResourceMetadata(resource))
 	})
 
-	router.GET("/.well-known/oauth-client-metadata", func(c echo.Context) error {
+	router.GET("/.well-known/oauth-client-metadata", func(c *echo.Context) error {
 		c.Response().Header().Set("Cache-Control", "public, max-age=3600")
 
 		doc, err := oauthBinding.OAuthRemoteClientMetadata(c.Request().Context())
@@ -296,12 +296,17 @@ func mount(
 	// resource metadata document for discovery.
 	resourceMetadataURL := strings.TrimSuffix(cfg.PublicAPIAddress.String(), "/") + "/.well-known/oauth-protected-resource/api"
 	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			switch c.Path() {
 			case "/api/oauth/userinfo":
-				c.Response().Before(func() {
-					if c.Response().Status == http.StatusUnauthorized && c.Response().Header().Get("WWW-Authenticate") == "" {
-						c.Response().Header().Set("WWW-Authenticate", `Bearer resource_metadata="`+resourceMetadataURL+`"`)
+				response, err := echo.UnwrapResponse(c.Response())
+				if err != nil {
+					return fault.Wrap(err)
+				}
+
+				response.Before(func() {
+					if response.Status == http.StatusUnauthorized && response.Header().Get("WWW-Authenticate") == "" {
+						response.Header().Set("WWW-Authenticate", `Bearer resource_metadata="`+resourceMetadataURL+`"`)
 					}
 				})
 
@@ -323,7 +328,7 @@ func mount(
 
 	logger.Debug(
 		"mounted OpenAPI to service bindings",
-		slog.Any("routes", lo.Map(router.Routes(), func(r *echo.Route, _ int) string {
+		slog.Any("routes", lo.Map(router.Router().Routes(), func(r echo.RouteInfo, _ int) string {
 			return r.Path
 		})),
 	)
