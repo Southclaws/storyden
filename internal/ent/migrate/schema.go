@@ -26,7 +26,7 @@ var (
 		{Name: "admin", Type: field.TypeBool, Default: false},
 		{Name: "links", Type: field.TypeJSON, Nullable: true},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
-		{Name: "notification_settings", Type: field.TypeJSON, Nullable: true},
+		{Name: "push_notifications_enabled", Type: field.TypeBool, Default: true},
 		{Name: "invited_by_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// AccountsTable holds the schema information for the "accounts" table.
@@ -834,6 +834,40 @@ var (
 				Columns:    []*schema.Column{NotificationsColumns[9]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// NotificationEventSettingsColumns holds the columns for the "notification_event_settings" table.
+	NotificationEventSettingsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "event", Type: field.TypeString},
+		{Name: "inbox_enabled", Type: field.TypeBool},
+		{Name: "push_enabled", Type: field.TypeBool},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+	}
+	// NotificationEventSettingsTable holds the schema information for the "notification_event_settings" table.
+	NotificationEventSettingsTable = &schema.Table{
+		Name:       "notification_event_settings",
+		Columns:    NotificationEventSettingsColumns,
+		PrimaryKey: []*schema.Column{NotificationEventSettingsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "notification_event_settings_accounts_notification_event_settings",
+				Columns:    []*schema.Column{NotificationEventSettingsColumns[4]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "notificationeventsettings_account_id_event",
+				Unique:  true,
+				Columns: []*schema.Column{NotificationEventSettingsColumns[4], NotificationEventSettingsColumns[1]},
+			},
+			{
+				Name:    "notificationeventsettings_event_inbox_enabled_account_id",
+				Unique:  false,
+				Columns: []*schema.Column{NotificationEventSettingsColumns[1], NotificationEventSettingsColumns[2], NotificationEventSettingsColumns[4]},
 			},
 		},
 	}
@@ -2606,6 +2640,7 @@ var (
 		NodesTable,
 		NodeVersionsTable,
 		NotificationsTable,
+		NotificationEventSettingsTable,
 		OauthAuthorisationCodesTable,
 		OauthAuthorisationRequestsTable,
 		OauthClientsTable,
@@ -2701,6 +2736,7 @@ func init() {
 	NodeVersionsTable.ForeignKeys[1].RefTable = NodesTable
 	NotificationsTable.ForeignKeys[0].RefTable = AccountsTable
 	NotificationsTable.ForeignKeys[1].RefTable = AccountsTable
+	NotificationEventSettingsTable.ForeignKeys[0].RefTable = AccountsTable
 	OauthAuthorisationCodesTable.ForeignKeys[0].RefTable = AccountsTable
 	OauthAuthorisationCodesTable.ForeignKeys[1].RefTable = OauthClientsTable
 	OauthAuthorisationRequestsTable.ForeignKeys[0].RefTable = AccountsTable

@@ -242,6 +242,8 @@ export interface EventPostUnliked {
 // Emitted when a member adds an emoji reaction to a post.
 export interface EventPostReacted {
   event: "EventPostReacted";
+  // Member who added the reaction
+  account_id: string;
   // Post ID that was reacted to
   post_id: string;
   // Root thread post ID

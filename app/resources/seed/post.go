@@ -305,7 +305,7 @@ func threads(tr *thread_writer.Writer, pr *reply_writer.Writer, rr *reaction_rep
 
 				acc := Accounts[rand.Intn(len(Accounts))]
 
-				_, err := rr.Add(ctx,
+				_, _, err := rr.Add(ctx,
 					acc.ID,
 					xid.ID(p.ID),
 					randomEmoji())

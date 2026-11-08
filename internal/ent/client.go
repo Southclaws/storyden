@@ -39,6 +39,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/nodeversion"
 	"github.com/Southclaws/storyden/internal/ent/notification"
+	"github.com/Southclaws/storyden/internal/ent/notificationeventsettings"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationcode"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
 	"github.com/Southclaws/storyden/internal/ent/oauthclient"
@@ -135,6 +136,8 @@ type Client struct {
 	NodeVersion *NodeVersionClient
 	// Notification is the client for interacting with the Notification builders.
 	Notification *NotificationClient
+	// NotificationEventSettings is the client for interacting with the NotificationEventSettings builders.
+	NotificationEventSettings *NotificationEventSettingsClient
 	// OAuthAuthorisationCode is the client for interacting with the OAuthAuthorisationCode builders.
 	OAuthAuthorisationCode *OAuthAuthorisationCodeClient
 	// OAuthAuthorisationRequest is the client for interacting with the OAuthAuthorisationRequest builders.
@@ -251,6 +254,7 @@ func (c *Client) init() {
 	c.Node = NewNodeClient(c.config)
 	c.NodeVersion = NewNodeVersionClient(c.config)
 	c.Notification = NewNotificationClient(c.config)
+	c.NotificationEventSettings = NewNotificationEventSettingsClient(c.config)
 	c.OAuthAuthorisationCode = NewOAuthAuthorisationCodeClient(c.config)
 	c.OAuthAuthorisationRequest = NewOAuthAuthorisationRequestClient(c.config)
 	c.OAuthClient = NewOAuthClientClient(c.config)
@@ -407,6 +411,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Node:                                 NewNodeClient(cfg),
 		NodeVersion:                          NewNodeVersionClient(cfg),
 		Notification:                         NewNotificationClient(cfg),
+		NotificationEventSettings:            NewNotificationEventSettingsClient(cfg),
 		OAuthAuthorisationCode:               NewOAuthAuthorisationCodeClient(cfg),
 		OAuthAuthorisationRequest:            NewOAuthAuthorisationRequestClient(cfg),
 		OAuthClient:                          NewOAuthClientClient(cfg),
@@ -490,6 +495,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Node:                                 NewNodeClient(cfg),
 		NodeVersion:                          NewNodeVersionClient(cfg),
 		Notification:                         NewNotificationClient(cfg),
+		NotificationEventSettings:            NewNotificationEventSettingsClient(cfg),
 		OAuthAuthorisationCode:               NewOAuthAuthorisationCodeClient(cfg),
 		OAuthAuthorisationRequest:            NewOAuthAuthorisationRequestClient(cfg),
 		OAuthClient:                          NewOAuthClientClient(cfg),
@@ -564,14 +570,15 @@ func (c *Client) Use(hooks ...Hook) {
 		c.Authentication, c.BackgroundJob, c.Category, c.Collection, c.CollectionNode,
 		c.CollectionPost, c.Email, c.EmailQueue, c.Event, c.EventParticipant,
 		c.Invitation, c.LikePost, c.Link, c.MentionProfile, c.ModerationNote, c.Node,
-		c.NodeVersion, c.Notification, c.OAuthAuthorisationCode,
-		c.OAuthAuthorisationRequest, c.OAuthClient, c.OAuthDeviceAuthorisation,
-		c.OAuthDynamicRegistrationAccessTokens, c.OAuthRefreshToken,
-		c.OAuthRegistrationApproval, c.OAuthRemoteAuthorisationFlow,
-		c.OAuthRemoteConnection, c.Plugin, c.Post, c.PostRead, c.Property,
-		c.PropertySchema, c.PropertySchemaField, c.PushSubscription, c.React, c.Report,
-		c.Robot, c.RobotMCPServer, c.RobotMCPTool, c.RobotMemory, c.RobotProviderModel,
-		c.RobotSession, c.RobotSessionInput, c.RobotSessionMessage, c.RobotSessionTurn,
+		c.NodeVersion, c.Notification, c.NotificationEventSettings,
+		c.OAuthAuthorisationCode, c.OAuthAuthorisationRequest, c.OAuthClient,
+		c.OAuthDeviceAuthorisation, c.OAuthDynamicRegistrationAccessTokens,
+		c.OAuthRefreshToken, c.OAuthRegistrationApproval,
+		c.OAuthRemoteAuthorisationFlow, c.OAuthRemoteConnection, c.Plugin, c.Post,
+		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField,
+		c.PushSubscription, c.React, c.Report, c.Robot, c.RobotMCPServer,
+		c.RobotMCPTool, c.RobotMemory, c.RobotProviderModel, c.RobotSession,
+		c.RobotSessionInput, c.RobotSessionMessage, c.RobotSessionTurn,
 		c.RobotSessionView, c.RobotToolset, c.RobotWorkspace, c.RobotWorkspaceInstance,
 		c.Role, c.Session, c.Setting, c.Tag, c.Trail, c.TrailAction, c.TrailActionRun,
 		c.TrailRun, c.TrailSchedulerLease, c.Warning,
@@ -588,14 +595,15 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.Authentication, c.BackgroundJob, c.Category, c.Collection, c.CollectionNode,
 		c.CollectionPost, c.Email, c.EmailQueue, c.Event, c.EventParticipant,
 		c.Invitation, c.LikePost, c.Link, c.MentionProfile, c.ModerationNote, c.Node,
-		c.NodeVersion, c.Notification, c.OAuthAuthorisationCode,
-		c.OAuthAuthorisationRequest, c.OAuthClient, c.OAuthDeviceAuthorisation,
-		c.OAuthDynamicRegistrationAccessTokens, c.OAuthRefreshToken,
-		c.OAuthRegistrationApproval, c.OAuthRemoteAuthorisationFlow,
-		c.OAuthRemoteConnection, c.Plugin, c.Post, c.PostRead, c.Property,
-		c.PropertySchema, c.PropertySchemaField, c.PushSubscription, c.React, c.Report,
-		c.Robot, c.RobotMCPServer, c.RobotMCPTool, c.RobotMemory, c.RobotProviderModel,
-		c.RobotSession, c.RobotSessionInput, c.RobotSessionMessage, c.RobotSessionTurn,
+		c.NodeVersion, c.Notification, c.NotificationEventSettings,
+		c.OAuthAuthorisationCode, c.OAuthAuthorisationRequest, c.OAuthClient,
+		c.OAuthDeviceAuthorisation, c.OAuthDynamicRegistrationAccessTokens,
+		c.OAuthRefreshToken, c.OAuthRegistrationApproval,
+		c.OAuthRemoteAuthorisationFlow, c.OAuthRemoteConnection, c.Plugin, c.Post,
+		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField,
+		c.PushSubscription, c.React, c.Report, c.Robot, c.RobotMCPServer,
+		c.RobotMCPTool, c.RobotMemory, c.RobotProviderModel, c.RobotSession,
+		c.RobotSessionInput, c.RobotSessionMessage, c.RobotSessionTurn,
 		c.RobotSessionView, c.RobotToolset, c.RobotWorkspace, c.RobotWorkspaceInstance,
 		c.Role, c.Session, c.Setting, c.Tag, c.Trail, c.TrailAction, c.TrailActionRun,
 		c.TrailRun, c.TrailSchedulerLease, c.Warning,
@@ -653,6 +661,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.NodeVersion.mutate(ctx, m)
 	case *NotificationMutation:
 		return c.Notification.mutate(ctx, m)
+	case *NotificationEventSettingsMutation:
+		return c.NotificationEventSettings.mutate(ctx, m)
 	case *OAuthAuthorisationCodeMutation:
 		return c.OAuthAuthorisationCode.mutate(ctx, m)
 	case *OAuthAuthorisationRequestMutation:
@@ -905,6 +915,22 @@ func (c *AccountClient) QueryPushSubscriptions(_m *Account) *PushSubscriptionQue
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(pushsubscription.Table, pushsubscription.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.PushSubscriptionsTable, account.PushSubscriptionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryNotificationEventSettings queries the notification_event_settings edge of a Account.
+func (c *AccountClient) QueryNotificationEventSettings(_m *Account) *NotificationEventSettingsQuery {
+	query := (&NotificationEventSettingsClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(notificationeventsettings.Table, notificationeventsettings.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.NotificationEventSettingsTable, account.NotificationEventSettingsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -5634,6 +5660,155 @@ func (c *NotificationClient) mutate(ctx context.Context, m *NotificationMutation
 		return (&NotificationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Notification mutation op: %q", m.Op())
+	}
+}
+
+// NotificationEventSettingsClient is a client for the NotificationEventSettings schema.
+type NotificationEventSettingsClient struct {
+	config
+}
+
+// NewNotificationEventSettingsClient returns a client for the NotificationEventSettings from the given config.
+func NewNotificationEventSettingsClient(c config) *NotificationEventSettingsClient {
+	return &NotificationEventSettingsClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `notificationeventsettings.Hooks(f(g(h())))`.
+func (c *NotificationEventSettingsClient) Use(hooks ...Hook) {
+	c.hooks.NotificationEventSettings = append(c.hooks.NotificationEventSettings, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `notificationeventsettings.Intercept(f(g(h())))`.
+func (c *NotificationEventSettingsClient) Intercept(interceptors ...Interceptor) {
+	c.inters.NotificationEventSettings = append(c.inters.NotificationEventSettings, interceptors...)
+}
+
+// Create returns a builder for creating a NotificationEventSettings entity.
+func (c *NotificationEventSettingsClient) Create() *NotificationEventSettingsCreate {
+	mutation := newNotificationEventSettingsMutation(c.config, OpCreate)
+	return &NotificationEventSettingsCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of NotificationEventSettings entities.
+func (c *NotificationEventSettingsClient) CreateBulk(builders ...*NotificationEventSettingsCreate) *NotificationEventSettingsCreateBulk {
+	return &NotificationEventSettingsCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *NotificationEventSettingsClient) MapCreateBulk(slice any, setFunc func(*NotificationEventSettingsCreate, int)) *NotificationEventSettingsCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &NotificationEventSettingsCreateBulk{err: fmt.Errorf("calling to NotificationEventSettingsClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*NotificationEventSettingsCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &NotificationEventSettingsCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for NotificationEventSettings.
+func (c *NotificationEventSettingsClient) Update() *NotificationEventSettingsUpdate {
+	mutation := newNotificationEventSettingsMutation(c.config, OpUpdate)
+	return &NotificationEventSettingsUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *NotificationEventSettingsClient) UpdateOne(_m *NotificationEventSettings) *NotificationEventSettingsUpdateOne {
+	mutation := newNotificationEventSettingsMutation(c.config, OpUpdateOne, withNotificationEventSettings(_m))
+	return &NotificationEventSettingsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *NotificationEventSettingsClient) UpdateOneID(id xid.ID) *NotificationEventSettingsUpdateOne {
+	mutation := newNotificationEventSettingsMutation(c.config, OpUpdateOne, withNotificationEventSettingsID(id))
+	return &NotificationEventSettingsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for NotificationEventSettings.
+func (c *NotificationEventSettingsClient) Delete() *NotificationEventSettingsDelete {
+	mutation := newNotificationEventSettingsMutation(c.config, OpDelete)
+	return &NotificationEventSettingsDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *NotificationEventSettingsClient) DeleteOne(_m *NotificationEventSettings) *NotificationEventSettingsDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *NotificationEventSettingsClient) DeleteOneID(id xid.ID) *NotificationEventSettingsDeleteOne {
+	builder := c.Delete().Where(notificationeventsettings.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &NotificationEventSettingsDeleteOne{builder}
+}
+
+// Query returns a query builder for NotificationEventSettings.
+func (c *NotificationEventSettingsClient) Query() *NotificationEventSettingsQuery {
+	return &NotificationEventSettingsQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeNotificationEventSettings},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a NotificationEventSettings entity by its id.
+func (c *NotificationEventSettingsClient) Get(ctx context.Context, id xid.ID) (*NotificationEventSettings, error) {
+	return c.Query().Where(notificationeventsettings.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *NotificationEventSettingsClient) GetX(ctx context.Context, id xid.ID) *NotificationEventSettings {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAccount queries the account edge of a NotificationEventSettings.
+func (c *NotificationEventSettingsClient) QueryAccount(_m *NotificationEventSettings) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(notificationeventsettings.Table, notificationeventsettings.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, notificationeventsettings.AccountTable, notificationeventsettings.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *NotificationEventSettingsClient) Hooks() []Hook {
+	return c.hooks.NotificationEventSettings
+}
+
+// Interceptors returns the client interceptors.
+func (c *NotificationEventSettingsClient) Interceptors() []Interceptor {
+	return c.inters.NotificationEventSettings
+}
+
+func (c *NotificationEventSettingsClient) mutate(ctx context.Context, m *NotificationEventSettingsMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&NotificationEventSettingsCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&NotificationEventSettingsUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&NotificationEventSettingsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&NotificationEventSettingsDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown NotificationEventSettings mutation op: %q", m.Op())
 	}
 }
 
@@ -12777,8 +12952,8 @@ type (
 		BackgroundJob, Category, Collection, CollectionNode, CollectionPost, Email,
 		EmailQueue, Event, EventParticipant, Invitation, LikePost, Link,
 		MentionProfile, ModerationNote, Node, NodeVersion, Notification,
-		OAuthAuthorisationCode, OAuthAuthorisationRequest, OAuthClient,
-		OAuthDeviceAuthorisation, OAuthDynamicRegistrationAccessTokens,
+		NotificationEventSettings, OAuthAuthorisationCode, OAuthAuthorisationRequest,
+		OAuthClient, OAuthDeviceAuthorisation, OAuthDynamicRegistrationAccessTokens,
 		OAuthRefreshToken, OAuthRegistrationApproval, OAuthRemoteAuthorisationFlow,
 		OAuthRemoteConnection, Plugin, Post, PostRead, Property, PropertySchema,
 		PropertySchemaField, PushSubscription, React, Report, Robot, RobotMCPServer,
@@ -12792,8 +12967,8 @@ type (
 		BackgroundJob, Category, Collection, CollectionNode, CollectionPost, Email,
 		EmailQueue, Event, EventParticipant, Invitation, LikePost, Link,
 		MentionProfile, ModerationNote, Node, NodeVersion, Notification,
-		OAuthAuthorisationCode, OAuthAuthorisationRequest, OAuthClient,
-		OAuthDeviceAuthorisation, OAuthDynamicRegistrationAccessTokens,
+		NotificationEventSettings, OAuthAuthorisationCode, OAuthAuthorisationRequest,
+		OAuthClient, OAuthDeviceAuthorisation, OAuthDynamicRegistrationAccessTokens,
 		OAuthRefreshToken, OAuthRegistrationApproval, OAuthRemoteAuthorisationFlow,
 		OAuthRemoteConnection, Plugin, Post, PostRead, Property, PropertySchema,
 		PropertySchemaField, PushSubscription, React, Report, Robot, RobotMCPServer,

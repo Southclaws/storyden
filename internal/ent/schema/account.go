@@ -21,20 +21,6 @@ type ExternalLink struct {
 	URL  string
 }
 
-type NotificationSettings struct {
-	Events map[string]NotificationEventSettings `json:"events,omitempty"`
-	Push   PushNotificationSettings             `json:"push"`
-}
-
-type NotificationEventSettings struct {
-	Inbox bool `json:"inbox"`
-	Push  bool `json:"push"`
-}
-
-type PushNotificationSettings struct {
-	Enabled bool `json:"enabled"`
-}
-
 func (Account) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("handle").Unique().NotEmpty(),
@@ -57,7 +43,7 @@ func (Account) Fields() []ent.Field {
 		field.Bool("admin").Default(false),
 		field.JSON("links", []ExternalLink{}).Optional(),
 		field.JSON("metadata", map[string]any{}).Optional(),
-		field.JSON("notification_settings", &NotificationSettings{}).Optional(),
+		field.Bool("push_notifications_enabled").Default(true),
 
 		field.String("invited_by_id").
 			GoType(xid.ID{}).
@@ -78,6 +64,9 @@ func (Account) Edges() []ent.Edge {
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
 		edge.To("push_subscriptions", PushSubscription.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("notification_event_settings", NotificationEventSettings.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
 		edge.To("notifications", Notification.Type).

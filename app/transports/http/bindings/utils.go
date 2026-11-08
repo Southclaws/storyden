@@ -13,7 +13,6 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -46,26 +45,25 @@ func serialiseAccount(acc *account.AccountWithEdges) openapi.Account {
 	})
 
 	return openapi.Account{
-		Id:                   openapi.Identifier(acc.ID.String()),
-		Joined:               acc.CreatedAt,
-		Suspended:            acc.DeletedAt.Ptr(),
-		Handle:               acc.Handle,
-		Name:                 acc.Name,
-		Bio:                  acc.Bio.HTML(),
-		Signature:            opt.Map(acc.Signature, func(s datagraph.Content) string { return s.HTML() }).Ptr(),
-		Meta:                 acc.Metadata,
-		NotificationSettings: serialiseNotificationSettings(acc.NotificationSettings),
-		Links:                serialiseExternalLinks(acc.ExternalLinks),
-		CreatedAt:            acc.CreatedAt,
-		UpdatedAt:            acc.UpdatedAt,
-		DeletedAt:            acc.DeletedAt.Ptr(),
-		Admin:                acc.Admin,
-		Kind:                 openapi.AccountKind(acc.Kind.String()),
-		VerifiedStatus:       serialiseAccountVerifiedStatus(acc.VerifiedStatus),
-		EmailAddresses:       dt.Map(acc.EmailAddresses, serialiseEmailAddressPtr),
-		AuthServices:         dt.Map(acc.Auths, func(service string) openapi.AuthProviderIdentifier { return openapi.AuthProviderIdentifier(service) }),
-		Roles:                serialiseHeldRoleList(acc.Roles),
-		InvitedBy:            invitedBy.Ptr(),
+		Id:             openapi.Identifier(acc.ID.String()),
+		Joined:         acc.CreatedAt,
+		Suspended:      acc.DeletedAt.Ptr(),
+		Handle:         acc.Handle,
+		Name:           acc.Name,
+		Bio:            acc.Bio.HTML(),
+		Signature:      opt.Map(acc.Signature, func(s datagraph.Content) string { return s.HTML() }).Ptr(),
+		Meta:           acc.Metadata,
+		Links:          serialiseExternalLinks(acc.ExternalLinks),
+		CreatedAt:      acc.CreatedAt,
+		UpdatedAt:      acc.UpdatedAt,
+		DeletedAt:      acc.DeletedAt.Ptr(),
+		Admin:          acc.Admin,
+		Kind:           openapi.AccountKind(acc.Kind.String()),
+		VerifiedStatus: serialiseAccountVerifiedStatus(acc.VerifiedStatus),
+		EmailAddresses: dt.Map(acc.EmailAddresses, serialiseEmailAddressPtr),
+		AuthServices:   dt.Map(acc.Auths, func(service string) openapi.AuthProviderIdentifier { return openapi.AuthProviderIdentifier(service) }),
+		Roles:          serialiseHeldRoleList(acc.Roles),
+		InvitedBy:      invitedBy.Ptr(),
 	}
 }
 
@@ -77,40 +75,6 @@ func serialiseAccountVerifiedStatus(in account.VerifiedStatus) openapi.AccountVe
 		return openapi.AccountVerifiedStatusManual
 	default:
 		return openapi.AccountVerifiedStatusNone
-	}
-}
-
-func serialiseNotificationSettings(in account.NotificationPreferences) *openapi.NotificationSettings {
-	events := make(map[string]openapi.NotificationEventSettings)
-	for event, settings := range notification.ResolveEventSettings(in.Events) {
-		events[event] = openapi.NotificationEventSettings{
-			Inbox: settings.Inbox,
-			Push:  settings.Push,
-		}
-	}
-
-	return &openapi.NotificationSettings{
-		Events: events,
-		Push: openapi.PushNotificationSettings{
-			Enabled: in.Push.Enabled,
-		},
-	}
-}
-
-func deserialiseNotificationPreferences(in openapi.NotificationSettings) account.NotificationPreferences {
-	events := make(map[string]account.NotificationEventSettings)
-	for event, settings := range in.Events {
-		events[event] = account.NotificationEventSettings{
-			Inbox: settings.Inbox,
-			Push:  settings.Push,
-		}
-	}
-
-	return account.NotificationPreferences{
-		Events: events,
-		Push: account.PushNotificationPreferences{
-			Enabled: in.Push.Enabled,
-		},
 	}
 }
 

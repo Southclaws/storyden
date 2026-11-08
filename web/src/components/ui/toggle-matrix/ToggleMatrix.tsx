@@ -38,7 +38,7 @@ export type ToggleMatrixProps = {
   label: string;
   rowHeading: string;
   rows: ToggleMatrixRow[];
-  columns: ToggleMatrixColumn[];
+  columnOptions: ToggleMatrixColumn[];
   value: ToggleMatrixValue;
   onValueChange: (details: ToggleMatrixValueChangeDetails) => void;
   disabled?: boolean;
@@ -50,7 +50,7 @@ export function ToggleMatrix({
   label,
   rowHeading,
   rows,
-  columns,
+  columnOptions,
   value,
   onValueChange,
   disabled,
@@ -84,7 +84,7 @@ export function ToggleMatrix({
           <Table.Header scope="col" color="text.muted">
             {rowHeading}
           </Table.Header>
-          {columns.map((column) => (
+          {columnOptions.map((column) => (
             <Table.Header
               key={column.value}
               scope="col"
@@ -109,7 +109,7 @@ export function ToggleMatrix({
                 </p>
               )}
             </Table.Header>
-            {columns.map((column) => {
+            {columnOptions.map((column) => {
               const state = value[row.value]?.[column.value] ?? false;
 
               return (

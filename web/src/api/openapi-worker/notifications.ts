@@ -16,6 +16,9 @@ import type { NotFoundResponse } from "../openapi-schema/notFoundResponse";
 import type { NotificationListOKResponse } from "../openapi-schema/notificationListOKResponse";
 import type { NotificationListParams } from "../openapi-schema/notificationListParams";
 import type { NotificationPushSubscriptionUpsertOKResponse } from "../openapi-schema/notificationPushSubscriptionUpsertOKResponse";
+import type { NotificationSettings } from "../openapi-schema/notificationSettings";
+import type { NotificationSettingsGetOKResponse } from "../openapi-schema/notificationSettingsGetOKResponse";
+import type { NotificationSettingsUpdateOKResponse } from "../openapi-schema/notificationSettingsUpdateOKResponse";
 import type { NotificationUpdateBody } from "../openapi-schema/notificationUpdateBody";
 import type { NotificationUpdateManyBody } from "../openapi-schema/notificationUpdateManyBody";
 import type { NotificationUpdateManyOKResponse } from "../openapi-schema/notificationUpdateManyOKResponse";
@@ -224,6 +227,221 @@ export const notificationUpdateMany = async (
   );
 };
 
+export type notificationUpdateResponse200 = {
+  data: NotificationUpdateOKResponse;
+  status: 200;
+};
+
+export type notificationUpdateResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type notificationUpdateResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type notificationUpdateResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401>;
+};
+
+export type notificationUpdateResponseSuccess =
+  notificationUpdateResponse200 & {
+    headers: Headers;
+  };
+export type notificationUpdateResponseError = (
+  | notificationUpdateResponse400
+  | notificationUpdateResponse401
+  | notificationUpdateResponseDefault
+) & {
+  headers: Headers;
+};
+
+export type notificationUpdateResponse =
+  | notificationUpdateResponseSuccess
+  | notificationUpdateResponseError;
+
+export const getNotificationUpdateUrl = (notificationId: string) => {
+  return `/notifications/${notificationId}`;
+};
+
+/**
+ * Change the read status for a notification.
+ */
+export const notificationUpdate = async (
+  notificationId: string,
+  notificationUpdateBody?: NotificationUpdateBody,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<notificationUpdateResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return fetcher<notificationUpdateResponse>(
+    getNotificationUpdateUrl(notificationId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(notificationUpdateBody),
+    },
+  );
+};
+
+export type notificationSettingsGetResponse200 = {
+  data: NotificationSettingsGetOKResponse;
+  status: 200;
+};
+
+export type notificationSettingsGetResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type notificationSettingsGetResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 401>;
+};
+
+export type notificationSettingsGetResponseSuccess =
+  notificationSettingsGetResponse200 & {
+    headers: Headers;
+  };
+export type notificationSettingsGetResponseError = (
+  | notificationSettingsGetResponse401
+  | notificationSettingsGetResponseDefault
+) & {
+  headers: Headers;
+};
+
+export type notificationSettingsGetResponse =
+  | notificationSettingsGetResponseSuccess
+  | notificationSettingsGetResponseError;
+
+export const getNotificationSettingsGetUrl = () => {
+  return `/notifications/settings`;
+};
+
+/**
+ * Retrieve notification settings for the authenticated account.
+ */
+export const notificationSettingsGet = async (
+  options?: Parameters<typeof fetcher>[1],
+): Promise<notificationSettingsGetResponse> => {
+  return fetcher<notificationSettingsGetResponse>(
+    getNotificationSettingsGetUrl(),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export type notificationSettingsUpdateResponse200 = {
+  data: NotificationSettingsUpdateOKResponse;
+  status: 200;
+};
+
+export type notificationSettingsUpdateResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type notificationSettingsUpdateResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type notificationSettingsUpdateResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401>;
+};
+
+export type notificationSettingsUpdateResponseSuccess =
+  notificationSettingsUpdateResponse200 & {
+    headers: Headers;
+  };
+export type notificationSettingsUpdateResponseError = (
+  | notificationSettingsUpdateResponse400
+  | notificationSettingsUpdateResponse401
+  | notificationSettingsUpdateResponseDefault
+) & {
+  headers: Headers;
+};
+
+export type notificationSettingsUpdateResponse =
+  | notificationSettingsUpdateResponseSuccess
+  | notificationSettingsUpdateResponseError;
+
+export const getNotificationSettingsUpdateUrl = () => {
+  return `/notifications/settings`;
+};
+
+/**
+ * Replace notification delivery settings for the authenticated account.
+ * Omitted event overrides return to their defaults.
+ */
+export const notificationSettingsUpdate = async (
+  notificationSettings: NotificationSettings,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<notificationSettingsUpdateResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return fetcher<notificationSettingsUpdateResponse>(
+    getNotificationSettingsUpdateUrl(),
+    {
+      ...options,
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(notificationSettings),
+    },
+  );
+};
+
 export type pushSubscriptionUpsertResponse200 = {
   data: NotificationPushSubscriptionUpsertOKResponse;
   status: 200;
@@ -273,7 +491,7 @@ export type pushSubscriptionUpsertResponse =
   | pushSubscriptionUpsertResponseError;
 
 export const getPushSubscriptionUpsertUrl = () => {
-  return `/notifications/push/subscriptions`;
+  return `/notifications/settings/push/subscriptions`;
 };
 
 /**
@@ -358,7 +576,7 @@ export type pushSubscriptionDeleteResponse =
 export const getPushSubscriptionDeleteUrl = (
   pushSubscriptionId: Identifier,
 ) => {
-  return `/notifications/push/subscriptions/${pushSubscriptionId}`;
+  return `/notifications/settings/push/subscriptions/${pushSubscriptionId}`;
 };
 
 /**
@@ -374,89 +592,6 @@ export const pushSubscriptionDelete = async (
     {
       ...options,
       method: "DELETE",
-    },
-  );
-};
-
-export type notificationUpdateResponse200 = {
-  data: NotificationUpdateOKResponse;
-  status: 200;
-};
-
-export type notificationUpdateResponse400 = {
-  data: BadRequestResponse;
-  status: 400;
-};
-
-export type notificationUpdateResponse401 = {
-  data: UnauthorisedResponse;
-  status: 401;
-};
-
-export type notificationUpdateResponseDefault = {
-  data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 400 | 401>;
-};
-
-export type notificationUpdateResponseSuccess =
-  notificationUpdateResponse200 & {
-    headers: Headers;
-  };
-export type notificationUpdateResponseError = (
-  | notificationUpdateResponse400
-  | notificationUpdateResponse401
-  | notificationUpdateResponseDefault
-) & {
-  headers: Headers;
-};
-
-export type notificationUpdateResponse =
-  | notificationUpdateResponseSuccess
-  | notificationUpdateResponseError;
-
-export const getNotificationUpdateUrl = (notificationId: string) => {
-  return `/notifications/${notificationId}`;
-};
-
-/**
- * Change the read status for a notification.
- */
-export const notificationUpdate = async (
-  notificationId: string,
-  notificationUpdateBody?: NotificationUpdateBody,
-  options?: Parameters<typeof fetcher>[1],
-): Promise<notificationUpdateResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<
-      string | readonly string[] | undefined
-    >(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  return fetcher<notificationUpdateResponse>(
-    getNotificationUpdateUrl(notificationId),
-    {
-      ...options,
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        ...getHeaders(options?.headers),
-      },
-      body: JSON.stringify(notificationUpdateBody),
     },
   );
 };

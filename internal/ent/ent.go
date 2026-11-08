@@ -35,6 +35,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/nodeversion"
 	"github.com/Southclaws/storyden/internal/ent/notification"
+	"github.com/Southclaws/storyden/internal/ent/notificationeventsettings"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationcode"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
 	"github.com/Southclaws/storyden/internal/ent/oauthclient"
@@ -159,6 +160,7 @@ func checkColumn(t, c string) error {
 			node.Table:                      node.ValidColumn,
 			nodeversion.Table:               nodeversion.ValidColumn,
 			notification.Table:              notification.ValidColumn,
+			notificationeventsettings.Table: notificationeventsettings.ValidColumn,
 			oauthauthorisationcode.Table:    oauthauthorisationcode.ValidColumn,
 			oauthauthorisationrequest.Table: oauthauthorisationrequest.ValidColumn,
 			oauthclient.Table:               oauthclient.ValidColumn,

@@ -7,12 +7,14 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_querier"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_writer"
 	"github.com/Southclaws/storyden/app/resources/account/notification/push_subscription"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/notification/push"
+	"github.com/Southclaws/storyden/app/services/notification/settings"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/infrastructure/webpush"
 )
@@ -22,6 +24,7 @@ type Notifications struct {
 	notifyWriter *notify_writer.Writer
 	push         *push.Service
 	pushRepo     *push_subscription.Repository
+	settings     *settings.Service
 }
 
 func NewNotifications(
@@ -29,55 +32,15 @@ func NewNotifications(
 	notifyWriter *notify_writer.Writer,
 	push *push.Service,
 	pushRepo *push_subscription.Repository,
+	settings *settings.Service,
 ) Notifications {
 	return Notifications{
 		notifyReader: notifyReader,
 		notifyWriter: notifyWriter,
 		push:         push,
 		pushRepo:     pushRepo,
+		settings:     settings,
 	}
-}
-
-func (h *Notifications) PushSubscriptionUpsert(
-	ctx context.Context,
-	request openapi.PushSubscriptionUpsertRequestObject,
-) (openapi.PushSubscriptionUpsertResponseObject, error) {
-	owner, err := session.GetAccountID(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	subscription, err := h.push.Register(ctx, owner, webpush.SubscriptionInput{
-		Endpoint: request.Body.Endpoint,
-		P256DH:   request.Body.Keys.P256dh,
-		Auth:     request.Body.Keys.Auth,
-	})
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return openapi.PushSubscriptionUpsert200JSONResponse{
-		NotificationPushSubscriptionUpsertOKJSONResponse: openapi.NotificationPushSubscriptionUpsertOKJSONResponse{
-			Id:       subscription.ID.String(),
-			Endpoint: subscription.Endpoint.String(),
-		},
-	}, nil
-}
-
-func (h *Notifications) PushSubscriptionDelete(
-	ctx context.Context,
-	request openapi.PushSubscriptionDeleteRequestObject,
-) (openapi.PushSubscriptionDeleteResponseObject, error) {
-	owner, err := session.GetAccountID(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if err := h.pushRepo.Delete(ctx, owner, openapi.ParseID(request.PushSubscriptionId)); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return openapi.PushSubscriptionDelete204Response{}, nil
 }
 
 func (h *Notifications) NotificationList(ctx context.Context, request openapi.NotificationListRequestObject) (openapi.NotificationListResponseObject, error) {
@@ -167,6 +130,80 @@ func (h *Notifications) NotificationUpdateMany(ctx context.Context, request open
 	}, nil
 }
 
+func (h *Notifications) NotificationSettingsGet(ctx context.Context, request openapi.NotificationSettingsGetRequestObject) (openapi.NotificationSettingsGetResponseObject, error) {
+	owner, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	settings, err := h.settings.Get(ctx, owner)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.NotificationSettingsGet200JSONResponse{
+		NotificationSettingsGetOKJSONResponse: openapi.NotificationSettingsGetOKJSONResponse(serialiseNotificationSettings(settings)),
+	}, nil
+}
+
+func (h *Notifications) NotificationSettingsUpdate(ctx context.Context, request openapi.NotificationSettingsUpdateRequestObject) (openapi.NotificationSettingsUpdateResponseObject, error) {
+	owner, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	settings, err := h.settings.Update(ctx, owner, deserialiseNotificationSettings(*request.Body))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.NotificationSettingsUpdate200JSONResponse{
+		NotificationSettingsUpdateOKJSONResponse: openapi.NotificationSettingsUpdateOKJSONResponse(serialiseNotificationSettings(settings)),
+	}, nil
+}
+
+func (h *Notifications) PushSubscriptionUpsert(
+	ctx context.Context,
+	request openapi.PushSubscriptionUpsertRequestObject,
+) (openapi.PushSubscriptionUpsertResponseObject, error) {
+	owner, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	subscription, err := h.push.Register(ctx, owner, webpush.SubscriptionInput{
+		Endpoint: request.Body.Endpoint,
+		P256DH:   request.Body.Keys.P256dh,
+		Auth:     request.Body.Keys.Auth,
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.PushSubscriptionUpsert200JSONResponse{
+		NotificationPushSubscriptionUpsertOKJSONResponse: openapi.NotificationPushSubscriptionUpsertOKJSONResponse{
+			Id:       subscription.ID.String(),
+			Endpoint: subscription.Endpoint.String(),
+		},
+	}, nil
+}
+
+func (h *Notifications) PushSubscriptionDelete(
+	ctx context.Context,
+	request openapi.PushSubscriptionDeleteRequestObject,
+) (openapi.PushSubscriptionDeleteResponseObject, error) {
+	owner, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := h.pushRepo.Delete(ctx, owner, openapi.ParseID(request.PushSubscriptionId)); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.PushSubscriptionDelete204Response{}, nil
+}
+
 func serialiseNotification(in *notification.Notification) openapi.Notification {
 	item := opt.Map(opt.NewSafe(in.Item, in.Item != nil), serialiseDatagraphItem)
 
@@ -201,4 +238,38 @@ func serialiseNotificationStatus(in bool) openapi.NotificationStatus {
 
 func deserialiseNotificationStatus(in openapi.NotificationStatus) bool {
 	return in == openapi.Read
+}
+
+func serialiseNotificationSettings(in account.NotificationPreferences) openapi.NotificationSettings {
+	events := make(map[string]openapi.NotificationEventSettings)
+	for event, settings := range notification.ResolveEventSettings(in.Events) {
+		events[event] = openapi.NotificationEventSettings{
+			Inbox: settings.Inbox,
+			Push:  settings.Push,
+		}
+	}
+
+	return openapi.NotificationSettings{
+		Events: events,
+		Push: openapi.PushNotificationSettings{
+			Enabled: in.Push.Enabled,
+		},
+	}
+}
+
+func deserialiseNotificationSettings(in openapi.NotificationSettings) account.NotificationPreferences {
+	events := make(map[string]account.NotificationEventSettings)
+	for event, settings := range in.Events {
+		events[event] = account.NotificationEventSettings{
+			Inbox: settings.Inbox,
+			Push:  settings.Push,
+		}
+	}
+
+	return account.NotificationPreferences{
+		Events: events,
+		Push: account.PushNotificationPreferences{
+			Enabled: in.Push.Enabled,
+		},
+	}
 }

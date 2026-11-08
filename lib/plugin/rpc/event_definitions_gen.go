@@ -205,6 +205,11 @@ var eventDefinitions = map[Event]EventDefinition{
 				Description: "Root thread post ID",
 				Required:    true,
 			},
+			{
+				Name:        "account_id",
+				Description: "Member who added the reaction",
+				Required:    true,
+			},
 		},
 	},
 	EventEventPostUnreacted: {

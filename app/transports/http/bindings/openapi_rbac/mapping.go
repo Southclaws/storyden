@@ -554,6 +554,14 @@ func (m *Mapping) NotificationList() (bool, *rbac.Permission) {
 	return true, nil
 }
 
+func (m *Mapping) NotificationSettingsGet() (bool, *rbac.Permission) {
+	return true, nil
+}
+
+func (m *Mapping) NotificationSettingsUpdate() (bool, *rbac.Permission) {
+	return true, nil
+}
+
 func (m *Mapping) PushSubscriptionUpsert() (bool, *rbac.Permission) {
 	return true, nil
 }

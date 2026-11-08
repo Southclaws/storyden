@@ -491,6 +491,8 @@ export * from "./notificationMutationList";
 export * from "./notificationPushSubscriptionUpsertOKResponse";
 export * from "./notificationSettings";
 export * from "./notificationSettingsEvents";
+export * from "./notificationSettingsGetOKResponse";
+export * from "./notificationSettingsUpdateOKResponse";
 export * from "./notificationStatus";
 export * from "./notificationStatusList";
 export * from "./notificationStatusQueryParameter";

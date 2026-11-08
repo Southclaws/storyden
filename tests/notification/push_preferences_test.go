@@ -2,6 +2,7 @@ package notification_test
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"testing"
 
@@ -40,12 +41,14 @@ func TestNotificationSettings(t *testing.T) {
 	otherCtx, _ := e2e.WithAccount(root, accounts, seed.Account_003_Baldur)
 	otherSession := sessions.WithSession(otherCtx)
 
-	initial := tests.AssertRequest(client.AccountGetWithResponse(root, ownerSession))(t, http.StatusOK)
-	r.NotNil(initial.JSON200.NotificationSettings)
-	a.True(initial.JSON200.NotificationSettings.Push.Enabled)
-	a.Equal(openapi.NotificationEventSettings{Inbox: true, Push: true}, initial.JSON200.NotificationSettings.Events["thread_reply"])
-	a.Equal(openapi.NotificationEventSettings{}, initial.JSON200.NotificationSettings.Events["post_like"])
-	a.Equal(openapi.NotificationEventSettings{}, initial.JSON200.NotificationSettings.Events["follow"])
+	tests.AssertRequest(client.NotificationSettingsGetWithResponse(root))(t, http.StatusUnauthorized)
+
+	initial := tests.AssertRequest(client.NotificationSettingsGetWithResponse(root, ownerSession))(t, http.StatusOK)
+	r.NotNil(initial.JSON200)
+	a.True(initial.JSON200.Push.Enabled)
+	a.Equal(openapi.NotificationEventSettings{Inbox: true, Push: true}, initial.JSON200.Events["thread_reply"])
+	a.Equal(openapi.NotificationEventSettings{}, initial.JSON200.Events["post_like"])
+	a.Equal(openapi.NotificationEventSettings{}, initial.JSON200.Events["follow"])
 
 	events := map[string]openapi.NotificationEventSettings{
 		"thread_reply":         {Inbox: false, Push: false},
@@ -56,61 +59,62 @@ func TestNotificationSettings(t *testing.T) {
 		Events: events,
 		Push:   openapi.PushNotificationSettings{Enabled: true},
 	}
-	input := openapi.AccountUpdateJSONRequestBody{NotificationSettings: preferences}
+	input := openapi.NotificationSettingsUpdateJSONRequestBody(*preferences)
 
-	tests.AssertRequest(client.AccountUpdateWithResponse(root, input))(t, http.StatusUnauthorized)
-	updated := tests.AssertRequest(client.AccountUpdateWithResponse(root, input, ownerSession))(t, http.StatusOK)
+	tests.AssertRequest(client.NotificationSettingsUpdateWithResponse(root, input))(t, http.StatusUnauthorized)
+	updated := tests.AssertRequest(client.NotificationSettingsUpdateWithResponse(root, input, ownerSession))(t, http.StatusOK)
 	for event, settings := range events {
-		a.Equal(settings, updated.JSON200.NotificationSettings.Events[event])
+		a.Equal(settings, updated.JSON200.Events[event])
 	}
-	a.Equal(initial.JSON200.NotificationSettings.Events["follow"], updated.JSON200.NotificationSettings.Events["follow"])
+	a.Equal(initial.JSON200.Events["follow"], updated.JSON200.Events["follow"])
 
-	loaded := tests.AssertRequest(client.AccountGetWithResponse(root, ownerSession))(t, http.StatusOK)
-	a.Equal(updated.JSON200.NotificationSettings, loaded.JSON200.NotificationSettings)
+	loaded := tests.AssertRequest(client.NotificationSettingsGetWithResponse(root, ownerSession))(t, http.StatusOK)
+	a.Equal(updated.JSON200, loaded.JSON200)
 
-	other := tests.AssertRequest(client.AccountGetWithResponse(root, otherSession))(t, http.StatusOK)
-	a.True(other.JSON200.NotificationSettings.Push.Enabled)
-	a.Equal(initial.JSON200.NotificationSettings, other.JSON200.NotificationSettings)
+	account := tests.AssertRequest(client.AccountGetWithResponse(root, ownerSession))(t, http.StatusOK)
+	var generic map[string]json.RawMessage
+	r.NoError(json.Unmarshal(account.Body, &generic))
+	a.NotContains(generic, "notification_settings")
+
+	other := tests.AssertRequest(client.NotificationSettingsGetWithResponse(root, otherSession))(t, http.StatusOK)
+	a.True(other.JSON200.Push.Enabled)
+	a.Equal(initial.JSON200, other.JSON200)
 
 	name := "New name"
 	tests.AssertRequest(client.AccountUpdateWithResponse(root,
 		openapi.AccountUpdateJSONRequestBody{Name: &name}, ownerSession,
 	))(t, http.StatusOK)
-	loaded = tests.AssertRequest(client.AccountGetWithResponse(root, ownerSession))(t, http.StatusOK)
-	a.Equal(updated.JSON200.NotificationSettings, loaded.JSON200.NotificationSettings)
+	loaded = tests.AssertRequest(client.NotificationSettingsGetWithResponse(root, ownerSession))(t, http.StatusOK)
+	a.Equal(updated.JSON200, loaded.JSON200)
 
 	invalidEvents := map[string]openapi.NotificationEventSettings{"replies": {Inbox: false, Push: false}}
-	invalid := openapi.AccountUpdateJSONRequestBody{
-		NotificationSettings: &openapi.NotificationSettings{
-			Events: invalidEvents,
-			Push:   openapi.PushNotificationSettings{Enabled: true},
-		},
+	invalid := openapi.NotificationSettingsUpdateJSONRequestBody{
+		Events: invalidEvents,
+		Push:   openapi.PushNotificationSettings{Enabled: true},
 	}
-	tests.AssertRequest(client.AccountUpdateWithResponse(root, invalid, ownerSession))(t, http.StatusBadRequest)
-	loaded = tests.AssertRequest(client.AccountGetWithResponse(root, ownerSession))(t, http.StatusOK)
-	a.Equal(updated.JSON200.NotificationSettings, loaded.JSON200.NotificationSettings)
+	tests.AssertRequest(client.NotificationSettingsUpdateWithResponse(root, invalid, ownerSession))(t, http.StatusBadRequest)
+	loaded = tests.AssertRequest(client.NotificationSettingsGetWithResponse(root, ownerSession))(t, http.StatusOK)
+	a.Equal(updated.JSON200, loaded.JSON200)
 
-	invalid.NotificationSettings.Events = map[string]openapi.NotificationEventSettings{
+	invalid.Events = map[string]openapi.NotificationEventSettings{
 		"thread_reply": {Inbox: false, Push: true},
 	}
-	tests.AssertRequest(client.AccountUpdateWithResponse(root, invalid, ownerSession))(t, http.StatusBadRequest)
-	loaded = tests.AssertRequest(client.AccountGetWithResponse(root, ownerSession))(t, http.StatusOK)
-	a.Equal(updated.JSON200.NotificationSettings, loaded.JSON200.NotificationSettings)
+	tests.AssertRequest(client.NotificationSettingsUpdateWithResponse(root, invalid, ownerSession))(t, http.StatusBadRequest)
+	loaded = tests.AssertRequest(client.NotificationSettingsGetWithResponse(root, ownerSession))(t, http.StatusOK)
+	a.Equal(updated.JSON200, loaded.JSON200)
 
-	preferences.Push.Enabled = false
-	tests.AssertRequest(client.AccountUpdateWithResponse(root, input, ownerSession))(t, http.StatusOK)
-	loaded = tests.AssertRequest(client.AccountGetWithResponse(root, ownerSession))(t, http.StatusOK)
-	a.False(loaded.JSON200.NotificationSettings.Push.Enabled)
-	a.Equal(updated.JSON200.NotificationSettings.Events, loaded.JSON200.NotificationSettings.Events)
+	input.Push.Enabled = false
+	tests.AssertRequest(client.NotificationSettingsUpdateWithResponse(root, input, ownerSession))(t, http.StatusOK)
+	loaded = tests.AssertRequest(client.NotificationSettingsGetWithResponse(root, ownerSession))(t, http.StatusOK)
+	a.False(loaded.JSON200.Push.Enabled)
+	a.Equal(updated.JSON200.Events, loaded.JSON200.Events)
 
-	reset := openapi.AccountUpdateJSONRequestBody{
-		NotificationSettings: &openapi.NotificationSettings{
-			Events: map[string]openapi.NotificationEventSettings{},
-			Push:   openapi.PushNotificationSettings{Enabled: true},
-		},
+	reset := openapi.NotificationSettingsUpdateJSONRequestBody{
+		Events: map[string]openapi.NotificationEventSettings{},
+		Push:   openapi.PushNotificationSettings{Enabled: true},
 	}
-	tests.AssertRequest(client.AccountUpdateWithResponse(root, reset, ownerSession))(t, http.StatusOK)
-	loaded = tests.AssertRequest(client.AccountGetWithResponse(root, ownerSession))(t, http.StatusOK)
-	a.True(loaded.JSON200.NotificationSettings.Push.Enabled)
-	a.Equal(initial.JSON200.NotificationSettings, loaded.JSON200.NotificationSettings)
+	tests.AssertRequest(client.NotificationSettingsUpdateWithResponse(root, reset, ownerSession))(t, http.StatusOK)
+	loaded = tests.AssertRequest(client.NotificationSettingsGetWithResponse(root, ownerSession))(t, http.StatusOK)
+	a.True(loaded.JSON200.Push.Enabled)
+	a.Equal(initial.JSON200, loaded.JSON200)
 }

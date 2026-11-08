@@ -9,6 +9,24 @@ function getNotificationContent(n: Notification) {
     : "/notifications";
 
   switch (n.event) {
+    case "global_thread_published":
+      return {
+        description: "started a new thread",
+        url: postURL,
+      };
+
+    case "global_reply_published":
+      return {
+        description: "replied to a thread",
+        url: postURL,
+      };
+
+    case "global_post_reacted":
+      return {
+        description: "reacted to a post",
+        url: postURL,
+      };
+
     case "trail_run_attention":
       return {
         description: "A Trail run needs your attention",

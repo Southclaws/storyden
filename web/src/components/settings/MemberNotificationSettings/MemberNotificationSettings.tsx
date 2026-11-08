@@ -1,5 +1,6 @@
 import { useId } from "react";
 
+import type { NotificationSettings } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";
 import { CheckboxField } from "@/components/ui/checkbox";
 import { FormControl } from "@/components/ui/form-control";
@@ -25,11 +26,16 @@ import { useMemberNotificationSettings } from "./useMemberNotificationSettings";
 type Props = {
   session: Member;
   settings: Settings;
+  notificationSettings: NotificationSettings;
 };
 
-export function MemberNotificationSettings({ session, settings }: Props) {
+export function MemberNotificationSettings({
+  session,
+  settings,
+  notificationSettings,
+}: Props) {
   const descriptionId = useId();
-  const form = useMemberNotificationSettings(session);
+  const form = useMemberNotificationSettings(session, notificationSettings);
   const groups = getNotificationGroups(session, settings);
   const value: ToggleMatrixValue = {};
 
@@ -115,7 +121,7 @@ export function MemberNotificationSettings({ session, settings }: Props) {
           aria-describedby={descriptionId}
           rowHeading="Notify me about"
           rows={groups.map((group) => ({ ...group, value: group.id }))}
-          columns={[
+          columnOptions={[
             { value: "inbox", label: "Inbox" },
             {
               value: "push",

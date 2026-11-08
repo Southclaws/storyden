@@ -39,40 +39,50 @@ describe("shared notification formatting", () => {
     });
   });
 
-  it("quotes the post title instead of its body preview", () => {
-    const source = {
-      id: "member-one",
-      joined: "2026-11-07T12:00:00Z",
-      handle: "odin",
-      name: "Odin",
-      roles: [],
-    };
-    const result = formatNotification({
-      ...notification("thread_reply"),
-      source,
-      item: {
-        kind: "post",
-        ref: {
-          id: "post-one",
-          createdAt: "2026-11-07T12:00:00Z",
-          updatedAt: "2026-11-07T12:00:00Z",
-          title: "The little harbour is finally playable",
-          description: "I got the boats moving! The lighting still needs work.",
-          slug: "post-one-the-little-harbour-is-finally-playable",
-          author: source,
-          visibility: "published",
-          assets: [],
-          reacts: [],
-          collections: { in_collections: 0, has_collected: false },
-          likes: { likes: 0, liked: false },
-          body: "I got the boats moving! The lighting still needs work.",
-          body_links: [],
+  it.each([
+    ["thread_reply", "replied to your post"],
+    ["global_thread_published", "started a new thread"],
+    ["global_reply_published", "replied to a thread"],
+    ["global_post_reacted", "reacted to a post"],
+  ] as const)(
+    "formats %s with the post title and destination",
+    (event, description) => {
+      const source = {
+        id: "member-one",
+        joined: "2026-11-07T12:00:00Z",
+        handle: "odin",
+        name: "Odin",
+        roles: [],
+      };
+      const result = formatNotification({
+        ...notification(event),
+        source,
+        item: {
+          kind: "post",
+          ref: {
+            id: "post-one",
+            createdAt: "2026-11-07T12:00:00Z",
+            updatedAt: "2026-11-07T12:00:00Z",
+            title: "The little harbour is finally playable",
+            description:
+              "I got the boats moving! The lighting still needs work.",
+            slug: "post-one-the-little-harbour-is-finally-playable",
+            author: source,
+            visibility: "published",
+            assets: [],
+            reacts: [],
+            collections: { in_collections: 0, has_collected: false },
+            likes: { likes: 0, liked: false },
+            body: "I got the boats moving! The lighting still needs work.",
+            body_links: [],
+          },
         },
-      },
-    });
+      });
 
-    expect(result.body).toBe(
-      'replied to your post "The little harbour is finally playable"',
-    );
-  });
+      expect(result.body).toBe(
+        `${description} "The little harbour is finally playable"`,
+      );
+      expect(result.url).toBe("/t/locate/post-one");
+    },
+  );
 });

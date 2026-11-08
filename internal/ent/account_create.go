@@ -28,6 +28,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/nodeversion"
 	"github.com/Southclaws/storyden/internal/ent/notification"
+	"github.com/Southclaws/storyden/internal/ent/notificationeventsettings"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationcode"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
 	"github.com/Southclaws/storyden/internal/ent/oauthclient"
@@ -234,9 +235,17 @@ func (_c *AccountCreate) SetMetadata(v map[string]interface{}) *AccountCreate {
 	return _c
 }
 
-// SetNotificationSettings sets the "notification_settings" field.
-func (_c *AccountCreate) SetNotificationSettings(v *schema.NotificationSettings) *AccountCreate {
-	_c.mutation.SetNotificationSettings(v)
+// SetPushNotificationsEnabled sets the "push_notifications_enabled" field.
+func (_c *AccountCreate) SetPushNotificationsEnabled(v bool) *AccountCreate {
+	_c.mutation.SetPushNotificationsEnabled(v)
+	return _c
+}
+
+// SetNillablePushNotificationsEnabled sets the "push_notifications_enabled" field if the given value is not nil.
+func (_c *AccountCreate) SetNillablePushNotificationsEnabled(v *bool) *AccountCreate {
+	if v != nil {
+		_c.SetPushNotificationsEnabled(*v)
+	}
 	return _c
 }
 
@@ -326,6 +335,21 @@ func (_c *AccountCreate) AddPushSubscriptions(v ...*PushSubscription) *AccountCr
 		ids[i] = v[i].ID
 	}
 	return _c.AddPushSubscriptionIDs(ids...)
+}
+
+// AddNotificationEventSettingIDs adds the "notification_event_settings" edge to the NotificationEventSettings entity by IDs.
+func (_c *AccountCreate) AddNotificationEventSettingIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddNotificationEventSettingIDs(ids...)
+	return _c
+}
+
+// AddNotificationEventSettings adds the "notification_event_settings" edges to the NotificationEventSettings entity.
+func (_c *AccountCreate) AddNotificationEventSettings(v ...*NotificationEventSettings) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddNotificationEventSettingIDs(ids...)
 }
 
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
@@ -1108,6 +1132,10 @@ func (_c *AccountCreate) defaults() {
 		v := account.DefaultAdmin
 		_c.mutation.SetAdmin(v)
 	}
+	if _, ok := _c.mutation.PushNotificationsEnabled(); !ok {
+		v := account.DefaultPushNotificationsEnabled
+		_c.mutation.SetPushNotificationsEnabled(v)
+	}
 	if _, ok := _c.mutation.ID(); !ok {
 		v := account.DefaultID()
 		_c.mutation.SetID(v)
@@ -1156,6 +1184,9 @@ func (_c *AccountCreate) check() error {
 	}
 	if _, ok := _c.mutation.Admin(); !ok {
 		return &ValidationError{Name: "admin", err: errors.New(`ent: missing required field "Account.admin"`)}
+	}
+	if _, ok := _c.mutation.PushNotificationsEnabled(); !ok {
+		return &ValidationError{Name: "push_notifications_enabled", err: errors.New(`ent: missing required field "Account.push_notifications_enabled"`)}
 	}
 	if v, ok := _c.mutation.ID(); ok {
 		if err := account.IDValidator(v.String()); err != nil {
@@ -1254,9 +1285,9 @@ func (_c *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		_spec.SetField(account.FieldMetadata, field.TypeJSON, value)
 		_node.Metadata = value
 	}
-	if value, ok := _c.mutation.NotificationSettings(); ok {
-		_spec.SetField(account.FieldNotificationSettings, field.TypeJSON, value)
-		_node.NotificationSettings = value
+	if value, ok := _c.mutation.PushNotificationsEnabled(); ok {
+		_spec.SetField(account.FieldPushNotificationsEnabled, field.TypeBool, value)
+		_node.PushNotificationsEnabled = value
 	}
 	if nodes := _c.mutation.SessionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -1315,6 +1346,22 @@ func (_c *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(pushsubscription.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.NotificationEventSettingsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationEventSettingsTable,
+			Columns: []string{account.NotificationEventSettingsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notificationeventsettings.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -2364,21 +2411,15 @@ func (u *AccountUpsert) ClearMetadata() *AccountUpsert {
 	return u
 }
 
-// SetNotificationSettings sets the "notification_settings" field.
-func (u *AccountUpsert) SetNotificationSettings(v *schema.NotificationSettings) *AccountUpsert {
-	u.Set(account.FieldNotificationSettings, v)
+// SetPushNotificationsEnabled sets the "push_notifications_enabled" field.
+func (u *AccountUpsert) SetPushNotificationsEnabled(v bool) *AccountUpsert {
+	u.Set(account.FieldPushNotificationsEnabled, v)
 	return u
 }
 
-// UpdateNotificationSettings sets the "notification_settings" field to the value that was provided on create.
-func (u *AccountUpsert) UpdateNotificationSettings() *AccountUpsert {
-	u.SetExcluded(account.FieldNotificationSettings)
-	return u
-}
-
-// ClearNotificationSettings clears the value of the "notification_settings" field.
-func (u *AccountUpsert) ClearNotificationSettings() *AccountUpsert {
-	u.SetNull(account.FieldNotificationSettings)
+// UpdatePushNotificationsEnabled sets the "push_notifications_enabled" field to the value that was provided on create.
+func (u *AccountUpsert) UpdatePushNotificationsEnabled() *AccountUpsert {
+	u.SetExcluded(account.FieldPushNotificationsEnabled)
 	return u
 }
 
@@ -2682,24 +2723,17 @@ func (u *AccountUpsertOne) ClearMetadata() *AccountUpsertOne {
 	})
 }
 
-// SetNotificationSettings sets the "notification_settings" field.
-func (u *AccountUpsertOne) SetNotificationSettings(v *schema.NotificationSettings) *AccountUpsertOne {
+// SetPushNotificationsEnabled sets the "push_notifications_enabled" field.
+func (u *AccountUpsertOne) SetPushNotificationsEnabled(v bool) *AccountUpsertOne {
 	return u.Update(func(s *AccountUpsert) {
-		s.SetNotificationSettings(v)
+		s.SetPushNotificationsEnabled(v)
 	})
 }
 
-// UpdateNotificationSettings sets the "notification_settings" field to the value that was provided on create.
-func (u *AccountUpsertOne) UpdateNotificationSettings() *AccountUpsertOne {
+// UpdatePushNotificationsEnabled sets the "push_notifications_enabled" field to the value that was provided on create.
+func (u *AccountUpsertOne) UpdatePushNotificationsEnabled() *AccountUpsertOne {
 	return u.Update(func(s *AccountUpsert) {
-		s.UpdateNotificationSettings()
-	})
-}
-
-// ClearNotificationSettings clears the value of the "notification_settings" field.
-func (u *AccountUpsertOne) ClearNotificationSettings() *AccountUpsertOne {
-	return u.Update(func(s *AccountUpsert) {
-		s.ClearNotificationSettings()
+		s.UpdatePushNotificationsEnabled()
 	})
 }
 
@@ -3173,24 +3207,17 @@ func (u *AccountUpsertBulk) ClearMetadata() *AccountUpsertBulk {
 	})
 }
 
-// SetNotificationSettings sets the "notification_settings" field.
-func (u *AccountUpsertBulk) SetNotificationSettings(v *schema.NotificationSettings) *AccountUpsertBulk {
+// SetPushNotificationsEnabled sets the "push_notifications_enabled" field.
+func (u *AccountUpsertBulk) SetPushNotificationsEnabled(v bool) *AccountUpsertBulk {
 	return u.Update(func(s *AccountUpsert) {
-		s.SetNotificationSettings(v)
+		s.SetPushNotificationsEnabled(v)
 	})
 }
 
-// UpdateNotificationSettings sets the "notification_settings" field to the value that was provided on create.
-func (u *AccountUpsertBulk) UpdateNotificationSettings() *AccountUpsertBulk {
+// UpdatePushNotificationsEnabled sets the "push_notifications_enabled" field to the value that was provided on create.
+func (u *AccountUpsertBulk) UpdatePushNotificationsEnabled() *AccountUpsertBulk {
 	return u.Update(func(s *AccountUpsert) {
-		s.UpdateNotificationSettings()
-	})
-}
-
-// ClearNotificationSettings clears the value of the "notification_settings" field.
-func (u *AccountUpsertBulk) ClearNotificationSettings() *AccountUpsertBulk {
-	return u.Update(func(s *AccountUpsert) {
-		s.ClearNotificationSettings()
+		s.UpdatePushNotificationsEnabled()
 	})
 }
 

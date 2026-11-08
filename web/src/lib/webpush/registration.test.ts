@@ -72,7 +72,7 @@ it("requests permission before asynchronous setup and saves a first subscription
   const request = fetchRequest.mock.lastCall?.[0] as Request;
 
   expect(request.url).toBe(
-    "https://api.example.com/api/notifications/push/subscriptions",
+    "https://api.example.com/api/notifications/settings/push/subscriptions",
   );
   expect(request.method).toBe("PUT");
   expect(request.credentials).toBe("include");

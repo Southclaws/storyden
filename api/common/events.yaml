@@ -284,9 +284,13 @@ $defs:
   EventPostReacted:
     type: object
     description: "Emitted when a member adds an emoji reaction to a post."
-    required: ["event", "post_id", "root_post_id"]
+    required: ["event", "post_id", "root_post_id", "account_id"]
     properties:
       event: { type: string, const: "EventPostReacted" }
+      account_id:
+        type: string
+        format: accountID
+        description: "Member who added the reaction"
       post_id:
         type: string
         format: postID

@@ -533,7 +533,9 @@ func (EventPostUnliked) EventPayloadType() string { return "EventPostUnliked" }
 
 // Emitted when a member adds an emoji reaction to a post.
 type EventPostReacted struct {
-	Event string `json:"event"`
+	// Member who added the reaction
+	AccountID account.AccountID `json:"account_id"`
+	Event     string            `json:"event"`
 	// Post ID that was reacted to
 	PostID post.ID `json:"post_id"`
 	// Root thread post ID

@@ -44,8 +44,8 @@ const (
 	FieldLinks = "links"
 	// FieldMetadata holds the string denoting the metadata field in the database.
 	FieldMetadata = "metadata"
-	// FieldNotificationSettings holds the string denoting the notification_settings field in the database.
-	FieldNotificationSettings = "notification_settings"
+	// FieldPushNotificationsEnabled holds the string denoting the push_notifications_enabled field in the database.
+	FieldPushNotificationsEnabled = "push_notifications_enabled"
 	// FieldInvitedByID holds the string denoting the invited_by_id field in the database.
 	FieldInvitedByID = "invited_by_id"
 	// EdgeSessions holds the string denoting the sessions edge name in mutations.
@@ -56,6 +56,8 @@ const (
 	EdgeEmails = "emails"
 	// EdgePushSubscriptions holds the string denoting the push_subscriptions edge name in mutations.
 	EdgePushSubscriptions = "push_subscriptions"
+	// EdgeNotificationEventSettings holds the string denoting the notification_event_settings edge name in mutations.
+	EdgeNotificationEventSettings = "notification_event_settings"
 	// EdgeNotifications holds the string denoting the notifications edge name in mutations.
 	EdgeNotifications = "notifications"
 	// EdgeTriggeredNotifications holds the string denoting the triggered_notifications edge name in mutations.
@@ -184,6 +186,13 @@ const (
 	PushSubscriptionsInverseTable = "push_subscriptions"
 	// PushSubscriptionsColumn is the table column denoting the push_subscriptions relation/edge.
 	PushSubscriptionsColumn = "account_id"
+	// NotificationEventSettingsTable is the table that holds the notification_event_settings relation/edge.
+	NotificationEventSettingsTable = "notification_event_settings"
+	// NotificationEventSettingsInverseTable is the table name for the NotificationEventSettings entity.
+	// It exists in this package in order to avoid circular dependency with the "notificationeventsettings" package.
+	NotificationEventSettingsInverseTable = "notification_event_settings"
+	// NotificationEventSettingsColumn is the table column denoting the notification_event_settings relation/edge.
+	NotificationEventSettingsColumn = "account_id"
 	// NotificationsTable is the table that holds the notifications relation/edge.
 	NotificationsTable = "notifications"
 	// NotificationsInverseTable is the table name for the Notification entity.
@@ -542,7 +551,7 @@ var Columns = []string{
 	FieldAdmin,
 	FieldLinks,
 	FieldMetadata,
-	FieldNotificationSettings,
+	FieldPushNotificationsEnabled,
 	FieldInvitedByID,
 }
 
@@ -578,6 +587,8 @@ var (
 	NameValidator func(string) error
 	// DefaultAdmin holds the default value on creation for the "admin" field.
 	DefaultAdmin bool
+	// DefaultPushNotificationsEnabled holds the default value on creation for the "push_notifications_enabled" field.
+	DefaultPushNotificationsEnabled bool
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -705,6 +716,11 @@ func ByAdmin(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAdmin, opts...).ToFunc()
 }
 
+// ByPushNotificationsEnabled orders the results by the push_notifications_enabled field.
+func ByPushNotificationsEnabled(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPushNotificationsEnabled, opts...).ToFunc()
+}
+
 // ByInvitedByID orders the results by the invited_by_id field.
 func ByInvitedByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldInvitedByID, opts...).ToFunc()
@@ -763,6 +779,20 @@ func ByPushSubscriptionsCount(opts ...sql.OrderTermOption) OrderOption {
 func ByPushSubscriptions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newPushSubscriptionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByNotificationEventSettingsCount orders the results by notification_event_settings count.
+func ByNotificationEventSettingsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newNotificationEventSettingsStep(), opts...)
+	}
+}
+
+// ByNotificationEventSettings orders the results by notification_event_settings terms.
+func ByNotificationEventSettings(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newNotificationEventSettingsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -1470,6 +1500,13 @@ func newPushSubscriptionsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(PushSubscriptionsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, PushSubscriptionsTable, PushSubscriptionsColumn),
+	)
+}
+func newNotificationEventSettingsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(NotificationEventSettingsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, NotificationEventSettingsTable, NotificationEventSettingsColumn),
 	)
 }
 func newNotificationsStep() *sqlgraph.Step {

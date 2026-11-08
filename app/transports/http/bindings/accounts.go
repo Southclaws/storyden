@@ -192,17 +192,16 @@ func (i *Accounts) AccountManageCreate(ctx context.Context, request openapi.Acco
 	}
 
 	acc, err := i.accountManage.Create(ctx, account_manage.InitialProps{
-		Handle:               string(request.Body.Handle),
-		Name:                 opt.NewPtr(request.Body.Name),
-		Bio:                  opt.NewPtr(request.Body.Bio),
-		Signature:            signature,
-		Interests:            opt.NewPtrMap(request.Body.Interests, tagsIDs),
-		Links:                links,
-		Admin:                opt.NewPtr(request.Body.Admin),
-		EmailAddress:         emailAddress,
-		VerifiedStatus:       opt.NewPtrMap(request.Body.VerifiedStatus, deserialiseAccountVerifiedStatus),
-		Meta:                 opt.NewPtr((*map[string]any)(request.Body.Meta)),
-		NotificationSettings: opt.NewPtrMap(request.Body.NotificationSettings, deserialiseNotificationPreferences),
+		Handle:         string(request.Body.Handle),
+		Name:           opt.NewPtr(request.Body.Name),
+		Bio:            opt.NewPtr(request.Body.Bio),
+		Signature:      signature,
+		Interests:      opt.NewPtrMap(request.Body.Interests, tagsIDs),
+		Links:          links,
+		Admin:          opt.NewPtr(request.Body.Admin),
+		EmailAddress:   emailAddress,
+		VerifiedStatus: opt.NewPtrMap(request.Body.VerifiedStatus, deserialiseAccountVerifiedStatus),
+		Meta:           opt.NewPtr((*map[string]any)(request.Body.Meta)),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -235,16 +234,15 @@ func (i *Accounts) AccountManageUpdate(ctx context.Context, request openapi.Acco
 	}
 
 	acc, err := i.accountManage.Update(ctx, account.AccountID(targetID), account_update.Partial{
-		Handle:               opt.NewPtrMap(request.Body.Handle, func(i openapi.AccountHandle) string { return string(i) }),
-		Name:                 opt.NewPtr(request.Body.Name),
-		Bio:                  opt.NewPtr(request.Body.Bio),
-		Signature:            signature,
-		Links:                links,
-		Interests:            opt.NewPtrMap(request.Body.Interests, tagsIDs),
-		Admin:                opt.NewPtr(request.Body.Admin),
-		VerifiedStatus:       opt.NewPtrMap(request.Body.VerifiedStatus, deserialiseAccountVerifiedStatus),
-		Meta:                 opt.NewPtr((*map[string]any)(request.Body.Meta)),
-		NotificationSettings: opt.NewPtrMap(request.Body.NotificationSettings, deserialiseNotificationPreferences),
+		Handle:         opt.NewPtrMap(request.Body.Handle, func(i openapi.AccountHandle) string { return string(i) }),
+		Name:           opt.NewPtr(request.Body.Name),
+		Bio:            opt.NewPtr(request.Body.Bio),
+		Signature:      signature,
+		Links:          links,
+		Interests:      opt.NewPtrMap(request.Body.Interests, tagsIDs),
+		Admin:          opt.NewPtr(request.Body.Admin),
+		VerifiedStatus: opt.NewPtrMap(request.Body.VerifiedStatus, deserialiseAccountVerifiedStatus),
+		Meta:           opt.NewPtr((*map[string]any)(request.Body.Meta)),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -447,14 +445,13 @@ func (i *Accounts) AccountUpdate(ctx context.Context, request openapi.AccountUpd
 	}
 
 	acc, err := i.accountUpdate.Update(ctx, accountID, account_update.Partial{
-		Handle:               opt.NewPtrMap(request.Body.Handle, func(i openapi.AccountHandle) string { return string(i) }),
-		Name:                 opt.NewPtr(request.Body.Name),
-		Bio:                  opt.NewPtr(request.Body.Bio),
-		Signature:            signature,
-		Links:                links,
-		Meta:                 opt.NewPtr((*map[string]any)(request.Body.Meta)),
-		NotificationSettings: opt.NewPtrMap(request.Body.NotificationSettings, deserialiseNotificationPreferences),
-		Interests:            opt.NewPtrMap(request.Body.Interests, tagsIDs),
+		Handle:    opt.NewPtrMap(request.Body.Handle, func(i openapi.AccountHandle) string { return string(i) }),
+		Name:      opt.NewPtr(request.Body.Name),
+		Bio:       opt.NewPtr(request.Body.Bio),
+		Signature: signature,
+		Links:     links,
+		Meta:      opt.NewPtr((*map[string]any)(request.Body.Meta)),
+		Interests: opt.NewPtrMap(request.Body.Interests, tagsIDs),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

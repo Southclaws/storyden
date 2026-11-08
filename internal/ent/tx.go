@@ -60,6 +60,8 @@ type Tx struct {
 	NodeVersion *NodeVersionClient
 	// Notification is the client for interacting with the Notification builders.
 	Notification *NotificationClient
+	// NotificationEventSettings is the client for interacting with the NotificationEventSettings builders.
+	NotificationEventSettings *NotificationEventSettingsClient
 	// OAuthAuthorisationCode is the client for interacting with the OAuthAuthorisationCode builders.
 	OAuthAuthorisationCode *OAuthAuthorisationCodeClient
 	// OAuthAuthorisationRequest is the client for interacting with the OAuthAuthorisationRequest builders.
@@ -296,6 +298,7 @@ func (tx *Tx) init() {
 	tx.Node = NewNodeClient(tx.config)
 	tx.NodeVersion = NewNodeVersionClient(tx.config)
 	tx.Notification = NewNotificationClient(tx.config)
+	tx.NotificationEventSettings = NewNotificationEventSettingsClient(tx.config)
 	tx.OAuthAuthorisationCode = NewOAuthAuthorisationCodeClient(tx.config)
 	tx.OAuthAuthorisationRequest = NewOAuthAuthorisationRequestClient(tx.config)
 	tx.OAuthClient = NewOAuthClientClient(tx.config)

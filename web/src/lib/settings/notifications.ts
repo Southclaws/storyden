@@ -74,6 +74,28 @@ export function getNotificationGroups(
     ],
   });
 
+  groups.push(
+    {
+      id: "new_threads",
+      label: "All new threads",
+      description: "New threads published across the community.",
+      events: [NotificationEvent.global_thread_published],
+    },
+    {
+      id: "all_replies",
+      label: "All replies",
+      description: "Replies to any thread, including those you haven't joined.",
+      events: [NotificationEvent.global_reply_published],
+    },
+    {
+      id: "all_reactions",
+      label: "All reactions",
+      description:
+        "Emoji reactions to threads and replies across the community.",
+      events: [NotificationEvent.global_post_reacted],
+    },
+  );
+
   return groups;
 }
 

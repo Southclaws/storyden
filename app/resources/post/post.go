@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -60,8 +61,9 @@ type Post struct {
 }
 
 type PostRef struct {
-	ID   ID
-	Root ID
+	ID       ID
+	Root     ID
+	AuthorID account.AccountID
 }
 
 func (p *PostRef) IsThread() bool {
@@ -151,7 +153,8 @@ func MapRef(in *ent.Post) *PostRef {
 	}()
 
 	return &PostRef{
-		ID:   ID(in.ID),
-		Root: root,
+		ID:       ID(in.ID),
+		Root:     root,
+		AuthorID: account.AccountID(in.AccountPosts),
 	}
 }

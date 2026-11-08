@@ -75,6 +75,9 @@ type NodeVersion func(*sql.Selector)
 // Notification is the predicate function for notification builders.
 type Notification func(*sql.Selector)
 
+// NotificationEventSettings is the predicate function for notificationeventsettings builders.
+type NotificationEventSettings func(*sql.Selector)
+
 // OAuthAuthorisationCode is the predicate function for oauthauthorisationcode builders.
 type OAuthAuthorisationCode func(*sql.Selector)
 

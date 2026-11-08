@@ -78,22 +78,24 @@ type Writer struct {
 	querier *Querier
 }
 
-func (w *Writer) Add(ctx context.Context, accountID account.AccountID, postID xid.ID, emojiID string) (*reaction.React, error) {
+func (w *Writer) Add(ctx context.Context, accountID account.AccountID, postID xid.ID, emojiID string) (*reaction.React, bool, error) {
 	e, ok := reaction.IsValidEmoji(emojiID)
 	if !ok {
-		return nil, fault.Wrap(ErrInvalidEmoji, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		return nil, false, fault.Wrap(ErrInvalidEmoji, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
 	reactID, err := w.tryAdd(ctx, accountID, postID, e)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, false, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	if reactID == nil {
-		return w.querier.Lookup(ctx, accountID, postID, e)
+		r, err := w.querier.Lookup(ctx, accountID, postID, e)
+		return r, false, err
 	}
 
-	return w.querier.Get(ctx, reaction.ReactID(*reactID))
+	r, err := w.querier.Get(ctx, reaction.ReactID(*reactID))
+	return r, true, err
 }
 
 func (w *Writer) tryAdd(ctx context.Context, accountID account.AccountID, postID xid.ID, e string) (*xid.ID, error) {

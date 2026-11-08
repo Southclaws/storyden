@@ -25,7 +25,7 @@ export default function Layout(props) {
   return (
     <>
       {props.children}
-      <OpenAPIPage document="../api/openapi.yaml" operations={[{"path":"/notifications/push/subscriptions","method":"put"}]} showDescription />
+      <OpenAPIPage document="../api/openapi.yaml" operations={[{"path":"/notifications/settings/push/subscriptions","method":"put"}]} showDescription />
     </>
   );
 }

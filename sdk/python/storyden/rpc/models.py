@@ -267,6 +267,8 @@ class EventPostUnliked(BaseModel):
 class EventPostReacted(BaseModel):
     model_config = ConfigDict(extra="forbid")
     event: Literal["EventPostReacted"]
+    """Member who added the reaction"""
+    account_id: str
     """Post ID that was reacted to"""
     post_id: str
     """Root thread post ID"""

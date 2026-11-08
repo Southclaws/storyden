@@ -166,7 +166,7 @@ func TestPushSubscriptionEndpoint(t *testing.T) {
 	r.Error(err)
 
 	err = db.PushSubscription.UpdateOneID(subscription.ID).
-		SetEndpoint("invalid endpoint").
+		SetEndpoint("invalid endpoint " + owner.ID.String()).
 		Exec(root)
 	r.NoError(err)
 
@@ -232,12 +232,17 @@ func TestNotificationCreatedEvent(t *testing.T) {
 		bus      *pubsub.Bus
 		notifier *notify.Notifier
 		accounts *account_writer.Writer
-		db       *ent.Client
+		client   *openapi.ClientWithResponses
+		sessions *e2e.SessionHelper
 	)
 
-	integration.Test(t, nil, fx.Populate(&root, &bus, &notifier, &accounts, &db))
+	integration.Test(t, nil,
+		e2e.Setup(),
+		fx.Populate(&root, &bus, &notifier, &accounts, &client, &sessions),
+	)
 
-	_, owner := e2e.WithAccount(root, accounts, seed.Account_001_Odin)
+	ownerCtx, owner := e2e.WithAccount(root, accounts, seed.Account_001_Odin)
+	ownerSession := sessions.WithSession(ownerCtx)
 	created := make(chan rpc.EventNotificationCreated, 1)
 
 	sub, err := pubsub.Subscribe(root, bus, "test.notification.created", func(_ context.Context, event *rpc.EventNotificationCreated) error {
@@ -261,10 +266,11 @@ func TestNotificationCreatedEvent(t *testing.T) {
 
 	select {
 	case event := <-created:
-		row, err := db.Notification.Get(root, event.ID)
-		r.NoError(err, "event must reference a persisted notification")
-		a.Equal(owner.ID.String(), row.OwnerAccountID.String())
-		a.Equal("thread_reply", row.EventType)
+		inbox := tests.AssertRequest(client.NotificationListWithResponse(root, nil, ownerSession))(t, http.StatusOK)
+		r.NotNil(inbox.JSON200)
+		r.Len(inbox.JSON200.Notifications, 1)
+		a.Equal(event.ID.String(), inbox.JSON200.Notifications[0].Id)
+		a.Equal(openapi.ThreadReply, inbox.JSON200.Notifications[0].Event)
 
 	case <-time.After(5 * time.Second):
 		t.Fatal("notification creation event was not delivered")

@@ -95,6 +95,18 @@ func (d *Writer) Create(
 	}
 	defer tx.Rollback()
 
+	err = tx.Post.
+		UpdateOneID(xid.ID(parentID)).
+		SetLastReplyAt(time.Now()).
+		Exec(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			err = fault.Wrap(err, ftag.With(ftag.NotFound), fmsg.WithDesc("not found", "Thread not found."))
+		}
+
+		return nil, fault.Wrap(err, fmsg.With("failed to update parent thread timestamp"), fctx.With(ctx))
+	}
+
 	thread, err := tx.Post.Get(ctx, xid.ID(parentID))
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -142,14 +154,6 @@ func (d *Writer) Create(
 		}
 
 		return nil, fault.Wrap(err, fmsg.With("failed to query created reply"), fctx.With(ctx))
-	}
-
-	err = tx.Post.
-		UpdateOneID(xid.ID(parentID)).
-		SetLastReplyAt(time.Now()).
-		Exec(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fmsg.With("failed to update parent thread timestamp"), fctx.With(ctx))
 	}
 
 	if err = tx.Commit(); err != nil {

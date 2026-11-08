@@ -11,8 +11,9 @@ import type { NotificationEventSettings } from "./notificationEventSettings";
 
 /**
  * Overrides keyed by NotificationEvent. Direct interactions and
- * actionable updates are enabled by default; likes, follows, and
- * attendance activity are disabled. Unknown event names are rejected.
+ * actionable updates are enabled by default. Global activity, likes,
+ * follows, and attendance activity are disabled by default. Unknown
+ * event names are rejected.
  */
 export type NotificationSettingsEvents = {
   [key: string]: NotificationEventSettings;

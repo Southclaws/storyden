@@ -118,7 +118,7 @@ function NotificationExample({
         aria-describedby={descriptionId}
         rowHeading="Notify me about"
         rows={rows}
-        columns={visibleColumns}
+        columnOptions={visibleColumns}
         value={value}
         onValueChange={handleValueChange}
         disabled={disabled}

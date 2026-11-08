@@ -20,9 +20,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/schema"
 )
 
-type (
-	Option func(*ent.AccountMutation)
-)
+type Option func(*ent.AccountMutation)
 
 func WithID(id account.AccountID) Option {
 	return func(a *ent.AccountMutation) {
@@ -102,13 +100,7 @@ func WithMetadata(m map[string]any) Option {
 	}
 }
 
-func WithNotificationSettings(preferences account.NotificationPreferences) Option {
-	return func(a *ent.AccountMutation) {
-		a.SetNotificationSettings(&preferences)
-	}
-}
-
-type Mutation func(u *ent.AccountUpdateOne)
+type Mutation func(*ent.AccountUpdateOne)
 
 func SetHandle(handle string) Mutation {
 	return func(u *ent.AccountUpdateOne) {
@@ -164,12 +156,6 @@ func SetMetadata(m map[string]any) Mutation {
 	}
 }
 
-func SetNotificationSettings(preferences account.NotificationPreferences) Mutation {
-	return func(u *ent.AccountUpdateOne) {
-		u.SetNotificationSettings(&preferences)
-	}
-}
-
 func SetAvatarAssetID(id opt.Optional[asset.AssetID]) Mutation {
 	return func(u *ent.AccountUpdateOne) {
 		if value, ok := id.Get(); ok {
@@ -206,8 +192,8 @@ func (r *Repository) Create(ctx context.Context, handle string, opts ...Option) 
 	mutate.SetHandle(handle)
 	mutate.SetName(handle)
 
-	for _, v := range opts {
-		v(mutate)
+	for _, option := range opts {
+		option(mutate)
 	}
 
 	saved, err := create.Save(ctx)
@@ -225,12 +211,11 @@ func (r *Repository) Create(ctx context.Context, handle string, opts ...Option) 
 func (r *Repository) Update(ctx context.Context, id account.AccountID, opts ...Mutation) (*account.AccountWithEdges, error) {
 	update := r.db.Account.UpdateOneID(xid.ID(id))
 
-	for _, fn := range opts {
-		fn(update)
+	for _, option := range opts {
+		option(update)
 	}
 
-	saved, err := update.Save(ctx)
-	if err != nil {
+	if err := update.Exec(ctx); err != nil {
 		if ent.IsNotFound(err) {
 			err = fault.Wrap(err, ftag.With(ftag.NotFound))
 		} else if ent.IsConstraintError(err) {
@@ -242,5 +227,5 @@ func (r *Repository) Update(ctx context.Context, id account.AccountID, opts ...M
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return r.GetByID(ctx, account.AccountID(saved.ID))
+	return r.GetByID(ctx, id)
 }

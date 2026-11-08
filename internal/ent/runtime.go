@@ -29,6 +29,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/nodeversion"
 	"github.com/Southclaws/storyden/internal/ent/notification"
+	"github.com/Southclaws/storyden/internal/ent/notificationeventsettings"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationcode"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
 	"github.com/Southclaws/storyden/internal/ent/oauthclient"
@@ -109,6 +110,10 @@ func init() {
 	accountDescAdmin := accountFields[7].Descriptor()
 	// account.DefaultAdmin holds the default value on creation for the admin field.
 	account.DefaultAdmin = accountDescAdmin.Default.(bool)
+	// accountDescPushNotificationsEnabled is the schema descriptor for push_notifications_enabled field.
+	accountDescPushNotificationsEnabled := accountFields[10].Descriptor()
+	// account.DefaultPushNotificationsEnabled holds the default value on creation for the push_notifications_enabled field.
+	account.DefaultPushNotificationsEnabled = accountDescPushNotificationsEnabled.Default.(bool)
 	// accountDescID is the schema descriptor for id field.
 	accountDescID := accountMixinFields0[0].Descriptor()
 	// account.DefaultID holds the default value on creation for the id field.
@@ -1052,6 +1057,35 @@ func init() {
 	// notification.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	notification.IDValidator = func() func(string) error {
 		validators := notificationDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	notificationeventsettingsMixin := schema.NotificationEventSettings{}.Mixin()
+	notificationeventsettingsMixinFields0 := notificationeventsettingsMixin[0].Fields()
+	_ = notificationeventsettingsMixinFields0
+	notificationeventsettingsFields := schema.NotificationEventSettings{}.Fields()
+	_ = notificationeventsettingsFields
+	// notificationeventsettingsDescEvent is the schema descriptor for event field.
+	notificationeventsettingsDescEvent := notificationeventsettingsFields[1].Descriptor()
+	// notificationeventsettings.EventValidator is a validator for the "event" field. It is called by the builders before save.
+	notificationeventsettings.EventValidator = notificationeventsettingsDescEvent.Validators[0].(func(string) error)
+	// notificationeventsettingsDescID is the schema descriptor for id field.
+	notificationeventsettingsDescID := notificationeventsettingsMixinFields0[0].Descriptor()
+	// notificationeventsettings.DefaultID holds the default value on creation for the id field.
+	notificationeventsettings.DefaultID = notificationeventsettingsDescID.Default.(func() xid.ID)
+	// notificationeventsettings.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	notificationeventsettings.IDValidator = func() func(string) error {
+		validators := notificationeventsettingsDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

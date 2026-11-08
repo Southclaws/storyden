@@ -36,6 +36,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/nodeversion"
 	"github.com/Southclaws/storyden/internal/ent/notification"
+	"github.com/Southclaws/storyden/internal/ent/notificationeventsettings"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationcode"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
 	"github.com/Southclaws/storyden/internal/ent/oauthclient"
@@ -114,6 +115,7 @@ const (
 	TypeNode                                 = "Node"
 	TypeNodeVersion                          = "NodeVersion"
 	TypeNotification                         = "Notification"
+	TypeNotificationEventSettings            = "NotificationEventSettings"
 	TypeOAuthAuthorisationCode               = "OAuthAuthorisationCode"
 	TypeOAuthAuthorisationRequest            = "OAuthAuthorisationRequest"
 	TypeOAuthClient                          = "OAuthClient"
@@ -178,7 +180,7 @@ type AccountMutation struct {
 	links                                       *[]schema.ExternalLink
 	appendlinks                                 []schema.ExternalLink
 	metadata                                    *map[string]interface{}
-	notification_settings                       **schema.NotificationSettings
+	push_notifications_enabled                  *bool
 	clearedFields                               map[string]struct{}
 	sessions                                    map[xid.ID]struct{}
 	removedsessions                             map[xid.ID]struct{}
@@ -192,6 +194,9 @@ type AccountMutation struct {
 	push_subscriptions                          map[xid.ID]struct{}
 	removedpush_subscriptions                   map[xid.ID]struct{}
 	clearedpush_subscriptions                   bool
+	notification_event_settings                 map[xid.ID]struct{}
+	removednotification_event_settings          map[xid.ID]struct{}
+	clearednotification_event_settings          bool
 	notifications                               map[xid.ID]struct{}
 	removednotifications                        map[xid.ID]struct{}
 	clearednotifications                        bool
@@ -1058,53 +1063,40 @@ func (m *AccountMutation) ResetMetadata() {
 	delete(m.clearedFields, account.FieldMetadata)
 }
 
-// SetNotificationSettings sets the "notification_settings" field.
-func (m *AccountMutation) SetNotificationSettings(ss *schema.NotificationSettings) {
-	m.notification_settings = &ss
+// SetPushNotificationsEnabled sets the "push_notifications_enabled" field.
+func (m *AccountMutation) SetPushNotificationsEnabled(b bool) {
+	m.push_notifications_enabled = &b
 }
 
-// NotificationSettings returns the value of the "notification_settings" field in the mutation.
-func (m *AccountMutation) NotificationSettings() (r *schema.NotificationSettings, exists bool) {
-	v := m.notification_settings
+// PushNotificationsEnabled returns the value of the "push_notifications_enabled" field in the mutation.
+func (m *AccountMutation) PushNotificationsEnabled() (r bool, exists bool) {
+	v := m.push_notifications_enabled
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldNotificationSettings returns the old "notification_settings" field's value of the Account entity.
+// OldPushNotificationsEnabled returns the old "push_notifications_enabled" field's value of the Account entity.
 // If the Account object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AccountMutation) OldNotificationSettings(ctx context.Context) (v *schema.NotificationSettings, err error) {
+func (m *AccountMutation) OldPushNotificationsEnabled(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldNotificationSettings is only allowed on UpdateOne operations")
+		return v, errors.New("OldPushNotificationsEnabled is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldNotificationSettings requires an ID field in the mutation")
+		return v, errors.New("OldPushNotificationsEnabled requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldNotificationSettings: %w", err)
+		return v, fmt.Errorf("querying old value for OldPushNotificationsEnabled: %w", err)
 	}
-	return oldValue.NotificationSettings, nil
+	return oldValue.PushNotificationsEnabled, nil
 }
 
-// ClearNotificationSettings clears the value of the "notification_settings" field.
-func (m *AccountMutation) ClearNotificationSettings() {
-	m.notification_settings = nil
-	m.clearedFields[account.FieldNotificationSettings] = struct{}{}
-}
-
-// NotificationSettingsCleared returns if the "notification_settings" field was cleared in this mutation.
-func (m *AccountMutation) NotificationSettingsCleared() bool {
-	_, ok := m.clearedFields[account.FieldNotificationSettings]
-	return ok
-}
-
-// ResetNotificationSettings resets all changes to the "notification_settings" field.
-func (m *AccountMutation) ResetNotificationSettings() {
-	m.notification_settings = nil
-	delete(m.clearedFields, account.FieldNotificationSettings)
+// ResetPushNotificationsEnabled resets all changes to the "push_notifications_enabled" field.
+func (m *AccountMutation) ResetPushNotificationsEnabled() {
+	m.push_notifications_enabled = nil
 }
 
 // SetInvitedByID sets the "invited_by_id" field.
@@ -1370,6 +1362,60 @@ func (m *AccountMutation) ResetPushSubscriptions() {
 	m.push_subscriptions = nil
 	m.clearedpush_subscriptions = false
 	m.removedpush_subscriptions = nil
+}
+
+// AddNotificationEventSettingIDs adds the "notification_event_settings" edge to the NotificationEventSettings entity by ids.
+func (m *AccountMutation) AddNotificationEventSettingIDs(ids ...xid.ID) {
+	if m.notification_event_settings == nil {
+		m.notification_event_settings = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.notification_event_settings[ids[i]] = struct{}{}
+	}
+}
+
+// ClearNotificationEventSettings clears the "notification_event_settings" edge to the NotificationEventSettings entity.
+func (m *AccountMutation) ClearNotificationEventSettings() {
+	m.clearednotification_event_settings = true
+}
+
+// NotificationEventSettingsCleared reports if the "notification_event_settings" edge to the NotificationEventSettings entity was cleared.
+func (m *AccountMutation) NotificationEventSettingsCleared() bool {
+	return m.clearednotification_event_settings
+}
+
+// RemoveNotificationEventSettingIDs removes the "notification_event_settings" edge to the NotificationEventSettings entity by IDs.
+func (m *AccountMutation) RemoveNotificationEventSettingIDs(ids ...xid.ID) {
+	if m.removednotification_event_settings == nil {
+		m.removednotification_event_settings = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.notification_event_settings, ids[i])
+		m.removednotification_event_settings[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedNotificationEventSettings returns the removed IDs of the "notification_event_settings" edge to the NotificationEventSettings entity.
+func (m *AccountMutation) RemovedNotificationEventSettingsIDs() (ids []xid.ID) {
+	for id := range m.removednotification_event_settings {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// NotificationEventSettingsIDs returns the "notification_event_settings" edge IDs in the mutation.
+func (m *AccountMutation) NotificationEventSettingsIDs() (ids []xid.ID) {
+	for id := range m.notification_event_settings {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetNotificationEventSettings resets all changes to the "notification_event_settings" edge.
+func (m *AccountMutation) ResetNotificationEventSettings() {
+	m.notification_event_settings = nil
+	m.clearednotification_event_settings = false
+	m.removednotification_event_settings = nil
 }
 
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by ids.
@@ -4068,8 +4114,8 @@ func (m *AccountMutation) Fields() []string {
 	if m.metadata != nil {
 		fields = append(fields, account.FieldMetadata)
 	}
-	if m.notification_settings != nil {
-		fields = append(fields, account.FieldNotificationSettings)
+	if m.push_notifications_enabled != nil {
+		fields = append(fields, account.FieldPushNotificationsEnabled)
 	}
 	if m.invited_by != nil {
 		fields = append(fields, account.FieldInvitedByID)
@@ -4110,8 +4156,8 @@ func (m *AccountMutation) Field(name string) (ent.Value, bool) {
 		return m.Links()
 	case account.FieldMetadata:
 		return m.Metadata()
-	case account.FieldNotificationSettings:
-		return m.NotificationSettings()
+	case account.FieldPushNotificationsEnabled:
+		return m.PushNotificationsEnabled()
 	case account.FieldInvitedByID:
 		return m.InvitedByID()
 	}
@@ -4151,8 +4197,8 @@ func (m *AccountMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldLinks(ctx)
 	case account.FieldMetadata:
 		return m.OldMetadata(ctx)
-	case account.FieldNotificationSettings:
-		return m.OldNotificationSettings(ctx)
+	case account.FieldPushNotificationsEnabled:
+		return m.OldPushNotificationsEnabled(ctx)
 	case account.FieldInvitedByID:
 		return m.OldInvitedByID(ctx)
 	}
@@ -4262,12 +4308,12 @@ func (m *AccountMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetMetadata(v)
 		return nil
-	case account.FieldNotificationSettings:
-		v, ok := value.(*schema.NotificationSettings)
+	case account.FieldPushNotificationsEnabled:
+		v, ok := value.(bool)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetNotificationSettings(v)
+		m.SetPushNotificationsEnabled(v)
 		return nil
 	case account.FieldInvitedByID:
 		v, ok := value.(xid.ID)
@@ -4327,9 +4373,6 @@ func (m *AccountMutation) ClearedFields() []string {
 	if m.FieldCleared(account.FieldMetadata) {
 		fields = append(fields, account.FieldMetadata)
 	}
-	if m.FieldCleared(account.FieldNotificationSettings) {
-		fields = append(fields, account.FieldNotificationSettings)
-	}
 	if m.FieldCleared(account.FieldInvitedByID) {
 		fields = append(fields, account.FieldInvitedByID)
 	}
@@ -4367,9 +4410,6 @@ func (m *AccountMutation) ClearField(name string) error {
 		return nil
 	case account.FieldMetadata:
 		m.ClearMetadata()
-		return nil
-	case account.FieldNotificationSettings:
-		m.ClearNotificationSettings()
 		return nil
 	case account.FieldInvitedByID:
 		m.ClearInvitedByID()
@@ -4424,8 +4464,8 @@ func (m *AccountMutation) ResetField(name string) error {
 	case account.FieldMetadata:
 		m.ResetMetadata()
 		return nil
-	case account.FieldNotificationSettings:
-		m.ResetNotificationSettings()
+	case account.FieldPushNotificationsEnabled:
+		m.ResetPushNotificationsEnabled()
 		return nil
 	case account.FieldInvitedByID:
 		m.ResetInvitedByID()
@@ -4436,7 +4476,7 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 53)
+	edges := make([]string, 0, 54)
 	if m.sessions != nil {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -4448,6 +4488,9 @@ func (m *AccountMutation) AddedEdges() []string {
 	}
 	if m.push_subscriptions != nil {
 		edges = append(edges, account.EdgePushSubscriptions)
+	}
+	if m.notification_event_settings != nil {
+		edges = append(edges, account.EdgeNotificationEventSettings)
 	}
 	if m.notifications != nil {
 		edges = append(edges, account.EdgeNotifications)
@@ -4624,6 +4667,12 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 	case account.EdgePushSubscriptions:
 		ids := make([]ent.Value, 0, len(m.push_subscriptions))
 		for id := range m.push_subscriptions {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeNotificationEventSettings:
+		ids := make([]ent.Value, 0, len(m.notification_event_settings))
+		for id := range m.notification_event_settings {
 			ids = append(ids, id)
 		}
 		return ids
@@ -4925,7 +4974,7 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 53)
+	edges := make([]string, 0, 54)
 	if m.removedsessions != nil {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -4937,6 +4986,9 @@ func (m *AccountMutation) RemovedEdges() []string {
 	}
 	if m.removedpush_subscriptions != nil {
 		edges = append(edges, account.EdgePushSubscriptions)
+	}
+	if m.removednotification_event_settings != nil {
+		edges = append(edges, account.EdgeNotificationEventSettings)
 	}
 	if m.removednotifications != nil {
 		edges = append(edges, account.EdgeNotifications)
@@ -5110,6 +5162,12 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 	case account.EdgePushSubscriptions:
 		ids := make([]ent.Value, 0, len(m.removedpush_subscriptions))
 		for id := range m.removedpush_subscriptions {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeNotificationEventSettings:
+		ids := make([]ent.Value, 0, len(m.removednotification_event_settings))
+		for id := range m.removednotification_event_settings {
 			ids = append(ids, id)
 		}
 		return ids
@@ -5407,7 +5465,7 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 53)
+	edges := make([]string, 0, 54)
 	if m.clearedsessions {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -5419,6 +5477,9 @@ func (m *AccountMutation) ClearedEdges() []string {
 	}
 	if m.clearedpush_subscriptions {
 		edges = append(edges, account.EdgePushSubscriptions)
+	}
+	if m.clearednotification_event_settings {
+		edges = append(edges, account.EdgeNotificationEventSettings)
 	}
 	if m.clearednotifications {
 		edges = append(edges, account.EdgeNotifications)
@@ -5582,6 +5643,8 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearedemails
 	case account.EdgePushSubscriptions:
 		return m.clearedpush_subscriptions
+	case account.EdgeNotificationEventSettings:
+		return m.clearednotification_event_settings
 	case account.EdgeNotifications:
 		return m.clearednotifications
 	case account.EdgeTriggeredNotifications:
@@ -5710,6 +5773,9 @@ func (m *AccountMutation) ResetEdge(name string) error {
 		return nil
 	case account.EdgePushSubscriptions:
 		m.ResetPushSubscriptions()
+		return nil
+	case account.EdgeNotificationEventSettings:
+		m.ResetNotificationEventSettings()
 		return nil
 	case account.EdgeNotifications:
 		m.ResetNotifications()
@@ -26895,6 +26961,554 @@ func (m *NotificationMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Notification edge %s", name)
+}
+
+// NotificationEventSettingsMutation represents an operation that mutates the NotificationEventSettings nodes in the graph.
+type NotificationEventSettingsMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *xid.ID
+	event          *string
+	inbox_enabled  *bool
+	push_enabled   *bool
+	clearedFields  map[string]struct{}
+	account        *xid.ID
+	clearedaccount bool
+	done           bool
+	oldValue       func(context.Context) (*NotificationEventSettings, error)
+	predicates     []predicate.NotificationEventSettings
+}
+
+var _ ent.Mutation = (*NotificationEventSettingsMutation)(nil)
+
+// notificationeventsettingsOption allows management of the mutation configuration using functional options.
+type notificationeventsettingsOption func(*NotificationEventSettingsMutation)
+
+// newNotificationEventSettingsMutation creates new mutation for the NotificationEventSettings entity.
+func newNotificationEventSettingsMutation(c config, op Op, opts ...notificationeventsettingsOption) *NotificationEventSettingsMutation {
+	m := &NotificationEventSettingsMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeNotificationEventSettings,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withNotificationEventSettingsID sets the ID field of the mutation.
+func withNotificationEventSettingsID(id xid.ID) notificationeventsettingsOption {
+	return func(m *NotificationEventSettingsMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *NotificationEventSettings
+		)
+		m.oldValue = func(ctx context.Context) (*NotificationEventSettings, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().NotificationEventSettings.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withNotificationEventSettings sets the old NotificationEventSettings of the mutation.
+func withNotificationEventSettings(node *NotificationEventSettings) notificationeventsettingsOption {
+	return func(m *NotificationEventSettingsMutation) {
+		m.oldValue = func(context.Context) (*NotificationEventSettings, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m NotificationEventSettingsMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m NotificationEventSettingsMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of NotificationEventSettings entities.
+func (m *NotificationEventSettingsMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *NotificationEventSettingsMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *NotificationEventSettingsMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().NotificationEventSettings.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetAccountID sets the "account_id" field.
+func (m *NotificationEventSettingsMutation) SetAccountID(x xid.ID) {
+	m.account = &x
+}
+
+// AccountID returns the value of the "account_id" field in the mutation.
+func (m *NotificationEventSettingsMutation) AccountID() (r xid.ID, exists bool) {
+	v := m.account
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccountID returns the old "account_id" field's value of the NotificationEventSettings entity.
+// If the NotificationEventSettings object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NotificationEventSettingsMutation) OldAccountID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccountID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccountID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccountID: %w", err)
+	}
+	return oldValue.AccountID, nil
+}
+
+// ResetAccountID resets all changes to the "account_id" field.
+func (m *NotificationEventSettingsMutation) ResetAccountID() {
+	m.account = nil
+}
+
+// SetEvent sets the "event" field.
+func (m *NotificationEventSettingsMutation) SetEvent(s string) {
+	m.event = &s
+}
+
+// Event returns the value of the "event" field in the mutation.
+func (m *NotificationEventSettingsMutation) Event() (r string, exists bool) {
+	v := m.event
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEvent returns the old "event" field's value of the NotificationEventSettings entity.
+// If the NotificationEventSettings object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NotificationEventSettingsMutation) OldEvent(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEvent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEvent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEvent: %w", err)
+	}
+	return oldValue.Event, nil
+}
+
+// ResetEvent resets all changes to the "event" field.
+func (m *NotificationEventSettingsMutation) ResetEvent() {
+	m.event = nil
+}
+
+// SetInboxEnabled sets the "inbox_enabled" field.
+func (m *NotificationEventSettingsMutation) SetInboxEnabled(b bool) {
+	m.inbox_enabled = &b
+}
+
+// InboxEnabled returns the value of the "inbox_enabled" field in the mutation.
+func (m *NotificationEventSettingsMutation) InboxEnabled() (r bool, exists bool) {
+	v := m.inbox_enabled
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldInboxEnabled returns the old "inbox_enabled" field's value of the NotificationEventSettings entity.
+// If the NotificationEventSettings object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NotificationEventSettingsMutation) OldInboxEnabled(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldInboxEnabled is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldInboxEnabled requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldInboxEnabled: %w", err)
+	}
+	return oldValue.InboxEnabled, nil
+}
+
+// ResetInboxEnabled resets all changes to the "inbox_enabled" field.
+func (m *NotificationEventSettingsMutation) ResetInboxEnabled() {
+	m.inbox_enabled = nil
+}
+
+// SetPushEnabled sets the "push_enabled" field.
+func (m *NotificationEventSettingsMutation) SetPushEnabled(b bool) {
+	m.push_enabled = &b
+}
+
+// PushEnabled returns the value of the "push_enabled" field in the mutation.
+func (m *NotificationEventSettingsMutation) PushEnabled() (r bool, exists bool) {
+	v := m.push_enabled
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPushEnabled returns the old "push_enabled" field's value of the NotificationEventSettings entity.
+// If the NotificationEventSettings object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NotificationEventSettingsMutation) OldPushEnabled(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPushEnabled is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPushEnabled requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPushEnabled: %w", err)
+	}
+	return oldValue.PushEnabled, nil
+}
+
+// ResetPushEnabled resets all changes to the "push_enabled" field.
+func (m *NotificationEventSettingsMutation) ResetPushEnabled() {
+	m.push_enabled = nil
+}
+
+// ClearAccount clears the "account" edge to the Account entity.
+func (m *NotificationEventSettingsMutation) ClearAccount() {
+	m.clearedaccount = true
+	m.clearedFields[notificationeventsettings.FieldAccountID] = struct{}{}
+}
+
+// AccountCleared reports if the "account" edge to the Account entity was cleared.
+func (m *NotificationEventSettingsMutation) AccountCleared() bool {
+	return m.clearedaccount
+}
+
+// AccountIDs returns the "account" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AccountID instead. It exists only for internal usage by the builders.
+func (m *NotificationEventSettingsMutation) AccountIDs() (ids []xid.ID) {
+	if id := m.account; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAccount resets all changes to the "account" edge.
+func (m *NotificationEventSettingsMutation) ResetAccount() {
+	m.account = nil
+	m.clearedaccount = false
+}
+
+// Where appends a list predicates to the NotificationEventSettingsMutation builder.
+func (m *NotificationEventSettingsMutation) Where(ps ...predicate.NotificationEventSettings) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the NotificationEventSettingsMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *NotificationEventSettingsMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.NotificationEventSettings, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *NotificationEventSettingsMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *NotificationEventSettingsMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (NotificationEventSettings).
+func (m *NotificationEventSettingsMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *NotificationEventSettingsMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.account != nil {
+		fields = append(fields, notificationeventsettings.FieldAccountID)
+	}
+	if m.event != nil {
+		fields = append(fields, notificationeventsettings.FieldEvent)
+	}
+	if m.inbox_enabled != nil {
+		fields = append(fields, notificationeventsettings.FieldInboxEnabled)
+	}
+	if m.push_enabled != nil {
+		fields = append(fields, notificationeventsettings.FieldPushEnabled)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *NotificationEventSettingsMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case notificationeventsettings.FieldAccountID:
+		return m.AccountID()
+	case notificationeventsettings.FieldEvent:
+		return m.Event()
+	case notificationeventsettings.FieldInboxEnabled:
+		return m.InboxEnabled()
+	case notificationeventsettings.FieldPushEnabled:
+		return m.PushEnabled()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *NotificationEventSettingsMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case notificationeventsettings.FieldAccountID:
+		return m.OldAccountID(ctx)
+	case notificationeventsettings.FieldEvent:
+		return m.OldEvent(ctx)
+	case notificationeventsettings.FieldInboxEnabled:
+		return m.OldInboxEnabled(ctx)
+	case notificationeventsettings.FieldPushEnabled:
+		return m.OldPushEnabled(ctx)
+	}
+	return nil, fmt.Errorf("unknown NotificationEventSettings field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *NotificationEventSettingsMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case notificationeventsettings.FieldAccountID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccountID(v)
+		return nil
+	case notificationeventsettings.FieldEvent:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEvent(v)
+		return nil
+	case notificationeventsettings.FieldInboxEnabled:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetInboxEnabled(v)
+		return nil
+	case notificationeventsettings.FieldPushEnabled:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPushEnabled(v)
+		return nil
+	}
+	return fmt.Errorf("unknown NotificationEventSettings field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *NotificationEventSettingsMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *NotificationEventSettingsMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *NotificationEventSettingsMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown NotificationEventSettings numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *NotificationEventSettingsMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *NotificationEventSettingsMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *NotificationEventSettingsMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown NotificationEventSettings nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *NotificationEventSettingsMutation) ResetField(name string) error {
+	switch name {
+	case notificationeventsettings.FieldAccountID:
+		m.ResetAccountID()
+		return nil
+	case notificationeventsettings.FieldEvent:
+		m.ResetEvent()
+		return nil
+	case notificationeventsettings.FieldInboxEnabled:
+		m.ResetInboxEnabled()
+		return nil
+	case notificationeventsettings.FieldPushEnabled:
+		m.ResetPushEnabled()
+		return nil
+	}
+	return fmt.Errorf("unknown NotificationEventSettings field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *NotificationEventSettingsMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.account != nil {
+		edges = append(edges, notificationeventsettings.EdgeAccount)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *NotificationEventSettingsMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case notificationeventsettings.EdgeAccount:
+		if id := m.account; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *NotificationEventSettingsMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *NotificationEventSettingsMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *NotificationEventSettingsMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedaccount {
+		edges = append(edges, notificationeventsettings.EdgeAccount)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *NotificationEventSettingsMutation) EdgeCleared(name string) bool {
+	switch name {
+	case notificationeventsettings.EdgeAccount:
+		return m.clearedaccount
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *NotificationEventSettingsMutation) ClearEdge(name string) error {
+	switch name {
+	case notificationeventsettings.EdgeAccount:
+		m.ClearAccount()
+		return nil
+	}
+	return fmt.Errorf("unknown NotificationEventSettings unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *NotificationEventSettingsMutation) ResetEdge(name string) error {
+	switch name {
+	case notificationeventsettings.EdgeAccount:
+		m.ResetAccount()
+		return nil
+	}
+	return fmt.Errorf("unknown NotificationEventSettings edge %s", name)
 }
 
 // OAuthAuthorisationCodeMutation represents an operation that mutates the OAuthAuthorisationCode nodes in the graph.

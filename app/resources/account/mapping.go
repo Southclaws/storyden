@@ -118,28 +118,12 @@ func MapAccount(a *ent.Account) (*AccountWithEdges, error) {
 	}
 
 	return &AccountWithEdges{
-		Account:              *ref,
-		NotificationSettings: MapNotificationSettings(a.NotificationSettings),
-		Auths:                auths,
-		EmailAddresses:       emails,
-		InvitedBy:            invitedBy,
-		ExternalLinks:        links,
+		Account:        *ref,
+		Auths:          auths,
+		EmailAddresses: emails,
+		InvitedBy:      invitedBy,
+		ExternalLinks:  links,
 	}, nil
-}
-
-func MapNotificationSettings(in *NotificationPreferences) NotificationPreferences {
-	settings := NotificationPreferences{
-		Push: PushNotificationPreferences{Enabled: true},
-	}
-	if in != nil {
-		settings = *in
-	}
-
-	if settings.Events == nil {
-		settings.Events = make(map[string]NotificationEventSettings)
-	}
-
-	return settings
 }
 
 func MapEmail(in *ent.Email) *EmailAddress {

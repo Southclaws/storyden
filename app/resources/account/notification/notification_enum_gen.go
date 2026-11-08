@@ -12,22 +12,25 @@ type Event struct {
 }
 
 var (
-	EventThreadReply          = Event{eventThreadReply}
-	EventReplyToReply         = Event{eventReplyToReply}
-	EventPostLike             = Event{eventPostLike}
-	EventFollow               = Event{eventFollow}
-	EventProfileMention       = Event{eventProfileMention}
-	EventEventHostAdded       = Event{eventEventHostAdded}
-	EventMemberAttendingEvent = Event{eventMemberAttendingEvent}
-	EventMemberDeclinedEvent  = Event{eventMemberDeclinedEvent}
-	EventAttendeeRemoved      = Event{eventAttendeeRemoved}
-	EventReportSubmitted      = Event{eventReportSubmitted}
-	EventReportUpdated        = Event{eventReportUpdated}
-	EventWarningIssued        = Event{eventWarningIssued}
-	EventNodeVersionCreated   = Event{eventNodeVersionCreated}
-	EventNodeVersionApplied   = Event{eventNodeVersionApplied}
-	EventNodeVersionDeleted   = Event{eventNodeVersionDeleted}
-	EventTrailRunAttention    = Event{eventTrailRunAttention}
+	EventGlobalThreadPublished = Event{eventGlobalThreadPublished}
+	EventGlobalReplyPublished  = Event{eventGlobalReplyPublished}
+	EventGlobalPostReacted     = Event{eventGlobalPostReacted}
+	EventThreadReply           = Event{eventThreadReply}
+	EventReplyToReply          = Event{eventReplyToReply}
+	EventPostLike              = Event{eventPostLike}
+	EventFollow                = Event{eventFollow}
+	EventProfileMention        = Event{eventProfileMention}
+	EventEventHostAdded        = Event{eventEventHostAdded}
+	EventMemberAttendingEvent  = Event{eventMemberAttendingEvent}
+	EventMemberDeclinedEvent   = Event{eventMemberDeclinedEvent}
+	EventAttendeeRemoved       = Event{eventAttendeeRemoved}
+	EventReportSubmitted       = Event{eventReportSubmitted}
+	EventReportUpdated         = Event{eventReportUpdated}
+	EventWarningIssued         = Event{eventWarningIssued}
+	EventNodeVersionCreated    = Event{eventNodeVersionCreated}
+	EventNodeVersionApplied    = Event{eventNodeVersionApplied}
+	EventNodeVersionDeleted    = Event{eventNodeVersionDeleted}
+	EventTrailRunAttention     = Event{eventTrailRunAttention}
 )
 
 func (r Event) Format(f fmt.State, verb rune) {
@@ -67,6 +70,12 @@ func (r *Event) Scan(__iNpUt__ any) error {
 }
 func NewEvent(__iNpUt__ string) (Event, error) {
 	switch __iNpUt__ {
+	case string(eventGlobalThreadPublished):
+		return EventGlobalThreadPublished, nil
+	case string(eventGlobalReplyPublished):
+		return EventGlobalReplyPublished, nil
+	case string(eventGlobalPostReacted):
+		return EventGlobalPostReacted, nil
 	case string(eventThreadReply):
 		return EventThreadReply, nil
 	case string(eventReplyToReply):

@@ -3,7 +3,14 @@ import { useForm, useWatch } from "react-hook-form";
 
 import { handle } from "@/api/client";
 import { accountUpdate, useAccountGet } from "@/api/openapi-client/accounts";
-import type { NotificationEvent } from "@/api/openapi-schema";
+import {
+  notificationSettingsUpdate,
+  useNotificationSettingsGet,
+} from "@/api/openapi-client/notifications";
+import type {
+  NotificationEvent,
+  NotificationSettings,
+} from "@/api/openapi-schema";
 import type { Member } from "@/lib/settings/member-settings";
 import * as z from "@/lib/validation";
 
@@ -18,14 +25,18 @@ const FormSchema = z.object({
 
 type Form = z.infer<typeof FormSchema>;
 
-export function useMemberNotificationSettings(session: Member) {
+export function useMemberNotificationSettings(
+  session: Member,
+  notificationSettings: NotificationSettings,
+) {
   const { mutate } = useAccountGet();
+  const { mutate: mutateSettings } = useNotificationSettingsGet();
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       markReadOnClick: session.meta.notifications.markReadOnClick,
-      pushEnabled: session.notification_settings?.push.enabled ?? true,
-      events: session.notification_settings?.events ?? {},
+      pushEnabled: notificationSettings.push.enabled,
+      events: notificationSettings.events,
     },
   });
   const events = useWatch({ control: form.control, name: "events" });
@@ -61,24 +72,28 @@ export function useMemberNotificationSettings(session: Member) {
   const onSubmit = form.handleSubmit(async (data) => {
     await handle(
       async () => {
-        const account = await accountUpdate({
-          meta: {
-            ...session.meta,
-            notifications: {
-              ...session.meta.notifications,
-              markReadOnClick: data.markReadOnClick,
-            },
-          },
-          notification_settings: {
-            ...session.notification_settings,
-            events: data.events,
-            push: {
-              enabled: data.pushEnabled,
-            },
-          },
+        const saved = await notificationSettingsUpdate({
+          events: data.events,
+          push: { enabled: data.pushEnabled },
         });
+        await mutateSettings(saved, { revalidate: false });
 
-        await mutate(account, { revalidate: false });
+        if (
+          data.markReadOnClick !== session.meta.notifications.markReadOnClick
+        ) {
+          const account = await accountUpdate({
+            meta: {
+              ...session.meta,
+              notifications: {
+                ...session.meta.notifications,
+                markReadOnClick: data.markReadOnClick,
+              },
+            },
+          });
+
+          await mutate(account, { revalidate: false });
+        }
+
         form.reset(data);
       },
       {

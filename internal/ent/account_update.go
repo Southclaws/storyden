@@ -28,6 +28,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/nodeversion"
 	"github.com/Southclaws/storyden/internal/ent/notification"
+	"github.com/Southclaws/storyden/internal/ent/notificationeventsettings"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationcode"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
 	"github.com/Southclaws/storyden/internal/ent/oauthclient"
@@ -283,15 +284,17 @@ func (_u *AccountUpdate) ClearMetadata() *AccountUpdate {
 	return _u
 }
 
-// SetNotificationSettings sets the "notification_settings" field.
-func (_u *AccountUpdate) SetNotificationSettings(v *schema.NotificationSettings) *AccountUpdate {
-	_u.mutation.SetNotificationSettings(v)
+// SetPushNotificationsEnabled sets the "push_notifications_enabled" field.
+func (_u *AccountUpdate) SetPushNotificationsEnabled(v bool) *AccountUpdate {
+	_u.mutation.SetPushNotificationsEnabled(v)
 	return _u
 }
 
-// ClearNotificationSettings clears the value of the "notification_settings" field.
-func (_u *AccountUpdate) ClearNotificationSettings() *AccountUpdate {
-	_u.mutation.ClearNotificationSettings()
+// SetNillablePushNotificationsEnabled sets the "push_notifications_enabled" field if the given value is not nil.
+func (_u *AccountUpdate) SetNillablePushNotificationsEnabled(v *bool) *AccountUpdate {
+	if v != nil {
+		_u.SetPushNotificationsEnabled(*v)
+	}
 	return _u
 }
 
@@ -373,6 +376,21 @@ func (_u *AccountUpdate) AddPushSubscriptions(v ...*PushSubscription) *AccountUp
 		ids[i] = v[i].ID
 	}
 	return _u.AddPushSubscriptionIDs(ids...)
+}
+
+// AddNotificationEventSettingIDs adds the "notification_event_settings" edge to the NotificationEventSettings entity by IDs.
+func (_u *AccountUpdate) AddNotificationEventSettingIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddNotificationEventSettingIDs(ids...)
+	return _u
+}
+
+// AddNotificationEventSettings adds the "notification_event_settings" edges to the NotificationEventSettings entity.
+func (_u *AccountUpdate) AddNotificationEventSettings(v ...*NotificationEventSettings) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddNotificationEventSettingIDs(ids...)
 }
 
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
@@ -1187,6 +1205,27 @@ func (_u *AccountUpdate) RemovePushSubscriptions(v ...*PushSubscription) *Accoun
 		ids[i] = v[i].ID
 	}
 	return _u.RemovePushSubscriptionIDs(ids...)
+}
+
+// ClearNotificationEventSettings clears all "notification_event_settings" edges to the NotificationEventSettings entity.
+func (_u *AccountUpdate) ClearNotificationEventSettings() *AccountUpdate {
+	_u.mutation.ClearNotificationEventSettings()
+	return _u
+}
+
+// RemoveNotificationEventSettingIDs removes the "notification_event_settings" edge to NotificationEventSettings entities by IDs.
+func (_u *AccountUpdate) RemoveNotificationEventSettingIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveNotificationEventSettingIDs(ids...)
+	return _u
+}
+
+// RemoveNotificationEventSettings removes "notification_event_settings" edges to NotificationEventSettings entities.
+func (_u *AccountUpdate) RemoveNotificationEventSettings(v ...*NotificationEventSettings) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveNotificationEventSettingIDs(ids...)
 }
 
 // ClearNotifications clears all "notifications" edges to the Notification entity.
@@ -2347,11 +2386,8 @@ func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(account.FieldMetadata, field.TypeJSON)
 	}
-	if value, ok := _u.mutation.NotificationSettings(); ok {
-		_spec.SetField(account.FieldNotificationSettings, field.TypeJSON, value)
-	}
-	if _u.mutation.NotificationSettingsCleared() {
-		_spec.ClearField(account.FieldNotificationSettings, field.TypeJSON)
+	if value, ok := _u.mutation.PushNotificationsEnabled(); ok {
+		_spec.SetField(account.FieldPushNotificationsEnabled, field.TypeBool, value)
 	}
 	if _u.mutation.SessionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -2526,6 +2562,51 @@ func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(pushsubscription.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.NotificationEventSettingsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationEventSettingsTable,
+			Columns: []string{account.NotificationEventSettingsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notificationeventsettings.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedNotificationEventSettingsIDs(); len(nodes) > 0 && !_u.mutation.NotificationEventSettingsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationEventSettingsTable,
+			Columns: []string{account.NotificationEventSettingsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notificationeventsettings.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.NotificationEventSettingsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationEventSettingsTable,
+			Columns: []string{account.NotificationEventSettingsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notificationeventsettings.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -4971,15 +5052,17 @@ func (_u *AccountUpdateOne) ClearMetadata() *AccountUpdateOne {
 	return _u
 }
 
-// SetNotificationSettings sets the "notification_settings" field.
-func (_u *AccountUpdateOne) SetNotificationSettings(v *schema.NotificationSettings) *AccountUpdateOne {
-	_u.mutation.SetNotificationSettings(v)
+// SetPushNotificationsEnabled sets the "push_notifications_enabled" field.
+func (_u *AccountUpdateOne) SetPushNotificationsEnabled(v bool) *AccountUpdateOne {
+	_u.mutation.SetPushNotificationsEnabled(v)
 	return _u
 }
 
-// ClearNotificationSettings clears the value of the "notification_settings" field.
-func (_u *AccountUpdateOne) ClearNotificationSettings() *AccountUpdateOne {
-	_u.mutation.ClearNotificationSettings()
+// SetNillablePushNotificationsEnabled sets the "push_notifications_enabled" field if the given value is not nil.
+func (_u *AccountUpdateOne) SetNillablePushNotificationsEnabled(v *bool) *AccountUpdateOne {
+	if v != nil {
+		_u.SetPushNotificationsEnabled(*v)
+	}
 	return _u
 }
 
@@ -5061,6 +5144,21 @@ func (_u *AccountUpdateOne) AddPushSubscriptions(v ...*PushSubscription) *Accoun
 		ids[i] = v[i].ID
 	}
 	return _u.AddPushSubscriptionIDs(ids...)
+}
+
+// AddNotificationEventSettingIDs adds the "notification_event_settings" edge to the NotificationEventSettings entity by IDs.
+func (_u *AccountUpdateOne) AddNotificationEventSettingIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddNotificationEventSettingIDs(ids...)
+	return _u
+}
+
+// AddNotificationEventSettings adds the "notification_event_settings" edges to the NotificationEventSettings entity.
+func (_u *AccountUpdateOne) AddNotificationEventSettings(v ...*NotificationEventSettings) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddNotificationEventSettingIDs(ids...)
 }
 
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
@@ -5875,6 +5973,27 @@ func (_u *AccountUpdateOne) RemovePushSubscriptions(v ...*PushSubscription) *Acc
 		ids[i] = v[i].ID
 	}
 	return _u.RemovePushSubscriptionIDs(ids...)
+}
+
+// ClearNotificationEventSettings clears all "notification_event_settings" edges to the NotificationEventSettings entity.
+func (_u *AccountUpdateOne) ClearNotificationEventSettings() *AccountUpdateOne {
+	_u.mutation.ClearNotificationEventSettings()
+	return _u
+}
+
+// RemoveNotificationEventSettingIDs removes the "notification_event_settings" edge to NotificationEventSettings entities by IDs.
+func (_u *AccountUpdateOne) RemoveNotificationEventSettingIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveNotificationEventSettingIDs(ids...)
+	return _u
+}
+
+// RemoveNotificationEventSettings removes "notification_event_settings" edges to NotificationEventSettings entities.
+func (_u *AccountUpdateOne) RemoveNotificationEventSettings(v ...*NotificationEventSettings) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveNotificationEventSettingIDs(ids...)
 }
 
 // ClearNotifications clears all "notifications" edges to the Notification entity.
@@ -7065,11 +7184,8 @@ func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err er
 	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(account.FieldMetadata, field.TypeJSON)
 	}
-	if value, ok := _u.mutation.NotificationSettings(); ok {
-		_spec.SetField(account.FieldNotificationSettings, field.TypeJSON, value)
-	}
-	if _u.mutation.NotificationSettingsCleared() {
-		_spec.ClearField(account.FieldNotificationSettings, field.TypeJSON)
+	if value, ok := _u.mutation.PushNotificationsEnabled(); ok {
+		_spec.SetField(account.FieldPushNotificationsEnabled, field.TypeBool, value)
 	}
 	if _u.mutation.SessionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -7244,6 +7360,51 @@ func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(pushsubscription.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.NotificationEventSettingsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationEventSettingsTable,
+			Columns: []string{account.NotificationEventSettingsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notificationeventsettings.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedNotificationEventSettingsIDs(); len(nodes) > 0 && !_u.mutation.NotificationEventSettingsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationEventSettingsTable,
+			Columns: []string{account.NotificationEventSettingsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notificationeventsettings.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.NotificationEventSettingsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationEventSettingsTable,
+			Columns: []string{account.NotificationEventSettingsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notificationeventsettings.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

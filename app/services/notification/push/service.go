@@ -99,8 +99,7 @@ func (s *Service) deliver(ctx context.Context, event *rpc.EventNotificationCreat
 		return nil
 	}
 
-	eventSettings := notification.SettingsForEvent(settings.Events, item.Event)
-	if !eventSettings.Inbox || !eventSettings.Push {
+	if !notification.PushEnabled(settings.Events, item.Event) {
 		return nil
 	}
 

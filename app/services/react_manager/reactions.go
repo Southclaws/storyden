@@ -61,7 +61,7 @@ func (s *Reactor) Add(ctx context.Context, postID post.ID, emoji string) (*react
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	r, err := s.reactWriter.Add(ctx, accountID, xid.ID(postID), emoji)
+	r, created, err := s.reactWriter.Add(ctx, accountID, xid.ID(postID), emoji)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -70,10 +70,13 @@ func (s *Reactor) Add(ctx context.Context, postID post.ID, emoji string) (*react
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.bus.Publish(ctx, &rpc.EventPostReacted{
-		PostID:     postID,
-		RootPostID: pref.Root,
-	})
+	if created {
+		s.bus.Publish(ctx, &rpc.EventPostReacted{
+			AccountID:  accountID,
+			PostID:     postID,
+			RootPostID: pref.Root,
+		})
+	}
 
 	return r, nil
 }

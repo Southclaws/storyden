@@ -6,13 +6,11 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
-	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
@@ -38,30 +36,15 @@ func New(
 }
 
 type Partial struct {
-	Handle               opt.Optional[string]
-	Name                 opt.Optional[string]
-	Bio                  opt.Optional[string]
-	Signature            opt.Optional[string]
-	Interests            opt.Optional[[]xid.ID]
-	Links                opt.Optional[[]account.ExternalLink]
-	Admin                opt.Optional[bool]
-	VerifiedStatus       opt.Optional[account.VerifiedStatus]
-	Meta                 opt.Optional[map[string]any]
-	NotificationSettings opt.Optional[account.NotificationPreferences]
-}
-
-func ValidateNotificationPreferences(preferences account.NotificationPreferences) error {
-	for event, settings := range preferences.Events {
-		if _, err := notification.NewEvent(event); err != nil {
-			return fault.Wrap(err, ftag.With(ftag.InvalidArgument))
-		}
-
-		if settings.Push && !settings.Inbox {
-			return fault.Wrap(fault.New("push notifications require inbox notifications"), ftag.With(ftag.InvalidArgument))
-		}
-	}
-
-	return nil
+	Handle         opt.Optional[string]
+	Name           opt.Optional[string]
+	Bio            opt.Optional[string]
+	Signature      opt.Optional[string]
+	Interests      opt.Optional[[]xid.ID]
+	Links          opt.Optional[[]account.ExternalLink]
+	Admin          opt.Optional[bool]
+	VerifiedStatus opt.Optional[account.VerifiedStatus]
+	Meta           opt.Optional[map[string]any]
 }
 
 func (u *Updater) Update(ctx context.Context, id account.AccountID, params Partial) (*account.AccountWithEdges, error) {
@@ -98,14 +81,6 @@ func (u *Updater) Update(ctx context.Context, id account.AccountID, params Parti
 	}
 	if v, ok := params.Meta.Get(); ok {
 		opts = append(opts, account_writer.SetMetadata(v))
-	}
-
-	if v, ok := params.NotificationSettings.Get(); ok {
-		if err := ValidateNotificationPreferences(v); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-
-		opts = append(opts, account_writer.SetNotificationSettings(v))
 	}
 
 	if err := u.profileCache.Invalidate(ctx, xid.ID(id)); err != nil {

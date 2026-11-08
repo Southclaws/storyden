@@ -18,8 +18,9 @@ import type { PushNotificationSettings } from "./pushNotificationSettings";
 export interface NotificationSettings {
   /**
    * Overrides keyed by NotificationEvent. Direct interactions and
-   * actionable updates are enabled by default; likes, follows, and
-   * attendance activity are disabled. Unknown event names are rejected.
+   * actionable updates are enabled by default. Global activity, likes,
+   * follows, and attendance activity are disabled by default. Unknown
+   * event names are rejected.
    */
   events: NotificationSettingsEvents;
   push: PushNotificationSettings;

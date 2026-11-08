@@ -11,11 +11,19 @@
 /**
  * The kind of event that triggered the notification.
  * Identical to the `notification.Event` enumerated type.
+ * Events prefixed with global_ cover activity across the instance and
+ * require an explicit opt-in.
+ * Global reply settings include personal replies. Overlapping alerts
+ * share one inbox entry, with Push enabled if either applicable event
+ * enables it.
  */
 export type NotificationEvent =
   (typeof NotificationEvent)[keyof typeof NotificationEvent];
 
 export const NotificationEvent = {
+  global_thread_published: "global_thread_published",
+  global_reply_published: "global_reply_published",
+  global_post_reacted: "global_post_reacted",
   thread_reply: "thread_reply",
   reply_to_reply: "reply_to_reply",
   post_like: "post_like",

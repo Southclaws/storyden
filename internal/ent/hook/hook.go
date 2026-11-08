@@ -285,6 +285,18 @@ func (f NotificationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.NotificationMutation", m)
 }
 
+// The NotificationEventSettingsFunc type is an adapter to allow the use of ordinary
+// function as NotificationEventSettings mutator.
+type NotificationEventSettingsFunc func(context.Context, *ent.NotificationEventSettingsMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f NotificationEventSettingsFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.NotificationEventSettingsMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.NotificationEventSettingsMutation", m)
+}
+
 // The OAuthAuthorisationCodeFunc type is an adapter to allow the use of ordinary
 // function as OAuthAuthorisationCode mutator.
 type OAuthAuthorisationCodeFunc func(context.Context, *ent.OAuthAuthorisationCodeMutation) (ent.Value, error)

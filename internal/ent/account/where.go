@@ -106,6 +106,11 @@ func Admin(v bool) predicate.Account {
 	return predicate.Account(sql.FieldEQ(FieldAdmin, v))
 }
 
+// PushNotificationsEnabled applies equality check predicate on the "push_notifications_enabled" field. It's identical to PushNotificationsEnabledEQ.
+func PushNotificationsEnabled(v bool) predicate.Account {
+	return predicate.Account(sql.FieldEQ(FieldPushNotificationsEnabled, v))
+}
+
 // InvitedByID applies equality check predicate on the "invited_by_id" field. It's identical to InvitedByIDEQ.
 func InvitedByID(v xid.ID) predicate.Account {
 	return predicate.Account(sql.FieldEQ(FieldInvitedByID, v))
@@ -721,14 +726,14 @@ func MetadataNotNil() predicate.Account {
 	return predicate.Account(sql.FieldNotNull(FieldMetadata))
 }
 
-// NotificationSettingsIsNil applies the IsNil predicate on the "notification_settings" field.
-func NotificationSettingsIsNil() predicate.Account {
-	return predicate.Account(sql.FieldIsNull(FieldNotificationSettings))
+// PushNotificationsEnabledEQ applies the EQ predicate on the "push_notifications_enabled" field.
+func PushNotificationsEnabledEQ(v bool) predicate.Account {
+	return predicate.Account(sql.FieldEQ(FieldPushNotificationsEnabled, v))
 }
 
-// NotificationSettingsNotNil applies the NotNil predicate on the "notification_settings" field.
-func NotificationSettingsNotNil() predicate.Account {
-	return predicate.Account(sql.FieldNotNull(FieldNotificationSettings))
+// PushNotificationsEnabledNEQ applies the NEQ predicate on the "push_notifications_enabled" field.
+func PushNotificationsEnabledNEQ(v bool) predicate.Account {
+	return predicate.Account(sql.FieldNEQ(FieldPushNotificationsEnabled, v))
 }
 
 // InvitedByIDEQ applies the EQ predicate on the "invited_by_id" field.
@@ -895,6 +900,29 @@ func HasPushSubscriptions() predicate.Account {
 func HasPushSubscriptionsWith(preds ...predicate.PushSubscription) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
 		step := newPushSubscriptionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasNotificationEventSettings applies the HasEdge predicate on the "notification_event_settings" edge.
+func HasNotificationEventSettings() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, NotificationEventSettingsTable, NotificationEventSettingsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasNotificationEventSettingsWith applies the HasEdge predicate on the "notification_event_settings" edge with a given conditions (other predicates).
+func HasNotificationEventSettingsWith(preds ...predicate.NotificationEventSettings) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newNotificationEventSettingsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

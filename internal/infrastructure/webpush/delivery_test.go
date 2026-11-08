@@ -19,7 +19,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/account/notification/push_subscription"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/services/account/account_update"
 	"github.com/Southclaws/storyden/app/services/notification/notify"
 	"github.com/Southclaws/storyden/internal/ent"
 	entnotification "github.com/Southclaws/storyden/internal/ent/notification"
@@ -167,7 +166,6 @@ func TestNotificationPushPreferences(t *testing.T) {
 		db            *ent.Client
 		notifier      *notify.Notifier
 		accounts      *account_writer.Writer
-		updater       *account_update.Updater
 		subscriptions *push_subscription.Repository
 	)
 
@@ -180,7 +178,7 @@ func TestNotificationPushPreferences(t *testing.T) {
 
 	integration.Test(t, &cfg,
 		fx.Replace(client),
-		fx.Populate(&root, &db, &notifier, &accounts, &updater, &subscriptions),
+		fx.Populate(&root, &db, &notifier, &accounts, &subscriptions),
 	)
 
 	_, owner := e2e.WithAccount(root, accounts, seed.Account_001_Odin)
@@ -211,11 +209,9 @@ func TestNotificationPushPreferences(t *testing.T) {
 	setPreferences := func(enabled bool, events map[string]account.NotificationEventSettings) {
 		t.Helper()
 
-		_, err := updater.Update(root, owner.ID, account_update.Partial{
-			NotificationSettings: opt.New(account.NotificationPreferences{
-				Events: events,
-				Push:   account.PushNotificationPreferences{Enabled: enabled},
-			}),
+		_, err := accounts.SetNotificationSettings(root, owner.ID, account.NotificationPreferences{
+			Events: events,
+			Push:   account.PushNotificationPreferences{Enabled: enabled},
 		})
 		r.NoError(err)
 	}

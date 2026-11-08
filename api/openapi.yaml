@@ -2559,7 +2559,46 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/NotificationUpdateManyOK" }
 
-  /notifications/push/subscriptions:
+  /notifications/{notification_id}:
+    patch:
+      operationId: NotificationUpdate
+      description: Change the read status for a notification.
+      tags: [notifications]
+      parameters: [$ref: "#/components/parameters/NotificationIDParam"]
+      requestBody: { $ref: "#/components/requestBodies/NotificationUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/NotificationUpdateOK" }
+
+  /notifications/settings:
+    get:
+      operationId: NotificationSettingsGet
+      description: Retrieve notification settings for the authenticated account.
+      tags: [notifications]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/NotificationSettingsGetOK" }
+    patch:
+      operationId: NotificationSettingsUpdate
+      description: |
+        Replace notification delivery settings for the authenticated account.
+        Omitted event overrides return to their defaults.
+      tags: [notifications]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/NotificationSettings" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/NotificationSettingsUpdateOK" }
+
+  /notifications/settings/push/subscriptions:
     put:
       operationId: PushSubscriptionUpsert
       description: |
@@ -2580,7 +2619,7 @@ paths:
         "200":
           $ref: "#/components/responses/NotificationPushSubscriptionUpsertOK"
 
-  /notifications/push/subscriptions/{push_subscription_id}:
+  /notifications/settings/push/subscriptions/{push_subscription_id}:
     delete:
       operationId: PushSubscriptionDelete
       description: |
@@ -2597,19 +2636,6 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "404": { $ref: "#/components/responses/NotFound" }
         "204": { description: Push subscription removed. }
-
-  /notifications/{notification_id}:
-    patch:
-      operationId: NotificationUpdate
-      description: Change the read status for a notification.
-      tags: [notifications]
-      parameters: [$ref: "#/components/parameters/NotificationIDParam"]
-      requestBody: { $ref: "#/components/requestBodies/NotificationUpdate" }
-      responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/NotificationUpdateOK" }
 
   #
   #                                           888
@@ -6885,6 +6911,18 @@ components:
           schema:
             $ref: "#/components/schemas/Invitation"
 
+    NotificationSettingsGetOK:
+      description: OK
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/NotificationSettings" }
+
+    NotificationSettingsUpdateOK:
+      description: OK
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/NotificationSettings" }
+
     NotificationListOK:
       description: OK
       content:
@@ -10744,8 +10782,6 @@ components:
           $ref: "#/components/schemas/AccountEmailAddressList"
         auth_services:
           $ref: "#/components/schemas/AuthProviderIdentifierList"
-        notification_settings:
-          $ref: "#/components/schemas/NotificationSettings"
         notifications:
           $ref: "#/components/schemas/NotificationCount"
         admin:
@@ -10770,8 +10806,6 @@ components:
           $ref: "#/components/schemas/ProfileExternalLinkList"
         meta:
           $ref: "#/components/schemas/Metadata"
-        notification_settings:
-          $ref: "#/components/schemas/NotificationSettings"
 
     NotificationSettings:
       type: object
@@ -10785,8 +10819,9 @@ components:
           type: object
           description: |
             Overrides keyed by NotificationEvent. Direct interactions and
-            actionable updates are enabled by default; likes, follows, and
-            attendance activity are disabled. Unknown event names are rejected.
+            actionable updates are enabled by default. Global activity, likes,
+            follows, and attendance activity are disabled by default. Unknown
+            event names are rejected.
           additionalProperties:
             $ref: "#/components/schemas/NotificationEventSettings"
         push:
@@ -11171,8 +11206,16 @@ components:
       description: |
         The kind of event that triggered the notification.
         Identical to the `notification.Event` enumerated type.
+        Events prefixed with global_ cover activity across the instance and
+        require an explicit opt-in.
+        Global reply settings include personal replies. Overlapping alerts
+        share one inbox entry, with Push enabled if either applicable event
+        enables it.
       type: string
       enum:
+        - global_thread_published
+        - global_reply_published
+        - global_post_reacted
         - thread_reply
         - reply_to_reply
         - post_like
