@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
-	"gopkg.in/yaml.v3"
+	"github.com/goccy/go-yaml"
 )
 
 type parameter struct {

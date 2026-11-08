@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"charm.land/glamour/v2"
+	"github.com/goccy/go-yaml"
 	"golang.org/x/term"
-	"gopkg.in/yaml.v3"
 )
 
 type fdWriter interface {

@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/goccy/go-yaml"
 	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
-	"gopkg.in/yaml.v3"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
