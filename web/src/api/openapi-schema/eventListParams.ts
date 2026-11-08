@@ -16,8 +16,6 @@ export type EventListParams = {
    * @minLength 0
    */
   q?: SearchQueryParameter;
-  /**
-   * Pagination query parameters.
-   */
+  /** Pagination query parameters. */
   page?: PaginationQueryParameter;
 };

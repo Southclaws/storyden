@@ -14,7 +14,9 @@ export function buildCategoryTree(categories: Category[]): CategoryTree[] {
 
   categories.forEach((category) => {
     const node = nodes.get(category.id);
-    if (!node) return;
+    if (!node) {
+      return;
+    }
 
     const parentId = category.parent;
 

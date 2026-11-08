@@ -19,7 +19,9 @@ export function useAccessKeySettings() {
       await mutate(
         cacheKey,
         async (currentData: { keys: AccessKeyList } | undefined) => {
-          if (!currentData) return currentData;
+          if (!currentData) {
+            return currentData;
+          }
 
           const updatedKeys = currentData.keys.map((key) =>
             key.id === keyId ? { ...key, enabled: false } : key,

@@ -13,7 +13,9 @@ import { IndexingState, Props, useLinkIndexView } from "./useLinkIndexView";
 export function LinkIndexView(props: Props) {
   const { form, data, handlers } = useLinkIndexView(props);
 
-  if (form.formState.isLoading) return <Unready />;
+  if (form.formState.isLoading) {
+    return <Unready />;
+  }
 
   return (
     <VStack w="full">

@@ -30,7 +30,9 @@ export function PluginStatusToggle({ plugin }: Props) {
   const isTransitioning = transitioningTo !== null;
 
   const handleToggleActive = async () => {
-    if (isTransitioning) return;
+    if (isTransitioning) {
+      return;
+    }
 
     const targetState = isActive
       ? PluginActiveState.inactive

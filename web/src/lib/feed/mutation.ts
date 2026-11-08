@@ -31,13 +31,17 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
 
   const threadQueryMutationKey = getThreadListKey(pageKeyParams);
   function threadListKeyFilterFn(key: Arguments) {
-    if (!Array.isArray(key)) return false;
+    if (!Array.isArray(key)) {
+      return false;
+    }
 
     const path = key[0];
     const params = key[1] as ThreadListParams;
 
     const pathMatch = path === threadQueryMutationKey[0];
-    if (!pathMatch) return false;
+    if (!pathMatch) {
+      return false;
+    }
 
     const pageMatch = (params.page ?? "1") === (pageKeyParams.page ?? "1");
 
@@ -59,8 +63,12 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
     preHydratedLink?: LinkReference,
   ) {
     const mutator: MutatorCallback<ThreadListOKResponse> = (data) => {
-      if (!data) return;
-      if (!session) return;
+      if (!data) {
+        return;
+      }
+      if (!session) {
+        return;
+      }
 
       // Don't mutate if not on first page.
       if (data.current_page === 1) {
@@ -126,7 +134,9 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
 
   async function updateThread(id: Identifier, updated: ThreadMutableProps) {
     const mutator: MutatorCallback<ThreadListOKResponse> = (data) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       return {
         ...data,
@@ -173,7 +183,9 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
 
   async function deleteThread(id: Identifier) {
     const mutator: MutatorCallback<ThreadListOKResponse> = (data) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       return {
         ...data,
@@ -190,7 +202,9 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
 
   async function likePost(id: Identifier) {
     const mutator: MutatorCallback<ThreadListOKResponse> = (data) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       const newThreads = data.threads.map((thread) => {
         if (thread.id === id) {
@@ -220,7 +234,9 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
 
   async function unlikePost(id: Identifier) {
     const mutator: MutatorCallback<ThreadListOKResponse> = (data) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       const newThreads = data.threads.map((thread) => {
         if (thread.id === id) {

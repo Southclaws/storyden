@@ -55,7 +55,9 @@ export function useRegistrationApprovals(enabled: boolean) {
     : (queue.data?.registrations ?? []);
 
   async function decide(code: string, approved: boolean) {
-    if (submitting || bulkSubmitting) return;
+    if (submitting || bulkSubmitting) {
+      return;
+    }
     setSubmitting({ code, approved });
     setOutcome(undefined);
     setBulkUpdated(undefined);
@@ -91,7 +93,9 @@ export function useRegistrationApprovals(enabled: boolean) {
   }
 
   async function decideAll(approved: boolean, createdBefore: string) {
-    if (submitting || bulkSubmitting) return;
+    if (submitting || bulkSubmitting) {
+      return;
+    }
     setBulkSubmitting(true);
     setSubmitError(undefined);
     setOutcome(undefined);

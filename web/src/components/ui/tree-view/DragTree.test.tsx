@@ -130,7 +130,9 @@ function TreeFixture(options: FixtureOptions) {
         options.menuActions ? (
           <Menu.Root
             onSelect={({ value }) => {
-              if (value === "move") startMove?.();
+              if (value === "move") {
+                startMove?.();
+              }
             }}
           >
             <Menu.Trigger asChild>
@@ -202,7 +204,9 @@ describe("DragTree", () => {
         expect(screen.getByRole("status")).toHaveTextContent("Carrying About"),
       );
       await user.keyboard("{Home}");
-      for (let n = 0; n < spaces; n++) await user.keyboard(" ");
+      for (let n = 0; n < spaces; n++) {
+        await user.keyboard(" ");
+      }
       expect(onMove).not.toHaveBeenCalled();
       expect(source).toHaveAttribute("href", "/docs/about");
       await user.keyboard("{Enter}");

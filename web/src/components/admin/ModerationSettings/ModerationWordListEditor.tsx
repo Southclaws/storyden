@@ -27,7 +27,9 @@ export function ModerationWordListEditor({
 
   function handleNewWordSubmit() {
     const trimmed = newWord.trim();
-    if (trimmed === "") return;
+    if (trimmed === "") {
+      return;
+    }
     onChange(uniq([...value, trimmed]));
     setNewWord("");
   }

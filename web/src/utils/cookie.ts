@@ -9,7 +9,9 @@ export type CookieSetOptions = {
 };
 
 export function getCookie(name: string): string | undefined {
-  if (typeof document === "undefined") return undefined;
+  if (typeof document === "undefined") {
+    return undefined;
+  }
   const nameEQ = `${encodeURIComponent(name)}=`;
   const parts = document.cookie.split("; ");
   for (const part of parts) {
@@ -25,7 +27,9 @@ export function setCookie(
   value: string,
   options: CookieSetOptions = {},
 ): void {
-  if (typeof document === "undefined") return;
+  if (typeof document === "undefined") {
+    return;
+  }
 
   const {
     days,
@@ -42,12 +46,20 @@ export function setCookie(
     date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
     cookie += `; Expires=${date.toUTCString()}`;
   }
-  if (path) cookie += `; Path=${path}`;
-  if (domain) cookie += `; Domain=${domain}`;
-  if (sameSite) cookie += `; SameSite=${capitalise(sameSite)}`;
+  if (path) {
+    cookie += `; Path=${path}`;
+  }
+  if (domain) {
+    cookie += `; Domain=${domain}`;
+  }
+  if (sameSite) {
+    cookie += `; SameSite=${capitalise(sameSite)}`;
+  }
   // Ensure Secure when SameSite=None to satisfy browser requirements
   const effectiveSecure = secure || sameSite === "none";
-  if (effectiveSecure) cookie += `; Secure`;
+  if (effectiveSecure) {
+    cookie += `; Secure`;
+  }
 
   document.cookie = cookie;
 }

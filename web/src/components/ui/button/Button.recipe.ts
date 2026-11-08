@@ -229,7 +229,7 @@ export const button = defineRecipe({
           },
         },
         _after: {
-          content: '\"\"',
+          content: '"\"',
           height: "6",
           left: "50%",
           position: "absolute",

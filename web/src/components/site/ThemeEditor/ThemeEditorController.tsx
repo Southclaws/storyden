@@ -42,19 +42,25 @@ export function ThemeEditorController() {
   const panelRect = useMemo(getPanelRect, []);
 
   useEffect(() => {
-    if (!query.data || documents !== null) return;
+    if (!query.data || documents !== null) {
+      return;
+    }
 
     let cancelled = false;
     void loadDocuments(query.data.stylesheets, query.data.scripts)
       .then((loaded) => {
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
         setDocuments(loaded);
         setBaseline(themeDocumentsSignature(loaded));
         setBaselineScripts(themeScriptSignature(loaded));
         setSelectedKey(loaded[0]?.key);
       })
       .catch((cause) => {
-        if (!cancelled) setError(errorMessage(cause));
+        if (!cancelled) {
+          setError(errorMessage(cause));
+        }
       });
     return () => {
       cancelled = true;
@@ -92,7 +98,9 @@ export function ThemeEditorController() {
 
   function deleteDocument(key: string) {
     setDocuments((current) => {
-      if (!current) return current;
+      if (!current) {
+        return current;
+      }
       const index = current.findIndex((item) => item.key === key);
       const next = current.filter((item) => item.key !== key);
       if (selectedKey === key) {
@@ -104,16 +112,22 @@ export function ThemeEditorController() {
 
   function moveDocument(key: string, offset: -1 | 1) {
     setDocuments((current) => {
-      if (!current) return current;
+      if (!current) {
+        return current;
+      }
       const index = current.findIndex((item) => item.key === key);
       const item = current[index];
-      if (!item) return current;
+      if (!item) {
+        return current;
+      }
       const peerIndices = current.flatMap((candidate, candidateIndex) =>
         candidate.kind === item.kind ? [candidateIndex] : [],
       );
       const peerIndex = peerIndices.indexOf(index);
       const target = peerIndices[peerIndex + offset];
-      if (target === undefined) return current;
+      if (target === undefined) {
+        return current;
+      }
       const next = [...current];
       [next[index], next[target]] = [next[target]!, next[index]!];
       return next;
@@ -121,7 +135,9 @@ export function ThemeEditorController() {
   }
 
   async function save() {
-    if (!documents || !dirty) return;
+    if (!documents || !dirty) {
+      return;
+    }
 
     setError(undefined);
     const validationError = validateDocuments(documents);
@@ -281,7 +297,9 @@ function remapPublishedDocuments(
       document.kind === "stylesheet"
         ? result.stylesheets[stylesheet++]
         : result.scripts[script++];
-    if (!asset) throw new Error("Published theme response was incomplete.");
+    if (!asset) {
+      throw new Error("Published theme response was incomplete.");
+    }
     return {
       ...document,
       key: asset.id,
@@ -301,7 +319,9 @@ function nextDocumentLabel(
     documents.filter((item) => item.kind === kind).map(({ label }) => label),
   );
   let index = 1;
-  while (used.has(`${prefix} ${index}`)) index += 1;
+  while (used.has(`${prefix} ${index}`)) {
+    index += 1;
+  }
   return `${prefix} ${index}`;
 }
 

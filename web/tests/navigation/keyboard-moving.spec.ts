@@ -60,8 +60,9 @@ for (const kind of ["Library", "Category"] as const) {
       if (
         new URL(request.url()).pathname === path &&
         request.method() === "PATCH"
-      )
+      ) {
         patches.push(request.postDataJSON());
+      }
     });
 
     await focusTreeNode(carried);

@@ -242,7 +242,9 @@ function KeyboardMovingExample({
         }}
         move={{
           onMove: async ({ node, target, placement }) => {
-            if (fail) throw new Error("Example persistence failure");
+            if (fail) {
+              throw new Error("Example persistence failure");
+            }
             const collection = createTreeCollection({
               rootNode: { children: nodes } as DemoNode,
               nodeToValue: getId,
@@ -268,7 +270,9 @@ function KeyboardMovingExample({
         renderActions={({ node, tabIndex, startMove }) => (
           <Menu
             onSelect={({ value }) => {
-              if (value === "move") startMove?.();
+              if (value === "move") {
+                startMove?.();
+              }
             }}
             trigger={
               <IconButton

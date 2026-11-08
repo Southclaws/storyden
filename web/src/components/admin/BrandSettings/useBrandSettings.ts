@@ -218,10 +218,14 @@ export function useBrandSettings({ settings }: Props) {
 }
 
 function toISODateTime(value?: string): string | undefined {
-  if (!value) return undefined;
+  if (!value) {
+    return undefined;
+  }
 
   const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return undefined;
+  if (Number.isNaN(parsed.getTime())) {
+    return undefined;
+  }
 
   return parsed.toISOString();
 }

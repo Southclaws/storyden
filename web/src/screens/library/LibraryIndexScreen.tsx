@@ -13,7 +13,9 @@ import { Props, useLibraryIndexScreen } from "./useLibraryIndexScreen";
 export function LibraryIndexScreen(props: Props) {
   const { ready, data, error } = useLibraryIndexScreen(props);
 
-  if (!ready) return <Unready error={error} />;
+  if (!ready) {
+    return <Unready error={error} />;
+  }
 
   const { nodes } = data;
 

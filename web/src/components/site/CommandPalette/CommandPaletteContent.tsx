@@ -35,7 +35,9 @@ export function CommandPaletteContent() {
   const isBusy = status === "submitted" || status === "streaming";
 
   async function handleChatSend() {
-    if (!search.trim()) return;
+    if (!search.trim()) {
+      return;
+    }
 
     if (mode !== "chat") {
       setMode("chat");

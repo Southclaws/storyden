@@ -11,12 +11,8 @@ import type { OAuthCodeQueryParameter } from "./oAuthCodeQueryParameter";
 import type { OAuthStateQueryParameter } from "./oAuthStateQueryParameter";
 
 export type OAuthRemoteCallbackParams = {
-  /**
-   * Client-provided opaque state returned to the redirect URI.
-   */
+  /** Client-provided opaque state returned to the redirect URI. */
   state?: OAuthStateQueryParameter;
-  /**
-   * OAuth authorization code returned to the redirect URI.
-   */
+  /** OAuth authorization code returned to the redirect URI. */
   code: OAuthCodeQueryParameter;
 };

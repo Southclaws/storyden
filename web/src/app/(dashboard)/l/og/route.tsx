@@ -40,7 +40,9 @@ export async function GET(req: NextRequest) {
         `/assets/${encodeURIComponent(image.filename)}?variant=l`,
       )
     : undefined;
-  if (imageData instanceof Response) return imageData;
+  if (imageData instanceof Response) {
+    return imageData;
+  }
 
   return new ImageResponse(
     <div

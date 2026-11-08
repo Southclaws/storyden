@@ -83,7 +83,9 @@ describe("ComboboxField", () => {
       act(() => {
         const pending = [...frames.values()];
         frames.clear();
-        for (const callback of pending) callback(performance.now());
+        for (const callback of pending) {
+          callback(performance.now());
+        }
       });
       expect(instruction).toHaveFocus();
       await user.keyboard("block trail action");

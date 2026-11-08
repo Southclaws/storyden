@@ -31,13 +31,17 @@ function UndoToastContent({
   const hasCompletedRef = useRef(false);
 
   const complete = useCallback(() => {
-    if (hasCompletedRef.current) return;
+    if (hasCompletedRef.current) {
+      return;
+    }
     hasCompletedRef.current = true;
     onComplete();
   }, [onComplete]);
 
   useEffect(() => {
-    if (isUndone) return;
+    if (isUndone) {
+      return;
+    }
 
     const startTime = Date.now();
     let animationFrameId: number;

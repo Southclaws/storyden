@@ -579,9 +579,13 @@ function getClientIPWarnings(
 
 function isLikelyInternalIP(ip: string): boolean {
   const trimmed = ip.trim();
-  if (!trimmed) return false;
+  if (!trimmed) {
+    return false;
+  }
 
-  if (trimmed === "::1") return true;
+  if (trimmed === "::1") {
+    return true;
+  }
   if (trimmed.includes(":")) {
     const lower = trimmed.toLowerCase();
     return (
@@ -592,19 +596,35 @@ function isLikelyInternalIP(ip: string): boolean {
   }
 
   const parts = trimmed.split(".");
-  if (parts.length !== 4) return false;
+  if (parts.length !== 4) {
+    return false;
+  }
 
   const octets = parts.map((p) => Number.parseInt(p, 10));
-  if (octets.some((n) => Number.isNaN(n) || n < 0 || n > 255)) return false;
+  if (octets.some((n) => Number.isNaN(n) || n < 0 || n > 255)) {
+    return false;
+  }
 
   const a = octets[0] ?? -1;
   const b = octets[1] ?? -1;
-  if (a === 10) return true;
-  if (a === 127) return true;
-  if (a === 192 && b === 168) return true;
-  if (a === 169 && b === 254) return true;
-  if (a === 172 && b >= 16 && b <= 31) return true;
-  if (a === 100 && b >= 64 && b <= 127) return true;
+  if (a === 10) {
+    return true;
+  }
+  if (a === 127) {
+    return true;
+  }
+  if (a === 192 && b === 168) {
+    return true;
+  }
+  if (a === 169 && b === 254) {
+    return true;
+  }
+  if (a === 172 && b >= 16 && b <= 31) {
+    return true;
+  }
+  if (a === 100 && b >= 64 && b <= 127) {
+    return true;
+  }
 
   return false;
 }

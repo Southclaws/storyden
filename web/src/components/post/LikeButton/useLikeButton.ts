@@ -18,7 +18,9 @@ export function useLikeButton({ initialSession, thread }: Props) {
   const [pending, setPending] = useState(false);
 
   const handleClick = async () => {
-    if (!enabled || pending) return;
+    if (!enabled || pending) {
+      return;
+    }
     setPending(true);
     await handle(
       async () => {

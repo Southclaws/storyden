@@ -39,7 +39,9 @@ async function fetchThemeBundle(): Promise<ThemeBundle> {
     }
 
     const manifest = parseThemeManifest(await response.json(), apiAddress);
-    if (manifest === EMPTY_THEME_MANIFEST) return EMPTY_THEME_BUNDLE;
+    if (manifest === EMPTY_THEME_MANIFEST) {
+      return EMPTY_THEME_BUNDLE;
+    }
 
     const [stylesheets, scripts] = await Promise.all([
       Promise.all(manifest.stylesheets.map(fetchThemeAsset)),

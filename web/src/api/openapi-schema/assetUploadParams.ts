@@ -11,9 +11,7 @@ import type { AssetNameQueryParameter } from "./assetNameQueryParameter";
 import type { ParentAssetIDQueryParameter } from "./parentAssetIDQueryParameter";
 
 export type AssetUploadParams = {
-  /**
-   * The client-provided file name for the asset.
-   */
+  /** The client-provided file name for the asset. */
   filename?: AssetNameQueryParameter;
   /**
    * For uploading new versions of an existing asset, set this parameter to

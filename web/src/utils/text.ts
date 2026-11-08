@@ -18,10 +18,14 @@ export function truncateText(
   value: string | undefined,
   maxLength = 280,
 ): string | undefined {
-  if (!value) return undefined;
+  if (!value) {
+    return undefined;
+  }
 
   const trimmed = value.trim();
-  if (trimmed.length <= maxLength) return trimmed;
+  if (trimmed.length <= maxLength) {
+    return trimmed;
+  }
 
   return `${trimmed.slice(0, maxLength).trimEnd()}…`;
 }

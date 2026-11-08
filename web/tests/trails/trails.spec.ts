@@ -87,14 +87,18 @@ test.describe("Trails", () => {
         return frameID;
       };
       window.cancelAnimationFrame = (id) => {
-        if (!frames.delete(id)) cancelFrame.call(window, id);
+        if (!frames.delete(id)) {
+          cancelFrame.call(window, id);
+        }
       };
       (
         window as Window & { flushSelectionFrames?: () => number }
       ).flushSelectionFrames = () => {
         window.requestAnimationFrame = requestFrame;
         window.cancelAnimationFrame = cancelFrame;
-        for (const callback of frames.values()) callback(performance.now());
+        for (const callback of frames.values()) {
+          callback(performance.now());
+        }
         return frames.size;
       };
     });
@@ -270,7 +274,9 @@ test.describe("Trails", () => {
           const response = await page.request.get(
             "http://localhost:8001/api/notifications",
           );
-          if (!response.ok()) return [];
+          if (!response.ok()) {
+            return [];
+          }
           const body = (await response.json()) as {
             notifications?: { event?: string; target?: string }[];
           };

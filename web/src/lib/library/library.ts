@@ -91,7 +91,9 @@ export function useLibraryMutation(node?: Node) {
     parentSlug,
     disableRedirect,
   }: CreateNodeArgs) => {
-    if (!session) return;
+    if (!session) {
+      return;
+    }
 
     // NOTE: This is a stopgap until the API deals with initial empty states in
     // a nicer way. For now we simply generate a dumb name which in turn results
@@ -125,7 +127,9 @@ export function useLibraryMutation(node?: Node) {
     };
 
     const mutator: MutatorCallback<NodeListOKResponse> = (data) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       return {
         ...data,
@@ -205,7 +209,9 @@ export function useLibraryMutation(node?: Node) {
     parentID?: Identifier,
   ) => {
     const mutator: MutatorCallback<NodeListOKResponse> = (data) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       const newNodes = data.nodes.map((node) => {
         if (node.slug === slug) {
@@ -252,7 +258,9 @@ export function useLibraryMutation(node?: Node) {
     hideChildTree: boolean,
   ) => {
     const nodeMutator: MutatorCallback<NodeGetOKResponse> = (data) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       const updated = {
         ...data,
@@ -263,7 +271,9 @@ export function useLibraryMutation(node?: Node) {
     };
 
     const nodeListMutator: MutatorCallback<NodeListOKResponse> = (data) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       const newNodes = data.nodes.map((node) => {
         if (node.slug === slug) {
@@ -300,7 +310,9 @@ export function useLibraryMutation(node?: Node) {
     newParent?: string,
   ) => {
     const mutator: MutatorCallback<NodeListOKResponse> = (data) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       const newNodes = data.nodes.filter((node) => node.slug !== slug);
 
@@ -343,7 +355,9 @@ export function useLibraryMutation(node?: Node) {
       | undefined, // node being moved is root
   ) => {
     const mutator: MutatorCallback<NodeListOKResponse> = (prevData) => {
-      if (!prevData) return prevData;
+      if (!prevData) {
+        return prevData;
+      }
 
       const newNodes = moveNodeInTree({
         tree: prevData.nodes,

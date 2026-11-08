@@ -23,7 +23,9 @@ export function useAuthProvider() {
   const isPrivate = pathname && isPrivatePage(pathname);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading) {
+      return;
+    }
 
     if (!loggedIn && isPrivate) {
       push(canRegister ? "/register" : "/login");

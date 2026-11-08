@@ -3,16 +3,24 @@
  * Based on fast-deep-equal with structural comparison
  */
 export function deepEqual(a: unknown, b: unknown): boolean {
-  if (a === b) return true;
+  if (a === b) {
+    return true;
+  }
 
   if (a && b && typeof a === "object" && typeof b === "object") {
-    if (Array.isArray(a) !== Array.isArray(b)) return false;
+    if (Array.isArray(a) !== Array.isArray(b)) {
+      return false;
+    }
 
     if (Array.isArray(a)) {
       const length = a.length;
-      if (length !== (b as unknown[]).length) return false;
+      if (length !== (b as unknown[]).length) {
+        return false;
+      }
       for (let i = length; i-- !== 0;) {
-        if (!deepEqual(a[i], (b as unknown[])[i])) return false;
+        if (!deepEqual(a[i], (b as unknown[])[i])) {
+          return false;
+        }
       }
       return true;
     }
@@ -28,17 +36,22 @@ export function deepEqual(a: unknown, b: unknown): boolean {
     const keys = Object.keys(a);
     const length = keys.length;
 
-    if (length !== Object.keys(b).length) return false;
-
-    for (let i = length; i-- !== 0;) {
-      const key = keys[i];
-      if (key === undefined || !Object.prototype.hasOwnProperty.call(b, key))
-        return false;
+    if (length !== Object.keys(b).length) {
+      return false;
     }
 
     for (let i = length; i-- !== 0;) {
       const key = keys[i];
-      if (key === undefined) return false;
+      if (key === undefined || !Object.prototype.hasOwnProperty.call(b, key)) {
+        return false;
+      }
+    }
+
+    for (let i = length; i-- !== 0;) {
+      const key = keys[i];
+      if (key === undefined) {
+        return false;
+      }
       if (
         !deepEqual(
           (a as Record<string, unknown>)[key],

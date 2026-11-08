@@ -9,8 +9,8 @@ import {
 } from "@/api/openapi-client/admin";
 import { getGetInfoKey } from "@/api/openapi-client/misc";
 import {
-  AdminSettingsUpdateBody,
   AdminSettingsProps,
+  AdminSettingsUpdateBody,
   Info,
   MessageOfTheDay,
   MessageOfTheDayMutableProps,
@@ -52,7 +52,9 @@ export function useSettingsMutation() {
         {
           key: infoKey,
           optimistic: (current: Info | undefined) => {
-            if (!current) return current;
+            if (!current) {
+              return current;
+            }
             const {
               services,
               motd,
@@ -75,7 +77,9 @@ export function useSettingsMutation() {
             } satisfies Info;
           },
           commit: (current, result) => {
-            if (!current) return current;
+            if (!current) {
+              return current;
+            }
 
             return mergeAdminSettingsIntoInfo(current, result);
           },

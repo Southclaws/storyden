@@ -20,9 +20,7 @@ export type DatagraphSearchParams = {
    * @minLength 0
    */
   q?: SearchQueryParameter;
-  /**
-   * Datagraph item kind query.
-   */
+  /** Datagraph item kind query. */
   kind?: DatagraphKindQueryParameter;
   /**
    * Datagraph item author query. When set, only items authored by the
@@ -35,12 +33,8 @@ export type DatagraphSearchParams = {
    * specified category slugs will be returned.
    */
   categories?: DatagraphCategoryQueryParameter;
-  /**
-   * Tags to filter by.
-   */
+  /** Tags to filter by. */
   tags?: TagNameListQueryParamParameter;
-  /**
-   * Pagination query parameters.
-   */
+  /** Pagination query parameters. */
   page?: PaginationQueryParameter;
 };

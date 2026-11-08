@@ -66,7 +66,9 @@ export function TrailDetailScreen({ trailId }: { trailId: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
 
-  if (!trailQuery.data) return <Unready error={trailQuery.error} />;
+  if (!trailQuery.data) {
+    return <Unready error={trailQuery.error} />;
+  }
 
   const trail = trailQuery.data;
 

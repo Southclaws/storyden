@@ -65,7 +65,9 @@ export function OperationCostOverridesList({
   );
 
   const handleAdd = () => {
-    if (!selectedOperation || costValue <= 0) return;
+    if (!selectedOperation || costValue <= 0) {
+      return;
+    }
 
     onChange({
       ...overrides,

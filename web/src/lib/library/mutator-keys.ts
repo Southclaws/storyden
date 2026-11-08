@@ -32,7 +32,9 @@ export const nodeListPrivateKeyFn = (key: Arguments) => {
 
 export function buildNodeListKey(params?: NodeListParams) {
   const nodeListKeyFn = (key: Arguments): key is NodeListKey => {
-    if (!key) return false;
+    if (!key) {
+      return false;
+    }
 
     const path = key[0] as string;
 
@@ -56,7 +58,9 @@ export function buildNodeChildrenListKey(
   params?: NodeListParams,
 ) {
   const nodeListKeyFn = (key: Arguments): key is NodeListKey => {
-    if (!key) return false;
+    if (!key) {
+      return false;
+    }
 
     const path = key[0] as string;
 
@@ -83,7 +87,9 @@ export function buildNodeKey(slug: Identifier, params?: NodeGetParams) {
   const nodeKeyPath = nodeKey[0];
 
   const nodeKeyFn = (key: Arguments): key is NodeKey => {
-    if (!key) return false;
+    if (!key) {
+      return false;
+    }
 
     const path = key[0] as string;
 

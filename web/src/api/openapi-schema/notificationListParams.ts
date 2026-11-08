@@ -11,12 +11,8 @@ import type { NotificationStatusQueryParameter } from "./notificationStatusQuery
 import type { PaginationQueryParameter } from "./paginationQueryParameter";
 
 export type NotificationListParams = {
-  /**
-   * Pagination query parameters.
-   */
+  /** Pagination query parameters. */
   page?: PaginationQueryParameter;
-  /**
-   * Notification status.
-   */
+  /** Notification status. */
   status?: NotificationStatusQueryParameter;
 };

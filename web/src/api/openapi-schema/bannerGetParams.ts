@@ -10,8 +10,6 @@
 import type { AssetVariantQueryParameter } from "./assetVariantQueryParameter";
 
 export type BannerGetParams = {
-  /**
-   * Image preset. Missing variants are queued and return the best available image with revalidation. Other file types return their original bytes.
-   */
+  /** Image preset. Missing variants are queued and return the best available image with revalidation. Other file types return their original bytes. */
   variant?: AssetVariantQueryParameter;
 };

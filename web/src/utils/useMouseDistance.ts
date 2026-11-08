@@ -11,7 +11,9 @@ export function useMouseDistance<T extends HTMLElement = HTMLElement>() {
   useEffect(() => {
     const update = (e: MouseEvent) => {
       const el = elementRef.current;
-      if (!el) return;
+      if (!el) {
+        return;
+      }
 
       const rect = el.getBoundingClientRect();
       const x = e.clientX;

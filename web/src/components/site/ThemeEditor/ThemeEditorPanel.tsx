@@ -50,7 +50,9 @@ export function ThemeEditorPanel(props: Props) {
       maxSize={{ width: 960, height: 960 }}
       restoreFocus={false}
       onOpenChange={({ open }) => {
-        if (!open) props.onExit();
+        if (!open) {
+          props.onExit();
+        }
       }}
     >
       <FloatingPanel.Positioner data-sd-theme-editor>

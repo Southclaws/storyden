@@ -125,7 +125,9 @@ export function LibraryPageEditMenu({ node }: Props) {
         },
         { errorToast: true },
       );
-      if (!saved) return;
+      if (!saved) {
+        return;
+      }
     }
     stopEditing();
   }

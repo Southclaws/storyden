@@ -25,7 +25,9 @@ type ObserveSessionOptions = {
 };
 
 function mergeHeaders(headers?: HeadersInit) {
-  if (!headers) return {};
+  if (!headers) {
+    return {};
+  }
   return Object.fromEntries(new Headers(headers).entries());
 }
 

@@ -23,7 +23,9 @@ export function createThemeResourceResponse(
 }
 
 function matchesETag(header: string | null, etag: string) {
-  if (!header) return false;
+  if (!header) {
+    return false;
+  }
 
   return header.split(",").some((candidate) => {
     const trimmed = candidate.trim();

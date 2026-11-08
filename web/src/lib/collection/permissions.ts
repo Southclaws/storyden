@@ -2,7 +2,9 @@ import { Account, Collection, Permission } from "@/api/openapi-schema";
 import { hasPermissionOr } from "@/utils/permissions";
 
 export function canDeleteCollection(col: Collection, account?: Account) {
-  if (!account) return false;
+  if (!account) {
+    return false;
+  }
 
   return hasPermissionOr(
     account,
@@ -12,7 +14,9 @@ export function canDeleteCollection(col: Collection, account?: Account) {
 }
 
 export function canEditCollection(col: Collection, account?: Account) {
-  if (!account) return false;
+  if (!account) {
+    return false;
+  }
 
   return hasPermissionOr(
     account,

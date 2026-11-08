@@ -15,7 +15,9 @@ export function DraftListScreen(props: Props) {
   const { ready, data, error } = useDraftListScreen(props);
   const libraryPath = useLibraryPath();
 
-  if (!ready) return <Unready error={error} />;
+  if (!ready) {
+    return <Unready error={error} />;
+  }
 
   const { nodes, threads } = data;
 

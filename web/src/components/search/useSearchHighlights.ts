@@ -19,7 +19,9 @@ function findSearchRanges(root: HTMLElement, pattern: RegExp): Range[] {
 
     while (walker.nextNode()) {
       const node = walker.currentNode;
-      if (node.parentElement?.closest(excludedText)) continue;
+      if (node.parentElement?.closest(excludedText)) {
+        continue;
+      }
 
       for (const match of (node.textContent ?? "").matchAll(pattern)) {
         const range = root.ownerDocument.createRange();
@@ -67,16 +69,24 @@ export function useSearchHighlights(query: string, enabled = true) {
       let frame: number | undefined;
 
       function removeRanges() {
-        for (const range of ranges) highlight.delete(range);
-        if (highlight.size === 0) CSS.highlights.delete(highlightName);
+        for (const range of ranges) {
+          highlight.delete(range);
+        }
+        if (highlight.size === 0) {
+          CSS.highlights.delete(highlightName);
+        }
       }
 
       function update() {
         frame = undefined;
         removeRanges();
         ranges = findSearchRanges(container, pattern);
-        for (const range of ranges) highlight.add(range);
-        if (highlight.size > 0) CSS.highlights.set(highlightName, highlight);
+        for (const range of ranges) {
+          highlight.add(range);
+        }
+        if (highlight.size > 0) {
+          CSS.highlights.set(highlightName, highlight);
+        }
       }
 
       update();
@@ -91,7 +101,9 @@ export function useSearchHighlights(query: string, enabled = true) {
 
       return () => {
         observer.disconnect();
-        if (frame !== undefined) cancelAnimationFrame(frame);
+        if (frame !== undefined) {
+          cancelAnimationFrame(frame);
+        }
         removeRanges();
       };
     },

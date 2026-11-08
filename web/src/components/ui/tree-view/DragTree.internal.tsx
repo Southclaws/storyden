@@ -152,7 +152,9 @@ export function DragTree<TNode>({
 
   const rootNodes = nodes;
 
-  if (nodes.length === 0) return null;
+  if (nodes.length === 0) {
+    return null;
+  }
 
   return (
     <ArkTreeView.Root
@@ -174,7 +176,9 @@ export function DragTree<TNode>({
         if (element.dataset["treeNodeId"]) {
           keyboardMove.setFocusedId(element.dataset["treeNodeId"]);
           keyboardMove.setKeyboard(element.matches(":focus-visible"));
-        } else keyboardMove.setKeyboard(false);
+        } else {
+          keyboardMove.setKeyboard(false);
+        }
       }}
       onBlurCapture={(event) => {
         if (

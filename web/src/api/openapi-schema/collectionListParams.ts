@@ -12,16 +12,10 @@ import type { CollectionHasItemQueryParamParameter } from "./collectionHasItemQu
 import type { PaginationQueryParameter } from "./paginationQueryParameter";
 
 export type CollectionListParams = {
-  /**
-   * The unique @ handle of an account.
-   */
+  /** The unique @ handle of an account. */
   account_handle?: AccountHandleQueryParamParameter;
-  /**
-   * A unique identifier for this resource.
-   */
+  /** A unique identifier for this resource. */
   has_item?: CollectionHasItemQueryParamParameter;
-  /**
-   * Pagination query parameters.
-   */
+  /** Pagination query parameters. */
   page?: PaginationQueryParameter;
 };

@@ -31,18 +31,26 @@ const stats = new Map(
 );
 
 for (const file of walkSourceFiles(srcDir)) {
-  if (isInside(file, uiDir)) continue;
-  if (!includeTests && isTestOrStory(file)) continue;
+  if (isInside(file, uiDir)) {
+    continue;
+  }
+  if (!includeTests && isTestOrStory(file)) {
+    continue;
+  }
 
   const source = fs.readFileSync(file, "utf8");
   const imports = parseImports(source);
 
   for (const importDeclaration of imports) {
     const component = resolveUiComponent(file, importDeclaration.source);
-    if (!component) continue;
+    if (!component) {
+      continue;
+    }
 
     const componentStats = stats.get(component);
-    if (!componentStats) continue;
+    if (!componentStats) {
+      continue;
+    }
 
     const importedSymbols = parseImportedSymbols(importDeclaration.clause);
     const body = source.replace(importDeclaration.full, "");
@@ -131,7 +139,9 @@ function parseImportedSymbols(clause) {
   if (namedMatch) {
     for (const rawPart of namedMatch[1].split(",")) {
       const part = rawPart.trim().replace(/^type\s+/, "");
-      if (!part) continue;
+      if (!part) {
+        continue;
+      }
 
       const aliasMatch = part.match(
         /^([A-Za-z_$][\w$]*)\s+as\s+([A-Za-z_$][\w$]*)$/,
@@ -177,17 +187,23 @@ function resolveUiComponent(importingFile, source) {
     return source.slice(aliasPrefix.length).split("/")[0];
   }
 
-  if (!source.startsWith(".")) return null;
+  if (!source.startsWith(".")) {
+    return null;
+  }
 
   const resolved = path.resolve(path.dirname(importingFile), source);
-  if (!isInside(resolved, uiDir)) return null;
+  if (!isInside(resolved, uiDir)) {
+    return null;
+  }
 
   const relativeToUi = path.relative(uiDir, resolved);
   return relativeToUi.split(path.sep)[0] || null;
 }
 
 function countReferences(source, localName) {
-  if (!localName) return 0;
+  if (!localName) {
+    return 0;
+  }
 
   const escaped = escapeRegExp(localName);
   const references = source.match(new RegExp(`\\b${escaped}\\b`, "g"));

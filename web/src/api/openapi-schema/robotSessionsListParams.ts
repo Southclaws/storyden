@@ -11,12 +11,8 @@ import type { AccountIDQueryParamParameter } from "./accountIDQueryParamParamete
 import type { PaginationQueryParameter } from "./paginationQueryParameter";
 
 export type RobotSessionsListParams = {
-  /**
-   * Pagination query parameters.
-   */
+  /** Pagination query parameters. */
   page?: PaginationQueryParameter;
-  /**
-   * A unique identifier for this resource.
-   */
+  /** A unique identifier for this resource. */
   account_id?: AccountIDQueryParamParameter;
 };

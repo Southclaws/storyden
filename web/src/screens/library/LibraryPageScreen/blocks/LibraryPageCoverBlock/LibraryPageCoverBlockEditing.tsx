@@ -38,14 +38,15 @@ export function LibraryPageCoverBlockEditing(props: Props) {
     const current = store
       .getState()
       .draft.meta.layout?.blocks.find((b) => b.type === "cover");
-    if (empty && current?.type === "cover" && !current.config?.layout)
+    if (empty && current?.type === "cover" && !current.config?.layout) {
       store.getState().overwriteBlock({
         ...current,
         config: { ...current.config, layout: "image" },
       });
+    }
   }
 
-  if (!primary || !block)
+  if (!primary || !block) {
     return (
       <AssetUploadAction
         operation="add"
@@ -58,6 +59,7 @@ export function LibraryPageCoverBlockEditing(props: Props) {
         </Button>
       </AssetUploadAction>
     );
+  }
   const source = primary.parent ?? primary;
   return (
     <MainImageCropEditor

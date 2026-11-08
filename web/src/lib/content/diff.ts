@@ -134,7 +134,9 @@ function mergeTextNodesInline(
   // Diff format is an array of [operation, text] tuples
   for (let i = 0; i < diffs.length; i++) {
     const diff = diffs[i];
-    if (!diff) continue;
+    if (!diff) {
+      continue;
+    }
 
     const operation = diff[0];
     const text = diff[1];
@@ -243,7 +245,9 @@ function computeLCS(arr1: JSONContent[], arr2: JSONContent[]): number[][] {
       const currentRow = dp[i];
       const nextRow = dp[i + 1];
 
-      if (!currentRow) continue;
+      if (!currentRow) {
+        continue;
+      }
 
       if (node1 && node2 && nodeSignature(node1) === nodeSignature(node2)) {
         currentRow[j] = 1 + (nextRow?.[j + 1] ?? 0);
@@ -262,7 +266,9 @@ function computeLCS(arr1: JSONContent[], arr2: JSONContent[]): number[][] {
  * rather than content similarity.
  */
 function nodeSignature(node: JSONContent): string {
-  if (!node) return "";
+  if (!node) {
+    return "";
+  }
 
   // For text nodes, use the text content (they need exact match)
   if (node.type === "text") {
@@ -363,8 +369,12 @@ export function countDiffMarks(doc: JSONContent): {
   function traverse(node: JSONContent) {
     if (node.marks) {
       for (const mark of node.marks) {
-        if (mark.type === "diffInsertion") insertions++;
-        if (mark.type === "diffDeletion") deletions++;
+        if (mark.type === "diffInsertion") {
+          insertions++;
+        }
+        if (mark.type === "diffDeletion") {
+          deletions++;
+        }
       }
     }
 

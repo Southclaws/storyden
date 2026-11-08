@@ -49,14 +49,15 @@ it.each(["fixed", "resizable"] as const)(
     expect(
       screen.getByRole("menuitem", { name: "Edit caption" }),
     ).toBeVisible();
-    if (cropMode === "resizable")
+    if (cropMode === "resizable") {
       expect(
         screen.getByRole("menuitem", { name: "Crop ratio" }),
       ).toBeVisible();
-    else
+    } else {
       expect(
         screen.queryByRole("menuitem", { name: "Crop ratio" }),
       ).not.toBeInTheDocument();
+    }
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "Apply crop" }),

@@ -35,8 +35,12 @@ function collectToolsetTools(
   const selected = new Set(selectedIDs);
   const tools = new Set<string>();
   for (const toolset of toolsets) {
-    if (!selected.has(toolset.id)) continue;
-    for (const tool of toolset.tools) tools.add(tool);
+    if (!selected.has(toolset.id)) {
+      continue;
+    }
+    for (const tool of toolset.tools) {
+      tools.add(tool);
+    }
   }
   return tools;
 }

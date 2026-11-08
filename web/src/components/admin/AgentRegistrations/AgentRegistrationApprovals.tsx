@@ -125,8 +125,9 @@ export function AgentRegistrationApprovals({
                 }
                 loading={approvals.bulkSubmitting && approveAll.isConfirming}
                 onClick={() => {
-                  if (!approveAll.isConfirming)
+                  if (!approveAll.isConfirming) {
                     setBulkSnapshot(approvals.queue.data!.snapshot_at);
+                  }
                   void approveAll.handleConfirmAction();
                 }}
               >
@@ -145,8 +146,9 @@ export function AgentRegistrationApprovals({
                 }
                 loading={approvals.bulkSubmitting && denyAll.isConfirming}
                 onClick={() => {
-                  if (!denyAll.isConfirming)
+                  if (!denyAll.isConfirming) {
                     setBulkSnapshot(approvals.queue.data!.snapshot_at);
+                  }
                   void denyAll.handleConfirmAction();
                 }}
               >

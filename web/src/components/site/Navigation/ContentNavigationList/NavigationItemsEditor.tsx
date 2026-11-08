@@ -53,7 +53,9 @@ export function NavigationItemsEditor(props: Props) {
   );
   const [isCreatingCustomLink, setCreatingCustomLink] = useState(false);
   const visibleItems = props.navigation.items.filter((item) => {
-    if (item.type === "robots") return props.robotsEnabled;
+    if (item.type === "robots") {
+      return props.robotsEnabled;
+    }
     return true;
   });
   const itemKeys = visibleItems.map(getNavigationItemKey);
@@ -78,7 +80,9 @@ export function NavigationItemsEditor(props: Props) {
 
   function addBuiltIn(type: string) {
     const parsed = BuiltInNavigationItemTypeSchema.safeParse(type);
-    if (!parsed.success) return;
+    if (!parsed.success) {
+      return;
+    }
 
     const updated = addBuiltInNavigationItem(props.navigation, parsed.data);
     if (updated !== props.navigation) {

@@ -130,11 +130,12 @@ const info = {
 function discoveryFetch(entries: unknown, oauth = true) {
   return vi.fn(async (input: Request | URL) => {
     const url = input instanceof Request ? new URL(input.url) : input;
-    if (url.pathname === "/api/info")
+    if (url.pathname === "/api/info") {
       return Response.json({
         ...info,
         capabilities: oauth ? ["oauth"] : [],
       });
+    }
     if (url.pathname === "/.well-known/ai-catalog.json") {
       return Response.json({ specVersion: "1.0", entries });
     }
@@ -303,8 +304,9 @@ test("document switches are independent and disabled guides advertise nothing", 
   };
   const fetchMock = vi.fn(async (input: Request | URL) => {
     const url = input instanceof Request ? new URL(input.url) : input;
-    if (url.pathname === "/api/info")
+    if (url.pathname === "/api/info") {
       return Response.json({ ...info, discovery: policy });
+    }
     return fetcher(input);
   });
   vi.stubGlobal("fetch", fetchMock);

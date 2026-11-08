@@ -10,8 +10,6 @@
 import type { PaginationQueryParameter } from "./paginationQueryParameter";
 
 export type AdminOAuthRegistrationApprovalListParams = {
-  /**
-   * Pagination query parameters.
-   */
+  /** Pagination query parameters. */
   page?: PaginationQueryParameter;
 };

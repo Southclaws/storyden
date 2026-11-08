@@ -10,8 +10,6 @@
 import type { PaginationQueryParameter } from "./paginationQueryParameter";
 
 export type ProfileFollowingGetParams = {
-  /**
-   * Pagination query parameters.
-   */
+  /** Pagination query parameters. */
   page?: PaginationQueryParameter;
 };

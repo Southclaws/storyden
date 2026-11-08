@@ -7,7 +7,9 @@ function encodeBase32(bytes: Uint8Array): string {
 
   for (let i = 0; i < bytes.length; i++) {
     const byte = bytes[i];
-    if (byte === undefined) continue;
+    if (byte === undefined) {
+      continue;
+    }
     value = (value << 8) | byte;
     bits += 8;
 

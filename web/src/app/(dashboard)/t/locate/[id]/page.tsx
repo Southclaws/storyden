@@ -23,7 +23,9 @@ export default async function LocatePage(props: Props) {
 
   // we pass through any parameters from the original call to the final URL
   Object.entries(searchParams).forEach(([key, value]) => {
-    if (value === undefined) return;
+    if (value === undefined) {
+      return;
+    }
     if (typeof value === "string") {
       url.searchParams.set(key, value);
     } else if (Array.isArray(value)) {

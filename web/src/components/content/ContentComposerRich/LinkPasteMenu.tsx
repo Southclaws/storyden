@@ -27,7 +27,9 @@ export function LinkPasteMenu({ editor }: Props) {
 
   const handleLinkChoice = () => {
     const menuState = linkPasteMenuKey.getState(editor.state);
-    if (!menuState?.range || !menuState?.url) return;
+    if (!menuState?.range || !menuState?.url) {
+      return;
+    }
 
     editor
       .chain()
@@ -41,7 +43,9 @@ export function LinkPasteMenu({ editor }: Props) {
 
   const handleCardChoice = () => {
     const menuState = linkPasteMenuKey.getState(editor.state);
-    if (!menuState?.range || !menuState?.url) return;
+    if (!menuState?.range || !menuState?.url) {
+      return;
+    }
 
     editor
       .chain()

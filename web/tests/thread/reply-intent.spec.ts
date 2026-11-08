@@ -111,8 +111,11 @@ for (const { mode, input } of [
       expect(payload.body.trim()).toBe(`<p>${body}</p>`);
       expect(payload.reply_to).toBeUndefined();
       await expect(page.locator("li").filter({ hasText: body })).toBeVisible();
-      if (mode === "markdown") await expect(editor).toHaveValue("");
-      else await expect(editor).toHaveText("");
+      if (mode === "markdown") {
+        await expect(editor).toHaveValue("");
+      } else {
+        await expect(editor).toHaveText("");
+      }
       await expect(post).toBeDisabled();
       await expect(
         form.getByRole("button", { name: "Write a reply" }),
@@ -171,9 +174,11 @@ for (const mode of ["richtext", "markdown"] as const) {
     expect(
       await editorElement?.evaluate((element) => element.isConnected),
     ).toBe(true);
-    if (mode === "markdown")
+    if (mode === "markdown") {
       await expect(editor).toHaveValue("A draft to keep");
-    else await expect(editor).toHaveText("A draft to keep");
+    } else {
+      await expect(editor).toHaveText("A draft to keep");
+    }
     await target.getByRole("button", { name: "Reply to this" }).click();
     const posted = page.waitForResponse(
       (response) =>

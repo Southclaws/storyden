@@ -62,8 +62,11 @@ it.each([false, true])(
     const toggle = screen.getByRole("checkbox", {
       name: "Enable dynamic client registration",
     });
-    if (enabled) expect(toggle).toBeChecked();
-    else expect(toggle).not.toBeChecked();
+    if (enabled) {
+      expect(toggle).toBeChecked();
+    } else {
+      expect(toggle).not.toBeChecked();
+    }
     await userEvent.click(toggle);
     expect(mocks.update).not.toHaveBeenCalled();
     await userEvent.click(screen.getByRole("button", { name: "Save" }));

@@ -32,14 +32,20 @@ export function createEmitter<
     handler: (event: TEvents[K]) => void,
   ) {
     const set = listeners.get(type);
-    if (!set) return;
+    if (!set) {
+      return;
+    }
     set.delete(handler as (event: unknown) => void);
-    if (set.size === 0) listeners.delete(type);
+    if (set.size === 0) {
+      listeners.delete(type);
+    }
   }
 
   function emit<K extends keyof TEvents>(type: K, event: TEvents[K]) {
     const set = listeners.get(type);
-    if (!set) return;
+    if (!set) {
+      return;
+    }
     // Iterate a snapshot, but consult the live set so removals during dispatch
     // can prevent later handlers from firing in this cycle.
     [...set].forEach((fn) => {

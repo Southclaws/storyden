@@ -14,7 +14,9 @@ export function TrailEditScreen({ trailId }: { trailId: string }) {
   const router = useRouter();
   const trailQuery = useTrailGet(trailId);
 
-  if (!trailQuery.data) return <Unready error={trailQuery.error} />;
+  if (!trailQuery.data) {
+    return <Unready error={trailQuery.error} />;
+  }
 
   const trail = trailQuery.data;
 

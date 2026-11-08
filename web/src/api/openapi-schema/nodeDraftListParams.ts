@@ -10,8 +10,6 @@
 import type { PaginationQueryParameter } from "./paginationQueryParameter";
 
 export type NodeDraftListParams = {
-  /**
-   * Pagination query parameters.
-   */
+  /** Pagination query parameters. */
   page?: PaginationQueryParameter;
 };

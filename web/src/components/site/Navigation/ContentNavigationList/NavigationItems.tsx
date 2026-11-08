@@ -29,7 +29,9 @@ const NavigationItemsEditor = lazy(() =>
 );
 
 export function NavigationItems(props: Props) {
-  if (!props.isEditing) return <NavigationItemsView {...props} />;
+  if (!props.isEditing) {
+    return <NavigationItemsView {...props} />;
+  }
   return (
     <Suspense fallback={<NavigationItemsView {...props} />}>
       <NavigationItemsEditor {...props} />

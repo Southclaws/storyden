@@ -84,7 +84,9 @@ export function FeedBlockEditorProvider({
       async () => {
         const current = feedRef.current;
         const updated = mutation(current);
-        if (updated === current) return current;
+        if (updated === current) {
+          return current;
+        }
 
         feedRef.current = updated;
         try {

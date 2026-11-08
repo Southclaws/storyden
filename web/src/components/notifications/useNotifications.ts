@@ -13,8 +13,8 @@ import {
   NotificationListResult,
   NotificationStatus,
 } from "@/api/openapi-schema";
-import { formatNotification } from "@/lib/notification";
 import { useSession } from "@/auth";
+import { formatNotification } from "@/lib/notification";
 
 import { NotificationItem } from "./item";
 

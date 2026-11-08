@@ -15,7 +15,9 @@ const getSessionCached = cache(async () => {
 export async function getServerSession(options?: Options) {
   const session = (await cookies()).get("storyden-session");
 
-  if (!session) return;
+  if (!session) {
+    return;
+  }
 
   try {
     const { data } = options

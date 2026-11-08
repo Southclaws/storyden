@@ -7,7 +7,9 @@ import { Props, useComposeScreen } from "./useComposeScreen";
 export function ComposeScreen(props: Props) {
   const { loadingDraft, draft } = useComposeScreen(props);
 
-  if (loadingDraft) return <UnreadyBanner />;
+  if (loadingDraft) {
+    return <UnreadyBanner />;
+  }
 
   return (
     <VStack alignItems="start" gap="2" w="full" h="full">

@@ -141,23 +141,25 @@ test("Main image presets preserve assets, match edit/view, and bound stress dime
           mode === "Banner" ? viewport.width / 4 : 640,
         );
         expect(pixels.width).toBeLessThanOrEqual(bounds.width + 1);
-        if (mode === "Banner")
+        if (mode === "Banner") {
           expect(bounds.width / bounds.height).toBeCloseTo(4, 1);
+        }
         if (mode === "Artwork") {
           expect(bounds.width / bounds.height).toBeCloseTo(1, 1);
           expect(bounds.width).toBeLessThanOrEqual(320);
         }
         if (mode === "Image") {
-          if (width >= height)
+          if (width >= height) {
             expect(pixels.height).toBeCloseTo(
               (pixels.width * height) / width,
               1,
             );
-          else
+          } else {
             expect(pixels.width).toBeCloseTo(
               (pixels.height * width) / height,
               1,
             );
+          }
         }
       }
       await page.reload();
@@ -231,10 +233,11 @@ test("Main image edits immediately, autosaves adjustments, and retains original 
     "Zoom in",
     "Zoom out",
     "Cancel",
-  ])
+  ]) {
     await expect(page.getByRole("button", { name, exact: true })).toHaveCount(
       0,
     );
+  }
   await expect(page.getByRole("combobox", { name: "Crop shape" })).toHaveCount(
     0,
   );

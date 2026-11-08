@@ -12,7 +12,9 @@ import {
 } from "@/api/openapi-schema";
 
 function threadsKeyFilter(key: Arguments) {
-  if (!Array.isArray(key)) return false;
+  if (!Array.isArray(key)) {
+    return false;
+  }
 
   if (key.length === 0) {
     return false;
@@ -50,7 +52,9 @@ export function useCategoryMutations() {
     updated: CategoryMutableProps,
   ) => {
     const mutator: MutatorCallback<CategoryListOKResponse> = (data) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       const newData = {
         categories: data.categories.map((category) => {

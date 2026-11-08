@@ -44,7 +44,9 @@ export function FullPageChatInput() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!canSend) return;
+    if (!canSend) {
+      return;
+    }
 
     const text = input.trim();
     const submittedAssets = assets;

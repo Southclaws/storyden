@@ -36,7 +36,9 @@ export function PluginItem({ plugin }: Props) {
           {
             key: getPluginListKey(),
             optimistic: (current: PluginListOKResponse | undefined) => {
-              if (!current) return current;
+              if (!current) {
+                return current;
+              }
               return {
                 ...current,
                 plugins: current.plugins.filter((p) => p.id !== plugin.id),

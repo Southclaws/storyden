@@ -59,7 +59,9 @@ export async function streamMetadataImage(path: ImagePath): Promise<Response> {
     // Fetch decodes compressed bodies, so their original length may be wrong.
     if (!response.headers.has("Content-Encoding")) {
       const length = response.headers.get("Content-Length");
-      if (length) headers.set("Content-Length", length);
+      if (length) {
+        headers.set("Content-Length", length);
+      }
     }
 
     return new Response(response.body, { headers });
@@ -73,7 +75,9 @@ export async function loadMetadataImage(
   path: `/assets/${string}`,
 ): Promise<ArrayBuffer | Response> {
   const response = await streamMetadataImage(path);
-  if (!response.ok) return response;
+  if (!response.ok) {
+    return response;
+  }
 
   const reader = response.body!.getReader();
   const chunks: Uint8Array[] = [];
@@ -82,7 +86,9 @@ export async function loadMetadataImage(
   try {
     while (true) {
       const { value, done } = await reader.read();
-      if (done) break;
+      if (done) {
+        break;
+      }
       length += value.byteLength;
       if (length > MAX_RENDER_IMAGE_BYTES) {
         await reader.cancel();

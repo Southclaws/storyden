@@ -22,7 +22,9 @@ export function useProfileMutations(handle: string) {
 
   const update = async (updated: AccountMutableProps) => {
     const mutator: MutatorCallback<ProfileGetOKResponse> = (data) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       const newData = {
         ...data,

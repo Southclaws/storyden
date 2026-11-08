@@ -33,7 +33,9 @@ export function JoinedDateFilter() {
   };
 
   const parseInitialValue = () => {
-    if (!joined) return undefined;
+    if (!joined) {
+      return undefined;
+    }
 
     const parts = joined.split("/").filter((p) => p);
     try {

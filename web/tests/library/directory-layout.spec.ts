@@ -103,7 +103,9 @@ test("Directory Gallery keeps mixed image dimensions bounded, preserves source o
   await page.goto(`/l/${parent.slug}`);
   const updates: string[] = [];
   page.on("request", (request) => {
-    if (request.method() === "PATCH") updates.push(request.url());
+    if (request.method() === "PATCH") {
+      updates.push(request.url());
+    }
   });
   const grid = page.getByRole("list", { name: "Library pages" });
   await expect(grid).toHaveAttribute("data-layout", "gallery");

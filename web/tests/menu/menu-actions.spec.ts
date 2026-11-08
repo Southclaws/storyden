@@ -138,7 +138,9 @@ test("creates invitations only on opening, supports retry and creates a fresh li
 }) => {
   let requests = 0;
   await page.route("**/api/invitations", async (route) => {
-    if (route.request().method() !== "POST") return route.continue();
+    if (route.request().method() !== "POST") {
+      return route.continue();
+    }
     requests++;
     if (requests === 1) {
       return route.fulfill({

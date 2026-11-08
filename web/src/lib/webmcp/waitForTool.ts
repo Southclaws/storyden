@@ -26,7 +26,9 @@ export async function waitForWebMCPTool(
     const handleToolChange = () => {
       void isRegistered()
         .then((ready) => {
-          if (!ready) return;
+          if (!ready) {
+            return;
+          }
           cleanup();
           resolve();
         })

@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 
 function decodeHash() {
   const raw = window.location.hash;
-  if (!raw || raw.length < 2) return "";
+  if (!raw || raw.length < 2) {
+    return "";
+  }
   try {
     return decodeURIComponent(raw.slice(1));
   } catch {
@@ -21,10 +23,14 @@ export function useFragmentScroll(elementId: string) {
 
     const run = () => {
       const hash = decodeHash();
-      if (hash !== elementId) return;
+      if (hash !== elementId) {
+        return;
+      }
 
       const el = document.getElementById(elementId);
-      if (!el) return;
+      if (!el) {
+        return;
+      }
 
       // Get scroll offset - only apply on desktop (md breakpoint and up)
       // cannot use tokens for this, so hardcoding the value from design system.

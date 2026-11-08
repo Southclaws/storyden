@@ -59,7 +59,9 @@ export function TrailTriggerFields({
   });
 
   function changeTriggerType({ value }: TabsValueChangeDetails) {
-    if (value !== "schedule" && value !== "event") return;
+    if (value !== "schedule" && value !== "event") {
+      return;
+    }
 
     form.setValue("triggerType", value, {
       shouldDirty: true,

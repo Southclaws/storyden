@@ -28,7 +28,9 @@ export function DragTreeMovePreview({
         ) ?? [],
       ).find((element) => element.dataset["treeNodeId"] === focusedId);
       const row = anchor?.parentElement;
-      if (!row) return;
+      if (!row) {
+        return;
+      }
       const rect = row.getBoundingClientRect();
       const width = Math.min(280, window.innerWidth - 24);
       const fitsRight = rect.right + width + 24 <= window.innerWidth;

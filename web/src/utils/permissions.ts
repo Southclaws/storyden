@@ -6,7 +6,9 @@ export function hasPermission(
   account?: Account | AccountCommonProps,
   ...permissions: Permission[]
 ) {
-  if (!account) return false;
+  if (!account) {
+    return false;
+  }
 
   // extract each permission from each role
   const accountPermissions = new Set(
@@ -25,7 +27,9 @@ export function hasPermissionOr(
   fn?: () => boolean,
   ...permissions: Permission[]
 ) {
-  if (!account) return false;
+  if (!account) {
+    return false;
+  }
 
   const hasPerm = hasPermission(account, ...permissions);
   if (hasPerm) {

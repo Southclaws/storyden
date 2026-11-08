@@ -19,7 +19,9 @@ export function ThemeSettingsScreen() {
   });
   const editingEnabled = useThemeEditingEnabled();
 
-  if (!account.data && !account.error) return <UnreadyBanner />;
+  if (!account.data && !account.error) {
+    return <UnreadyBanner />;
+  }
   if (!hasPermission(account.data, Permission.ADMINISTRATOR)) {
     return (
       <UnreadyBanner error="Administrator permission is required to manage custom themes." />

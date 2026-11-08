@@ -557,13 +557,27 @@ export function useContentComposer(props: ContentComposerProps) {
   }
 
   function getBlockType(): Block | null {
-    if (editor?.isActive("paragraph")) return "p";
-    if (editor?.isActive("heading", { level: 1 })) return "h1";
-    if (editor?.isActive("heading", { level: 2 })) return "h2";
-    if (editor?.isActive("heading", { level: 3 })) return "h3";
-    if (editor?.isActive("heading", { level: 4 })) return "h4";
-    if (editor?.isActive("heading", { level: 5 })) return "h5";
-    if (editor?.isActive("heading", { level: 6 })) return "h6";
+    if (editor?.isActive("paragraph")) {
+      return "p";
+    }
+    if (editor?.isActive("heading", { level: 1 })) {
+      return "h1";
+    }
+    if (editor?.isActive("heading", { level: 2 })) {
+      return "h2";
+    }
+    if (editor?.isActive("heading", { level: 3 })) {
+      return "h3";
+    }
+    if (editor?.isActive("heading", { level: 4 })) {
+      return "h4";
+    }
+    if (editor?.isActive("heading", { level: 5 })) {
+      return "h5";
+    }
+    if (editor?.isActive("heading", { level: 6 })) {
+      return "h6";
+    }
 
     return "p";
   }

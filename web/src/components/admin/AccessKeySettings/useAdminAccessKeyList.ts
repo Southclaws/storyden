@@ -20,7 +20,9 @@ export function useAdminAccessKeyList() {
       await mutate(
         cacheKey,
         async (currentData: { keys: OwnedAccessKeyList } | undefined) => {
-          if (!currentData) return currentData;
+          if (!currentData) {
+            return currentData;
+          }
 
           // Update the specific key to be disabled
           const updatedKeys = currentData.keys.map((key) =>

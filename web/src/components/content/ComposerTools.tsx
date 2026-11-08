@@ -61,7 +61,9 @@ export function ComposerTools({
 
   const handlePointerEnter = (e: React.PointerEvent) => {
     // Only respond to mouse hover, not touch events
-    if (e.pointerType === "touch") return;
+    if (e.pointerType === "touch") {
+      return;
+    }
 
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
@@ -72,7 +74,9 @@ export function ComposerTools({
 
   const handlePointerLeave = (e: React.PointerEvent) => {
     // Only respond to mouse leave, not touch events
-    if (e.pointerType === "touch") return;
+    if (e.pointerType === "touch") {
+      return;
+    }
 
     closeTimeoutRef.current = setTimeout(() => {
       setIsExpanded(false);
@@ -90,11 +94,17 @@ export function ComposerTools({
   const floatingRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    if (!enabled) return;
-    if (!anchorRef.current || !floatingRef.current) return;
+    if (!enabled) {
+      return;
+    }
+    if (!anchorRef.current || !floatingRef.current) {
+      return;
+    }
 
     const updatePosition = () => {
-      if (!anchorRef.current || !floatingRef.current) return;
+      if (!anchorRef.current || !floatingRef.current) {
+        return;
+      }
 
       const anchorRect = anchorRef.current.getBoundingClientRect();
       const floatingRect = floatingRef.current.getBoundingClientRect();

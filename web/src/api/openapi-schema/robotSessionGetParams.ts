@@ -11,12 +11,8 @@ import type { RobotSessionMessageBeforeQueryParameter } from "./robotSessionMess
 import type { RobotSessionMessageLimitQueryParameter } from "./robotSessionMessageLimitQueryParameter";
 
 export type RobotSessionGetParams = {
-  /**
-   * A unique identifier for this resource.
-   */
+  /** A unique identifier for this resource. */
   before?: RobotSessionMessageBeforeQueryParameter;
-  /**
-   * Maximum number of messages to return.
-   */
+  /** Maximum number of messages to return. */
   limit?: RobotSessionMessageLimitQueryParameter;
 };

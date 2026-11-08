@@ -11,7 +11,9 @@ import { Props, useThreadIndexView } from "./useThreadIndexView";
 export function ThreadIndexView(props: Props) {
   const { form, data, handlers } = useThreadIndexView(props);
 
-  if (form.formState.isLoading) return <Unready />;
+  if (form.formState.isLoading) {
+    return <Unready />;
+  }
 
   return (
     <LStack>

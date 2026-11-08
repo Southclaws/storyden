@@ -47,7 +47,9 @@ describe("createDurableChatTransport", () => {
     });
 
     const chunks: UIMessageChunk[] = [];
-    for await (const chunk of response) chunks.push(chunk);
+    for await (const chunk of response) {
+      chunks.push(chunk);
+    }
     expect(chunks).toEqual([]);
     expect(fetchClient).toHaveBeenCalledTimes(1);
     const requestBody = JSON.parse(
@@ -99,7 +101,9 @@ describe("observeRobotSession", () => {
     });
 
     const received: RobotSessionStreamEvent[] = [];
-    for await (const event of events) received.push(event);
+    for await (const event of events) {
+      received.push(event);
+    }
     expect(received).toEqual([
       {
         sequence: 43,

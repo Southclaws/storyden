@@ -86,7 +86,9 @@ export function CreatePageFromURLAction({
   }
 
   async function handleImport() {
-    if (!url.valid || !url.url) return;
+    if (!url.valid || !url.url) {
+      return;
+    }
 
     setIsImporting(true);
     setImportState(null);

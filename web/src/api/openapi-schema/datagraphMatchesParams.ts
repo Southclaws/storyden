@@ -16,8 +16,6 @@ export type DatagraphMatchesParams = {
    * @minLength 0
    */
   q: RequiredSearchQueryParameter;
-  /**
-   * Datagraph item kind query.
-   */
+  /** Datagraph item kind query. */
   kind?: DatagraphKindQueryParameter;
 };

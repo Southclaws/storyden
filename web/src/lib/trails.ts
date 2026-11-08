@@ -41,7 +41,9 @@ export function describeTrailSchedule(schedule: RecurrenceSchedule): string {
 }
 
 export function formatOccurrence(value?: string): string {
-  if (!value) return "—";
+  if (!value) {
+    return "—";
+  }
   return occurrenceFormatter.format(new Date(value));
 }
 
@@ -58,8 +60,12 @@ function describeMonthDays(
   const days = values ?? [Number(start.slice(8, 10))];
   return days
     .map((value) => {
-      if (value === -1) return "the last day";
-      if (value < 0) return `the ${ordinal(Math.abs(value))} day from the end`;
+      if (value === -1) {
+        return "the last day";
+      }
+      if (value < 0) {
+        return `the ${ordinal(Math.abs(value))} day from the end`;
+      }
       return `day ${value}`;
     })
     .join(", ");
@@ -67,7 +73,9 @@ function describeMonthDays(
 
 function ordinal(value: number): string {
   const remainder = value % 100;
-  if (remainder >= 11 && remainder <= 13) return `${value}th`;
+  if (remainder >= 11 && remainder <= 13) {
+    return `${value}th`;
+  }
   switch (value % 10) {
     case 1:
       return `${value}st`;

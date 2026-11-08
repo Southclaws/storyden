@@ -12,16 +12,10 @@ import type { ReportKindQueryParameter } from "./reportKindQueryParameter";
 import type { ReportStatusQueryParameter } from "./reportStatusQueryParameter";
 
 export type ReportListParams = {
-  /**
-   * Pagination query parameters.
-   */
+  /** Pagination query parameters. */
   page?: PaginationQueryParameter;
-  /**
-   * Report status filter.
-   */
+  /** Report status filter. */
   status?: ReportStatusQueryParameter;
-  /**
-   * Report target kind filter.
-   */
+  /** Report target kind filter. */
   kind?: ReportKindQueryParameter;
 };

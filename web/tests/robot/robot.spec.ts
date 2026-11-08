@@ -36,7 +36,9 @@ async function waitForPersistedRobotText(
         const response = await page.request.get(
           `http://localhost:8001/api/robots/sessions/${sessionID}`,
         );
-        if (!response.ok()) return false;
+        if (!response.ok()) {
+          return false;
+        }
 
         const payload = (await response.json()) as {
           message_list?: {
@@ -273,7 +275,9 @@ test.describe("Robot Chat — mock LLM stream", () => {
           { timeout: 15000 },
         )
         .toBeTruthy();
-      if (!sessionID) throw new Error("new robot session was not created");
+      if (!sessionID) {
+        throw new Error("new robot session was not created");
+      }
 
       await page.goto("/");
       await waitForPersistedRobotText(

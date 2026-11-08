@@ -21,7 +21,9 @@ import { capitalise, pluralise } from "@/utils/text";
 export function TrailListScreen() {
   const { data, error } = useTrailList();
   const targetRunID = useSearchParams().get("run");
-  if (!data) return <Unready error={error} />;
+  if (!data) {
+    return <Unready error={error} />;
+  }
   if (data.trails.length === 0) {
     return (
       <EmptyState icon={<TrailIcon />} hideContributionLabel>

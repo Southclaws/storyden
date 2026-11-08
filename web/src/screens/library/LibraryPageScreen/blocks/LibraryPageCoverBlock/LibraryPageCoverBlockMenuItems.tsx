@@ -19,7 +19,7 @@ export function LibraryPageCoverBlockMenuItems() {
     <>
       <Menu.Root
         onSelect={({ value }) => {
-          if (block)
+          if (block) {
             overwriteBlock({
               ...block,
               config: {
@@ -29,6 +29,7 @@ export function LibraryPageCoverBlockMenuItems() {
                 >["layout"],
               },
             });
+          }
         }}
       >
         <Menu.TriggerItem>

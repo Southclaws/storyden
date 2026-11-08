@@ -10,8 +10,6 @@
 import type { PaginationQueryParameter } from "./paginationQueryParameter";
 
 export type ThreadGetParams = {
-  /**
-   * Pagination query parameters.
-   */
+  /** Pagination query parameters. */
   page?: PaginationQueryParameter;
 };

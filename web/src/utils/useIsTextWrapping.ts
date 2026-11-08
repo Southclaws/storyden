@@ -6,12 +6,16 @@ export function useIsTextWrapping<T extends HTMLElement>() {
 
   useLayoutEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    if (!el) {
+      return;
+    }
 
     let frame: number | null = null;
 
     const check = () => {
-      if (frame !== null) cancelAnimationFrame(frame);
+      if (frame !== null) {
+        cancelAnimationFrame(frame);
+      }
 
       frame = requestAnimationFrame(() => {
         const range = document.createRange();
@@ -33,7 +37,9 @@ export function useIsTextWrapping<T extends HTMLElement>() {
     }
 
     return () => {
-      if (frame !== null) cancelAnimationFrame(frame);
+      if (frame !== null) {
+        cancelAnimationFrame(frame);
+      }
       ro.disconnect();
     };
   }, []);

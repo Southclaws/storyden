@@ -60,7 +60,9 @@ export function ColorPickerField<
             field.onChange(valueAsString)
           }
           onOpenChange={({ open }) => {
-            if (!open) field.onBlur();
+            if (!open) {
+              field.onBlur();
+            }
           }}
           disabled={field.disabled}
           invalid={fieldState.invalid}

@@ -21,7 +21,9 @@ export function useEditAvatar(props: Props) {
 
   useEffect(() => {
     (async () => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       const file = new File([data], "avatar.png");
       setInitialValue(file);

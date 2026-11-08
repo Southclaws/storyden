@@ -19,7 +19,9 @@ export function useOAuthClientSettings() {
       await mutate(
         cacheKey,
         async (currentData: { clients: OAuthClientList } | undefined) => {
-          if (!currentData) return currentData;
+          if (!currentData) {
+            return currentData;
+          }
 
           return {
             ...currentData,

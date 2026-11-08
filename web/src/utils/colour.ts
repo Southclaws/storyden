@@ -54,7 +54,9 @@ export function getColourVariants(colour: string): Record<string, string> {
     const step = index + 1;
     const darkValue = dark[index];
 
-    if (!darkValue) return;
+    if (!darkValue) {
+      return;
+    }
 
     variants[`--accent-colour-light-${step}`] = value;
     variants[`--accent-colour-dark-${step}`] = darkValue;
@@ -117,7 +119,9 @@ function createScale(
   const background = scale[1];
   const direction = appearance === "light" ? -1 : 1;
 
-  if (!background) return scale;
+  if (!background) {
+    return scale;
+  }
 
   // Radix reserves steps 11 and 12 for readable text. Fixed HSL lightness
   // cannot satisfy every hue, so move only those two stops until they meet
@@ -131,7 +135,9 @@ function createScale(
     const stop = stops[index];
     const value = scale[index];
 
-    if (!stop || !value) return;
+    if (!stop || !value) {
+      return;
+    }
 
     let lightness = stop[1];
 

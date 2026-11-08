@@ -21,9 +21,7 @@ export type ThreadListParams = {
    * @minLength 0
    */
   q?: SearchQueryParameter;
-  /**
-   * Pagination query parameters.
-   */
+  /** Pagination query parameters. */
   page?: PaginationQueryParameter;
   /**
    * When set to true, pinned threads will be ignored in the results and the
@@ -32,9 +30,7 @@ export type ThreadListParams = {
    * page.
    */
   ignore_pinned?: ThreadsIgnorePinnedQueryParameter;
-  /**
-   * Show only results creeated by this user.
-   */
+  /** Show only results creeated by this user. */
   author?: AccountHandle;
   /**
    * Filter content with specific visibility values. Note that by default,
@@ -44,12 +40,8 @@ export type ThreadListParams = {
    * the necessary permission to view in-review items.
    */
   visibility?: VisibilityParamParameter;
-  /**
-   * Show only results with these tags
-   */
+  /** Show only results with these tags */
   tags?: TagListIDs;
-  /**
-   * A list of category names.
-   */
+  /** A list of category names. */
   categories?: CategorySlugListQueryParameter;
 };

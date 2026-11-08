@@ -42,8 +42,9 @@ export function BannerEditor() {
     await handle(
       async () => {
         const crop = cropperRef.current?.getCrop();
-        if (!crop)
+        if (!crop) {
           throw new Error("Wait for the banner image to finish loading.");
+        }
         let original = uploadedSourceRef.current;
         if (!original) {
           original = fileRef.current
@@ -84,7 +85,9 @@ export function BannerEditor() {
     );
   }
 
-  if (!settings) return <UnreadyBanner error={error} />;
+  if (!settings) {
+    return <UnreadyBanner error={error} />;
+  }
 
   return (
     <LStack gap="2">

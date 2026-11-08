@@ -30,13 +30,17 @@ export function AgentRegistrationsScreen() {
   const publicSettings = useSettings();
   const roles = useRoleList({ swr: { enabled: authorised } });
 
-  if (!account.data) return <Unready error={account.error} />;
-  if (!authorised)
+  if (!account.data) {
+    return <Unready error={account.error} />;
+  }
+  if (!authorised) {
     return (
       <Unready error="Only administrators can manage agent registrations." />
     );
-  if (!settings.data || !publicSettings.ready)
+  }
+  if (!settings.data || !publicSettings.ready) {
     return <Unready error={settings.error ?? publicSettings.error} />;
+  }
 
   const configuration = settings.data.services?.oauth;
   const oauthEnabled = publicSettings.settings.capabilities.includes("oauth");

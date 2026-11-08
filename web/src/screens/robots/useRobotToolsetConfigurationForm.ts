@@ -45,7 +45,9 @@ export function useRobotToolsetConfigurationForm({
   });
 
   const handleSave = form.handleSubmit(async (data) => {
-    if (!isEditable) return;
+    if (!isEditable) {
+      return;
+    }
 
     await handle(
       async () => {

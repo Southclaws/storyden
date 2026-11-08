@@ -19,7 +19,9 @@ export function CollectionMenu(props: Props) {
   const [selected, setSelected] = useState(0);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.shiftKey) setMultiSelect(true);
+    if (e.shiftKey) {
+      setMultiSelect(true);
+    }
   };
 
   const handleKeyUp = (e: KeyboardEvent<HTMLDivElement>) => {

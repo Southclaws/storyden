@@ -12,7 +12,9 @@ export const nodeListMutator = (
   updated: NodeWithChildren,
 ): MutatorCallback<NodeListOKResponse> => {
   return (data) => {
-    if (!data) return;
+    if (!data) {
+      return;
+    }
 
     const nodes = data.nodes.map((node) => {
       if (node.slug === updated.slug) {
@@ -42,7 +44,9 @@ export const nodeMutator = (
   updated: NodeWithChildren,
 ): MutatorCallback<NodeGetOKResponse> => {
   return (previous) => {
-    if (!previous) return;
+    if (!previous) {
+      return;
+    }
 
     const node = mergeWith(previous, updated, (target, source) => {
       // If the target is an array, we want to replace it with the source value.

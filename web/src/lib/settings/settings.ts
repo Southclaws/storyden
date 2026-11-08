@@ -125,7 +125,9 @@ export function parseAdminSettings(data: AdminSettingsProps): AdminSettings {
 }
 
 function parseMotd(motd: MessageOfTheDay | undefined): ParsedMotd | undefined {
-  if (!motd) return undefined;
+  if (!motd) {
+    return undefined;
+  }
 
   const parsed = MotdMetadataSchema.safeParse(motd.metadata);
 

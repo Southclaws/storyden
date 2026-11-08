@@ -74,8 +74,12 @@ type PickerCollectionItem = MultiSelectPickerItem & {
 const CREATE_VALUE_PREFIX = "multi-select-picker:create:";
 
 function selectedBadgeSize(size: ControlSize | undefined) {
-  if (size === "lg") return "lg";
-  if (size === "md") return "md";
+  if (size === "lg") {
+    return "lg";
+  }
+  if (size === "md") {
+    return "md";
+  }
   return "sm";
 }
 
@@ -91,7 +95,9 @@ function uniqueItems(items: PickerCollectionItem[]) {
   const seen = new Set<string>();
 
   return items.filter((item) => {
-    if (seen.has(item.value)) return false;
+    if (seen.has(item.value)) {
+      return false;
+    }
     seen.add(item.value);
     return true;
   });
@@ -195,7 +201,9 @@ export function MultiSelectPicker({
   }
 
   async function createNewValue() {
-    if (!showCreateNew) return;
+    if (!showCreateNew) {
+      return;
+    }
 
     await onChange([
       ...value,
@@ -216,7 +224,9 @@ export function MultiSelectPicker({
 
     const nextItems = nextValues.flatMap((itemValue) => {
       const item = itemsByValue.get(itemValue);
-      if (!item || item.kind === "create") return [];
+      if (!item || item.kind === "create") {
+        return [];
+      }
 
       return [selectedValues.has(itemValue) ? item : addColour(item)];
     });
@@ -240,7 +250,9 @@ export function MultiSelectPicker({
       value={value.map((item) => item.value)}
       onOpenChange={(details) => {
         setIsOpen(details.open);
-        if (!details.open && queryInput) resetQuery();
+        if (!details.open && queryInput) {
+          resetQuery();
+        }
         onOpenChange?.(details);
       }}
       onValueChange={({ value: nextValues }) => handleValueChange(nextValues)}

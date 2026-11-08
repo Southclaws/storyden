@@ -10,8 +10,6 @@
 import type { AssetNameQueryParameter } from "./assetNameQueryParameter";
 
 export type AdminThemeAssetUploadParams = {
-  /**
-   * The client-provided file name for the asset.
-   */
+  /** The client-provided file name for the asset. */
   filename?: AssetNameQueryParameter;
 };

@@ -10,8 +10,6 @@
 import type { OAuthAuthorizationRequestIDQueryParameter } from "./oAuthAuthorizationRequestIDQueryParameter";
 
 export type OAuthAuthoriseConsentParams = {
-  /**
-   * OAuth authorisation request identifier.
-   */
+  /** OAuth authorisation request identifier. */
   request_id?: OAuthAuthorizationRequestIDQueryParameter;
 };

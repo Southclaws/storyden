@@ -10,8 +10,6 @@
 import type { Identifier } from "./identifier";
 
 export type PostLocationGetParams = {
-  /**
-   * The post ID to locate
-   */
+  /** The post ID to locate */
   id: Identifier;
 };

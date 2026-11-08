@@ -26,7 +26,9 @@ export function useRobotPageContext(): () => Promise<RobotChatContext> {
       try {
         const slugParam = currentParams["slug"];
         const slug = Array.isArray(slugParam) ? slugParam[0] : slugParam;
-        if (!slug) return {};
+        if (!slug) {
+          return {};
+        }
 
         const thread = await threadGet(slug);
         return {
@@ -45,7 +47,9 @@ export function useRobotPageContext(): () => Promise<RobotChatContext> {
       try {
         const slugParam = currentParams["slug"];
         const slug = Array.isArray(slugParam) ? slugParam.join("/") : slugParam;
-        if (!slug) return {};
+        if (!slug) {
+          return {};
+        }
 
         const node = await nodeGet(slug);
         return {
@@ -66,7 +70,9 @@ export function useRobotPageContext(): () => Promise<RobotChatContext> {
         const handle = Array.isArray(handleParam)
           ? handleParam[0]
           : handleParam;
-        if (!handle) return {};
+        if (!handle) {
+          return {};
+        }
 
         const profile = await profileGet(handle);
         return {

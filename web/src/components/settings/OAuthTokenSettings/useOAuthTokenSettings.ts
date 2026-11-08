@@ -23,7 +23,9 @@ export function useOAuthTokenSettings(params: OAuthRefreshTokenListParams) {
       await mutate(
         cacheKey,
         async (currentData: OAuthRefreshTokenListResult | undefined) => {
-          if (!currentData) return currentData;
+          if (!currentData) {
+            return currentData;
+          }
 
           const now = new Date().toISOString();
           const tokens = currentData.tokens.map((token) =>

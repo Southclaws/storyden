@@ -47,10 +47,14 @@ export function useContentComposerMarkdown(props: ContentComposerProps) {
   }, [focusOnReady, disabled, showPreview]);
 
   useEffect(() => {
-    if (props.disabled || showPreview) return;
+    if (props.disabled || showPreview) {
+      return;
+    }
 
     const textarea = textareaRef.current;
-    if (!textarea) return;
+    if (!textarea) {
+      return;
+    }
 
     textarea.style.height = "auto";
     textarea.style.height = `${textarea.scrollHeight}px`;
@@ -129,7 +133,9 @@ export function useContentComposerMarkdown(props: ContentComposerProps) {
 
   async function handleMultipleImageUploads(files: File[]) {
     const textarea = textareaRef.current;
-    if (!textarea) return;
+    if (!textarea) {
+      return;
+    }
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;

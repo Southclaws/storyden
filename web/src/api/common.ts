@@ -186,13 +186,17 @@ const processQueryParams = (init: URLSearchParams) =>
   flow(toPairs, removeEmpty, objectToParams(init));
 
 export const cleanQuery = (params?: QueryParameters): string => {
-  if (!params) return "";
+  if (!params) {
+    return "";
+  }
 
   const usp = processQueryParams(new URLSearchParams())(params);
 
   const format = usp.toString();
 
-  if (!format) return "";
+  if (!format) {
+    return "";
+  }
 
   return `?${format}`;
 };

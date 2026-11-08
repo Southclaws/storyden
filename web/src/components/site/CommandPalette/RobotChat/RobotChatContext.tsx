@@ -96,7 +96,9 @@ export const DENBOT_NAME = "Denbot";
 export const DENBOT_ID = "denbot";
 
 function threadListKeyFilterFn(key: unknown) {
-  if (!Array.isArray(key)) return false;
+  if (!Array.isArray(key)) {
+    return false;
+  }
   return key[0] === getThreadListKey()[0];
 }
 
@@ -349,7 +351,9 @@ export function RobotChatContext({
         }
         case "data-session_name": {
           setIsSessionConfirmed(true);
-          if (!sessionsData || typeof message.data !== "string") return;
+          if (!sessionsData || typeof message.data !== "string") {
+            return;
+          }
 
           const sessionName = message.data;
           const newData = {
@@ -542,7 +546,9 @@ export function RobotChatContext({
       }
 
       if (event.event_kind === "turn_queued") {
-        if (!turnID) return;
+        if (!turnID) {
+          return;
+        }
         activeTurnIDs.add(turnID);
         setActiveTurnID(turnID);
         queuedParts.set(turnID, parts);
@@ -573,7 +579,9 @@ export function RobotChatContext({
       }
 
       if (isTerminalSessionEvent(event)) {
-        if (!turnID) return;
+        if (!turnID) {
+          return;
+        }
         activeTurnIDs.delete(turnID);
         setActiveTurnID((active) => (active === turnID ? undefined : active));
         setIsCancelling(false);

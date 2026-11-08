@@ -10,8 +10,6 @@
 import type { RobotStreamOffsetQueryParameter } from "./robotStreamOffsetQueryParameter";
 
 export type RobotSessionTurnHeadParams = {
-  /**
-   * Read events after this stream offset. Use `-1` to start at beginning.
-   */
+  /** Read events after this stream offset. Use `-1` to start at beginning. */
   offset?: RobotStreamOffsetQueryParameter;
 };

@@ -12,16 +12,10 @@ import type { AuditEventTypeFilterQueryParameter } from "./auditEventTypeFilterQ
 import type { PaginationQueryParameter } from "./paginationQueryParameter";
 
 export type AuditEventListParams = {
-  /**
-   * Pagination query parameters.
-   */
+  /** Pagination query parameters. */
   page?: PaginationQueryParameter;
-  /**
-   * Audit event type filter query
-   */
+  /** Audit event type filter query */
   types?: AuditEventTypeFilterQueryParameter;
-  /**
-   * Audit event time range query
-   */
+  /** Audit event time range query */
   range?: AuditEventTimeRangeQueryParameter;
 };

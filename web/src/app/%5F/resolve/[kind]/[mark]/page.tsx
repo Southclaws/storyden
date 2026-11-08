@@ -48,7 +48,9 @@ export default async function Page(props: Props) {
   const url = new URL(path, WEB_ADDRESS);
 
   Object.entries(searchParams).forEach(([key, value]) => {
-    if (value === undefined) return;
+    if (value === undefined) {
+      return;
+    }
     if (typeof value === "string") {
       url.searchParams.set(key, value);
     } else if (Array.isArray(value)) {

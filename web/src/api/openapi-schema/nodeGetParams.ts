@@ -11,12 +11,8 @@ import type { NodeChildrenSortParamParameter } from "./nodeChildrenSortParamPara
 import type { PaginationQueryParameter } from "./paginationQueryParameter";
 
 export type NodeGetParams = {
-  /**
-   * The field (either in schema or in property schema) to sort by.
-   */
+  /** The field (either in schema or in property schema) to sort by. */
   children_sort?: NodeChildrenSortParamParameter;
-  /**
-   * Pagination query parameters.
-   */
+  /** Pagination query parameters. */
   page?: PaginationQueryParameter;
 };

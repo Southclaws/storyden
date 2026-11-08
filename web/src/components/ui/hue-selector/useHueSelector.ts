@@ -22,7 +22,9 @@ const hueToAngle = (input: number) => {
   const shifted = input + 90;
 
   let clamped = shifted;
-  while (clamped < 0) clamped += 360;
+  while (clamped < 0) {
+    clamped += 360;
+  }
 
   return clamped;
 };
@@ -31,7 +33,9 @@ const angleToHue = (input: number) => {
   const shifted = input - 90;
 
   let clamped = shifted;
-  while (clamped < 0) clamped += 360;
+  while (clamped < 0) {
+    clamped += 360;
+  }
 
   return clamped;
 };
@@ -42,7 +46,9 @@ export function useHueSelector(props: HueSelectorProps) {
   const [grabbing, setGrabbing] = useState(false);
 
   useEffect(() => {
-    if (!props.value) return;
+    if (!props.value) {
+      return;
+    }
 
     try {
       const colour = parseToHsl(props.value);
@@ -61,7 +67,9 @@ export function useHueSelector(props: HueSelectorProps) {
   const value = hsl(hue);
 
   function onPointerMove(e: globalThis.PointerEvent) {
-    if (!ref.current) return;
+    if (!ref.current) {
+      return;
+    }
 
     const rect = ref.current.getBoundingClientRect();
 

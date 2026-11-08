@@ -136,22 +136,30 @@ export function ImageCropper({
   const styles = imageCropper();
   const notifyChange = useEffectEvent(() => onChange?.());
   let statusMessage = "";
-  if (loading) statusMessage = "Loading image";
-  else if (saving) statusMessage = "Saving image";
-  else if (loadError)
+  if (loading) {
+    statusMessage = "Loading image";
+  } else if (saving) {
+    statusMessage = "Saving image";
+  } else if (loadError) {
     statusMessage = "The image could not be opened. Please choose another.";
-  else if (showSaved) statusMessage = "Image saved";
+  } else if (showSaved) {
+    statusMessage = "Image saved";
+  }
 
   useEffect(() => setShowSaved(saved && !busy), [saved, busy]);
 
   // Ready precedes the canvas commit. Menu choices and default local uploads
   // notify after that commit, so consumers always capture the finished crop.
   useEffect(() => {
-    if (ready && (selectedURL || selection.revision > 0)) notifyChange();
+    if (ready && (selectedURL || selection.revision > 0)) {
+      notifyChange();
+    }
   }, [ready, selectedURL, selection.revision]);
   useEffect(
     () => () => {
-      if (selectedURL) URL.revokeObjectURL(selectedURL);
+      if (selectedURL) {
+        URL.revokeObjectURL(selectedURL);
+      }
     },
     [selectedURL],
   );
@@ -172,7 +180,9 @@ export function ImageCropper({
           }
         : { width, height },
     );
-    if (!canvas || !coordinates || !image) return null;
+    if (!canvas || !coordinates || !image) {
+      return null;
+    }
     return {
       coordinates,
       imageSize: { width: image.width, height: image.height },
@@ -181,8 +191,11 @@ export function ImageCropper({
       getBlob: () =>
         new Promise<Blob>((resolve, reject) => {
           canvas.toBlob((blob) => {
-            if (blob) resolve(blob);
-            else reject(new Error("The cropped image could not be saved."));
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error("The cropped image could not be saved."));
+            }
           }, "image/png");
         }),
     };
@@ -243,7 +256,9 @@ export function ImageCropper({
     },
     onReady: (cropper: CropperRef | FixedCropperRef) => {
       const image = cropper.getImage();
-      if (image) setOriginalRatio(image.width / image.height);
+      if (image) {
+        setOriginalRatio(image.width / image.height);
+      }
       setReady(true);
       setLoading(false);
     },
@@ -286,8 +301,9 @@ export function ImageCropper({
         tabIndex={cropDisabled ? undefined : 0}
         data-saving={saving}
         onKeyDown={(event) => {
-          if (!cropDisabled)
+          if (!cropDisabled) {
             handleCropperKeyDown(event, cropperRef.current, cropMode);
+          }
         }}
       >
         {cropMode === "fixed" ? (
@@ -380,17 +396,22 @@ function getInitialCoordinates(
   defaults: ImageCropperProps["defaultCoordinates"],
   fixedRatio?: number,
 ) {
-  if (selection.shape === "original")
+  if (selection.shape === "original") {
     return ({ imageSize }: { imageSize: ImageCropperSize }) => ({
       left: 0,
       top: 0,
       ...imageSize,
     });
-  if (selection.revision > 0 || !defaults) return undefined;
+  }
+  if (selection.revision > 0 || !defaults) {
+    return undefined;
+  }
   return ({ imageSize }: { imageSize: ImageCropperSize }) => {
     const coordinates =
       typeof defaults === "function" ? defaults(imageSize) : defaults;
-    if (!fixedRatio) return coordinates;
+    if (!fixedRatio) {
+      return coordinates;
+    }
     // Match the centered cover presentation without expanding a saved free crop.
     const width = Math.min(coordinates.width, coordinates.height * fixedRatio);
     const height = width / fixedRatio;

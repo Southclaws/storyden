@@ -22,7 +22,9 @@ export function LinkScreen(props: Props) {
     swr: { fallbackData: props.initialLink },
   });
 
-  if (!data) return <Unready error={error} />;
+  if (!data) {
+    return <Unready error={error} />;
+  }
 
   const link = data;
 

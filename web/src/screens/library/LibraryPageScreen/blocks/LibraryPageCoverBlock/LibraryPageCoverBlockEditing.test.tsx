@@ -57,13 +57,14 @@ it.each([undefined, "banner", "artwork", "image"] as const)(
       screen.getByRole("button", { name: "Main image options" }),
     );
     expect(screen.getByRole("menuitem", { name: "Page layout" })).toBeVisible();
-    if (mode === "image")
+    if (mode === "image") {
       expect(
         screen.getByRole("menuitem", { name: "Crop ratio" }),
       ).toBeVisible();
-    else
+    } else {
       expect(
         screen.queryByRole("menuitem", { name: "Crop ratio" }),
       ).not.toBeInTheDocument();
+    }
   },
 );

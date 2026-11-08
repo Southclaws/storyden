@@ -24,40 +24,22 @@ export type AccountListParams = {
    * @minLength 0
    */
   q?: SearchQueryParameter;
-  /**
-   * Pagination query parameters.
-   */
+  /** Pagination query parameters. */
   page?: PaginationQueryParameter;
-  /**
-   * Profiles sort by query
-   */
+  /** Profiles sort by query */
   sort?: ProfilesSortByQueryParameter;
-  /**
-   * Profiles role filter query
-   */
+  /** Profiles role filter query */
   roles?: ProfilesRoleFilterQueryParameter;
-  /**
-   * Profiles join range query
-   */
+  /** Profiles join range query */
   joined?: ProfilesJoinRangeQueryParameter;
-  /**
-   * Profiles invited by query (account handles)
-   */
+  /** Profiles invited by query (account handles) */
   invited_by?: ProfilesInvitedByQueryParameter;
-  /**
-   * Filter accounts by suspension state.
-   */
+  /** Filter accounts by suspension state. */
   suspended?: AdminAccountsSuspendedQueryParameter;
-  /**
-   * Filter accounts by administrator status.
-   */
+  /** Filter accounts by administrator status. */
   admin?: AdminAccountsAdminQueryParameter;
-  /**
-   * Filter accounts by account type.
-   */
+  /** Filter accounts by account type. */
   kind?: AdminAccountsKindQueryParameter;
-  /**
-   * Filter accounts by one or more active authentication services.
-   */
+  /** Filter accounts by one or more active authentication services. */
   auth_service?: AdminAccountsAuthServicesQueryParameter;
 };

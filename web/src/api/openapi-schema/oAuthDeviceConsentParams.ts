@@ -10,8 +10,6 @@
 import type { OAuthUserCodeQueryParameter } from "./oAuthUserCodeQueryParameter";
 
 export type OAuthDeviceConsentParams = {
-  /**
-   * OAuth device authorisation user code.
-   */
+  /** OAuth device authorisation user code. */
   user_code?: OAuthUserCodeQueryParameter;
 };

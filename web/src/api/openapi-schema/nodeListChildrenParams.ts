@@ -13,21 +13,15 @@ import type { SearchQueryParameter } from "./searchQueryParameter";
 import type { TagNameListQueryParamParameter } from "./tagNameListQueryParamParameter";
 
 export type NodeListChildrenParams = {
-  /**
-   * The field (either in schema or in property schema) to sort by.
-   */
+  /** The field (either in schema or in property schema) to sort by. */
   children_sort?: NodeChildrenSortParamParameter;
-  /**
-   * Pagination query parameters.
-   */
+  /** Pagination query parameters. */
   page?: PaginationQueryParameter;
   /**
    * Search query string.
    * @minLength 0
    */
   q?: SearchQueryParameter;
-  /**
-   * Tags to filter by.
-   */
+  /** Tags to filter by. */
   tags?: TagNameListQueryParamParameter;
 };

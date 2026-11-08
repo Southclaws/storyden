@@ -2,7 +2,9 @@ import { Account, Permission, PostReference } from "@/api/openapi-schema";
 import { hasPermissionOr } from "@/utils/permissions";
 
 export function canDeletePost(pr: PostReference, account?: Account) {
-  if (!account) return false;
+  if (!account) {
+    return false;
+  }
 
   return hasPermissionOr(
     account,
@@ -12,7 +14,9 @@ export function canDeletePost(pr: PostReference, account?: Account) {
 }
 
 export function canEditPost(pr: PostReference, account?: Account) {
-  if (!account) return false;
+  if (!account) {
+    return false;
+  }
 
   return hasPermissionOr(
     account,

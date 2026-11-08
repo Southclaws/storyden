@@ -74,7 +74,9 @@ export function useIconEditor(props: Props) {
 
   function onPositionChange(p: any) {
     // Don't allow position changes while upload in progress.
-    if (saving) return;
+    if (saving) {
+      return;
+    }
 
     setPosition(p);
     setIsDirty(true);

@@ -91,8 +91,9 @@ export function useDragTreeMove<TNode>({
 
   function focusNode(id: string) {
     for (const ancestor of collection.getParentNodes(id)) {
-      if (!collection.isRootNode(ancestor))
+      if (!collection.isRootNode(ancestor)) {
         expand(collection.getNodeValue(ancestor));
+      }
     }
     requestAnimationFrame(() => {
       const anchor = Array.from(
@@ -105,23 +106,30 @@ export function useDragTreeMove<TNode>({
   }
 
   function start(id: string) {
-    if (!enabled || !config || committing.current) return;
+    if (!enabled || !config || committing.current) {
+      return;
+    }
     setError("");
     setNotice("");
     setPlacement("inside");
     setSourceId(id);
     setFocusedId(id);
     setKeyboard(true);
-    if (document.activeElement?.getAttribute("data-tree-node-id") !== id)
+    if (document.activeElement?.getAttribute("data-tree-node-id") !== id) {
       focusNode(id);
+    }
   }
 
   function cancel(restoreFocus = true) {
-    if (!sourceId || committing.current) return;
+    if (!sourceId || committing.current) {
+      return;
+    }
     setNotice("Move cancelled. The original position is unchanged.");
     setSourceId(null);
     setError("");
-    if (restoreFocus) focusNode(sourceId);
+    if (restoreFocus) {
+      focusNode(sourceId);
+    }
   }
 
   async function commit() {
@@ -134,12 +142,15 @@ export function useDragTreeMove<TNode>({
       !focusedId ||
       invalid ||
       committing.current
-    )
+    ) {
       return;
+    }
     committing.current = true;
     setPending(true);
     setError("");
-    if (parent) expand(collection.getNodeValue(parent));
+    if (parent) {
+      expand(collection.getNodeValue(parent));
+    }
     let saved = false;
     await handle(
       async () => {
@@ -195,8 +206,9 @@ export function useDragTreeMove<TNode>({
       !anchor ||
       !rootRef.current?.contains(anchor) ||
       event.nativeEvent.isComposing
-    )
+    ) {
       return;
+    }
     restoringId.current = null;
     setKeyboard(true);
     if (
@@ -210,11 +222,15 @@ export function useDragTreeMove<TNode>({
     ) {
       event.preventDefault();
       event.stopPropagation();
-      if (!event.repeat && !sourceId) start(anchor.dataset["treeNodeId"]!);
+      if (!event.repeat && !sourceId) {
+        start(anchor.dataset["treeNodeId"]!);
+      }
       return;
     }
     if (!sourceId) {
-      if (event.key === "Escape") setKeyboard(false);
+      if (event.key === "Escape") {
+        setKeyboard(false);
+      }
       return;
     }
     if (event.key === "Tab") {
@@ -224,32 +240,45 @@ export function useDragTreeMove<TNode>({
     if (pending || ["Enter", " ", "Escape"].includes(event.key)) {
       event.preventDefault();
       event.stopPropagation();
-      if (pending || event.repeat) return;
-      if (event.key === "Escape") cancel();
-      if (event.key === " ")
+      if (pending || event.repeat) {
+        return;
+      }
+      if (event.key === "Escape") {
+        cancel();
+      }
+      if (event.key === " ") {
         setPlacement(
           (current) =>
             placements[(placements.indexOf(current) + 1) % placements.length]!,
         );
-      if (event.key === "Enter") void commit();
+      }
+      if (event.key === "Enter") {
+        void commit();
+      }
     }
   }
 
   // Cache refreshes may reparent/remount a node more than once. Restore focus
   // against the committed DOM, and stop as soon as the user navigates again.
   useEffect(() => {
-    if (!focusRequest || restoringId.current !== focusRequest.id) return;
+    if (!focusRequest || restoringId.current !== focusRequest.id) {
+      return;
+    }
     for (const ancestor of collection.getParentNodes(focusRequest.id)) {
-      if (!collection.isRootNode(ancestor))
+      if (!collection.isRootNode(ancestor)) {
         expand(collection.getNodeValue(ancestor));
+      }
     }
     const frame = requestAnimationFrame(() => {
-      if (restoringId.current !== focusRequest.id) return;
+      if (restoringId.current !== focusRequest.id) {
+        return;
+      }
       if (
         document.activeElement !== document.body &&
         !rootRef.current?.contains(document.activeElement)
-      )
+      ) {
         return;
+      }
       const anchors = Array.from(
         rootRef.current?.querySelectorAll<HTMLAnchorElement>(
           "a[data-tree-node-id]",
@@ -271,7 +300,9 @@ export function useDragTreeMove<TNode>({
 
   useEffect(() => {
     setHintId(null);
-    if (!keyboard || sourceId || !enabled) return;
+    if (!keyboard || sourceId || !enabled) {
+      return;
+    }
     const timeout = setTimeout(() => setHintId(focusedId), 600);
     return () => clearTimeout(timeout);
   }, [keyboard, sourceId, focusedId, enabled]);

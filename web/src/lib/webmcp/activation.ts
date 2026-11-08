@@ -7,9 +7,13 @@ const listeners = new Set<() => void>();
 
 // Keep tools available after the first chat activation, including across navigation.
 export function enableWebMCPTools() {
-  if (enabled) return;
+  if (enabled) {
+    return;
+  }
   enabled = true;
-  for (const listener of listeners) listener();
+  for (const listener of listeners) {
+    listener();
+  }
 }
 
 export function useWebMCPToolsEnabled() {

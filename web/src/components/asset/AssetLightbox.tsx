@@ -77,7 +77,9 @@ export function AssetLightbox({
   const ref = useClickAway<HTMLImageElement>(handleClose);
 
   useEffect(() => {
-    if (!presenceProps.present) return;
+    if (!presenceProps.present) {
+      return;
+    }
 
     const listener = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -94,7 +96,9 @@ export function AssetLightbox({
   }
 
   function handlePrevious() {
-    if (set === undefined || setIndex === undefined) return;
+    if (set === undefined || setIndex === undefined) {
+      return;
+    }
 
     const nextIndex = setIndex - 1 < 0 ? set.length - 1 : setIndex - 1;
     const next = set[nextIndex];
@@ -105,7 +109,9 @@ export function AssetLightbox({
   }
 
   function handleNext() {
-    if (set === undefined || setIndex === undefined) return;
+    if (set === undefined || setIndex === undefined) {
+      return;
+    }
 
     const nextIndex = setIndex + 1 === set.length ? 0 : setIndex + 1;
     const next = set[nextIndex];

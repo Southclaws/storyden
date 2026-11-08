@@ -84,7 +84,9 @@ export function useAuditLogSettingsScreen() {
   };
 
   const parseInitialDateValue = () => {
-    if (!filters.range) return undefined;
+    if (!filters.range) {
+      return undefined;
+    }
 
     const parts = filters.range.split("/").filter((p) => p);
     try {

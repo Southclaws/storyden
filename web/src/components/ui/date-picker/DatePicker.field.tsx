@@ -35,7 +35,9 @@ export function DatePickerField<
             field.onChange(first ? first.toDate("utc").toISOString() : "");
           }}
           onOpenChange={({ open }) => {
-            if (!open) field.onBlur();
+            if (!open) {
+              field.onBlur();
+            }
           }}
           disabled={field.disabled}
         />
@@ -45,7 +47,9 @@ export function DatePickerField<
 }
 
 function parseValue(value: unknown): DateValue[] {
-  if (typeof value !== "string" || value.trim() === "") return [];
+  if (typeof value !== "string" || value.trim() === "") {
+    return [];
+  }
 
   try {
     const datePart = value.split("T")[0];

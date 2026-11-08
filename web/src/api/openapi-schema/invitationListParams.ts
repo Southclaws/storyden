@@ -10,8 +10,6 @@
 import type { AccountIDQueryParamParameter } from "./accountIDQueryParamParameter";
 
 export type InvitationListParams = {
-  /**
-   * A unique identifier for this resource.
-   */
+  /** A unique identifier for this resource. */
   account_id?: AccountIDQueryParamParameter;
 };

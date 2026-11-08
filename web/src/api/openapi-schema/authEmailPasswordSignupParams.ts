@@ -10,8 +10,6 @@
 import type { InvitationIDQueryParamParameter } from "./invitationIDQueryParamParameter";
 
 export type AuthEmailPasswordSignupParams = {
-  /**
-   * A unique identifier for this resource.
-   */
+  /** A unique identifier for this resource. */
   invitation_id?: InvitationIDQueryParamParameter;
 };

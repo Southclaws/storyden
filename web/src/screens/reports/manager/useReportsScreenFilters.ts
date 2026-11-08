@@ -11,7 +11,9 @@ export function useReportsScreenFilters() {
     defaultValue: null,
     clearOnDefault: true,
     parse(value) {
-      if (!value) return null;
+      if (!value) {
+        return null;
+      }
       return isReportStatus(value) ? (value as ReportStatus) : null;
     },
   });
@@ -20,7 +22,9 @@ export function useReportsScreenFilters() {
     defaultValue: null,
     clearOnDefault: true,
     parse(value) {
-      if (!value) return null;
+      if (!value) {
+        return null;
+      }
       return isDatagraphKind(value) ? (value as DatagraphItemKind) : null;
     },
   });

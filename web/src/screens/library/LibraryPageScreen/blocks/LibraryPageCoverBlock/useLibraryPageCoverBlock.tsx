@@ -23,7 +23,9 @@ export function useLibraryPageCoverBlock() {
   function captureCrop() {
     const crop = cropperRef.current?.getCrop();
     const primary = store.getState().draft.primary_image;
-    if (!crop || !primary) return;
+    if (!crop || !primary) {
+      return;
+    }
     return { ...crop, source: primary.parent ?? primary };
   }
 
@@ -48,7 +50,9 @@ export function useLibraryPageCoverBlock() {
           };
           const state = store.getState();
           const primary = state.draft.primary_image;
-          if ((primary?.parent ?? primary)?.id !== source.id) return false;
+          if ((primary?.parent ?? primary)?.id !== source.id) {
+            return false;
+          }
           state.setPrimaryImage({
             asset,
             config: { left: coordinates.left, top: coordinates.top },
@@ -95,7 +99,9 @@ export function useLibraryPageCoverBlock() {
 
   function handleInteractionEnd() {
     const snapshot = captureCrop();
-    if (!snapshot) return;
+    if (!snapshot) {
+      return;
+    }
     setImageSaving(true);
     void save(snapshot);
   }

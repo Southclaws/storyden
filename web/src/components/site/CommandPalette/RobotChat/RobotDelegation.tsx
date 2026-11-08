@@ -42,7 +42,6 @@ export function RobotDelegation({ data, renderParts }: Props) {
 
   return (
     <details
-      role="group"
       aria-label={`${data.robot.name} delegation`}
       open={data.status === "failed" || undefined}
       className={css({

@@ -75,17 +75,22 @@ export function ImageCropperTools({
         className={styles.toolbar}
         data-expanded={open || busy || saved}
         onPointerEnter={(event) => {
-          if (event.pointerType === "touch") return;
+          if (event.pointerType === "touch") {
+            return;
+          }
           clearTimeout(closeTimeoutRef.current);
           setExpanded(true);
         }}
         onPointerLeave={(event) => {
-          if (event.pointerType === "touch") return;
+          if (event.pointerType === "touch") {
+            return;
+          }
           closeTimeoutRef.current = setTimeout(() => setExpanded(false), 650);
         }}
         onBlur={(event) => {
-          if (!event.currentTarget.contains(event.relatedTarget))
+          if (!event.currentTarget.contains(event.relatedTarget)) {
             setExpanded(false);
+          }
         }}
       >
         {hasImage &&
@@ -147,7 +152,9 @@ export function ImageCropperTools({
               data-state={busy ? "saving" : "saved"}
               aria-hidden="true"
               onAnimationEnd={(event) => {
-                if (event.animationName === "imageCropperSaved") onSavedEnd();
+                if (event.animationName === "imageCropperSaved") {
+                  onSavedEnd();
+                }
               }}
             >
               {busy ? (

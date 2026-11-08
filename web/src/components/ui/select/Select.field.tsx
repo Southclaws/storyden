@@ -65,7 +65,9 @@ export function SelectField<
             field.onChange(value[0] ?? undefined);
           }}
           onOpenChange={({ open }) => {
-            if (!open) field.onBlur();
+            if (!open) {
+              field.onBlur();
+            }
           }}
           disabled={field.disabled}
           invalid={fieldState.invalid}

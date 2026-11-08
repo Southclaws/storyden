@@ -13,21 +13,15 @@ import type { PaginationQueryParameter } from "./paginationQueryParameter";
 import type { SearchQueryParameter } from "./searchQueryParameter";
 
 export type EmailQueueListParams = {
-  /**
-   * Pagination query parameters.
-   */
+  /** Pagination query parameters. */
   page?: PaginationQueryParameter;
   /**
    * Search query string.
    * @minLength 0
    */
   q?: SearchQueryParameter;
-  /**
-   * Email queue status filter query
-   */
+  /** Email queue status filter query */
   statuses?: EmailQueueStatusFilterQueryParameter;
-  /**
-   * Email queue time range query
-   */
+  /** Email queue time range query */
   range?: EmailQueueTimeRangeQueryParameter;
 };

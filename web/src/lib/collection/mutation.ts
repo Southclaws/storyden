@@ -35,8 +35,12 @@ export function useCollectionMutations(session?: Account) {
 
   const create = async (create: CollectionInitialProps) => {
     const mutator: MutatorCallback<CollectionListOKResponse> = (data) => {
-      if (!data) return;
-      if (!session) return;
+      if (!data) {
+        return;
+      }
+      if (!session) {
+        return;
+      }
 
       const newCollection = {
         id: uniqueId("optimistic_collection_"),
@@ -66,7 +70,9 @@ export function useCollectionMutations(session?: Account) {
 
   const update = async (id: Identifier, update: CollectionMutableProps) => {
     const mutator: MutatorCallback<CollectionListOKResponse> = (data) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       const newCollections = data.collections.map((c) => {
         if (c.id === id) {
@@ -93,7 +99,9 @@ export function useCollectionMutations(session?: Account) {
 
   const deleteCollection = async (id: Identifier) => {
     const mutator: MutatorCallback<CollectionListOKResponse> = (data) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       const newCollections = data.collections.filter((c) => c.id !== id);
 
@@ -143,7 +151,9 @@ export function useCollectionItemMutations(session: Account) {
     });
 
     const threadListMutator: MutatorCallback<ThreadListOKResponse> = (data) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       const newThreads = data.threads.map((t) => {
         if (t.id === postID) {
@@ -175,7 +185,9 @@ export function useCollectionItemMutations(session: Account) {
     const collectionListMutator: MutatorCallback<CollectionListOKResponse> = (
       data,
     ) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       const newCollections = data.collections.map((c) => {
         if (c.id === collection.id) {
@@ -211,7 +223,9 @@ export function useCollectionItemMutations(session: Account) {
     });
 
     const threadListMutator: MutatorCallback<ThreadListOKResponse> = (data) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       const newThreads = data.threads.map((t) => {
         if (t.id === postID) {
@@ -243,7 +257,9 @@ export function useCollectionItemMutations(session: Account) {
     const collectionListMutator: MutatorCallback<CollectionListOKResponse> = (
       data,
     ) => {
-      if (!data) return;
+      if (!data) {
+        return;
+      }
 
       const newCollections = data.collections.map((c) => {
         if (c.id === collectionID) {

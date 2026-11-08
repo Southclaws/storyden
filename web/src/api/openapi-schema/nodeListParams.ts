@@ -21,17 +21,11 @@ export type NodeListParams = {
    * @minLength 0
    */
   q?: SearchQueryParameter;
-  /**
-   * Pagination query parameters.
-   */
+  /** Pagination query parameters. */
   page?: PaginationQueryParameter;
-  /**
-   * List this node and all child nodes.
-   */
+  /** List this node and all child nodes. */
   node_id?: Identifier;
-  /**
-   * Show only results owned by this account.
-   */
+  /** Show only results owned by this account. */
   author?: AccountHandle;
   /**
    * Filter content with specific visibility values. Note that by default,

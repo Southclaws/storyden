@@ -11,12 +11,8 @@ import type { RobotStreamLiveQueryParameter } from "./robotStreamLiveQueryParame
 import type { RobotStreamOffsetQueryParameter } from "./robotStreamOffsetQueryParameter";
 
 export type RobotSessionStreamParams = {
-  /**
-   * Read events after this stream offset. Use `-1` to start at beginning.
-   */
+  /** Read events after this stream offset. Use `-1` to start at beginning. */
   offset?: RobotStreamOffsetQueryParameter;
-  /**
-   * Attach to the live stream tail after catching up.
-   */
+  /** Attach to the live stream tail after catching up. */
   live?: RobotStreamLiveQueryParameter;
 };

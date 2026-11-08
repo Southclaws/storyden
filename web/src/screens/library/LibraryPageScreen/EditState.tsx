@@ -86,12 +86,16 @@ export function LibraryPageEditProvider({
     editing && editMode === LibraryPageEditMode.proposal;
 
   function setEditing(value: boolean) {
-    if (disabled) return;
+    if (disabled) {
+      return;
+    }
     void setQueryEditing(value);
   }
 
   function startDirectEdit() {
-    if (disabled || !isAllowedToDirectEdit) return;
+    if (disabled || !isAllowedToDirectEdit) {
+      return;
+    }
 
     setProposalVersion(undefined);
     setReviewVersionID(null);
@@ -101,7 +105,9 @@ export function LibraryPageEditProvider({
   }
 
   async function startProposalEdit(existingVersion?: NodeVersion) {
-    if (disabled || !isAllowedToProposeEdit) return;
+    if (disabled || !isAllowedToProposeEdit) {
+      return;
+    }
 
     setSaving(true);
     try {

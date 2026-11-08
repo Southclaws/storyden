@@ -186,7 +186,9 @@ export function removeNavigationItem(
 
 export function isSafeNavigationHref(value: string): boolean {
   const href = value.trim();
-  if (!href) return false;
+  if (!href) {
+    return false;
+  }
 
   if (
     (href.startsWith("/") && !href.startsWith("//")) ||

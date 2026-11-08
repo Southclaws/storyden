@@ -202,8 +202,12 @@ export function trailFormPayload(
 function scheduleKind(
   schedule?: RecurrenceSchedule,
 ): TrailFormValues["scheduleKind"] {
-  if (!schedule) return "weekly";
-  if (schedule.rule.count === 1) return "once";
+  if (!schedule) {
+    return "weekly";
+  }
+  if (schedule.rule.count === 1) {
+    return "once";
+  }
 
   switch (schedule.rule.frequency) {
     case "hourly":

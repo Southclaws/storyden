@@ -50,12 +50,16 @@ export function useMemberRoleMenu(props: Props) {
   };
 
   const handleSelect = (details: MenuSelectionDetails) => {
-    if (isUpdating) return;
+    if (isUpdating) {
+      return;
+    }
 
     const id = details.value;
     const role = roles.find((r) => r.id === id);
 
-    if (!role) return;
+    if (!role) {
+      return;
+    }
 
     if (role.selected) {
       handleRemove(id);

@@ -17,37 +17,23 @@ import type { OAuthScopeQueryParameter } from "./oAuthScopeQueryParameter";
 import type { OAuthStateQueryParameter } from "./oAuthStateQueryParameter";
 
 export type OAuthAuthoriseParams = {
-  /**
-   * OAuth response type. Storyden currently supports authorisation code.
-   */
+  /** OAuth response type. Storyden currently supports authorisation code. */
   response_type: OAuthResponseTypeQueryParameter;
-  /**
-   * OAuth client identifier.
-   */
+  /** OAuth client identifier. */
   client_id: OAuthClientIDQueryParameter;
-  /**
-   * Registered redirect URI for the OAuth client.
-   */
+  /** Registered redirect URI for the OAuth client. */
   redirect_uri: OAuthRedirectURIQueryParameter;
-  /**
-   * Space-separated OAuth scopes requested by the client.
-   */
+  /** Space-separated OAuth scopes requested by the client. */
   scope?: OAuthScopeQueryParameter;
-  /**
-   * Client-provided opaque state returned to the redirect URI.
-   */
+  /** Client-provided opaque state returned to the redirect URI. */
   state?: OAuthStateQueryParameter;
   /**
    * OpenID Connect nonce. When provided, it is returned unmodified as the
    * `nonce` claim in the issued ID token (OIDC Core §3.1.2).
    */
   nonce?: OAuthNonceQueryParameter;
-  /**
-   * PKCE code challenge.
-   */
+  /** PKCE code challenge. */
   code_challenge: OAuthCodeChallengeQueryParameter;
-  /**
-   * PKCE code challenge method.
-   */
+  /** PKCE code challenge method. */
   code_challenge_method: OAuthCodeChallengeMethodQueryParameter;
 };

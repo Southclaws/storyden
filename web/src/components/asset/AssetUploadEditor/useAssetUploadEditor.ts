@@ -70,7 +70,9 @@ export function useAssetUploadEditor(props: Props) {
   }, [props.value]);
 
   function onPositionChange(p: any) {
-    if (saving) return;
+    if (saving) {
+      return;
+    }
 
     setPosition(p);
   }

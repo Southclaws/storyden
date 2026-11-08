@@ -205,7 +205,9 @@ function createTools(initial: FeedConfig, firstSave?: Promise<void>) {
       const activeIndex = blocks.findIndex((block) => block.type === active);
       const overIndex = blocks.findIndex((block) => block.type === over);
       const [moved] = blocks.splice(activeIndex, 1);
-      if (!moved) throw new Error("Missing moved block in test editor");
+      if (!moved) {
+        throw new Error("Missing moved block in test editor");
+      }
       blocks.splice(overIndex, 0, moved);
       return save({ blocks });
     }),

@@ -26,7 +26,9 @@ async function waitForImageToSettle(image: Locator) {
     .poll(
       async () => {
         const bounds = await image.boundingBox();
-        if (!bounds) return 0;
+        if (!bounds) {
+          return 0;
+        }
         const current = JSON.stringify(bounds);
         stable = current === previous ? stable + 1 : 0;
         previous = current;
@@ -93,7 +95,9 @@ test("branding banner saves exact-size crops, pans and zooms with shared control
     releaseSave = resolve;
   });
   await page.route(`${API_ADDRESS}/api/admin`, async (route) => {
-    if (route.request().method() === "PATCH") await saveGate;
+    if (route.request().method() === "PATCH") {
+      await saveGate;
+    }
     await route.continue();
   });
   try {
@@ -255,7 +259,9 @@ test("branding banner recovers from a save failure without losing the editable s
           status: 503,
         },
       });
-    } else await route.continue();
+    } else {
+      await route.continue();
+    }
   });
   const failed = page.waitForResponse(isBannerSave);
   const chooser = page.waitForEvent("filechooser");

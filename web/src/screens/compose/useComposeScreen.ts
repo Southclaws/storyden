@@ -13,7 +13,9 @@ export function useComposeScreen({ editing }: Props) {
   useEffect(() => {
     handle(
       async () => {
-        if (editing === undefined) return;
+        if (editing === undefined) {
+          return;
+        }
 
         const thread = await threadGet(editing);
 

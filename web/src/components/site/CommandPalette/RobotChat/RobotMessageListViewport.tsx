@@ -50,7 +50,9 @@ export function RobotMessageListViewport({ surface }: Props) {
 
   const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
     const scroller = scrollerRef.current;
-    if (!scroller) return;
+    if (!scroller) {
+      return;
+    }
 
     scroller.scrollTo({
       top: scroller.scrollHeight,
@@ -60,7 +62,9 @@ export function RobotMessageListViewport({ surface }: Props) {
 
   const updateNearBottom = useCallback(() => {
     const scroller = scrollerRef.current;
-    if (!scroller) return true;
+    if (!scroller) {
+      return true;
+    }
 
     const distanceFromBottom =
       scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight;
@@ -76,7 +80,9 @@ export function RobotMessageListViewport({ surface }: Props) {
 
   const handleLoadOlder = useCallback(async () => {
     const scroller = scrollerRef.current;
-    if (!scroller || !hasOlderMessages || isLoadingOlderMessages) return;
+    if (!scroller || !hasOlderMessages || isLoadingOlderMessages) {
+      return;
+    }
 
     pendingAnchorRef.current = getFirstVisibleMessageAnchor(scroller);
     suppressNextNewMessagePillRef.current = true;
@@ -90,7 +96,9 @@ export function RobotMessageListViewport({ surface }: Props) {
 
   const handleScroll = useCallback(() => {
     const scroller = scrollerRef.current;
-    if (!scroller) return;
+    if (!scroller) {
+      return;
+    }
 
     updateNearBottom();
 
@@ -109,7 +117,9 @@ export function RobotMessageListViewport({ surface }: Props) {
     const pendingAnchor = pendingAnchorRef.current;
     const scroller = scrollerRef.current;
 
-    if (!pendingAnchor || !scroller) return;
+    if (!pendingAnchor || !scroller) {
+      return;
+    }
 
     const anchoredElement = scroller.querySelector<HTMLElement>(
       `#robot-message-${pendingAnchor.id}`,
@@ -127,7 +137,9 @@ export function RobotMessageListViewport({ surface }: Props) {
 
   useEffect(() => {
     const content = contentRef.current;
-    if (!content) return;
+    if (!content) {
+      return;
+    }
 
     const observer = new ResizeObserver(() => {
       if (pendingAnchorRef.current || !wasNearBottomRef.current) {
