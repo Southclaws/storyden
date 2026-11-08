@@ -82,7 +82,7 @@ Current behavior in code:
 When a new thread is published, the plugin receives `EventThreadPublished`, fetches thread details, and posts to the configured Discord channel.
 
 - Event contract: [Manifest `events_consumed`](/docs/extending/manifest#events_consumed)
-- RPC reference: [Host to Plugin `event`](/docs/extending/rpc/host-to-plugin/event)
+- RPC reference: [Host to Plugin `event`](/docs/extending/api/host-to-plugin/event)
 - API used for thread details: [Thread Get](/docs/api/threads/ThreadGet)
 - Code path: [`handleThreadPublished`](https://github.com/Southclaws/storyden/blob/main/plugins/discord-connector/main.go)
 
@@ -93,7 +93,7 @@ Everything here is grounded in current plugin contracts:
 - event subscriptions in [`events_consumed`](/docs/extending/manifest#events_consumed)
 - API identity and permission requests in [`access`](/docs/extending/manifest#access)
 - operator-provided config fields in [`configuration_schema`](/docs/extending/manifest#configuration_schema)
-- runtime messaging via [Host-to-Plugin RPC](/docs/extending/rpc/host-to-plugin) and [Plugin-to-Host RPC](/docs/extending/rpc/plugin-to-host)
+- runtime messaging via [Host-to-Plugin RPC](/docs/extending/api/host-to-plugin) and [Plugin-to-Host RPC](/docs/extending/api/plugin-to-host)
 
 This example plugin currently expects these config fields:
 

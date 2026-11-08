@@ -12,12 +12,12 @@ This page is intentionally concrete. No roadmap guessing, just current behaviour
 Plugins can subscribe to supported Storyden events and react in real time.
 
 This covers common automation/integration tasks such as notifications, indexing, downstream sync, and moderation-side workflows.
-See [Manifest -> `events_consumed`](/docs/extending/manifest#events_consumed) and [RPC -> `event`](/docs/extending/rpc/host-to-plugin/event).
+See [Manifest -> `events_consumed`](/docs/extending/manifest#events_consumed) and [RPC -> `event`](/docs/extending/api/host-to-plugin/event).
 
 ### Receive and apply runtime configuration
 
 Plugins can define a simple config schema in their manifest which is used to build a configuration UI in the Admin UI. When a user changes configuration, Storyden validates the new config against the schema and sends it to the plugin via RPC.
-See [Manifest -> `configuration_schema`](/docs/extending/manifest#configuration_schema), [RPC -> `configure`](/docs/extending/rpc/host-to-plugin/configure), and [RPC -> `get_config`](/docs/extending/rpc/plugin-to-host/get_config).
+See [Manifest -> `configuration_schema`](/docs/extending/manifest#configuration_schema), [RPC -> `configure`](/docs/extending/api/host-to-plugin/configure), and [RPC -> `get_config`](/docs/extending/api/plugin-to-host/get_config).
 
 Current schema field types are intentionally small:
 
@@ -34,7 +34,7 @@ Plugins can call host-side RPC methods for operations like:
 - retrieving plugin configuration
 - requesting API access credentials (when access is declared)
 
-See [RPC Reference](/docs/extending/rpc), especially [Plugin to Host](/docs/extending/rpc/plugin-to-host).
+See [RPC Reference](/docs/extending/api), especially [Plugin to Host](/docs/extending/api/plugin-to-host).
 
 ### Use the HTTP API (when access is requested)
 
