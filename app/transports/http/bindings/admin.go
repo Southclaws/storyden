@@ -1214,7 +1214,7 @@ func metadataString(metadata map[string]any, key string) string {
 	}
 }
 
-func deserialiseMediaServiceSettings(in openapi.MediaServiceSettings) settings.MediaServiceSettings {
+func deserialiseMediaServiceSettings(in openapi.MediaServiceSettingsMutableProps) settings.MediaServiceSettings {
 	return settings.MediaServiceSettings{
 		ImageMaxSize:   opt.NewPtr(in.ImageMaxSize),
 		ImageMaxPixels: opt.NewPtr(in.ImageMaxPixels),

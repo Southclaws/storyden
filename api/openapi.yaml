@@ -8276,7 +8276,7 @@ components:
         registration_mode:
           $ref: "#/components/schemas/RegistrationMode"
         services:
-          $ref: "#/components/schemas/AdminSettingsServiceProps"
+          $ref: "#/components/schemas/AdminSettingsServiceMutableProps"
         metadata:
           description: |
             The settings metadata may be used by frontends to store arbitrary
@@ -8331,6 +8331,39 @@ components:
           $ref: "#/components/schemas/ModerationServiceSettings"
         robots:
           $ref: "#/components/schemas/RobotServiceSettings"
+
+    AdminSettingsServiceMutableProps:
+      type: object
+      properties:
+        media:
+          $ref: "#/components/schemas/MediaServiceSettingsMutableProps"
+        oauth:
+          $ref: "#/components/schemas/OAuthServiceSettings"
+        client_ip:
+          $ref: "#/components/schemas/ClientIPServiceSettings"
+        rate_limiting:
+          $ref: "#/components/schemas/RateLimitServiceSettings"
+        discovery:
+          $ref: "#/components/schemas/DiscoveryServiceSettings"
+        moderation:
+          $ref: "#/components/schemas/ModerationServiceSettings"
+        robots:
+          $ref: "#/components/schemas/RobotServiceSettings"
+
+    MediaServiceSettingsMutableProps:
+      type: object
+      additionalProperties: false
+      properties:
+        image_max_size:
+          type: integer
+          format: int64
+          minimum: 1
+          description: Maximum encoded image upload size in bytes. Defaults to 8388608 (8 MiB).
+        image_max_pixels:
+          type: integer
+          format: int64
+          minimum: 1
+          description: Maximum image upload pixel count (width multiplied by height). Defaults to 1500000 (1.5 megapixels).
 
     MediaServiceSettings:
       type: object

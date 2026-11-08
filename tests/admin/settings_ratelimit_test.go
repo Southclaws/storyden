@@ -135,7 +135,7 @@ func TestRateLimitCostOverrides(t *testing.T) {
 				}
 
 				updateReq := openapi.AdminSettingsUpdateJSONRequestBody{
-					Services: &openapi.AdminSettingsServiceProps{
+					Services: &openapi.AdminSettingsServiceMutableProps{
 						RateLimiting: &openapi.RateLimitServiceSettings{
 							CostOverrides: &costOverrides,
 						},
@@ -193,7 +193,7 @@ func TestRateLimitCostOverrides(t *testing.T) {
 				}
 
 				updateReq := openapi.AdminSettingsUpdateJSONRequestBody{
-					Services: &openapi.AdminSettingsServiceProps{
+					Services: &openapi.AdminSettingsServiceMutableProps{
 						RateLimiting: &openapi.RateLimitServiceSettings{
 							CostOverrides: &partialOverrides,
 						},
@@ -223,7 +223,7 @@ func TestRateLimitCostOverrides(t *testing.T) {
 				emptyOverrides := map[string]int{}
 
 				updateReq := openapi.AdminSettingsUpdateJSONRequestBody{
-					Services: &openapi.AdminSettingsServiceProps{
+					Services: &openapi.AdminSettingsServiceMutableProps{
 						RateLimiting: &openapi.RateLimitServiceSettings{
 							CostOverrides: &emptyOverrides,
 						},
@@ -253,7 +253,7 @@ func TestRateLimitCostOverrides(t *testing.T) {
 				guestCost := 5
 
 				updateReq := openapi.AdminSettingsUpdateJSONRequestBody{
-					Services: &openapi.AdminSettingsServiceProps{
+					Services: &openapi.AdminSettingsServiceMutableProps{
 						RateLimiting: &openapi.RateLimitServiceSettings{
 							RateLimitGuestCost: &guestCost,
 						},

@@ -41,7 +41,7 @@ func TestOAuthRuntimeRegistrationSettings(t *testing.T) {
 			memberCtx, _ := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
 			memberSession := sh.WithSession(memberCtx)
 			patch := func(value openapi.OAuthServiceSettings) openapi.AdminSettingsUpdateJSONRequestBody {
-				return openapi.AdminSettingsUpdateJSONRequestBody{Services: &openapi.AdminSettingsServiceProps{Oauth: &value}}
+				return openapi.AdminSettingsUpdateJSONRequestBody{Services: &openapi.AdminSettingsServiceMutableProps{Oauth: &value}}
 			}
 			update := func(value openapi.OAuthServiceSettings) *openapi.OAuthServiceSettings {
 				t.Helper()

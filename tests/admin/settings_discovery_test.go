@@ -71,7 +71,7 @@ func TestDiscoverySettingsProjection(t *testing.T) {
 				expected.RobotsTxt = new("User-agent: *\nDisallow: /handwritten/\n")
 
 				patch := openapi.AdminSettingsUpdateJSONRequestBody{
-					Services: &openapi.AdminSettingsServiceProps{
+					Services: &openapi.AdminSettingsServiceMutableProps{
 						Discovery: &expected,
 						Moderation: &openapi.ModerationServiceSettings{
 							ThreadBodyLengthMax: new(12345),
@@ -94,7 +94,7 @@ func TestDiscoverySettingsProjection(t *testing.T) {
 
 			t.Run("partial_update_preserves_other_fields_and_services", func(t *testing.T) {
 				patch := openapi.AdminSettingsUpdateJSONRequestBody{
-					Services: &openapi.AdminSettingsServiceProps{
+					Services: &openapi.AdminSettingsServiceMutableProps{
 						Discovery: &openapi.DiscoveryServiceSettings{
 							LlmsTxt:   new(false),
 							RobotsTxt: new(""),

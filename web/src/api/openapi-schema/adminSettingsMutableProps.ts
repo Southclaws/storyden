@@ -7,7 +7,7 @@
  *
  * OpenAPI spec version: v1.26.16-post
  */
-import type { AdminSettingsServiceProps } from "./adminSettingsServiceProps";
+import type { AdminSettingsServiceMutableProps } from "./adminSettingsServiceMutableProps";
 import type { AuthMode } from "./authMode";
 import type { Identifier } from "./identifier";
 import type { MessageOfTheDayMutableProps } from "./messageOfTheDayMutableProps";
@@ -24,7 +24,7 @@ export interface AdminSettingsMutableProps {
   banner_asset_id?: Identifier;
   authentication_mode?: AuthMode;
   registration_mode?: RegistrationMode;
-  services?: AdminSettingsServiceProps;
+  services?: AdminSettingsServiceMutableProps;
   /**
    * The settings metadata may be used by frontends to store arbitrary
    * vendor-specific configuration data specific to the frontend itself.

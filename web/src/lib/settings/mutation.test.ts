@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
-import { test } from "vitest";
+import { expectTypeOf, test } from "vitest";
 
-import type { AdminSettingsProps, Info } from "@/api/openapi-schema";
+import type {
+  AdminSettingsProps,
+  AdminSettingsUpdateBody,
+  Info,
+  MediaServiceSettings,
+} from "@/api/openapi-schema";
 import {
   AuthMode,
   InstanceCapability,
@@ -87,4 +92,21 @@ test("admin settings updates copy public discovery settings without private serv
 
   assert.deepStrictEqual(updated.discovery, { llms_txt: false, auth_md: true });
   assert.equal("services" in updated, false);
+});
+
+// Checked by tsc: request generation must not expose the computed response fields.
+test("media settings request and response types keep their distinct fields", () => {
+  type MediaPatch = NonNullable<
+    NonNullable<AdminSettingsUpdateBody["services"]>["media"]
+  >;
+
+  expectTypeOf<keyof MediaPatch>().toEqualTypeOf<
+    "image_max_size" | "image_max_pixels"
+  >();
+  expectTypeOf<MediaServiceSettings["image_memory_budget"]>().toEqualTypeOf<
+    number | undefined
+  >();
+  expectTypeOf<MediaServiceSettings["image_estimated_memory"]>().toEqualTypeOf<
+    number | undefined
+  >();
 });

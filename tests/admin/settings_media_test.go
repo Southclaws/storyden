@@ -3,6 +3,7 @@ package admin_test
 import (
 	"context"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -45,8 +46,8 @@ func TestMediaSettings(t *testing.T) {
 			require.Greater(t, *media.ImageEstimatedMemory, *media.ImageMemoryBudget)
 
 			patch := openapi.AdminSettingsUpdateJSONRequestBody{
-				Services: &openapi.AdminSettingsServiceProps{
-					Media: &openapi.MediaServiceSettings{
+				Services: &openapi.AdminSettingsServiceMutableProps{
+					Media: &openapi.MediaServiceSettingsMutableProps{
 						ImageMaxSize:   new(int64(1048576)),
 						ImageMaxPixels: new(int64(250000)),
 					},
@@ -57,16 +58,21 @@ func TestMediaSettings(t *testing.T) {
 			require.Less(t, *media.ImageEstimatedMemory, *media.ImageMemoryBudget)
 			require.Equal(t, response.JSON200.Services.Moderation, updated.JSON200.Services.Moderation)
 
-			patch.Services.Media = &openapi.MediaServiceSettings{ImageMaxPixels: new(int64(2000000))}
+			patch.Services.Media = &openapi.MediaServiceSettingsMutableProps{ImageMaxPixels: new(int64(2000000))}
 			updated = tests.AssertRequest(cl.AdminSettingsUpdateWithResponse(ctx, patch, auth))(t, http.StatusOK)
 			require.EqualValues(t, 1048576, *updated.JSON200.Services.Media.ImageMaxSize)
 			require.EqualValues(t, 2000000, *updated.JSON200.Services.Media.ImageMaxPixels)
 
 			for _, invalid := range []int64{0, -1} {
-				patch.Services.Media = &openapi.MediaServiceSettings{ImageMaxSize: &invalid}
+				patch.Services.Media = &openapi.MediaServiceSettingsMutableProps{ImageMaxSize: &invalid}
 				tests.AssertRequest(cl.AdminSettingsUpdateWithResponse(ctx, patch, auth))(t, http.StatusBadRequest)
-				patch.Services.Media = &openapi.MediaServiceSettings{ImageMaxPixels: &invalid}
+				patch.Services.Media = &openapi.MediaServiceSettingsMutableProps{ImageMaxPixels: &invalid}
 				tests.AssertRequest(cl.AdminSettingsUpdateWithResponse(ctx, patch, auth))(t, http.StatusBadRequest)
+			}
+
+			for _, field := range []string{"image_memory_budget", "image_estimated_memory"} {
+				body := strings.NewReader(`{"services":{"media":{"` + field + `":1}}}`)
+				tests.AssertRequest(cl.AdminSettingsUpdateWithBodyWithResponse(ctx, "application/json", body, auth))(t, http.StatusBadRequest)
 			}
 
 			stored := tests.AssertRequest(cl.AdminSettingsGetWithResponse(ctx, auth))(t, http.StatusOK)

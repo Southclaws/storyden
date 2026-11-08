@@ -57,7 +57,7 @@ func TestAutonomousRegistrationRoles(t *testing.T) {
 			}
 			update := func(value openapi.OAuthServiceSettings) *openapi.OAuthServiceSettings {
 				t.Helper()
-				response := tests.AssertRequest(cl.AdminSettingsUpdateWithResponse(root, openapi.AdminSettingsUpdateJSONRequestBody{Services: &openapi.AdminSettingsServiceProps{Oauth: &value}}, adminSession))(t, http.StatusOK)
+				response := tests.AssertRequest(cl.AdminSettingsUpdateWithResponse(root, openapi.AdminSettingsUpdateJSONRequestBody{Services: &openapi.AdminSettingsServiceMutableProps{Oauth: &value}}, adminSession))(t, http.StatusOK)
 				return response.JSON200.Services.Oauth
 			}
 			botRole := createRole("Bot", "MANAGE_LIBRARY")
@@ -89,7 +89,7 @@ func TestAutonomousRegistrationRoles(t *testing.T) {
 			expanded := agentAccessToken(t, root, cl, registered.ClientId, key, "")
 			require.Contains(t, *expanded.Scope, "MANAGE_SETTINGS")
 			tests.AssertRequest(cl.AdminSettingsGetWithResponse(root, bearer(*expanded.AccessToken)))(t, http.StatusOK)
-			tests.AssertRequest(cl.AdminSettingsUpdateWithResponse(root, openapi.AdminSettingsUpdateJSONRequestBody{Services: &openapi.AdminSettingsServiceProps{Oauth: &openapi.OAuthServiceSettings{AutonomousRegistrationRoleId: nullable.NewNullableWithValue(openapi.NullableIdentifier("00000000000000000a00"))}}}, bearer(*expanded.AccessToken)))(t, http.StatusForbidden)
+			tests.AssertRequest(cl.AdminSettingsUpdateWithResponse(root, openapi.AdminSettingsUpdateJSONRequestBody{Services: &openapi.AdminSettingsServiceMutableProps{Oauth: &openapi.OAuthServiceSettings{AutonomousRegistrationRoleId: nullable.NewNullableWithValue(openapi.NullableIdentifier("00000000000000000a00"))}}}, bearer(*expanded.AccessToken)))(t, http.StatusForbidden)
 
 			tests.AssertRequest(cl.AdminSettingsGetWithResponse(root, bearer(*first.AccessToken)))(t, http.StatusForbidden)
 			tests.AssertRequest(cl.AccountRemoveRoleWithResponse(root, *body.ClientName, managerRole, adminSession))(t, http.StatusOK)

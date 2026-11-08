@@ -9,7 +9,7 @@ import {
 } from "@/api/openapi-client/admin";
 import { getGetInfoKey } from "@/api/openapi-client/misc";
 import {
-  AdminSettingsMutableProps,
+  AdminSettingsUpdateBody,
   AdminSettingsProps,
   Info,
   MessageOfTheDay,
@@ -28,7 +28,7 @@ export function useSettingsMutation() {
     await mutate(infoKey, data);
   }
 
-  async function updateSettings(patch: AdminSettingsMutableProps) {
+  async function updateSettings(patch: AdminSettingsUpdateBody) {
     await mutateTransaction(
       mutate,
       [

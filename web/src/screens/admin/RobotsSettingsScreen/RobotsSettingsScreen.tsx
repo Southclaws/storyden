@@ -30,7 +30,6 @@ import {
   useRobotWorkspacesList,
 } from "@/api/openapi-client/robots";
 import {
-  AdminSettingsServiceProps,
   RobotMCPServer,
   RobotModelInfo,
   RobotProviderMutableSettings,
@@ -165,7 +164,6 @@ export function RobotsSettingsScreen() {
               enabledProviders={enabledProviders.length}
               models={modelsQuery.data?.models ?? []}
               modelsReady={!!modelsQuery.data}
-              services={settingsQuery.data.services}
             />
 
             {providers.map((provider) => (
@@ -1031,13 +1029,11 @@ function GlobalDefaultModelForm({
   enabledProviders,
   models,
   modelsReady,
-  services,
 }: {
   defaultModel: string | undefined;
   enabledProviders: number;
   models: RobotModelInfo[];
   modelsReady: boolean;
-  services: AdminSettingsServiceProps | undefined;
 }) {
   const { updateSettings, revalidate } = useSettingsMutation();
   const form = useForm<DefaultModelForm>({
@@ -1070,9 +1066,7 @@ function GlobalDefaultModelForm({
       async () => {
         await updateSettings({
           services: {
-            ...services,
             robots: {
-              ...services?.robots,
               default_model: data.default_model,
             },
           },
