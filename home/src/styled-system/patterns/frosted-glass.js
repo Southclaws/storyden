@@ -2,13 +2,13 @@ import { getPatternStyles, patternFns } from './runtime';
 import { memo } from '../helpers';
 import { css } from '../css/index';
 
-const frostedGlassConfig = {transform() {
-	return {
-		backgroundColor: "bg.opaque",
-		backdropBlur: "frosted",
-		backdropFilter: "auto"
-	};
-}}
+const frostedGlassConfig = { transform() {
+  return {
+    backgroundColor: "bg.opaque",
+    backdropBlur: "frosted",
+    backdropFilter: "auto"
+  };
+} }
 
 export function frostedGlassRaw(styles) {
   const s = getPatternStyles(frostedGlassConfig, styles || {})

@@ -3,7 +3,7 @@
 import { createContext, useContext, createElement, forwardRef } from 'react';
 import { cx, sva } from '../css/index';
 import { styled } from './factory';
-import { getDisplayName } from './helper';
+import { getDisplayName, mergeDefaultProps } from './helper';
 
 function createSafeContext(contextName) {
   const Context = createContext(undefined)
@@ -33,6 +33,10 @@ export function createSlotRecipeContext(recipeInput) {
   const recipeName = isRuntimeRecipe && recipe.__name__ ? recipe.__name__ : undefined
   const contextName = recipeName ? `createSlotRecipeContext("${recipeName}")` : 'createSlotRecipeContext'
   const [SlotStylesContext, useSlotStylesContext] = createSafeContext(contextName)
+  const PropsContext = createContext(undefined)
+  const usePropsContext = () => useContext(PropsContext)
+  const withPropsContext = (props, propsContext) =>
+    propsContext ? mergeDefaultProps(propsContext, props) : props
   const slotRecipeFn = isRuntimeRecipe ? recipe : sva(recipe.config ?? recipe)
 
   const resolveProps = (props, slotStyles) => {
@@ -49,10 +53,11 @@ export function createSlotRecipeContext(recipeInput) {
   }
 
   const withRootProvider = (Component, options) => {
-    const WithRootProvider = (props) => {
+    const WithRootProvider = (inProps) => {
+      const props = withPropsContext(inProps, usePropsContext())
       const [variantProps, otherProps] = slotRecipeFn.splitVariantProps(props)
       const resolvedSlots = resolveSlots(variantProps)
-      const mergedProps = options?.defaultProps ? Object.assign({}, options.defaultProps, otherProps) : otherProps
+      const mergedProps = options?.defaultProps ? mergeDefaultProps(options.defaultProps, otherProps) : otherProps
       return createElement(SlotStylesContext.Provider, {
         value: resolvedSlots,
         children: createElement(Component, mergedProps),
@@ -65,7 +70,8 @@ export function createSlotRecipeContext(recipeInput) {
 
   const withProvider = (Component, slot, options) => {
     const StyledComponent = styled(Component, {}, options)
-    const WithProvider = forwardRef(function WithProvider(props, ref) {
+    const WithProvider = forwardRef(function WithProvider(inProps, ref) {
+      const props = withPropsContext(inProps, usePropsContext())
       const [variantProps, restProps] = slotRecipeFn.splitVariantProps(props)
       const resolvedSlots = resolveSlots(variantProps)
       if (restProps.className == null && options?.defaultProps?.className) restProps.className = options.defaultProps.className
@@ -112,5 +118,7 @@ export function createSlotRecipeContext(recipeInput) {
     withRootProvider,
     withProvider,
     withContext,
+    PropsProvider: PropsContext.Provider,
+    usePropsContext,
   }
 }

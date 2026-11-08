@@ -2,9 +2,9 @@ import { getPatternStyles, patternFns } from './runtime';
 import { memo } from '../helpers';
 import { css } from '../css/index';
 
-const boxConfig = {transform(props) {
-	return props;
-}}
+const boxConfig = { transform(props) {
+  return props;
+} }
 
 export function boxRaw(styles) {
   const s = getPatternStyles(boxConfig, styles || {})

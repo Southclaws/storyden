@@ -2,15 +2,15 @@ import { getPatternStyles, patternFns } from './runtime';
 import { memo } from '../helpers';
 import { css } from '../css/index';
 
-const centerConfig = {transform(props) {
-	const { inline, ...rest } = props;
-	return {
-		display: inline ? "inline-flex" : "flex",
-		alignItems: "center",
-		justifyContent: "center",
-		...rest
-	};
-}}
+const centerConfig = { transform(props) {
+  const { inline, ...rest } = props;
+  return {
+    display: inline ? "inline-flex" : "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    ...rest
+  };
+} }
 
 export function centerRaw(styles) {
   const s = getPatternStyles(centerConfig, styles || {})

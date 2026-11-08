@@ -2,18 +2,19 @@ import { getPatternStyles, patternFns } from './runtime';
 import { memo } from '../helpers';
 import { css } from '../css/index';
 
-const spacerConfig = {transform(props, { map, isCssUnit, isCssVar }) {
-	const { size, ...rest } = props;
-	return {
-		alignSelf: "stretch",
-		justifySelf: "stretch",
-		flex: map(size, (v) => {
-			if (v == null) return "1";
-			return `0 0 ${isCssUnit(v) || isCssVar(v) ? v : `token(spacing.${v}, ${v})`}`;
-		}),
-		...rest
-	};
-}}
+const spacerConfig = { transform(props, { map, isCssUnit, isCssVar }) {
+  const { size, ...rest } = props;
+  return {
+    alignSelf: "stretch",
+    justifySelf: "stretch",
+    flex: map(size, (v) => {
+      if (v == null) return "1";
+      const val = isCssUnit(v) || isCssVar(v) ? v : `token(spacing.${v}, ${v})`;
+      return `0 0 ${val}`;
+    }),
+    ...rest
+  };
+} }
 
 export function spacerRaw(styles) {
   const s = getPatternStyles(spacerConfig, styles || {})

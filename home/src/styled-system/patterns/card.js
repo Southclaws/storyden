@@ -2,20 +2,20 @@ import { getPatternStyles, patternFns } from './runtime';
 import { memo } from '../helpers';
 import { css } from '../css/index';
 
-const cardConfig = {transform(props) {
-	const { kind, display } = props;
-	return {
-		display,
-		flexDirection: "column",
-		gap: "1",
-		width: "full",
-		overflow: "hidden",
-		boxShadow: "sm",
-		borderRadius: "lg",
-		backgroundColor: "bg.default",
-		padding: kind === "edge" ? "0" : "2"
-	};
-}}
+const cardConfig = { transform(props) {
+  const { kind, display } = props;
+  return {
+    display,
+    flexDirection: "column",
+    gap: "1",
+    width: "full",
+    overflow: "hidden",
+    boxShadow: "sm",
+    borderRadius: "lg",
+    backgroundColor: "bg.default",
+    padding: kind === "edge" ? "0" : "2"
+  };
+} }
 
 export function cardRaw(styles) {
   const s = getPatternStyles(cardConfig, styles || {})

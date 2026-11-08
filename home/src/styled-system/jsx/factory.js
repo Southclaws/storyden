@@ -1,6 +1,6 @@
 import { createElement, forwardRef } from 'react';
 import { cx, cva } from '../css/index';
-import { composeCvaFn, composeShouldForwardProps, getDisplayName, serializeSplitStyles, splitJsxProps } from './helper';
+import { composeCvaFn, composeShouldForwardProps, getDisplayName, serializeSplitStyles, mergeDefaultProps, splitJsxProps } from './helper';
 import { isCssProperty } from './is-valid-prop';
 
 function styledFn(BaseComponent, recipeOrConfig = {}, options = {}) {
@@ -30,7 +30,7 @@ function styledFn(BaseComponent, recipeOrConfig = {}, options = {}) {
     let combinedProps = props
     if (hasDefaultProps) {
       const { as, unstyled, children, ...restProps } = props
-      combinedProps = Object.assign({}, defaultProps, restProps)
+      combinedProps = mergeDefaultProps(defaultProps, restProps)
     }
     const [htmlProps, forwardedProps, variantProps, propStyles, cssStyles, elementProps] = splitJsxProps(
       combinedProps,

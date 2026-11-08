@@ -28,7 +28,9 @@ export function createRecipe(config) {
     },
     utility: {
       prefix: classPrefix,
-      toHash,
+      toHash(path, hashFn) {
+        return hashFn(path.join(":"))
+      },
       transform(prop, value) {
         return { className: value === "__ignore__" ? className : `${className}--${prop}_${withoutSpace(value)}` }
       },

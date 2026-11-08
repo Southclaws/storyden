@@ -1,4 +1,3 @@
-import type { PatternRuntimeConfig } from '../types/pattern';
 import type { ConditionalValue, SystemProperties, SystemStyleObject } from '../types/system';
 
 export interface CardProperties {

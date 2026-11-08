@@ -2,12 +2,12 @@ import { getPatternStyles, patternFns } from './runtime';
 import { memo } from '../helpers';
 import { css } from '../css/index';
 
-const visuallyHiddenConfig = {transform(props) {
-	return {
-		srOnly: true,
-		...props
-	};
-}}
+const visuallyHiddenConfig = { transform(props) {
+  return {
+    srOnly: true,
+    ...props
+  };
+} }
 
 export function visuallyHiddenRaw(styles) {
   const s = getPatternStyles(visuallyHiddenConfig, styles || {})

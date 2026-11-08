@@ -55,17 +55,19 @@ export function stableStringify(value) {
   return 'null'
 }
 
+const CSS_VAR_CHAR_REGEX = /[a-z0-9_-]/
+
 export function toCssVar(path) {
   let out = ""
   for (const ch of path.replaceAll(".", "-")) {
     if (ch >= "A" && ch <= "Z") out += "-" + ch.toLowerCase()
-    else if (/[a-z0-9_-]/.test(ch) || ch >= "\u0081") out += ch
+    else if (CSS_VAR_CHAR_REGEX.test(ch) || ch >= "\u0081") out += ch
     else out += "\\" + ch
   }
   return "var(--" + out + ")"
 }
 
-export function colorMix(tokens, path) {
+export function colorMix(tokens, path, resolveVar) {
   const colorPrefix = "colors."
   if (!path.startsWith(colorPrefix)) return
 
@@ -80,11 +82,11 @@ export function colorMix(tokens, path) {
   const percent = opacity === undefined ? Number(rawOpacity) : Number(opacity) * 100
   if (Number.isNaN(percent)) return
 
-  return "color-mix(in oklab, " + toCssVar(colorPath) + " " + percent + "%, transparent)"
+  return "color-mix(in oklab, " + (resolveVar || toCssVar)(colorPath) + " " + percent + "%, transparent)"
 }
 
 export function compact(v) {
-  const out = Object.create(null)
+  const out = {}
   if (!v) return out
   for (const k in v) {
     if (v[k] !== void 0) out[k] = v[k]
@@ -173,7 +175,7 @@ export function getSlotRecipes(recipe) {
 }
 
 export function toResponsiveObject(values, breakpoints) {
-  const out = Object.create(null)
+  const out = {}
   for (let i = 0; i < values.length; i++) {
     if (values[i] != null) out[breakpoints[i]] = values[i]
   }
@@ -186,9 +188,9 @@ export function walkObject(target, fn, options) {
   const inner = (value, path = []) => {
     if (!value || typeof value !== "object") return fn(value, path)
     if (stop?.(value, path)) return fn(value, path)
-    const out = Array.isArray(value) ? [] : Object.create(null)
+    const out = Array.isArray(value) ? [] : {}
     for (const prop in value) {
-      if (!HAS_OWN.call(value, prop)) continue
+      if (!HAS_OWN.call(value, prop) || prop === "__proto__") continue
       const key = getKey?.(prop, value[prop]) ?? prop
       path.push(key)
       const next = inner(value[prop], path)
@@ -407,7 +409,7 @@ export function weakMemo(fn) {
 }
 
 export function mergeProps(...src) {
-  const out = Object.create(null)
+  const out = {}
   for (const obj of src) {
     if (!obj) continue
     for (const k in obj) {
@@ -530,8 +532,8 @@ export function splitProps(props, ...keys) {
 
   if (keyCount === 1) {
     const matcher = keys[0]
-    const picked = Object.create(null)
-    const rest = Object.create(null)
+    const picked = {}
+    const rest = {}
 
     if (Array.isArray(matcher)) {
       const keyMap = getSplitPropsKeyMap(matcher)
@@ -564,7 +566,7 @@ export function splitProps(props, ...keys) {
   }
 
   const out = new Array(keyCount + 1)
-  for (let i = 0; i <= keyCount; i++) out[i] = Object.create(null)
+  for (let i = 0; i <= keyCount; i++) out[i] = {}
   const rest = out[keyCount]
 
   for (let i = 0; i < propKeys.length; i++) {
@@ -611,10 +613,12 @@ export function withoutSpace(str) {
   return (typeof str === "string" && str.indexOf(" ") >= 0 ? str.replaceAll(" ", "_") : str)
 }
 
+const IMPORTANT_REGEX = /\s*!(important)?\s*$/i
+
 export function isImportant(value) {
-  return typeof value === "string" ? /\s*!(important)?\s*$/i.test(value) : false
+  return typeof value === "string" ? IMPORTANT_REGEX.test(value) : false
 }
 
 export function withoutImportant(value) {
-  return (typeof value === "string" ? value.replace(/\s*!(important)?\s*$/i, "").trim() : value)
+  return (typeof value === "string" ? value.replace(IMPORTANT_REGEX, "").trim() : value)
 }

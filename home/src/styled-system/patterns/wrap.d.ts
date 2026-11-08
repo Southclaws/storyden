@@ -1,4 +1,3 @@
-import type { PatternRuntimeConfig } from '../types/pattern';
 import type { SystemProperties, SystemStyleObject } from '../types/system';
 
 export interface WrapProperties {

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, createElement, forwardRef } from 'react';
 import { styled } from './factory';
-import { getDisplayName } from './helper';
+import { getDisplayName, mergeDefaultProps } from './helper';
 
 function resolveRecipe(recipe) {
   if (recipe == null) throw new Error('createRecipeContext requires a recipe')
@@ -22,7 +22,7 @@ export function createRecipeContext(recipeInput) {
 
     const WithContext = forwardRef(function WithContext(inProps, ref) {
       const propsContext = usePropsContext()
-      const props = propsContext ? Object.assign({}, propsContext, inProps) : inProps
+      const props = propsContext ? mergeDefaultProps(propsContext, inProps) : inProps
       return createElement(StyledComponent, { ...props, ref })
     })
 

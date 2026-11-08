@@ -2,20 +2,20 @@ import { getPatternStyles, patternFns } from './runtime';
 import { memo } from '../helpers';
 import { css } from '../css/index';
 
-const flexConfig = {transform(props) {
-	const { direction, align, justify, wrap: wrap2, basis, grow, shrink, ...rest } = props;
-	return {
-		display: "flex",
-		flexDirection: direction,
-		alignItems: align,
-		justifyContent: justify,
-		flexWrap: wrap2,
-		flexBasis: basis,
-		flexGrow: grow,
-		flexShrink: shrink,
-		...rest
-	};
-}}
+const flexConfig = { transform(props) {
+  const { direction, align, justify, wrap: wrap2, basis, grow, shrink, ...rest } = props;
+  return {
+    display: "flex",
+    flexDirection: direction,
+    alignItems: align,
+    justifyContent: justify,
+    flexWrap: wrap2,
+    flexBasis: basis,
+    flexGrow: grow,
+    flexShrink: shrink,
+    ...rest
+  };
+} }
 
 export function flexRaw(styles) {
   const s = getPatternStyles(flexConfig, styles || {})
