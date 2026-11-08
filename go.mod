@@ -208,7 +208,7 @@ require (
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-openapi/inflect v1.0.1 // indirect
 	github.com/go-openapi/jsonpointer v1.0.2 // indirect
-	github.com/go-test/deep v1.1.1 // indirect
+	github.com/go-test/deep v1.1.2 // indirect
 	github.com/go-webauthn/x v0.3.1 // indirect
 	github.com/goccy/go-json v0.12.0 // indirect
 	github.com/godbus/dbus v0.0.0-20190726142602-4481cbc300e2 // indirect
@@ -295,7 +295,7 @@ require (
 	github.com/sony/gobreaker v1.0.0 // indirect
 	github.com/sosodev/duration v1.4.0 // indirect
 	github.com/speakeasy-api/jsonpath v0.6.3 // indirect
-	github.com/speakeasy-api/openapi v1.25.5 // indirect
+	github.com/speakeasy-api/openapi v1.25.6 // indirect
 	github.com/spf13/cast v1.10.0 // indirect
 	github.com/spf13/pflag v1.1.0 // indirect
 	github.com/spyzhov/ajson v0.9.6 // indirect
