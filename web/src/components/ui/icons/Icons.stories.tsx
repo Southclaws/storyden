@@ -82,6 +82,7 @@ import * as TagIcons from "./Tag";
 import * as ToolIcons from "./Tool";
 import * as ToolsetIcons from "./Toolset";
 import * as TypographyIcons from "./Typography";
+import * as UnreadIcons from "./Unread";
 import * as VersionsIcons from "./Versions";
 import * as VisibilityIcons from "./Visibility";
 import * as WarningIcons from "./Warning";
@@ -165,6 +166,7 @@ const modules = {
   ToolIcons,
   ToolsetIcons,
   TypographyIcons,
+  UnreadIcons,
   VersionsIcons,
   VisibilityIcons,
   WarningIcons,

@@ -44,6 +44,7 @@ test("the default navigation contains only first-class items", () => {
   assert.deepStrictEqual(DefaultNavigationConfig.items, [
     { type: "compose" },
     { type: "categories" },
+    { type: "unread" },
     { type: "library" },
     { type: "collections" },
     { type: "links" },

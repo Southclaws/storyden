@@ -2,7 +2,7 @@ import { PropsWithChildren } from "react";
 
 import { CardBox } from "@/components/ui/card-box";
 import { Text } from "@/components/ui/text";
-import { usePublicRegistration } from "@/lib/settings/registration";
+import { allowsPublicRegistration } from "@/lib/settings/registration";
 import type { Settings } from "@/lib/settings/settings";
 import { Box, Center, HStack, LStack, styled } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
@@ -101,7 +101,9 @@ export function UnauthenticatedBanner({
 }: {
   initialSettings?: Settings;
 }) {
-  const canRegister = usePublicRegistration(initialSettings);
+  const canRegister = initialSettings
+    ? allowsPublicRegistration(initialSettings.registration_mode)
+    : false;
 
   return (
     <UnreadyBanner error="Please log in to see this page.">

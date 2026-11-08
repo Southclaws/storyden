@@ -23,6 +23,12 @@ export function useThreadReadStatus(
   ) {
     const readStatus = await threadReadStatusUpdate(thread.slug, { status });
     await updateCachedReadStatus(readStatus);
+    await mutate(
+      (key) =>
+        Array.isArray(key) &&
+        key[0] === getThreadListKey()[0] &&
+        key[1]?.read_status !== undefined,
+    );
 
     return readStatus;
   }

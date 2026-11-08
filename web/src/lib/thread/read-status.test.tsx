@@ -215,4 +215,43 @@ describe("thread read status", () => {
     await waitFor(() => expect(navigator.sendBeacon).toHaveBeenCalledTimes(1));
     expect(result.current.read_status).toEqual(thread.read_status);
   });
+
+  it("refetches filtered membership and totals after an explicit read change", async () => {
+    const key = getThreadListKey({ read_status: "unread", page: "1" });
+    const initial: ThreadListOKResponse = {
+      threads: [thread],
+      current_page: 1,
+      page_size: 50,
+      results: 1,
+      total_pages: 1,
+    };
+    const fetchList = vi.fn().mockResolvedValue({
+      ...initial,
+      threads: [],
+      results: 0,
+      total_pages: 0,
+    });
+    const { result } = renderHook(
+      () => {
+        const { data } = useSWR<ThreadListOKResponse>(key, fetchList, {
+          fallbackData: initial,
+          revalidateOnMount: false,
+        });
+        return { data, ...useThreadReadStatus(thread) };
+      },
+      { wrapper: withCache(new Map()) },
+    );
+    vi.mocked(threadReadStatusUpdate).mockResolvedValueOnce({
+      last_read_at: markedAt,
+      replies_since: 0,
+    });
+
+    await act(async () => {
+      await result.current.updateReadStatus("read");
+    });
+
+    expect(fetchList).toHaveBeenCalledOnce();
+    expect(result.current.data?.threads).toEqual([]);
+    expect(result.current.data?.total_pages).toBe(0);
+  });
 });

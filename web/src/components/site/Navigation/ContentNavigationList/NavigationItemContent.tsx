@@ -20,6 +20,7 @@ import { MembersAnchor } from "../Anchors/Members";
 import { RobotsAnchor } from "../Anchors/Robots";
 import { RolesAnchor } from "../Anchors/Roles";
 import { SearchAnchor } from "../Anchors/Search";
+import { UnreadAnchor } from "../Anchors/Unread";
 import { LibraryNavigationTree } from "../LibraryNavigationTree/LibraryNavigationTree";
 import { libraryNavigationVisibility } from "../LibraryNavigationTree/LibraryNavigationTree.constants";
 
@@ -49,6 +50,8 @@ export function NavigationItemContent({
           currentPath={currentPath}
         />
       );
+    case "unread":
+      return session ? <UnreadAnchor /> : null;
     case "library":
       return (
         <LibraryNavigationTree

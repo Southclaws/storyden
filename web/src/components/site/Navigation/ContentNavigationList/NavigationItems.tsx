@@ -40,9 +40,17 @@ export function NavigationItems(props: Props) {
 }
 
 function NavigationItemsView(props: Props) {
-  const visibleItems = props.navigation.items.filter(
-    (item) => item.type !== "robots" || props.robotsEnabled,
-  );
+  const visibleItems = props.navigation.items.filter((item) => {
+    if (item.type === "robots") {
+      return props.robotsEnabled;
+    }
+
+    if (item.type === "unread") {
+      return Boolean(props.session);
+    }
+
+    return true;
+  });
   return (
     <div className="navigation-editor__items" data-editing={false}>
       {visibleItems.map((item) => (

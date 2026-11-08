@@ -4,6 +4,7 @@ export const BuiltInNavigationItemTypeSchema = z.enum([
   "search",
   "compose",
   "categories",
+  "unread",
   "library",
   "robots",
   "collections",
@@ -70,6 +71,7 @@ export const DefaultNavigationConfig = {
   items: [
     { type: "compose" },
     { type: "categories" },
+    { type: "unread" },
     { type: "library" },
     { type: "collections" },
     { type: "links" },
@@ -90,6 +92,7 @@ export const BuiltInNavigationItemName: Record<
   search: "Search",
   compose: "New thread",
   categories: "Discussion",
+  unread: "Unread",
   library: "Library",
   robots: "Robots",
   collections: "Collections",

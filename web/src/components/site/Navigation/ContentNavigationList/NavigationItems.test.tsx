@@ -2,6 +2,8 @@ import { act, render, screen } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { expect, it, vi } from "vitest";
 
+import type { Account } from "@/api/openapi-schema";
+
 import { NavigationItems, type Props } from "./NavigationItems";
 
 const { loadEditor, loading } = vi.hoisted(() => ({
@@ -73,4 +75,24 @@ it("keeps server-rendered navigation available until the editing controls are re
   expect(
     screen.queryByRole("button", { name: "Edit navigation" }),
   ).not.toBeInTheDocument();
+});
+
+it("renders Unread only for signed-in members", () => {
+  const props: Props = {
+    navigation: { items: [{ type: "unread" }] },
+    currentPath: "/unread",
+    isEditing: false,
+    robotsEnabled: false,
+  };
+
+  const view = render(<NavigationItems {...props} />);
+  expect(screen.queryByRole("link", { name: "Unread" })).toBeNull();
+
+  view.rerender(
+    <NavigationItems {...props} session={{ id: "member-id" } as Account} />,
+  );
+  expect(screen.getByRole("link", { name: "Unread" })).toHaveAttribute(
+    "href",
+    "/unread",
+  );
 });
