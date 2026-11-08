@@ -18,6 +18,7 @@ export const richCard = defineSlotRecipe({
     "menuContainer",
     "titleContainer",
     "titleIcon",
+    "indicator",
     "title",
     "contentContainer",
     "mediaContainer",
@@ -84,8 +85,23 @@ export const richCard = defineSlotRecipe({
       },
     },
 
+    indicator: {
+      gridColumn: "2",
+      gridRow: "1",
+      alignSelf: "start",
+      justifySelf: "end",
+      margin: "2",
+      width: "1.5",
+      height: "1.5",
+      borderRadius: "full",
+      zIndex: "1",
+      pointerEvents: "none",
+    },
+
     title: {
-      lineClamp: "1",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
       color: "text.default",
       fontSize: "sm",
       fontWeight: "semibold",
@@ -156,6 +172,30 @@ export const richCard = defineSlotRecipe({
     },
   },
   variants: {
+    indicator: {
+      true: {
+        container: {
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1fr) auto",
+        },
+        root: {
+          gridColumn: "1 / -1",
+          gridRow: "1",
+          zIndex: "0",
+        },
+        titleContainer: { paddingInlineEnd: "1" },
+        headerContainer: { paddingInlineEnd: "4" },
+        menuContainer: { marginInlineEnd: "4" },
+      },
+    },
+    titleWeight: {
+      semibold: {
+        title: { fontWeight: "semibold" },
+      },
+      bold: {
+        title: { fontWeight: "bold" },
+      },
+    },
     hasMedia: {
       true: {},
       false: {},

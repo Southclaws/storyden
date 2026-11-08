@@ -22,6 +22,8 @@ import {
   cardRows,
   richCard,
 } from "@/styled-system/recipes";
+import { token } from "@/styled-system/tokens";
+import type { ColorToken } from "@/styled-system/types/tokens";
 import { isExternalURL } from "@/utils/url";
 
 import { ContentComposer } from "../../content/ContentComposer/ContentComposer";
@@ -38,6 +40,8 @@ export type CardItem = CardMediaOptions & {
   text?: string;
   titleIcon?: React.ReactNode;
   titleStatus?: string;
+  indicator?: boolean;
+  indicatorColour?: ColorToken;
   headingAs?: "h2" | "h3" | "h4";
   content?: string;
   body?: ReactNode;
@@ -59,6 +63,8 @@ export function Card({
   text,
   titleIcon,
   titleStatus,
+  indicator = false,
+  indicatorColour = "accent.text",
   headingAs = "h2",
   content,
   image,
@@ -73,6 +79,7 @@ export function Card({
   controls,
   shape,
   backgroundColor,
+  titleWeight,
   disableAnchors = false,
   prefetchOnIntent = false,
   children,
@@ -86,7 +93,9 @@ export function Card({
   const styles = richCard({
     shape,
     backgroundColor,
+    titleWeight,
     hasMedia,
+    indicator,
   });
 
   const externalURL = isExternalURL(url);
@@ -272,6 +281,15 @@ export function Card({
           </div>
         )}
       </div>
+      {indicator && (
+        <span
+          className={styles.indicator}
+          style={{
+            backgroundColor: token.var(`colors.${indicatorColour}`),
+          }}
+          aria-hidden="true"
+        />
+      )}
     </styled.article>
   );
 }

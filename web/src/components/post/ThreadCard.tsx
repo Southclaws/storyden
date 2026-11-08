@@ -59,6 +59,22 @@ export const ThreadReferenceCard = memo(
       : replyCountLabel;
 
     const newRepliesCount = thread.read_status?.replies_since ?? 0;
+    let readState: "read" | "unread" | undefined;
+    let readStatusLabel: string | undefined;
+
+    if (session && !isDraft) {
+      if (!thread.read_status) {
+        readState = "unread";
+        readStatusLabel = "Unread";
+      } else if (newRepliesCount > 0) {
+        readState = "unread";
+        readStatusLabel = "New replies";
+      } else {
+        readState = "read";
+        readStatusLabel = "Caught up";
+      }
+    }
+
     const lastReadAt = thread.read_status?.last_read_at;
     const newRepliesLabel =
       newRepliesCount > 0 && lastReadAt
@@ -84,6 +100,10 @@ export const ThreadReferenceCard = memo(
         id={thread.id}
         title={title}
         titleIcon={isPinned ? <PinIcon w="4" /> : undefined}
+        indicator={readState === "unread"}
+        indicatorColour="blue.solid"
+        titleWeight={readState === "unread" ? "bold" : "semibold"}
+        titleStatus={readStatusLabel}
         text={thread.description}
         url={permalink}
         prefetchOnIntent={!isDraft}

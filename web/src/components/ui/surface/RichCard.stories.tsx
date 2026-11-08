@@ -125,6 +125,9 @@ const meta = {
     image: { control: "text" },
     imageAlt: { control: "text" },
     titleStatus: { control: "text" },
+    indicator: { control: "boolean" },
+    indicatorColour: { control: "text" },
+    titleWeight: { control: "select", options: ["semibold", "bold"] },
     content: { control: "text" },
     header: { control: false },
     menu: { control: false },
@@ -137,7 +140,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "The canonical Surface family for independent content objects. Row, responsive, box, and fill cards use a `border.default` boundary. Minimal uses a flat inset surface for media-led collections. Use `Card` when content has a title, description, metadata, media, or controls; use `CardRows` and `CardGrid` for repeated collections. `titleIcon` is an optional, decorative 16px semantic marker whose size and muted colour are owned by Card. Use a product-owned icon when it adds deliberate object identity or state; do not substitute a visually similar icon from another domain. Card exposes a named article and an h2 title by default; use headingAs for a nested section. The title is the primary link and the excerpt remains readable text. Use titleStatus for meaningful state conveyed by a decorative icon. Backdrop images are decorative; foreground previews default to decorative teasers, with imageAlt available when a meaningful image description is supplied. Do not copy the title into imageAlt. The recipe has five shapes and three backgrounds, with no size axis. Responsive layout changes at a container width of 560px. The fill shape intentionally hides its title slot and top-right menu: put visible identity in its header; its content provides the primary link. Use Variants and Without Media to inspect all 15 combinations, and Container Widths to check 320, 480, 560, 561, and 800px frames. Do not wrap arbitrary page sections in cards, and use an Inset treatment for subordinate content inside a Surface.",
+          "The canonical Surface family for independent content objects. Row, responsive, box, and fill cards use a `border.default` boundary. Minimal uses a flat inset surface for media-led collections. Use `Card` when content has a title, description, metadata, media, or controls; use `CardRows` and `CardGrid` for repeated collections. `titleIcon` is an optional, decorative 16px semantic marker whose size and muted colour are owned by Card. Use a product-owned icon when it adds deliberate object identity or state; do not substitute a visually similar icon from another domain. Card exposes a named article and an h2 title by default; use headingAs for a nested section. The title is the primary link and the excerpt remains readable text. Use titleStatus for meaningful state conveyed by a decorative icon. Use indicator for a small decorative attention dot, with indicatorColour accepting a design-system colour token and defaulting to accent.text. The indicator occupies a grid slot in the top-right corner and reserves title space. An absent indicator takes no space. Set titleWeight independently to semibold or bold, and use titleStatus to describe the domain meaning accessibly. The dot is not a lifecycle StatusBadge or a replacement for detailed counts. Backdrop images are decorative; foreground previews default to decorative teasers, with imageAlt available when a meaningful image description is supplied. Do not copy the title into imageAlt. The recipe has five shapes and three backgrounds, with no size axis. Responsive layout changes at a container width of 560px. The fill shape intentionally hides its title slot and top-right menu: put visible identity in its header; its content provides the primary link. Use Variants and Without Media to inspect all 15 combinations, and Container Widths to check 320, 480, 560, 561, and 800px frames. Do not wrap arbitrary page sections in cards, and use an Inset treatment for subordinate content inside a Surface.",
       },
     },
   },
@@ -426,6 +429,112 @@ export const StateIcon: Story = {
       description: {
         story:
           "Use a semantic icon export when it adds deliberate product identity or state. This example communicates pinned state; object-family icons should likewise have their own product name rather than borrowing a visually similar symbol.",
+      },
+    },
+  },
+};
+
+export const Indicator: Story = {
+  args: {
+    id: "attention-indicator",
+    title: "A contribution needs your attention",
+    url: "/l/contribution",
+    text: "The domain chooses the dot colour and its accessible meaning.",
+    indicator: true,
+    indicatorColour: "status.warning.content",
+    titleStatus: "Needs attention",
+    disableAnchors: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Use indicator for a compact attention cue in the card's top-right corner. Its grid slot reserves title space, so long titles truncate before the corner. indicatorColour accepts a colour token, while titleWeight controls typography separately. Supply titleStatus to communicate what the dot means; use StatusBadge when the state needs a visible label.",
+      },
+    },
+  },
+};
+
+export const ReadStates: Story = {
+  render: () => (
+    <LStack gap="4" maxW="3xl">
+      <Card
+        id="never-opened"
+        title="Recommendations for our next community meetup"
+        url="/t/never-opened"
+        text="Which places would you like to visit together?"
+        indicator
+        indicatorColour="blue.solid"
+        titleWeight="bold"
+        titleStatus="Unread"
+        disableAnchors
+      >
+        <Text variant="metadata">Mara · 4h · 2 replies</Text>
+      </Card>
+      <Card
+        id="new-replies"
+        title="Planning the winter gathering"
+        url="/t/new-replies"
+        text="A few updates on dates and venues."
+        indicator
+        indicatorColour="blue.solid"
+        titleWeight="bold"
+        titleStatus="New replies"
+        titleIcon={<PinIcon />}
+        backgroundColor="emphasized"
+        disableAnchors
+      >
+        <Text variant="metadata">Odin · 4h · 2 replies +2</Text>
+      </Card>
+      <Card
+        id="unbroken-title"
+        title={"W".repeat(180)}
+        url="/t/unbroken-title"
+        text="An unbroken title truncates before the corner slot."
+        indicator
+        indicatorColour="blue.solid"
+        titleWeight="bold"
+        titleStatus="Unread"
+        disableAnchors
+      />
+      <Card
+        id="long-title"
+        title="Planning our next community gathering with recommendations for places to visit, things to make, and projects to share together"
+        url="/t/long-title"
+        text="A long title with spaces also leaves room for the corner slot."
+        indicator
+        indicatorColour="blue.solid"
+        titleWeight="bold"
+        titleStatus="Unread"
+        disableAnchors
+      />
+      <Card
+        id="caught-up"
+        title="Recommendations for our next community meetup"
+        url="/t/caught-up"
+        text="Which places would you like to visit together?"
+        titleWeight="semibold"
+        titleStatus="Caught up"
+        disableAnchors
+      >
+        <Text variant="metadata">Mara · 4h · 2 replies</Text>
+      </Card>
+      <Card
+        id="signed-out"
+        title="Recommendations for our next community meetup"
+        url="/t/signed-out"
+        text="Signed-out cards retain their usual title styling."
+        disableAnchors
+      >
+        <Text variant="metadata">Mara · 4h · 2 replies</Text>
+      </Card>
+    </LStack>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Personal attention states: never opened, new replies with a pin, caught up, and signed out. Read titles sit flush with the description because absent indicators take no space. Read state can coexist with a semantic title icon and preserves the existing reply count. It is independent of completion, moderation, or locking.",
       },
     },
   },
