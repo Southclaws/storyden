@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/anthropics/anthropic-sdk-go"
+	"github.com/anthropics/anthropic-sdk-go/v2"
 	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
 

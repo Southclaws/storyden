@@ -38,7 +38,7 @@ require (
 	github.com/agext/levenshtein v1.2.3
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/alitto/pond/v2 v2.7.3
-	github.com/anthropics/anthropic-sdk-go v1.84.0
+	github.com/anthropics/anthropic-sdk-go/v2 v2.7.0
 	github.com/bep/imagemeta v1.1.1
 	github.com/blevesearch/bleve/v2 v2.6.3
 	github.com/britishboop/hermes v0.0.0-20251206153109-3b31218be4fc

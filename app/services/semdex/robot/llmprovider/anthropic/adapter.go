@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/anthropics/anthropic-sdk-go"
-	anthropicoption "github.com/anthropics/anthropic-sdk-go/option"
+	"github.com/anthropics/anthropic-sdk-go/v2"
+	anthropicoption "github.com/anthropics/anthropic-sdk-go/v2/option"
 	"google.golang.org/adk/v2/model"
 
 	"github.com/Southclaws/storyden/app/resources/robot/llm_provider"

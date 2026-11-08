@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	anthropicapi "github.com/anthropics/anthropic-sdk-go"
-	anthropicoption "github.com/anthropics/anthropic-sdk-go/option"
+	anthropicapi "github.com/anthropics/anthropic-sdk-go/v2"
+	anthropicoption "github.com/anthropics/anthropic-sdk-go/v2/option"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -18,6 +18,10 @@ import (
 
 func TestModelCapabilitiesProbesAnthropicImageSupport(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "Bearer test-key", r.Header.Get("Authorization"))
+		assert.Empty(t, r.Header.Get("X-Api-Key"))
+		assert.Equal(t, "2026-10-21", r.Header.Get("Anthropic-Version"))
+
 		supported := r.URL.Path == "/v1/models/claude-with-images"
 		w.Header().Set("Content-Type", "application/json")
 		_, err := fmt.Fprintf(w, `{

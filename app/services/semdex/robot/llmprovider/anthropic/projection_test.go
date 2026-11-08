@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	anthropicapi "github.com/anthropics/anthropic-sdk-go"
+	anthropicapi "github.com/anthropics/anthropic-sdk-go/v2"
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
