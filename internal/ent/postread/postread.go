@@ -19,6 +19,8 @@ const (
 	FieldAccountID = "account_id"
 	// FieldLastSeenAt holds the string denoting the last_seen_at field in the database.
 	FieldLastSeenAt = "last_seen_at"
+	// FieldMarkedUnreadAt holds the string denoting the marked_unread_at field in the database.
+	FieldMarkedUnreadAt = "marked_unread_at"
 	// EdgeRootPost holds the string denoting the root_post edge name in mutations.
 	EdgeRootPost = "root_post"
 	// EdgeAccount holds the string denoting the account edge name in mutations.
@@ -47,6 +49,7 @@ var Columns = []string{
 	FieldRootPostID,
 	FieldAccountID,
 	FieldLastSeenAt,
+	FieldMarkedUnreadAt,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -87,6 +90,11 @@ func ByAccountID(opts ...sql.OrderTermOption) OrderOption {
 // ByLastSeenAt orders the results by the last_seen_at field.
 func ByLastSeenAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLastSeenAt, opts...).ToFunc()
+}
+
+// ByMarkedUnreadAt orders the results by the marked_unread_at field.
+func ByMarkedUnreadAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMarkedUnreadAt, opts...).ToFunc()
 }
 
 // ByRootPostField orders the results by root_post field.

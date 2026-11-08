@@ -42655,6 +42655,7 @@ type PostReadMutation struct {
 	typ              string
 	id               *xid.ID
 	last_seen_at     *time.Time
+	marked_unread_at *time.Time
 	clearedFields    map[string]struct{}
 	root_post        *xid.ID
 	clearedroot_post bool
@@ -42877,6 +42878,55 @@ func (m *PostReadMutation) ResetLastSeenAt() {
 	m.last_seen_at = nil
 }
 
+// SetMarkedUnreadAt sets the "marked_unread_at" field.
+func (m *PostReadMutation) SetMarkedUnreadAt(t time.Time) {
+	m.marked_unread_at = &t
+}
+
+// MarkedUnreadAt returns the value of the "marked_unread_at" field in the mutation.
+func (m *PostReadMutation) MarkedUnreadAt() (r time.Time, exists bool) {
+	v := m.marked_unread_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMarkedUnreadAt returns the old "marked_unread_at" field's value of the PostRead entity.
+// If the PostRead object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PostReadMutation) OldMarkedUnreadAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMarkedUnreadAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMarkedUnreadAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMarkedUnreadAt: %w", err)
+	}
+	return oldValue.MarkedUnreadAt, nil
+}
+
+// ClearMarkedUnreadAt clears the value of the "marked_unread_at" field.
+func (m *PostReadMutation) ClearMarkedUnreadAt() {
+	m.marked_unread_at = nil
+	m.clearedFields[postread.FieldMarkedUnreadAt] = struct{}{}
+}
+
+// MarkedUnreadAtCleared returns if the "marked_unread_at" field was cleared in this mutation.
+func (m *PostReadMutation) MarkedUnreadAtCleared() bool {
+	_, ok := m.clearedFields[postread.FieldMarkedUnreadAt]
+	return ok
+}
+
+// ResetMarkedUnreadAt resets all changes to the "marked_unread_at" field.
+func (m *PostReadMutation) ResetMarkedUnreadAt() {
+	m.marked_unread_at = nil
+	delete(m.clearedFields, postread.FieldMarkedUnreadAt)
+}
+
 // ClearRootPost clears the "root_post" edge to the Post entity.
 func (m *PostReadMutation) ClearRootPost() {
 	m.clearedroot_post = true
@@ -42965,7 +43015,7 @@ func (m *PostReadMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PostReadMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.root_post != nil {
 		fields = append(fields, postread.FieldRootPostID)
 	}
@@ -42974,6 +43024,9 @@ func (m *PostReadMutation) Fields() []string {
 	}
 	if m.last_seen_at != nil {
 		fields = append(fields, postread.FieldLastSeenAt)
+	}
+	if m.marked_unread_at != nil {
+		fields = append(fields, postread.FieldMarkedUnreadAt)
 	}
 	return fields
 }
@@ -42989,6 +43042,8 @@ func (m *PostReadMutation) Field(name string) (ent.Value, bool) {
 		return m.AccountID()
 	case postread.FieldLastSeenAt:
 		return m.LastSeenAt()
+	case postread.FieldMarkedUnreadAt:
+		return m.MarkedUnreadAt()
 	}
 	return nil, false
 }
@@ -43004,6 +43059,8 @@ func (m *PostReadMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldAccountID(ctx)
 	case postread.FieldLastSeenAt:
 		return m.OldLastSeenAt(ctx)
+	case postread.FieldMarkedUnreadAt:
+		return m.OldMarkedUnreadAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown PostRead field %s", name)
 }
@@ -43034,6 +43091,13 @@ func (m *PostReadMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetLastSeenAt(v)
 		return nil
+	case postread.FieldMarkedUnreadAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMarkedUnreadAt(v)
+		return nil
 	}
 	return fmt.Errorf("unknown PostRead field %s", name)
 }
@@ -43063,7 +43127,11 @@ func (m *PostReadMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *PostReadMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(postread.FieldMarkedUnreadAt) {
+		fields = append(fields, postread.FieldMarkedUnreadAt)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -43076,6 +43144,11 @@ func (m *PostReadMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *PostReadMutation) ClearField(name string) error {
+	switch name {
+	case postread.FieldMarkedUnreadAt:
+		m.ClearMarkedUnreadAt()
+		return nil
+	}
 	return fmt.Errorf("unknown PostRead nullable field %s", name)
 }
 
@@ -43091,6 +43164,9 @@ func (m *PostReadMutation) ResetField(name string) error {
 		return nil
 	case postread.FieldLastSeenAt:
 		m.ResetLastSeenAt()
+		return nil
+	case postread.FieldMarkedUnreadAt:
+		m.ResetMarkedUnreadAt()
 		return nil
 	}
 	return fmt.Errorf("unknown PostRead field %s", name)

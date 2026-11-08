@@ -38,7 +38,7 @@ func (l *listener) handleBeacon(ctx context.Context, cmd *message.CommandSendBea
 		if subject, ok := cmd.Subject.Get(); ok {
 			log = log.With(slog.String("account_id", subject.String()))
 
-			err := l.postReadStateWriter.UpsertReadState(ctx, subject, post.ID(cmd.Item.ID))
+			err := l.postReadStateWriter.MarkRead(ctx, subject, post.ID(cmd.Item.ID), cmd.ReceivedAt)
 			if err != nil {
 				log.Error("failed to update read state", slog.String("error", err.Error()))
 				// NOTE: No error here, we don't care enough about read states

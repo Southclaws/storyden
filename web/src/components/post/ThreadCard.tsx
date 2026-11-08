@@ -63,7 +63,7 @@ export const ThreadReferenceCard = memo(
     let readStatusLabel: string | undefined;
 
     if (session && !isDraft) {
-      if (!thread.read_status) {
+      if (!thread.read_status || thread.read_status.marked_unread_at) {
         readState = "unread";
         readStatusLabel = "Unread";
       } else if (newRepliesCount > 0) {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/url"
 	"strconv"
+	"time"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -168,6 +169,28 @@ func (i *Threads) ThreadDelete(ctx context.Context, request openapi.ThreadDelete
 	return openapi.ThreadDelete200Response{}, nil
 }
 
+func (i *Threads) ThreadReadStatusUpdate(ctx context.Context, request openapi.ThreadReadStatusUpdateRequestObject) (openapi.ThreadReadStatusUpdateResponseObject, error) {
+	at := time.Now().UTC()
+	if request.Body == nil || !request.Body.Status.Valid() {
+		return nil, fault.New("expected a read status of read or unread", ftag.With(ftag.InvalidArgument))
+	}
+
+	postID, err := i.thread_mark_svc.Lookup(ctx, string(request.ThreadMark))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	unread := request.Body.Status == openapi.ThreadReadStatusUnread
+	status, err := i.thread_svc.UpdateReadStatus(ctx, postID, unread, at)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.ThreadReadStatusUpdate200JSONResponse{
+		ThreadReadStatusUpdateOKJSONResponse: openapi.ThreadReadStatusUpdateOKJSONResponse(serialiseReadStatus(*status)),
+	}, nil
+}
+
 func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequestObject) (openapi.ThreadListResponseObject, error) {
 	pageSize := 50
 
@@ -228,7 +251,7 @@ func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequ
 				TotalPages:  result.TotalPages,
 			},
 			Headers: openapi.ThreadListOKResponseHeaders{
-				CacheControl: ptr("no-store"),
+				CacheControl: new("no-store"),
 			},
 		},
 	}, nil
@@ -241,11 +264,11 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 	}
 
 	etag, notModified := i.thread_cache.Check(ctx, reqinfo.GetCacheQuery(ctx), xid.ID(postID))
-	if notModified {
+	if notModified && !session.GetOptAccountID(ctx).Ok() {
 		return openapi.ThreadGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
-				CacheControl: ptr(getAuthStateCacheControl(ctx, "no-cache")),
-				ETag:         ptr(etag.String()),
+				CacheControl: new(getAuthStateCacheControl(ctx, "no-cache")),
+				ETag:         new(etag.String()),
 			},
 		}, nil
 	}
@@ -262,12 +285,32 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 		etag = cachecontrol.NewETag(thread.UpdatedAt)
 	}
 
+	if accountID, ok := session.GetOptAccountID(ctx).Get(); ok {
+		value := etag.Value + ":" + accountID.String()
+		if status, ok := thread.ReadStatus.Get(); ok {
+			value += ":" + status.LastReadAt.UTC().Format(time.RFC3339Nano)
+			if markedAt, ok := status.MarkedUnreadAt.Get(); ok {
+				value += ":" + markedAt.UTC().Format(time.RFC3339Nano)
+			}
+		}
+
+		etag = cachecontrol.NewETagValue(value)
+		if reqinfo.GetCacheQuery(ctx).MatchesETag(etag.String()) {
+			return openapi.ThreadGet304Response{
+				Headers: openapi.NotModifiedResponseHeaders{
+					CacheControl: new(getAuthStateCacheControl(ctx, "no-cache")),
+					ETag:         new(etag.String()),
+				},
+			}, nil
+		}
+	}
+
 	return openapi.ThreadGet200JSONResponse{
 		ThreadGetJSONResponse: openapi.ThreadGetJSONResponse{
 			Body: serialiseThread(thread),
 			Headers: openapi.ThreadGetResponseHeaders{
-				CacheControl: ptr(getAuthStateCacheControl(ctx, "no-cache")),
-				ETag:         ptr(etag.String()),
+				CacheControl: new(getAuthStateCacheControl(ctx, "no-cache")),
+				ETag:         new(etag.String()),
 			},
 		},
 	}, nil

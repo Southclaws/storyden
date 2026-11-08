@@ -192,8 +192,9 @@ func serialiseReplyStatus(s post.ReplyStatus) openapi.ReplyStatus {
 
 func serialiseReadStatus(s post.ReadStatus) openapi.ReadStatus {
 	return openapi.ReadStatus{
-		RepliesSince: s.Count,
-		LastReadAt:   s.LastReadAt,
+		RepliesSince:   s.Count,
+		LastReadAt:     s.LastReadAt,
+		MarkedUnreadAt: s.MarkedUnreadAt.Ptr(),
 	}
 }
 

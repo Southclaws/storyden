@@ -9,25 +9,33 @@ import (
 )
 
 type ReadStatus struct {
-	Count      int
-	LastReadAt time.Time
+	Count          int
+	LastReadAt     time.Time
+	MarkedUnreadAt opt.Optional[time.Time]
 }
 
 type ReadStateResult struct {
-	PostID     xid.ID `db:"post_id"`
-	NewReplies int    `db:"new_replies"`
-	LastReadAt string `db:"last_read_at"`
+	PostID         xid.ID  `db:"post_id"`
+	NewReplies     int     `db:"new_replies"`
+	LastReadAt     string  `db:"last_read_at"`
+	MarkedUnreadAt *string `db:"marked_unread_at"`
 }
 
 func (p ReadStateResult) Status() ReadStatus {
-	t, err := time.Parse(time.RFC3339Nano, p.LastReadAt)
-	if err != nil {
-		t, _ = time.Parse("2006-01-02 15:04:05.999999999-07:00", p.LastReadAt)
-	}
 	return ReadStatus{
-		Count:      p.NewReplies,
-		LastReadAt: t,
+		Count:          p.NewReplies,
+		LastReadAt:     parseReadTimestamp(p.LastReadAt),
+		MarkedUnreadAt: opt.NewPtrMap(p.MarkedUnreadAt, parseReadTimestamp),
 	}
+}
+
+func parseReadTimestamp(value string) time.Time {
+	t, err := time.Parse(time.RFC3339Nano, value)
+	if err != nil {
+		t, _ = time.Parse("2006-01-02 15:04:05.999999999-07:00", value)
+	}
+
+	return t
 }
 
 type ReadStateResults []ReadStateResult

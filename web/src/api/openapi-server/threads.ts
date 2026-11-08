@@ -8,6 +8,8 @@
  * OpenAPI spec version: v1.26.16-post
  */
 import type {
+  BadRequestResponse,
+  ForbiddenResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
   NotModifiedResponse,
@@ -17,6 +19,8 @@ import type {
   ThreadGetResponse,
   ThreadListOKResponse,
   ThreadListParams,
+  ThreadReadStatusUpdateBody,
+  ThreadReadStatusUpdateOKResponse,
   ThreadUpdateBody,
   ThreadUpdateOKResponse,
   UnauthorisedResponse,
@@ -404,4 +408,99 @@ export const threadDelete = async (
     ...options,
     method: "DELETE",
   });
+};
+
+export type threadReadStatusUpdateResponse200 = {
+  data: ThreadReadStatusUpdateOKResponse;
+  status: 200;
+};
+
+export type threadReadStatusUpdateResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type threadReadStatusUpdateResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type threadReadStatusUpdateResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type threadReadStatusUpdateResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type threadReadStatusUpdateResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 403 | 404>;
+};
+
+export type threadReadStatusUpdateResponseSuccess =
+  threadReadStatusUpdateResponse200 & {
+    headers: Headers;
+  };
+export type threadReadStatusUpdateResponseError = (
+  | threadReadStatusUpdateResponse400
+  | threadReadStatusUpdateResponse401
+  | threadReadStatusUpdateResponse403
+  | threadReadStatusUpdateResponse404
+  | threadReadStatusUpdateResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getThreadReadStatusUpdateUrl = (threadMark: string) => {
+  return `/threads/${threadMark}/read-status`;
+};
+
+/**
+ * Updates only the authenticated member's read status. Marking unread
+ * preserves an existing last-read timestamp and new-reply count. Marking
+ * read advances the timestamp and clears the explicit unread marker.
+ * A later visit or successful reply marks the thread as read again.
+ * @summary Mark a thread as read or unread for the authenticated member.
+ */
+export const threadReadStatusUpdate = async (
+  threadMark: string,
+  threadReadStatusUpdateBody: ThreadReadStatusUpdateBody,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<threadReadStatusUpdateResponseSuccess> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return fetcher<threadReadStatusUpdateResponseSuccess>(
+    getThreadReadStatusUpdateUrl(threadMark),
+    {
+      ...options,
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(threadReadStatusUpdateBody),
+    },
+  );
 };

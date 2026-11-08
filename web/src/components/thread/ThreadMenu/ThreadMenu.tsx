@@ -8,8 +8,10 @@ import { CategoryMoveMenu } from "@/components/category/CategoryMoveMenu/Categor
 import { ReportPostMenuItem } from "@/components/report/ReportPostMenuItem";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { MoreAction } from "@/components/site/Action/More";
+import { CheckIcon } from "@/components/ui/icons/Check";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { EditIcon } from "@/components/ui/icons/Edit";
+import { InboxIcon } from "@/components/ui/icons/Inbox";
 import { LinkIcon } from "@/components/ui/icons/Link";
 import { PinIcon, PinOffIcon } from "@/components/ui/icons/Pin";
 import { ShareIcon } from "@/components/ui/icons/Share";
@@ -28,6 +30,9 @@ export function ThreadMenu(props: Props) {
     isConfirmingDelete,
     canPinThread,
     isThreadPinned,
+    canUpdateReadStatus,
+    isUnread,
+    isUpdatingReadStatus,
     handlers,
   } = useThreadMenu(props);
 
@@ -58,6 +63,30 @@ export function ThreadMenu(props: Props) {
               </Menu.ItemGroupLabel>
 
               <Menu.Separator />
+
+              {canUpdateReadStatus && isUnread && (
+                <Menu.Item
+                  value="mark-read"
+                  disabled={isUpdatingReadStatus}
+                  onClick={() => handlers.handleReadStatusChange("read")}
+                >
+                  <HStack gap="1">
+                    <CheckIcon /> Mark as read
+                  </HStack>
+                </Menu.Item>
+              )}
+
+              {canUpdateReadStatus && !isUnread && (
+                <Menu.Item
+                  value="mark-unread"
+                  disabled={isUpdatingReadStatus}
+                  onClick={() => handlers.handleReadStatusChange("unread")}
+                >
+                  <HStack gap="1">
+                    <InboxIcon /> Mark as unread
+                  </HStack>
+                </Menu.Item>
+              )}
 
               <Menu.Item value="copy-link" onClick={handlers.handleCopyLink}>
                 <HStack gap="1">

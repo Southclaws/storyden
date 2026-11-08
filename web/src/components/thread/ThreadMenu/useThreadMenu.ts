@@ -2,14 +2,21 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
+import { useState } from "react";
 
 import { handle } from "@/api/client";
-import { Account, Permission, ThreadReference } from "@/api/openapi-schema";
+import {
+  Account,
+  Permission,
+  ThreadReadStatusMutableProps,
+  ThreadReference,
+} from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { useFeedMutations } from "@/lib/feed/mutation";
 import { useReportContext } from "@/lib/report/useReportContext";
 import { canDeletePost, canEditPost } from "@/lib/thread/permissions";
+import { useThreadReadStatus } from "@/lib/thread/read-status";
 import { withUndo } from "@/lib/thread/undo";
 import { useShare } from "@/utils/client";
 import { hasPermission } from "@/utils/permissions";
@@ -39,6 +46,8 @@ export function useThreadMenu({
   const isOnThreadPage = pathname?.includes(`/t/${thread.slug}`);
 
   const { deleteThread, updateThread, revalidate } = useFeedMutations();
+  const { updateReadStatus } = useThreadReadStatus(thread);
+  const [isUpdatingReadStatus, setUpdatingReadStatus] = useState(false);
 
   const {
     isConfirming: isConfirmingDelete,
@@ -56,6 +65,11 @@ export function useThreadMenu({
     canDeletePost(thread, account) && thread.deletedAt === undefined;
   const canPinThread = hasPermission(account, Permission.MANAGE_POSTS);
   const isThreadPinned = (thread.pinned ?? 0) > 0;
+  const canUpdateReadStatus = Boolean(account) && !thread.deletedAt;
+  const isUnread =
+    !thread.read_status ||
+    Boolean(thread.read_status.marked_unread_at) ||
+    thread.read_status.replies_since > 0;
 
   const permalink = getPermalinkForThread(thread.slug);
 
@@ -73,6 +87,23 @@ export function useThreadMenu({
 
   function handleEdit() {
     setEditing(true);
+  }
+
+  async function handleReadStatusChange(
+    status: ThreadReadStatusMutableProps["status"],
+  ) {
+    setUpdatingReadStatus(true);
+
+    await handle(
+      async () => {
+        await updateReadStatus(status);
+      },
+      {
+        cleanup: async () => {
+          setUpdatingReadStatus(false);
+        },
+      },
+    );
   }
 
   async function handleDelete() {
@@ -129,6 +160,9 @@ export function useThreadMenu({
     isConfirmingDelete,
     canPinThread,
     isThreadPinned,
+    canUpdateReadStatus,
+    isUnread,
+    isUpdatingReadStatus,
     handlers: {
       handleCopyLink,
       handleShare,
@@ -137,6 +171,7 @@ export function useThreadMenu({
       handleCancelDelete,
       handlePinThread,
       handleUnpinThread,
+      handleReadStatusChange,
     },
   };
 }

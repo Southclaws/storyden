@@ -44,6 +44,20 @@ func (_c *PostReadCreate) SetLastSeenAt(v time.Time) *PostReadCreate {
 	return _c
 }
 
+// SetMarkedUnreadAt sets the "marked_unread_at" field.
+func (_c *PostReadCreate) SetMarkedUnreadAt(v time.Time) *PostReadCreate {
+	_c.mutation.SetMarkedUnreadAt(v)
+	return _c
+}
+
+// SetNillableMarkedUnreadAt sets the "marked_unread_at" field if the given value is not nil.
+func (_c *PostReadCreate) SetNillableMarkedUnreadAt(v *time.Time) *PostReadCreate {
+	if v != nil {
+		_c.SetMarkedUnreadAt(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *PostReadCreate) SetID(v xid.ID) *PostReadCreate {
 	_c.mutation.SetID(v)
@@ -171,6 +185,10 @@ func (_c *PostReadCreate) createSpec() (*PostRead, *sqlgraph.CreateSpec) {
 		_spec.SetField(postread.FieldLastSeenAt, field.TypeTime, value)
 		_node.LastSeenAt = value
 	}
+	if value, ok := _c.mutation.MarkedUnreadAt(); ok {
+		_spec.SetField(postread.FieldMarkedUnreadAt, field.TypeTime, value)
+		_node.MarkedUnreadAt = &value
+	}
 	if nodes := _c.mutation.RootPostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -293,6 +311,24 @@ func (u *PostReadUpsert) UpdateLastSeenAt() *PostReadUpsert {
 	return u
 }
 
+// SetMarkedUnreadAt sets the "marked_unread_at" field.
+func (u *PostReadUpsert) SetMarkedUnreadAt(v time.Time) *PostReadUpsert {
+	u.Set(postread.FieldMarkedUnreadAt, v)
+	return u
+}
+
+// UpdateMarkedUnreadAt sets the "marked_unread_at" field to the value that was provided on create.
+func (u *PostReadUpsert) UpdateMarkedUnreadAt() *PostReadUpsert {
+	u.SetExcluded(postread.FieldMarkedUnreadAt)
+	return u
+}
+
+// ClearMarkedUnreadAt clears the value of the "marked_unread_at" field.
+func (u *PostReadUpsert) ClearMarkedUnreadAt() *PostReadUpsert {
+	u.SetNull(postread.FieldMarkedUnreadAt)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -380,6 +416,27 @@ func (u *PostReadUpsertOne) SetLastSeenAt(v time.Time) *PostReadUpsertOne {
 func (u *PostReadUpsertOne) UpdateLastSeenAt() *PostReadUpsertOne {
 	return u.Update(func(s *PostReadUpsert) {
 		s.UpdateLastSeenAt()
+	})
+}
+
+// SetMarkedUnreadAt sets the "marked_unread_at" field.
+func (u *PostReadUpsertOne) SetMarkedUnreadAt(v time.Time) *PostReadUpsertOne {
+	return u.Update(func(s *PostReadUpsert) {
+		s.SetMarkedUnreadAt(v)
+	})
+}
+
+// UpdateMarkedUnreadAt sets the "marked_unread_at" field to the value that was provided on create.
+func (u *PostReadUpsertOne) UpdateMarkedUnreadAt() *PostReadUpsertOne {
+	return u.Update(func(s *PostReadUpsert) {
+		s.UpdateMarkedUnreadAt()
+	})
+}
+
+// ClearMarkedUnreadAt clears the value of the "marked_unread_at" field.
+func (u *PostReadUpsertOne) ClearMarkedUnreadAt() *PostReadUpsertOne {
+	return u.Update(func(s *PostReadUpsert) {
+		s.ClearMarkedUnreadAt()
 	})
 }
 
@@ -637,6 +694,27 @@ func (u *PostReadUpsertBulk) SetLastSeenAt(v time.Time) *PostReadUpsertBulk {
 func (u *PostReadUpsertBulk) UpdateLastSeenAt() *PostReadUpsertBulk {
 	return u.Update(func(s *PostReadUpsert) {
 		s.UpdateLastSeenAt()
+	})
+}
+
+// SetMarkedUnreadAt sets the "marked_unread_at" field.
+func (u *PostReadUpsertBulk) SetMarkedUnreadAt(v time.Time) *PostReadUpsertBulk {
+	return u.Update(func(s *PostReadUpsert) {
+		s.SetMarkedUnreadAt(v)
+	})
+}
+
+// UpdateMarkedUnreadAt sets the "marked_unread_at" field to the value that was provided on create.
+func (u *PostReadUpsertBulk) UpdateMarkedUnreadAt() *PostReadUpsertBulk {
+	return u.Update(func(s *PostReadUpsert) {
+		s.UpdateMarkedUnreadAt()
+	})
+}
+
+// ClearMarkedUnreadAt clears the value of the "marked_unread_at" field.
+func (u *PostReadUpsertBulk) ClearMarkedUnreadAt() *PostReadUpsertBulk {
+	return u.Update(func(s *PostReadUpsert) {
+		s.ClearMarkedUnreadAt()
 	})
 }
 

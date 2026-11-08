@@ -18,6 +18,7 @@ import { useBeacon } from "@/lib/beacon/useBeacon";
 import { useReportContext } from "@/lib/report/useReportContext";
 import type { Settings, SignatureConfig } from "@/lib/settings/settings";
 import { useThreadMutations } from "@/lib/thread/mutation";
+import { useThreadReadStatus } from "@/lib/thread/read-status";
 import { withUndo } from "@/lib/thread/undo";
 import * as z from "@/lib/validation";
 import { hasPermission } from "@/utils/permissions";
@@ -88,7 +89,12 @@ export function useThreadScreen({
     },
   );
 
-  useBeacon(DatagraphItemKind.thread, data?.id);
+  const { recordRead } = useThreadReadStatus(data ?? thread);
+  useBeacon(
+    DatagraphItemKind.thread,
+    data?.id,
+    session ? recordRead : undefined,
+  );
 
   const isModerator = hasPermission(
     session,

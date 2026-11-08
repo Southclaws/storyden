@@ -662,6 +662,10 @@ func (m *Mapping) ThreadUpdate() (bool, *rbac.Permission) {
 	return true, nil // See NOTE.
 }
 
+func (m *Mapping) ThreadReadStatusUpdate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionReadPublishedThreads
+}
+
 func (m *Mapping) ThreadDelete() (bool, *rbac.Permission) {
 	return true, nil // See NOTE.
 }

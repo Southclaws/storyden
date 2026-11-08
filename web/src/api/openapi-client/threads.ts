@@ -14,6 +14,8 @@ import type { SWRMutationConfiguration } from "swr/mutation";
 
 import { fetcher } from "../client";
 import type {
+  BadRequestResponse,
+  ForbiddenResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
   NotModifiedResponse,
@@ -23,6 +25,8 @@ import type {
   ThreadGetResponse,
   ThreadListOKResponse,
   ThreadListParams,
+  ThreadReadStatusUpdateBody,
+  ThreadReadStatusUpdateOKResponse,
   ThreadUpdateBody,
   ThreadUpdateOKResponse,
   UnauthorisedResponse,
@@ -418,6 +422,111 @@ export const useThreadDelete = <
 
   const swrKey = swrOptions?.swrKey ?? getThreadDeleteMutationKey(threadMark);
   const swrFn = getThreadDeleteMutationFetcher(threadMark, requestOptions);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getThreadReadStatusUpdateUrl = (threadMark: string) => {
+  return `/threads/${threadMark}/read-status`;
+};
+
+/**
+ * Updates only the authenticated member's read status. Marking unread
+ * preserves an existing last-read timestamp and new-reply count. Marking
+ * read advances the timestamp and clears the explicit unread marker.
+ * A later visit or successful reply marks the thread as read again.
+ * @summary Mark a thread as read or unread for the authenticated member.
+ */
+export const threadReadStatusUpdate = async (
+  threadMark: string,
+  threadReadStatusUpdateBody: ThreadReadStatusUpdateBody,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<ThreadReadStatusUpdateOKResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return fetcher<ThreadReadStatusUpdateOKResponse>(
+    getThreadReadStatusUpdateUrl(threadMark),
+    {
+      ...options,
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(threadReadStatusUpdateBody),
+    },
+  );
+};
+
+export const getThreadReadStatusUpdateMutationFetcher = (
+  threadMark: string,
+  options?: SecondParameter<typeof fetcher>,
+) => {
+  return (_: Key, { arg }: { arg: ThreadReadStatusUpdateBody }) => {
+    return threadReadStatusUpdate(threadMark, arg, options);
+  };
+};
+export const getThreadReadStatusUpdateMutationKey = (threadMark: string) =>
+  [`/threads/${threadMark}/read-status`] as const;
+
+export type ThreadReadStatusUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof threadReadStatusUpdate>>
+>;
+
+/**
+ * @summary Mark a thread as read or unread for the authenticated member.
+ */
+export const useThreadReadStatusUpdate = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  threadMark: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof threadReadStatusUpdate>>,
+      TError,
+      Key,
+      ThreadReadStatusUpdateBody,
+      Awaited<ReturnType<typeof threadReadStatusUpdate>>
+    > & { swrKey?: string };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getThreadReadStatusUpdateMutationKey(threadMark);
+  const swrFn = getThreadReadStatusUpdateMutationFetcher(
+    threadMark,
+    requestOptions,
+  );
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

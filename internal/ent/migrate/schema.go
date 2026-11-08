@@ -1354,6 +1354,7 @@ var (
 	PostReadsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "last_seen_at", Type: field.TypeTime},
+		{Name: "marked_unread_at", Type: field.TypeTime, Nullable: true},
 		{Name: "account_id", Type: field.TypeString, Size: 20},
 		{Name: "root_post_id", Type: field.TypeString, Size: 20},
 	}
@@ -1365,13 +1366,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "post_reads_accounts_post_reads",
-				Columns:    []*schema.Column{PostReadsColumns[2]},
+				Columns:    []*schema.Column{PostReadsColumns[3]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "post_reads_posts_post_reads",
-				Columns:    []*schema.Column{PostReadsColumns[3]},
+				Columns:    []*schema.Column{PostReadsColumns[4]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -1380,7 +1381,7 @@ var (
 			{
 				Name:    "unique_post_read",
 				Unique:  true,
-				Columns: []*schema.Column{PostReadsColumns[3], PostReadsColumns[2]},
+				Columns: []*schema.Column{PostReadsColumns[4], PostReadsColumns[3]},
 			},
 		},
 	}

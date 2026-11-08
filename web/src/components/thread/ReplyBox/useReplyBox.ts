@@ -10,6 +10,7 @@ import { useSession } from "@/auth";
 import { sendBeacon } from "@/lib/beacon/beacon";
 import type { Settings } from "@/lib/settings/settings";
 import { useThreadMutations } from "@/lib/thread/mutation";
+import { useThreadReadStatus } from "@/lib/thread/read-status";
 import * as z from "@/lib/validation";
 
 import { useReplyContext } from "../ReplyContext";
@@ -37,6 +38,7 @@ export function useReplyBox({
   thread,
 }: Props) {
   const session = useSession(initialSession, initialSettings);
+  const { recordRead } = useThreadReadStatus(thread);
   const { replyTo, clearReplyTo } = useReplyContext();
   const { createReply, revalidate } = useThreadMutations(
     thread,
@@ -72,7 +74,9 @@ export function useReplyBox({
 
         // Mark the thread as read after successfully replying to it
         try {
-          sendBeacon(DatagraphItemKind.thread, thread.id);
+          if (sendBeacon(DatagraphItemKind.thread, thread.id)) {
+            await recordRead();
+          }
         } catch (error) {
           console.warn("failed to send beacon:", error);
         }

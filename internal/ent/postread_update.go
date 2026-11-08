@@ -74,6 +74,26 @@ func (_u *PostReadUpdate) SetNillableLastSeenAt(v *time.Time) *PostReadUpdate {
 	return _u
 }
 
+// SetMarkedUnreadAt sets the "marked_unread_at" field.
+func (_u *PostReadUpdate) SetMarkedUnreadAt(v time.Time) *PostReadUpdate {
+	_u.mutation.SetMarkedUnreadAt(v)
+	return _u
+}
+
+// SetNillableMarkedUnreadAt sets the "marked_unread_at" field if the given value is not nil.
+func (_u *PostReadUpdate) SetNillableMarkedUnreadAt(v *time.Time) *PostReadUpdate {
+	if v != nil {
+		_u.SetMarkedUnreadAt(*v)
+	}
+	return _u
+}
+
+// ClearMarkedUnreadAt clears the value of the "marked_unread_at" field.
+func (_u *PostReadUpdate) ClearMarkedUnreadAt() *PostReadUpdate {
+	_u.mutation.ClearMarkedUnreadAt()
+	return _u
+}
+
 // SetRootPost sets the "root_post" edge to the Post entity.
 func (_u *PostReadUpdate) SetRootPost(v *Post) *PostReadUpdate {
 	return _u.SetRootPostID(v.ID)
@@ -159,6 +179,12 @@ func (_u *PostReadUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.LastSeenAt(); ok {
 		_spec.SetField(postread.FieldLastSeenAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.MarkedUnreadAt(); ok {
+		_spec.SetField(postread.FieldMarkedUnreadAt, field.TypeTime, value)
+	}
+	if _u.mutation.MarkedUnreadAtCleared() {
+		_spec.ClearField(postread.FieldMarkedUnreadAt, field.TypeTime)
 	}
 	if _u.mutation.RootPostCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -282,6 +308,26 @@ func (_u *PostReadUpdateOne) SetNillableLastSeenAt(v *time.Time) *PostReadUpdate
 	return _u
 }
 
+// SetMarkedUnreadAt sets the "marked_unread_at" field.
+func (_u *PostReadUpdateOne) SetMarkedUnreadAt(v time.Time) *PostReadUpdateOne {
+	_u.mutation.SetMarkedUnreadAt(v)
+	return _u
+}
+
+// SetNillableMarkedUnreadAt sets the "marked_unread_at" field if the given value is not nil.
+func (_u *PostReadUpdateOne) SetNillableMarkedUnreadAt(v *time.Time) *PostReadUpdateOne {
+	if v != nil {
+		_u.SetMarkedUnreadAt(*v)
+	}
+	return _u
+}
+
+// ClearMarkedUnreadAt clears the value of the "marked_unread_at" field.
+func (_u *PostReadUpdateOne) ClearMarkedUnreadAt() *PostReadUpdateOne {
+	_u.mutation.ClearMarkedUnreadAt()
+	return _u
+}
+
 // SetRootPost sets the "root_post" edge to the Post entity.
 func (_u *PostReadUpdateOne) SetRootPost(v *Post) *PostReadUpdateOne {
 	return _u.SetRootPostID(v.ID)
@@ -397,6 +443,12 @@ func (_u *PostReadUpdateOne) sqlSave(ctx context.Context) (_node *PostRead, err 
 	}
 	if value, ok := _u.mutation.LastSeenAt(); ok {
 		_spec.SetField(postread.FieldLastSeenAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.MarkedUnreadAt(); ok {
+		_spec.SetField(postread.FieldMarkedUnreadAt, field.TypeTime, value)
+	}
+	if _u.mutation.MarkedUnreadAtCleared() {
+		_spec.ClearField(postread.FieldMarkedUnreadAt, field.TypeTime)
 	}
 	if _u.mutation.RootPostCleared() {
 		edge := &sqlgraph.EdgeSpec{

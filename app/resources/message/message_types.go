@@ -2,6 +2,7 @@ package message
 
 import (
 	"net/url"
+	"time"
 
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
@@ -101,8 +102,9 @@ type CommandAttemptQueuedEmail struct {
 }
 
 type CommandSendBeacon struct {
-	Item    datagraph.Ref
-	Subject opt.Optional[account_ref.ID]
+	Item       datagraph.Ref
+	Subject    opt.Optional[account_ref.ID]
+	ReceivedAt time.Time
 }
 
 // -

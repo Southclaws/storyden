@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useEffectEvent } from "react";
 
 import { DatagraphItemKind } from "@/api/openapi-schema";
 
@@ -13,16 +13,27 @@ import { sendBeacon } from "./beacon";
  *
  * @param kind - The type of item being tracked
  * @param id - The unique identifier of the item
+ * @param onQueued - Called when the browser queues the beacon; does not confirm delivery
  */
-export function useBeacon(kind: DatagraphItemKind, id: string | undefined) {
+export function useBeacon(
+  kind: DatagraphItemKind,
+  id: string | undefined,
+  onQueued?: () => void | Promise<void>,
+) {
+  const onBeaconQueued = useEffectEvent(async () => {
+    await onQueued?.();
+  });
+
   useEffect(() => {
     if (!id) {
       return;
     }
 
-    queueMicrotask(() => {
+    queueMicrotask(async () => {
       try {
-        sendBeacon(kind, id);
+        if (sendBeacon(kind, id)) {
+          await onBeaconQueued();
+        }
       } catch (error) {
         console.warn("failed to send beacon:", error);
       }

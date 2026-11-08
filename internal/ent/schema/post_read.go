@@ -21,6 +21,7 @@ func (PostRead) Fields() []ent.Field {
 		field.String("root_post_id").GoType(xid.ID{}),
 		field.String("account_id").GoType(xid.ID{}),
 		field.Time("last_seen_at"),
+		field.Time("marked_unread_at").Optional().Nillable(),
 	}
 }
 

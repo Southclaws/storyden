@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { Permission } from "@/api/openapi-schema";
+import { Permission, type ReadStatus } from "@/api/openapi-schema";
 
 import { useThreadMenu } from "./useThreadMenu";
 
@@ -75,5 +75,46 @@ describe("useThreadMenu", () => {
     );
 
     expect(result.current.isEditingEnabled).toBe(false);
+  });
+
+  it.each<{
+    state: string;
+    readStatus?: ReadStatus;
+    isUnread: boolean;
+  }>([
+    { state: "never visited", isUnread: true },
+    {
+      state: "caught up",
+      readStatus: { last_read_at: "2026-11-08T10:00:00Z", replies_since: 0 },
+      isUnread: false,
+    },
+    {
+      state: "new replies",
+      readStatus: { last_read_at: "2026-11-08T10:00:00Z", replies_since: 5 },
+      isUnread: true,
+    },
+    {
+      state: "explicitly marked unread",
+      readStatus: {
+        last_read_at: "2026-11-08T10:00:00Z",
+        replies_since: 0,
+        marked_unread_at: "2026-11-08T11:00:00Z",
+      },
+      isUnread: true,
+    },
+  ])("recognises $state threads", ({ readStatus, isUnread }) => {
+    const { result } = renderHook(() =>
+      useThreadMenu({
+        thread: {
+          id: "thread-1",
+          slug: "thread-1",
+          author: { id: "author-1", name: "Author" },
+          read_status: readStatus,
+        } as any,
+      }),
+    );
+
+    expect(result.current.canUpdateReadStatus).toBe(true);
+    expect(result.current.isUnread).toBe(isUnread);
   });
 });

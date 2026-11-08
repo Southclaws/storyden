@@ -8,15 +8,18 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
 )
 
 const newRepliesCountManyQuery_sqlite = `select
-  p.id        as post_id,
-  max(pr.last_seen_at) as last_read_at,
+  p.id                     as post_id,
+  max(pr.last_seen_at)     as last_read_at,
+  max(pr.marked_unread_at) as marked_unread_at,
   count(r.id) as new_replies
 from
   posts p
@@ -31,8 +34,9 @@ group by p.id
 `
 
 const newRepliesCountManyQuery_postgres = `select
-  p.id        as post_id,
-  max(pr.last_seen_at) as last_read_at,
+  p.id                     as post_id,
+  max(pr.last_seen_at)     as last_read_at,
+  max(pr.marked_unread_at) as marked_unread_at,
   count(r.id) as new_replies
 from
   posts p
@@ -82,4 +86,18 @@ func (d *Querier) getReadStatus(ctx context.Context, ids []xid.ID, accountID str
 	)
 
 	return readStates.Map(), nil
+}
+
+func (d *Querier) GetReadStatus(ctx context.Context, threadID post.ID, accountID account.AccountID) (*post.ReadStatus, error) {
+	states, err := d.getReadStatus(ctx, []xid.ID{xid.ID(threadID)}, accountID.String())
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	status, ok := states.Status(xid.ID(threadID)).Get()
+	if !ok {
+		return nil, fault.New("thread read state not found", ftag.With(ftag.NotFound))
+	}
+
+	return &status, nil
 }

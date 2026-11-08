@@ -71,6 +71,11 @@ func LastSeenAt(v time.Time) predicate.PostRead {
 	return predicate.PostRead(sql.FieldEQ(FieldLastSeenAt, v))
 }
 
+// MarkedUnreadAt applies equality check predicate on the "marked_unread_at" field. It's identical to MarkedUnreadAtEQ.
+func MarkedUnreadAt(v time.Time) predicate.PostRead {
+	return predicate.PostRead(sql.FieldEQ(FieldMarkedUnreadAt, v))
+}
+
 // RootPostIDEQ applies the EQ predicate on the "root_post_id" field.
 func RootPostIDEQ(v xid.ID) predicate.PostRead {
 	return predicate.PostRead(sql.FieldEQ(FieldRootPostID, v))
@@ -249,6 +254,56 @@ func LastSeenAtLT(v time.Time) predicate.PostRead {
 // LastSeenAtLTE applies the LTE predicate on the "last_seen_at" field.
 func LastSeenAtLTE(v time.Time) predicate.PostRead {
 	return predicate.PostRead(sql.FieldLTE(FieldLastSeenAt, v))
+}
+
+// MarkedUnreadAtEQ applies the EQ predicate on the "marked_unread_at" field.
+func MarkedUnreadAtEQ(v time.Time) predicate.PostRead {
+	return predicate.PostRead(sql.FieldEQ(FieldMarkedUnreadAt, v))
+}
+
+// MarkedUnreadAtNEQ applies the NEQ predicate on the "marked_unread_at" field.
+func MarkedUnreadAtNEQ(v time.Time) predicate.PostRead {
+	return predicate.PostRead(sql.FieldNEQ(FieldMarkedUnreadAt, v))
+}
+
+// MarkedUnreadAtIn applies the In predicate on the "marked_unread_at" field.
+func MarkedUnreadAtIn(vs ...time.Time) predicate.PostRead {
+	return predicate.PostRead(sql.FieldIn(FieldMarkedUnreadAt, vs...))
+}
+
+// MarkedUnreadAtNotIn applies the NotIn predicate on the "marked_unread_at" field.
+func MarkedUnreadAtNotIn(vs ...time.Time) predicate.PostRead {
+	return predicate.PostRead(sql.FieldNotIn(FieldMarkedUnreadAt, vs...))
+}
+
+// MarkedUnreadAtGT applies the GT predicate on the "marked_unread_at" field.
+func MarkedUnreadAtGT(v time.Time) predicate.PostRead {
+	return predicate.PostRead(sql.FieldGT(FieldMarkedUnreadAt, v))
+}
+
+// MarkedUnreadAtGTE applies the GTE predicate on the "marked_unread_at" field.
+func MarkedUnreadAtGTE(v time.Time) predicate.PostRead {
+	return predicate.PostRead(sql.FieldGTE(FieldMarkedUnreadAt, v))
+}
+
+// MarkedUnreadAtLT applies the LT predicate on the "marked_unread_at" field.
+func MarkedUnreadAtLT(v time.Time) predicate.PostRead {
+	return predicate.PostRead(sql.FieldLT(FieldMarkedUnreadAt, v))
+}
+
+// MarkedUnreadAtLTE applies the LTE predicate on the "marked_unread_at" field.
+func MarkedUnreadAtLTE(v time.Time) predicate.PostRead {
+	return predicate.PostRead(sql.FieldLTE(FieldMarkedUnreadAt, v))
+}
+
+// MarkedUnreadAtIsNil applies the IsNil predicate on the "marked_unread_at" field.
+func MarkedUnreadAtIsNil() predicate.PostRead {
+	return predicate.PostRead(sql.FieldIsNull(FieldMarkedUnreadAt))
+}
+
+// MarkedUnreadAtNotNil applies the NotNil predicate on the "marked_unread_at" field.
+func MarkedUnreadAtNotNil() predicate.PostRead {
+	return predicate.PostRead(sql.FieldNotNull(FieldMarkedUnreadAt))
 }
 
 // HasRootPost applies the HasEdge predicate on the "root_post" edge.

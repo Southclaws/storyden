@@ -24,4 +24,11 @@ export interface ReadStatus {
    * replies since they last read the thread.
    */
   replies_since: number;
+  /**
+   * When the member explicitly marked this thread unread. Absent when
+   * there is no explicit unread marker. This does not reset last_read_at
+   * or replies_since. For a previously untracked thread, last_read_at
+   * is initialised to the same timestamp as this marker.
+   */
+  marked_unread_at?: string;
 }

@@ -26,6 +26,8 @@ type PostRead struct {
 	AccountID xid.ID `json:"account_id,omitempty"`
 	// LastSeenAt holds the value of the "last_seen_at" field.
 	LastSeenAt time.Time `json:"last_seen_at,omitempty"`
+	// MarkedUnreadAt holds the value of the "marked_unread_at" field.
+	MarkedUnreadAt *time.Time `json:"marked_unread_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PostReadQuery when eager-loading is set.
 	Edges        PostReadEdges `json:"edges"`
@@ -70,7 +72,7 @@ func (*PostRead) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case postread.FieldLastSeenAt:
+		case postread.FieldLastSeenAt, postread.FieldMarkedUnreadAt:
 			values[i] = new(sql.NullTime)
 		case postread.FieldID, postread.FieldRootPostID, postread.FieldAccountID:
 			values[i] = new(xid.ID)
@@ -112,6 +114,13 @@ func (_m *PostRead) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field last_seen_at", values[i])
 			} else if value.Valid {
 				_m.LastSeenAt = value.Time
+			}
+		case postread.FieldMarkedUnreadAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field marked_unread_at", values[i])
+			} else if value.Valid {
+				_m.MarkedUnreadAt = new(time.Time)
+				*_m.MarkedUnreadAt = value.Time
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -167,6 +176,11 @@ func (_m *PostRead) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("last_seen_at=")
 	builder.WriteString(_m.LastSeenAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	if v := _m.MarkedUnreadAt; v != nil {
+		builder.WriteString("marked_unread_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -3012,6 +3012,26 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { description: OK }
 
+  /threads/{thread_mark}/read-status:
+    patch:
+      operationId: ThreadReadStatusUpdate
+      summary: Mark a thread as read or unread for the authenticated member.
+      description: |
+        Updates only the authenticated member's read status. Marking unread
+        preserves an existing last-read timestamp and new-reply count. Marking
+        read advances the timestamp and clears the explicit unread marker.
+        A later visit or successful reply marks the thread as read again.
+      tags: [threads]
+      parameters: [$ref: "#/components/parameters/ThreadMarkParam"]
+      requestBody: { $ref: "#/components/requestBodies/ThreadReadStatusUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/ThreadReadStatusUpdateOK" }
+
   #
   #                          888 d8b
   #                          888 Y8P
@@ -6146,6 +6166,12 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/ThreadMutableProps" }
 
+    ThreadReadStatusUpdate:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ThreadReadStatusMutableProps" }
+
     ReplyCreate:
       description: Create a reply, which is a post within a thread.
       content:
@@ -7077,6 +7103,12 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/Thread" }
+
+    ThreadReadStatusUpdateOK:
+      description: The member's updated read status.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ReadStatus" }
 
     ReplyCreateOK:
       description: Thread reply created successfully.
@@ -11884,6 +11916,23 @@ components:
           description: |
             When requested by an authenticated account, shows the number of new
             replies since they last read the thread.
+        marked_unread_at:
+          type: string
+          format: date-time
+          description: |
+            When the member explicitly marked this thread unread. Absent when
+            there is no explicit unread marker. This does not reset last_read_at
+            or replies_since. For a previously untracked thread, last_read_at
+            is initialised to the same timestamp as this marker.
+
+    ThreadReadStatusMutableProps:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [read, unread]
+          x-enum-varnames: [ThreadReadStatusRead, ThreadReadStatusUnread]
 
     ReplyStatus:
       type: object

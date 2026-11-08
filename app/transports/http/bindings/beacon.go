@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"log/slog"
+	"time"
 
 	"github.com/rs/xid"
 
@@ -33,6 +34,7 @@ type Message struct {
 
 // NOTE: Does not handle errors or return anything other than 202.
 func (b *Beacon) SendBeacon(ctx context.Context, request openapi.SendBeaconRequestObject) (openapi.SendBeaconResponseObject, error) {
+	receivedAt := time.Now().UTC()
 	accountID := session.GetOptAccountID(ctx)
 
 	log := b.logger.With(slog.String("handler", "beacon.SendBeacon"))
@@ -62,7 +64,8 @@ func (b *Beacon) SendBeacon(ctx context.Context, request openapi.SendBeaconReque
 			Kind: m.Kind,
 			ID:   m.ID,
 		},
-		Subject: accountID,
+		Subject:    accountID,
+		ReceivedAt: receivedAt,
 	}); err != nil {
 		log.Error("failed to send beacon command", slog.String("error", err.Error()))
 	}

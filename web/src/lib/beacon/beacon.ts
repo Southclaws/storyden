@@ -9,9 +9,9 @@ import { API_ADDRESS } from "@/config";
  * @param kind - The type of item being tracked (thread, post, etc.)
  * @param id - The unique identifier of the item
  */
-export function sendBeacon(kind: DatagraphItemKind, id: string): void {
+export function sendBeacon(kind: DatagraphItemKind, id: string): boolean {
   if (typeof navigator === "undefined" || !navigator.sendBeacon) {
-    return;
+    return false;
   }
 
   const beaconData = JSON.stringify({
@@ -20,5 +20,5 @@ export function sendBeacon(kind: DatagraphItemKind, id: string): void {
   });
 
   const endpoint = `${API_ADDRESS}/api${getSendBeaconMutationKey()[0]}`;
-  navigator.sendBeacon(endpoint, beaconData);
+  return navigator.sendBeacon(endpoint, beaconData);
 }

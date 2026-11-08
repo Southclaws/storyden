@@ -6,6 +6,7 @@ import (
 	"context"
 	"log/slog"
 	"net/url"
+	"time"
 
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
@@ -15,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/post/post_read_state"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
 	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
@@ -42,6 +44,7 @@ type Service interface {
 	) (*thread.Thread, error)
 
 	Update(ctx context.Context, threadID post.ID, partial Partial) (*thread.Thread, error)
+	UpdateReadStatus(ctx context.Context, threadID post.ID, unread bool, at time.Time) (*post.ReadStatus, error)
 
 	Delete(ctx context.Context, id post.ID) error
 
@@ -90,16 +93,17 @@ type service struct {
 	logger *slog.Logger
 	ins    spanner.Instrumentation
 
-	threadQuerier  *thread_querier.Querier
-	threadWriter   *thread_writer.Writer
-	tagWriter      *tag_writer.Writer
-	fetcher        *fetcher.Fetcher
-	recommender    semdex.Recommender
-	bus            *pubsub.Bus
-	mentioner      *mentioner.Mentioner
-	cpm            *moderation.Manager
-	cache          *thread_cache.Cache
-	systemReporter *system_report.Manager
+	threadQuerier   *thread_querier.Querier
+	threadWriter    *thread_writer.Writer
+	readStateWriter *post_read_state.Writer
+	tagWriter       *tag_writer.Writer
+	fetcher         *fetcher.Fetcher
+	recommender     semdex.Recommender
+	bus             *pubsub.Bus
+	mentioner       *mentioner.Mentioner
+	cpm             *moderation.Manager
+	cache           *thread_cache.Cache
+	systemReporter  *system_report.Manager
 }
 
 func New(
@@ -108,6 +112,7 @@ func New(
 
 	threadQuerier *thread_querier.Querier,
 	threadWriter *thread_writer.Writer,
+	readStateWriter *post_read_state.Writer,
 	tagWriter *tag_writer.Writer,
 	fetcher *fetcher.Fetcher,
 	recommender semdex.Recommender,
@@ -121,15 +126,16 @@ func New(
 		logger: logger,
 		ins:    ins.Build(),
 
-		threadQuerier:  threadQuerier,
-		threadWriter:   threadWriter,
-		tagWriter:      tagWriter,
-		fetcher:        fetcher,
-		recommender:    recommender,
-		bus:            bus,
-		mentioner:      mentioner,
-		cpm:            cpm,
-		cache:          cache,
-		systemReporter: systemReporter,
+		threadQuerier:   threadQuerier,
+		threadWriter:    threadWriter,
+		readStateWriter: readStateWriter,
+		tagWriter:       tagWriter,
+		fetcher:         fetcher,
+		recommender:     recommender,
+		bus:             bus,
+		mentioner:       mentioner,
+		cpm:             cpm,
+		cache:           cache,
+		systemReporter:  systemReporter,
 	}
 }
