@@ -25,6 +25,7 @@ describe("server API requests", () => {
     expect(request.headers.get("Cookie")).toBe("session=admin-session");
     expect(request.headers.get("x-forwarded-for")).toBe("203.0.113.1");
     expect(request.headers.get("x-storyden-ssr")).toBe("1");
+    expect(request.cache).toBe("no-store");
   });
 
   it("makes anonymous requests without credentials", async () => {
@@ -72,4 +73,23 @@ describe("server API requests", () => {
     expect(request.headers.has("x-forwarded-for")).toBe(false);
     expect(request.headers.has("x-storyden-ssr")).toBe(false);
   });
+
+  it.each(["default", "force-cache"] as const)(
+    "keeps server API reads uncached when callers request %s",
+    async (cache) => {
+      const fetchMock = vi
+        .spyOn(globalThis, "fetch")
+        .mockResolvedValue(Response.json({ ok: true }));
+
+      await fetcher("/threads", {
+        method: "GET",
+        cache,
+        next: { revalidate: 15, tags: ["threads"] },
+      });
+
+      const request = fetchMock.mock.calls[0]![0] as Request;
+      expect(request.cache).toBe("no-store");
+      expect(fetchMock).toHaveBeenCalledWith(request);
+    },
+  );
 });

@@ -1,6 +1,38 @@
 import type { Metadata } from "next";
 
+import { RequestError } from "@/api/common";
 import { WEB_ADDRESS } from "@/config";
+
+export function isNotPublic(error: unknown): boolean {
+  return (
+    error instanceof RequestError && [401, 403, 404].includes(error.status)
+  );
+}
+
+export type PublicContent<T> =
+  | { status: "public"; data: T }
+  | { status: "not-public" }
+  | { status: "unavailable"; error: unknown };
+
+// A failed SEO read cannot establish that content is private or missing.
+export async function readPublicContent<T>(
+  read: () => Promise<T | undefined>,
+): Promise<PublicContent<T>> {
+  try {
+    const data = await read();
+    if (data) {
+      return { status: "public", data };
+    }
+
+    return { status: "not-public" };
+  } catch (error) {
+    if (isNotPublic(error)) {
+      return { status: "not-public" };
+    }
+
+    return { status: "unavailable", error };
+  }
+}
 
 export function canonicalPage(path: string, page = 1): string {
   const url = new URL(path, WEB_ADDRESS);

@@ -1,8 +1,9 @@
 import { ImageResponse } from "next/og";
 import { NextRequest, NextResponse } from "next/server";
 
-import { nodeGet } from "@/api/openapi-server/nodes";
+import { RequestError } from "@/api/common";
 import { loadMetadataImage } from "@/lib/metadata/image-response";
+import { getPublicNode } from "@/lib/metadata/library";
 import { getSettings } from "@/lib/settings/settings-server";
 
 const size = {
@@ -16,18 +17,25 @@ export async function GET(req: NextRequest) {
     return new NextResponse("No slug provided", { status: 400 });
   }
 
-  const { data } = await nodeGet(slug, undefined, {
-    anonymous: true,
-    cache: "no-store",
-    signal: req.signal,
-  });
-  if (data.visibility !== "published") {
+  const result = await getPublicNode(slug, req.signal);
+  if (result.status === "not-public") {
     return new NextResponse("Not Found", {
       status: 404,
       headers: { "Cache-Control": "no-store" },
     });
   }
 
+  if (result.status === "unavailable") {
+    const rateLimited =
+      result.error instanceof RequestError && result.error.status === 429;
+
+    return new NextResponse("Preview unavailable", {
+      status: rateLimited ? 503 : 502,
+      headers: { "Cache-Control": "no-store" },
+    });
+  }
+
+  const data = result.data;
   const { accent_colour } = await getSettings();
 
   const image =

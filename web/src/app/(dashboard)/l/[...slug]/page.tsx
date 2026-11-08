@@ -1,14 +1,15 @@
 import { Metadata } from "next";
-import { cache } from "react";
+import { notFound } from "next/navigation";
 
 import { NodeListResult, NodeWithChildren } from "@/api/openapi-schema";
-import { nodeGet, nodeListChildren } from "@/api/openapi-server/nodes";
+import { nodeListChildren } from "@/api/openapi-server/nodes";
 import { ServerRenderedContent } from "@/components/content/ContentRenderer/ServerRenderedContent";
 import { getTargetSlug } from "@/components/library/utils";
 import {
   LibraryPageBlockTypeDirectory,
   parseNodeMetadata,
 } from "@/lib/library/metadata";
+import { getLibraryNode, getPublicNode } from "@/lib/metadata/library";
 import { canonicalPage, jsonLD, socialImage } from "@/lib/metadata/public";
 import { getSettings } from "@/lib/settings/settings-server";
 import { LibraryPageScreen } from "@/screens/library/LibraryPageScreen/LibraryPageScreen";
@@ -17,24 +18,6 @@ import { Params, ParamsSchema } from "@/screens/library/library-path";
 export type Props = {
   params: Promise<Params>;
 };
-
-// Metadata and JSON-LD share one anonymous read for this render.
-const getPublicNode = cache(async (slug: string) => {
-  try {
-    const { data } = await nodeGet(slug, undefined, {
-      anonymous: true,
-      cache: "no-store",
-    });
-
-    if (data.visibility === "published") {
-      return data;
-    }
-  } catch {
-    // Public metadata is unavailable if the anonymous read fails.
-  }
-
-  return undefined;
-});
 
 export default async function Page(props: Props) {
   const { slug } = ParamsSchema.parse(await props.params);
@@ -46,22 +29,20 @@ export default async function Page(props: Props) {
     throw new Error("Library page not found");
   }
 
-  const { data } = await nodeGet(targetSlug, undefined, {
-    cache: "no-store",
-    next: {
-      tags: ["library", "node"],
-      revalidate: 1,
-    },
-  });
+  const data = await getLibraryNode(targetSlug);
+  if (!data) {
+    notFound();
+  }
 
   // NOTE: A waterfall request which can probably be avoided by fetching the
   // subtree. However subtrees do not currently support property filtering or
   // sorting so this may need a new API endpoint or a parameter for nodeGet.
-  const children = await maybeGetChildren(data);
-  const publicNode =
-    data.visibility === "published"
-      ? await getPublicNode(targetSlug)
-      : undefined;
+  const [children, result] = await Promise.all([
+    maybeGetChildren(data),
+    data.visibility === "published" ? getPublicNode(targetSlug) : undefined,
+  ]);
+  const publicNode = result?.status === "public" ? result.data : undefined;
+
   const structuredData = publicNode && {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -112,34 +93,50 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const targetSlug = params.success
     ? getTargetSlug(params.data.slug)
     : undefined;
-  const data = targetSlug ? await getPublicNode(targetSlug) : undefined;
+  if (!targetSlug) {
+    return { title: "Page not found", robots: { index: false, follow: false } };
+  }
 
-  if (!data) {
+  const node = await getLibraryNode(targetSlug);
+  if (!node) {
     return {
       title: "Page not found",
-      description: "The page you are looking for does not exist.",
       robots: { index: false, follow: false },
     };
   }
 
   const settings = await getSettings();
-  const url = canonicalPage(`/l/${encodeURIComponent(data.slug)}`);
+  const title = `${node.name} | ${settings.title}`;
+  if (node.visibility !== "published") {
+    return { title, robots: { index: false, follow: false } };
+  }
+
+  const result = await getPublicNode(targetSlug);
+  if (result.status === "not-public") {
+    return { title, robots: { index: false, follow: false } };
+  }
+
+  if (result.status === "unavailable") {
+    return { title };
+  }
+
+  const publicNode = result.data;
+  const url = canonicalPage(`/l/${encodeURIComponent(publicNode.slug)}`);
 
   return {
-    title: `${data.name} | ${settings.title}`,
-    description: data.description,
+    title,
+    description: publicNode.description,
     alternates: { canonical: url },
     openGraph: {
-      type: data.content ? "article" : "website",
-      title: data.name,
-      description: data.description,
+      type: publicNode.content ? "article" : "website",
+      title: publicNode.name,
+      description: publicNode.description,
       url,
-      // NOTE: Massive hack because Next.js still hasn't fixed a bug with
-      // catch-all routes and opengraph-image route handlers.
+      // Catch-all routes cannot reliably use an opengraph-image handler.
       images: [
         socialImage(
-          `/l/og?slug=${encodeURIComponent(data.slug)}&t=${encodeURIComponent(data.updatedAt)}`,
-          data.name,
+          `/l/og?slug=${encodeURIComponent(publicNode.slug)}&t=${encodeURIComponent(publicNode.updatedAt)}`,
+          publicNode.name,
         ),
       ],
     },

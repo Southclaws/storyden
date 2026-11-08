@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { cache } from "react";
+import { notFound } from "next/navigation";
 
-import { threadGet } from "@/api/openapi-server/threads";
 import { getServerSession } from "@/auth/server-session";
 import { ServerRenderedContent } from "@/components/content/ContentRenderer/ServerRenderedContent";
 import { getPermalinkForPost } from "@/components/thread/utils";
@@ -11,6 +10,7 @@ import {
   pageLinks,
   socialImage,
 } from "@/lib/metadata/public";
+import { getPublicThread, getThread } from "@/lib/metadata/thread";
 import { getSettings } from "@/lib/settings/settings-server";
 import * as z from "@/lib/validation";
 import { ThreadScreen } from "@/screens/thread/ThreadScreen/ThreadScreen";
@@ -29,41 +29,19 @@ const QuerySchema = z.object({
 });
 type Query = z.input<typeof QuerySchema>;
 
-// Metadata and JSON-LD share one anonymous read for this render.
-const getPublicThread = cache(async (slug: string, page: number) => {
-  try {
-    const { data } = await threadGet(
-      slug,
-      { page: String(page) },
-      {
-        anonymous: true,
-        cache: "no-store",
-      },
-    );
-
-    if (
-      data.visibility === "published" &&
-      page <= Math.max(1, data.replies.total_pages)
-    ) {
-      return data;
-    }
-  } catch {
-    // Public metadata is unavailable if the anonymous read fails.
-  }
-
-  return undefined;
-});
-
 export default async function Page(props: Props) {
   const { slug } = await props.params;
   const { page } = QuerySchema.parse(await props.searchParams);
-  const { data } = await threadGet(slug, { page: page?.toString() });
+  const data = await getThread(slug, page ?? 1);
+  if (!data) {
+    notFound();
+  }
+
   const session = await getServerSession();
   const settings = await getSettings();
-  const publicThread =
-    data.visibility === "published"
-      ? await getPublicThread(slug, page ?? 1)
-      : undefined;
+  const result = await getPublicThread(slug, page ?? 1);
+  const publicThread = result.status === "public" ? result.data : undefined;
+
   const url = canonicalPage(`/t/${encodeURIComponent(data.slug)}`);
   const structuredData = publicThread && {
     "@context": "https://schema.org",
@@ -136,35 +114,51 @@ export default async function Page(props: Props) {
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const { slug } = await props.params;
   const query = QuerySchema.safeParse(await props.searchParams);
-  const page = query.success ? (query.data.page ?? 1) : 1;
-  const thread = query.success ? await getPublicThread(slug, page) : undefined;
-  const totalPages = Math.max(1, thread?.replies.total_pages ?? 0);
-
-  if (!thread || page > totalPages) {
+  if (!query.success) {
     return {
       title: "Thread Not Found",
-      description: "The thread you are looking for does not exist.",
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const page = query.data.page ?? 1;
+  const thread = await getThread(slug, page);
+  if (!thread) {
+    return {
+      title: "Thread Not Found",
       robots: { index: false, follow: false },
     };
   }
 
   const settings = await getSettings();
-  const path = `/t/${encodeURIComponent(thread.slug)}`;
+  const title = `${thread.title} | ${settings.title}`;
+  const result = await getPublicThread(slug, page);
+  if (result.status === "not-public") {
+    return { title, robots: { index: false, follow: false } };
+  }
+
+  if (result.status === "unavailable") {
+    return { title };
+  }
+
+  const publicThread = result.data;
+  const path = `/t/${encodeURIComponent(publicThread.slug)}`;
   const url = canonicalPage(path, page);
+  const totalPages = Math.max(1, publicThread.replies.total_pages);
 
   return {
-    title: `${thread.title} | ${settings.title}`,
-    description: thread.description,
+    title,
+    description: publicThread.description,
     alternates: { canonical: url },
     pagination: pageLinks(path, page, totalPages),
     openGraph: {
       images: [socialImage(undefined, settings.title)],
       type: "article",
-      title: thread.title,
-      description: thread.description,
+      title: publicThread.title,
+      description: publicThread.description,
       url,
-      publishedTime: thread.createdAt,
-      modifiedTime: thread.updatedAt,
+      publishedTime: publicThread.createdAt,
+      modifiedTime: publicThread.updatedAt,
     },
   };
 }

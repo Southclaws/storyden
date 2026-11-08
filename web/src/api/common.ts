@@ -50,13 +50,11 @@ export class RequestError extends Error {
 
 export function buildRequest(
   url: string,
-  { method = "GET", headers, params, body, signal, revalidate, cache }: Options,
+  { method = "GET", headers, params, body, signal, cache }: Options,
 ): Request {
   const apiAddress = getAPIAddress();
   const address = `${apiAddress}/api${url}${cleanQuery(params)}`;
   const _method = method.toUpperCase();
-
-  const tags = buildNextTagsFromURL(address);
 
   return new Request(address, {
     method: _method,
@@ -66,10 +64,6 @@ export function buildRequest(
     body: buildPayload(body),
     signal,
     cache,
-    next: {
-      tags,
-      revalidate,
-    },
   });
 }
 
@@ -211,12 +205,4 @@ export function shouldLog(status: number) {
   }
 
   return true;
-}
-
-function buildNextTagsFromURL(url: string) {
-  const u = new URL(url);
-
-  const segments = u.pathname.split("/").filter(Boolean);
-
-  return segments;
 }

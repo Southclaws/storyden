@@ -3,14 +3,18 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
 import CategoryPage from "@/app/(dashboard)/d/[category]/page";
-import LibraryPage from "@/app/(dashboard)/l/[...slug]/page";
+import LibraryPage, {
+  generateMetadata as libraryMetadata,
+} from "@/app/(dashboard)/l/[...slug]/page";
 import LibraryIndexPage from "@/app/(dashboard)/l/page";
 import ProfilePage from "@/app/(dashboard)/m/[handle]/page";
+import { generateMetadata as homeMetadata } from "@/app/(dashboard)/page";
 import ThreadPage, {
   generateMetadata as threadMetadata,
 } from "@/app/(dashboard)/t/[slug]/page";
 import TagPage from "@/app/(dashboard)/tags/[tag]/page";
 
+vi.mock("server-only", () => ({}));
 vi.mock("@/components/content/ContentRenderer/ServerRenderedContent", () => ({
   ServerRenderedContent: ({ children }: { children: ReactNode }) => children,
 }));
@@ -21,7 +25,9 @@ vi.mock("@/config", () => ({
 }));
 vi.mock("next/headers", () => ({
   cookies: async () => ({
-    getAll: () => [{ name: "session", value: "admin" }],
+    get: () => (sessionPresent ? { value: "admin" } : undefined),
+    getAll: () =>
+      sessionPresent ? [{ name: "storyden-session", value: "admin" }] : [],
   }),
   headers: async () => new Headers({ "x-forwarded-for": "203.0.113.1" }),
 }));
@@ -36,7 +42,11 @@ vi.mock("@/auth/server-session", () => ({
 vi.mock("@/lib/settings/settings-server", () => ({
   getSettings: async () => ({
     title: "Community",
-    metadata: { signatures: {} },
+    description: "Community discussions",
+    metadata: {
+      signatures: {},
+      feed: { blocks: [{ type: "threads", source: "all" }] },
+    },
     discovery: { search_indexing: false },
   }),
 }));
@@ -105,10 +115,14 @@ const thread = {
 
 let responses: Record<string, { signed: unknown; public: unknown }>;
 let publicStatus: number;
+let signedStatus: number;
+let sessionPresent: boolean;
 let requests: Request[];
 
 beforeEach(() => {
   publicStatus = 200;
+  signedStatus = 200;
+  sessionPresent = true;
   requests = [];
   responses = {
     "/profiles/ada": {
@@ -162,8 +176,10 @@ beforeEach(() => {
       throw new Error(`Unexpected API request: ${path}`);
     }
 
-    if (request.headers.has("Cookie")) {
-      return Response.json(response.signed);
+    if (request.headers.get("Cookie")) {
+      return Response.json(signedStatus === 200 ? response.signed : {}, {
+        status: signedStatus,
+      });
     }
 
     expect(request.headers.has("Authorization")).toBe(false);
@@ -212,8 +228,7 @@ it.each([
 
     expect(structuredData(await ThreadPage(props))).toEqual([]);
     expect(await threadMetadata(props)).toEqual({
-      title: "Thread Not Found",
-      description: "The thread you are looking for does not exist.",
+      title: "A conversation | Community",
       robots: { index: false, follow: false },
     });
   },
@@ -451,7 +466,7 @@ it("describes each tag item with its actual public route", async () => {
   ]);
 });
 
-it.each([401, 403, 404, 500])(
+it.each([401, 403, 404, 429, 500])(
   "omits all public schemas when anonymous reads return %i",
   async (status) => {
     publicStatus = status;
@@ -475,6 +490,58 @@ it.each([401, 403, 404, 500])(
     for (const page of pages) {
       expect(structuredData(page)).toEqual([]);
     }
+  },
+);
+
+const metadataSurfaces = [
+  {
+    name: "library page",
+    metadata: () =>
+      libraryMetadata({
+        params: Promise.resolve({ slug: ["drawing-colour"] }),
+      }),
+    restricted: {
+      title: "Drawing & colour | Community",
+      robots: { index: false, follow: false },
+    },
+  },
+  {
+    name: "thread",
+    metadata: () =>
+      threadMetadata({
+        params: Promise.resolve({ slug: thread.slug }),
+        searchParams: Promise.resolve({}),
+      }),
+    restricted: {
+      title: "A conversation | Community",
+      robots: { index: false, follow: false },
+    },
+  },
+];
+
+it.each(
+  metadataSurfaces.flatMap((surface) =>
+    [401, 403, 404].map((status) => ({ ...surface, status })),
+  ),
+)(
+  "keeps the authorized $name title without public metadata on anonymous $status",
+  async ({ metadata, restricted, status }) => {
+    publicStatus = status;
+
+    expect(await metadata()).toEqual(restricted);
+  },
+);
+
+it.each(
+  metadataSurfaces.flatMap((surface) =>
+    [429, 500].map((status) => ({ ...surface, status })),
+  ),
+)(
+  "retains the $name title without manufacturing noindex on anonymous $status",
+  async ({ metadata, restricted, status }) => {
+    publicStatus = status;
+
+    expect(await metadata()).toEqual({ title: restricted.title });
   },
 );
 
@@ -509,5 +576,132 @@ it("keeps profile HTML inside one inert JSON-LD script", async () => {
   expect(renderToStaticMarkup(element).match(/<script/g)).toHaveLength(1);
   expect(structuredData(element)[0].mainEntity.description).toBe(
     '</script><script>alert("x")</script>',
+  );
+});
+
+it.each(["draft", "review"])(
+  "uses the authorized thread title for %s threads without a public read",
+  async (visibility) => {
+    responses["/threads/thread-a-conversation"]!.signed = {
+      ...thread,
+      visibility,
+    };
+    const props = {
+      params: Promise.resolve({ slug: thread.slug }),
+      searchParams: Promise.resolve({}),
+    };
+
+    expect(structuredData(await ThreadPage(props))).toEqual([]);
+    expect(await threadMetadata(props)).toEqual({
+      title: "A conversation | Community",
+      robots: { index: false, follow: false },
+    });
+    expect(requests.every((request) => request.headers.has("Cookie"))).toBe(
+      true,
+    );
+  },
+);
+
+it("uses the authorized draft Library title without a public read", async () => {
+  responses["/nodes/drawing-colour"]!.signed = { ...node, visibility: "draft" };
+  const props = { params: Promise.resolve({ slug: ["drawing-colour"] }) };
+
+  expect(structuredData(await LibraryPage(props))).toEqual([]);
+  expect(await libraryMetadata(props)).toEqual({
+    title: "Drawing & colour | Community",
+    robots: { index: false, follow: false },
+  });
+  expect(requests.every((request) => request.headers.has("Cookie"))).toBe(true);
+});
+
+it.each([429, 500])(
+  "still propagates critical viewer read failures on %i",
+  async (status) => {
+    signedStatus = status;
+
+    for (const surface of metadataSurfaces) {
+      await expect(surface.metadata()).rejects.toMatchObject({ status });
+    }
+  },
+);
+
+it.each([429, 500])(
+  "propagates guest metadata failures on %i instead of returning not-found metadata",
+  async (status) => {
+    sessionPresent = false;
+    publicStatus = status;
+
+    for (const surface of metadataSurfaces) {
+      await expect(surface.metadata()).rejects.toMatchObject({ status });
+    }
+  },
+);
+
+it.each([401, 403])(
+  "returns not-found metadata for denied guest reads on %i",
+  async (status) => {
+    sessionPresent = false;
+    publicStatus = status;
+
+    expect(
+      await libraryMetadata({
+        params: Promise.resolve({ slug: ["drawing-colour"] }),
+      }),
+    ).toEqual({
+      title: "Page not found",
+      robots: { index: false, follow: false },
+    });
+    expect(
+      await threadMetadata({
+        params: Promise.resolve({ slug: thread.slug }),
+        searchParams: Promise.resolve({}),
+      }),
+    ).toEqual({
+      title: "Thread Not Found",
+      robots: { index: false, follow: false },
+    });
+  },
+);
+
+it("preserves Next.js notFound for a missing guest page", async () => {
+  sessionPresent = false;
+  publicStatus = 404;
+
+  for (const surface of metadataSurfaces) {
+    await expect(surface.metadata()).rejects.toThrow("not found");
+  }
+});
+
+it.each([429, 500])(
+  "keeps public site metadata when feed pagination returns %i",
+  async (status) => {
+    publicStatus = status;
+
+    const metadata = await homeMetadata({
+      searchParams: Promise.resolve({ page: "2" }),
+    });
+
+    expect(metadata.title).toBe("Community | Community discussions");
+    expect(metadata.robots).toBeUndefined();
+    expect(metadata.pagination).toBeUndefined();
+  },
+);
+
+it("uses anonymous thread data for guest metadata and JSON-LD", async () => {
+  sessionPresent = false;
+  responses["/threads/thread-a-conversation"]!.signed = thread;
+  const props = {
+    params: Promise.resolve({ slug: thread.slug }),
+    searchParams: Promise.resolve({}),
+  };
+
+  expect((await threadMetadata(props)).title).toBe(
+    "A conversation | Community",
+  );
+  expect(structuredData(await ThreadPage(props))[0].headline).toBe(
+    "A conversation",
+  );
+  expect(requests.every((request) => !request.headers.get("Cookie"))).toBe(
+    true,
   );
 });

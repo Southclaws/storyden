@@ -7,6 +7,7 @@ import {
   canonicalPage,
   jsonLD,
   pageLinks,
+  readPublicContent,
   socialImage,
 } from "@/lib/metadata/public";
 import type { Settings } from "@/lib/settings/settings";
@@ -61,7 +62,6 @@ export async function generateMetadata({
   searchParams,
 }: Props): Promise<Metadata> {
   const query = QuerySchema.safeParse(await searchParams);
-
   if (!query.success) {
     return { title: "Page not found", robots: { index: false, follow: false } };
   }
@@ -72,10 +72,11 @@ export async function generateMetadata({
   );
   const page = threadsBlock ? (query.data.page ?? 1) : 1;
   const url = canonicalPage("/", page);
+  const title = `${settings.title} | ${settings.description}`;
   let pagination: Metadata["pagination"];
 
   if (threadsBlock) {
-    try {
+    const result = await readPublicContent(async () => {
       const { data } = await threadList(
         {
           ...getCategoryThreadListParams(threadsBlock.source, page),
@@ -83,29 +84,23 @@ export async function generateMetadata({
         },
         { anonymous: true, cache: "no-store" },
       );
-      const totalPages = Math.max(1, data.total_pages);
+      return data;
+    });
 
+    if (result.status === "public") {
+      const totalPages = Math.max(1, result.data.total_pages);
       if (page > totalPages) {
-        return {
-          title: "Page not found",
-          robots: { index: false, follow: false },
-        };
+        return { title, robots: { index: false, follow: false } };
       }
 
       pagination = pageLinks("/", page, totalPages);
-    } catch {
-      // Public site metadata remains available when the feed requires login.
-      if (page > 1) {
-        return {
-          title: "Page not found",
-          robots: { index: false, follow: false },
-        };
-      }
+    } else if (result.status === "not-public" && page > 1) {
+      return { title, robots: { index: false, follow: false } };
     }
   }
 
   return {
-    title: `${settings.title} | ${settings.description}`,
+    title,
     description: settings.description,
     alternates: { canonical: url },
     pagination,
