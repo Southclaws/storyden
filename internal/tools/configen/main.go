@@ -34,14 +34,17 @@ type Section struct {
 }
 
 type ConfigOption struct {
-	Env               string  `yaml:"env"`
-	Name              string  `yaml:"name"`
-	Description       string  `yaml:"description"`
-	Type              string  `yaml:"type"`
-	Required          bool    `yaml:"required"`
-	Default           *string `yaml:"default"`
-	ExportDefault     bool    `yaml:"export_default"`
-	DocumentedDefault *string `yaml:"documented_default"`
+	Env               string   `yaml:"env"`
+	Name              string   `yaml:"name"`
+	Description       string   `yaml:"description"`
+	Type              string   `yaml:"type"`
+	Required          bool     `yaml:"required"`
+	Default           *string  `yaml:"default"`
+	ExportDefault     bool     `yaml:"export_default"`
+	DocumentedDefault *string  `yaml:"documented_default"`
+	Minimum           *float64 `yaml:"minimum"`
+	Maximum           *float64 `yaml:"maximum"`
+	ZeroIsDefault     bool     `yaml:"zero_is_default"`
 }
 
 func run(filename, outputPkgFile, outputDocFile string) error {
@@ -54,6 +57,10 @@ func run(filename, outputPkgFile, outputDocFile string) error {
 
 	err = yaml.Unmarshal(spec, &sections)
 	if err != nil {
+		return err
+	}
+
+	if err := validateSchema(sections); err != nil {
 		return err
 	}
 
@@ -90,56 +97,27 @@ The term "Settings" is distinct from these and refers to runtime-configurable va
 			for _, f := range section.Fields {
 				// Generate golang code
 
-				fieldName := f.Name
-				if f.Required {
-					fieldName = fieldName + "Required"
-				}
-
-				tags := map[string]string{
-					"envconfig": f.Env,
-				}
-
-				if f.Default != nil {
-					tags["default"] = *f.Default
-				}
-
 				g.Comment(f.Description)
 
 				switch getTypeType(f.Type) {
 				case primitive:
-					g.Id(fieldName).Id(f.Type).Tag(tags)
+					g.Id(f.Name).Id(f.Type)
 
 				case stdlib:
 					path, sym := splitImportPath(f.Type)
 
-					g.Id(fieldName).Qual(path, sym).Tag(tags)
+					g.Id(f.Name).Qual(path, sym)
 
 				case thirdParty:
 					path, sym := splitImportPath(f.Type)
 
-					g.Id(fieldName).Qual(path, sym).Tag(tags)
+					g.Id(f.Name).Qual(path, sym)
 				}
-
-				documentedDefault := f.Default
-				if f.DocumentedDefault != nil {
-					documentedDefault = f.DocumentedDefault
-				}
-
-				properties := fmt.Sprintf(`<table>
-<tr><td>type</td><td>%s</td></tr>
-<tr><td>default</td><td>%s</td></tr>
-</table>
-
-`, getNonTechnicalTypeName(f.Type), getPrettyDefault(documentedDefault))
 
 				// Generate markdown documentation
 				markdown.WriteString(fmt.Sprintf("### `%s`\n\n", f.Env))
-				markdown.WriteString(properties)
-				// if f.Default != nil {
-				// 	markdown.WriteString(fmt.Sprintf("> default: `%s`\n\n", *f.Default))
-				// }
+				markdown.WriteString(optionProperties(f))
 				markdown.WriteString(fmt.Sprintf("%s\n\n", f.Description))
-				// markdown.WriteString(fmt.Sprintf("Type: %s\n\n", getNonTechnicalTypeName(f.Type)))
 			}
 		}
 	})
@@ -161,6 +139,8 @@ The term "Settings" is distinct from these and refers to runtime-configurable va
 			}
 		}
 	}
+
+	generateLoading(f, sections)
 
 	// Generate the markdown documentation
 	docFile, err := os.Create(outputDocFile)
@@ -253,4 +233,35 @@ func getPrettyDefault(s *string) string {
 	}
 
 	return fmt.Sprintf("`%s`", *s)
+}
+
+func optionProperties(option ConfigOption) string {
+	documentedDefault := option.Default
+	if option.DocumentedDefault != nil {
+		documentedDefault = option.DocumentedDefault
+	}
+
+	var properties strings.Builder
+	properties.WriteString("<table>\n")
+	writeProperty(&properties, "type", getNonTechnicalTypeName(option.Type))
+	writeProperty(&properties, "default", getPrettyDefault(documentedDefault))
+
+	if option.Required {
+		writeProperty(&properties, "required", "yes")
+	}
+
+	if option.Minimum != nil {
+		writeProperty(&properties, "minimum", fmt.Sprintf("%g", *option.Minimum))
+	}
+
+	if option.Maximum != nil {
+		writeProperty(&properties, "maximum", fmt.Sprintf("%g", *option.Maximum))
+	}
+
+	properties.WriteString("</table>\n\n")
+	return properties.String()
+}
+
+func writeProperty(output *strings.Builder, name, value string) {
+	fmt.Fprintf(output, "  <tr>\n    <td>%s</td>\n    <td>%s</td>\n  </tr>\n", name, value)
 }

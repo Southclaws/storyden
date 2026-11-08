@@ -79,6 +79,8 @@
     - env: "DEV_CHAOS_FAIL_RATE"
       name: DevChaosFailRate
       type: float64
+      minimum: 0
+      maximum: 1
       description: |-
         A value between 0 and 1 which simulates failed requests.
 
@@ -665,14 +667,18 @@
     - env: "IMAGE_WORKERS"
       name: ImageWorkers
       export_default: true
+      zero_is_default: true
       type: int
       default: "1"
+      minimum: 0
       description: Maximum simultaneously active image jobs per process.
     - env: "IMAGE_MEMORY_BUDGET"
       name: ImageMemoryBudget
       export_default: true
+      zero_is_default: true
       type: int64
       default: "268435456"
+      minimum: 0
       description: Admission budget in bytes for image work, separate from application memory. This is not a process RSS limit.
 
 - section: Cache

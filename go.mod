@@ -71,7 +71,6 @@ require (
 	github.com/invopop/jsonschema v0.14.0
 	github.com/jackc/pgx/v5 v5.12.0
 	github.com/jmoiron/sqlx v1.4.0
-	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/labstack/echo/v5 v5.4.4
 	github.com/mazznoer/colorgrad v0.11.1
 	github.com/mazznoer/csscolorparser v0.2.0

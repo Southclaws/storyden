@@ -1,0 +1,34 @@
+- section: Fixture
+  fields:
+    - env: TOKEN
+      name: Token
+      type: string
+      required: true
+    - env: LIMIT
+      name: Limit
+      type: int
+      default: "5"
+      export_default: true
+      zero_is_default: true
+      minimum: 1
+      maximum: 10
+    - env: REQUIRED_DEFAULT
+      name: RequiredDefault
+      type: string
+      required: true
+      default: fallback
+    - env: PAYLOAD
+      name: Payload
+      type: "[]byte"
+      default: raw
+    - env: ORIGINS
+      name: Origins
+      type: "[]string"
+      default: one,two
+    - env: OPTIONAL_DURATION
+      name: OptionalDuration
+      type: time.Duration
+    - env: EMPTY_URL
+      name: EmptyURL
+      type: net/url.URL
+      default: ""
