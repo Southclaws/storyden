@@ -9,9 +9,10 @@ import (
 
 	"github.com/Southclaws/enumerator/generate"
 	"github.com/dave/jennifer/jen"
-	"github.com/iancoleman/strcase"
 	"github.com/pb33f/libopenapi"
 	"github.com/pb33f/libopenapi/datamodel"
+
+	"github.com/Southclaws/storyden/internal/case_convert"
 )
 
 func main() {
@@ -100,7 +101,7 @@ func run(filename, outfile, enumOutfilePath, operationEnumOutfile, operationCost
 		if name == "Permission" {
 			for _, v := range schema.Schema().Enum {
 				enum.Values = append(enum.Values, generate.Value{
-					Symbol: fmt.Sprintf("Permission%s", strcase.ToCamel(v.Value)),
+					Symbol: fmt.Sprintf("Permission%s", case_convert.ToCamel(v.Value)),
 					Value:  fmt.Sprintf("`%s`", v.Value),
 				})
 			}
