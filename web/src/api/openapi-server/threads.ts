@@ -148,6 +148,11 @@ export type threadListResponse200 = {
   status: 200;
 };
 
+export type threadListResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
 export type threadListResponse401 = {
   data: UnauthorisedResponse;
   status: 401;
@@ -160,13 +165,14 @@ export type threadListResponse404 = {
 
 export type threadListResponseDefault = {
   data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 401 | 404>;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 404>;
 };
 
 export type threadListResponseSuccess = threadListResponse200 & {
   headers: Headers;
 };
 export type threadListResponseError = (
+  | threadListResponse400
   | threadListResponse401
   | threadListResponse404
   | threadListResponseDefault

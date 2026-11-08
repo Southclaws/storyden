@@ -102,7 +102,7 @@ func TestGlobalNotifications(t *testing.T) {
 			r.NoError(err)
 			a.Equal(postID, post.Ref.Id)
 			a.Equal(actor.ID.String(), item.Source.Id)
-			a.Equal(openapi.Unread, item.Status)
+			a.Equal(openapi.NotificationStatusUnread, item.Status)
 
 			id, err := xid.FromString(item.Id)
 			r.NoError(err)

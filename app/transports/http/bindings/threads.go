@@ -180,7 +180,7 @@ func (i *Threads) ThreadReadStatusUpdate(ctx context.Context, request openapi.Th
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	unread := request.Body.Status == openapi.ThreadReadStatusUnread
+	unread := request.Body.Status == openapi.ThreadReadStatusMutablePropsStatusUnread
 	status, err := i.thread_svc.UpdateReadStatus(ctx, postID, unread, at)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -223,6 +223,14 @@ func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequ
 
 	cats := deserialiseCategorySlugQueryParam(request.Params.Categories)
 	ignorePinned := opt.NewPtr(request.Params.IgnorePinned)
+	unread := opt.NewEmpty[bool]()
+	if status := request.Params.ReadStatus; status != nil {
+		if !status.Valid() {
+			return nil, fault.New("invalid thread read status filter", ftag.With(ftag.InvalidArgument))
+		}
+
+		unread = opt.New(*status == openapi.ThreadReadStatusFilterUnread)
+	}
 
 	page = max(0, page-1)
 	result, err := i.thread_svc.List(ctx, page, pageSize, thread_service.Params{
@@ -232,6 +240,7 @@ func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequ
 		Tags:         tags,
 		Categories:   cats,
 		IgnorePinned: ignorePinned,
+		Unread:       unread,
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

@@ -13,6 +13,7 @@ import type { PaginationQueryParameter } from "./paginationQueryParameter";
 import type { SearchQueryParameter } from "./searchQueryParameter";
 import type { TagListIDs } from "./tagListIDs";
 import type { ThreadsIgnorePinnedQueryParameter } from "./threadsIgnorePinnedQueryParameter";
+import type { ThreadsReadStatusQueryParameter } from "./threadsReadStatusQueryParameter";
 import type { VisibilityParamParameter } from "./visibilityParamParameter";
 
 export type ThreadListParams = {
@@ -30,6 +31,14 @@ export type ThreadListParams = {
    * page.
    */
   ignore_pinned?: ThreadsIgnorePinnedQueryParameter;
+  /**
+   * Filter by read status for the authenticated account. Requires authentication
+   * when supplied. A thread is unread when it has never been visited, has been
+   * explicitly marked unread, or has undeleted replies created after the last
+   * visit. Read threads have a recorded visit, no explicit unread marker, and
+   * no newer undeleted replies. Omit this parameter to include both statuses.
+   */
+  read_status?: ThreadsReadStatusQueryParameter;
   /** Show only results creeated by this user. */
   author?: AccountHandle;
   /**

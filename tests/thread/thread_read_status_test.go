@@ -77,12 +77,12 @@ func TestThreadReadStatusUpdate(t *testing.T) {
 				r.Equal(5, before.JSON200.ReadStatus.RepliesSince)
 				etag := before.HTTPResponse.Header.Get("ETag")
 
-				unread := updateStatus(t, thread.Slug, openapi.ThreadReadStatusUnread)
+				unread := updateStatus(t, thread.Slug, openapi.ThreadReadStatusMutablePropsStatusUnread)
 				r.True(unread.LastReadAt.Equal(baseline))
 				r.Equal(5, unread.RepliesSince)
 				r.NotNil(unread.MarkedUnreadAt)
 
-				again := updateStatus(t, thread.Slug, openapi.ThreadReadStatusUnread)
+				again := updateStatus(t, thread.Slug, openapi.ThreadReadStatusMutablePropsStatusUnread)
 				r.True(again.LastReadAt.Equal(baseline))
 				r.Equal(5, again.RepliesSince)
 
@@ -110,14 +110,14 @@ func TestThreadReadStatusUpdate(t *testing.T) {
 				r.Nil(otherGet.JSON200.ReadStatus)
 				r.False(db.PostRead.Query().Where(postread.AccountID(xid.ID(other.ID)), postread.RootPostID(xid.ID(id))).ExistX(root))
 
-				read := updateStatus(t, thread.Slug, openapi.ThreadReadStatusRead)
+				read := updateStatus(t, thread.Slug, openapi.ThreadReadStatusMutablePropsStatusRead)
 				r.Nil(read.MarkedUnreadAt)
 				r.Zero(read.RepliesSince)
 				r.True(read.LastReadAt.After(baseline))
 			})
 
 			t.Run("initialises_untracked_threads", func(t *testing.T) {
-				for _, status := range []openapi.ThreadReadStatusMutablePropsStatus{openapi.ThreadReadStatusUnread, openapi.ThreadReadStatusRead} {
+				for _, status := range []openapi.ThreadReadStatusMutablePropsStatus{openapi.ThreadReadStatusMutablePropsStatusUnread, openapi.ThreadReadStatusMutablePropsStatusRead} {
 					t.Run(string(status), func(t *testing.T) {
 						r := require.New(t)
 						thread := createThread(t, openapi.VisibilityPublished)
@@ -125,7 +125,7 @@ func TestThreadReadStatusUpdate(t *testing.T) {
 						r.Zero(result.RepliesSince)
 						r.False(result.LastReadAt.IsZero())
 
-						if status == openapi.ThreadReadStatusUnread {
+						if status == openapi.ThreadReadStatusMutablePropsStatusUnread {
 							r.NotNil(result.MarkedUnreadAt)
 							r.True(result.MarkedUnreadAt.Equal(result.LastReadAt))
 						} else {
@@ -161,7 +161,7 @@ func TestThreadReadStatusUpdate(t *testing.T) {
 				r.True(row.LastSeenAt.Equal(visited))
 				r.Nil(row.MarkedUnreadAt)
 
-				unread := updateStatus(t, thread.Slug, openapi.ThreadReadStatusUnread)
+				unread := updateStatus(t, thread.Slug, openapi.ThreadReadStatusMutablePropsStatusUnread)
 				body := "{\"k\":\"thread\",\"id\":\"" + thread.Id + "\"}"
 				tests.AssertRequest(cl.SendBeaconWithBodyWithResponse(root, "text/plain", strings.NewReader(body), memberSession))(t, http.StatusAccepted)
 				r.Eventually(func() bool {
@@ -172,7 +172,7 @@ func TestThreadReadStatusUpdate(t *testing.T) {
 
 			t.Run("rejects_unauthorised_or_invalid_updates", func(t *testing.T) {
 				thread := createThread(t, openapi.VisibilityPublished)
-				body := openapi.ThreadReadStatusMutableProps{Status: openapi.ThreadReadStatusUnread}
+				body := openapi.ThreadReadStatusMutableProps{Status: openapi.ThreadReadStatusMutablePropsStatusUnread}
 				tests.AssertRequest(cl.ThreadReadStatusUpdateWithResponse(root, thread.Slug, body))(t, http.StatusUnauthorized)
 				tests.AssertRequest(cl.ThreadReadStatusUpdateWithResponse(root, xid.New().String(), body, memberSession))(t, http.StatusNotFound)
 

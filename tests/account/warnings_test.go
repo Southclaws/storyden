@@ -179,7 +179,7 @@ func TestWarningIssueCreatesNotification(t *testing.T) {
 			if a.NotNil(warningNotification.Source) {
 				a.Equal(admin.ID.String(), warningNotification.Source.Id)
 			}
-			a.Equal(openapi.Unread, warningNotification.Status)
+			a.Equal(openapi.NotificationStatusUnread, warningNotification.Status)
 		}))
 	}))
 }

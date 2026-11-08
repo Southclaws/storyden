@@ -164,6 +164,7 @@ export type ThreadListQueryResult = NonNullable<
 
 export const useThreadList = <
   TError =
+    | BadRequestResponse
     | UnauthorisedResponse
     | NotFoundResponse
     | InternalServerErrorResponse,

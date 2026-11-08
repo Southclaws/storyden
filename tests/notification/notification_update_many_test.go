@@ -56,10 +56,10 @@ func TestNotificationUpdateMany(t *testing.T) {
 			a.Nil(notlist.JSON200.NextPage, "single page must not advertise a next page")
 
 			for _, n := range notlist.JSON200.Notifications {
-				a.Equal(openapi.Unread, n.Status)
+				a.Equal(openapi.NotificationStatusUnread, n.Status)
 			}
 
-			statusRead := openapi.Read
+			statusRead := openapi.NotificationStatusRead
 			updateResp, err := cl.NotificationUpdateManyWithResponse(root, openapi.NotificationListUpdate{
 				Notifications: []openapi.NotificationMutation{
 					{
@@ -77,7 +77,7 @@ func TestNotificationUpdateMany(t *testing.T) {
 			r.Len(updateResp.JSON200.Notifications, 2)
 			a.Nil(updateResp.JSON200.NextPage, "single page must not advertise a next page")
 			for _, n := range updateResp.JSON200.Notifications {
-				a.Equal(openapi.Read, n.Status)
+				a.Equal(openapi.NotificationStatusRead, n.Status)
 			}
 
 			notlistAfter, err := cl.NotificationListWithResponse(root, &openapi.NotificationListParams{}, userSession)
@@ -87,7 +87,7 @@ func TestNotificationUpdateMany(t *testing.T) {
 			readCount := 0
 			unreadCount := 0
 			for _, n := range notlistAfter.JSON200.Notifications {
-				if n.Status == openapi.Read {
+				if n.Status == openapi.NotificationStatusRead {
 					readCount++
 				} else {
 					unreadCount++

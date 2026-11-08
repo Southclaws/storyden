@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -13,6 +15,8 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/post"
+	ent_post "github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
 )
 
@@ -49,6 +53,38 @@ from
 where p.id in (%s)
 group by p.id
 `
+
+func HasReadStatus(accountID account.AccountID, unread bool) Query {
+	return func(q *threadListOptions) {
+		q.q.Where(func(s *sql.Selector) {
+			reads := sql.Table(postread.Table).As("read_status")
+			replies := sql.Table(ent_post.Table).As("unread_replies")
+			newerThanVisit := sql.ColumnsGT(replies.C(ent_post.FieldCreatedAt), reads.C(postread.FieldLastSeenAt))
+			if s.Dialect() == dialect.SQLite {
+				newerThanVisit = sql.ExprP("unixepoch(" + replies.C(ent_post.FieldCreatedAt) + ") > unixepoch(" + reads.C(postread.FieldLastSeenAt) + ")")
+			}
+
+			newReplies := sql.Select(replies.C(ent_post.FieldID)).From(replies).Where(sql.And(
+				sql.ColumnsEQ(replies.C(ent_post.FieldRootPostID), s.C(ent_post.FieldID)),
+				sql.IsNull(replies.C(ent_post.FieldDeletedAt)),
+				newerThanVisit,
+			))
+			readState := sql.Select(reads.C(postread.FieldID)).From(reads).Where(sql.And(
+				sql.ColumnsEQ(reads.C(postread.FieldRootPostID), s.C(ent_post.FieldID)),
+				sql.EQ(reads.C(postread.FieldAccountID), xid.ID(accountID)),
+				sql.IsNull(reads.C(postread.FieldMarkedUnreadAt)),
+				sql.Not(sql.Exists(newReplies)),
+			))
+
+			predicate := sql.Exists(readState)
+			if unread {
+				predicate = sql.Not(predicate)
+			}
+
+			s.Where(predicate)
+		})
+	}
+}
 
 func (d *Querier) newRepliesCountManyQuery() string {
 	switch d.raw.DriverName() {

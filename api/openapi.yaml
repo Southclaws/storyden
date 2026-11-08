@@ -2955,6 +2955,7 @@ paths:
         - $ref: "#/components/parameters/SearchQuery"
         - $ref: "#/components/parameters/PaginationQuery"
         - $ref: "#/components/parameters/ThreadsIgnorePinnedQuery"
+        - $ref: "#/components/parameters/ThreadsReadStatusQuery"
         - name: author
           description: Show only results creeated by this user.
           required: false
@@ -2969,6 +2970,7 @@ paths:
         - $ref: "#/components/parameters/CategorySlugListQuery"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ThreadListOK" }
@@ -5597,6 +5599,18 @@ components:
       required: false
       schema:
         type: boolean
+
+    ThreadsReadStatusQuery:
+      description: |
+        Filter by read status for the authenticated account. Requires authentication
+        when supplied. A thread is unread when it has never been visited, has been
+        explicitly marked unread, or has undeleted replies created after the last
+        visit. Read threads have a recorded visit, no explicit unread marker, and
+        no newer undeleted replies. Omit this parameter to include both statuses.
+      name: read_status
+      in: query
+      required: false
+      schema: { $ref: "#/components/schemas/ThreadReadStatusFilter" }
 
     CategorySlugParam:
       description: Unique category URL slug.
@@ -11925,6 +11939,10 @@ components:
             or replies_since. For a previously untracked thread, last_read_at
             is initialised to the same timestamp as this marker.
 
+    ThreadReadStatusFilter:
+      type: string
+      enum: [read, unread]
+
     ThreadReadStatusMutableProps:
       type: object
       required: [status]
@@ -11932,7 +11950,6 @@ components:
         status:
           type: string
           enum: [read, unread]
-          x-enum-varnames: [ThreadReadStatusRead, ThreadReadStatusUnread]
 
     ReplyStatus:
       type: object

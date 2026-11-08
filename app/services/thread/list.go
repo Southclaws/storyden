@@ -29,6 +29,7 @@ type Params struct {
 	Tags          opt.Optional[[]xid.ID]
 	Categories    opt.Optional[thread_querier.CategoryFilter]
 	IgnorePinned  opt.Optional[bool]
+	Unread        opt.Optional[bool]
 }
 
 func (s *service) List(ctx context.Context,
@@ -47,6 +48,15 @@ func (s *service) List(ctx context.Context,
 
 	q := []thread_querier.Query{
 		thread_querier.HasNotBeenDeleted(),
+	}
+
+	if unread, ok := opts.Unread.Get(); ok {
+		readerID, err := session.GetAccountID(ctx)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		q = append(q, thread_querier.HasReadStatus(readerID, unread))
 	}
 
 	opts.Query.Call(func(value string) { q = append(q, thread_querier.HasKeyword(value)) })

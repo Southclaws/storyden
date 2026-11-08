@@ -12,6 +12,6 @@ export type ThreadReadStatusMutablePropsStatus =
   (typeof ThreadReadStatusMutablePropsStatus)[keyof typeof ThreadReadStatusMutablePropsStatus];
 
 export const ThreadReadStatusMutablePropsStatus = {
-  ThreadReadStatusRead: "read",
-  ThreadReadStatusUnread: "unread",
+  read: "read",
+  unread: "unread",
 } as const;

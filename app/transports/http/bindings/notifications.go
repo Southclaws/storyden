@@ -231,13 +231,13 @@ func serialiseNotificationRef(in *notification.NotificationRef) openapi.Notifica
 
 func serialiseNotificationStatus(in bool) openapi.NotificationStatus {
 	if in {
-		return openapi.Read
+		return openapi.NotificationStatusRead
 	}
-	return openapi.Unread
+	return openapi.NotificationStatusUnread
 }
 
 func deserialiseNotificationStatus(in openapi.NotificationStatus) bool {
-	return in == openapi.Read
+	return in == openapi.NotificationStatusRead
 }
 
 func serialiseNotificationSettings(in account.NotificationPreferences) openapi.NotificationSettings {
