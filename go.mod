@@ -76,7 +76,6 @@ require (
 	github.com/mazznoer/colorgrad v0.11.1
 	github.com/mazznoer/csscolorparser v0.2.0
 	github.com/microcosm-cc/bluemonday v1.0.27
-	github.com/mileusna/useragent v1.3.5
 	github.com/minimaxir/big-list-of-naughty-strings/naughtystrings v0.0.0-20210417190545-db33ec7b1d5d
 	github.com/minio/minio-go/v7 v7.4.1
 	github.com/mocktools/go-smtp-mock/v2 v2.5.4

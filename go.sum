@@ -497,8 +497,6 @@ github.com/mazznoer/csscolorparser v0.2.0 h1:jX2HVimzgKxWr9Wo5cRC0tdJb3C7kveK0h7
 github.com/mazznoer/csscolorparser v0.2.0/go.mod h1:8lLAVvBKTTG/ux1I1CZJ6HCCKW1it97MjYB02xs9rSg=
 github.com/microcosm-cc/bluemonday v1.0.27 h1:MpEUotklkwCSLeH+Qdx1VJgNqLlpY2KXwXFM08ygZfk=
 github.com/microcosm-cc/bluemonday v1.0.27/go.mod h1:jFi9vgW+H7c3V0lb6nR74Ib/DIB5OBs92Dimizgw2cA=
-github.com/mileusna/useragent v1.3.5 h1:SJM5NzBmh/hO+4LGeATKpaEX9+b4vcGg2qXGLiNGDws=
-github.com/mileusna/useragent v1.3.5/go.mod h1:3d8TOmwL/5I8pJjyVDteHtgDGcefrFUX4ccGOMKNYYc=
 github.com/minimaxir/big-list-of-naughty-strings/naughtystrings v0.0.0-20210417190545-db33ec7b1d5d h1:ShRpqqb9+2q4YosdyQDB3DPARnyMrbOZsMErDiM1wZU=
 github.com/minimaxir/big-list-of-naughty-strings/naughtystrings v0.0.0-20210417190545-db33ec7b1d5d/go.mod h1:JbjHlMEuA7AKSWQPyEFPQ0hIRsl6ob4RBLPvGhwqddU=
 github.com/minio/crc64nvme v1.1.1 h1:8dwx/Pz49suywbO+auHCBpCtlW1OfpcLN7wYgVR6wAI=

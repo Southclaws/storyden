@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/mileusna/useragent"
-
 	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
+	"github.com/Southclaws/storyden/internal/useragent"
 )
 
 type Info struct {
