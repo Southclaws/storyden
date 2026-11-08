@@ -1,72 +1,47 @@
 import type { Metadata } from "next";
-import { cache } from "react";
+import { notFound } from "next/navigation";
 
-import { threadGet } from "@/api/openapi-server/threads";
 import { getServerSession } from "@/auth/server-session";
 import { ServerRenderedContent } from "@/components/content/ContentRenderer/ServerRenderedContent";
 import { getPermalinkForPost } from "@/components/thread/utils";
 import {
+  type PageQuery,
+  PageQuerySchema,
   canonicalPage,
-  isNotPublic,
   jsonLD,
-  pageLinks,
-  socialImage,
 } from "@/lib/metadata/public";
+import {
+  getPublicThread,
+  getThread,
+  getThreadMetadata,
+} from "@/lib/metadata/thread";
 import { getSettings } from "@/lib/settings/settings-server";
-import * as z from "@/lib/validation";
 import { ThreadScreen } from "@/screens/thread/ThreadScreen/ThreadScreen";
 
 export type Props = {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<Query>;
+  searchParams: Promise<PageQuery>;
 };
-
-const QuerySchema = z.object({
-  page: z.optional(
-    z
-      .pipe(z.string().check(z.regex(/^[1-9]\d*$/)), z.transform(Number))
-      .check(z.refine(Number.isSafeInteger)),
-  ),
-});
-type Query = z.input<typeof QuerySchema>;
-
-// Metadata and JSON-LD share one anonymous read for this render.
-const getPublicThread = cache(async (slug: string, page: number) => {
-  try {
-    const { data } = await threadGet(
-      slug,
-      { page: String(page) },
-      {
-        anonymous: true,
-        cache: "no-store",
-      },
-    );
-
-    if (
-      data.visibility === "published" &&
-      page <= Math.max(1, data.replies.total_pages)
-    ) {
-      return data;
-    }
-  } catch (error) {
-    if (!isNotPublic(error)) {
-      throw error;
-    }
-  }
-
-  return undefined;
-});
 
 export default async function Page(props: Props) {
   const { slug } = await props.params;
-  const { page } = QuerySchema.parse(await props.searchParams);
-  const { data } = await threadGet(slug, { page: page?.toString() });
+  const { page } = PageQuerySchema.parse(await props.searchParams);
+  const data = await getThread(slug, page ?? 1);
+  if (!data) {
+    notFound();
+  }
+
   const session = await getServerSession();
   const settings = await getSettings();
-  const publicThread =
-    data.visibility === "published"
-      ? await getPublicThread(slug, page ?? 1).catch(() => undefined)
-      : undefined;
+  let publicThread;
+
+  if (data.visibility === "published") {
+    const result = await getPublicThread(slug, page ?? 1);
+    if (result.status === "public") {
+      publicThread = result.data;
+    }
+  }
+
   const url = canonicalPage(`/t/${encodeURIComponent(data.slug)}`);
   const structuredData = publicThread && {
     "@context": "https://schema.org",
@@ -138,36 +113,13 @@ export default async function Page(props: Props) {
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const { slug } = await props.params;
-  const query = QuerySchema.safeParse(await props.searchParams);
-  const page = query.success ? (query.data.page ?? 1) : 1;
-  const thread = query.success ? await getPublicThread(slug, page) : undefined;
-  const totalPages = Math.max(1, thread?.replies.total_pages ?? 0);
-
-  if (!thread || page > totalPages) {
+  const query = PageQuerySchema.safeParse(await props.searchParams);
+  if (!query.success) {
     return {
       title: "Thread Not Found",
-      description: "The thread you are looking for does not exist.",
       robots: { index: false, follow: false },
     };
   }
 
-  const settings = await getSettings();
-  const path = `/t/${encodeURIComponent(thread.slug)}`;
-  const url = canonicalPage(path, page);
-
-  return {
-    title: `${thread.title} | ${settings.title}`,
-    description: thread.description,
-    alternates: { canonical: url },
-    pagination: pageLinks(path, page, totalPages),
-    openGraph: {
-      images: [socialImage(undefined, settings.title)],
-      type: "article",
-      title: thread.title,
-      description: thread.description,
-      url,
-      publishedTime: thread.createdAt,
-      modifiedTime: thread.updatedAt,
-    },
-  };
+  return getThreadMetadata(slug, query.data.page ?? 1);
 }

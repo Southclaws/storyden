@@ -60,11 +60,18 @@ func run(ctx context.Context, playwrightArgs []string) error {
 	}
 	defer stopManagedProcess("backend", backend)
 
+	metadataFailureFixture, err := filepath.Abs(filepath.Join("web", "tests", "metadata", "fetch-failures.cjs"))
+	if err != nil {
+		return fmt.Errorf("failed to resolve metadata test fixture: %w", err)
+	}
+
 	frontendCmd := exec.CommandContext(ctx, "pnpm", "start", "--port", "3001")
 	frontendCmd.Dir = "web"
 	frontendCmd.Env = append(os.Environ(),
 		"PUBLIC_API_ADDRESS=http://localhost:8001",
 		"PUBLIC_WEB_ADDRESS=http://localhost:3001",
+		// Failure injection stays in the E2E process, outside the production app.
+		fmt.Sprintf("NODE_OPTIONS=%s --require=%q", os.Getenv("NODE_OPTIONS"), metadataFailureFixture),
 	)
 	frontendCmd.Stdout = os.Stdout
 	frontendCmd.Stderr = os.Stderr

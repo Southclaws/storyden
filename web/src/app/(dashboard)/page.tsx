@@ -4,36 +4,28 @@ import { threadList } from "@/api/openapi-server/threads";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { getCategoryThreadListParams } from "@/lib/feed/category";
 import {
+  type PageQuery,
+  PageQuerySchema,
   canonicalPage,
-  isNotPublic,
   jsonLD,
   pageLinks,
+  readPublicContent,
   socialImage,
 } from "@/lib/metadata/public";
 import type { Settings } from "@/lib/settings/settings";
 import { getSettings } from "@/lib/settings/settings-server";
-import * as z from "@/lib/validation";
 import { FeedScreen } from "@/screens/feed/FeedScreen";
 
 type Props = {
-  searchParams: Promise<Query>;
+  searchParams: Promise<PageQuery>;
 };
-
-const QuerySchema = z.object({
-  page: z.optional(
-    z
-      .pipe(z.string().check(z.regex(/^[1-9]\d*$/)), z.transform(Number))
-      .check(z.refine(Number.isSafeInteger)),
-  ),
-});
-type Query = z.input<typeof QuerySchema>;
 
 export default async function Page({ searchParams }: Props) {
   let page: number | undefined;
   let settings: Settings;
 
   try {
-    ({ page } = QuerySchema.parse(await searchParams));
+    ({ page } = PageQuerySchema.parse(await searchParams));
     settings = await getSettings();
   } catch (error) {
     return <UnreadyBanner error={error} />;
@@ -61,8 +53,7 @@ export default async function Page({ searchParams }: Props) {
 export async function generateMetadata({
   searchParams,
 }: Props): Promise<Metadata> {
-  const query = QuerySchema.safeParse(await searchParams);
-
+  const query = PageQuerySchema.safeParse(await searchParams);
   if (!query.success) {
     return { title: "Page not found", robots: { index: false, follow: false } };
   }
@@ -73,10 +64,11 @@ export async function generateMetadata({
   );
   const page = threadsBlock ? (query.data.page ?? 1) : 1;
   const url = canonicalPage("/", page);
+  const title = `${settings.title} | ${settings.description}`;
   let pagination: Metadata["pagination"];
 
   if (threadsBlock) {
-    try {
+    const result = await readPublicContent(async () => {
       const { data } = await threadList(
         {
           ...getCategoryThreadListParams(threadsBlock.source, page),
@@ -84,33 +76,23 @@ export async function generateMetadata({
         },
         { anonymous: true, cache: "no-store" },
       );
-      const totalPages = Math.max(1, data.total_pages);
+      return data;
+    });
 
+    if (result.status === "public") {
+      const totalPages = Math.max(1, result.data.total_pages);
       if (page > totalPages) {
-        return {
-          title: "Page not found",
-          robots: { index: false, follow: false },
-        };
+        return { title, robots: { index: false, follow: false } };
       }
 
       pagination = pageLinks("/", page, totalPages);
-    } catch (error) {
-      if (!isNotPublic(error)) {
-        throw error;
-      }
-
-      // Public site metadata remains available when the feed requires login.
-      if (page > 1) {
-        return {
-          title: "Page not found",
-          robots: { index: false, follow: false },
-        };
-      }
+    } else if (result.status === "not-public" && page > 1) {
+      return { title, robots: { index: false, follow: false } };
     }
   }
 
   return {
-    title: `${settings.title} | ${settings.description}`,
+    title,
     description: settings.description,
     alternates: { canonical: url },
     pagination,

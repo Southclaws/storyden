@@ -40,3 +40,29 @@ References:
 responses with Twitter, Facebook, Discord, Slack, and LinkedIn crawler user
 agents. This checks the server contract; platform caches and actual in-app
 presentation require a publicly reachable deployment to verify.
+
+## Page titles and public metadata
+
+Thread and Library document titles use the same authorized server read as the
+page body. A draft, a thread awaiting moderation, or an empty reply page can
+still have a valid title. Public canonical links, Open Graph fields and JSON-LD
+use only published content that an anonymous reader can access.
+
+Anonymous denial (401, 403 or 404) disables public indexing for that content.
+A transient failure of a separate public read does not establish a denial: keep
+the successful SSR page and its document title, omit unavailable public data,
+and inherit the site's indexing policy. Failures of the critical viewer read
+still propagate. The public home-feed lookup follows the same distinction when
+resolving pagination metadata.
+
+The loaders use React's request-scoped `cache`, not a cross-request content
+cache. Guests and crawlers reuse their already-anonymous viewer read; signed-in
+viewers need a separate anonymous read for public metadata. Keep cookies and
+viewer-specific results outside any future shared `use cache` boundary. The
+native loading boundaries and metadata streaming remain in place, and these
+loaders add no client-side data fetching or JavaScript.
+
+`tests/metadata/page-metadata.spec.ts` checks authorized titles, transient public
+read failures and guest SSR with application scripts blocked. The E2E harness preloads
+`fetch-failures.cjs` into its frontend process to simulate slow failures using
+reserved documentation addresses; production code contains no test switches.

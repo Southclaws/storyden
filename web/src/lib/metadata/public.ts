@@ -2,11 +2,46 @@ import type { Metadata } from "next";
 
 import { RequestError } from "@/api/common";
 import { WEB_ADDRESS } from "@/config";
+import * as z from "@/lib/validation";
+
+export const PageQuerySchema = z.object({
+  page: z.optional(
+    z
+      .pipe(z.string().check(z.regex(/^[1-9]\d*$/)), z.transform(Number))
+      .check(z.refine(Number.isSafeInteger)),
+  ),
+});
+export type PageQuery = z.input<typeof PageQuerySchema>;
 
 export function isNotPublic(error: unknown): boolean {
   return (
     error instanceof RequestError && [401, 403, 404].includes(error.status)
   );
+}
+
+export type PublicContent<T> =
+  | { status: "public"; data: T }
+  | { status: "not-public" }
+  | { status: "unavailable" };
+
+// A failed SEO read cannot establish that content is private or missing.
+export async function readPublicContent<T>(
+  read: () => Promise<T | undefined>,
+): Promise<PublicContent<T>> {
+  try {
+    const data = await read();
+    if (data) {
+      return { status: "public", data };
+    }
+
+    return { status: "not-public" };
+  } catch (error) {
+    if (isNotPublic(error)) {
+      return { status: "not-public" };
+    }
+
+    return { status: "unavailable" };
+  }
 }
 
 export function canonicalPage(path: string, page = 1): string {

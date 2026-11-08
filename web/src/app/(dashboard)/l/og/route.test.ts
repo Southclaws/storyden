@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { beforeAll, beforeEach, expect, it, vi } from "vitest";
 
+import { RequestError } from "@/api/common";
 import { nodeGet } from "@/api/openapi-server/nodes";
 
 import { GET } from "./route";
@@ -50,6 +51,39 @@ it("only renders publicly visible pages through an anonymous read", async () => 
     undefined,
     expect.objectContaining({ anonymous: true, cache: "no-store" }),
   );
+});
+
+it.each([
+  { upstream: 401, expected: 404 },
+  { upstream: 403, expected: 404 },
+  { upstream: 404, expected: 404 },
+  { upstream: 429, expected: 503 },
+  { upstream: 500, expected: 502 },
+])(
+  "returns $expected for an upstream $upstream",
+  async ({ upstream, expected }) => {
+    vi.mocked(nodeGet).mockRejectedValue(
+      new RequestError("Unavailable", upstream),
+    );
+
+    const response = await GET(
+      new NextRequest("http://example.com/l/og?slug=missing"),
+    );
+
+    expect(response.status).toBe(expected);
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
+  },
+);
+
+it("returns a retryable response for a network failure", async () => {
+  vi.mocked(nodeGet).mockRejectedValue(new TypeError("fetch failed"));
+
+  const response = await GET(
+    new NextRequest("http://example.com/l/og?slug=public"),
+  );
+
+  expect(response.status).toBe(502);
+  expect(response.headers.get("Cache-Control")).toBe("no-store");
 });
 
 it.each([false, true])(

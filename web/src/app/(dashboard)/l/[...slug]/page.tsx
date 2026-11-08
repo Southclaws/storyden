@@ -1,8 +1,8 @@
 import { Metadata } from "next";
-import { cache } from "react";
+import { notFound } from "next/navigation";
 
 import { NodeListResult, NodeWithChildren } from "@/api/openapi-schema";
-import { nodeGet, nodeListChildren } from "@/api/openapi-server/nodes";
+import { nodeListChildren } from "@/api/openapi-server/nodes";
 import { ServerRenderedContent } from "@/components/content/ContentRenderer/ServerRenderedContent";
 import { getTargetSlug } from "@/components/library/utils";
 import {
@@ -10,38 +10,17 @@ import {
   parseNodeMetadata,
 } from "@/lib/library/metadata";
 import {
-  canonicalPage,
-  isNotPublic,
-  jsonLD,
-  socialImage,
-} from "@/lib/metadata/public";
-import { getSettings } from "@/lib/settings/settings-server";
+  getLibraryMetadata,
+  getLibraryNode,
+  getPublicNode,
+} from "@/lib/metadata/library";
+import { canonicalPage, jsonLD } from "@/lib/metadata/public";
 import { LibraryPageScreen } from "@/screens/library/LibraryPageScreen/LibraryPageScreen";
 import { Params, ParamsSchema } from "@/screens/library/library-path";
 
 export type Props = {
   params: Promise<Params>;
 };
-
-// Metadata and JSON-LD share one anonymous read for this render.
-const getPublicNode = cache(async (slug: string) => {
-  try {
-    const { data } = await nodeGet(slug, undefined, {
-      anonymous: true,
-      cache: "no-store",
-    });
-
-    if (data.visibility === "published") {
-      return data;
-    }
-  } catch (error) {
-    if (!isNotPublic(error)) {
-      throw error;
-    }
-  }
-
-  return undefined;
-});
 
 export default async function Page(props: Props) {
   const { slug } = ParamsSchema.parse(await props.params);
@@ -53,22 +32,24 @@ export default async function Page(props: Props) {
     throw new Error("Library page not found");
   }
 
-  const { data } = await nodeGet(targetSlug, undefined, {
-    cache: "no-store",
-    next: {
-      tags: ["library", "node"],
-      revalidate: 1,
-    },
-  });
+  const data = await getLibraryNode(targetSlug);
+  if (!data) {
+    notFound();
+  }
 
   // NOTE: A waterfall request which can probably be avoided by fetching the
   // subtree. However subtrees do not currently support property filtering or
   // sorting so this may need a new API endpoint or a parameter for nodeGet.
   const children = await maybeGetChildren(data);
-  const publicNode =
-    data.visibility === "published"
-      ? await getPublicNode(targetSlug).catch(() => undefined)
-      : undefined;
+  let publicNode;
+
+  if (data.visibility === "published") {
+    const result = await getPublicNode(targetSlug);
+    if (result.status === "public") {
+      publicNode = result.data;
+    }
+  }
+
   const structuredData = publicNode && {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -119,38 +100,11 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const targetSlug = params.success
     ? getTargetSlug(params.data.slug)
     : undefined;
-  const data = targetSlug ? await getPublicNode(targetSlug) : undefined;
-
-  if (!data) {
-    return {
-      title: "Page not found",
-      description: "The page you are looking for does not exist.",
-      robots: { index: false, follow: false },
-    };
+  if (!targetSlug) {
+    return { title: "Page not found", robots: { index: false, follow: false } };
   }
 
-  const settings = await getSettings();
-  const url = canonicalPage(`/l/${encodeURIComponent(data.slug)}`);
-
-  return {
-    title: `${data.name} | ${settings.title}`,
-    description: data.description,
-    alternates: { canonical: url },
-    openGraph: {
-      type: data.content ? "article" : "website",
-      title: data.name,
-      description: data.description,
-      url,
-      // NOTE: Massive hack because Next.js still hasn't fixed a bug with
-      // catch-all routes and opengraph-image route handlers.
-      images: [
-        socialImage(
-          `/l/og?slug=${encodeURIComponent(data.slug)}&t=${encodeURIComponent(data.updatedAt)}`,
-          data.name,
-        ),
-      ],
-    },
-  };
+  return getLibraryMetadata(targetSlug);
 }
 
 async function maybeGetChildren(

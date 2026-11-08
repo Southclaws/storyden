@@ -1,8 +1,10 @@
 import { ImageResponse } from "next/og";
 import { NextRequest, NextResponse } from "next/server";
 
+import { RequestError } from "@/api/common";
 import { nodeGet } from "@/api/openapi-server/nodes";
 import { loadMetadataImage } from "@/lib/metadata/image-response";
+import { isNotPublic } from "@/lib/metadata/public";
 import { getSettings } from "@/lib/settings/settings-server";
 
 const size = {
@@ -16,11 +18,33 @@ export async function GET(req: NextRequest) {
     return new NextResponse("No slug provided", { status: 400 });
   }
 
-  const { data } = await nodeGet(slug, undefined, {
-    anonymous: true,
-    cache: "no-store",
-    signal: req.signal,
-  });
+  let data;
+
+  try {
+    const response = await nodeGet(slug, undefined, {
+      anonymous: true,
+      cache: "no-store",
+      signal: req.signal,
+    });
+    data = response.data;
+  } catch (error) {
+    let status = 502;
+
+    if (isNotPublic(error)) {
+      status = 404;
+    } else if (error instanceof RequestError && error.status === 429) {
+      status = 503;
+    }
+
+    return new NextResponse(
+      status === 404 ? "Not Found" : "Preview unavailable",
+      {
+        status,
+        headers: { "Cache-Control": "no-store" },
+      },
+    );
+  }
+
   if (data.visibility !== "published") {
     return new NextResponse("Not Found", {
       status: 404,
@@ -40,7 +64,9 @@ export async function GET(req: NextRequest) {
         `/assets/${encodeURIComponent(image.filename)}?variant=l`,
       )
     : undefined;
-  if (imageData instanceof Response) return imageData;
+  if (imageData instanceof Response) {
+    return imageData;
+  }
 
   return new ImageResponse(
     <div
