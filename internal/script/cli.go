@@ -6,12 +6,12 @@ import (
 	"os"
 	"os/signal"
 
-	_ "github.com/joho/godotenv/autoload"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources"
 	"github.com/Southclaws/storyden/app/services"
 	"github.com/Southclaws/storyden/internal/config"
+	_ "github.com/Southclaws/storyden/internal/dotenv/autoload"
 	"github.com/Southclaws/storyden/internal/infrastructure"
 )
 

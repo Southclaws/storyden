@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"testing"
 
-	_ "github.com/joho/godotenv/autoload"
 	"github.com/samber/lo"
 
 	"github.com/google/uuid"
@@ -18,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
+	_ "github.com/Southclaws/storyden/internal/dotenv/autoload"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
 	"github.com/Southclaws/storyden/tests"

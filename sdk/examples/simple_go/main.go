@@ -7,8 +7,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/joho/godotenv"
-
+	"github.com/Southclaws/storyden/internal/dotenv"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 	"github.com/Southclaws/storyden/sdk/go/storyden"
 )
@@ -17,7 +16,7 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 
-	godotenv.Load(".env")
+	_ = dotenv.Load(".env")
 
 	rpcURL := os.Getenv("STORYDEN_RPC_URL")
 

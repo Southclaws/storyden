@@ -16,9 +16,9 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/joho/godotenv"
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/internal/dotenv"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 	sdk "github.com/Southclaws/storyden/sdk/go/storyden"
 )
@@ -73,7 +73,7 @@ type connector struct {
 func main() {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
 	logger.Info("starting discord connector plugin")
-	if err := godotenv.Load(); err == nil {
+	if err := dotenv.Load(".env"); err == nil {
 		logger.Info("loaded environment from .env")
 	}
 
