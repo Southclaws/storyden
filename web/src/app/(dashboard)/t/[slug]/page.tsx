@@ -12,6 +12,7 @@ import {
 } from "@/lib/metadata/public";
 import { getPublicThread, getThread } from "@/lib/metadata/thread";
 import { getSettings } from "@/lib/settings/settings-server";
+import { getConclusionReply } from "@/lib/thread/conclusion-server";
 import * as z from "@/lib/validation";
 import { ThreadScreen } from "@/screens/thread/ThreadScreen/ThreadScreen";
 
@@ -37,9 +38,14 @@ export default async function Page(props: Props) {
     notFound();
   }
 
-  const session = await getServerSession();
-  const settings = await getSettings();
-  const result = await getPublicThread(slug, page ?? 1);
+  const [initialConclusionReply, session, settings, result] = await Promise.all(
+    [
+      getConclusionReply(data),
+      getServerSession(),
+      getSettings(),
+      getPublicThread(slug, page ?? 1),
+    ],
+  );
   const publicThread = result.status === "public" ? result.data : undefined;
 
   const url = canonicalPage(`/t/${encodeURIComponent(data.slug)}`);
@@ -96,7 +102,11 @@ export default async function Page(props: Props) {
         />
       )}
       <ServerRenderedContent
-        values={[data.body, ...data.replies.replies.map((reply) => reply.body)]}
+        values={[
+          data.body,
+          initialConclusionReply?.body,
+          ...data.replies.replies.map((reply) => reply.body),
+        ]}
       >
         <ThreadScreen
           initialSession={session}
@@ -105,6 +115,7 @@ export default async function Page(props: Props) {
           thread={data}
           initialSettings={settings}
           initialSignatureConfig={settings.metadata.signatures}
+          initialConclusionReply={initialConclusionReply}
         />
       </ServerRenderedContent>
     </>

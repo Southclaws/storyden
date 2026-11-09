@@ -7778,6 +7778,38 @@ func (c *PostClient) QueryReplies(_m *Post) *PostQuery {
 	return query
 }
 
+// QueryConclusion queries the conclusion edge of a Post.
+func (c *PostClient) QueryConclusion(_m *Post) *PostQuery {
+	query := (&PostClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, id),
+			sqlgraph.To(post.Table, post.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, post.ConclusionTable, post.ConclusionColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryConclusions queries the conclusions edge of a Post.
+func (c *PostClient) QueryConclusions(_m *Post) *PostQuery {
+	query := (&PostClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, id),
+			sqlgraph.To(post.Table, post.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, post.ConclusionsTable, post.ConclusionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryReacts queries the reacts edge of a Post.
 func (c *PostClient) QueryReacts(_m *Post) *ReactQuery {
 	query := (&ReactClient{config: c.config}).Query()

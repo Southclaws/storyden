@@ -80,6 +80,7 @@ export function Card({
   shape,
   backgroundColor,
   titleWeight,
+  tone,
   disableAnchors = false,
   prefetchOnIntent = false,
   children,
@@ -94,6 +95,7 @@ export function Card({
     shape,
     backgroundColor,
     titleWeight,
+    tone,
     hasMedia,
     indicator,
   });

@@ -238,18 +238,6 @@ func (_u *PostUpdate) SetNillableShort(v *string) *PostUpdate {
 	return _u
 }
 
-// SetMetadata sets the "metadata" field.
-func (_u *PostUpdate) SetMetadata(v map[string]interface{}) *PostUpdate {
-	_u.mutation.SetMetadata(v)
-	return _u
-}
-
-// ClearMetadata clears the value of the "metadata" field.
-func (_u *PostUpdate) ClearMetadata() *PostUpdate {
-	_u.mutation.ClearMetadata()
-	return _u
-}
-
 // SetVisibility sets the "visibility" field.
 func (_u *PostUpdate) SetVisibility(v post.Visibility) *PostUpdate {
 	_u.mutation.SetVisibility(v)
@@ -315,6 +303,52 @@ func (_u *PostUpdate) SetNillableLinkID(v *xid.ID) *PostUpdate {
 // ClearLinkID clears the value of the "link_id" field.
 func (_u *PostUpdate) ClearLinkID() *PostUpdate {
 	_u.mutation.ClearLinkID()
+	return _u
+}
+
+// SetLifecycleState sets the "lifecycle_state" field.
+func (_u *PostUpdate) SetLifecycleState(v post.LifecycleState) *PostUpdate {
+	_u.mutation.SetLifecycleState(v)
+	return _u
+}
+
+// SetNillableLifecycleState sets the "lifecycle_state" field if the given value is not nil.
+func (_u *PostUpdate) SetNillableLifecycleState(v *post.LifecycleState) *PostUpdate {
+	if v != nil {
+		_u.SetLifecycleState(*v)
+	}
+	return _u
+}
+
+// SetConclusionPostID sets the "conclusion_post_id" field.
+func (_u *PostUpdate) SetConclusionPostID(v xid.ID) *PostUpdate {
+	_u.mutation.SetConclusionPostID(v)
+	return _u
+}
+
+// SetNillableConclusionPostID sets the "conclusion_post_id" field if the given value is not nil.
+func (_u *PostUpdate) SetNillableConclusionPostID(v *xid.ID) *PostUpdate {
+	if v != nil {
+		_u.SetConclusionPostID(*v)
+	}
+	return _u
+}
+
+// ClearConclusionPostID clears the value of the "conclusion_post_id" field.
+func (_u *PostUpdate) ClearConclusionPostID() *PostUpdate {
+	_u.mutation.ClearConclusionPostID()
+	return _u
+}
+
+// SetMetadata sets the "metadata" field.
+func (_u *PostUpdate) SetMetadata(v map[string]interface{}) *PostUpdate {
+	_u.mutation.SetMetadata(v)
+	return _u
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (_u *PostUpdate) ClearMetadata() *PostUpdate {
+	_u.mutation.ClearMetadata()
 	return _u
 }
 
@@ -415,6 +449,40 @@ func (_u *PostUpdate) AddReplies(v ...*Post) *PostUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.AddReplyIDs(ids...)
+}
+
+// SetConclusionID sets the "conclusion" edge to the Post entity by ID.
+func (_u *PostUpdate) SetConclusionID(id xid.ID) *PostUpdate {
+	_u.mutation.SetConclusionID(id)
+	return _u
+}
+
+// SetNillableConclusionID sets the "conclusion" edge to the Post entity by ID if the given value is not nil.
+func (_u *PostUpdate) SetNillableConclusionID(id *xid.ID) *PostUpdate {
+	if id != nil {
+		_u = _u.SetConclusionID(*id)
+	}
+	return _u
+}
+
+// SetConclusion sets the "conclusion" edge to the Post entity.
+func (_u *PostUpdate) SetConclusion(v *Post) *PostUpdate {
+	return _u.SetConclusionID(v.ID)
+}
+
+// AddConclusionIDs adds the "conclusions" edge to the Post entity by IDs.
+func (_u *PostUpdate) AddConclusionIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.AddConclusionIDs(ids...)
+	return _u
+}
+
+// AddConclusions adds the "conclusions" edges to the Post entity.
+func (_u *PostUpdate) AddConclusions(v ...*Post) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddConclusionIDs(ids...)
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
@@ -634,6 +702,33 @@ func (_u *PostUpdate) RemoveReplies(v ...*Post) *PostUpdate {
 	return _u.RemoveReplyIDs(ids...)
 }
 
+// ClearConclusion clears the "conclusion" edge to the Post entity.
+func (_u *PostUpdate) ClearConclusion() *PostUpdate {
+	_u.mutation.ClearConclusion()
+	return _u
+}
+
+// ClearConclusions clears all "conclusions" edges to the Post entity.
+func (_u *PostUpdate) ClearConclusions() *PostUpdate {
+	_u.mutation.ClearConclusions()
+	return _u
+}
+
+// RemoveConclusionIDs removes the "conclusions" edge to Post entities by IDs.
+func (_u *PostUpdate) RemoveConclusionIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.RemoveConclusionIDs(ids...)
+	return _u
+}
+
+// RemoveConclusions removes "conclusions" edges to Post entities.
+func (_u *PostUpdate) RemoveConclusions(v ...*Post) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveConclusionIDs(ids...)
+}
+
 // ClearReacts clears all "reacts" edges to the React entity.
 func (_u *PostUpdate) ClearReacts() *PostUpdate {
 	_u.mutation.ClearReacts()
@@ -842,6 +937,11 @@ func (_u *PostUpdate) check() error {
 			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Post.visibility": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.LifecycleState(); ok {
+		if err := post.LifecycleStateValidator(v); err != nil {
+			return &ValidationError{Name: "lifecycle_state", err: fmt.Errorf(`ent: validator failed for field "Post.lifecycle_state": %w`, err)}
+		}
+	}
 	if _u.mutation.AuthorCleared() && len(_u.mutation.AuthorIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Post.author"`)
 	}
@@ -908,14 +1008,17 @@ func (_u *PostUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if value, ok := _u.mutation.Short(); ok {
 		_spec.SetField(post.FieldShort, field.TypeString, value)
 	}
+	if value, ok := _u.mutation.Visibility(); ok {
+		_spec.SetField(post.FieldVisibility, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.LifecycleState(); ok {
+		_spec.SetField(post.FieldLifecycleState, field.TypeEnum, value)
+	}
 	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(post.FieldMetadata, field.TypeJSON, value)
 	}
 	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(post.FieldMetadata, field.TypeJSON)
-	}
-	if value, ok := _u.mutation.Visibility(); ok {
-		_spec.SetField(post.FieldVisibility, field.TypeEnum, value)
 	}
 	if _u.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -1158,6 +1261,80 @@ func (_u *PostUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Inverse: false,
 			Table:   post.RepliesTable,
 			Columns: []string{post.RepliesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ConclusionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.ConclusionTable,
+			Columns: []string{post.ConclusionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ConclusionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.ConclusionTable,
+			Columns: []string{post.ConclusionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ConclusionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.ConclusionsTable,
+			Columns: []string{post.ConclusionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedConclusionsIDs(); len(nodes) > 0 && !_u.mutation.ConclusionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.ConclusionsTable,
+			Columns: []string{post.ConclusionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ConclusionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.ConclusionsTable,
+			Columns: []string{post.ConclusionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
@@ -1776,18 +1953,6 @@ func (_u *PostUpdateOne) SetNillableShort(v *string) *PostUpdateOne {
 	return _u
 }
 
-// SetMetadata sets the "metadata" field.
-func (_u *PostUpdateOne) SetMetadata(v map[string]interface{}) *PostUpdateOne {
-	_u.mutation.SetMetadata(v)
-	return _u
-}
-
-// ClearMetadata clears the value of the "metadata" field.
-func (_u *PostUpdateOne) ClearMetadata() *PostUpdateOne {
-	_u.mutation.ClearMetadata()
-	return _u
-}
-
 // SetVisibility sets the "visibility" field.
 func (_u *PostUpdateOne) SetVisibility(v post.Visibility) *PostUpdateOne {
 	_u.mutation.SetVisibility(v)
@@ -1853,6 +2018,52 @@ func (_u *PostUpdateOne) SetNillableLinkID(v *xid.ID) *PostUpdateOne {
 // ClearLinkID clears the value of the "link_id" field.
 func (_u *PostUpdateOne) ClearLinkID() *PostUpdateOne {
 	_u.mutation.ClearLinkID()
+	return _u
+}
+
+// SetLifecycleState sets the "lifecycle_state" field.
+func (_u *PostUpdateOne) SetLifecycleState(v post.LifecycleState) *PostUpdateOne {
+	_u.mutation.SetLifecycleState(v)
+	return _u
+}
+
+// SetNillableLifecycleState sets the "lifecycle_state" field if the given value is not nil.
+func (_u *PostUpdateOne) SetNillableLifecycleState(v *post.LifecycleState) *PostUpdateOne {
+	if v != nil {
+		_u.SetLifecycleState(*v)
+	}
+	return _u
+}
+
+// SetConclusionPostID sets the "conclusion_post_id" field.
+func (_u *PostUpdateOne) SetConclusionPostID(v xid.ID) *PostUpdateOne {
+	_u.mutation.SetConclusionPostID(v)
+	return _u
+}
+
+// SetNillableConclusionPostID sets the "conclusion_post_id" field if the given value is not nil.
+func (_u *PostUpdateOne) SetNillableConclusionPostID(v *xid.ID) *PostUpdateOne {
+	if v != nil {
+		_u.SetConclusionPostID(*v)
+	}
+	return _u
+}
+
+// ClearConclusionPostID clears the value of the "conclusion_post_id" field.
+func (_u *PostUpdateOne) ClearConclusionPostID() *PostUpdateOne {
+	_u.mutation.ClearConclusionPostID()
+	return _u
+}
+
+// SetMetadata sets the "metadata" field.
+func (_u *PostUpdateOne) SetMetadata(v map[string]interface{}) *PostUpdateOne {
+	_u.mutation.SetMetadata(v)
+	return _u
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (_u *PostUpdateOne) ClearMetadata() *PostUpdateOne {
+	_u.mutation.ClearMetadata()
 	return _u
 }
 
@@ -1953,6 +2164,40 @@ func (_u *PostUpdateOne) AddReplies(v ...*Post) *PostUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.AddReplyIDs(ids...)
+}
+
+// SetConclusionID sets the "conclusion" edge to the Post entity by ID.
+func (_u *PostUpdateOne) SetConclusionID(id xid.ID) *PostUpdateOne {
+	_u.mutation.SetConclusionID(id)
+	return _u
+}
+
+// SetNillableConclusionID sets the "conclusion" edge to the Post entity by ID if the given value is not nil.
+func (_u *PostUpdateOne) SetNillableConclusionID(id *xid.ID) *PostUpdateOne {
+	if id != nil {
+		_u = _u.SetConclusionID(*id)
+	}
+	return _u
+}
+
+// SetConclusion sets the "conclusion" edge to the Post entity.
+func (_u *PostUpdateOne) SetConclusion(v *Post) *PostUpdateOne {
+	return _u.SetConclusionID(v.ID)
+}
+
+// AddConclusionIDs adds the "conclusions" edge to the Post entity by IDs.
+func (_u *PostUpdateOne) AddConclusionIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.AddConclusionIDs(ids...)
+	return _u
+}
+
+// AddConclusions adds the "conclusions" edges to the Post entity.
+func (_u *PostUpdateOne) AddConclusions(v ...*Post) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddConclusionIDs(ids...)
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
@@ -2170,6 +2415,33 @@ func (_u *PostUpdateOne) RemoveReplies(v ...*Post) *PostUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveReplyIDs(ids...)
+}
+
+// ClearConclusion clears the "conclusion" edge to the Post entity.
+func (_u *PostUpdateOne) ClearConclusion() *PostUpdateOne {
+	_u.mutation.ClearConclusion()
+	return _u
+}
+
+// ClearConclusions clears all "conclusions" edges to the Post entity.
+func (_u *PostUpdateOne) ClearConclusions() *PostUpdateOne {
+	_u.mutation.ClearConclusions()
+	return _u
+}
+
+// RemoveConclusionIDs removes the "conclusions" edge to Post entities by IDs.
+func (_u *PostUpdateOne) RemoveConclusionIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.RemoveConclusionIDs(ids...)
+	return _u
+}
+
+// RemoveConclusions removes "conclusions" edges to Post entities.
+func (_u *PostUpdateOne) RemoveConclusions(v ...*Post) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveConclusionIDs(ids...)
 }
 
 // ClearReacts clears all "reacts" edges to the React entity.
@@ -2393,6 +2665,11 @@ func (_u *PostUpdateOne) check() error {
 			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Post.visibility": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.LifecycleState(); ok {
+		if err := post.LifecycleStateValidator(v); err != nil {
+			return &ValidationError{Name: "lifecycle_state", err: fmt.Errorf(`ent: validator failed for field "Post.lifecycle_state": %w`, err)}
+		}
+	}
 	if _u.mutation.AuthorCleared() && len(_u.mutation.AuthorIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Post.author"`)
 	}
@@ -2476,14 +2753,17 @@ func (_u *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) {
 	if value, ok := _u.mutation.Short(); ok {
 		_spec.SetField(post.FieldShort, field.TypeString, value)
 	}
+	if value, ok := _u.mutation.Visibility(); ok {
+		_spec.SetField(post.FieldVisibility, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.LifecycleState(); ok {
+		_spec.SetField(post.FieldLifecycleState, field.TypeEnum, value)
+	}
 	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(post.FieldMetadata, field.TypeJSON, value)
 	}
 	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(post.FieldMetadata, field.TypeJSON)
-	}
-	if value, ok := _u.mutation.Visibility(); ok {
-		_spec.SetField(post.FieldVisibility, field.TypeEnum, value)
 	}
 	if _u.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -2726,6 +3006,80 @@ func (_u *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) {
 			Inverse: false,
 			Table:   post.RepliesTable,
 			Columns: []string{post.RepliesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ConclusionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.ConclusionTable,
+			Columns: []string{post.ConclusionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ConclusionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.ConclusionTable,
+			Columns: []string{post.ConclusionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ConclusionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.ConclusionsTable,
+			Columns: []string{post.ConclusionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedConclusionsIDs(); len(nodes) > 0 && !_u.mutation.ConclusionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.ConclusionsTable,
+			Columns: []string{post.ConclusionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ConclusionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.ConclusionsTable,
+			Columns: []string{post.ConclusionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),

@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "A compact compatibility Surface for independent arbitrary content. It always retains the canonical Surface border, padding, and radius. Prefer the richer Surface components for titled, repeated, media-backed, or metadata-heavy objects; do not use CardBox as a generic wrapper around top-level settings or page sections.",
+          "A compact compatibility Surface for independent arbitrary content. It always retains the canonical Surface border, padding, and radius. The success tone changes the border to `status.success.border` for a selected positive outcome; pair it with a visible state label rather than relying on colour alone. Prefer the richer Surface components for titled, repeated, media-backed, or metadata-heavy objects; do not use CardBox as a generic wrapper around top-level settings or page sections.",
       },
     },
   },
@@ -29,6 +29,14 @@ export const Variants: Story = {
         <styled.strong fontSize="sm">Discussion summary</styled.strong>
         <styled.span color="text.muted" fontSize="xs">
           A compact independent object on the application canvas.
+        </styled.span>
+      </CardBox>
+
+      <CardBox tone="success">
+        <styled.strong fontSize="sm">Selected answer</styled.strong>
+        <styled.span color="text.muted" fontSize="xs">
+          A success border distinguishes a selected positive outcome. Keep a
+          visible status label so colour is not the only cue.
         </styled.span>
       </CardBox>
 

@@ -1,6 +1,7 @@
 import type { ConfigSlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type RichCardVariant = {
+  tone?: "default" | "success"
   indicator?: boolean
   titleWeight?: "semibold" | "bold"
   hasMedia?: boolean

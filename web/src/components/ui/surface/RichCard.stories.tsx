@@ -13,6 +13,8 @@ import { IconButton } from "../icon-button";
 import { EmptyIcon } from "../icons/Empty";
 import { MoreIcon } from "../icons/More";
 import { PinIcon } from "../icons/Pin";
+import { ResolvedIcon } from "../icons/Resolved";
+import { ThreadConclusionIcon } from "../icons/ThreadConclusion";
 import { ToolsetIcon } from "../icons/Toolset";
 import { Input } from "../input";
 import { PropertyList } from "../property-list";
@@ -121,6 +123,7 @@ const meta = {
   argTypes: {
     shape: { control: "select", options: shapes },
     backgroundColor: { control: "select", options: backgrounds },
+    tone: { control: "select", options: ["default", "success"] },
     headingAs: { control: "select", options: ["h2", "h3", "h4"] },
     image: { control: "text" },
     imageAlt: { control: "text" },
@@ -140,7 +143,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "The canonical Surface family for independent content objects. Row, responsive, box, and fill cards use a `border.default` boundary. Minimal uses a flat inset surface for media-led collections. Use `Card` when content has a title, description, metadata, media, or controls; use `CardRows` and `CardGrid` for repeated collections. `titleIcon` is an optional, decorative 16px semantic marker whose size and muted colour are owned by Card. Use a product-owned icon when it adds deliberate object identity or state; do not substitute a visually similar icon from another domain. Card exposes a named article and an h2 title by default; use headingAs for a nested section. The title is the primary link and the excerpt remains readable text. Use titleStatus for meaningful state conveyed by a decorative icon. Use indicator for a small decorative attention dot, with indicatorColour accepting a design-system colour token and defaulting to accent.text. The indicator occupies a grid slot in the top-right corner and reserves title space. An absent indicator takes no space. Set titleWeight independently to semibold or bold, and use titleStatus to describe the domain meaning accessibly. The dot is not a lifecycle StatusBadge or a replacement for detailed counts. Backdrop images are decorative; foreground previews default to decorative teasers, with imageAlt available when a meaningful image description is supplied. Do not copy the title into imageAlt. The recipe has five shapes and three backgrounds, with no size axis. Responsive layout changes at a container width of 560px. The fill shape intentionally hides its title slot and top-right menu: put visible identity in its header; its content provides the primary link. Use Variants and Without Media to inspect all 15 combinations, and Container Widths to check 320, 480, 560, 561, and 800px frames. Do not wrap arbitrary page sections in cards, and use an Inset treatment for subordinate content inside a Surface.",
+          "The canonical Surface family for independent content objects. Row, responsive, box, and fill cards retain a semantic Surface border. The default tone uses `border.default`; the success tone uses `status.success.border` for a selected positive outcome, paired with a visible label or semantic icon. Minimal uses a flat inset surface for media-led collections. Use `Card` when content has a title, description, metadata, media, or controls; use `CardRows` and `CardGrid` for repeated collections. `titleIcon` accepts decorative semantic markers. Card owns their 16px size, spacing, and muted default colour; a domain state may use a semantic status content colour. Independent markers may share the slot. Use a product-owned icon when it adds deliberate object identity or state; do not substitute a visually similar icon from another domain. Card exposes a named article and an h2 title by default; use headingAs for a nested section. The title is the primary link and the excerpt remains readable text. Use titleStatus for meaningful state conveyed by a decorative icon. Use indicator for a small decorative attention dot, with indicatorColour accepting a design-system colour token and defaulting to accent.text. The indicator occupies a grid slot in the top-right corner and reserves title space. An absent indicator takes no space. Set titleWeight independently to semibold or bold, and use titleStatus to describe the domain meaning accessibly. The dot is not a lifecycle StatusBadge or a replacement for detailed counts. Backdrop images are decorative; foreground previews default to decorative teasers, with imageAlt available when a meaningful image description is supplied. Do not copy the title into imageAlt. The recipe has five shapes and three backgrounds, with no size axis. Responsive layout changes at a container width of 560px. The fill shape intentionally hides its title slot and top-right menu: put visible identity in its header; its content provides the primary link. Use Variants and Without Media to inspect all 15 combinations, and Container Widths to check 320, 480, 560, 561, and 800px frames. Do not wrap arbitrary page sections in cards, and use an Inset treatment for subordinate content inside a Surface.",
       },
     },
   },
@@ -428,7 +431,32 @@ export const StateIcon: Story = {
     docs: {
       description: {
         story:
-          "Use a semantic icon export when it adds deliberate product identity or state. This example communicates pinned state; object-family icons should likewise have their own product name rather than borrowing a visually similar symbol.",
+          "Use semantic icon exports when they add deliberate product identity or state. Card owns compact sizing, alignment, and muted colour; domain state may use a semantic status colour. Supply titleStatus to announce the meaning. Multiple independent states may share the title icon slot. Use StatusBadge when a visible state label is needed.",
+      },
+    },
+  },
+};
+
+export const CombinedStateIcons: Story = {
+  args: {
+    id: "resolved-pinned-discussion",
+    title: "Pinned discussion with a resolved outcome",
+    url: "/t/resolved-pinned-discussion",
+    titleIcon: (
+      <>
+        <PinIcon />
+        <ResolvedIcon color="status.success.content" />
+      </>
+    ),
+    titleStatus: "Pinned discussion. Resolved",
+    shape: "responsive",
+    disableAnchors: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Pinning and resolution are independent. Keep both markers visible and announce both states; success colour communicates resolution without changing the card's background or read state.",
       },
     },
   },
@@ -450,6 +478,28 @@ export const Indicator: Story = {
       description: {
         story:
           "Use indicator for a compact attention cue in the card's top-right corner. Its grid slot reserves title space, so long titles truncate before the corner. indicatorColour accepts a colour token, while titleWeight controls typography separately. Supply titleStatus to communicate what the dot means; use StatusBadge when the state needs a visible label.",
+      },
+    },
+  },
+};
+
+export const SuccessBorder: Story = {
+  args: {
+    id: "selected-answer",
+    title: "Answer",
+    titleIcon: <ThreadConclusionIcon color="status.success.content" />,
+    url: "/t/locate/selected-answer",
+    content:
+      "<p>The community found a solution. The border marks this selected outcome while the content keeps the normal Surface treatment.</p>",
+    tone: "success",
+    shape: "row",
+    disableAnchors: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Use the success tone for an object representing a selected positive outcome, such as a thread's answer. The tone changes the border only. Pair it with a meaningful label and semantic icon; colour must not be the only cue. It does not indicate read state or prevent further replies.",
       },
     },
   },

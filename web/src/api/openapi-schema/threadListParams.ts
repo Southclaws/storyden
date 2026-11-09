@@ -13,6 +13,7 @@ import type { PaginationQueryParameter } from "./paginationQueryParameter";
 import type { SearchQueryParameter } from "./searchQueryParameter";
 import type { TagListIDs } from "./tagListIDs";
 import type { ThreadsIgnorePinnedQueryParameter } from "./threadsIgnorePinnedQueryParameter";
+import type { ThreadsLifecycleStateQueryParameter } from "./threadsLifecycleStateQueryParameter";
 import type { ThreadsReadStatusQueryParameter } from "./threadsReadStatusQueryParameter";
 import type { VisibilityParamParameter } from "./visibilityParamParameter";
 
@@ -39,6 +40,11 @@ export type ThreadListParams = {
    * no newer undeleted replies. Omit this parameter to include both statuses.
    */
   read_status?: ThreadsReadStatusQueryParameter;
+  /**
+   * Whether a discussion is ongoing or has reached a conclusion. Independent
+   * of publication visibility and reply permissions. New threads start open.
+   */
+  lifecycle_state?: ThreadsLifecycleStateQueryParameter;
   /** Show only results creeated by this user. */
   author?: AccountHandle;
   /**

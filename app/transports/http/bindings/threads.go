@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
 	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
@@ -28,6 +29,7 @@ import (
 	thread_service "github.com/Southclaws/storyden/app/services/thread"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/internal/deletable"
 )
 
 type Threads struct {
@@ -120,6 +122,23 @@ func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdate
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	lifecycleState, err := opt.MapErr(opt.NewPtr(request.Body.LifecycleState), deserialiseThreadLifecycleState)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	conclusion, err := deletable.NewMapErr(request.Body.ConclusionReplyId, func(value string) (post.ID, error) {
+		id, err := xid.FromString(value)
+		if err != nil {
+			return post.ID{}, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
+		}
+
+		return post.ID(id), nil
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	tags := opt.Map(opt.NewPtr(request.Body.Tags), func(tags []string) tag_ref.Names {
 		return dt.Map(tags, deserialiseTagName)
 	})
@@ -139,12 +158,14 @@ func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdate
 	})
 
 	thread, err := i.thread_svc.Update(ctx, postID, thread_service.Partial{
-		Title:      opt.NewPtr(request.Body.Title),
-		Content:    richContent,
-		Tags:       tags,
-		Category:   opt.NewPtrMap(request.Body.Category, deserialiseID),
-		Visibility: Visibility,
-		Pinned:     pinned,
+		Title:             opt.NewPtr(request.Body.Title),
+		Content:           richContent,
+		Tags:              tags,
+		Category:          opt.NewPtrMap(request.Body.Category, deserialiseID),
+		Visibility:        Visibility,
+		Pinned:            pinned,
+		LifecycleState:    lifecycleState,
+		ConclusionReplyID: conclusion,
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -221,6 +242,11 @@ func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequ
 		})
 	})
 
+	lifecycleState, err := opt.MapErr(opt.NewPtr(request.Params.LifecycleState), deserialiseThreadLifecycleState)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	cats := deserialiseCategorySlugQueryParam(request.Params.Categories)
 	ignorePinned := opt.NewPtr(request.Params.IgnorePinned)
 	unread := opt.NewEmpty[bool]()
@@ -234,13 +260,14 @@ func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequ
 
 	page = max(0, page-1)
 	result, err := i.thread_svc.List(ctx, page, pageSize, thread_service.Params{
-		Query:        query,
-		AccountID:    author,
-		Visibility:   visibilities,
-		Tags:         tags,
-		Categories:   cats,
-		IgnorePinned: ignorePinned,
-		Unread:       unread,
+		LifecycleState: lifecycleState,
+		Query:          query,
+		AccountID:      author,
+		Visibility:     visibilities,
+		Tags:           tags,
+		Categories:     cats,
+		IgnorePinned:   ignorePinned,
+		Unread:         unread,
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -353,4 +380,13 @@ func deserialiseCategorySlugQueryParam(in *openapi.CategorySlugListQuery) opt.Op
 		Slugs:         *in,
 		Uncategorised: false,
 	})
+}
+
+func deserialiseThreadLifecycleState(value openapi.ThreadLifecycleState) (post.ThreadLifecycleState, error) {
+	state, err := post.NewThreadLifecycleState(string(value))
+	if err != nil {
+		return post.ThreadLifecycleState{}, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
+	}
+
+	return state, nil
 }

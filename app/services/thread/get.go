@@ -40,10 +40,21 @@ func (s *service) Get(
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get thread"))
 	}
 
+	if err := authoriseThreadRead(ctx, &thr.Post); err != nil {
+		return nil, err
+	}
+
+	thr.Replies.Items = s.filterRepliesByVisibility(ctx, thr.Replies.Items, accountID)
+
+	return thr, nil
+}
+
+func authoriseThreadRead(ctx context.Context, thr *post.Post) error {
+	accountID := session.GetOptAccountID(ctx)
 	if thr.Visibility != visibility.VisibilityPublished {
 		aid, ok := accountID.Get()
 		if !ok {
-			return nil, fault.Wrap(ErrNoPermission, fctx.With(ctx))
+			return fault.Wrap(ErrNoPermission, fctx.With(ctx))
 		}
 
 		if err := session.Authorise(ctx, func() error {
@@ -53,20 +64,11 @@ func (s *service) Get(
 
 			return ErrNoPermission
 		}, rbac.PermissionManagePosts); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
+			return fault.Wrap(err, fctx.With(ctx))
 		}
 	}
 
-	thr.Replies.Items = s.filterRepliesByVisibility(ctx, thr.Replies.Items, accountID)
-
-	// recommendations, err := s.recommender.Recommend(ctx, thr)
-	// if err != nil {
-	// 	s.l.Warn("failed to aggregate recommendations", slog.String("error", err.Error()))
-	// } else {
-	// 	thr.Related = append(thr.Related, recommendations...)
-	// }
-
-	return thr, nil
+	return nil
 }
 
 func (s *service) filterRepliesByVisibility(ctx context.Context, replies []*reply.Reply, accountID opt.Optional[account.AccountID]) []*reply.Reply {

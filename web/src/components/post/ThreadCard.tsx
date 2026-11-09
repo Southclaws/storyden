@@ -25,6 +25,7 @@ import {
   DiscussionParticipatingIcon,
 } from "../ui/icons/Discussion";
 import { PinIcon } from "../ui/icons/Pin";
+import { ResolvedIcon } from "../ui/icons/Resolved";
 
 import { LikeButton } from "./LikeButton/LikeButton";
 import { useThreadCardModeration } from "./useThreadCardModeration";
@@ -83,6 +84,14 @@ export const ThreadReferenceCard = memo(
 
     const isInReview = thread.visibility === Visibility.review;
     const isPinned = (thread.pinned ?? 0) > 0;
+    const isResolved = thread.lifecycle_state === "resolved";
+    const titleStatus = [
+      readStatusLabel,
+      isPinned ? "Pinned discussion" : undefined,
+      isResolved ? "Resolved" : undefined,
+    ]
+      .filter(Boolean)
+      .join(". ");
     const cardBackground = isPinned ? "emphasized" : "default";
 
     // Don't show images for in-review threads, too noisy.
@@ -99,11 +108,20 @@ export const ThreadReferenceCard = memo(
         backgroundColor={cardBackground}
         id={thread.id}
         title={title}
-        titleIcon={isPinned ? <PinIcon w="4" /> : undefined}
+        titleIcon={
+          <>
+            {isPinned && <PinIcon />}
+            {isResolved && (
+              <ResolvedIcon color="status.success.content">
+                <title>Resolved</title>
+              </ResolvedIcon>
+            )}
+          </>
+        }
         indicator={readState === "unread"}
         indicatorColour="blue.solid"
         titleWeight={readState === "unread" ? "bold" : "semibold"}
-        titleStatus={readStatusLabel}
+        titleStatus={titleStatus}
         text={thread.description}
         url={permalink}
         prefetchOnIntent={!isDraft}
@@ -152,9 +170,7 @@ export const ThreadReferenceCard = memo(
               flexShrink="0"
               overflow="hidden"
             >
-              <styled.span srOnly>
-                {isDraft ? "Draft. " : isPinned ? "Pinned discussion. " : ""}
-              </styled.span>
+              <styled.span srOnly>{isDraft ? "Draft. " : ""}</styled.span>
               <styled.span
                 className="thread-byline__reply-status-label"
                 color="text.muted"

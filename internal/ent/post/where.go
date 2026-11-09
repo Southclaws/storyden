@@ -131,6 +131,11 @@ func LinkID(v xid.ID) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldLinkID, v))
 }
 
+// ConclusionPostID applies equality check predicate on the "conclusion_post_id" field. It's identical to ConclusionPostIDEQ.
+func ConclusionPostID(v xid.ID) predicate.Post {
+	return predicate.Post(sql.FieldEQ(FieldConclusionPostID, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldCreatedAt, v))
@@ -831,16 +836,6 @@ func ShortContainsFold(v string) predicate.Post {
 	return predicate.Post(sql.FieldContainsFold(FieldShort, v))
 }
 
-// MetadataIsNil applies the IsNil predicate on the "metadata" field.
-func MetadataIsNil() predicate.Post {
-	return predicate.Post(sql.FieldIsNull(FieldMetadata))
-}
-
-// MetadataNotNil applies the NotNil predicate on the "metadata" field.
-func MetadataNotNil() predicate.Post {
-	return predicate.Post(sql.FieldNotNull(FieldMetadata))
-}
-
 // VisibilityEQ applies the EQ predicate on the "visibility" field.
 func VisibilityEQ(v Visibility) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldVisibility, v))
@@ -1091,6 +1086,116 @@ func LinkIDContainsFold(v xid.ID) predicate.Post {
 	return predicate.Post(sql.FieldContainsFold(FieldLinkID, vc))
 }
 
+// LifecycleStateEQ applies the EQ predicate on the "lifecycle_state" field.
+func LifecycleStateEQ(v LifecycleState) predicate.Post {
+	return predicate.Post(sql.FieldEQ(FieldLifecycleState, v))
+}
+
+// LifecycleStateNEQ applies the NEQ predicate on the "lifecycle_state" field.
+func LifecycleStateNEQ(v LifecycleState) predicate.Post {
+	return predicate.Post(sql.FieldNEQ(FieldLifecycleState, v))
+}
+
+// LifecycleStateIn applies the In predicate on the "lifecycle_state" field.
+func LifecycleStateIn(vs ...LifecycleState) predicate.Post {
+	return predicate.Post(sql.FieldIn(FieldLifecycleState, vs...))
+}
+
+// LifecycleStateNotIn applies the NotIn predicate on the "lifecycle_state" field.
+func LifecycleStateNotIn(vs ...LifecycleState) predicate.Post {
+	return predicate.Post(sql.FieldNotIn(FieldLifecycleState, vs...))
+}
+
+// ConclusionPostIDEQ applies the EQ predicate on the "conclusion_post_id" field.
+func ConclusionPostIDEQ(v xid.ID) predicate.Post {
+	return predicate.Post(sql.FieldEQ(FieldConclusionPostID, v))
+}
+
+// ConclusionPostIDNEQ applies the NEQ predicate on the "conclusion_post_id" field.
+func ConclusionPostIDNEQ(v xid.ID) predicate.Post {
+	return predicate.Post(sql.FieldNEQ(FieldConclusionPostID, v))
+}
+
+// ConclusionPostIDIn applies the In predicate on the "conclusion_post_id" field.
+func ConclusionPostIDIn(vs ...xid.ID) predicate.Post {
+	return predicate.Post(sql.FieldIn(FieldConclusionPostID, vs...))
+}
+
+// ConclusionPostIDNotIn applies the NotIn predicate on the "conclusion_post_id" field.
+func ConclusionPostIDNotIn(vs ...xid.ID) predicate.Post {
+	return predicate.Post(sql.FieldNotIn(FieldConclusionPostID, vs...))
+}
+
+// ConclusionPostIDGT applies the GT predicate on the "conclusion_post_id" field.
+func ConclusionPostIDGT(v xid.ID) predicate.Post {
+	return predicate.Post(sql.FieldGT(FieldConclusionPostID, v))
+}
+
+// ConclusionPostIDGTE applies the GTE predicate on the "conclusion_post_id" field.
+func ConclusionPostIDGTE(v xid.ID) predicate.Post {
+	return predicate.Post(sql.FieldGTE(FieldConclusionPostID, v))
+}
+
+// ConclusionPostIDLT applies the LT predicate on the "conclusion_post_id" field.
+func ConclusionPostIDLT(v xid.ID) predicate.Post {
+	return predicate.Post(sql.FieldLT(FieldConclusionPostID, v))
+}
+
+// ConclusionPostIDLTE applies the LTE predicate on the "conclusion_post_id" field.
+func ConclusionPostIDLTE(v xid.ID) predicate.Post {
+	return predicate.Post(sql.FieldLTE(FieldConclusionPostID, v))
+}
+
+// ConclusionPostIDContains applies the Contains predicate on the "conclusion_post_id" field.
+func ConclusionPostIDContains(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(sql.FieldContains(FieldConclusionPostID, vc))
+}
+
+// ConclusionPostIDHasPrefix applies the HasPrefix predicate on the "conclusion_post_id" field.
+func ConclusionPostIDHasPrefix(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(sql.FieldHasPrefix(FieldConclusionPostID, vc))
+}
+
+// ConclusionPostIDHasSuffix applies the HasSuffix predicate on the "conclusion_post_id" field.
+func ConclusionPostIDHasSuffix(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(sql.FieldHasSuffix(FieldConclusionPostID, vc))
+}
+
+// ConclusionPostIDIsNil applies the IsNil predicate on the "conclusion_post_id" field.
+func ConclusionPostIDIsNil() predicate.Post {
+	return predicate.Post(sql.FieldIsNull(FieldConclusionPostID))
+}
+
+// ConclusionPostIDNotNil applies the NotNil predicate on the "conclusion_post_id" field.
+func ConclusionPostIDNotNil() predicate.Post {
+	return predicate.Post(sql.FieldNotNull(FieldConclusionPostID))
+}
+
+// ConclusionPostIDEqualFold applies the EqualFold predicate on the "conclusion_post_id" field.
+func ConclusionPostIDEqualFold(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(sql.FieldEqualFold(FieldConclusionPostID, vc))
+}
+
+// ConclusionPostIDContainsFold applies the ContainsFold predicate on the "conclusion_post_id" field.
+func ConclusionPostIDContainsFold(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(sql.FieldContainsFold(FieldConclusionPostID, vc))
+}
+
+// MetadataIsNil applies the IsNil predicate on the "metadata" field.
+func MetadataIsNil() predicate.Post {
+	return predicate.Post(sql.FieldIsNull(FieldMetadata))
+}
+
+// MetadataNotNil applies the NotNil predicate on the "metadata" field.
+func MetadataNotNil() predicate.Post {
+	return predicate.Post(sql.FieldNotNull(FieldMetadata))
+}
+
 // HasAuthor applies the HasEdge predicate on the "author" edge.
 func HasAuthor() predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
@@ -1244,6 +1349,52 @@ func HasReplies() predicate.Post {
 func HasRepliesWith(preds ...predicate.Post) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		step := newRepliesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasConclusion applies the HasEdge predicate on the "conclusion" edge.
+func HasConclusion() predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ConclusionTable, ConclusionColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasConclusionWith applies the HasEdge predicate on the "conclusion" edge with a given conditions (other predicates).
+func HasConclusionWith(preds ...predicate.Post) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		step := newConclusionStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasConclusions applies the HasEdge predicate on the "conclusions" edge.
+func HasConclusions() predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ConclusionsTable, ConclusionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasConclusionsWith applies the HasEdge predicate on the "conclusions" edge with a given conditions (other predicates).
+func HasConclusionsWith(preds ...predicate.Post) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		step := newConclusionsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

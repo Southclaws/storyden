@@ -8,11 +8,13 @@
  * OpenAPI spec version: v1.26.16-post
  */
 import type { CategoryReference } from "./categoryReference";
+import type { Identifier } from "./identifier";
 import type { LinkReference } from "./linkReference";
 import type { PinnedRank } from "./pinnedRank";
 import type { ReadStatus } from "./readStatus";
 import type { ReplyStatus } from "./replyStatus";
 import type { TagReferenceList } from "./tagReferenceList";
+import type { ThreadLifecycleState } from "./threadLifecycleState";
 
 export interface ThreadReferenceProps {
   pinned: PinnedRank;
@@ -20,6 +22,9 @@ export interface ThreadReferenceProps {
   reply_status: ReplyStatus;
   category?: CategoryReference;
   link?: LinkReference;
+  lifecycle_state: ThreadLifecycleState;
+  /** The conclusion reply. For usage as a Q&A "answer" or "solution". */
+  conclusion_reply_id?: Identifier;
   tags: TagReferenceList;
   /** The time of the last reply to the thread. */
   last_reply_at?: string;

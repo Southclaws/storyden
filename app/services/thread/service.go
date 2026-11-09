@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_read_state"
+	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
 	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
@@ -29,6 +30,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/moderation"
 	"github.com/Southclaws/storyden/app/services/report/system_report"
 	"github.com/Southclaws/storyden/app/services/semdex"
+	"github.com/Southclaws/storyden/internal/deletable"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
@@ -60,17 +62,20 @@ type Service interface {
 		threadID post.ID,
 		pageParams pagination.Parameters,
 	) (*thread.Thread, error)
+	GetReply(ctx context.Context, threadID post.ID, replyID post.ID) (*reply.Reply, error)
 }
 
 type Partial struct {
-	Title      opt.Optional[string]
-	Content    opt.Optional[datagraph.Content]
-	Category   opt.Optional[xid.ID]
-	Tags       opt.Optional[tag_ref.Names]
-	Visibility opt.Optional[visibility.Visibility]
-	URL        opt.Optional[url.URL]
-	Meta       opt.Optional[map[string]any]
-	Pinned     opt.Optional[int]
+	Title             opt.Optional[string]
+	Content           opt.Optional[datagraph.Content]
+	Category          opt.Optional[xid.ID]
+	Tags              opt.Optional[tag_ref.Names]
+	Visibility        opt.Optional[visibility.Visibility]
+	URL               opt.Optional[url.URL]
+	LifecycleState    opt.Optional[post.ThreadLifecycleState]
+	ConclusionReplyID deletable.Value[post.ID]
+	Meta              opt.Optional[map[string]any]
+	Pinned            opt.Optional[int]
 }
 
 func (p Partial) Opts() (opts []thread_writer.Option) {
@@ -78,6 +83,11 @@ func (p Partial) Opts() (opts []thread_writer.Option) {
 	p.Content.Call(func(v datagraph.Content) { opts = append(opts, thread_writer.WithContent(v)) })
 	p.Category.Call(func(v xid.ID) { opts = append(opts, thread_writer.WithCategory(xid.ID(v))) })
 	p.Visibility.Call(func(v visibility.Visibility) { opts = append(opts, thread_writer.WithVisibility(v)) })
+	p.LifecycleState.Call(func(v post.ThreadLifecycleState) { opts = append(opts, thread_writer.WithLifecycleState(v)) })
+	p.ConclusionReplyID.Call(
+		func(v post.ID) { opts = append(opts, thread_writer.WithConclusion(v)) },
+		func() { opts = append(opts, thread_writer.WithoutConclusion()) },
+	)
 	p.Meta.Call(func(v map[string]any) { opts = append(opts, thread_writer.WithMeta(v)) })
 	p.Pinned.Call(func(v int) { opts = append(opts, thread_writer.WithPinned(v)) })
 	return

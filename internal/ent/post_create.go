@@ -171,12 +171,6 @@ func (_c *PostCreate) SetShort(v string) *PostCreate {
 	return _c
 }
 
-// SetMetadata sets the "metadata" field.
-func (_c *PostCreate) SetMetadata(v map[string]interface{}) *PostCreate {
-	_c.mutation.SetMetadata(v)
-	return _c
-}
-
 // SetVisibility sets the "visibility" field.
 func (_c *PostCreate) SetVisibility(v post.Visibility) *PostCreate {
 	_c.mutation.SetVisibility(v)
@@ -222,6 +216,40 @@ func (_c *PostCreate) SetNillableLinkID(v *xid.ID) *PostCreate {
 	if v != nil {
 		_c.SetLinkID(*v)
 	}
+	return _c
+}
+
+// SetLifecycleState sets the "lifecycle_state" field.
+func (_c *PostCreate) SetLifecycleState(v post.LifecycleState) *PostCreate {
+	_c.mutation.SetLifecycleState(v)
+	return _c
+}
+
+// SetNillableLifecycleState sets the "lifecycle_state" field if the given value is not nil.
+func (_c *PostCreate) SetNillableLifecycleState(v *post.LifecycleState) *PostCreate {
+	if v != nil {
+		_c.SetLifecycleState(*v)
+	}
+	return _c
+}
+
+// SetConclusionPostID sets the "conclusion_post_id" field.
+func (_c *PostCreate) SetConclusionPostID(v xid.ID) *PostCreate {
+	_c.mutation.SetConclusionPostID(v)
+	return _c
+}
+
+// SetNillableConclusionPostID sets the "conclusion_post_id" field if the given value is not nil.
+func (_c *PostCreate) SetNillableConclusionPostID(v *xid.ID) *PostCreate {
+	if v != nil {
+		_c.SetConclusionPostID(*v)
+	}
+	return _c
+}
+
+// SetMetadata sets the "metadata" field.
+func (_c *PostCreate) SetMetadata(v map[string]interface{}) *PostCreate {
+	_c.mutation.SetMetadata(v)
 	return _c
 }
 
@@ -336,6 +364,40 @@ func (_c *PostCreate) AddReplies(v ...*Post) *PostCreate {
 		ids[i] = v[i].ID
 	}
 	return _c.AddReplyIDs(ids...)
+}
+
+// SetConclusionID sets the "conclusion" edge to the Post entity by ID.
+func (_c *PostCreate) SetConclusionID(id xid.ID) *PostCreate {
+	_c.mutation.SetConclusionID(id)
+	return _c
+}
+
+// SetNillableConclusionID sets the "conclusion" edge to the Post entity by ID if the given value is not nil.
+func (_c *PostCreate) SetNillableConclusionID(id *xid.ID) *PostCreate {
+	if id != nil {
+		_c = _c.SetConclusionID(*id)
+	}
+	return _c
+}
+
+// SetConclusion sets the "conclusion" edge to the Post entity.
+func (_c *PostCreate) SetConclusion(v *Post) *PostCreate {
+	return _c.SetConclusionID(v.ID)
+}
+
+// AddConclusionIDs adds the "conclusions" edge to the Post entity by IDs.
+func (_c *PostCreate) AddConclusionIDs(ids ...xid.ID) *PostCreate {
+	_c.mutation.AddConclusionIDs(ids...)
+	return _c
+}
+
+// AddConclusions adds the "conclusions" edges to the Post entity.
+func (_c *PostCreate) AddConclusions(v ...*Post) *PostCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddConclusionIDs(ids...)
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
@@ -510,6 +572,10 @@ func (_c *PostCreate) defaults() {
 		v := post.DefaultVisibility
 		_c.mutation.SetVisibility(v)
 	}
+	if _, ok := _c.mutation.LifecycleState(); !ok {
+		v := post.DefaultLifecycleState
+		_c.mutation.SetLifecycleState(v)
+	}
 	if _, ok := _c.mutation.ID(); !ok {
 		v := post.DefaultID()
 		_c.mutation.SetID(v)
@@ -546,6 +612,14 @@ func (_c *PostCreate) check() error {
 	}
 	if _, ok := _c.mutation.AccountPosts(); !ok {
 		return &ValidationError{Name: "account_posts", err: errors.New(`ent: missing required field "Post.account_posts"`)}
+	}
+	if _, ok := _c.mutation.LifecycleState(); !ok {
+		return &ValidationError{Name: "lifecycle_state", err: errors.New(`ent: missing required field "Post.lifecycle_state"`)}
+	}
+	if v, ok := _c.mutation.LifecycleState(); ok {
+		if err := post.LifecycleStateValidator(v); err != nil {
+			return &ValidationError{Name: "lifecycle_state", err: fmt.Errorf(`ent: validator failed for field "Post.lifecycle_state": %w`, err)}
+		}
 	}
 	if v, ok := _c.mutation.ID(); ok {
 		if err := post.IDValidator(v.String()); err != nil {
@@ -631,13 +705,17 @@ func (_c *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		_spec.SetField(post.FieldShort, field.TypeString, value)
 		_node.Short = value
 	}
-	if value, ok := _c.mutation.Metadata(); ok {
-		_spec.SetField(post.FieldMetadata, field.TypeJSON, value)
-		_node.Metadata = value
-	}
 	if value, ok := _c.mutation.Visibility(); ok {
 		_spec.SetField(post.FieldVisibility, field.TypeEnum, value)
 		_node.Visibility = value
+	}
+	if value, ok := _c.mutation.LifecycleState(); ok {
+		_spec.SetField(post.FieldLifecycleState, field.TypeEnum, value)
+		_node.LifecycleState = value
+	}
+	if value, ok := _c.mutation.Metadata(); ok {
+		_spec.SetField(post.FieldMetadata, field.TypeJSON, value)
+		_node.Metadata = value
 	}
 	if nodes := _c.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -745,6 +823,39 @@ func (_c *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Inverse: false,
 			Table:   post.RepliesTable,
 			Columns: []string{post.RepliesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.ConclusionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.ConclusionTable,
+			Columns: []string{post.ConclusionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.ConclusionPostID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.ConclusionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.ConclusionsTable,
+			Columns: []string{post.ConclusionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
@@ -1126,24 +1237,6 @@ func (u *PostUpsert) UpdateShort() *PostUpsert {
 	return u
 }
 
-// SetMetadata sets the "metadata" field.
-func (u *PostUpsert) SetMetadata(v map[string]interface{}) *PostUpsert {
-	u.Set(post.FieldMetadata, v)
-	return u
-}
-
-// UpdateMetadata sets the "metadata" field to the value that was provided on create.
-func (u *PostUpsert) UpdateMetadata() *PostUpsert {
-	u.SetExcluded(post.FieldMetadata)
-	return u
-}
-
-// ClearMetadata clears the value of the "metadata" field.
-func (u *PostUpsert) ClearMetadata() *PostUpsert {
-	u.SetNull(post.FieldMetadata)
-	return u
-}
-
 // SetVisibility sets the "visibility" field.
 func (u *PostUpsert) SetVisibility(v post.Visibility) *PostUpsert {
 	u.Set(post.FieldVisibility, v)
@@ -1201,6 +1294,54 @@ func (u *PostUpsert) UpdateLinkID() *PostUpsert {
 // ClearLinkID clears the value of the "link_id" field.
 func (u *PostUpsert) ClearLinkID() *PostUpsert {
 	u.SetNull(post.FieldLinkID)
+	return u
+}
+
+// SetLifecycleState sets the "lifecycle_state" field.
+func (u *PostUpsert) SetLifecycleState(v post.LifecycleState) *PostUpsert {
+	u.Set(post.FieldLifecycleState, v)
+	return u
+}
+
+// UpdateLifecycleState sets the "lifecycle_state" field to the value that was provided on create.
+func (u *PostUpsert) UpdateLifecycleState() *PostUpsert {
+	u.SetExcluded(post.FieldLifecycleState)
+	return u
+}
+
+// SetConclusionPostID sets the "conclusion_post_id" field.
+func (u *PostUpsert) SetConclusionPostID(v xid.ID) *PostUpsert {
+	u.Set(post.FieldConclusionPostID, v)
+	return u
+}
+
+// UpdateConclusionPostID sets the "conclusion_post_id" field to the value that was provided on create.
+func (u *PostUpsert) UpdateConclusionPostID() *PostUpsert {
+	u.SetExcluded(post.FieldConclusionPostID)
+	return u
+}
+
+// ClearConclusionPostID clears the value of the "conclusion_post_id" field.
+func (u *PostUpsert) ClearConclusionPostID() *PostUpsert {
+	u.SetNull(post.FieldConclusionPostID)
+	return u
+}
+
+// SetMetadata sets the "metadata" field.
+func (u *PostUpsert) SetMetadata(v map[string]interface{}) *PostUpsert {
+	u.Set(post.FieldMetadata, v)
+	return u
+}
+
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *PostUpsert) UpdateMetadata() *PostUpsert {
+	u.SetExcluded(post.FieldMetadata)
+	return u
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (u *PostUpsert) ClearMetadata() *PostUpsert {
+	u.SetNull(post.FieldMetadata)
 	return u
 }
 
@@ -1458,27 +1599,6 @@ func (u *PostUpsertOne) UpdateShort() *PostUpsertOne {
 	})
 }
 
-// SetMetadata sets the "metadata" field.
-func (u *PostUpsertOne) SetMetadata(v map[string]interface{}) *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.SetMetadata(v)
-	})
-}
-
-// UpdateMetadata sets the "metadata" field to the value that was provided on create.
-func (u *PostUpsertOne) UpdateMetadata() *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateMetadata()
-	})
-}
-
-// ClearMetadata clears the value of the "metadata" field.
-func (u *PostUpsertOne) ClearMetadata() *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.ClearMetadata()
-	})
-}
-
 // SetVisibility sets the "visibility" field.
 func (u *PostUpsertOne) SetVisibility(v post.Visibility) *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
@@ -1546,6 +1666,62 @@ func (u *PostUpsertOne) UpdateLinkID() *PostUpsertOne {
 func (u *PostUpsertOne) ClearLinkID() *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.ClearLinkID()
+	})
+}
+
+// SetLifecycleState sets the "lifecycle_state" field.
+func (u *PostUpsertOne) SetLifecycleState(v post.LifecycleState) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetLifecycleState(v)
+	})
+}
+
+// UpdateLifecycleState sets the "lifecycle_state" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateLifecycleState() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateLifecycleState()
+	})
+}
+
+// SetConclusionPostID sets the "conclusion_post_id" field.
+func (u *PostUpsertOne) SetConclusionPostID(v xid.ID) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetConclusionPostID(v)
+	})
+}
+
+// UpdateConclusionPostID sets the "conclusion_post_id" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateConclusionPostID() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateConclusionPostID()
+	})
+}
+
+// ClearConclusionPostID clears the value of the "conclusion_post_id" field.
+func (u *PostUpsertOne) ClearConclusionPostID() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearConclusionPostID()
+	})
+}
+
+// SetMetadata sets the "metadata" field.
+func (u *PostUpsertOne) SetMetadata(v map[string]interface{}) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetMetadata(v)
+	})
+}
+
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateMetadata() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateMetadata()
+	})
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (u *PostUpsertOne) ClearMetadata() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearMetadata()
 	})
 }
 
@@ -1970,27 +2146,6 @@ func (u *PostUpsertBulk) UpdateShort() *PostUpsertBulk {
 	})
 }
 
-// SetMetadata sets the "metadata" field.
-func (u *PostUpsertBulk) SetMetadata(v map[string]interface{}) *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.SetMetadata(v)
-	})
-}
-
-// UpdateMetadata sets the "metadata" field to the value that was provided on create.
-func (u *PostUpsertBulk) UpdateMetadata() *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateMetadata()
-	})
-}
-
-// ClearMetadata clears the value of the "metadata" field.
-func (u *PostUpsertBulk) ClearMetadata() *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.ClearMetadata()
-	})
-}
-
 // SetVisibility sets the "visibility" field.
 func (u *PostUpsertBulk) SetVisibility(v post.Visibility) *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
@@ -2058,6 +2213,62 @@ func (u *PostUpsertBulk) UpdateLinkID() *PostUpsertBulk {
 func (u *PostUpsertBulk) ClearLinkID() *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.ClearLinkID()
+	})
+}
+
+// SetLifecycleState sets the "lifecycle_state" field.
+func (u *PostUpsertBulk) SetLifecycleState(v post.LifecycleState) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetLifecycleState(v)
+	})
+}
+
+// UpdateLifecycleState sets the "lifecycle_state" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateLifecycleState() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateLifecycleState()
+	})
+}
+
+// SetConclusionPostID sets the "conclusion_post_id" field.
+func (u *PostUpsertBulk) SetConclusionPostID(v xid.ID) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetConclusionPostID(v)
+	})
+}
+
+// UpdateConclusionPostID sets the "conclusion_post_id" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateConclusionPostID() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateConclusionPostID()
+	})
+}
+
+// ClearConclusionPostID clears the value of the "conclusion_post_id" field.
+func (u *PostUpsertBulk) ClearConclusionPostID() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearConclusionPostID()
+	})
+}
+
+// SetMetadata sets the "metadata" field.
+func (u *PostUpsertBulk) SetMetadata(v map[string]interface{}) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetMetadata(v)
+	})
+}
+
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateMetadata() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateMetadata()
+	})
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (u *PostUpsertBulk) ClearMetadata() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearMetadata()
 	})
 }
 

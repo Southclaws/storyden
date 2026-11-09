@@ -298,9 +298,19 @@ export type threadUpdateResponse200 = {
   status: 200;
 };
 
+export type threadUpdateResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
 export type threadUpdateResponse401 = {
   data: UnauthorisedResponse;
   status: 401;
+};
+
+export type threadUpdateResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
 };
 
 export type threadUpdateResponse404 = {
@@ -310,14 +320,16 @@ export type threadUpdateResponse404 = {
 
 export type threadUpdateResponseDefault = {
   data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 401 | 404>;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 403 | 404>;
 };
 
 export type threadUpdateResponseSuccess = threadUpdateResponse200 & {
   headers: Headers;
 };
 export type threadUpdateResponseError = (
+  | threadUpdateResponse400
   | threadUpdateResponse401
+  | threadUpdateResponse403
   | threadUpdateResponse404
   | threadUpdateResponseDefault
 ) & {
@@ -329,7 +341,14 @@ export const getThreadUpdateUrl = (threadMark: string) => {
 };
 
 /**
- * Publish changes to a thread.
+ * Publish changes to a thread using a partial update. Every update
+ * requires authentication and must be made by the thread author or a
+ * member with MANAGE_POSTS. Setting the pinned rank additionally requires
+ * MANAGE_POSTS, including when the requesting member is the thread author.
+ *
+ * Supply the properties to change. Omitted properties preserve their
+ * existing values unless a documented transition changes a related field;
+ * see ThreadMutableProps for lifecycle and conclusion transitions.
  */
 export const threadUpdate = async (
   threadMark: string,

@@ -42,6 +42,8 @@ type PostQuery struct {
 	withPosts        *PostQuery
 	withReplyTo      *PostQuery
 	withReplies      *PostQuery
+	withConclusion   *PostQuery
+	withConclusions  *PostQuery
 	withReacts       *ReactQuery
 	withLikes        *LikePostQuery
 	withMentions     *MentionProfileQuery
@@ -235,6 +237,50 @@ func (_q *PostQuery) QueryReplies() *PostQuery {
 			sqlgraph.From(post.Table, post.FieldID, selector),
 			sqlgraph.To(post.Table, post.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, post.RepliesTable, post.RepliesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryConclusion chains the current query on the "conclusion" edge.
+func (_q *PostQuery) QueryConclusion() *PostQuery {
+	query := (&PostClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, selector),
+			sqlgraph.To(post.Table, post.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, post.ConclusionTable, post.ConclusionColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryConclusions chains the current query on the "conclusions" edge.
+func (_q *PostQuery) QueryConclusions() *PostQuery {
+	query := (&PostClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, selector),
+			sqlgraph.To(post.Table, post.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, post.ConclusionsTable, post.ConclusionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -639,6 +685,8 @@ func (_q *PostQuery) Clone() *PostQuery {
 		withPosts:        _q.withPosts.Clone(),
 		withReplyTo:      _q.withReplyTo.Clone(),
 		withReplies:      _q.withReplies.Clone(),
+		withConclusion:   _q.withConclusion.Clone(),
+		withConclusions:  _q.withConclusions.Clone(),
 		withReacts:       _q.withReacts.Clone(),
 		withLikes:        _q.withLikes.Clone(),
 		withMentions:     _q.withMentions.Clone(),
@@ -729,6 +777,28 @@ func (_q *PostQuery) WithReplies(opts ...func(*PostQuery)) *PostQuery {
 		opt(query)
 	}
 	_q.withReplies = query
+	return _q
+}
+
+// WithConclusion tells the query-builder to eager-load the nodes that are connected to
+// the "conclusion" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *PostQuery) WithConclusion(opts ...func(*PostQuery)) *PostQuery {
+	query := (&PostClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withConclusion = query
+	return _q
+}
+
+// WithConclusions tells the query-builder to eager-load the nodes that are connected to
+// the "conclusions" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *PostQuery) WithConclusions(opts ...func(*PostQuery)) *PostQuery {
+	query := (&PostClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withConclusions = query
 	return _q
 }
 
@@ -909,7 +979,7 @@ func (_q *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 	var (
 		nodes       = []*Post{}
 		_spec       = _q.querySpec()
-		loadedTypes = [16]bool{
+		loadedTypes = [18]bool{
 			_q.withAuthor != nil,
 			_q.withCategory != nil,
 			_q.withTags != nil,
@@ -917,6 +987,8 @@ func (_q *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 			_q.withPosts != nil,
 			_q.withReplyTo != nil,
 			_q.withReplies != nil,
+			_q.withConclusion != nil,
+			_q.withConclusions != nil,
 			_q.withReacts != nil,
 			_q.withLikes != nil,
 			_q.withMentions != nil,
@@ -991,6 +1063,19 @@ func (_q *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 		if err := _q.loadReplies(ctx, query, nodes,
 			func(n *Post) { n.Edges.Replies = []*Post{} },
 			func(n *Post, e *Post) { n.Edges.Replies = append(n.Edges.Replies, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withConclusion; query != nil {
+		if err := _q.loadConclusion(ctx, query, nodes, nil,
+			func(n *Post, e *Post) { n.Edges.Conclusion = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withConclusions; query != nil {
+		if err := _q.loadConclusions(ctx, query, nodes,
+			func(n *Post) { n.Edges.Conclusions = []*Post{} },
+			func(n *Post, e *Post) { n.Edges.Conclusions = append(n.Edges.Conclusions, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1303,6 +1388,71 @@ func (_q *PostQuery) loadReplies(ctx context.Context, query *PostQuery, nodes []
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "reply_to_post_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *PostQuery) loadConclusion(ctx context.Context, query *PostQuery, nodes []*Post, init func(*Post), assign func(*Post, *Post)) error {
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Post)
+	for i := range nodes {
+		if nodes[i].ConclusionPostID == nil {
+			continue
+		}
+		fk := *nodes[i].ConclusionPostID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(post.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "conclusion_post_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (_q *PostQuery) loadConclusions(ctx context.Context, query *PostQuery, nodes []*Post, init func(*Post), assign func(*Post, *Post)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Post)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(post.FieldConclusionPostID)
+	}
+	query.Where(predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(post.ConclusionsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ConclusionPostID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "conclusion_post_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "conclusion_post_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1711,6 +1861,9 @@ func (_q *PostQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if _q.withReplyTo != nil {
 			_spec.Node.AddColumnOnce(post.FieldReplyToPostID)
+		}
+		if _q.withConclusion != nil {
+			_spec.Node.AddColumnOnce(post.FieldConclusionPostID)
 		}
 		if _q.withLink != nil {
 			_spec.Node.AddColumnOnce(post.FieldLinkID)

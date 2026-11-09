@@ -76,12 +76,13 @@ export const richCard = defineSlotRecipe({
       alignItems: "center",
       justifyContent: "center",
       flexShrink: "0",
-      width: "4",
+      gap: "1",
       height: "4",
       color: "text.muted",
       "& svg": {
-        width: "full",
-        height: "full",
+        width: "4",
+        height: "4",
+        flexShrink: "0",
       },
     },
 
@@ -172,6 +173,12 @@ export const richCard = defineSlotRecipe({
     },
   },
   variants: {
+    tone: {
+      default: {},
+      success: {
+        root: { borderColor: "status.success.border" },
+      },
+    },
     indicator: {
       true: {
         container: {

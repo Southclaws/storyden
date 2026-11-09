@@ -40,8 +40,6 @@ const (
 	FieldBody = "body"
 	// FieldShort holds the string denoting the short field in the database.
 	FieldShort = "short"
-	// FieldMetadata holds the string denoting the metadata field in the database.
-	FieldMetadata = "metadata"
 	// FieldVisibility holds the string denoting the visibility field in the database.
 	FieldVisibility = "visibility"
 	// FieldAccountPosts holds the string denoting the account_posts field in the database.
@@ -50,6 +48,12 @@ const (
 	FieldCategoryID = "category_id"
 	// FieldLinkID holds the string denoting the link_id field in the database.
 	FieldLinkID = "link_id"
+	// FieldLifecycleState holds the string denoting the lifecycle_state field in the database.
+	FieldLifecycleState = "lifecycle_state"
+	// FieldConclusionPostID holds the string denoting the conclusion_post_id field in the database.
+	FieldConclusionPostID = "conclusion_post_id"
+	// FieldMetadata holds the string denoting the metadata field in the database.
+	FieldMetadata = "metadata"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
 	EdgeAuthor = "author"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
@@ -64,6 +68,10 @@ const (
 	EdgeReplyTo = "replyTo"
 	// EdgeReplies holds the string denoting the replies edge name in mutations.
 	EdgeReplies = "replies"
+	// EdgeConclusion holds the string denoting the conclusion edge name in mutations.
+	EdgeConclusion = "conclusion"
+	// EdgeConclusions holds the string denoting the conclusions edge name in mutations.
+	EdgeConclusions = "conclusions"
 	// EdgeReacts holds the string denoting the reacts edge name in mutations.
 	EdgeReacts = "reacts"
 	// EdgeLikes holds the string denoting the likes edge name in mutations.
@@ -119,6 +127,14 @@ const (
 	RepliesTable = "posts"
 	// RepliesColumn is the table column denoting the replies relation/edge.
 	RepliesColumn = "reply_to_post_id"
+	// ConclusionTable is the table that holds the conclusion relation/edge.
+	ConclusionTable = "posts"
+	// ConclusionColumn is the table column denoting the conclusion relation/edge.
+	ConclusionColumn = "conclusion_post_id"
+	// ConclusionsTable is the table that holds the conclusions relation/edge.
+	ConclusionsTable = "posts"
+	// ConclusionsColumn is the table column denoting the conclusions relation/edge.
+	ConclusionsColumn = "conclusion_post_id"
 	// ReactsTable is the table that holds the reacts relation/edge.
 	ReactsTable = "reacts"
 	// ReactsInverseTable is the table name for the React entity.
@@ -193,11 +209,13 @@ var Columns = []string{
 	FieldReplyToPostID,
 	FieldBody,
 	FieldShort,
-	FieldMetadata,
 	FieldVisibility,
 	FieldAccountPosts,
 	FieldCategoryID,
 	FieldLinkID,
+	FieldLifecycleState,
+	FieldConclusionPostID,
+	FieldMetadata,
 }
 
 var (
@@ -261,6 +279,32 @@ func VisibilityValidator(v Visibility) error {
 		return nil
 	default:
 		return fmt.Errorf("post: invalid enum value for visibility field: %q", v)
+	}
+}
+
+// LifecycleState defines the type for the "lifecycle_state" enum field.
+type LifecycleState string
+
+// LifecycleStateOpen is the default value of the LifecycleState enum.
+const DefaultLifecycleState = LifecycleStateOpen
+
+// LifecycleState values.
+const (
+	LifecycleStateOpen     LifecycleState = "open"
+	LifecycleStateResolved LifecycleState = "resolved"
+)
+
+func (ls LifecycleState) String() string {
+	return string(ls)
+}
+
+// LifecycleStateValidator is a validator for the "lifecycle_state" field enum values. It is called by the builders before save.
+func LifecycleStateValidator(ls LifecycleState) error {
+	switch ls {
+	case LifecycleStateOpen, LifecycleStateResolved:
+		return nil
+	default:
+		return fmt.Errorf("post: invalid enum value for lifecycle_state field: %q", ls)
 	}
 }
 
@@ -352,6 +396,16 @@ func ByLinkID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLinkID, opts...).ToFunc()
 }
 
+// ByLifecycleState orders the results by the lifecycle_state field.
+func ByLifecycleState(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLifecycleState, opts...).ToFunc()
+}
+
+// ByConclusionPostID orders the results by the conclusion_post_id field.
+func ByConclusionPostID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldConclusionPostID, opts...).ToFunc()
+}
+
 // ByAuthorField orders the results by author field.
 func ByAuthorField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -419,6 +473,27 @@ func ByRepliesCount(opts ...sql.OrderTermOption) OrderOption {
 func ByReplies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newRepliesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByConclusionField orders the results by conclusion field.
+func ByConclusionField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newConclusionStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByConclusionsCount orders the results by conclusions count.
+func ByConclusionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newConclusionsStep(), opts...)
+	}
+}
+
+// ByConclusions orders the results by conclusions terms.
+func ByConclusions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newConclusionsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -587,6 +662,20 @@ func newRepliesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(Table, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, RepliesTable, RepliesColumn),
+	)
+}
+func newConclusionStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, ConclusionTable, ConclusionColumn),
+	)
+}
+func newConclusionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ConclusionsTable, ConclusionsColumn),
 	)
 }
 func newReactsStep() *sqlgraph.Step {

@@ -8,6 +8,7 @@ import { handle } from "@/api/client";
 import {
   Account,
   Permission,
+  ThreadLifecycleState,
   ThreadReadStatusMutableProps,
   ThreadReference,
 } from "@/api/openapi-schema";
@@ -15,6 +16,7 @@ import { useSession } from "@/auth";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { useFeedMutations } from "@/lib/feed/mutation";
 import { useReportContext } from "@/lib/report/useReportContext";
+import { useThreadLifecycle } from "@/lib/thread/lifecycle";
 import { canDeletePost, canEditPost } from "@/lib/thread/permissions";
 import { useThreadReadStatus } from "@/lib/thread/read-status";
 import { withUndo } from "@/lib/thread/undo";
@@ -48,6 +50,8 @@ export function useThreadMenu({
   const { deleteThread, updateThread, revalidate } = useFeedMutations();
   const { updateReadStatus } = useThreadReadStatus(thread);
   const [isUpdatingReadStatus, setUpdatingReadStatus] = useState(false);
+  const { updateLifecycleState } = useThreadLifecycle(thread);
+  const [isUpdatingLifecycle, setUpdatingLifecycle] = useState(false);
 
   const {
     isConfirming: isConfirmingDelete,
@@ -65,6 +69,8 @@ export function useThreadMenu({
     canDeletePost(thread, account) && thread.deletedAt === undefined;
   const canPinThread = hasPermission(account, Permission.MANAGE_POSTS);
   const isThreadPinned = (thread.pinned ?? 0) > 0;
+  const canUpdateLifecycle = canEditPost(thread, account) && !thread.deletedAt;
+  const isThreadResolved = thread.lifecycle_state === "resolved";
   const canUpdateReadStatus = Boolean(account) && !thread.deletedAt;
   const isUnread =
     !thread.read_status ||
@@ -130,6 +136,25 @@ export function useThreadMenu({
     );
   }
 
+  async function handleLifecycleChange(state: ThreadLifecycleState) {
+    if (!canUpdateLifecycle || isUpdatingLifecycle) {
+      return;
+    }
+
+    setUpdatingLifecycle(true);
+
+    await handle(
+      async () => {
+        await updateLifecycleState(state);
+      },
+      {
+        cleanup: async () => {
+          setUpdatingLifecycle(false);
+        },
+      },
+    );
+  }
+
   async function handlePinThread() {
     await handle(
       async () => {
@@ -160,6 +185,9 @@ export function useThreadMenu({
     isConfirmingDelete,
     canPinThread,
     isThreadPinned,
+    canUpdateLifecycle,
+    isThreadResolved,
+    isUpdatingLifecycle,
     canUpdateReadStatus,
     isUnread,
     isUpdatingReadStatus,
@@ -171,6 +199,7 @@ export function useThreadMenu({
       handleCancelDelete,
       handlePinThread,
       handleUnpinThread,
+      handleLifecycleChange,
       handleReadStatusChange,
     },
   };

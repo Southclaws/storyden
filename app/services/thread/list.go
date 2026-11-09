@@ -11,6 +11,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -19,17 +20,18 @@ import (
 )
 
 type Params struct {
-	Query         opt.Optional[string]
-	CreatedBefore opt.Optional[time.Time]
-	CreatedSince  opt.Optional[time.Time]
-	NewestFirst   opt.Optional[bool]
-	UpdatedBefore opt.Optional[time.Time]
-	AccountID     opt.Optional[account.AccountID]
-	Visibility    opt.Optional[[]visibility.Visibility]
-	Tags          opt.Optional[[]xid.ID]
-	Categories    opt.Optional[thread_querier.CategoryFilter]
-	IgnorePinned  opt.Optional[bool]
-	Unread        opt.Optional[bool]
+	Query          opt.Optional[string]
+	CreatedBefore  opt.Optional[time.Time]
+	CreatedSince   opt.Optional[time.Time]
+	NewestFirst    opt.Optional[bool]
+	UpdatedBefore  opt.Optional[time.Time]
+	AccountID      opt.Optional[account.AccountID]
+	Visibility     opt.Optional[[]visibility.Visibility]
+	Tags           opt.Optional[[]xid.ID]
+	Categories     opt.Optional[thread_querier.CategoryFilter]
+	IgnorePinned   opt.Optional[bool]
+	Unread         opt.Optional[bool]
+	LifecycleState opt.Optional[post.ThreadLifecycleState]
 }
 
 func (s *service) List(ctx context.Context,
@@ -59,6 +61,7 @@ func (s *service) List(ctx context.Context,
 		q = append(q, thread_querier.HasReadStatus(readerID, unread))
 	}
 
+	opts.LifecycleState.Call(func(value post.ThreadLifecycleState) { q = append(q, thread_querier.HasLifecycleState(value)) })
 	opts.Query.Call(func(value string) { q = append(q, thread_querier.HasKeyword(value)) })
 	opts.CreatedBefore.Call(func(value time.Time) { q = append(q, thread_querier.HasCreatedDateBefore(value)) })
 	opts.CreatedSince.Call(func(value time.Time) { q = append(q, thread_querier.HasCreatedDateSince(value)) })

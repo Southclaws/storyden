@@ -8,12 +8,16 @@ import { CategoryMoveMenu } from "@/components/category/CategoryMoveMenu/Categor
 import { ReportPostMenuItem } from "@/components/report/ReportPostMenuItem";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { MoreAction } from "@/components/site/Action/More";
-import { CheckIcon } from "@/components/ui/icons/Check";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
+import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { EditIcon } from "@/components/ui/icons/Edit";
-import { InboxIcon } from "@/components/ui/icons/Inbox";
 import { LinkIcon } from "@/components/ui/icons/Link";
 import { PinIcon, PinOffIcon } from "@/components/ui/icons/Pin";
+import {
+  ReadStateReadIcon,
+  ReadStateUnreadIcon,
+} from "@/components/ui/icons/ReadState";
+import { ResolvedIcon } from "@/components/ui/icons/Resolved";
 import { ShareIcon } from "@/components/ui/icons/Share";
 import * as Menu from "@/components/ui/menu";
 import { HStack, styled } from "@/styled-system/jsx";
@@ -30,6 +34,9 @@ export function ThreadMenu(props: Props) {
     isConfirmingDelete,
     canPinThread,
     isThreadPinned,
+    canUpdateLifecycle,
+    isThreadResolved,
+    isUpdatingLifecycle,
     canUpdateReadStatus,
     isUnread,
     isUpdatingReadStatus,
@@ -71,7 +78,7 @@ export function ThreadMenu(props: Props) {
                   onClick={() => handlers.handleReadStatusChange("read")}
                 >
                   <HStack gap="1">
-                    <CheckIcon /> Mark as read
+                    <ReadStateReadIcon /> Mark as read
                   </HStack>
                 </Menu.Item>
               )}
@@ -83,7 +90,7 @@ export function ThreadMenu(props: Props) {
                   onClick={() => handlers.handleReadStatusChange("unread")}
                 >
                   <HStack gap="1">
-                    <InboxIcon /> Mark as unread
+                    <ReadStateUnreadIcon /> Mark as unread
                   </HStack>
                 </Menu.Item>
               )}
@@ -123,6 +130,31 @@ export function ThreadMenu(props: Props) {
                 <Menu.Item value="unpin" onClick={handlers.handleUnpinThread}>
                   <HStack gap="1">
                     <PinOffIcon /> Unpin thread
+                  </HStack>
+                </Menu.Item>
+              )}
+
+              {canUpdateLifecycle && !isThreadResolved && (
+                <Menu.Item
+                  value="resolve"
+                  disabled={isUpdatingLifecycle}
+                  onClick={() => handlers.handleLifecycleChange("resolved")}
+                >
+                  <HStack gap="1">
+                    <ResolvedIcon color="status.success.content" /> Mark as
+                    resolved
+                  </HStack>
+                </Menu.Item>
+              )}
+
+              {canUpdateLifecycle && isThreadResolved && (
+                <Menu.Item
+                  value="reopen"
+                  disabled={isUpdatingLifecycle}
+                  onClick={() => handlers.handleLifecycleChange("open")}
+                >
+                  <HStack gap="1">
+                    <DiscussionIcon /> Reopen thread
                   </HStack>
                 </Menu.Item>
               )}

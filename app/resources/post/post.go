@@ -42,17 +42,19 @@ type Post struct {
 	ID   ID
 	Root ID // Identical to ID if this is the root.
 
-	Title       string
-	Slug        string
-	Content     datagraph.Content
-	Author      profile.Ref
-	Likes       like.Status
-	Collections collection_item_status.Status
-	Reacts      []*reaction.React
-	Assets      []*asset.Asset
-	WebLink     opt.Optional[link_ref.LinkRef]
-	Meta        map[string]any
-	Visibility  visibility.Visibility
+	Title             string
+	Slug              string
+	Content           datagraph.Content
+	Author            profile.Ref
+	Likes             like.Status
+	Collections       collection_item_status.Status
+	Reacts            []*reaction.React
+	Assets            []*asset.Asset
+	WebLink           opt.Optional[link_ref.LinkRef]
+	LifecycleState    ThreadLifecycleState
+	ConclusionReplyID opt.Optional[ID]
+	Meta              map[string]any
+	Visibility        visibility.Visibility
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -127,15 +129,17 @@ func Map(in *ent.Post) (*Post, error) {
 		ID:   ID(in.ID),
 		Root: rootID,
 
-		Title:      title,
-		Slug:       slug,
-		Content:    content.Content,
-		Author:     *pro,
-		Reacts:     reacts,
-		Assets:     assets,
-		WebLink:    link,
-		Meta:       in.Metadata,
-		Visibility: vis,
+		Title:             title,
+		Slug:              slug,
+		Content:           content.Content,
+		Author:            *pro,
+		Reacts:            reacts,
+		Assets:            assets,
+		WebLink:           link,
+		LifecycleState:    ThreadLifecycleStateFromEnt(in.LifecycleState),
+		ConclusionReplyID: opt.NewPtrMap(in.ConclusionPostID, func(id xid.ID) ID { return ID(id) }),
+		Meta:              in.Metadata,
+		Visibility:        vis,
 
 		CreatedAt: in.CreatedAt,
 		UpdatedAt: in.UpdatedAt,

@@ -32,15 +32,17 @@ func (Post) Fields() []ent.Field {
 		// All posts
 		field.String("body"),
 		field.String("short"),
-		field.JSON("metadata", map[string]any{}).
-			Optional().
-			Comment("Arbitrary metadata used by clients to store domain specific information."),
 		field.Enum("visibility").Values(VisibilityTypes...).Default(VisibilityTypesDraft),
 
 		// Edges
 		field.String("account_posts").GoType(xid.ID{}),
 		field.String("category_id").GoType(xid.ID{}).Optional(),
 		field.String("link_id").GoType(xid.ID{}).Optional(),
+		field.Enum("lifecycle_state").Values("open", "resolved").Default("open"),
+		field.String("conclusion_post_id").GoType(xid.ID{}).Optional().Nillable(),
+		field.JSON("metadata", map[string]any{}).
+			Optional().
+			Comment("Arbitrary metadata used by clients to store domain specific information."),
 	}
 }
 
@@ -91,6 +93,12 @@ func (Post) Edges() []ent.Edge {
 			Field("reply_to_post_id").
 			Annotations(entsql.OnDelete(entsql.SetNull)).
 			Comment("A many-to-many recursive self reference. The replyTo post is an optional post that this post is in reply to."),
+
+		edge.To("conclusions", Post.Type).
+			From("conclusion").
+			Unique().
+			Field("conclusion_post_id").
+			Annotations(entsql.OnDelete(entsql.SetNull)),
 
 		edge.To("reacts", React.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),

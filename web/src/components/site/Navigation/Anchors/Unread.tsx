@@ -1,4 +1,4 @@
-import { UnreadIcon } from "@/components/ui/icons/Unread";
+import { ReadStateUnreadIcon } from "@/components/ui/icons/ReadState";
 import type { LinkButtonStyleProps } from "@/components/ui/link-button";
 
 import { Anchor, type AnchorProps } from "./Anchor";
@@ -13,7 +13,7 @@ export function UnreadAnchor(props: AnchorProps & LinkButtonStyleProps) {
       id={UnreadID}
       route={UnreadRoute}
       label={UnreadLabel}
-      icon={<UnreadIcon />}
+      icon={<ReadStateUnreadIcon />}
       {...props}
     />
   );

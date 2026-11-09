@@ -60,10 +60,12 @@ import * as PinIcons from "./Pin";
 import * as ProfileIcons from "./Profile";
 import * as QueueIcons from "./Queue";
 import * as ReactionIcons from "./Reaction";
+import * as ReadStateIcons from "./ReadState";
 import * as ReinstateIconIcons from "./ReinstateIcon";
 import * as RemoveIcons from "./Remove";
 import * as ReplyIcons from "./Reply";
 import * as ReportIcons from "./Report";
+import * as ResolvedIcons from "./Resolved";
 import * as RobotIcons from "./Robot";
 import * as RolesIcons from "./Roles";
 import * as SaveIcons from "./Save";
@@ -79,10 +81,10 @@ import * as SubmenuIcons from "./Submenu";
 import * as SuggestIcons from "./Suggest";
 import * as SystemIcons from "./System";
 import * as TagIcons from "./Tag";
+import * as ThreadConclusionIcons from "./ThreadConclusion";
 import * as ToolIcons from "./Tool";
 import * as ToolsetIcons from "./Toolset";
 import * as TypographyIcons from "./Typography";
-import * as UnreadIcons from "./Unread";
 import * as VersionsIcons from "./Versions";
 import * as VisibilityIcons from "./Visibility";
 import * as WarningIcons from "./Warning";
@@ -144,10 +146,12 @@ const modules = {
   ProfileIcons,
   QueueIcons,
   ReactionIcons,
+  ReadStateIcons,
   ReinstateIconIcons,
   RemoveIcons,
   ReplyIcons,
   ReportIcons,
+  ResolvedIcons,
   RobotIcons,
   RolesIcons,
   SaveIcons,
@@ -163,10 +167,10 @@ const modules = {
   SuggestIcons,
   SystemIcons,
   TagIcons,
+  ThreadConclusionIcons,
   ToolIcons,
   ToolsetIcons,
   TypographyIcons,
-  UnreadIcons,
   VersionsIcons,
   VisibilityIcons,
   WarningIcons,
@@ -288,6 +292,49 @@ export const StatusColours: Story = {
       <styled.div display="flex" alignItems="center" gap="2">
         <WarningIcons.WarningIcon color="status.danger.content" />
         <span>Failed operation or error details: danger stroke</span>
+      </styled.div>
+    </styled.div>
+  ),
+};
+
+export const ReadAndResolutionStates: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "ReadStateReadIcon and ReadStateUnreadIcon communicate whether a member has read a discussion. Use them for read-state commands and navigation. ResolvedIcon communicates that a discussion has reached a conclusion, independently of who has read it or whether an answer has been nominated. ThreadConclusionIcon identifies the particular reply selected as the answer. Use semantic success colour for these positive outcomes. Keep generic check icons for confirmation or selection; do not use them as substitutes for these product states. The containing component owns icon size, colour, and accessible labels.",
+      },
+    },
+  },
+  render: () => (
+    <styled.div
+      display="flex"
+      flexDirection="column"
+      gap="3"
+      color="text.muted"
+      css={{ "& svg": { width: "4", height: "4" } }}
+    >
+      <styled.div display="flex" alignItems="center" gap="2">
+        <ReadStateIcons.ReadStateUnreadIcon aria-hidden="true" />
+        <span>Unread</span>
+      </styled.div>
+      <styled.div display="flex" alignItems="center" gap="2">
+        <ReadStateIcons.ReadStateReadIcon aria-hidden="true" />
+        <span>Read</span>
+      </styled.div>
+      <styled.div display="flex" alignItems="center" gap="2">
+        <ResolvedIcons.ResolvedIcon
+          color="status.success.content"
+          aria-hidden="true"
+        />
+        <span>Resolved</span>
+      </styled.div>
+      <styled.div display="flex" alignItems="center" gap="2">
+        <ThreadConclusionIcons.ThreadConclusionIcon
+          color="status.success.content"
+          aria-hidden="true"
+        />
+        <span>Selected answer</span>
       </styled.div>
     </styled.div>
   ),

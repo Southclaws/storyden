@@ -10,14 +10,22 @@ import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { EditIcon } from "@/components/ui/icons/Edit";
 import { LinkIcon } from "@/components/ui/icons/Link";
 import { ShareIcon } from "@/components/ui/icons/Share";
+import { ThreadConclusionIcon } from "@/components/ui/icons/ThreadConclusion";
 import * as Menu from "@/components/ui/menu";
 import { HStack, styled } from "@/styled-system/jsx";
 
 import { Props, useReplyMenu } from "./useReplyMenu";
 
 export function ReplyMenu(props: Props) {
-  const { isSharingEnabled, isEditingEnabled, isDeletingEnabled, handlers } =
-    useReplyMenu(props);
+  const {
+    isSharingEnabled,
+    isEditingEnabled,
+    isDeletingEnabled,
+    canUpdateConclusion,
+    isConclusion,
+    isUpdatingConclusion,
+    handlers,
+  } = useReplyMenu(props);
 
   return (
     <Menu.Root lazyMount>
@@ -65,6 +73,19 @@ export function ReplyMenu(props: Props) {
                 headline={`Reply from ${props.reply.author.name}`}
                 body={props.reply.body}
               />
+
+              {canUpdateConclusion && (
+                <Menu.Item
+                  value="conclusion"
+                  disabled={isUpdatingConclusion}
+                  onClick={handlers.handleConclusionChange}
+                >
+                  <HStack gap="1">
+                    <ThreadConclusionIcon color="status.success.content" />
+                    {isConclusion ? "Remove answer" : "Mark as answer"}
+                  </HStack>
+                </Menu.Item>
+              )}
 
               {isEditingEnabled && (
                 <Menu.Item value="edit" onClick={handlers.handleSetEditing}>

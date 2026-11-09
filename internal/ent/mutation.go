@@ -40067,8 +40067,9 @@ type PostMutation struct {
 	last_reply_at        *time.Time
 	body                 *string
 	short                *string
-	metadata             *map[string]interface{}
 	visibility           *post.Visibility
+	lifecycle_state      *post.LifecycleState
+	metadata             *map[string]interface{}
 	clearedFields        map[string]struct{}
 	author               *xid.ID
 	clearedauthor        bool
@@ -40087,6 +40088,11 @@ type PostMutation struct {
 	replies              map[xid.ID]struct{}
 	removedreplies       map[xid.ID]struct{}
 	clearedreplies       bool
+	conclusion           *xid.ID
+	clearedconclusion    bool
+	conclusions          map[xid.ID]struct{}
+	removedconclusions   map[xid.ID]struct{}
+	clearedconclusions   bool
 	reacts               map[xid.ID]struct{}
 	removedreacts        map[xid.ID]struct{}
 	clearedreacts        bool
@@ -40752,55 +40758,6 @@ func (m *PostMutation) ResetShort() {
 	m.short = nil
 }
 
-// SetMetadata sets the "metadata" field.
-func (m *PostMutation) SetMetadata(value map[string]interface{}) {
-	m.metadata = &value
-}
-
-// Metadata returns the value of the "metadata" field in the mutation.
-func (m *PostMutation) Metadata() (r map[string]interface{}, exists bool) {
-	v := m.metadata
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldMetadata returns the old "metadata" field's value of the Post entity.
-// If the Post object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldMetadata(ctx context.Context) (v map[string]interface{}, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldMetadata is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldMetadata requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldMetadata: %w", err)
-	}
-	return oldValue.Metadata, nil
-}
-
-// ClearMetadata clears the value of the "metadata" field.
-func (m *PostMutation) ClearMetadata() {
-	m.metadata = nil
-	m.clearedFields[post.FieldMetadata] = struct{}{}
-}
-
-// MetadataCleared returns if the "metadata" field was cleared in this mutation.
-func (m *PostMutation) MetadataCleared() bool {
-	_, ok := m.clearedFields[post.FieldMetadata]
-	return ok
-}
-
-// ResetMetadata resets all changes to the "metadata" field.
-func (m *PostMutation) ResetMetadata() {
-	m.metadata = nil
-	delete(m.clearedFields, post.FieldMetadata)
-}
-
 // SetVisibility sets the "visibility" field.
 func (m *PostMutation) SetVisibility(po post.Visibility) {
 	m.visibility = &po
@@ -40969,6 +40926,140 @@ func (m *PostMutation) LinkIDCleared() bool {
 func (m *PostMutation) ResetLinkID() {
 	m.link = nil
 	delete(m.clearedFields, post.FieldLinkID)
+}
+
+// SetLifecycleState sets the "lifecycle_state" field.
+func (m *PostMutation) SetLifecycleState(ps post.LifecycleState) {
+	m.lifecycle_state = &ps
+}
+
+// LifecycleState returns the value of the "lifecycle_state" field in the mutation.
+func (m *PostMutation) LifecycleState() (r post.LifecycleState, exists bool) {
+	v := m.lifecycle_state
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLifecycleState returns the old "lifecycle_state" field's value of the Post entity.
+// If the Post object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PostMutation) OldLifecycleState(ctx context.Context) (v post.LifecycleState, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLifecycleState is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLifecycleState requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLifecycleState: %w", err)
+	}
+	return oldValue.LifecycleState, nil
+}
+
+// ResetLifecycleState resets all changes to the "lifecycle_state" field.
+func (m *PostMutation) ResetLifecycleState() {
+	m.lifecycle_state = nil
+}
+
+// SetConclusionPostID sets the "conclusion_post_id" field.
+func (m *PostMutation) SetConclusionPostID(x xid.ID) {
+	m.conclusion = &x
+}
+
+// ConclusionPostID returns the value of the "conclusion_post_id" field in the mutation.
+func (m *PostMutation) ConclusionPostID() (r xid.ID, exists bool) {
+	v := m.conclusion
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldConclusionPostID returns the old "conclusion_post_id" field's value of the Post entity.
+// If the Post object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PostMutation) OldConclusionPostID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldConclusionPostID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldConclusionPostID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldConclusionPostID: %w", err)
+	}
+	return oldValue.ConclusionPostID, nil
+}
+
+// ClearConclusionPostID clears the value of the "conclusion_post_id" field.
+func (m *PostMutation) ClearConclusionPostID() {
+	m.conclusion = nil
+	m.clearedFields[post.FieldConclusionPostID] = struct{}{}
+}
+
+// ConclusionPostIDCleared returns if the "conclusion_post_id" field was cleared in this mutation.
+func (m *PostMutation) ConclusionPostIDCleared() bool {
+	_, ok := m.clearedFields[post.FieldConclusionPostID]
+	return ok
+}
+
+// ResetConclusionPostID resets all changes to the "conclusion_post_id" field.
+func (m *PostMutation) ResetConclusionPostID() {
+	m.conclusion = nil
+	delete(m.clearedFields, post.FieldConclusionPostID)
+}
+
+// SetMetadata sets the "metadata" field.
+func (m *PostMutation) SetMetadata(value map[string]interface{}) {
+	m.metadata = &value
+}
+
+// Metadata returns the value of the "metadata" field in the mutation.
+func (m *PostMutation) Metadata() (r map[string]interface{}, exists bool) {
+	v := m.metadata
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMetadata returns the old "metadata" field's value of the Post entity.
+// If the Post object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PostMutation) OldMetadata(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMetadata is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMetadata requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMetadata: %w", err)
+	}
+	return oldValue.Metadata, nil
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (m *PostMutation) ClearMetadata() {
+	m.metadata = nil
+	m.clearedFields[post.FieldMetadata] = struct{}{}
+}
+
+// MetadataCleared returns if the "metadata" field was cleared in this mutation.
+func (m *PostMutation) MetadataCleared() bool {
+	_, ok := m.clearedFields[post.FieldMetadata]
+	return ok
+}
+
+// ResetMetadata resets all changes to the "metadata" field.
+func (m *PostMutation) ResetMetadata() {
+	m.metadata = nil
+	delete(m.clearedFields, post.FieldMetadata)
 }
 
 // SetAuthorID sets the "author" edge to the Account entity by id.
@@ -41278,6 +41369,100 @@ func (m *PostMutation) ResetReplies() {
 	m.replies = nil
 	m.clearedreplies = false
 	m.removedreplies = nil
+}
+
+// SetConclusionID sets the "conclusion" edge to the Post entity by id.
+func (m *PostMutation) SetConclusionID(id xid.ID) {
+	m.conclusion = &id
+}
+
+// ClearConclusion clears the "conclusion" edge to the Post entity.
+func (m *PostMutation) ClearConclusion() {
+	m.clearedconclusion = true
+	m.clearedFields[post.FieldConclusionPostID] = struct{}{}
+}
+
+// ConclusionCleared reports if the "conclusion" edge to the Post entity was cleared.
+func (m *PostMutation) ConclusionCleared() bool {
+	return m.ConclusionPostIDCleared() || m.clearedconclusion
+}
+
+// ConclusionID returns the "conclusion" edge ID in the mutation.
+func (m *PostMutation) ConclusionID() (id xid.ID, exists bool) {
+	if m.conclusion != nil {
+		return *m.conclusion, true
+	}
+	return
+}
+
+// ConclusionIDs returns the "conclusion" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ConclusionID instead. It exists only for internal usage by the builders.
+func (m *PostMutation) ConclusionIDs() (ids []xid.ID) {
+	if id := m.conclusion; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetConclusion resets all changes to the "conclusion" edge.
+func (m *PostMutation) ResetConclusion() {
+	m.conclusion = nil
+	m.clearedconclusion = false
+}
+
+// AddConclusionIDs adds the "conclusions" edge to the Post entity by ids.
+func (m *PostMutation) AddConclusionIDs(ids ...xid.ID) {
+	if m.conclusions == nil {
+		m.conclusions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.conclusions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearConclusions clears the "conclusions" edge to the Post entity.
+func (m *PostMutation) ClearConclusions() {
+	m.clearedconclusions = true
+}
+
+// ConclusionsCleared reports if the "conclusions" edge to the Post entity was cleared.
+func (m *PostMutation) ConclusionsCleared() bool {
+	return m.clearedconclusions
+}
+
+// RemoveConclusionIDs removes the "conclusions" edge to the Post entity by IDs.
+func (m *PostMutation) RemoveConclusionIDs(ids ...xid.ID) {
+	if m.removedconclusions == nil {
+		m.removedconclusions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.conclusions, ids[i])
+		m.removedconclusions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedConclusions returns the removed IDs of the "conclusions" edge to the Post entity.
+func (m *PostMutation) RemovedConclusionsIDs() (ids []xid.ID) {
+	for id := range m.removedconclusions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ConclusionsIDs returns the "conclusions" edge IDs in the mutation.
+func (m *PostMutation) ConclusionsIDs() (ids []xid.ID) {
+	for id := range m.conclusions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetConclusions resets all changes to the "conclusions" edge.
+func (m *PostMutation) ResetConclusions() {
+	m.conclusions = nil
+	m.clearedconclusions = false
+	m.removedconclusions = nil
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by ids.
@@ -41773,7 +41958,7 @@ func (m *PostMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PostMutation) Fields() []string {
-	fields := make([]string, 0, 17)
+	fields := make([]string, 0, 19)
 	if m.created_at != nil {
 		fields = append(fields, post.FieldCreatedAt)
 	}
@@ -41810,9 +41995,6 @@ func (m *PostMutation) Fields() []string {
 	if m.short != nil {
 		fields = append(fields, post.FieldShort)
 	}
-	if m.metadata != nil {
-		fields = append(fields, post.FieldMetadata)
-	}
 	if m.visibility != nil {
 		fields = append(fields, post.FieldVisibility)
 	}
@@ -41824,6 +42006,15 @@ func (m *PostMutation) Fields() []string {
 	}
 	if m.link != nil {
 		fields = append(fields, post.FieldLinkID)
+	}
+	if m.lifecycle_state != nil {
+		fields = append(fields, post.FieldLifecycleState)
+	}
+	if m.conclusion != nil {
+		fields = append(fields, post.FieldConclusionPostID)
+	}
+	if m.metadata != nil {
+		fields = append(fields, post.FieldMetadata)
 	}
 	return fields
 }
@@ -41857,8 +42048,6 @@ func (m *PostMutation) Field(name string) (ent.Value, bool) {
 		return m.Body()
 	case post.FieldShort:
 		return m.Short()
-	case post.FieldMetadata:
-		return m.Metadata()
 	case post.FieldVisibility:
 		return m.Visibility()
 	case post.FieldAccountPosts:
@@ -41867,6 +42056,12 @@ func (m *PostMutation) Field(name string) (ent.Value, bool) {
 		return m.CategoryID()
 	case post.FieldLinkID:
 		return m.LinkID()
+	case post.FieldLifecycleState:
+		return m.LifecycleState()
+	case post.FieldConclusionPostID:
+		return m.ConclusionPostID()
+	case post.FieldMetadata:
+		return m.Metadata()
 	}
 	return nil, false
 }
@@ -41900,8 +42095,6 @@ func (m *PostMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldBody(ctx)
 	case post.FieldShort:
 		return m.OldShort(ctx)
-	case post.FieldMetadata:
-		return m.OldMetadata(ctx)
 	case post.FieldVisibility:
 		return m.OldVisibility(ctx)
 	case post.FieldAccountPosts:
@@ -41910,6 +42103,12 @@ func (m *PostMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldCategoryID(ctx)
 	case post.FieldLinkID:
 		return m.OldLinkID(ctx)
+	case post.FieldLifecycleState:
+		return m.OldLifecycleState(ctx)
+	case post.FieldConclusionPostID:
+		return m.OldConclusionPostID(ctx)
+	case post.FieldMetadata:
+		return m.OldMetadata(ctx)
 	}
 	return nil, fmt.Errorf("unknown Post field %s", name)
 }
@@ -42003,13 +42202,6 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetShort(v)
 		return nil
-	case post.FieldMetadata:
-		v, ok := value.(map[string]interface{})
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetMetadata(v)
-		return nil
 	case post.FieldVisibility:
 		v, ok := value.(post.Visibility)
 		if !ok {
@@ -42037,6 +42229,27 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetLinkID(v)
+		return nil
+	case post.FieldLifecycleState:
+		v, ok := value.(post.LifecycleState)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLifecycleState(v)
+		return nil
+	case post.FieldConclusionPostID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetConclusionPostID(v)
+		return nil
+	case post.FieldMetadata:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMetadata(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Post field %s", name)
@@ -42101,14 +42314,17 @@ func (m *PostMutation) ClearedFields() []string {
 	if m.FieldCleared(post.FieldReplyToPostID) {
 		fields = append(fields, post.FieldReplyToPostID)
 	}
-	if m.FieldCleared(post.FieldMetadata) {
-		fields = append(fields, post.FieldMetadata)
-	}
 	if m.FieldCleared(post.FieldCategoryID) {
 		fields = append(fields, post.FieldCategoryID)
 	}
 	if m.FieldCleared(post.FieldLinkID) {
 		fields = append(fields, post.FieldLinkID)
+	}
+	if m.FieldCleared(post.FieldConclusionPostID) {
+		fields = append(fields, post.FieldConclusionPostID)
+	}
+	if m.FieldCleared(post.FieldMetadata) {
+		fields = append(fields, post.FieldMetadata)
 	}
 	return fields
 }
@@ -42142,14 +42358,17 @@ func (m *PostMutation) ClearField(name string) error {
 	case post.FieldReplyToPostID:
 		m.ClearReplyToPostID()
 		return nil
-	case post.FieldMetadata:
-		m.ClearMetadata()
-		return nil
 	case post.FieldCategoryID:
 		m.ClearCategoryID()
 		return nil
 	case post.FieldLinkID:
 		m.ClearLinkID()
+		return nil
+	case post.FieldConclusionPostID:
+		m.ClearConclusionPostID()
+		return nil
+	case post.FieldMetadata:
+		m.ClearMetadata()
 		return nil
 	}
 	return fmt.Errorf("unknown Post nullable field %s", name)
@@ -42195,9 +42414,6 @@ func (m *PostMutation) ResetField(name string) error {
 	case post.FieldShort:
 		m.ResetShort()
 		return nil
-	case post.FieldMetadata:
-		m.ResetMetadata()
-		return nil
 	case post.FieldVisibility:
 		m.ResetVisibility()
 		return nil
@@ -42210,13 +42426,22 @@ func (m *PostMutation) ResetField(name string) error {
 	case post.FieldLinkID:
 		m.ResetLinkID()
 		return nil
+	case post.FieldLifecycleState:
+		m.ResetLifecycleState()
+		return nil
+	case post.FieldConclusionPostID:
+		m.ResetConclusionPostID()
+		return nil
+	case post.FieldMetadata:
+		m.ResetMetadata()
+		return nil
 	}
 	return fmt.Errorf("unknown Post field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *PostMutation) AddedEdges() []string {
-	edges := make([]string, 0, 16)
+	edges := make([]string, 0, 18)
 	if m.author != nil {
 		edges = append(edges, post.EdgeAuthor)
 	}
@@ -42237,6 +42462,12 @@ func (m *PostMutation) AddedEdges() []string {
 	}
 	if m.replies != nil {
 		edges = append(edges, post.EdgeReplies)
+	}
+	if m.conclusion != nil {
+		edges = append(edges, post.EdgeConclusion)
+	}
+	if m.conclusions != nil {
+		edges = append(edges, post.EdgeConclusions)
 	}
 	if m.reacts != nil {
 		edges = append(edges, post.EdgeReacts)
@@ -42306,6 +42537,16 @@ func (m *PostMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case post.EdgeConclusion:
+		if id := m.conclusion; id != nil {
+			return []ent.Value{*id}
+		}
+	case post.EdgeConclusions:
+		ids := make([]ent.Value, 0, len(m.conclusions))
+		for id := range m.conclusions {
+			ids = append(ids, id)
+		}
+		return ids
 	case post.EdgeReacts:
 		ids := make([]ent.Value, 0, len(m.reacts))
 		for id := range m.reacts {
@@ -42364,7 +42605,7 @@ func (m *PostMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *PostMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 16)
+	edges := make([]string, 0, 18)
 	if m.removedtags != nil {
 		edges = append(edges, post.EdgeTags)
 	}
@@ -42373,6 +42614,9 @@ func (m *PostMutation) RemovedEdges() []string {
 	}
 	if m.removedreplies != nil {
 		edges = append(edges, post.EdgeReplies)
+	}
+	if m.removedconclusions != nil {
+		edges = append(edges, post.EdgeConclusions)
 	}
 	if m.removedreacts != nil {
 		edges = append(edges, post.EdgeReacts)
@@ -42420,6 +42664,12 @@ func (m *PostMutation) RemovedIDs(name string) []ent.Value {
 	case post.EdgeReplies:
 		ids := make([]ent.Value, 0, len(m.removedreplies))
 		for id := range m.removedreplies {
+			ids = append(ids, id)
+		}
+		return ids
+	case post.EdgeConclusions:
+		ids := make([]ent.Value, 0, len(m.removedconclusions))
+		for id := range m.removedconclusions {
 			ids = append(ids, id)
 		}
 		return ids
@@ -42477,7 +42727,7 @@ func (m *PostMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *PostMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 16)
+	edges := make([]string, 0, 18)
 	if m.clearedauthor {
 		edges = append(edges, post.EdgeAuthor)
 	}
@@ -42498,6 +42748,12 @@ func (m *PostMutation) ClearedEdges() []string {
 	}
 	if m.clearedreplies {
 		edges = append(edges, post.EdgeReplies)
+	}
+	if m.clearedconclusion {
+		edges = append(edges, post.EdgeConclusion)
+	}
+	if m.clearedconclusions {
+		edges = append(edges, post.EdgeConclusions)
 	}
 	if m.clearedreacts {
 		edges = append(edges, post.EdgeReacts)
@@ -42547,6 +42803,10 @@ func (m *PostMutation) EdgeCleared(name string) bool {
 		return m.clearedreplyTo
 	case post.EdgeReplies:
 		return m.clearedreplies
+	case post.EdgeConclusion:
+		return m.clearedconclusion
+	case post.EdgeConclusions:
+		return m.clearedconclusions
 	case post.EdgeReacts:
 		return m.clearedreacts
 	case post.EdgeLikes:
@@ -42585,6 +42845,9 @@ func (m *PostMutation) ClearEdge(name string) error {
 	case post.EdgeReplyTo:
 		m.ClearReplyTo()
 		return nil
+	case post.EdgeConclusion:
+		m.ClearConclusion()
+		return nil
 	case post.EdgeLink:
 		m.ClearLink()
 		return nil
@@ -42616,6 +42879,12 @@ func (m *PostMutation) ResetEdge(name string) error {
 		return nil
 	case post.EdgeReplies:
 		m.ResetReplies()
+		return nil
+	case post.EdgeConclusion:
+		m.ResetConclusion()
+		return nil
+	case post.EdgeConclusions:
+		m.ResetConclusions()
 		return nil
 	case post.EdgeReacts:
 		m.ResetReacts()

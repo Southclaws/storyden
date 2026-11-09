@@ -9,6 +9,11 @@ const deleteReply = vi.fn();
 const revalidate = vi.fn();
 const resolveReport = vi.fn();
 const onEdit = vi.fn();
+const updateConclusionReply = vi.fn();
+
+vi.mock("@/lib/thread/lifecycle", () => ({
+  useThreadLifecycle: () => ({ updateConclusionReply }),
+}));
 
 let sessionMock: any;
 
@@ -103,5 +108,87 @@ describe("useReplyMenu", () => {
     expect(deleteReply).toHaveBeenCalledWith("reply-1");
     expect(resolveReport).toHaveBeenCalledTimes(1);
     expect(revalidate).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    {
+      name: "thread author",
+      id: "thread-author",
+      permissions: [],
+      allowed: true,
+    },
+    {
+      name: "post manager",
+      id: "manager",
+      permissions: [Permission.MANAGE_POSTS],
+      allowed: true,
+    },
+    {
+      name: "reply author",
+      id: "reply-author",
+      permissions: [],
+      allowed: false,
+    },
+    { name: "other member", id: "other", permissions: [], allowed: false },
+    { name: "guest", id: undefined, permissions: [], allowed: false },
+  ])(
+    "allows answer selection by $name: $allowed",
+    async ({ id, permissions, allowed }) => {
+      sessionMock = id ? { id, roles: [{ permissions }] } : undefined;
+      const reply = {
+        id: "reply-1",
+        author: { id: "reply-author" },
+        visibility: "published",
+      };
+      const { result } = renderHook(() =>
+        useReplyMenu({
+          thread: { slug: "thread-1", author: { id: "thread-author" } } as any,
+          reply: reply as any,
+          onEdit,
+        }),
+      );
+
+      expect(result.current.canUpdateConclusion).toBe(allowed);
+      await act(async () => {
+        await result.current.handlers.handleConclusionChange();
+      });
+      expect(updateConclusionReply).toHaveBeenCalledTimes(allowed ? 1 : 0);
+      if (allowed) {
+        expect(updateConclusionReply).toHaveBeenCalledWith(reply);
+      }
+    },
+  );
+
+  it.each([
+    { deletedAt: "2026-11-08T10:00:00Z", visibility: "published" },
+    { visibility: "review" },
+    { visibility: "draft" },
+  ])(
+    "does not nominate unavailable replies: $visibility $deletedAt",
+    (state) => {
+      const { result } = renderHook(() =>
+        useReplyMenu({
+          thread: { slug: "thread-1" } as any,
+          reply: { id: "reply-1", ...state } as any,
+          onEdit,
+        }),
+      );
+      expect(result.current.canUpdateConclusion).toBe(false);
+    },
+  );
+
+  it("removes the selected answer without reopening the thread", async () => {
+    const { result } = renderHook(() =>
+      useReplyMenu({
+        thread: { slug: "thread-1", conclusion_reply_id: "reply-1" } as any,
+        reply: { id: "reply-1", visibility: "published" } as any,
+        onEdit,
+      }),
+    );
+    expect(result.current.isConclusion).toBe(true);
+    await act(async () => {
+      await result.current.handlers.handleConclusionChange();
+    });
+    expect(updateConclusionReply).toHaveBeenCalledWith(null);
   });
 });

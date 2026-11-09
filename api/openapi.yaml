@@ -2956,6 +2956,7 @@ paths:
         - $ref: "#/components/parameters/PaginationQuery"
         - $ref: "#/components/parameters/ThreadsIgnorePinnedQuery"
         - $ref: "#/components/parameters/ThreadsReadStatusQuery"
+        - $ref: "#/components/parameters/ThreadsLifecycleStateQuery"
         - name: author
           description: Show only results creeated by this user.
           required: false
@@ -2994,12 +2995,22 @@ paths:
         "304": { $ref: "#/components/responses/NotModified" }
     patch:
       operationId: ThreadUpdate
-      description: Publish changes to a thread.
+      description: |
+        Publish changes to a thread using a partial update. Every update
+        requires authentication and must be made by the thread author or a
+        member with MANAGE_POSTS. Setting the pinned rank additionally requires
+        MANAGE_POSTS, including when the requesting member is the thread author.
+
+        Supply the properties to change. Omitted properties preserve their
+        existing values unless a documented transition changes a related field;
+        see ThreadMutableProps for lifecycle and conclusion transitions.
       tags: [threads]
       parameters: [$ref: "#/components/parameters/ThreadMarkParam"]
       requestBody: { $ref: "#/components/requestBodies/ThreadUpdate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ThreadUpdateOK" }
@@ -3060,6 +3071,27 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ReplyCreateOK" }
+
+  /threads/{thread_mark}/replies/{post_id}:
+    get:
+      operationId: ReplyGet
+      description: >-
+        Read a single reply from a thread, independently of reply pagination.
+        The thread must be visible to the requesting member. Published replies
+        are visible to anyone who can read the thread; in-review replies are
+        also visible to their author, and members with MANAGE_POSTS may read
+        replies of any visibility. Deleted replies and deleted threads are
+        unavailable. The reply must belong to the specified thread.
+      tags: [replies]
+      parameters:
+        - $ref: "#/components/parameters/ThreadMarkParam"
+        - $ref: "#/components/parameters/PostIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/ReplyGetOK" }
 
   #
   #                            888
@@ -5600,6 +5632,13 @@ components:
       schema:
         type: boolean
 
+    ThreadsLifecycleStateQuery:
+      description: Filter threads by lifecycle state. Omit to include all.
+      name: lifecycle_state
+      in: query
+      required: false
+      schema: { $ref: "#/components/schemas/ThreadLifecycleState" }
+
     ThreadsReadStatusQuery:
       description: |
         Filter by read status for the authenticated account. Requires authentication
@@ -7130,6 +7169,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Reply"
+
+    ReplyGetOK:
+      description: The requested reply.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Reply" }
 
     PostUpdateOK:
       description: Post updated successfully.
@@ -11874,10 +11919,23 @@ components:
         pinned: { $ref: "#/components/schemas/PinnedRank" }
         body: { $ref: "#/components/schemas/PostContent" }
         tags: { $ref: "#/components/schemas/TagNameList" }
-        meta: { $ref: "#/components/schemas/Metadata" }
         category: { $ref: "#/components/schemas/Identifier" }
         visibility: { $ref: "#/components/schemas/Visibility" }
         url: { $ref: "#/components/schemas/URL" }
+        lifecycle_state:
+          $ref: "#/components/schemas/ThreadLifecycleState"
+          description: |
+            The thread author or a member with Manage Posts may change the state.
+            Reopening clears the conclusion. Resolution does not restrict replies.
+        conclusion_reply_id:
+          $ref: "#/components/schemas/NullableIdentifier"
+          description: |
+            Nominate a published, undeleted reply from anywhere in this thread's
+            reply tree as its conclusion. Setting this also resolves the thread.
+            Set null to remove conclusion without reopening. Omission preserves
+            the current conclusion, unless lifecycle_state is set to open.
+            A non-null conclusion with lifecycle_state open is invalid.
+        meta: { $ref: "#/components/schemas/Metadata" }
 
     ThreadReference:
       type: object
@@ -11895,6 +11953,7 @@ components:
       type: object
       required:
         - pinned
+        - lifecycle_state
         - visibility
         - tags
         - reply_status
@@ -11905,11 +11964,24 @@ components:
         reply_status: { $ref: "#/components/schemas/ReplyStatus" }
         category: { $ref: "#/components/schemas/CategoryReference" }
         link: { $ref: "#/components/schemas/LinkReference" }
+        lifecycle_state: { $ref: "#/components/schemas/ThreadLifecycleState" }
+        conclusion_reply_id:
+          $ref: "#/components/schemas/Identifier"
+          description: |
+            The conclusion reply. For usage as a Q&A "answer" or "solution".
         tags: { $ref: "#/components/schemas/TagReferenceList" }
         last_reply_at:
           type: string
           format: date-time
           description: The time of the last reply to the thread.
+
+    ThreadLifecycleState:
+      type: string
+      enum: [open, resolved]
+      x-enum-varnames: [ThreadLifecycleStateOpen, ThreadLifecycleStateResolved]
+      description: |
+        Whether a discussion is ongoing or has reached a conclusion. Independent
+        of publication visibility and reply permissions. New threads start open.
 
     ReadStatus:
       description: |

@@ -115,6 +115,7 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
         tags: [],
         visibility: Visibility.draft,
         link: preHydratedLink,
+        lifecycle_state: "open",
       } satisfies ThreadReference;
 
       const newData = {
@@ -145,9 +146,20 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
             return t;
           }
 
+          let conclusionReplyID = t.conclusion_reply_id;
+          if (
+            updated.lifecycle_state === "open" ||
+            updated.conclusion_reply_id === null
+          ) {
+            conclusionReplyID = undefined;
+          } else if (updated.conclusion_reply_id !== undefined) {
+            conclusionReplyID = updated.conclusion_reply_id;
+          }
+
           const newThread = {
             ...t,
             ...updated,
+            conclusion_reply_id: conclusionReplyID,
             category: t.category
               ? {
                   ...t.category,

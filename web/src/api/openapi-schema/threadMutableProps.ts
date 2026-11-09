@@ -9,9 +9,11 @@
  */
 import type { Identifier } from "./identifier";
 import type { Metadata } from "./metadata";
+import type { NullableIdentifier } from "./nullableIdentifier";
 import type { PinnedRank } from "./pinnedRank";
 import type { PostContent } from "./postContent";
 import type { TagNameList } from "./tagNameList";
+import type { ThreadLifecycleState } from "./threadLifecycleState";
 import type { ThreadTitle } from "./threadTitle";
 import type { Url } from "./url";
 import type { Visibility } from "./visibility";
@@ -21,8 +23,21 @@ export interface ThreadMutableProps {
   pinned?: PinnedRank;
   body?: PostContent;
   tags?: TagNameList;
-  meta?: Metadata;
   category?: Identifier;
   visibility?: Visibility;
   url?: Url;
+  /**
+   * The thread author or a member with Manage Posts may change the state.
+   * Reopening clears the conclusion. Resolution does not restrict replies.
+   */
+  lifecycle_state?: ThreadLifecycleState;
+  /**
+   * Nominate a published, undeleted reply from anywhere in this thread's
+   * reply tree as its conclusion. Setting this also resolves the thread.
+   * Set null to remove conclusion without reopening. Omission preserves
+   * the current conclusion, unless lifecycle_state is set to open.
+   * A non-null conclusion with lifecycle_state open is invalid.
+   */
+  conclusion_reply_id?: NullableIdentifier | null;
+  meta?: Metadata;
 }

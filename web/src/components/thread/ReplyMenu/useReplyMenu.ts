@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
+
 import { handle } from "@/api/client";
 import { Reply, Thread } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { useReportContext } from "@/lib/report/useReportContext";
+import { useThreadLifecycle } from "@/lib/thread/lifecycle";
 import { useThreadMutations } from "@/lib/thread/mutation";
 import { canDeletePost, canEditPost } from "@/lib/thread/permissions";
 import { withUndo } from "@/lib/thread/undo";
@@ -24,6 +27,8 @@ export function useReplyMenu({ thread, reply, currentPage, onEdit }: Props) {
   const { resolveReport } = useReportContext();
 
   const account = useSession();
+  const { updateConclusionReply } = useThreadLifecycle(thread);
+  const [isUpdatingConclusion, setUpdatingConclusion] = useState(false);
   const [, copyToClipboard] = useCopyToClipboard();
 
   const permalink = getPermalinkForPost(thread.slug, reply.id, currentPage);
@@ -33,6 +38,30 @@ export function useReplyMenu({ thread, reply, currentPage, onEdit }: Props) {
     canEditPost(reply, account) && reply.deletedAt === undefined;
   const isDeletingEnabled =
     canDeletePost(reply, account) && reply.deletedAt === undefined;
+  const canUpdateConclusion =
+    canEditPost(thread, account) &&
+    !thread.deletedAt &&
+    !reply.deletedAt &&
+    reply.visibility === "published";
+  const isConclusion = thread.conclusion_reply_id === reply.id;
+
+  async function handleConclusionChange() {
+    if (!canUpdateConclusion || isUpdatingConclusion) {
+      return;
+    }
+
+    setUpdatingConclusion(true);
+    await handle(
+      async () => {
+        await updateConclusionReply(isConclusion ? null : reply);
+      },
+      {
+        cleanup: async () => {
+          setUpdatingConclusion(false);
+        },
+      },
+    );
+  }
 
   async function handleCopyURL() {
     copyToClipboard(permalink);
@@ -74,11 +103,15 @@ export function useReplyMenu({ thread, reply, currentPage, onEdit }: Props) {
     isSharingEnabled,
     isEditingEnabled,
     isDeletingEnabled,
+    canUpdateConclusion,
+    isConclusion,
+    isUpdatingConclusion,
     handlers: {
       handleCopyURL,
       handleShare,
       handleSetEditing,
       handleDelete,
+      handleConclusionChange,
     },
   };
 }

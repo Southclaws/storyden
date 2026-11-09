@@ -7,16 +7,20 @@
  *
  * OpenAPI spec version: v1.26.16-post
  */
-import type { Key } from "swr";
+import useSwr from "swr";
+import type { Key, SWRConfiguration } from "swr";
 import useSWRMutation from "swr/mutation";
 import type { SWRMutationConfiguration } from "swr/mutation";
 
 import { fetcher } from "../client";
 import type {
+  BadRequestResponse,
+  ForbiddenResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
   ReplyCreateBody,
   ReplyCreateOKResponse,
+  ReplyGetOKResponse,
   UnauthorisedResponse,
 } from "../openapi-schema";
 
@@ -105,6 +109,72 @@ export const useReplyCreate = <
   const swrFn = getReplyCreateMutationFetcher(threadMark, requestOptions);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getReplyGetUrl = (threadMark: string, postId: string) => {
+  return `/threads/${threadMark}/replies/${postId}`;
+};
+
+/**
+ * Read a single reply from a thread, independently of reply pagination. The thread must be visible to the requesting member. Published replies are visible to anyone who can read the thread; in-review replies are also visible to their author, and members with MANAGE_POSTS may read replies of any visibility. Deleted replies and deleted threads are unavailable. The reply must belong to the specified thread.
+ */
+export const replyGet = async (
+  threadMark: string,
+  postId: string,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<ReplyGetOKResponse> => {
+  return fetcher<ReplyGetOKResponse>(getReplyGetUrl(threadMark, postId), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getReplyGetKey = (threadMark: string, postId: string) =>
+  [`/threads/${threadMark}/replies/${postId}`] as const;
+
+export type ReplyGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof replyGet>>
+>;
+
+export const useReplyGet = <
+  TError =
+    | BadRequestResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  threadMark: string,
+  postId: string,
+  options?: {
+    swr?: SWRConfiguration<Awaited<ReturnType<typeof replyGet>>, TError> & {
+      swrKey?: Key;
+      enabled?: boolean;
+    };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const isEnabled =
+    swrOptions?.enabled !== false &&
+    threadMark !== null &&
+    threadMark !== undefined &&
+    postId !== null &&
+    postId !== undefined;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getReplyGetKey(threadMark, postId) : null));
+  const swrFn = () => replyGet(threadMark, postId, requestOptions);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
 
   return {
     swrKey,

@@ -2,6 +2,7 @@ import type { ConditionalValue } from '../types/system';
 import type { ConfigRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
 export type CardBoxVariant = {
+  tone?: "default" | "success"
   kind?: "default" | "edge"
 }
 

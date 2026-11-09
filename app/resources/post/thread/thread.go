@@ -99,12 +99,14 @@ func Map(m *ent.Post) (*Thread, error) {
 		Post: post.Post{
 			ID: post.ID(m.ID),
 
-			Content:    content.Content,
-			Author:     *pro,
-			Assets:     dt.Map(m.Edges.Assets, asset.Map),
-			WebLink:    link,
-			Meta:       m.Metadata,
-			Visibility: visibility.NewVisibilityFromEnt(m.Visibility),
+			Content:           content.Content,
+			Author:            *pro,
+			Assets:            dt.Map(m.Edges.Assets, asset.Map),
+			WebLink:           link,
+			LifecycleState:    post.ThreadLifecycleStateFromEnt(m.LifecycleState),
+			ConclusionReplyID: opt.NewPtrMap(m.ConclusionPostID, func(id xid.ID) post.ID { return post.ID(id) }),
+			Meta:              m.Metadata,
+			Visibility:        visibility.NewVisibilityFromEnt(m.Visibility),
 
 			CreatedAt: m.CreatedAt,
 			UpdatedAt: m.UpdatedAt,
@@ -164,14 +166,16 @@ func Mapper(
 			Post: post.Post{
 				ID: post.ID(m.ID),
 
-				Content:     content.Content,
-				Author:      *pro,
-				Likes:       ls.Status(m.ID),
-				Collections: cs.Status(m.ID),
-				Reacts:      reacts,
-				WebLink:     link,
-				Meta:        m.Metadata,
-				Visibility:  visibility.NewVisibilityFromEnt(m.Visibility),
+				Content:           content.Content,
+				Author:            *pro,
+				Likes:             ls.Status(m.ID),
+				Collections:       cs.Status(m.ID),
+				Reacts:            reacts,
+				WebLink:           link,
+				LifecycleState:    post.ThreadLifecycleStateFromEnt(m.LifecycleState),
+				ConclusionReplyID: opt.NewPtrMap(m.ConclusionPostID, func(id xid.ID) post.ID { return post.ID(id) }),
+				Meta:              m.Metadata,
+				Visibility:        visibility.NewVisibilityFromEnt(m.Visibility),
 
 				CreatedAt: m.CreatedAt,
 				UpdatedAt: m.UpdatedAt,
@@ -195,7 +199,11 @@ func Mapper(
 func MapRef(m *ent.Post) *ThreadRef {
 	return &ThreadRef{
 		Post: post.Post{
-			ID: post.ID(m.ID),
+			ID:                post.ID(m.ID),
+			Author:            profile.Ref{ID: account.AccountID(m.AccountPosts)},
+			Visibility:        visibility.NewVisibilityFromEnt(m.Visibility),
+			LifecycleState:    post.ThreadLifecycleStateFromEnt(m.LifecycleState),
+			ConclusionReplyID: opt.NewPtrMap(m.ConclusionPostID, func(id xid.ID) post.ID { return post.ID(id) }),
 
 			CreatedAt: m.CreatedAt,
 			UpdatedAt: m.UpdatedAt,

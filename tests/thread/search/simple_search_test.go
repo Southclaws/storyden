@@ -6,6 +6,7 @@ import (
 
 	"github.com/Southclaws/opt"
 	"github.com/google/uuid"
+	"github.com/oapi-codegen/nullable"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
@@ -125,6 +126,26 @@ func TestSimpleSearchThreadReplyFiltering(t *testing.T) {
 				r.NotNil(foundThread, "should find the thread")
 				r.NotNil(foundReply1, "should find first reply")
 				r.NotNil(foundReply2, "should find second reply")
+			})
+
+			t.Run("search_retains_lifecycle_and_conclusion", func(t *testing.T) {
+				r := require.New(t)
+
+				updated, err := cl.ThreadUpdateWithResponse(root, threadResp.JSON200.Slug, openapi.ThreadMutableProps{
+					ConclusionReplyId: nullable.NewNullableWithValue(reply2Resp.JSON200.Id),
+				}, adminSession)
+				tests.Ok(t, err, updated)
+
+				response, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
+					Q:    opt.New("programming").Ptr(),
+					Kind: &[]openapi.DatagraphItemKind{openapi.DatagraphItemKindThread},
+				}, adminSession)
+				tests.Ok(t, err, response)
+
+				found := findThreadItem(response.JSON200.Items, threadResp.JSON200.Id)
+				r.NotNil(found)
+				r.Equal(openapi.ThreadLifecycleStateResolved, found.Ref.LifecycleState)
+				r.Equal(reply2Resp.JSON200.Id, *found.Ref.ConclusionReplyId)
 			})
 		}))
 	}))

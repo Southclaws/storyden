@@ -164,24 +164,45 @@ func (d *Writer) Create(
 }
 
 func (d *Writer) Update(ctx context.Context, id post.ID, opts ...Option) (*reply.Reply, error) {
-	update := d.db.Post.UpdateOneID(xid.ID(id))
+	current, err := d.db.Post.Get(ctx, xid.ID(id))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	tx, err := d.db.Tx(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	defer tx.Rollback()
+
+	update := tx.Post.UpdateOneID(xid.ID(id))
 	mutate := update.Mutation()
 
 	for _, fn := range opts {
 		fn(mutate)
 	}
 
+	if v, ok := mutate.Visibility(); ok && v != ent_post.VisibilityPublished {
+		if err := clearConclusion(ctx, tx, current); err != nil {
+			return nil, err
+		}
+	}
+
 	if _, set := mutate.IndexedAt(); !set {
 		mutate.SetUpdatedAt(time.Now())
 	}
 
-	err := update.Exec(ctx)
+	err = update.Exec(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			err = fault.Wrap(err, ftag.With(ftag.NotFound), fmsg.WithDesc("not found", "Reply not found."))
 		}
 
 		return nil, fault.Wrap(err, fmsg.With("failed to update reply"), fctx.With(ctx))
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	p, err := d.db.Post.
@@ -213,7 +234,22 @@ func (d *Writer) Update(ctx context.Context, id post.ID, opts ...Option) (*reply
 }
 
 func (d *Writer) Delete(ctx context.Context, id post.ID) error {
-	err := d.db.Post.
+	current, err := d.db.Post.Get(ctx, xid.ID(id))
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	tx, err := d.db.Tx(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+	defer tx.Rollback()
+
+	if err := clearConclusion(ctx, tx, current); err != nil {
+		return err
+	}
+
+	err = tx.Post.
 		UpdateOneID(xid.ID(id)).
 		SetDeletedAt(time.Now()).
 		Exec(ctx)
@@ -223,6 +259,31 @@ func (d *Writer) Delete(ctx context.Context, id post.ID) error {
 		}
 
 		return fault.Wrap(err, fmsg.With("failed to delete reply"), fctx.With(ctx))
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
+}
+
+func clearConclusion(ctx context.Context, tx *ent.Tx, p *ent.Post) error {
+	if p.RootPostID == nil {
+		return nil
+	}
+
+	err := tx.Post.UpdateOneID(*p.RootPostID).SetUpdatedAt(time.Now()).Exec(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	_, err = tx.Post.Update().Where(
+		ent_post.ID(*p.RootPostID),
+		ent_post.ConclusionPostID(p.ID),
+	).ClearConclusionPostID().Save(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return nil

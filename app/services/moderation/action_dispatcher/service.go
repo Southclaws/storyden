@@ -18,6 +18,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/audit"
 	"github.com/Southclaws/storyden/app/resources/audit/audit_writer"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/post/reply_writer"
+	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_account "github.com/Southclaws/storyden/internal/ent/account"
 	ent_collection "github.com/Southclaws/storyden/internal/ent/collection"
@@ -35,17 +38,23 @@ type Service struct {
 	db            *ent.Client
 	accountWriter *account_writer.Writer
 	auditWriter   *audit_writer.Writer
+	replyWriter   *reply_writer.Writer
+	threadCache   *thread_cache.Cache
 }
 
 func New(
 	db *ent.Client,
 	accountWriter *account_writer.Writer,
 	auditWriter *audit_writer.Writer,
+	replyWriter *reply_writer.Writer,
+	threadCache *thread_cache.Cache,
 ) *Service {
 	return &Service{
 		db:            db,
 		accountWriter: accountWriter,
 		auditWriter:   auditWriter,
+		replyWriter:   replyWriter,
+		threadCache:   threadCache,
 	}
 }
 
@@ -135,6 +144,7 @@ func (s *Service) purgeThreads(ctx context.Context, accountID account.AccountID)
 			ent_post.DeletedAtIsNil(),
 			ent_post.RootPostIDIsNil(),
 		).
+		ClearConclusionPostID().
 		SetDeletedAt(time.Now()).
 		Save(ctx)
 	if err != nil {
@@ -145,17 +155,29 @@ func (s *Service) purgeThreads(ctx context.Context, accountID account.AccountID)
 }
 
 func (s *Service) purgeReplies(ctx context.Context, accountID account.AccountID) error {
-	// Bulk soft-delete replies using Ent update
-	_, err := s.db.Post.Update().
+	replies, err := s.db.Post.Query().
 		Where(
 			ent_post.AccountPosts(xid.ID(accountID)),
 			ent_post.DeletedAtIsNil(),
 			ent_post.RootPostIDNotNil(),
 		).
-		SetDeletedAt(time.Now()).
-		Save(ctx)
+		All(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	for _, reply := range replies {
+		if err := s.threadCache.Invalidate(ctx, *reply.RootPostID); err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+
+		if err := s.replyWriter.Delete(ctx, post.ID(reply.ID)); err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+
+		if err := s.threadCache.Invalidate(ctx, *reply.RootPostID); err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
 	}
 
 	return nil

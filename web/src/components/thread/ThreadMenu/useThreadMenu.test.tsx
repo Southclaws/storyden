@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Permission, type ReadStatus } from "@/api/openapi-schema";
@@ -6,6 +6,11 @@ import { Permission, type ReadStatus } from "@/api/openapi-schema";
 import { useThreadMenu } from "./useThreadMenu";
 
 let sessionMock: any;
+const updateLifecycleState = vi.fn();
+
+vi.mock("@/lib/thread/lifecycle", () => ({
+  useThreadLifecycle: () => ({ updateLifecycleState }),
+}));
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/t/thread-1",
@@ -75,6 +80,88 @@ describe("useThreadMenu", () => {
     );
 
     expect(result.current.isEditingEnabled).toBe(false);
+    expect(result.current.canUpdateLifecycle).toBe(false);
+  });
+
+  it.each([
+    { name: "author", id: "author-1", permissions: [], allowed: true },
+    {
+      name: "member with Manage Posts",
+      id: "manager-1",
+      permissions: [Permission.MANAGE_POSTS],
+      allowed: true,
+    },
+    { name: "another member", id: "other-1", permissions: [], allowed: false },
+    { name: "guest", id: undefined, permissions: [], allowed: false },
+  ])("lifecycle access for $name", ({ id, permissions, allowed }) => {
+    sessionMock = id ? { id, roles: [{ permissions }] } : undefined;
+    const { result } = renderHook(() =>
+      useThreadMenu({
+        thread: {
+          id: "thread-1",
+          slug: "thread-1",
+          author: { id: "author-1" },
+          lifecycle_state: "open",
+        } as any,
+      }),
+    );
+
+    expect(result.current.canUpdateLifecycle).toBe(allowed);
+    expect(result.current.isThreadResolved).toBe(false);
+
+    if (!allowed) {
+      act(() => {
+        void result.current.handlers.handleLifecycleChange("resolved");
+      });
+      expect(updateLifecycleState).not.toHaveBeenCalled();
+    }
+  });
+
+  it("disables lifecycle changes while saving and allows reopening afterward", async () => {
+    let finish!: () => void;
+    updateLifecycleState.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          finish = resolve;
+        }),
+    );
+    const { result, rerender } = renderHook(
+      ({ state }: { state: "open" | "resolved" }) =>
+        useThreadMenu({
+          thread: {
+            id: "thread-1",
+            slug: "thread-1",
+            author: { id: "author-1" },
+            lifecycle_state: state,
+          } as any,
+        }),
+      { initialProps: { state: "open" } },
+    );
+
+    let pending!: Promise<void>;
+    act(() => {
+      pending = result.current.handlers.handleLifecycleChange("resolved");
+    });
+    expect(result.current.isUpdatingLifecycle).toBe(true);
+
+    await act(async () => {
+      await result.current.handlers.handleLifecycleChange("resolved");
+    });
+    expect(updateLifecycleState).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      finish();
+      await pending;
+    });
+    expect(result.current.isUpdatingLifecycle).toBe(false);
+
+    rerender({ state: "resolved" });
+    expect(result.current.isThreadResolved).toBe(true);
+
+    await act(async () => {
+      await result.current.handlers.handleLifecycleChange("open");
+    });
+    expect(updateLifecycleState).toHaveBeenLastCalledWith("open");
   });
 
   it.each<{

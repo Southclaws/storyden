@@ -12,6 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -182,5 +183,11 @@ func HasNotBeenDeleted() Query {
 func HasNoPinnedOrdering(ignorePinned bool) Query {
 	return func(q *threadListOptions) {
 		q.ignorePinned = ignorePinned
+	}
+}
+
+func HasLifecycleState(state post.ThreadLifecycleState) Query {
+	return func(q *threadListOptions) {
+		q.q.Where(ent_post.LifecycleStateEQ(ent_post.LifecycleState(state.String())))
 	}
 }

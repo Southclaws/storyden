@@ -674,6 +674,10 @@ func (m *Mapping) ReplyCreate() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionCreatePost
 }
 
+func (m *Mapping) ReplyGet() (bool, *rbac.Permission) {
+	return false, nil // Visibility is enforced by the thread service.
+}
+
 func (m *Mapping) PostUpdate() (bool, *rbac.Permission) {
 	return true, nil // See NOTE.
 }

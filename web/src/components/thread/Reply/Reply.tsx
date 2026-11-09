@@ -8,6 +8,8 @@ import { SaveAction } from "@/components/site/Action/Save";
 import { Timestamp } from "@/components/site/Timestamp";
 import { CardBox } from "@/components/ui/card-box";
 import { ReplyIcon } from "@/components/ui/icons/Reply";
+import { ThreadConclusionIcon } from "@/components/ui/icons/ThreadConclusion";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { HStack, WStack, styled } from "@/styled-system/jsx";
 import { hstack } from "@/styled-system/patterns";
 
@@ -37,10 +39,12 @@ export function Reply(props: Props) {
     props;
 
   const isInReview = reply.visibility === "review";
+  const isConclusion = thread.conclusion_reply_id === reply.id;
 
   return (
     <CardBox
       className="thread-reply"
+      tone={isConclusion ? "success" : "default"}
       id={reply.id}
       data-outline-reply=""
       data-outline-label={reply.author.name || reply.author.handle}
@@ -125,12 +129,20 @@ export function Reply(props: Props) {
       </styled.form>
 
       <WStack className="thread-reply__footer">
-        <ThreadReactList
-          initialSession={initialSession}
-          thread={thread}
-          reply={reply}
-          currentPage={currentPage}
-        />
+        <HStack gap="2">
+          {isConclusion && (
+            <StatusBadge tone="success">
+              <ThreadConclusionIcon w="4" h="4" aria-hidden="true" />
+              Answer
+            </StatusBadge>
+          )}
+          <ThreadReactList
+            initialSession={initialSession}
+            thread={thread}
+            reply={reply}
+            currentPage={currentPage}
+          />
+        </HStack>
 
         {isInReview && (
           <PostReviewBadge

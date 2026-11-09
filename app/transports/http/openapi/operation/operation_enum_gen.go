@@ -180,6 +180,7 @@ var (
 	OperationIDThreadDelete                                   = OperationID{`ThreadDelete`}
 	OperationIDThreadReadStatusUpdate                         = OperationID{`ThreadReadStatusUpdate`}
 	OperationIDReplyCreate                                    = OperationID{`ReplyCreate`}
+	OperationIDReplyGet                                       = OperationID{`ReplyGet`}
 	OperationIDPostUpdate                                     = OperationID{`PostUpdate`}
 	OperationIDPostDelete                                     = OperationID{`PostDelete`}
 	OperationIDPostReactAdd                                   = OperationID{`PostReactAdd`}
@@ -662,6 +663,8 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDThreadReadStatusUpdate, nil
 	case string(`ReplyCreate`):
 		return OperationIDReplyCreate, nil
+	case string(`ReplyGet`):
+		return OperationIDReplyGet, nil
 	case string(`PostUpdate`):
 		return OperationIDPostUpdate, nil
 	case string(`PostDelete`):

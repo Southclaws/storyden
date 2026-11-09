@@ -285,7 +285,14 @@ export const getThreadUpdateUrl = (threadMark: string) => {
 };
 
 /**
- * Publish changes to a thread.
+ * Publish changes to a thread using a partial update. Every update
+ * requires authentication and must be made by the thread author or a
+ * member with MANAGE_POSTS. Setting the pinned rank additionally requires
+ * MANAGE_POSTS, including when the requesting member is the thread author.
+ *
+ * Supply the properties to change. Omitted properties preserve their
+ * existing values unless a documented transition changes a related field;
+ * see ThreadMutableProps for lifecycle and conclusion transitions.
  */
 export const threadUpdate = async (
   threadMark: string,
@@ -341,7 +348,9 @@ export type ThreadUpdateMutationResult = NonNullable<
 
 export const useThreadUpdate = <
   TError =
+    | BadRequestResponse
     | UnauthorisedResponse
+    | ForbiddenResponse
     | NotFoundResponse
     | InternalServerErrorResponse,
 >(

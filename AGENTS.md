@@ -48,6 +48,16 @@ Code is written for human maintainers, not for minimising tokens, characters, or
 
 Before completing a change, review generated code for unnecessary compression and rewrite any dense or abbreviated constructs into clear, idiomatic code.
 
+## Clean Up as You Go
+
+Incidental cleanup should improve the surrounding code or documentation for its full purpose, beyond the immediate feature being implemented.
+
+- Before changing a comment, API description, or other documentation, read the relevant implementation and consider the wider contract: supported operations, permissions, side effects, and material exceptions.
+- Describe a rule at the scope where it applies. If an ownership or permission requirement applies to every update, document it for the whole operation rather than only the fields involved in the current task.
+- Keep feature-specific behavior in the appropriate field or feature documentation, while keeping shared rules complete and consistent.
+- Pause before making the edit: can it leave a clearer, more accurate explanation of the wider behavior? Make that complete, focused improvement, or leave the documentation unchanged.
+- Keep cleanup local and useful. Do not narrate the current diff or expand a small correction into an unrelated rewrite.
+
 ## Backend Task Routing (Go)
 
 Storyden backend is a Go application using Uber Fx dependency injection and a 3-layer app structure.

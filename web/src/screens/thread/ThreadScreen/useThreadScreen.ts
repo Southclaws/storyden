@@ -10,6 +10,7 @@ import {
   Account,
   DatagraphItemKind,
   Permission,
+  Reply,
   ThreadGetResponse,
 } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
@@ -30,6 +31,7 @@ export type Props = {
   thread: ThreadGetResponse;
   initialSettings?: Settings;
   initialSignatureConfig?: SignatureConfig;
+  initialConclusionReply?: Reply;
 };
 
 export const FormSchema = z.object({

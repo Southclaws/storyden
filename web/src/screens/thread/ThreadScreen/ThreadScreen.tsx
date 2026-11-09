@@ -18,6 +18,7 @@ import { ReplyBox } from "@/components/thread/ReplyBox/ReplyBox";
 import { ReplyProvider } from "@/components/thread/ReplyContext";
 import { ReplyList } from "@/components/thread/ReplyList/ReplyList";
 import { Signature } from "@/components/thread/Signature";
+import { ThreadConclusion } from "@/components/thread/ThreadConclusion";
 import { ThreadDeletedAlert } from "@/components/thread/ThreadDeletedAlert";
 import { ThreadMenu } from "@/components/thread/ThreadMenu/ThreadMenu";
 import { ThreadTagListField } from "@/components/thread/ThreadTagList.field";
@@ -29,6 +30,7 @@ import {
   DiscussionParticipatingIcon,
 } from "@/components/ui/icons/Discussion";
 import { LikeIcon, LikeSavedIcon } from "@/components/ui/icons/Like";
+import { ResolvedIcon } from "@/components/ui/icons/Resolved";
 import { PageHeading } from "@/components/ui/page-heading";
 import { VisibilityBadge } from "@/components/visibility/VisibilityBadge";
 import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
@@ -154,7 +156,25 @@ export function ThreadScreen(props: Props) {
                 </FormErrorText>
               </>
             ) : (
-              <PageHeading>{thread.title}</PageHeading>
+              <PageHeading textWrap="wrap">
+                {thread.lifecycle_state === "resolved" && (
+                  <ResolvedIcon
+                    color="status.success.content"
+                    w="4"
+                    h="4"
+                    display="inline-block"
+                    verticalAlign="middle"
+                    me="1"
+                    aria-hidden="true"
+                  >
+                    <title>Resolved</title>
+                  </ResolvedIcon>
+                )}
+                {thread.title}
+                {thread.lifecycle_state === "resolved" && (
+                  <styled.span srOnly> Resolved</styled.span>
+                )}
+              </PageHeading>
             )}
 
             {isEditing ? (
@@ -190,6 +210,10 @@ export function ThreadScreen(props: Props) {
           <ThreadStats thread={thread} />
 
           <VStack className="thread-page__replies" w="full">
+            <ThreadConclusion
+              thread={thread}
+              initialConclusionReply={props.initialConclusionReply}
+            />
             {data.thread.replies.total_pages > 1 && (
               <PaginationControls
                 path={`/t/${thread.slug}`}

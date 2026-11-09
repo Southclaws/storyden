@@ -8,10 +8,13 @@
  * OpenAPI spec version: v1.26.16-post
  */
 import type {
+  BadRequestResponse,
+  ForbiddenResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
   ReplyCreateBody,
   ReplyCreateOKResponse,
+  ReplyGetOKResponse,
   UnauthorisedResponse,
 } from "../openapi-schema";
 import { fetcher } from "../server";
@@ -130,5 +133,60 @@ export const replyCreate = async (
       ...getHeaders(options?.headers),
     },
     body: JSON.stringify(replyCreateBody),
+  });
+};
+
+export type replyGetResponse200 = {
+  data: ReplyGetOKResponse;
+  status: 200;
+};
+
+export type replyGetResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type replyGetResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type replyGetResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type replyGetResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 403 | 404>;
+};
+
+export type replyGetResponseSuccess = replyGetResponse200 & {
+  headers: Headers;
+};
+export type replyGetResponseError = (
+  | replyGetResponse400
+  | replyGetResponse403
+  | replyGetResponse404
+  | replyGetResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getReplyGetUrl = (threadMark: string, postId: string) => {
+  return `/threads/${threadMark}/replies/${postId}`;
+};
+
+/**
+ * Read a single reply from a thread, independently of reply pagination. The thread must be visible to the requesting member. Published replies are visible to anyone who can read the thread; in-review replies are also visible to their author, and members with MANAGE_POSTS may read replies of any visibility. Deleted replies and deleted threads are unavailable. The reply must belong to the specified thread.
+ */
+export const replyGet = async (
+  threadMark: string,
+  postId: string,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<replyGetResponseSuccess> => {
+  return fetcher<replyGetResponseSuccess>(getReplyGetUrl(threadMark, postId), {
+    ...options,
+    method: "GET",
   });
 };

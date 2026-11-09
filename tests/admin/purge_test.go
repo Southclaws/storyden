@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Southclaws/opt"
+	"github.com/oapi-codegen/nullable"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
@@ -121,6 +122,10 @@ func TestPurgeAccountContent(t *testing.T) {
 				}, memberSession)
 				tests.Ok(t, err, reply2)
 
+				tests.AssertRequest(cl.ThreadUpdateWithResponse(root, createdThread.JSON200.Slug, openapi.ThreadMutableProps{
+					ConclusionReplyId: nullable.NewNullableWithValue(reply1.JSON200.Id),
+				}, otherMemberSession))(t, http.StatusOK)
+
 				threadGet, err := cl.ThreadGetWithResponse(adminCtx, createdThread.JSON200.Slug, &openapi.ThreadGetParams{}, adminSession)
 				tests.Ok(t, err, threadGet)
 				initialReplyCount := threadGet.JSON200.Replies.Results
@@ -142,6 +147,8 @@ func TestPurgeAccountContent(t *testing.T) {
 
 				threadAfter, err := cl.ThreadGetWithResponse(adminCtx, createdThread.JSON200.Slug, &openapi.ThreadGetParams{}, adminSession)
 				tests.Ok(t, err, threadAfter)
+				a.Nil(threadAfter.JSON200.ConclusionReplyId)
+				a.Equal(openapi.ThreadLifecycleStateResolved, threadAfter.JSON200.LifecycleState)
 
 				memberReplyCount := 0
 				for _, post := range threadAfter.JSON200.Replies.Replies {
@@ -192,6 +199,10 @@ func TestPurgeAccountContent(t *testing.T) {
 						ReplyTo: &parentReplyResp.JSON200.Id,
 					}, nestedReplyAuthorSession),
 				)(t, http.StatusOK)
+
+				tests.AssertRequest(cl.ThreadUpdateWithResponse(root, threadResp.JSON200.Slug, openapi.ThreadMutableProps{
+					ConclusionReplyId: nullable.NewNullableWithValue(nestedReplyResp.JSON200.Id),
+				}, threadAuthorSession))(t, http.StatusOK)
 
 				// Verify the nested reply has a replyTo reference
 				threadBefore, err := cl.ThreadGetWithResponse(adminCtx, threadResp.JSON200.Slug, &openapi.ThreadGetParams{}, adminSession)
@@ -252,6 +263,8 @@ func TestPurgeAccountContent(t *testing.T) {
 					}
 				}
 				a.True(foundNestedAfter, "Nested reply should still exist after parent deletion")
+				a.Equal(nestedReplyResp.JSON200.Id, *threadAfter.JSON200.ConclusionReplyId)
+				a.Equal(openapi.ThreadLifecycleStateResolved, threadAfter.JSON200.LifecycleState)
 			})
 
 			t.Run("purges_multiple_content_types", func(t *testing.T) {

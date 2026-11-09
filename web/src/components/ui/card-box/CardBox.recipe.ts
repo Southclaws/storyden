@@ -17,6 +17,10 @@ export const cardBox = defineRecipe({
     kind: "default",
   },
   variants: {
+    tone: {
+      default: {},
+      success: { borderColor: "status.success.border" },
+    },
     kind: {
       default: {},
       edge: {

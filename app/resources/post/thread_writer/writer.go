@@ -74,12 +74,6 @@ func WithVisibility(v visibility.Visibility) Option {
 	}
 }
 
-func WithMeta(meta map[string]any) Option {
-	return func(m *ent.PostMutation) {
-		m.SetMetadata(meta)
-	}
-}
-
 func WithPinned(v int) Option {
 	return func(m *ent.PostMutation) {
 		m.SetPinnedRank(v)
@@ -95,6 +89,30 @@ func WithAssets(a []asset.AssetID) Option {
 func WithLink(id xid.ID) Option {
 	return func(pm *ent.PostMutation) {
 		pm.SetLinkID(id)
+	}
+}
+
+func WithLifecycleState(state post.ThreadLifecycleState) Option {
+	return func(m *ent.PostMutation) {
+		m.SetLifecycleState(ent_post.LifecycleState(state.String()))
+	}
+}
+
+func WithConclusion(id post.ID) Option {
+	return func(m *ent.PostMutation) {
+		m.SetConclusionPostID(xid.ID(id))
+	}
+}
+
+func WithoutConclusion() Option {
+	return func(m *ent.PostMutation) {
+		m.ClearConclusionPostID()
+	}
+}
+
+func WithMeta(meta map[string]any) Option {
+	return func(m *ent.PostMutation) {
+		m.SetMetadata(meta)
 	}
 }
 
@@ -196,11 +214,35 @@ func (d *Writer) Create(
 }
 
 func (d *Writer) Update(ctx context.Context, id post.ID, opts ...Option) (*thread.Thread, error) {
-	update := d.db.Post.UpdateOneID(xid.ID(id))
+	tx, err := d.db.Tx(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	defer tx.Rollback()
+
+	update := tx.Post.UpdateOneID(xid.ID(id)).Where(
+		ent_post.RootPostIDIsNil(),
+		ent_post.DeletedAtIsNil(),
+	)
 	mutate := update.Mutation()
 
 	for _, fn := range opts {
 		fn(mutate)
+	}
+
+	conclusionID, hasConclusion := mutate.ConclusionPostID()
+	state, hasState := mutate.LifecycleState()
+	if hasState && state == ent_post.LifecycleStateOpen {
+		if hasConclusion {
+			return nil, fault.New("an open thread cannot have a conclusion", ftag.With(ftag.InvalidArgument))
+		}
+
+		mutate.ClearConclusionPostID()
+	}
+
+	if hasConclusion {
+		mutate.SetLifecycleState(ent_post.LifecycleStateResolved)
+		mutate.ResetConclusionPostID()
 	}
 
 	// Only set the updated_at field if not changing the indexed_at field.
@@ -208,8 +250,22 @@ func (d *Writer) Update(ctx context.Context, id post.ID, opts ...Option) (*threa
 		mutate.SetUpdatedAt(time.Now())
 	}
 
-	err := update.Exec(ctx)
+	err = update.Exec(ctx)
 	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+		}
+
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if hasConclusion {
+		if err := setConclusion(ctx, tx, id, conclusionID); err != nil {
+			return nil, err
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -235,9 +291,33 @@ func (d *Writer) Update(ctx context.Context, id post.ID, opts ...Option) (*threa
 	return thread.Map(p)
 }
 
+func setConclusion(ctx context.Context, tx *ent.Tx, threadID post.ID, replyID xid.ID) error {
+	exists, err := tx.Post.Query().Where(
+		ent_post.ID(replyID),
+		ent_post.RootPostID(xid.ID(threadID)),
+		ent_post.DeletedAtIsNil(),
+		ent_post.VisibilityEQ(ent_post.VisibilityPublished),
+	).Exist(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if !exists {
+		return fault.New("the conclusion must be a published, undeleted reply in this thread", ftag.With(ftag.InvalidArgument))
+	}
+
+	err = tx.Post.UpdateOneID(xid.ID(threadID)).SetConclusionPostID(replyID).Exec(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
+}
+
 func (d *Writer) Delete(ctx context.Context, id post.ID) error {
 	err := d.db.Post.
 		UpdateOneID(xid.ID(id)).
+		ClearConclusionPostID().
 		SetDeletedAt(time.Now()).
 		Exec(ctx)
 	if err != nil {
