@@ -58,6 +58,7 @@
     "dompurify": "3.4.17",
     "emoji-picker-react": "5.1.4",
     "framer-motion": "14.9.0",
+    "happy-dom": "^21.0.4",
     "immer": "11.2.9",
     "lodash": "4.18.1",
     "lucide-react": "1.66.0",
