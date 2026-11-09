@@ -1,41 +1,85 @@
+import { ReactNode, useRef } from "react";
+
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { Unready } from "@/components/site/Unready";
+import { Admonition } from "@/components/ui/admonition";
 import { Button } from "@/components/ui/button";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { Input } from "@/components/ui/input";
-import { VStack, styled } from "@/styled-system/jsx";
-
-import { LinkCard } from "../LinkCard";
+import { LStack, styled } from "@/styled-system/jsx";
 
 import { LinkResultList } from "./LinkResultList";
-import { IndexingState, Props, useLinkIndexView } from "./useLinkIndexView";
+import { Props, useLinkIndexView } from "./useLinkIndexView";
 
 export function LinkIndexView(props: Props) {
-  const { form, data, handlers } = useLinkIndexView(props);
+  const { data, handlers } = useLinkIndexView(props);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  if (form.formState.isLoading) {
-    return <Unready />;
+  let submitLabel = "Search";
+
+  if (data.isURL) {
+    submitLabel = "Add link";
+  }
+
+  if (data.isURL && data.isSaved) {
+    submitLabel = "Saved";
+  }
+
+  let results: ReactNode;
+
+  if (data.isLoading) {
+    results = <Unready />;
+  } else if (data.error) {
+    results = (
+      <>
+        <Unready error="Could not search links." />
+        <Button variant="outline" onClick={handlers.handleRefresh}>
+          Try again
+        </Button>
+      </>
+    );
+  } else if (data.links) {
+    results = (
+      <>
+        <LinkResultList links={data.links} />
+        <PaginationControls
+          path="/links"
+          params={{ q: data.query }}
+          onClick={handlers.handlePage}
+          currentPage={data.page}
+          totalPages={data.links.total_pages}
+          pageSize={data.links.page_size}
+        />
+      </>
+    );
   }
 
   return (
-    <VStack w="full">
+    <LStack w="full" gap="4">
       <styled.form display="flex" w="full" onSubmit={handlers.handleSubmission}>
         <Input
           w="full"
+          minW="0"
           borderRight="none"
           borderRightRadius="none"
           type="search"
+          aria-label="Search links or paste a URL"
           placeholder="Search or paste a new link"
-          defaultValue={props.query}
-          {...form.register("q")}
+          ref={inputRef}
+          value={data.query}
+          onChange={(event) => handlers.handleQuery(event.target.value)}
         />
 
-        {(props.query || data.q) && (
+        {data.query && (
           <Button
             borderX="none"
             borderRadius="none"
-            type="reset"
-            onClick={handlers.handleReset}
+            type="button"
+            aria-label="Clear search"
+            onClick={() => {
+              handlers.handleReset();
+              inputRef.current?.focus();
+            }}
           >
             <CancelIcon />
           </Button>
@@ -46,38 +90,34 @@ export function LinkIndexView(props: Props) {
           borderLeftRadius="none"
           type="submit"
           width="min"
+          disabled={data.isURL && data.isSaved}
+          loading={data.adding.state === "adding"}
+          loadingText="Adding…"
         >
-          Search
+          {submitLabel}
         </Button>
       </styled.form>
 
-      <PaginationControls
-        path="/links"
-        params={{ q: data.q }}
-        onClick={handlers.handlePage}
-        currentPage={props.page ?? 1}
-        totalPages={data.links.total_pages}
-        pageSize={data.links.page_size}
-      />
-
-      {data.indexing.state !== "not-indexing" ? (
-        <IndexingStateBadge {...data.indexing} />
-      ) : (
-        <LinkResultList links={data.links} />
+      {data.adding.state === "error" && (
+        <Admonition
+          value
+          kind="failure"
+          title="Could not add link"
+          role="alert"
+          onChange={handlers.handleDismissError}
+        >
+          {data.adding.error} Try adding the link again.
+        </Admonition>
       )}
-    </VStack>
-  );
-}
 
-function IndexingStateBadge(props: IndexingState) {
-  switch (props.state) {
-    case "not-indexing":
-      return <></>;
-    case "indexing":
-      return <>Indexing {props.url}...</>;
-    case "indexed":
-      return <LinkCard shape="row" link={props.link} />;
-    case "error":
-      return <>{props.error}</>;
-  }
+      <LStack
+        as="section"
+        aria-label="Link results"
+        aria-busy={data.isLoading}
+        gap="4"
+      >
+        {results}
+      </LStack>
+    </LStack>
+  );
 }

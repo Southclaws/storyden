@@ -1,151 +1,151 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { KeyedMutator } from "swr";
+import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
+import { FormEvent, useEffect, useRef, useState } from "react";
+import { useSWRConfig } from "swr";
 
-import { linkCreate } from "@/api/openapi-client/links";
-import { LinkListResult, LinkReference } from "@/api/openapi-schema";
-import * as z from "@/lib/validation";
+import {
+  getLinkListKey,
+  linkCreate,
+  useLinkList,
+} from "@/api/openapi-client/links";
+import { LinkListResult } from "@/api/openapi-schema";
+import { normalizeLink } from "@/lib/link/validation";
+import { deriveError } from "@/utils/error";
 
 export type Props = {
-  links: LinkListResult;
-  mutate?: KeyedMutator<LinkListResult>;
+  initialResult?: LinkListResult;
   query?: string;
   page?: number;
 };
 
-export const FormSchema = z.object({
-  q: z.string(),
-});
-export type Form = z.infer<typeof FormSchema>;
-
-const indexingResetTimeout = 5000;
-
-export type IndexingState =
-  | {
-      state: "not-indexing";
-    }
-  | {
-      state: "indexing";
-      url: string;
-    }
-  | {
-      state: "indexed";
-      link: LinkReference;
-    }
-  | {
-      state: "error";
-      error: string;
-    };
-
-const defaultIndexingState = { state: "not-indexing" } satisfies IndexingState;
+type AddState =
+  | { state: "idle" }
+  | { state: "adding" }
+  | { state: "added" }
+  | { state: "error"; error: string };
 
 export function useLinkIndexView(props: Props) {
-  const router = useRouter();
-  const form = useForm<Form>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      q: props.query,
-    },
+  const { mutate } = useSWRConfig();
+  const [filters, setFilters] = useQueryStates({
+    q: parseAsString.withDefault(""),
+    page: parseAsInteger.withDefault(1),
   });
-  const [indexing, setIndexing] = useState<IndexingState>(defaultIndexingState);
+  const query = filters.q.trim();
+  const page = Math.max(1, filters.page);
+  const [search, setSearch] = useState({ query, page });
+  const [adding, setAdding] = useState<AddState>({ state: "idle" });
+  const requestRef = useRef<{ url: string } | undefined>(undefined);
+  const url = normalizeLink(query);
+  const [previousURL, setPreviousURL] = useState(url);
 
-  const { q } = form.watch();
-
-  const url = getURL(q);
-
-  function resetIndexingState() {
-    setTimeout(() => {
-      setIndexing({
-        state: "not-indexing",
-      });
-    }, indexingResetTimeout);
-  }
+  const isInitialSearch =
+    search.query === (props.query ?? "").trim() &&
+    search.page === Number(props.page ?? 1);
+  const {
+    data: links,
+    error,
+    mutate: refresh,
+  } = useLinkList(
+    { q: search.query, page: search.page.toString() },
+    {
+      swr: {
+        fallbackData: isInitialSearch ? props.initialResult : undefined,
+        keepPreviousData: false,
+      },
+    },
+  );
 
   useEffect(() => {
-    if (!url) {
-      setIndexing({
-        state: "not-indexing",
-      });
+    const timeout = setTimeout(() => setSearch({ query, page }), 300);
+    return () => clearTimeout(timeout);
+  }, [query, page]);
 
+  useEffect(() => {
+    return () => {
+      requestRef.current = undefined;
+    };
+  }, [url]);
+
+  if (previousURL !== url) {
+    setPreviousURL(url);
+    setAdding({ state: "idle" });
+  }
+
+  const isSearching = search.query !== query || search.page !== page;
+  const hasSavedLink = links?.links.some((link) => link.url === url) ?? false;
+  const isSaved = adding.state === "added" || (!isSearching && hasSavedLink);
+  const isAddingToEmptyList =
+    adding.state === "adding" && links?.links.length === 0;
+  const isLoading = isSearching || (!links && !error) || isAddingToEmptyList;
+
+  function handleQuery(value: string) {
+    void setFilters({ q: value || null, page: null });
+  }
+
+  function handleReset() {
+    setSearch({ query: "", page: 1 });
+    void setFilters({ q: null, page: null });
+  }
+
+  function handlePage(page: number) {
+    setSearch({ query, page });
+    void setFilters({ page }, { history: "push" });
+  }
+
+  async function handleSubmission(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSearch({ query, page: 1 });
+    void setFilters({ page: null });
+
+    if (!url) {
       return;
     }
 
-    (async () => {
-      setIndexing({
-        state: "indexing",
-        url,
-      });
+    if (isSaved || requestRef.current?.url === url) {
+      return;
+    }
 
-      try {
-        const link = await linkCreate({
-          url,
-        });
+    const request = { url };
+    requestRef.current = request;
+    setAdding({ state: "adding" });
 
-        setIndexing({
-          state: "indexed",
-          link,
-        });
-      } catch (_) {
-        setIndexing({
-          state: "error",
-          error: "Failed to index the provided link.",
-        });
-
-        resetIndexingState();
+    try {
+      await linkCreate({ url });
+    } catch (error) {
+      if (requestRef.current !== request) {
         return;
       }
-    })();
-  }, [url]);
 
-  const handlePage = async (page: number) => {
-    router.push(`/links?q=${q}&page=${page}`);
-  };
+      requestRef.current = undefined;
+      setAdding({ state: "error", error: deriveError(error) });
+      return;
+    }
 
-  const handleSubmission = form.handleSubmit(async (payload) => {
-    router.push(`/links?q=${payload.q}`);
-  });
+    // Refresh every cached link search, including one opened while adding.
+    await mutate((key) => Array.isArray(key) && key[0] === getLinkListKey()[0]);
 
-  const handleReset = async () => {
-    form.reset();
-    router.push("/links");
-  };
-
-  const handleMutate = async () => {
-    await props.mutate?.();
-  };
+    if (requestRef.current === request) {
+      setAdding({ state: "added" });
+    }
+  }
 
   return {
-    form,
     data: {
-      q,
-      links: props.links,
-      indexing,
+      query: filters.q,
+      page,
+      isURL: url !== undefined,
+      isSaved,
+      isLoading,
+      links,
+      error,
+      adding,
     },
     handlers: {
+      handleQuery,
       handlePage,
       handleSubmission,
       handleReset,
-      handleMutate,
+      handleDismissError: () => setAdding({ state: "idle" }),
+      handleRefresh: () => refresh(),
     },
   };
-}
-
-function getURL(s: string) {
-  try {
-    if (s.length < 5) {
-      return undefined;
-    }
-
-    if (s.includes(" ")) {
-      return undefined;
-    }
-
-    const parsed = new URL(s);
-
-    return parsed.toString();
-  } catch (_) {
-    return undefined;
-  }
 }
