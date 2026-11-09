@@ -1,4 +1,4 @@
-import { APIRequestContext, expect, test } from "@playwright/test";
+import { APIRequestContext, Page, expect, test } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 
 import { LinkListOKResponse } from "../../src/api/openapi-schema";
@@ -14,14 +14,21 @@ async function searchLinkURLs(request: APIRequestContext, q: string) {
   return body.links.map((link) => link.url);
 }
 
-test("Links page only creates a link when the user submits it", async ({
-  page,
-  request,
-}) => {
-  const seed = randomUUID().slice(0, 8);
-  const username = `links-${seed}`;
-  const url = `https://links-${seed}.invalid`;
+function recordLinkCreates(page: Page) {
+  const urls: string[] = [];
+  page.on("request", (request) => {
+    if (
+      request.method() === "POST" &&
+      new URL(request.url()).pathname === "/api/links"
+    ) {
+      urls.push((request.postDataJSON() as { url: string }).url);
+    }
+  });
+  return urls;
+}
 
+async function openLinksPage(page: Page, seed: string) {
+  const username = `links-${seed}`;
   await createAccountWithRole(
     page.context(),
     username,
@@ -29,34 +36,49 @@ test("Links page only creates a link when the user submits it", async ({
     "member",
   );
   await login(page, username, "TestPassword123!");
-
-  const linkCreates: string[] = [];
-  page.on("request", (request) => {
-    if (
-      request.method() === "POST" &&
-      new URL(request.url()).pathname === "/api/links"
-    ) {
-      linkCreates.push(request.postData() ?? "");
-    }
-  });
-
   await page.goto("/links", { waitUntil: "networkidle" });
+  return page.getByPlaceholder("Search or paste a new link");
+}
 
-  const input = page.getByPlaceholder("Search or paste a new link");
-  await input.pressSequentially(url, { delay: 20 });
-  await expect(input).toHaveValue(url);
+test("Links page previews a link once the typed URL is complete", async ({
+  page,
+  request,
+}) => {
+  const seed = randomUUID().slice(0, 8);
+  const host = `links-${seed}.invalid`;
+  const url = `https://${host}/`;
 
-  const submit = page.getByRole("button", { name: "Add link" });
-  await expect(submit).toBeVisible();
-  await page.waitForLoadState("networkidle");
+  const input = await openLinksPage(page, seed);
+  const linkCreates = recordLinkCreates(page);
 
-  expect(linkCreates).toHaveLength(0);
-  expect(await searchLinkURLs(request, seed)).toHaveLength(0);
+  await input.pressSequentially(`https://links-${seed}`, { delay: 20 });
+  await expect(page.getByRole("button", { name: "Search" })).toBeVisible();
+  await page.waitForTimeout(1000);
+  expect(linkCreates).toEqual([]);
 
-  await submit.click();
+  await input.pressSequentially(".invalid", { delay: 20 });
+  await expect(page.getByRole("button", { name: "Add link" })).toBeVisible();
 
-  await expect.poll(() => linkCreates.length).toBe(1);
-  await expect
-    .poll(() => searchLinkURLs(request, seed))
-    .toEqual([expect.stringContaining(`links-${seed}.invalid`)]);
+  await expect(page.getByRole("main").getByText(url).first()).toBeVisible();
+  expect(linkCreates).toEqual([url]);
+  expect(await searchLinkURLs(request, seed)).toEqual([url]);
+});
+
+test("Links page adds a bare domain immediately on submit", async ({
+  page,
+  request,
+}) => {
+  const seed = randomUUID().slice(0, 8);
+  const url = `https://links-${seed}.invalid/`;
+
+  const input = await openLinksPage(page, seed);
+  const linkCreates = recordLinkCreates(page);
+
+  await input.fill(`links-${seed}.invalid`);
+  await input.press("Enter");
+
+  await expect(page.getByRole("main").getByText(url).first()).toBeVisible();
+  await page.waitForTimeout(1000);
+  expect(linkCreates).toEqual([url]);
+  expect(await searchLinkURLs(request, seed)).toEqual([url]);
 });

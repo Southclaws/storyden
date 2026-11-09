@@ -1,11 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { KeyedMutator } from "swr";
 
 import { linkCreate } from "@/api/openapi-client/links";
 import { LinkListResult, LinkReference } from "@/api/openapi-schema";
+import { normalizeLink } from "@/lib/link/validation";
 import * as z from "@/lib/validation";
 
 export type Props = {
@@ -20,6 +21,7 @@ export const FormSchema = z.object({
 });
 export type Form = z.infer<typeof FormSchema>;
 
+const indexingDelay = 500;
 const indexingResetTimeout = 5000;
 
 export type IndexingState =
@@ -50,10 +52,11 @@ export function useLinkIndexView(props: Props) {
     },
   });
   const [indexing, setIndexing] = useState<IndexingState>(defaultIndexingState);
+  const indexedURL = useRef<string | undefined>(undefined);
 
   const { q } = form.watch();
 
-  const url = getURL(q);
+  const url = normalizeLink(q);
 
   function resetIndexingState() {
     setTimeout(() => {
@@ -63,11 +66,12 @@ export function useLinkIndexView(props: Props) {
     }, indexingResetTimeout);
   }
 
-  useEffect(() => {
-    setIndexing(defaultIndexingState);
-  }, [url]);
+  async function indexLink(url: string) {
+    if (indexedURL.current === url) {
+      return;
+    }
+    indexedURL.current = url;
 
-  async function createLink(url: string) {
     setIndexing({
       state: "indexing",
       url,
@@ -77,6 +81,9 @@ export function useLinkIndexView(props: Props) {
       const link = await linkCreate({
         url,
       });
+      if (indexedURL.current !== url) {
+        return;
+      }
 
       setIndexing({
         state: "indexed",
@@ -85,6 +92,10 @@ export function useLinkIndexView(props: Props) {
 
       await props.mutate?.();
     } catch (_) {
+      if (indexedURL.current !== url) {
+        return;
+      }
+
       setIndexing({
         state: "error",
         error: "Failed to index the provided link.",
@@ -94,14 +105,31 @@ export function useLinkIndexView(props: Props) {
     }
   }
 
+  useEffect(() => {
+    if (indexedURL.current === url) {
+      return;
+    }
+
+    indexedURL.current = undefined;
+    setIndexing(defaultIndexingState);
+
+    if (!url) {
+      return;
+    }
+
+    const timeout = setTimeout(() => indexLink(url), indexingDelay);
+    return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [url]);
+
   const handlePage = async (page: number) => {
     router.push(`/links?q=${q}&page=${page}`);
   };
 
   const handleSubmission = form.handleSubmit(async (payload) => {
-    const submittedURL = getURL(payload.q);
+    const submittedURL = normalizeLink(payload.q);
     if (submittedURL) {
-      await createLink(submittedURL);
+      await indexLink(submittedURL);
       return;
     }
 
@@ -132,22 +160,4 @@ export function useLinkIndexView(props: Props) {
       handleMutate,
     },
   };
-}
-
-function getURL(s: string) {
-  try {
-    if (s.length < 5) {
-      return undefined;
-    }
-
-    if (s.includes(" ")) {
-      return undefined;
-    }
-
-    const parsed = new URL(s);
-
-    return parsed.toString();
-  } catch (_) {
-    return undefined;
-  }
 }
