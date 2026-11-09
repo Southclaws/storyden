@@ -117,11 +117,13 @@ export function SearchScreen(props: Props) {
           }}
         >
           <MultiSelectPicker
+            ariaLabel="Authors"
             value={filters.authorsValue}
             onChange={handlers.handleAuthorsChange}
             onQuery={handlers.handleQueryAuthors}
             queryResults={filters.authorsResults}
             queryError={filters.authorsError}
+            queryLoading={filters.authorsLoading}
             inputPlaceholder="Authors..."
             size="sm"
             width="full"
@@ -131,11 +133,13 @@ export function SearchScreen(props: Props) {
 
           {filters.showCategories && (
             <MultiSelectPicker
+              ariaLabel="Categories"
               value={filters.categoriesValue}
               onChange={handlers.handleCategoriesChange}
               onQuery={handlers.handleQueryCategories}
               queryResults={filters.categoriesResults}
               queryError={filters.categoriesError}
+              queryLoading={filters.categoriesLoading}
               inputPlaceholder="Categories..."
               size="sm"
               width="full"
@@ -146,11 +150,13 @@ export function SearchScreen(props: Props) {
 
           {filters.showTags && (
             <MultiSelectPicker
+              ariaLabel="Tags"
               value={filters.tagsValue}
               onChange={handlers.handleTagsChange}
               onQuery={handlers.handleQueryTags}
               queryResults={filters.tagsResults}
               queryError={filters.tagsError}
+              queryLoading={filters.tagsLoading}
               inputPlaceholder="Tags..."
               size="sm"
               width="full"

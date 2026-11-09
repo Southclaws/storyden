@@ -4,14 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { debounce } from "lodash";
 import { parseAsArrayOf, parseAsString, useQueryStates } from "nuqs";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { categoryList } from "@/api/openapi-client/categories";
+import { useCategoryList } from "@/api/openapi-client/categories";
 import { useDatagraphSearch } from "@/api/openapi-client/datagraph";
-import { profileList } from "@/api/openapi-client/profiles";
-import { tagList } from "@/api/openapi-client/tags";
-import { Category } from "@/api/openapi-schema";
+import { useProfileList } from "@/api/openapi-client/profiles";
+import { useTagList } from "@/api/openapi-client/tags";
 import {
   DatagraphItemKind,
   DatagraphSearchOKResponse,
@@ -61,113 +60,79 @@ export function useSearchScreen(props: Props) {
     },
   );
 
-  const [allCategories, setAllCategories] = useState<Category[]>([]);
-  const [authorsResults, setAuthorsResults] = useState<MultiSelectPickerItem[]>(
-    [],
+  const [authorsQuery, setAuthorsQuery] = useState("");
+  const [categoriesQuery, setCategoriesQuery] = useState("");
+  const [tagsQuery, setTagsQuery] = useState("");
+
+  const {
+    data: authorsData,
+    error: authorsError,
+    isLoading: authorsLoading,
+  } = useProfileList({ q: authorsQuery });
+  const {
+    data: categoriesData,
+    error: categoriesError,
+    isLoading: categoriesLoading,
+  } = useCategoryList();
+  const {
+    data: tagsData,
+    error: tagsError,
+    isLoading: tagsLoading,
+  } = useTagList({ q: tagsQuery });
+
+  const allCategories = useMemo(
+    () => categoriesData?.categories ?? [],
+    [categoriesData],
   );
-  const [categoriesResults, setCategoriesResults] = useState<
-    MultiSelectPickerItem[]
-  >([]);
-  const [tagsResults, setTagsResults] = useState<MultiSelectPickerItem[]>([]);
+  const authorsResults = (authorsData?.profiles ?? []).map((profile) => ({
+    label: profile.handle,
+    value: profile.handle,
+  }));
+  const lowerCategoriesQuery = categoriesQuery.toLowerCase();
+  const categoriesResults = allCategories
+    .filter(
+      (category) =>
+        category.name.toLowerCase().includes(lowerCategoriesQuery) ||
+        category.slug.toLowerCase().includes(lowerCategoriesQuery),
+    )
+    .map((category) => ({ label: category.name, value: category.slug }));
+  const tagsResults = (tagsData?.tags ?? []).map((tag) => ({
+    label: tag.name,
+    value: tag.name,
+  }));
 
-  const [authorsError, setAuthorsError] = useState<string | null>(null);
-  const [categoriesError, setCategoriesError] = useState<string | null>(null);
-  const [tagsError, setTagsError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchCategories() {
-      try {
-        const { categories } = await categoryList();
-        setAllCategories(categories);
-      } catch (error) {
-        setCategoriesError(deriveError(error));
-      }
-    }
-
-    fetchCategories();
-  }, []);
-
-  const debouncedSearchTags = useRef(
-    debounce(async (query: string) => {
-      try {
-        setTagsError(null);
-
-        if (query.length === 0) {
-          setTagsResults([]);
-          return;
-        }
-
-        const { tags } = await tagList({ q: query });
-        const items = tags.map((t) => ({ label: t.name, value: t.name }));
-        setTagsResults(items);
-      } catch (error) {
-        setTagsError(deriveError(error));
-        setTagsResults([]);
-      }
-    }, 300),
-  ).current;
-
-  const debouncedSearchAuthors = useRef(
-    debounce(async (query: string) => {
-      try {
-        setAuthorsError(null);
-
-        if (query.length === 0) {
-          setAuthorsResults([]);
-          return;
-        }
-
-        const { profiles } = await profileList({ q: query });
-        const items = profiles.map((v) => ({
-          label: v.handle,
-          value: v.handle,
-        }));
-        setAuthorsResults(items);
-      } catch (error) {
-        setAuthorsError(deriveError(error));
-        setAuthorsResults([]);
-      }
-    }, 300),
-  ).current;
+  const debouncedSearchTags = useRef(debounce(setTagsQuery, 300)).current;
+  const debouncedSearchAuthors = useRef(debounce(setAuthorsQuery, 300)).current;
 
   useEffect(() => {
     return () => {
       debouncedSearchTags.cancel();
       debouncedSearchAuthors.cancel();
     };
-  }, []);
+  }, [debouncedSearchTags, debouncedSearchAuthors]);
 
   function handleQueryTags(query: string) {
     if (query.length === 0) {
-      setTagsResults([]);
-    } else {
-      debouncedSearchTags(query);
-    }
-  }
-
-  function handleQueryCategories(query: string) {
-    if (query.length === 0) {
-      setCategoriesResults([]);
+      debouncedSearchTags.cancel();
+      setTagsQuery("");
       return;
     }
 
-    const filtered = allCategories
-      .filter(
-        (cat) =>
-          cat.name.toLowerCase().includes(query.toLowerCase()) ||
-          cat.slug.toLowerCase().includes(query.toLowerCase()),
-      )
-      .map((cat) => ({ label: cat.name, value: cat.slug }));
+    debouncedSearchTags(query);
+  }
 
-    setCategoriesResults(filtered);
+  function handleQueryCategories(query: string) {
+    setCategoriesQuery(query);
   }
 
   function handleQueryAuthors(query: string) {
     if (query.length === 0) {
-      setAuthorsResults([]);
-    } else {
-      debouncedSearchAuthors(query);
+      debouncedSearchAuthors.cancel();
+      setAuthorsQuery("");
+      return;
     }
+
+    debouncedSearchAuthors(query);
   }
 
   const handleAuthorsChange = async (items: MultiSelectPickerItem[]) => {
@@ -319,13 +284,16 @@ export function useSearchScreen(props: Props) {
     filters: {
       authorsValue,
       authorsResults,
-      authorsError,
+      authorsError: deriveError(authorsError),
+      authorsLoading,
       categoriesValue,
       categoriesResults,
-      categoriesError,
+      categoriesError: deriveError(categoriesError),
+      categoriesLoading,
       tagsValue,
       tagsResults,
-      tagsError,
+      tagsError: deriveError(tagsError),
+      tagsLoading,
       showCategories,
       showTags,
     },

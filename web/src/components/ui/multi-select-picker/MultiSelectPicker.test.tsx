@@ -42,6 +42,42 @@ describe("MultiSelectPicker", () => {
     expect(onQuery.mock.calls.at(-1)?.[0]).toBe("ab");
   });
 
+  it("queries the default options again when the search is cleared", async () => {
+    const user = userEvent.setup();
+    const onQuery = vi.fn();
+
+    render(
+      <MultiSelectPicker
+        value={[]}
+        onQuery={onQuery}
+        onChange={vi.fn().mockResolvedValue(undefined)}
+      />,
+    );
+
+    await user.type(getSearchInput(), "beta");
+    await user.clear(getSearchInput());
+
+    expect(getSearchInput()).toHaveValue("");
+    expect(onQuery.mock.calls.at(-1)?.[0]).toBe("");
+  });
+
+  it("describes the current selection while the popup is closed", () => {
+    const props = {
+      onQuery: vi.fn(),
+      onChange: vi.fn().mockResolvedValue(undefined),
+    };
+    const { rerender } = render(
+      <MultiSelectPicker {...props} value={baseValue} />,
+    );
+
+    expect(getSearchInput()).toHaveAccessibleDescription("Selected: Alpha.");
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+
+    rerender(<MultiSelectPicker {...props} value={[]} />);
+
+    expect(getSearchInput()).toHaveAccessibleDescription("No items selected.");
+  });
+
   it("adds a selected result and auto-assigns colour when enabled", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn().mockResolvedValue(undefined);
@@ -84,7 +120,15 @@ describe("MultiSelectPicker", () => {
 
     const input = getSearchInput();
     await user.type(input, "bet");
-    await user.keyboard("{ArrowDown}{Enter}");
+    await user.keyboard("{ArrowDown}");
+
+    expect(input).toHaveFocus();
+    expect(input).toHaveAttribute(
+      "aria-activedescendant",
+      screen.getByRole("option", { name: "Beta" }).id,
+    );
+
+    await user.keyboard("{Enter}");
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith([result]));
   });
@@ -168,6 +212,32 @@ describe("MultiSelectPicker", () => {
     await user.type(input, "a{Backspace}");
 
     expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("shows loading instead of an empty state until options arrive", async () => {
+    const props = {
+      value: [],
+      onQuery: vi.fn(),
+      onChange: vi.fn().mockResolvedValue(undefined),
+    };
+    const { rerender } = render(<MultiSelectPicker {...props} queryLoading />);
+
+    await openPicker();
+    expect(screen.getByRole("status", { name: "Loading" })).toBeVisible();
+    expect(screen.getByRole("listbox")).toHaveAttribute("aria-busy", "true");
+    expect(screen.queryByText("No options available")).not.toBeInTheDocument();
+
+    rerender(
+      <MultiSelectPicker
+        {...props}
+        queryResults={[{ label: "Beta", value: "beta" }]}
+      />,
+    );
+
+    expect(screen.getByRole("option", { name: "Beta" })).toBeVisible();
+    expect(
+      screen.queryByRole("status", { name: "Loading" }),
+    ).not.toBeInTheDocument();
   });
 
   it("shows no-results state when searching with no matches", async () => {

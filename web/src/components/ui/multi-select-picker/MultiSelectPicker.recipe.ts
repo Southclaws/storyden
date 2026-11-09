@@ -24,8 +24,9 @@ export const multiSelectPicker = defineRecipe({
       borderColor: "border.strong",
     },
     _focusWithin: {
-      borderColor: "colorPalette.text",
-      boxShadow: "0 0 0 1px var(--colors-color-palette-text)",
+      borderColor: "var(--sd-color-focus-ring, var(--colors-border-strong))",
+      boxShadow:
+        "0 0 0 1px var(--sd-color-focus-ring, var(--colors-border-strong))",
     },
     _disabled: {
       background: "background.controlDisabled",

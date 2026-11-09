@@ -10,7 +10,7 @@ import {
   shift,
   useFloating,
 } from "@floating-ui/react";
-import { type CSSProperties, type Ref, useRef, useState } from "react";
+import { type CSSProperties, type Ref, useId, useRef, useState } from "react";
 import { cx } from "styled-system/css";
 
 import { Unready } from "@/components/site/Unready";
@@ -63,6 +63,7 @@ export type MultiSelectPickerProps = RootProps & {
   ariaLabel?: string;
   autoColour?: boolean;
   queryError?: string | null;
+  queryLoading?: boolean;
   size?: ControlSize;
   inputVariant?: InputVariantProps["variant"];
 };
@@ -113,6 +114,7 @@ export function MultiSelectPicker({
   ariaLabel,
   autoColour = false,
   queryError,
+  queryLoading = false,
   size = "sm",
   inputVariant = "ghost",
   positioning,
@@ -120,6 +122,7 @@ export function MultiSelectPicker({
   defaultOpen = false,
   ...rootProps
 }: MultiSelectPickerProps) {
+  const selectionDescriptionId = useId();
   const [queryInput, setQueryInput] = useState("");
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -188,6 +191,15 @@ export function MultiSelectPicker({
   const badgeSize = selectedBadgeSize(size);
   const inputLabel = ariaLabel ?? "Search for items";
   const triggerLabel = ariaLabel ?? "Select items";
+  const selectedLabels = value.map((item) => item.label).join(", ");
+  const selectionDescription =
+    value.length > 0 ? `Selected: ${selectedLabels}.` : "No items selected.";
+  const inputDescriptionIds = [
+    rootProps["aria-describedby"],
+    selectionDescriptionId,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   function resetQuery() {
     setQueryInput("");
@@ -242,6 +254,7 @@ export function MultiSelectPicker({
       closeOnSelect={false}
       inputBehavior="autohighlight"
       inputValue={queryInput}
+      loading={queryLoading}
       multiple
       open={isOpen}
       openOnClick
@@ -258,6 +271,14 @@ export function MultiSelectPicker({
       onValueChange={({ value: nextValues }) => handleValueChange(nextValues)}
     >
       <Combobox.Label srOnly>{inputLabel}</Combobox.Label>
+      <styled.span
+        id={selectionDescriptionId}
+        srOnly
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {selectionDescription}
+      </styled.span>
       <Combobox.Control
         ref={setReference}
         className={multiSelectPicker({ size })}
@@ -290,6 +311,7 @@ export function MultiSelectPicker({
           <Combobox.Input
             ref={inputRef}
             aria-label={inputLabel}
+            aria-describedby={inputDescriptionIds}
             autoComplete="off"
             className={cx(input({ size, variant: inputVariant }))}
             flex="1"
@@ -298,6 +320,7 @@ export function MultiSelectPicker({
             placeholder={inputPlaceholder}
             pr="0!"
             width="auto"
+            _focusVisible={{ outline: "none", boxShadow: "none" }}
             onChange={(event) => {
               const nextQuery = event.currentTarget.value;
               setQueryInput(nextQuery);
@@ -332,6 +355,7 @@ export function MultiSelectPicker({
             transform="translateY(-50%)"
             type="button"
             variant="ghost"
+            _focusVisible={{ outline: "none", boxShadow: "none" }}
           >
             <SelectIcon />
           </IconButton>
@@ -344,6 +368,7 @@ export function MultiSelectPicker({
           floatingRef={setFloating}
           floatingStyles={floatingStyles}
           queryError={queryError}
+          queryLoading={queryLoading}
           queryInput={queryInput}
           queryResults={filteredQueryResults}
           selectedItems={value}
@@ -358,6 +383,7 @@ type PickerContentProps = {
   floatingRef: Ref<HTMLDivElement>;
   floatingStyles: CSSProperties;
   queryError?: string | null;
+  queryLoading?: boolean;
   queryInput: string;
   queryResults: MultiSelectPickerItem[];
   selectedItems: MultiSelectPickerItem[];
@@ -368,6 +394,7 @@ function PickerContent({
   floatingRef,
   floatingStyles,
   queryError,
+  queryLoading,
   queryInput,
   queryResults,
   selectedItems,
@@ -413,9 +440,9 @@ function PickerContent({
           )}
         </Combobox.List>
 
-        {queryError ? (
+        {queryError || queryLoading ? (
           <styled.div p="2">
-            <Unready error={queryError} />
+            <Unready error={queryError} size="sm" />
           </styled.div>
         ) : (
           !hasOptions && (

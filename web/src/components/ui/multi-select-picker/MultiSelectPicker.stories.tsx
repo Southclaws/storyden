@@ -40,7 +40,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "A searchable multi-value combobox for choosing several items from a dynamic collection. Use it when selection and search belong in one compact field. Use Combobox for one value, Select for a short known list, and Checkbox Group when every choice should remain visible. Do not use it for commands, navigation, or a single free-form value.",
+          "A searchable multi-value combobox for choosing several items from a dynamic collection. Use it when selection and search belong in one compact field. The whole field owns its focus ring; the input is the single Tab stop and describes the current selection. Use ariaLabel to name the field in product contexts. Use Combobox for one value, Select for a short known list, and Checkbox Group when every choice should remain visible. Do not use it for commands, navigation, or a single free-form value.",
       },
     },
   },
@@ -196,9 +196,45 @@ export const NearViewportEdge: Story = {
   ),
 };
 
-export const Error: Story = {
+export const Loading: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Use queryLoading while remote options are loading so the picker does not announce an empty collection before the request completes.",
+      },
+    },
+  },
   render: () => (
     <LStack width="full" maxW="lg">
+      <ControlledPicker defaultOpen items={[]} queryLoading />
+    </LStack>
+  ),
+};
+
+export const Error: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Remote option failures use the compact Unready size: metadata text and a 16px warning icon aligned to the first line, while selected values remain available.",
+      },
+    },
+  },
+  render: () => (
+    <LStack width="full" maxW="lg">
+      <ControlledPicker
+        defaultOpen
+        items={[]}
+        queryError="Capabilities could not be loaded. Try again."
+      />
+    </LStack>
+  ),
+};
+
+export const NarrowError: Story = {
+  render: () => (
+    <LStack width="64">
       <ControlledPicker
         defaultOpen
         items={[]}

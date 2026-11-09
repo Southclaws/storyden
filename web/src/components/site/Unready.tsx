@@ -13,9 +13,12 @@ import { Spinner } from "../ui/spinner";
 
 type Props = {
   error?: unknown;
+  size?: "sm" | "md";
 };
 
-export function Unready({ error }: Props) {
+export function Unready({ error, size = "md" }: Props) {
+  const isCompact = size === "sm";
+
   if (!error) {
     return (
       <Center
@@ -27,7 +30,7 @@ export function Unready({ error }: Props) {
         aria-label="Loading"
       >
         <div aria-hidden="true">
-          <Spinner />
+          <Spinner size={size} />
         </div>
       </Center>
     );
@@ -37,16 +40,25 @@ export function Unready({ error }: Props) {
 
   return (
     <HStack
-      maxW="xs"
-      alignItems="center"
+      maxW={isCompact ? "full" : "xs"}
+      alignItems={isCompact ? "flex-start" : "center"}
+      gap="2"
       color="text.muted"
       role="alert"
       aria-atomic="true"
     >
-      <Box w="5" flexShrink="0">
-        <WarningIcon aria-hidden="true" />
+      <Box w={isCompact ? "4" : "5"} flexShrink="0">
+        <WarningIcon aria-hidden="true" boxSize={isCompact ? "4" : undefined} />
       </Box>
-      <p id="error__message">{message}</p>
+      <Text
+        id="error__message"
+        variant={isCompact ? "metadata" : "body"}
+        color="text.muted"
+        minW="0"
+        overflowWrap="anywhere"
+      >
+        {message}
+      </Text>
     </HStack>
   );
 }
