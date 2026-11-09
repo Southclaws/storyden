@@ -27,7 +27,7 @@ func TestOAuthGitHubDuplicateAuthMethod(t *testing.T) {
 			r := require.New(t)
 			a := assert.New(t)
 
-			service := authentication.ServiceOAuthGitHub
+			service := authentication.AuthServiceOAuthGitHub
 			token := "test-token"
 
 			t.Run("duplicate_via_email_returns_same_account", func(t *testing.T) {
