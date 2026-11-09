@@ -10,7 +10,7 @@ import {
   pageLinks,
   socialImage,
 } from "@/lib/metadata/public";
-import { getPublicThread, getThread } from "@/lib/metadata/thread";
+import { getThread } from "@/lib/metadata/thread";
 import { getSettings } from "@/lib/settings/settings-server";
 import { getConclusionReply } from "@/lib/thread/conclusion-server";
 import * as z from "@/lib/validation";
@@ -38,60 +38,51 @@ export default async function Page(props: Props) {
     notFound();
   }
 
-  const [initialConclusionReply, session, settings, result] = await Promise.all(
-    [
-      getConclusionReply(data),
-      getServerSession(),
-      getSettings(),
-      getPublicThread(slug, page ?? 1),
-    ],
-  );
-  const publicThread = result.status === "public" ? result.data : undefined;
+  const [initialConclusionReply, session, settings] = await Promise.all([
+    getConclusionReply(data),
+    getServerSession(),
+    getSettings(),
+  ]);
 
   const url = canonicalPage(`/t/${encodeURIComponent(data.slug)}`);
-  const structuredData = publicThread && {
-    "@context": "https://schema.org",
-    "@type": "DiscussionForumPosting",
-    headline: publicThread.title,
-    description: publicThread.description,
-    text: publicThread.body,
-    url,
-    mainEntityOfPage: url,
-    datePublished: publicThread.createdAt,
-    dateModified: publicThread.updatedAt,
-    author: {
-      "@type": "Person",
-      name: publicThread.author.name,
-      url: canonicalPage(
-        `/m/${encodeURIComponent(publicThread.author.handle)}`,
-      ),
-    },
-    commentCount: publicThread.replies.results,
-    comment: publicThread.replies.replies
-      .filter(
-        (reply) =>
-          reply.visibility === "published" &&
-          data.replies.replies.some(
-            (visibleReply) => visibleReply.id === reply.id,
+  const isPublished = data.visibility === "published";
+  const isValidPage = (page ?? 1) <= Math.max(1, data.replies.total_pages);
+  const structuredData = isPublished &&
+    isValidPage && {
+      "@context": "https://schema.org",
+      "@type": "DiscussionForumPosting",
+      headline: data.title,
+      description: data.description,
+      text: data.body,
+      url,
+      mainEntityOfPage: url,
+      datePublished: data.createdAt,
+      dateModified: data.updatedAt,
+      author: {
+        "@type": "Person",
+        name: data.author.name,
+        url: canonicalPage(`/m/${encodeURIComponent(data.author.handle)}`),
+      },
+      commentCount: data.replies.results,
+      comment: data.replies.replies
+        .filter((reply) => reply.visibility === "published")
+        .map((reply) => ({
+          "@type": "Comment",
+          text: reply.body,
+          url: getPermalinkForPost(
+            encodeURIComponent(data.slug),
+            reply.id,
+            page,
           ),
-      )
-      .map((reply) => ({
-        "@type": "Comment",
-        text: reply.body,
-        url: getPermalinkForPost(
-          encodeURIComponent(publicThread.slug),
-          reply.id,
-          page,
-        ),
-        datePublished: reply.createdAt,
-        dateModified: reply.updatedAt,
-        author: {
-          "@type": "Person",
-          name: reply.author.name,
-          url: canonicalPage(`/m/${encodeURIComponent(reply.author.handle)}`),
-        },
-      })),
-  };
+          datePublished: reply.createdAt,
+          dateModified: reply.updatedAt,
+          author: {
+            "@type": "Person",
+            name: reply.author.name,
+            url: canonicalPage(`/m/${encodeURIComponent(reply.author.handle)}`),
+          },
+        })),
+    };
 
   return (
     <>
@@ -143,33 +134,27 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
   const settings = await getSettings();
   const title = `${thread.title} | ${settings.title}`;
-  const result = await getPublicThread(slug, page);
-  if (result.status === "not-public") {
+  const totalPages = Math.max(1, thread.replies.total_pages);
+  if (thread.visibility !== "published" || page > totalPages) {
     return { title, robots: { index: false, follow: false } };
   }
 
-  if (result.status === "unavailable") {
-    return { title };
-  }
-
-  const publicThread = result.data;
-  const path = `/t/${encodeURIComponent(publicThread.slug)}`;
+  const path = `/t/${encodeURIComponent(thread.slug)}`;
   const url = canonicalPage(path, page);
-  const totalPages = Math.max(1, publicThread.replies.total_pages);
 
   return {
     title,
-    description: publicThread.description,
+    description: thread.description,
     alternates: { canonical: url },
     pagination: pageLinks(path, page, totalPages),
     openGraph: {
       images: [socialImage(undefined, settings.title)],
       type: "article",
-      title: publicThread.title,
-      description: publicThread.description,
+      title: thread.title,
+      description: thread.description,
       url,
-      publishedTime: publicThread.createdAt,
-      modifiedTime: publicThread.updatedAt,
+      publishedTime: thread.createdAt,
+      modifiedTime: thread.updatedAt,
     },
   };
 }

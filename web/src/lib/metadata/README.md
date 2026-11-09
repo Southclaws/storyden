@@ -43,31 +43,39 @@ presentation require a publicly reachable deployment to verify.
 
 ## Page titles and public metadata
 
-Thread and Library document titles use the same authorized server read as the
-page body. A draft, a thread awaiting moderation, or an empty reply page can
-still have a valid title. Public canonical links, Open Graph fields and JSON-LD
-use only published content that an anonymous reader can access.
+Thread and Library pages share one request-scoped content read between the page
+body, document metadata and JSON-LD. All three use the incoming request's
+cookies. A crawler without a session receives the backend's anonymous response;
+a signed-in visitor receives the response authorised for that member. Page
+rendering does not make a second anonymous request to establish SEO eligibility.
 
-Anonymous denial (401, 403 or 404) disables public indexing for that content.
-A transient failure of a separate public read does not establish a denial: keep
-the successful SSR page and its document title, omit unavailable public data,
-and inherit the site's indexing policy. Failures of the critical viewer read
-still propagate. The public home-feed lookup follows the same distinction when
-resolving pagination metadata.
+Drafts, threads awaiting moderation and out-of-range reply pages retain their
+authorised titles with `noindex, nofollow` and omit published-content metadata.
+Published pages generate canonical links, Open Graph fields and JSON-LD from
+the same data displayed on the page. Thread JSON-LD includes only published
+replies from the current page. Library breadcrumbs use the returned ancestry.
+Failures of the shared content read propagate; a transient failure must not be
+classified as missing content.
+
+Standalone Library preview images still make one anonymous read. Other public
+surfaces, such as the home feed and profiles, also retain their anonymous reads.
+For these reads, 401, 403 and 404 establish a denial; transient errors mean the
+public data is unavailable rather than missing.
 
 Throwing a critical read failure does not guarantee an HTTP 5xx: a loading
 boundary may already have streamed a 200 response. Keep native streaming;
 do not classify transient failures as missing content to force a status code.
 
 The loaders use React's request-scoped `cache` to share reads within a render.
-The shared server API fetcher always uses `no-store`, for both viewer reads and
-anonymous SEO checks. Browser mutations go directly to the backend, so there is
+The shared server API fetcher always uses `no-store`. Browser mutations go
+directly to the backend, so there is
 no persistent Next.js API cache to invalidate when content or permissions change.
 Browser API requests retain their normal HTTP caching and ETag revalidation.
 Keep cookies and viewer-specific results outside any future shared `use cache` boundary.
 Native loading boundaries and metadata streaming remain in place, with no new
 client-side data fetching or JavaScript.
 
-`surfaces.test.ts` checks anonymous denials and transient failures separately.
+`surfaces.test.ts` checks request identity and request counts for Thread and
+Library rendering, as well as denied reads and transient failures.
 `tests/metadata/page-metadata.spec.ts` checks authorized titles, replies on an
 immediate refresh, and guest SSR with application scripts blocked.

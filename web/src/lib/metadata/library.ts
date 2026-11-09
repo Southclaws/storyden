@@ -5,7 +5,7 @@ import { nodeGet } from "@/api/openapi-server/nodes";
 
 import { isNotPublic, readPublicContent } from "./public";
 
-// Share the viewer's read between the document title and the page body.
+// Share the incoming request's response between metadata and the page body.
 export const getLibraryNode = cache(async (slug: string) => {
   try {
     const { data } = await nodeGet(slug);

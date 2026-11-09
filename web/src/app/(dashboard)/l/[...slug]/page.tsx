@@ -9,7 +9,7 @@ import {
   LibraryPageBlockTypeDirectory,
   parseNodeMetadata,
 } from "@/lib/library/metadata";
-import { getLibraryNode, getPublicNode } from "@/lib/metadata/library";
+import { getLibraryNode } from "@/lib/metadata/library";
 import { canonicalPage, jsonLD, socialImage } from "@/lib/metadata/public";
 import { getSettings } from "@/lib/settings/settings-server";
 import { LibraryPageScreen } from "@/screens/library/LibraryPageScreen/LibraryPageScreen";
@@ -37,22 +37,19 @@ export default async function Page(props: Props) {
   // NOTE: A waterfall request which can probably be avoided by fetching the
   // subtree. However subtrees do not currently support property filtering or
   // sorting so this may need a new API endpoint or a parameter for nodeGet.
-  const [children, result] = await Promise.all([
-    maybeGetChildren(data),
-    data.visibility === "published" ? getPublicNode(targetSlug) : undefined,
-  ]);
-  const publicNode = result?.status === "public" ? result.data : undefined;
+  const children = await maybeGetChildren(data);
 
-  const structuredData = publicNode && {
+  const isPublished = data.visibility === "published";
+  const structuredData = isPublished && {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: publicNode.name,
-    description: publicNode.description,
-    url: canonicalPage(`/l/${encodeURIComponent(publicNode.slug)}`),
-    datePublished: publicNode.createdAt,
-    dateModified: publicNode.updatedAt,
+    name: data.name,
+    description: data.description,
+    url: canonicalPage(`/l/${encodeURIComponent(data.slug)}`),
+    datePublished: data.createdAt,
+    dateModified: data.updatedAt,
   };
-  const breadcrumbs = publicNode && {
+  const breadcrumbs = isPublished && {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
@@ -62,7 +59,7 @@ export default async function Page(props: Props) {
         name: "Library",
         item: canonicalPage("/l"),
       },
-      ...[...publicNode.ancestors, publicNode].map((node, index) => ({
+      ...[...data.ancestors, data].map((node, index) => ({
         "@type": "ListItem",
         position: index + 2,
         name: node.name,
@@ -111,32 +108,22 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     return { title, robots: { index: false, follow: false } };
   }
 
-  const result = await getPublicNode(targetSlug);
-  if (result.status === "not-public") {
-    return { title, robots: { index: false, follow: false } };
-  }
-
-  if (result.status === "unavailable") {
-    return { title };
-  }
-
-  const publicNode = result.data;
-  const url = canonicalPage(`/l/${encodeURIComponent(publicNode.slug)}`);
+  const url = canonicalPage(`/l/${encodeURIComponent(node.slug)}`);
 
   return {
     title,
-    description: publicNode.description,
+    description: node.description,
     alternates: { canonical: url },
     openGraph: {
-      type: publicNode.content ? "article" : "website",
-      title: publicNode.name,
-      description: publicNode.description,
+      type: node.content ? "article" : "website",
+      title: node.name,
+      description: node.description,
       url,
       // Catch-all routes cannot reliably use an opengraph-image handler.
       images: [
         socialImage(
-          `/l/og?slug=${encodeURIComponent(publicNode.slug)}&t=${encodeURIComponent(publicNode.updatedAt)}`,
-          publicNode.name,
+          `/l/og?slug=${encodeURIComponent(node.slug)}&t=${encodeURIComponent(node.updatedAt)}`,
+          node.name,
         ),
       ],
     },

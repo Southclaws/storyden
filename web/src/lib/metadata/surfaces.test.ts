@@ -284,7 +284,7 @@ it("describes the anonymous profile, even when search indexing is disabled", asy
   ]);
 });
 
-it("builds breadcrumbs from anonymous ancestry, not URL segments or signed-in ancestors", async () => {
+it("builds breadcrumbs from the displayed ancestry instead of URL segments", async () => {
   const element = await LibraryPage({
     params: Promise.resolve({ slug: ["invented-parent", "drawing-colour"] }),
   });
@@ -304,8 +304,8 @@ it("builds breadcrumbs from anonymous ancestry, not URL segments or signed-in an
       {
         "@type": "ListItem",
         position: 2,
-        name: "Art",
-        item: "https://community.example/l/art",
+        name: "Private parent",
+        item: "https://community.example/l/private",
       },
       {
         "@type": "ListItem",
@@ -366,10 +366,9 @@ it("describes only the displayed public reply page and retains the total comment
       },
     },
   ]);
-  expect(
-    requests.filter((request) => !request.headers.has("Cookie")),
-  ).toHaveLength(1);
-  expect(new URL(requests[1]!.url).searchParams.get("page")).toBe("2");
+  expect(requests).toHaveLength(1);
+  expect(requests[0]!.headers.get("Cookie")).toBe("storyden-session=admin");
+  expect(new URL(requests[0]!.url).searchParams.get("page")).toBe("2");
 });
 
 it("describes the current category page with a bounded public item list", async () => {
@@ -472,13 +471,6 @@ it.each([401, 403, 404, 429, 500])(
     publicStatus = status;
     const pages = [
       await ProfilePage({ params: Promise.resolve({ handle: "ada" }) }),
-      await LibraryPage({
-        params: Promise.resolve({ slug: ["drawing-colour"] }),
-      }),
-      await ThreadPage({
-        params: Promise.resolve({ slug: thread.slug }),
-        searchParams: Promise.resolve({}),
-      }),
       await CategoryPage({
         params: Promise.resolve({ category: "art" }),
         searchParams: Promise.resolve({}),
@@ -496,6 +488,10 @@ it.each([401, 403, 404, 429, 500])(
 const metadataSurfaces = [
   {
     name: "library page",
+    page: () =>
+      LibraryPage({
+        params: Promise.resolve({ slug: ["drawing-colour"] }),
+      }),
     metadata: () =>
       libraryMetadata({
         params: Promise.resolve({ slug: ["drawing-colour"] }),
@@ -507,6 +503,11 @@ const metadataSurfaces = [
   },
   {
     name: "thread",
+    page: () =>
+      ThreadPage({
+        params: Promise.resolve({ slug: thread.slug }),
+        searchParams: Promise.resolve({}),
+      }),
     metadata: () =>
       threadMetadata({
         params: Promise.resolve({ slug: thread.slug }),
@@ -518,32 +519,6 @@ const metadataSurfaces = [
     },
   },
 ];
-
-it.each(
-  metadataSurfaces.flatMap((surface) =>
-    [401, 403, 404].map((status) => ({ ...surface, status })),
-  ),
-)(
-  "keeps the authorized $name title without public metadata on anonymous $status",
-  async ({ metadata, restricted, status }) => {
-    publicStatus = status;
-
-    expect(await metadata()).toEqual(restricted);
-  },
-);
-
-it.each(
-  metadataSurfaces.flatMap((surface) =>
-    [429, 500].map((status) => ({ ...surface, status })),
-  ),
-)(
-  "retains the $name title without manufacturing noindex on anonymous $status",
-  async ({ metadata, restricted, status }) => {
-    publicStatus = status;
-
-    expect(await metadata()).toEqual({ title: restricted.title });
-  },
-);
 
 it("does not emit a category collection for an invalid page", async () => {
   expect(
@@ -687,21 +662,38 @@ it.each([429, 500])(
   },
 );
 
-it("uses anonymous thread data for guest metadata and JSON-LD", async () => {
-  sessionPresent = false;
-  responses["/threads/thread-a-conversation"]!.signed = thread;
-  const props = {
-    params: Promise.resolve({ slug: thread.slug }),
-    searchParams: Promise.resolve({}),
-  };
+it.each(
+  metadataSurfaces.flatMap((surface) =>
+    [true, false].flatMap((authenticated) =>
+      ["page", "metadata"].map((read) => ({
+        ...surface,
+        authenticated,
+        read,
+      })),
+    ),
+  ),
+)(
+  "reads $name $read once using the incoming identity (authenticated=$authenticated)",
+  async ({ page, metadata, restricted, authenticated, read }) => {
+    sessionPresent = authenticated;
+    if (authenticated) {
+      publicStatus = 503;
+    } else {
+      signedStatus = 503;
+    }
 
-  expect((await threadMetadata(props)).title).toBe(
-    "A conversation | Community",
-  );
-  expect(structuredData(await ThreadPage(props))[0].headline).toBe(
-    "A conversation",
-  );
-  expect(requests.every((request) => !request.headers.get("Cookie"))).toBe(
-    true,
-  );
-});
+    if (read === "metadata") {
+      expect(await metadata()).toMatchObject({
+        title: restricted.title,
+        openGraph: expect.any(Object),
+      });
+    } else {
+      expect(structuredData(await page()).length).toBeGreaterThan(0);
+    }
+
+    expect(requests).toHaveLength(1);
+    expect(requests[0]!.headers.get("Cookie")).toBe(
+      authenticated ? "storyden-session=admin" : "",
+    );
+  },
+);
