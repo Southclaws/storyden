@@ -127,7 +127,9 @@ for (const viewport of [
     await expect(editor).toHaveAttribute("contenteditable", "true");
     await editor.click();
     await editor.fill(`Following up at ${viewport.width}px`);
-    await reply.getByRole("button", { name: "Post", exact: true }).click();
+    await reply
+      .getByRole("button", { name: "Post reply", exact: true })
+      .click();
     await expect(editor).toHaveText("");
     await threadTrigger.click();
     await expect(

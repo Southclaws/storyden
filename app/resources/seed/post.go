@@ -292,6 +292,7 @@ func threads(tr *thread_writer.Writer, pr *reply_writer.Writer, rr *reaction_rep
 			p, err = pr.Create(ctx,
 				p.Author.ID,
 				th.ID,
+				true,
 				reply_writer.WithContent(p.Content),
 				reply_writer.WithID(p.ID))
 			if err != nil {

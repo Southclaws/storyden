@@ -71,6 +71,11 @@ export type replyCreateResponse401 = {
   status: 401;
 };
 
+export type replyCreateResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
 export type replyCreateResponse404 = {
   data: NotFoundResponse;
   status: 404;
@@ -78,7 +83,7 @@ export type replyCreateResponse404 = {
 
 export type replyCreateResponseDefault = {
   data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 401 | 404>;
+  status: Exclude<HTTPStatusCodes, 200 | 401 | 403 | 404>;
 };
 
 export type replyCreateResponseSuccess = replyCreateResponse200 & {
@@ -86,6 +91,7 @@ export type replyCreateResponseSuccess = replyCreateResponse200 & {
 };
 export type replyCreateResponseError = (
   | replyCreateResponse401
+  | replyCreateResponse403
   | replyCreateResponse404
   | replyCreateResponseDefault
 ) & {
@@ -97,7 +103,9 @@ export const getReplyCreateUrl = (threadMark: string) => {
 };
 
 /**
- * Create a new post within a thread.
+ * Create a new post within a thread. When the thread is locked, only members
+ * with MANAGE_POSTS (including administrators) may reply, even if they are
+ * the thread author. Resolution alone does not restrict replies.
  */
 export const replyCreate = async (
   threadMark: string,

@@ -59,7 +59,10 @@ test.describe("Keyboard submission in WebKit", () => {
       await replyEditor.focus();
       await expect(replyEditor).toBeFocused();
       await replyEditor.fill("A reply posted from the keyboard.");
-      const post = form.getByRole("button", { name: "Post", exact: true });
+      const post = form.getByRole("button", {
+        name: "Post reply",
+        exact: true,
+      });
       await expect(post).toBeEnabled();
 
       const posted = page.waitForResponse(

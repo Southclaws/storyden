@@ -9,6 +9,7 @@ import {
 import { useSession } from "@/auth";
 import { Byline } from "@/components/content/Byline";
 import { CollectionMenu } from "@/components/content/CollectionMenu/CollectionMenu";
+import { ThreadLockedIcon } from "@/components/ui/icons/ThreadLock";
 import { Card } from "@/components/ui/surface";
 import { Text } from "@/components/ui/text";
 import { Box, HStack, styled } from "@/styled-system/jsx";
@@ -89,6 +90,7 @@ export const ThreadReferenceCard = memo(
       readStatusLabel,
       isPinned ? "Pinned discussion" : undefined,
       isResolved ? "Resolved" : undefined,
+      thread.locked_at ? "Locked" : undefined,
     ]
       .filter(Boolean)
       .join(". ");
@@ -116,6 +118,7 @@ export const ThreadReferenceCard = memo(
                 <title>Resolved</title>
               </ResolvedIcon>
             )}
+            {thread.locked_at && <ThreadLockedIcon />}
           </>
         }
         indicator={readState === "unread"}

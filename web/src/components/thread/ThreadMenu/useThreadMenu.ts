@@ -50,8 +50,8 @@ export function useThreadMenu({
   const { deleteThread, updateThread, revalidate } = useFeedMutations();
   const { updateReadStatus } = useThreadReadStatus(thread);
   const [isUpdatingReadStatus, setUpdatingReadStatus] = useState(false);
-  const { updateLifecycleState } = useThreadLifecycle(thread);
-  const [isUpdatingLifecycle, setUpdatingLifecycle] = useState(false);
+  const { updateLifecycleState, updateLocked } = useThreadLifecycle(thread);
+  const [isUpdatingState, setUpdatingState] = useState(false);
 
   const {
     isConfirming: isConfirmingDelete,
@@ -68,6 +68,8 @@ export function useThreadMenu({
   const isDeletingEnabled =
     canDeletePost(thread, account) && thread.deletedAt === undefined;
   const canPinThread = hasPermission(account, Permission.MANAGE_POSTS);
+  const canLockThread =
+    hasPermission(account, Permission.MANAGE_POSTS) && !thread.deletedAt;
   const isThreadPinned = (thread.pinned ?? 0) > 0;
   const canUpdateLifecycle = canEditPost(thread, account) && !thread.deletedAt;
   const isThreadResolved = thread.lifecycle_state === "resolved";
@@ -136,23 +138,21 @@ export function useThreadMenu({
     );
   }
 
-  async function handleLifecycleChange(state: ThreadLifecycleState) {
-    if (!canUpdateLifecycle || isUpdatingLifecycle) {
+  async function handleStateChange(
+    action: () => Promise<void>,
+    allowed: boolean,
+  ) {
+    if (!allowed || isUpdatingState) {
       return;
     }
 
-    setUpdatingLifecycle(true);
+    setUpdatingState(true);
 
-    await handle(
-      async () => {
-        await updateLifecycleState(state);
+    await handle(action, {
+      cleanup: async () => {
+        setUpdatingState(false);
       },
-      {
-        cleanup: async () => {
-          setUpdatingLifecycle(false);
-        },
-      },
-    );
+    });
   }
 
   async function handlePinThread() {
@@ -184,10 +184,12 @@ export function useThreadMenu({
     isDeletingEnabled,
     isConfirmingDelete,
     canPinThread,
+    canLockThread,
+    isUpdatingLock: isUpdatingState,
     isThreadPinned,
     canUpdateLifecycle,
     isThreadResolved,
-    isUpdatingLifecycle,
+    isUpdatingLifecycle: isUpdatingState,
     canUpdateReadStatus,
     isUnread,
     isUpdatingReadStatus,
@@ -198,8 +200,14 @@ export function useThreadMenu({
       handleConfirmDelete,
       handleCancelDelete,
       handlePinThread,
+      handleLockChange: (locked: boolean) =>
+        handleStateChange(() => updateLocked(locked), canLockThread),
       handleUnpinThread,
-      handleLifecycleChange,
+      handleLifecycleChange: (state: ThreadLifecycleState) =>
+        handleStateChange(
+          () => updateLifecycleState(state),
+          canUpdateLifecycle,
+        ),
       handleReadStatusChange,
     },
   };

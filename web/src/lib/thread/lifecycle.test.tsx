@@ -34,6 +34,57 @@ function withCache(cache: Cache) {
 }
 
 describe("thread lifecycle", () => {
+  it("locks and unlocks without changing resolution, the answer, or paginated replies", async () => {
+    const cache = new Map();
+    const firstPageKey = getThreadGetKey(thread.slug, { page: "1" });
+    const secondPageKey = getThreadGetKey(thread.id, { page: "2" });
+    const feedKey = getThreadListKey();
+    const secondPage = {
+      ...thread,
+      replies: { replies: [{ id: "second-page-reply" }] },
+    };
+    cache.set(unstable_serialize(secondPageKey), {
+      data: secondPage,
+      _k: secondPageKey,
+    });
+    cache.set(unstable_serialize(feedKey), {
+      data: { threads: [thread] },
+      _k: feedKey,
+    });
+    const { result } = renderHook(
+      () => {
+        const { data } = useSWR(firstPageKey, null, { fallbackData: thread });
+        return { data, ...useThreadLifecycle(data) };
+      },
+      { wrapper: withCache(cache) },
+    );
+
+    for (const lockedAt of ["2026-11-09T10:00:00Z", undefined]) {
+      vi.mocked(threadUpdate).mockResolvedValueOnce({
+        ...thread,
+        locked_at: lockedAt,
+      });
+      await act(async () => {
+        await result.current.updateLocked(Boolean(lockedAt));
+      });
+
+      expect(threadUpdate).toHaveBeenLastCalledWith(thread.id, {
+        locked: Boolean(lockedAt),
+      });
+      expect(result.current.data.locked_at).toBe(lockedAt);
+      expect(result.current.data.lifecycle_state).toBe("resolved");
+      expect(result.current.data.conclusion_reply_id).toBe("reply-id");
+      expect(result.current.data.replies).toEqual(thread.replies);
+      expect(cache.get(unstable_serialize(secondPageKey)).data).toEqual({
+        ...secondPage,
+        locked_at: lockedAt,
+      });
+      expect(
+        cache.get(unstable_serialize(feedKey)).data.threads[0].locked_at,
+      ).toBe(lockedAt);
+    }
+  });
+
   it("nominates and removes an answer while synchronising the detail and reply caches", async () => {
     const cache = new Map();
     const initial = {

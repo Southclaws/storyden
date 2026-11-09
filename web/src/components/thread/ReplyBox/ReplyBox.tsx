@@ -1,210 +1,50 @@
-import Link from "next/link";
 import { useState } from "react";
 
-import { ContentComposerField } from "@/components/content/ContentComposer";
-import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
-import { Anchor } from "@/components/site/Anchor";
-import { Admonition } from "@/components/ui/admonition";
-import { Button } from "@/components/ui/button";
-import { IconButton } from "@/components/ui/icon-button";
-import { CloseIcon } from "@/components/ui/icons/Close";
-import { DiscussionIcon } from "@/components/ui/icons/Discussion";
-import { Text } from "@/components/ui/text";
 import { usePublicRegistration } from "@/lib/settings/registration";
-import { css, cx } from "@/styled-system/css";
-import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
-import { cardBox } from "@/styled-system/recipes";
-import { timestamp } from "@/utils/date";
 
 import { useReplyContext } from "../ReplyContext";
 
+import { ReplyBoxView } from "./ReplyBoxView";
 import { Props, useReplyBox } from "./useReplyBox";
 
 export function ReplyBox(props: Props) {
   const { replyTo, clearReplyTo } = useReplyContext();
+  const state = useReplyBox(props);
+  const registrationAllowed = usePublicRegistration(props.initialSettings);
   const [isActivated, setIsActivated] = useState(false);
   const [focusOnReady, setFocusOnReady] = useState(false);
   const isActive = isActivated || !!replyTo;
-  const {
-    isLoggedIn,
-    isEmpty,
-    isLoading,
-    form,
-    draftKey,
-    postedReply,
-    handlers,
-  } = useReplyBox(props);
+  const isReplyingDisabled = Boolean(props.thread.locked_at) && !state.canReply;
 
   function handleActivate() {
+    if (isReplyingDisabled) {
+      return;
+    }
+
     setIsActivated(true);
     setFocusOnReady(true);
   }
 
+  function handleWarmEditor() {
+    setIsActivated(true);
+  }
+
   function handleClearReplyTo() {
-    // Keep the editor and any draft when removing the reply target.
     setIsActivated(true);
     clearReplyTo();
   }
 
-  if (!isLoggedIn) {
-    return <LoginToReply initialSettings={props.initialSettings} />;
-  }
-
   return (
-    <VStack
-      className="reply-composer"
-      w="full"
-      pb="12"
-      gap="2"
-      alignItems="stretch"
-    >
-      <Admonition
-        value={!!postedReply}
-        onChange={handlers.handleReplyPostedAdmonitionClose}
-      >
-        {postedReply && (
-          <LStack h="full" justifyContent="center">
-            <Text variant="supporting">
-              Your reply has been posted on{" "}
-              <Link
-                className={css({
-                  color: "interactive.emphasized.content",
-                  _hover: { textDecoration: "underline" },
-                })}
-                href={postedReply.permalink}
-                onClick={handlers.handleReplyNavigation}
-              >
-                page {postedReply.pageNumber}
-              </Link>
-              .
-            </Text>
-          </LStack>
-        )}
-      </Admonition>
-
-      <styled.form
-        className={cx("reply-composer__form", cardBox())}
-        display="flex"
-        flexDirection="column"
-        gap="1"
-        width="full"
-        onPointerEnter={(event) => {
-          if (event.pointerType === "mouse") {
-            setIsActivated(true);
-          }
-        }}
-        onPointerDown={(event) => {
-          // Remember a click on the placeholder while the editor downloads.
-          if (
-            event.target instanceof Element &&
-            event.target.closest(".content-composer--readonly")
-          ) {
-            handleActivate();
-          }
-        }}
-        onSubmit={(event) => {
-          setIsActivated(true);
-          return handlers.handleSubmit(event);
-        }}
-      >
-        {replyTo && (
-          <WStack py="1" px="2" borderRadius="md" bgColor="background.inset">
-            <HStack gap="1" fontSize="sm" color="text.subtle">
-              <span>Replying&nbsp;to</span>
-              <MemberIdent
-                profile={replyTo.reply.author}
-                name="handle"
-                size="xs"
-              />
-              <styled.a href={`#${replyTo.reply.id}`}>
-                {timestamp(replyTo.reply.createdAt)}
-              </styled.a>
-            </HStack>
-
-            <IconButton
-              type="button"
-              variant="ghost"
-              aria-label="Clear reply-to"
-              onClick={handleClearReplyTo}
-            >
-              <CloseIcon />
-            </IconButton>
-          </WStack>
-        )}
-
-        <HStack justifyContent="space-between">
-          <HStack gap="1">
-            <styled.span textWrap="nowrap">Reply to</styled.span>
-            <MemberIdent
-              profile={props.thread.author}
-              name="handle"
-              avatar="hidden"
-            />
-          </HStack>
-
-          <Button type="submit" disabled={isLoading || isEmpty}>
-            Post
-          </Button>
-        </HStack>
-
-        {isActive ? (
-          <ContentComposerField
-            name="body"
-            control={form.control}
-            focusOnReady={focusOnReady || !!replyTo}
-            onEmptyStateChange={handlers.handleEmptyStateChange}
-            key={draftKey}
-          />
-        ) : (
-          <Button
-            className="content-composer content-composer--idle reply-composer__trigger"
-            type="button"
-            variant="ghost"
-            aria-label="Write a reply"
-            w="full"
-            minH="8"
-            px="0"
-            alignItems="start"
-            justifyContent="start"
-            fontWeight="normal"
-            fontSize="md"
-            color="text.muted"
-            textAlign="start"
-            whiteSpace="normal"
-            onFocus={handleActivate}
-            onClick={handleActivate}
-          >
-            Write your heart out...
-          </Button>
-        )}
-      </styled.form>
-    </VStack>
-  );
-}
-
-function LoginToReply({
-  initialSettings,
-}: {
-  initialSettings?: Props["initialSettings"];
-}) {
-  const canRegister = usePublicRegistration(initialSettings);
-  const action = canRegister ? "sign up or log in" : "log in";
-
-  return (
-    <HStack
-      w="full"
-      p="8"
-      borderRadius="xl"
-      bgColor="border.strong"
-      justifyContent="center"
-    >
-      <DiscussionIcon width="4" />
-
-      <p>
-        Please{" "}
-        <Anchor href={canRegister ? "/register" : "/login"}>{action}</Anchor> to
-        reply
-      </p>
-    </HStack>
+    <ReplyBoxView
+      thread={props.thread}
+      state={state}
+      replyTo={replyTo?.reply ?? null}
+      registrationAllowed={registrationAllowed}
+      isActive={isActive}
+      focusOnReady={focusOnReady}
+      onActivate={handleActivate}
+      onWarmEditor={handleWarmEditor}
+      onClearReplyTo={handleClearReplyTo}
+    />
   );
 }

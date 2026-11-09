@@ -73,6 +73,7 @@ type Partial struct {
 	Visibility        opt.Optional[visibility.Visibility]
 	URL               opt.Optional[url.URL]
 	LifecycleState    opt.Optional[post.ThreadLifecycleState]
+	Locked            opt.Optional[bool]
 	ConclusionReplyID deletable.Value[post.ID]
 	Meta              opt.Optional[map[string]any]
 	Pinned            opt.Optional[int]
@@ -84,6 +85,7 @@ func (p Partial) Opts() (opts []thread_writer.Option) {
 	p.Category.Call(func(v xid.ID) { opts = append(opts, thread_writer.WithCategory(xid.ID(v))) })
 	p.Visibility.Call(func(v visibility.Visibility) { opts = append(opts, thread_writer.WithVisibility(v)) })
 	p.LifecycleState.Call(func(v post.ThreadLifecycleState) { opts = append(opts, thread_writer.WithLifecycleState(v)) })
+	p.Locked.Call(func(v bool) { opts = append(opts, thread_writer.WithLocked(v)) })
 	p.ConclusionReplyID.Call(
 		func(v post.ID) { opts = append(opts, thread_writer.WithConclusion(v)) },
 		func() { opts = append(opts, thread_writer.WithoutConclusion()) },

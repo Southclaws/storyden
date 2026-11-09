@@ -14,7 +14,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/reply_writer"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/moderation/checker"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
@@ -40,7 +42,8 @@ func (s *Mutator) Create(
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to invalidate thread cache"))
 	}
 
-	p, err := s.replyWriter.Create(ctx, authorID, parentID, opts...)
+	canReplyToLocked := session.Authorise(ctx, nil, rbac.PermissionManagePosts) == nil
+	p, err := s.replyWriter.Create(ctx, authorID, parentID, canReplyToLocked, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create reply post in thread"))
 	}

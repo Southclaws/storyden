@@ -56,6 +56,8 @@ type Post struct {
 	LinkID xid.ID `json:"link_id,omitempty"`
 	// LifecycleState holds the value of the "lifecycle_state" field.
 	LifecycleState post.LifecycleState `json:"lifecycle_state,omitempty"`
+	// LockedAt holds the value of the "locked_at" field.
+	LockedAt *time.Time `json:"locked_at,omitempty"`
 	// ConclusionPostID holds the value of the "conclusion_post_id" field.
 	ConclusionPostID *xid.ID `json:"conclusion_post_id,omitempty"`
 	// Arbitrary metadata used by clients to store domain specific information.
@@ -296,7 +298,7 @@ func (*Post) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case post.FieldTitle, post.FieldSlug, post.FieldBody, post.FieldShort, post.FieldVisibility, post.FieldLifecycleState:
 			values[i] = new(sql.NullString)
-		case post.FieldCreatedAt, post.FieldUpdatedAt, post.FieldDeletedAt, post.FieldIndexedAt, post.FieldLastReplyAt:
+		case post.FieldCreatedAt, post.FieldUpdatedAt, post.FieldDeletedAt, post.FieldIndexedAt, post.FieldLastReplyAt, post.FieldLockedAt:
 			values[i] = new(sql.NullTime)
 		case post.FieldID, post.FieldAccountPosts, post.FieldCategoryID, post.FieldLinkID:
 			values[i] = new(xid.ID)
@@ -426,6 +428,13 @@ func (_m *Post) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field lifecycle_state", values[i])
 			} else if value.Valid {
 				_m.LifecycleState = post.LifecycleState(value.String)
+			}
+		case post.FieldLockedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field locked_at", values[i])
+			} else if value.Valid {
+				_m.LockedAt = new(time.Time)
+				*_m.LockedAt = value.Time
 			}
 		case post.FieldConclusionPostID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -626,6 +635,11 @@ func (_m *Post) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("lifecycle_state=")
 	builder.WriteString(fmt.Sprintf("%v", _m.LifecycleState))
+	builder.WriteString(", ")
+	if v := _m.LockedAt; v != nil {
+		builder.WriteString("locked_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	if v := _m.ConclusionPostID; v != nil {
 		builder.WriteString("conclusion_post_id=")

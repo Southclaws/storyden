@@ -18,6 +18,11 @@ import type { ThreadLifecycleState } from "./threadLifecycleState";
 
 export interface ThreadReferenceProps {
   pinned: PinnedRank;
+  /**
+   * When this thread was locked. Absent when unlocked. Only members with
+   * Manage Posts (including administrators) may reply to a locked thread.
+   */
+  locked_at?: string;
   read_status?: ReadStatus;
   reply_status: ReplyStatus;
   category?: CategoryReference;

@@ -1,10 +1,14 @@
 import assert from "node:assert/strict";
 import { test } from "vitest";
 
-import type { Account, PostReference } from "@/api/openapi-schema";
+import type {
+  Account,
+  PostReference,
+  ThreadReference,
+} from "@/api/openapi-schema";
 import { Permission } from "@/api/openapi-schema";
 
-import { canDeletePost, canEditPost } from "./permissions";
+import { canDeletePost, canEditPost, canReplyToThread } from "./permissions";
 
 function account(id: string, permissions: string[] = []): Account {
   return {
@@ -51,4 +55,26 @@ test("canDeletePost/canEditPost denies non-author without permission", () => {
   const acc = account("user-1", [Permission.READ_PROFILE]);
   assert.ok(!canDeletePost(pr, acc));
   assert.ok(!canEditPost(pr, acc));
+});
+
+test("locked threads only allow replies from Manage Posts or administrators", () => {
+  const unlocked = { locked_at: undefined } as ThreadReference;
+  const locked = { locked_at: "2026-11-09T10:00:00Z" } as ThreadReference;
+
+  for (const acc of [account("author-1"), account("other-1")]) {
+    assert.ok(canReplyToThread(unlocked, acc));
+    assert.ok(!canReplyToThread(locked, acc));
+  }
+
+  for (const permission of [
+    Permission.MANAGE_POSTS,
+    Permission.ADMINISTRATOR,
+  ]) {
+    const acc = account("moderator-1", [permission]);
+    assert.ok(canReplyToThread(unlocked, acc));
+    assert.ok(canReplyToThread(locked, acc));
+  }
+
+  assert.ok(!canReplyToThread(unlocked));
+  assert.ok(!canReplyToThread(locked));
 });

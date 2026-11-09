@@ -82,6 +82,7 @@ import * as SuggestIcons from "./Suggest";
 import * as SystemIcons from "./System";
 import * as TagIcons from "./Tag";
 import * as ThreadConclusionIcons from "./ThreadConclusion";
+import * as ThreadLockIcons from "./ThreadLock";
 import * as ToolIcons from "./Tool";
 import * as ToolsetIcons from "./Toolset";
 import * as TypographyIcons from "./Typography";
@@ -168,6 +169,7 @@ const modules = {
   SystemIcons,
   TagIcons,
   ThreadConclusionIcons,
+  ThreadLockIcons,
   ToolIcons,
   ToolsetIcons,
   TypographyIcons,

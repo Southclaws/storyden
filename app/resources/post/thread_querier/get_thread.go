@@ -236,6 +236,13 @@ func (d *Querier) Get(ctx context.Context, threadID post.ID, pageParams paginati
 	}
 
 	accountLookup = account.NewAccountLookup(accountEdges)
+	threadResult.Edges.Author = accountLookup[threadResult.AccountPosts]
+
+	for _, p := range allPosts {
+		if p.RootPostID != nil && *p.RootPostID == threadResult.ID {
+			p.Edges.Root = threadResult
+		}
+	}
 
 	// Join all data together
 

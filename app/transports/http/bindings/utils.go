@@ -136,6 +136,7 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 		Collections:       serialiseCollectionStatus(t.Collections),
 		Link:              opt.Map(t.WebLink, serialiseLinkRef).Ptr(),
 		LifecycleState:    openapi.ThreadLifecycleState(t.LifecycleState.String()),
+		LockedAt:          t.LockedAt.Ptr(),
 		ConclusionReplyId: opt.PtrMap(t.ConclusionReplyID, func(id post.ID) string { return id.String() }),
 		Meta:              (*openapi.Metadata)(&t.Meta),
 	}
@@ -160,6 +161,7 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		Id:                openapi.Identifier(t.ID.String()),
 		Link:              opt.Map(t.WebLink, serialiseLinkRef).Ptr(),
 		LifecycleState:    openapi.ThreadLifecycleState(t.LifecycleState.String()),
+		LockedAt:          t.LockedAt.Ptr(),
 		ConclusionReplyId: opt.PtrMap(t.ConclusionReplyID, func(id post.ID) string { return id.String() }),
 		Meta:              (*openapi.Metadata)(&t.Meta),
 		Pinned:            t.Pinned,

@@ -40069,6 +40069,7 @@ type PostMutation struct {
 	short                *string
 	visibility           *post.Visibility
 	lifecycle_state      *post.LifecycleState
+	locked_at            *time.Time
 	metadata             *map[string]interface{}
 	clearedFields        map[string]struct{}
 	author               *xid.ID
@@ -40962,6 +40963,55 @@ func (m *PostMutation) OldLifecycleState(ctx context.Context) (v post.LifecycleS
 // ResetLifecycleState resets all changes to the "lifecycle_state" field.
 func (m *PostMutation) ResetLifecycleState() {
 	m.lifecycle_state = nil
+}
+
+// SetLockedAt sets the "locked_at" field.
+func (m *PostMutation) SetLockedAt(t time.Time) {
+	m.locked_at = &t
+}
+
+// LockedAt returns the value of the "locked_at" field in the mutation.
+func (m *PostMutation) LockedAt() (r time.Time, exists bool) {
+	v := m.locked_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLockedAt returns the old "locked_at" field's value of the Post entity.
+// If the Post object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PostMutation) OldLockedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLockedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLockedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLockedAt: %w", err)
+	}
+	return oldValue.LockedAt, nil
+}
+
+// ClearLockedAt clears the value of the "locked_at" field.
+func (m *PostMutation) ClearLockedAt() {
+	m.locked_at = nil
+	m.clearedFields[post.FieldLockedAt] = struct{}{}
+}
+
+// LockedAtCleared returns if the "locked_at" field was cleared in this mutation.
+func (m *PostMutation) LockedAtCleared() bool {
+	_, ok := m.clearedFields[post.FieldLockedAt]
+	return ok
+}
+
+// ResetLockedAt resets all changes to the "locked_at" field.
+func (m *PostMutation) ResetLockedAt() {
+	m.locked_at = nil
+	delete(m.clearedFields, post.FieldLockedAt)
 }
 
 // SetConclusionPostID sets the "conclusion_post_id" field.
@@ -41958,7 +42008,7 @@ func (m *PostMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PostMutation) Fields() []string {
-	fields := make([]string, 0, 19)
+	fields := make([]string, 0, 20)
 	if m.created_at != nil {
 		fields = append(fields, post.FieldCreatedAt)
 	}
@@ -42010,6 +42060,9 @@ func (m *PostMutation) Fields() []string {
 	if m.lifecycle_state != nil {
 		fields = append(fields, post.FieldLifecycleState)
 	}
+	if m.locked_at != nil {
+		fields = append(fields, post.FieldLockedAt)
+	}
 	if m.conclusion != nil {
 		fields = append(fields, post.FieldConclusionPostID)
 	}
@@ -42058,6 +42111,8 @@ func (m *PostMutation) Field(name string) (ent.Value, bool) {
 		return m.LinkID()
 	case post.FieldLifecycleState:
 		return m.LifecycleState()
+	case post.FieldLockedAt:
+		return m.LockedAt()
 	case post.FieldConclusionPostID:
 		return m.ConclusionPostID()
 	case post.FieldMetadata:
@@ -42105,6 +42160,8 @@ func (m *PostMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldLinkID(ctx)
 	case post.FieldLifecycleState:
 		return m.OldLifecycleState(ctx)
+	case post.FieldLockedAt:
+		return m.OldLockedAt(ctx)
 	case post.FieldConclusionPostID:
 		return m.OldConclusionPostID(ctx)
 	case post.FieldMetadata:
@@ -42237,6 +42294,13 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetLifecycleState(v)
 		return nil
+	case post.FieldLockedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLockedAt(v)
+		return nil
 	case post.FieldConclusionPostID:
 		v, ok := value.(xid.ID)
 		if !ok {
@@ -42320,6 +42384,9 @@ func (m *PostMutation) ClearedFields() []string {
 	if m.FieldCleared(post.FieldLinkID) {
 		fields = append(fields, post.FieldLinkID)
 	}
+	if m.FieldCleared(post.FieldLockedAt) {
+		fields = append(fields, post.FieldLockedAt)
+	}
 	if m.FieldCleared(post.FieldConclusionPostID) {
 		fields = append(fields, post.FieldConclusionPostID)
 	}
@@ -42363,6 +42430,9 @@ func (m *PostMutation) ClearField(name string) error {
 		return nil
 	case post.FieldLinkID:
 		m.ClearLinkID()
+		return nil
+	case post.FieldLockedAt:
+		m.ClearLockedAt()
 		return nil
 	case post.FieldConclusionPostID:
 		m.ClearConclusionPostID()
@@ -42428,6 +42498,9 @@ func (m *PostMutation) ResetField(name string) error {
 		return nil
 	case post.FieldLifecycleState:
 		m.ResetLifecycleState()
+		return nil
+	case post.FieldLockedAt:
+		m.ResetLockedAt()
 		return nil
 	case post.FieldConclusionPostID:
 		m.ResetConclusionPostID()

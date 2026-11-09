@@ -12,6 +12,7 @@ import type { Metadata } from "./metadata";
 import type { PinnedRank } from "./pinnedRank";
 import type { PostContent } from "./postContent";
 import type { TagNameList } from "./tagNameList";
+import type { ThreadLocked } from "./threadLocked";
 import type { ThreadTitle } from "./threadTitle";
 import type { Url } from "./url";
 import type { Visibility } from "./visibility";
@@ -19,6 +20,7 @@ import type { Visibility } from "./visibility";
 export interface ThreadInitialProps {
   title: ThreadTitle;
   pinned?: PinnedRank;
+  locked?: ThreadLocked;
   body?: PostContent;
   tags?: TagNameList;
   meta?: Metadata;

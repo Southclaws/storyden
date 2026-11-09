@@ -233,6 +233,20 @@ func (_c *PostCreate) SetNillableLifecycleState(v *post.LifecycleState) *PostCre
 	return _c
 }
 
+// SetLockedAt sets the "locked_at" field.
+func (_c *PostCreate) SetLockedAt(v time.Time) *PostCreate {
+	_c.mutation.SetLockedAt(v)
+	return _c
+}
+
+// SetNillableLockedAt sets the "locked_at" field if the given value is not nil.
+func (_c *PostCreate) SetNillableLockedAt(v *time.Time) *PostCreate {
+	if v != nil {
+		_c.SetLockedAt(*v)
+	}
+	return _c
+}
+
 // SetConclusionPostID sets the "conclusion_post_id" field.
 func (_c *PostCreate) SetConclusionPostID(v xid.ID) *PostCreate {
 	_c.mutation.SetConclusionPostID(v)
@@ -712,6 +726,10 @@ func (_c *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.LifecycleState(); ok {
 		_spec.SetField(post.FieldLifecycleState, field.TypeEnum, value)
 		_node.LifecycleState = value
+	}
+	if value, ok := _c.mutation.LockedAt(); ok {
+		_spec.SetField(post.FieldLockedAt, field.TypeTime, value)
+		_node.LockedAt = &value
 	}
 	if value, ok := _c.mutation.Metadata(); ok {
 		_spec.SetField(post.FieldMetadata, field.TypeJSON, value)
@@ -1309,6 +1327,24 @@ func (u *PostUpsert) UpdateLifecycleState() *PostUpsert {
 	return u
 }
 
+// SetLockedAt sets the "locked_at" field.
+func (u *PostUpsert) SetLockedAt(v time.Time) *PostUpsert {
+	u.Set(post.FieldLockedAt, v)
+	return u
+}
+
+// UpdateLockedAt sets the "locked_at" field to the value that was provided on create.
+func (u *PostUpsert) UpdateLockedAt() *PostUpsert {
+	u.SetExcluded(post.FieldLockedAt)
+	return u
+}
+
+// ClearLockedAt clears the value of the "locked_at" field.
+func (u *PostUpsert) ClearLockedAt() *PostUpsert {
+	u.SetNull(post.FieldLockedAt)
+	return u
+}
+
 // SetConclusionPostID sets the "conclusion_post_id" field.
 func (u *PostUpsert) SetConclusionPostID(v xid.ID) *PostUpsert {
 	u.Set(post.FieldConclusionPostID, v)
@@ -1680,6 +1716,27 @@ func (u *PostUpsertOne) SetLifecycleState(v post.LifecycleState) *PostUpsertOne 
 func (u *PostUpsertOne) UpdateLifecycleState() *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.UpdateLifecycleState()
+	})
+}
+
+// SetLockedAt sets the "locked_at" field.
+func (u *PostUpsertOne) SetLockedAt(v time.Time) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetLockedAt(v)
+	})
+}
+
+// UpdateLockedAt sets the "locked_at" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateLockedAt() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateLockedAt()
+	})
+}
+
+// ClearLockedAt clears the value of the "locked_at" field.
+func (u *PostUpsertOne) ClearLockedAt() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearLockedAt()
 	})
 }
 
@@ -2227,6 +2284,27 @@ func (u *PostUpsertBulk) SetLifecycleState(v post.LifecycleState) *PostUpsertBul
 func (u *PostUpsertBulk) UpdateLifecycleState() *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.UpdateLifecycleState()
+	})
+}
+
+// SetLockedAt sets the "locked_at" field.
+func (u *PostUpsertBulk) SetLockedAt(v time.Time) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetLockedAt(v)
+	})
+}
+
+// UpdateLockedAt sets the "locked_at" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateLockedAt() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateLockedAt()
+	})
+}
+
+// ClearLockedAt clears the value of the "locked_at" field.
+func (u *PostUpsertBulk) ClearLockedAt() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearLockedAt()
 	})
 }
 

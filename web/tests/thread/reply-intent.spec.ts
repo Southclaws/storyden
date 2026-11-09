@@ -47,11 +47,14 @@ for (const { mode, input } of [
         const document = new DOMParser().parseFromString(html, "text/html");
         return document.querySelector(".reply-composer__trigger")?.textContent;
       }, initialHTML);
-      expect(serverTrigger).toBe("Write your heart out...");
+      expect(serverTrigger).toBe("Write a reply…");
       const form = page.getByRole("main").locator(".reply-composer__form");
       await expect(form).toBeVisible();
       await expect(form.locator(".content-composer__editor")).toHaveCount(0);
-      const post = form.getByRole("button", { name: "Post", exact: true });
+      const post = form.getByRole("button", {
+        name: "Post reply",
+        exact: true,
+      });
       await expect(post).toBeDisabled();
       const formElement = await form.elementHandle();
       const postElement = await post.elementHandle();
@@ -186,7 +189,7 @@ for (const mode of ["richtext", "markdown"] as const) {
           `/api/threads/${thread.slug}/replies` &&
         response.request().method() === "POST",
     );
-    await form.getByRole("button", { name: "Post", exact: true }).click();
+    await form.getByRole("button", { name: "Post reply", exact: true }).click();
     const result = await posted;
     expect(result.ok()).toBe(true);
     const payload = result.request().postDataJSON();

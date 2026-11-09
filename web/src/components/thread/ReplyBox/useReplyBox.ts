@@ -10,6 +10,7 @@ import { useSession } from "@/auth";
 import { sendBeacon } from "@/lib/beacon/beacon";
 import type { Settings } from "@/lib/settings/settings";
 import { useThreadMutations } from "@/lib/thread/mutation";
+import { canReplyToThread } from "@/lib/thread/permissions";
 import { useThreadReadStatus } from "@/lib/thread/read-status";
 import * as z from "@/lib/validation";
 
@@ -108,6 +109,7 @@ export function useReplyBox({
 
   return {
     isLoggedIn: !!session,
+    canReply: canReplyToThread(thread, session),
     isEmpty,
     isLoading: form.formState.isSubmitting,
     draftKey,

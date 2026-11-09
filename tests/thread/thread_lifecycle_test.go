@@ -107,6 +107,11 @@ func TestThreadLifecycle(t *testing.T) {
 				for _, item := range listed.Replies.Replies {
 					r.Equal(thread.Id, item.RootId)
 					r.Equal(thread.Slug, item.RootSlug)
+
+					if item.ReplyTo != nil {
+						r.Equal(thread.Id, item.ReplyTo.RootId)
+						r.Equal(thread.Slug, item.ReplyTo.RootSlug)
+					}
 				}
 				tests.AssertRequest(cl.ReplyGetWithResponse(root, thread.Slug, nested.Id))(t, http.StatusOK)
 

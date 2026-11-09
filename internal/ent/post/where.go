@@ -131,6 +131,11 @@ func LinkID(v xid.ID) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldLinkID, v))
 }
 
+// LockedAt applies equality check predicate on the "locked_at" field. It's identical to LockedAtEQ.
+func LockedAt(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldEQ(FieldLockedAt, v))
+}
+
 // ConclusionPostID applies equality check predicate on the "conclusion_post_id" field. It's identical to ConclusionPostIDEQ.
 func ConclusionPostID(v xid.ID) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldConclusionPostID, v))
@@ -1104,6 +1109,56 @@ func LifecycleStateIn(vs ...LifecycleState) predicate.Post {
 // LifecycleStateNotIn applies the NotIn predicate on the "lifecycle_state" field.
 func LifecycleStateNotIn(vs ...LifecycleState) predicate.Post {
 	return predicate.Post(sql.FieldNotIn(FieldLifecycleState, vs...))
+}
+
+// LockedAtEQ applies the EQ predicate on the "locked_at" field.
+func LockedAtEQ(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldEQ(FieldLockedAt, v))
+}
+
+// LockedAtNEQ applies the NEQ predicate on the "locked_at" field.
+func LockedAtNEQ(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldNEQ(FieldLockedAt, v))
+}
+
+// LockedAtIn applies the In predicate on the "locked_at" field.
+func LockedAtIn(vs ...time.Time) predicate.Post {
+	return predicate.Post(sql.FieldIn(FieldLockedAt, vs...))
+}
+
+// LockedAtNotIn applies the NotIn predicate on the "locked_at" field.
+func LockedAtNotIn(vs ...time.Time) predicate.Post {
+	return predicate.Post(sql.FieldNotIn(FieldLockedAt, vs...))
+}
+
+// LockedAtGT applies the GT predicate on the "locked_at" field.
+func LockedAtGT(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldGT(FieldLockedAt, v))
+}
+
+// LockedAtGTE applies the GTE predicate on the "locked_at" field.
+func LockedAtGTE(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldGTE(FieldLockedAt, v))
+}
+
+// LockedAtLT applies the LT predicate on the "locked_at" field.
+func LockedAtLT(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldLT(FieldLockedAt, v))
+}
+
+// LockedAtLTE applies the LTE predicate on the "locked_at" field.
+func LockedAtLTE(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldLTE(FieldLockedAt, v))
+}
+
+// LockedAtIsNil applies the IsNil predicate on the "locked_at" field.
+func LockedAtIsNil() predicate.Post {
+	return predicate.Post(sql.FieldIsNull(FieldLockedAt))
+}
+
+// LockedAtNotNil applies the NotNil predicate on the "locked_at" field.
+func LockedAtNotNil() predicate.Post {
+	return predicate.Post(sql.FieldNotNull(FieldLockedAt))
 }
 
 // ConclusionPostIDEQ applies the EQ predicate on the "conclusion_post_id" field.

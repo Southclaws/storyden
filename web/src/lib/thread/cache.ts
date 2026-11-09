@@ -13,7 +13,11 @@ import type {
 type ThreadState = Partial<
   Pick<
     ThreadReference,
-    "read_status" | "lifecycle_state" | "conclusion_reply_id" | "updatedAt"
+    | "read_status"
+    | "lifecycle_state"
+    | "conclusion_reply_id"
+    | "locked_at"
+    | "updatedAt"
   >
 >;
 

@@ -7,9 +7,10 @@ import { useThreadMenu } from "./useThreadMenu";
 
 let sessionMock: any;
 const updateLifecycleState = vi.fn();
+const updateLocked = vi.fn();
 
 vi.mock("@/lib/thread/lifecycle", () => ({
-  useThreadLifecycle: () => ({ updateLifecycleState }),
+  useThreadLifecycle: () => ({ updateLifecycleState, updateLocked }),
 }));
 
 vi.mock("next/navigation", () => ({
@@ -60,6 +61,7 @@ vi.mock("@/utils/useCopyToClipboard", () => ({
 
 describe("useThreadMenu", () => {
   beforeEach(() => {
+    updateLocked.mockReset();
     sessionMock = {
       id: "moderator-1",
       roles: [{ id: "role-1", permissions: [Permission.MANAGE_POSTS] }],
@@ -115,6 +117,33 @@ describe("useThreadMenu", () => {
       });
       expect(updateLifecycleState).not.toHaveBeenCalled();
     }
+  });
+
+  it.each([
+    { name: "author", permissions: [], allowed: false },
+    { name: "manager", permissions: [Permission.MANAGE_POSTS], allowed: true },
+    {
+      name: "administrator",
+      permissions: [Permission.ADMINISTRATOR],
+      allowed: true,
+    },
+  ])("lock access for $name", async ({ permissions, allowed }) => {
+    sessionMock = { id: "author-1", roles: [{ permissions }] };
+    const { result } = renderHook(() =>
+      useThreadMenu({
+        thread: {
+          id: "thread-1",
+          slug: "thread-1",
+          author: { id: "author-1" },
+        } as any,
+      }),
+    );
+
+    expect(result.current.canLockThread).toBe(allowed);
+    await act(async () => {
+      await result.current.handlers.handleLockChange(true);
+    });
+    expect(updateLocked).toHaveBeenCalledTimes(allowed ? 1 : 0);
   });
 
   it("disables lifecycle changes while saving and allows reopening afterward", async () => {

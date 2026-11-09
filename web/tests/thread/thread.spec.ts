@@ -130,7 +130,9 @@ test.describe("Thread Replies", () => {
       await editor.pressSequentially("X");
       await editor.pressSequentially("Y");
       await expect.poll(() => editor.textContent()).toBe("helloXY ");
-      await form.getByRole("button", { name: "Post", exact: true }).click();
+      await form
+        .getByRole("button", { name: "Post reply", exact: true })
+        .click();
     }
     await expect(editor).toBeEmpty();
   });
@@ -564,7 +566,9 @@ test.describe("Thread Pagination", () => {
       await replyForm.hover();
       await replyEditor.click();
       await replyEditor.fill(`Reply number ${i} for pagination test.`);
-      await replyForm.getByRole("button", { name: "Post" }).click();
+      await replyForm
+        .getByRole("button", { name: "Post reply", exact: true })
+        .click();
       await expect(replyEditor).toHaveText("");
     }
 
@@ -572,17 +576,17 @@ test.describe("Thread Pagination", () => {
 
     await expect(
       page
-        .locator("li")
+        .getByRole("listitem")
         .filter({ hasText: "Reply number 1 for pagination test." }),
     ).toBeVisible();
     await expect(
       page
-        .locator("li")
+        .getByRole("listitem")
         .filter({ hasText: "Reply number 50 for pagination test." }),
     ).toBeVisible();
     await expect(
       page
-        .locator("li")
+        .getByRole("listitem")
         .filter({ hasText: "Reply number 51 for pagination test." }),
     ).not.toBeVisible();
 
@@ -594,22 +598,22 @@ test.describe("Thread Pagination", () => {
 
     await expect(
       page
-        .locator("li")
+        .getByRole("listitem")
         .filter({ hasText: "Reply number 51 for pagination test." }),
     ).toBeVisible();
     await expect(
       page
-        .locator("li")
+        .getByRole("listitem")
         .filter({ hasText: "Reply number 52 for pagination test." }),
     ).toBeVisible();
     await expect(
       page
-        .locator("li")
+        .getByRole("listitem")
         .filter({ hasText: "Reply number 53 for pagination test." }),
     ).toBeVisible();
     await expect(
       page
-        .locator("li")
+        .getByRole("listitem")
         .filter({ hasText: "Reply number 1 for pagination test." }),
     ).not.toBeVisible();
   });

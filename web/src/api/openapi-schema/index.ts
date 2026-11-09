@@ -1025,6 +1025,7 @@ export * from "./threadList";
 export * from "./threadListOKResponse";
 export * from "./threadListParams";
 export * from "./threadListResult";
+export * from "./threadLocked";
 export * from "./threadMark";
 export * from "./threadMutableProps";
 export * from "./threadReadStatusFilter";

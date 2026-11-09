@@ -110,6 +110,15 @@ func (s *service) Create(ctx context.Context,
 }
 
 func authoriseMutation(ctx context.Context, partial Partial) error {
+	if partial.Locked.Ok() {
+		if err := session.Authorise(ctx, nil, rbac.PermissionManagePosts); err != nil {
+			return fault.Wrap(err,
+				fctx.With(ctx),
+				fmsg.WithDesc("locked state", "Only members with Manage Posts may lock or unlock threads."),
+			)
+		}
+	}
+
 	if partial.Pinned.Ok() {
 		err := session.Authorise(ctx, nil, rbac.PermissionManagePosts)
 		if err != nil {

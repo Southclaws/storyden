@@ -39,6 +39,7 @@ func (Post) Fields() []ent.Field {
 		field.String("category_id").GoType(xid.ID{}).Optional(),
 		field.String("link_id").GoType(xid.ID{}).Optional(),
 		field.Enum("lifecycle_state").Values("open", "resolved").Default("open"),
+		field.Time("locked_at").Optional().Nillable(),
 		field.String("conclusion_post_id").GoType(xid.ID{}).Optional().Nillable(),
 		field.JSON("metadata", map[string]any{}).
 			Optional().

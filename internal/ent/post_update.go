@@ -320,6 +320,26 @@ func (_u *PostUpdate) SetNillableLifecycleState(v *post.LifecycleState) *PostUpd
 	return _u
 }
 
+// SetLockedAt sets the "locked_at" field.
+func (_u *PostUpdate) SetLockedAt(v time.Time) *PostUpdate {
+	_u.mutation.SetLockedAt(v)
+	return _u
+}
+
+// SetNillableLockedAt sets the "locked_at" field if the given value is not nil.
+func (_u *PostUpdate) SetNillableLockedAt(v *time.Time) *PostUpdate {
+	if v != nil {
+		_u.SetLockedAt(*v)
+	}
+	return _u
+}
+
+// ClearLockedAt clears the value of the "locked_at" field.
+func (_u *PostUpdate) ClearLockedAt() *PostUpdate {
+	_u.mutation.ClearLockedAt()
+	return _u
+}
+
 // SetConclusionPostID sets the "conclusion_post_id" field.
 func (_u *PostUpdate) SetConclusionPostID(v xid.ID) *PostUpdate {
 	_u.mutation.SetConclusionPostID(v)
@@ -1013,6 +1033,12 @@ func (_u *PostUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.LifecycleState(); ok {
 		_spec.SetField(post.FieldLifecycleState, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.LockedAt(); ok {
+		_spec.SetField(post.FieldLockedAt, field.TypeTime, value)
+	}
+	if _u.mutation.LockedAtCleared() {
+		_spec.ClearField(post.FieldLockedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(post.FieldMetadata, field.TypeJSON, value)
@@ -2035,6 +2061,26 @@ func (_u *PostUpdateOne) SetNillableLifecycleState(v *post.LifecycleState) *Post
 	return _u
 }
 
+// SetLockedAt sets the "locked_at" field.
+func (_u *PostUpdateOne) SetLockedAt(v time.Time) *PostUpdateOne {
+	_u.mutation.SetLockedAt(v)
+	return _u
+}
+
+// SetNillableLockedAt sets the "locked_at" field if the given value is not nil.
+func (_u *PostUpdateOne) SetNillableLockedAt(v *time.Time) *PostUpdateOne {
+	if v != nil {
+		_u.SetLockedAt(*v)
+	}
+	return _u
+}
+
+// ClearLockedAt clears the value of the "locked_at" field.
+func (_u *PostUpdateOne) ClearLockedAt() *PostUpdateOne {
+	_u.mutation.ClearLockedAt()
+	return _u
+}
+
 // SetConclusionPostID sets the "conclusion_post_id" field.
 func (_u *PostUpdateOne) SetConclusionPostID(v xid.ID) *PostUpdateOne {
 	_u.mutation.SetConclusionPostID(v)
@@ -2758,6 +2804,12 @@ func (_u *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) {
 	}
 	if value, ok := _u.mutation.LifecycleState(); ok {
 		_spec.SetField(post.FieldLifecycleState, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.LockedAt(); ok {
+		_spec.SetField(post.FieldLockedAt, field.TypeTime, value)
+	}
+	if _u.mutation.LockedAtCleared() {
+		_spec.ClearField(post.FieldLockedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(post.FieldMetadata, field.TypeJSON, value)

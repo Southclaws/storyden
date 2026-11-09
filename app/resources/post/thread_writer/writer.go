@@ -37,6 +37,16 @@ func New(db *ent.Client, roleQuerier *role_hydrate.Hydrator) *Writer {
 
 type Option func(*ent.PostMutation)
 
+func WithLocked(locked bool) Option {
+	return func(m *ent.PostMutation) {
+		if locked {
+			m.SetLockedAt(time.Now())
+		} else {
+			m.ClearLockedAt()
+		}
+	}
+}
+
 func WithID(id post.ID) Option {
 	return func(m *ent.PostMutation) {
 		m.SetID(xid.ID(id))

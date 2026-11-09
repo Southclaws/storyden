@@ -31,7 +31,9 @@ export const getReplyCreateUrl = (threadMark: string) => {
 };
 
 /**
- * Create a new post within a thread.
+ * Create a new post within a thread. When the thread is locked, only members
+ * with MANAGE_POSTS (including administrators) may reply, even if they are
+ * the thread author. Resolution alone does not restrict replies.
  */
 export const replyCreate = async (
   threadMark: string,
@@ -88,6 +90,7 @@ export type ReplyCreateMutationResult = NonNullable<
 export const useReplyCreate = <
   TError =
     | UnauthorisedResponse
+    | ForbiddenResponse
     | NotFoundResponse
     | InternalServerErrorResponse,
 >(

@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/reply_querier"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
@@ -87,6 +88,7 @@ func (d *Writer) Create(
 	ctx context.Context,
 	authorID account.AccountID,
 	parentID post.ID,
+	canReplyToLocked bool,
 	opts ...Option,
 ) (*reply.Reply, error) {
 	tx, err := d.db.Tx(ctx)
@@ -118,6 +120,13 @@ func (d *Writer) Create(
 
 	if thread.RootPostID != nil {
 		return nil, fault.New("attempt to create post under non-thread post", fmsg.WithDesc("invalid parent", "Cannot reply to a non-thread post."))
+	}
+
+	if thread.LockedAt != nil && !canReplyToLocked {
+		return nil, fault.Wrap(rbac.ErrPermissions,
+			fctx.With(ctx),
+			fmsg.WithDesc("thread locked", "This thread is locked. Only members with Manage Posts may reply."),
+		)
 	}
 
 	q := tx.Post.

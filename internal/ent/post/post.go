@@ -50,6 +50,8 @@ const (
 	FieldLinkID = "link_id"
 	// FieldLifecycleState holds the string denoting the lifecycle_state field in the database.
 	FieldLifecycleState = "lifecycle_state"
+	// FieldLockedAt holds the string denoting the locked_at field in the database.
+	FieldLockedAt = "locked_at"
 	// FieldConclusionPostID holds the string denoting the conclusion_post_id field in the database.
 	FieldConclusionPostID = "conclusion_post_id"
 	// FieldMetadata holds the string denoting the metadata field in the database.
@@ -214,6 +216,7 @@ var Columns = []string{
 	FieldCategoryID,
 	FieldLinkID,
 	FieldLifecycleState,
+	FieldLockedAt,
 	FieldConclusionPostID,
 	FieldMetadata,
 }
@@ -399,6 +402,11 @@ func ByLinkID(opts ...sql.OrderTermOption) OrderOption {
 // ByLifecycleState orders the results by the lifecycle_state field.
 func ByLifecycleState(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLifecycleState, opts...).ToFunc()
+}
+
+// ByLockedAt orders the results by the locked_at field.
+func ByLockedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLockedAt, opts...).ToFunc()
 }
 
 // ByConclusionPostID orders the results by the conclusion_post_id field.

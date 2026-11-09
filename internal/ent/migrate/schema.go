@@ -1289,6 +1289,7 @@ var (
 		{Name: "short", Type: field.TypeString},
 		{Name: "visibility", Type: field.TypeEnum, Enums: []string{"draft", "unlisted", "review", "published"}, Default: "draft"},
 		{Name: "lifecycle_state", Type: field.TypeEnum, Enums: []string{"open", "resolved"}, Default: "open"},
+		{Name: "locked_at", Type: field.TypeTime, Nullable: true},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_posts", Type: field.TypeString, Size: 20},
 		{Name: "category_id", Type: field.TypeString, Nullable: true, Size: 20},
@@ -1305,37 +1306,37 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "posts_accounts_posts",
-				Columns:    []*schema.Column{PostsColumns[14]},
+				Columns:    []*schema.Column{PostsColumns[15]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "posts_categories_posts",
-				Columns:    []*schema.Column{PostsColumns[15]},
+				Columns:    []*schema.Column{PostsColumns[16]},
 				RefColumns: []*schema.Column{CategoriesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "posts_links_posts",
-				Columns:    []*schema.Column{PostsColumns[16]},
+				Columns:    []*schema.Column{PostsColumns[17]},
 				RefColumns: []*schema.Column{LinksColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "posts_posts_posts",
-				Columns:    []*schema.Column{PostsColumns[17]},
-				RefColumns: []*schema.Column{PostsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "posts_posts_replies",
 				Columns:    []*schema.Column{PostsColumns[18]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "posts_posts_conclusions",
+				Symbol:     "posts_posts_replies",
 				Columns:    []*schema.Column{PostsColumns[19]},
+				RefColumns: []*schema.Column{PostsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "posts_posts_conclusions",
+				Columns:    []*schema.Column{PostsColumns[20]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -1344,17 +1345,17 @@ var (
 			{
 				Name:    "post_root_post_id_deleted_at_visibility_pinned_rank_last_reply_at",
 				Unique:  false,
-				Columns: []*schema.Column{PostsColumns[17], PostsColumns[3], PostsColumns[11], PostsColumns[7], PostsColumns[8]},
+				Columns: []*schema.Column{PostsColumns[18], PostsColumns[3], PostsColumns[11], PostsColumns[7], PostsColumns[8]},
 			},
 			{
 				Name:    "post_root_post_id_deleted_at_visibility_category_id_pinned_rank_last_reply_at",
 				Unique:  false,
-				Columns: []*schema.Column{PostsColumns[17], PostsColumns[3], PostsColumns[11], PostsColumns[15], PostsColumns[7], PostsColumns[8]},
+				Columns: []*schema.Column{PostsColumns[18], PostsColumns[3], PostsColumns[11], PostsColumns[16], PostsColumns[7], PostsColumns[8]},
 			},
 			{
 				Name:    "post_root_post_id_deleted_at_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{PostsColumns[17], PostsColumns[3], PostsColumns[1]},
+				Columns: []*schema.Column{PostsColumns[18], PostsColumns[3], PostsColumns[1]},
 			},
 		},
 	}

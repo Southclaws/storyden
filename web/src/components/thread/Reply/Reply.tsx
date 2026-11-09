@@ -99,7 +99,11 @@ export function Reply(props: Props) {
             </HStack>
           ) : (
             <HStack>
-              <ReplyToButton thread={thread} reply={reply} />
+              <ReplyToButton
+                initialSession={initialSession}
+                thread={thread}
+                reply={reply}
+              />
               <ReplyMenu
                 thread={thread}
                 reply={reply}

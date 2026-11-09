@@ -104,6 +104,7 @@ func Map(m *ent.Post) (*Thread, error) {
 			Assets:            dt.Map(m.Edges.Assets, asset.Map),
 			WebLink:           link,
 			LifecycleState:    post.ThreadLifecycleStateFromEnt(m.LifecycleState),
+			LockedAt:          opt.NewPtr(m.LockedAt),
 			ConclusionReplyID: opt.NewPtrMap(m.ConclusionPostID, func(id xid.ID) post.ID { return post.ID(id) }),
 			Meta:              m.Metadata,
 			Visibility:        visibility.NewVisibilityFromEnt(m.Visibility),
@@ -173,6 +174,7 @@ func Mapper(
 				Reacts:            reacts,
 				WebLink:           link,
 				LifecycleState:    post.ThreadLifecycleStateFromEnt(m.LifecycleState),
+				LockedAt:          opt.NewPtr(m.LockedAt),
 				ConclusionReplyID: opt.NewPtrMap(m.ConclusionPostID, func(id xid.ID) post.ID { return post.ID(id) }),
 				Meta:              m.Metadata,
 				Visibility:        visibility.NewVisibilityFromEnt(m.Visibility),
@@ -203,6 +205,7 @@ func MapRef(m *ent.Post) *ThreadRef {
 			Author:            profile.Ref{ID: account.AccountID(m.AccountPosts)},
 			Visibility:        visibility.NewVisibilityFromEnt(m.Visibility),
 			LifecycleState:    post.ThreadLifecycleStateFromEnt(m.LifecycleState),
+			LockedAt:          opt.NewPtr(m.LockedAt),
 			ConclusionReplyID: opt.NewPtrMap(m.ConclusionPostID, func(id xid.ID) post.ID { return post.ID(id) }),
 
 			CreatedAt: m.CreatedAt,
@@ -232,6 +235,7 @@ func ItemRef(t *ent.Post) (datagraph.Item, error) {
 			Author: profile.Ref{
 				ID: account.AccountID(t.AccountPosts),
 			},
+			LockedAt:   opt.NewPtr(t.LockedAt),
 			Visibility: visibility.NewVisibilityFromEnt(t.Visibility),
 			CreatedAt:  t.CreatedAt,
 			UpdatedAt:  t.UpdatedAt,

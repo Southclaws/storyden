@@ -52,6 +52,7 @@ type Post struct {
 	Assets            []*asset.Asset
 	WebLink           opt.Optional[link_ref.LinkRef]
 	LifecycleState    ThreadLifecycleState
+	LockedAt          opt.Optional[time.Time]
 	ConclusionReplyID opt.Optional[ID]
 	Meta              map[string]any
 	Visibility        visibility.Visibility
@@ -137,6 +138,7 @@ func Map(in *ent.Post) (*Post, error) {
 		Assets:            assets,
 		WebLink:           link,
 		LifecycleState:    ThreadLifecycleStateFromEnt(in.LifecycleState),
+		LockedAt:          opt.NewPtr(in.LockedAt),
 		ConclusionReplyID: opt.NewPtrMap(in.ConclusionPostID, func(id xid.ID) ID { return ID(id) }),
 		Meta:              in.Metadata,
 		Visibility:        vis,

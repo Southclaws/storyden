@@ -19,6 +19,10 @@ import {
 } from "@/components/ui/icons/ReadState";
 import { ResolvedIcon } from "@/components/ui/icons/Resolved";
 import { ShareIcon } from "@/components/ui/icons/Share";
+import {
+  ThreadLockedIcon,
+  ThreadUnlockedIcon,
+} from "@/components/ui/icons/ThreadLock";
 import * as Menu from "@/components/ui/menu";
 import { HStack, styled } from "@/styled-system/jsx";
 import { menuItemColorPalette } from "@/styled-system/patterns";
@@ -33,6 +37,8 @@ export function ThreadMenu(props: Props) {
     isDeletingEnabled,
     isConfirmingDelete,
     canPinThread,
+    canLockThread,
+    isUpdatingLock,
     isThreadPinned,
     canUpdateLifecycle,
     isThreadResolved,
@@ -44,6 +50,10 @@ export function ThreadMenu(props: Props) {
   } = useThreadMenu(props);
 
   const { thread } = props;
+  const lockActionLabel = thread.locked_at ? "Unlock thread" : "Lock thread";
+  const LockActionIcon = thread.locked_at
+    ? ThreadUnlockedIcon
+    : ThreadLockedIcon;
 
   return (
     <Menu.Root
@@ -155,6 +165,18 @@ export function ThreadMenu(props: Props) {
                 >
                   <HStack gap="1">
                     <DiscussionIcon /> Reopen thread
+                  </HStack>
+                </Menu.Item>
+              )}
+
+              {canLockThread && (
+                <Menu.Item
+                  value="toggle-lock"
+                  disabled={isUpdatingLock}
+                  onClick={() => handlers.handleLockChange(!thread.locked_at)}
+                >
+                  <HStack gap="1">
+                    <LockActionIcon /> {lockActionLabel}
                   </HStack>
                 </Menu.Item>
               )}

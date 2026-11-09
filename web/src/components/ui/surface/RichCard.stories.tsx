@@ -15,6 +15,7 @@ import { MoreIcon } from "../icons/More";
 import { PinIcon } from "../icons/Pin";
 import { ResolvedIcon } from "../icons/Resolved";
 import { ThreadConclusionIcon } from "../icons/ThreadConclusion";
+import { ThreadLockedIcon } from "../icons/ThreadLock";
 import { ToolsetIcon } from "../icons/Toolset";
 import { Input } from "../input";
 import { PropertyList } from "../property-list";
@@ -440,15 +441,16 @@ export const StateIcon: Story = {
 export const CombinedStateIcons: Story = {
   args: {
     id: "resolved-pinned-discussion",
-    title: "Pinned discussion with a resolved outcome",
+    title: "Pinned, resolved, and locked discussion",
     url: "/t/resolved-pinned-discussion",
     titleIcon: (
       <>
         <PinIcon />
         <ResolvedIcon color="status.success.content" />
+        <ThreadLockedIcon />
       </>
     ),
-    titleStatus: "Pinned discussion. Resolved",
+    titleStatus: "Pinned discussion. Resolved. Locked",
     shape: "responsive",
     disableAnchors: true,
   },
@@ -456,7 +458,7 @@ export const CombinedStateIcons: Story = {
     docs: {
       description: {
         story:
-          "Pinning and resolution are independent. Keep both markers visible and announce both states; success colour communicates resolution without changing the card's background or read state.",
+          "Pinning, resolution, and locking are independent. Keep each marker visible and announce each state; success colour communicates resolution without changing the card's background or read state.",
       },
     },
   },

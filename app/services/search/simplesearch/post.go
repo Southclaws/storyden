@@ -91,6 +91,7 @@ func (s *postSearcher) mapToThread(p *post.Post) (datagraph.Item, error) {
 			Assets:            p.Assets,
 			WebLink:           p.WebLink,
 			LifecycleState:    p.LifecycleState,
+			LockedAt:          p.LockedAt,
 			ConclusionReplyID: p.ConclusionReplyID,
 			Meta:              p.Meta,
 			CreatedAt:         p.CreatedAt,

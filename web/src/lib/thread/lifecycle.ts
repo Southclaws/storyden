@@ -26,10 +26,14 @@ export function useThreadLifecycle(
     await publishState({ conclusion_reply_id: reply?.id ?? null }, reply);
   }
 
+  async function updateLocked(locked: boolean) {
+    await publishState({ locked });
+  }
+
   async function publishState(
     partial: Pick<
       ThreadMutableProps,
-      "lifecycle_state" | "conclusion_reply_id"
+      "lifecycle_state" | "conclusion_reply_id" | "locked"
     >,
     reply?: Reply | null,
   ) {
@@ -43,9 +47,10 @@ export function useThreadLifecycle(
     await updateCachedThread({
       lifecycle_state: updated.lifecycle_state,
       conclusion_reply_id: updated.conclusion_reply_id,
+      locked_at: updated.locked_at,
       updatedAt: updated.updatedAt,
     });
   }
 
-  return { updateLifecycleState, updateConclusionReply };
+  return { updateLifecycleState, updateConclusionReply, updateLocked };
 }

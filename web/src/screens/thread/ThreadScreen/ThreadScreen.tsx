@@ -22,6 +22,7 @@ import { ThreadConclusion } from "@/components/thread/ThreadConclusion";
 import { ThreadDeletedAlert } from "@/components/thread/ThreadDeletedAlert";
 import { ThreadMenu } from "@/components/thread/ThreadMenu/ThreadMenu";
 import { ThreadTagListField } from "@/components/thread/ThreadTagList.field";
+import * as Alert from "@/components/ui/alert";
 import { ContentOutline } from "@/components/ui/content-outline";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { HeadingInputField } from "@/components/ui/heading-input";
@@ -31,6 +32,7 @@ import {
 } from "@/components/ui/icons/Discussion";
 import { LikeIcon, LikeSavedIcon } from "@/components/ui/icons/Like";
 import { ResolvedIcon } from "@/components/ui/icons/Resolved";
+import { ThreadLockedIcon } from "@/components/ui/icons/ThreadLock";
 import { PageHeading } from "@/components/ui/page-heading";
 import { VisibilityBadge } from "@/components/visibility/VisibilityBadge";
 import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
@@ -106,6 +108,20 @@ export function ThreadScreen(props: Props) {
                 />
               </HStack>
             </WStack>
+
+            {thread.locked_at && (
+              <Alert.Root tone="info" w="full" mb="4">
+                <Alert.Icon asChild>
+                  <ThreadLockedIcon />
+                </Alert.Icon>
+                <Alert.Content>
+                  <Alert.Title>Thread locked</Alert.Title>
+                  <Alert.Description>
+                    Only members with permission may reply.
+                  </Alert.Description>
+                </Alert.Content>
+              </Alert.Root>
+            )}
 
             {thread.deletedAt !== undefined && (
               <ThreadDeletedAlert thread={thread} />

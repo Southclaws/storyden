@@ -105,6 +105,7 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 			Visibility: status,
 			URL:        url,
 			Pinned:     pinned,
+			Locked:     opt.NewPtr(request.Body.Locked),
 		},
 	)
 	if err != nil {
@@ -165,6 +166,7 @@ func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdate
 		Visibility:        Visibility,
 		Pinned:            pinned,
 		LifecycleState:    lifecycleState,
+		Locked:            opt.NewPtr(request.Body.Locked),
 		ConclusionReplyID: conclusion,
 	})
 	if err != nil {
