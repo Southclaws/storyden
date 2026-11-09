@@ -47,7 +47,7 @@ export function LinkIndexView(props: Props) {
           type="submit"
           width="min"
         >
-          Search
+          {data.isURL ? "Add link" : "Search"}
         </Button>
       </styled.form>
 

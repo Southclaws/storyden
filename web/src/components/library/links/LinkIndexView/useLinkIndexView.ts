@@ -64,46 +64,47 @@ export function useLinkIndexView(props: Props) {
   }
 
   useEffect(() => {
-    if (!url) {
-      setIndexing({
-        state: "not-indexing",
-      });
+    setIndexing(defaultIndexingState);
+  }, [url]);
 
-      return;
-    }
+  async function createLink(url: string) {
+    setIndexing({
+      state: "indexing",
+      url,
+    });
 
-    (async () => {
-      setIndexing({
-        state: "indexing",
+    try {
+      const link = await linkCreate({
         url,
       });
 
-      try {
-        const link = await linkCreate({
-          url,
-        });
+      setIndexing({
+        state: "indexed",
+        link,
+      });
 
-        setIndexing({
-          state: "indexed",
-          link,
-        });
-      } catch (_) {
-        setIndexing({
-          state: "error",
-          error: "Failed to index the provided link.",
-        });
+      await props.mutate?.();
+    } catch (_) {
+      setIndexing({
+        state: "error",
+        error: "Failed to index the provided link.",
+      });
 
-        resetIndexingState();
-        return;
-      }
-    })();
-  }, [url]);
+      resetIndexingState();
+    }
+  }
 
   const handlePage = async (page: number) => {
     router.push(`/links?q=${q}&page=${page}`);
   };
 
   const handleSubmission = form.handleSubmit(async (payload) => {
+    const submittedURL = getURL(payload.q);
+    if (submittedURL) {
+      await createLink(submittedURL);
+      return;
+    }
+
     router.push(`/links?q=${payload.q}`);
   });
 
@@ -120,6 +121,7 @@ export function useLinkIndexView(props: Props) {
     form,
     data: {
       q,
+      isURL: url !== undefined,
       links: props.links,
       indexing,
     },
