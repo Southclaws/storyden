@@ -24,6 +24,7 @@ function queryResult(
   };
 }
 vi.mock("@/api/openapi-client/replies", () => ({ useReplyGet: vi.fn() }));
+vi.mock("@/auth", () => ({ useSession: () => undefined }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ prefetch: vi.fn() }),
 }));
@@ -70,6 +71,8 @@ function Preview(props: ComponentProps<typeof ThreadConclusion>) {
 
 describe("thread conclusion preview", () => {
   it("renders the SSR answer and links to its original position on another page", () => {
+    const fetch = vi.spyOn(globalThis, "fetch");
+
     vi.mocked(useReplyGet).mockImplementation((_slug, _id, options) =>
       queryResult(options?.swr?.fallbackData as Reply | undefined),
     );
@@ -79,6 +82,7 @@ describe("thread conclusion preview", () => {
     expect(
       screen.getByRole("link", { name: "View in thread" }),
     ).toHaveAttribute("href", "/t/locate/answer");
+    expect(fetch).not.toHaveBeenCalled();
   });
 
   it("renders a pointer instead of duplicating a reply on the current page", () => {
