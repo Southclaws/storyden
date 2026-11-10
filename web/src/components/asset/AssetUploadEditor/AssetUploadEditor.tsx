@@ -97,12 +97,13 @@ export function AssetUploadEditor(props: AssetUploadEditorProps) {
             Edit
           </styled.label>
           <Button
+            type="button"
             flexGrow="1"
             borderLeftRadius="none"
             borderTopRadius="none"
             borderRadius="xl"
             onClick={onSave}
-            disabled={saving}
+            disabled={saving || !file}
           >
             Save
           </Button>
