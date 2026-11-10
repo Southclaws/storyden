@@ -5,7 +5,6 @@ package thread
 import (
 	"context"
 	"log/slog"
-	"net/url"
 	"time"
 
 	"github.com/Southclaws/opt"
@@ -14,6 +13,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_read_state"
@@ -71,7 +71,7 @@ type Partial struct {
 	Category          opt.Optional[xid.ID]
 	Tags              opt.Optional[tag_ref.Names]
 	Visibility        opt.Optional[visibility.Visibility]
-	URL               opt.Optional[url.URL]
+	URL               opt.Optional[link_url.URL]
 	LifecycleState    opt.Optional[post.ThreadLifecycleState]
 	Locked            opt.Optional[bool]
 	ConclusionReplyID deletable.Value[post.ID]

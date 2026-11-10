@@ -2,7 +2,6 @@ package bindings
 
 import (
 	"context"
-	"net/url"
 	"strconv"
 	"time"
 
@@ -17,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
@@ -79,13 +79,7 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		return openapi.ParseID(cat)
 	})
 
-	url, err := opt.MapErr(opt.NewPtr(request.Body.Url), func(s string) (url.URL, error) {
-		u, err := url.Parse(s)
-		if err != nil {
-			return url.URL{}, err
-		}
-		return *u, nil
-	})
+	url, err := opt.MapErr(opt.NewPtr(request.Body.Url), link_url.Parse)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}

@@ -2,18 +2,16 @@ package bindings
 
 import (
 	"context"
-	"net/url"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/fault/fmsg"
-	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/link"
 	"github.com/Southclaws/storyden/app/resources/link/link_querier"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
 
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
@@ -39,17 +37,14 @@ func NewLinks(
 }
 
 func (i *Links) LinkCreate(ctx context.Context, request openapi.LinkCreateRequestObject) (openapi.LinkCreateResponseObject, error) {
-	u, err := url.Parse(request.Body.Url)
+	u, err := link_url.Parse(request.Body.Url)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	link, err := i.fetcher.Fetch(ctx, *u)
+	link, err := i.fetcher.Fetch(ctx, u)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx),
-			fmsg.WithDesc("failed to fetch link",
-				"The URL could not be fetched. It may be invalid or the server may be unreachable.",
-			), ftag.With(ftag.InvalidArgument))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.LinkCreate200JSONResponse{
@@ -96,35 +91,45 @@ func (i *Links) LinkGet(ctx context.Context, request openapi.LinkGetRequestObjec
 
 func serialiseLink(in *link.Link) openapi.Link {
 	return openapi.Link{
-		Id:             in.ID.String(),
-		CreatedAt:      in.CreatedAt,
-		UpdatedAt:      in.UpdatedAt,
-		Url:            in.URL,
-		Slug:           in.Slug,
-		Domain:         in.Domain,
-		Title:          in.Title.Ptr(),
-		Description:    in.Description.Ptr(),
-		FaviconImage:   opt.Map(in.FaviconImage, serialiseAsset).Ptr(),
-		PrimaryImage:   opt.Map(in.PrimaryImage, serialiseAsset).Ptr(),
-		Assets:         dt.Map(in.Assets, serialiseAssetPtr),
-		Nodes:          dt.Map(in.Nodes, serialiseNode),
-		Posts:          dt.Map(in.Posts, serialisePostRef),
-		Recomentations: dt.Map(in.Related, serialiseDatagraphItem),
+		Id:                in.ID.String(),
+		CreatedAt:         in.CreatedAt,
+		UpdatedAt:         in.UpdatedAt,
+		Url:               in.URL.String(),
+		Slug:              in.Slug,
+		Domain:            in.Domain,
+		Title:             in.Title.Ptr(),
+		Description:       in.Description.Ptr(),
+		LivenessStatus:    opt.New(openapi.LinkLivenessStatus(in.LivenessStatus)).Ptr(),
+		LivenessCheckedAt: in.LivenessCheckedAt,
+		ScrapeStatus:      opt.New(openapi.LinkScrapeStatus(in.ScrapeStatus)).Ptr(),
+		ScrapeAttemptedAt: in.ScrapeAttemptedAt,
+		ScrapedAt:         in.ScrapedAt,
+		FaviconImage:      opt.Map(in.FaviconImage, serialiseAsset).Ptr(),
+		PrimaryImage:      opt.Map(in.PrimaryImage, serialiseAsset).Ptr(),
+		Assets:            dt.Map(in.Assets, serialiseAssetPtr),
+		Nodes:             dt.Map(in.Nodes, serialiseNode),
+		Posts:             dt.Map(in.Posts, serialisePostRef),
+		Recomentations:    dt.Map(in.Related, serialiseDatagraphItem),
 	}
 }
 
 func serialiseLinkRef(in link_ref.LinkRef) openapi.LinkReference {
 	return openapi.LinkReference{
-		Id:           in.ID.String(),
-		CreatedAt:    in.CreatedAt,
-		UpdatedAt:    in.UpdatedAt,
-		Slug:         in.Slug,
-		Url:          in.URL,
-		Domain:       in.Domain,
-		Title:        in.Title.Ptr(),
-		Description:  in.Description.Ptr(),
-		FaviconImage: opt.Map(in.FaviconImage, serialiseAsset).Ptr(),
-		PrimaryImage: opt.Map(in.PrimaryImage, serialiseAsset).Ptr(),
+		Id:                in.ID.String(),
+		CreatedAt:         in.CreatedAt,
+		UpdatedAt:         in.UpdatedAt,
+		Slug:              in.Slug,
+		Url:               in.URL.String(),
+		Domain:            in.Domain,
+		Title:             in.Title.Ptr(),
+		Description:       in.Description.Ptr(),
+		LivenessStatus:    opt.New(openapi.LinkLivenessStatus(in.LivenessStatus)).Ptr(),
+		LivenessCheckedAt: in.LivenessCheckedAt,
+		ScrapeStatus:      opt.New(openapi.LinkScrapeStatus(in.ScrapeStatus)).Ptr(),
+		ScrapeAttemptedAt: in.ScrapeAttemptedAt,
+		ScrapedAt:         in.ScrapedAt,
+		FaviconImage:      opt.Map(in.FaviconImage, serialiseAsset).Ptr(),
+		PrimaryImage:      opt.Map(in.PrimaryImage, serialiseAsset).Ptr(),
 	}
 }
 

@@ -3985,26 +3985,32 @@ paths:
     post:
       operationId: LinkCreate
       description: |
-        Add a link to the community bookmarks. This will also scrape the content
-        at the site the link points to, if possible. If scraping fails, the link
-        is stored with basic information instead of scraped metadata.
+        Save a URL as a community bookmark and retrieve available page metadata.
+        Only public HTTP(S) URLs with fully qualified DNS hostnames, no
+        credentials, and no explicit ports are accepted, including redirect
+        destinations.
 
-        If the submitted URL already exists, the existing link is returned and a
-        background scrape is queued to refresh its metadata. The handler
-        consumes only the `url` field; submitted `title` and `description` are
-        not applied.
+        New bookmarks use the final URL reached after redirects. If that URL is
+        already bookmarked, the existing link is returned. Paths, queries, and
+        fragments distinguish bookmarks.
 
-        The submitted URL is used for lookup and storage without removing its
-        fragment. Use the returned link resource to inspect the stored metadata.
+        Unavailable pages can still be bookmarked. Metadata may be refreshed
+        asynchronously; failed refreshes preserve previously saved metadata.
+        Submitted titles and descriptions are ignored.
       tags: [links]
       requestBody: { $ref: "#/components/requestBodies/LinkCreate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/LinkCreateOK" }
     get:
       operationId: LinkList
-      description: List all links using the filtering options.
+      description: |
+        List links with paginated search. Text searches match titles,
+        descriptions, and URLs. URL and domain searches match HTTP and HTTPS
+        forms with or without www, while distinguishing different hostnames.
+        Search does not create or refresh links.
       tags: [links]
       parameters:
         - $ref: "#/components/parameters/SearchQuery"
@@ -12988,6 +12994,35 @@ components:
         description: { $ref: "#/components/schemas/LinkDescription" }
         favicon_image: { $ref: "#/components/schemas/Asset" }
         primary_image: { $ref: "#/components/schemas/Asset" }
+        liveness_status: { $ref: "#/components/schemas/LinkLivenessStatus" }
+        liveness_checked_at:
+          type: string
+          format: date-time
+          description: When the link was last checked for reachability.
+        scrape_status: { $ref: "#/components/schemas/LinkScrapeStatus" }
+        scrape_attempted_at:
+          type: string
+          format: date-time
+          description: When the latest scrape attempt was recorded.
+        scraped_at:
+          type: string
+          format: date-time
+          description: When metadata was last successfully scraped.
+
+    LinkLivenessStatus:
+      type: string
+      enum: [unknown, alive, offline]
+      description: |
+        Whether the link is reachable, unreachable, or has no conclusive result.
+        Liveness checks preserve saved page metadata.
+
+    LinkScrapeStatus:
+      type: string
+      enum: [pending, success, failed]
+      description: |
+        Whether page metadata is awaiting retrieval, was retrieved successfully,
+        or could not be retrieved. Failed refreshes preserve previously saved
+        metadata.
 
     LinkTitle:
       type: string

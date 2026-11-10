@@ -41,7 +41,7 @@ func TestNodesHappyPath(t *testing.T) {
 			name1 := "test-node-1"
 			slug1 := name1 + uuid.NewString()
 			content1 := "<h1>Nodes</h1><p>Rich text content.</p>"
-			url1 := "https://southcla.ws"
+			url1 := "https://node-create-" + uuid.NewString() + ".invalid/"
 			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 				Name:       name1,
 				Slug:       &slug1,
@@ -75,7 +75,7 @@ func TestNodesHappyPath(t *testing.T) {
 			name1 = "test-node-1-updated"
 			slug1 = name1 + uuid.NewString()
 			cont1 := "<h1>Nodes</h1><p>Newly changed content.</p>"
-			url1 = "https://cla.ws"
+			url1 = "https://node-update-" + uuid.NewString() + ".invalid/"
 			prop1 := openapi.Metadata(map[string]any{
 				"key": "value",
 			})
@@ -117,7 +117,7 @@ func TestNodesHappyPath(t *testing.T) {
 			t.Run("remove_link", func(t *testing.T) {
 				name3 := "test-node-with-link" + uuid.NewString()
 				slug3 := name3
-				url3 := "https://example.com"
+				url3 := "https://example.invalid/"
 				node3, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 					Name:       name3,
 					Slug:       &slug3,

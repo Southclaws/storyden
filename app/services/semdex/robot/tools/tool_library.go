@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_properties"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
@@ -345,13 +346,13 @@ func (lt *libraryTools) ExecuteLibraryPageCreate(ctx context.Context, args mcp.T
 		richContent = opt.New(rc)
 	}
 
-	var urlParsed deletable.Value[url.URL]
+	var urlParsed deletable.Value[link_url.URL]
 	if args.Url != nil {
-		u, err := url.Parse(*args.Url)
+		u, err := link_url.Parse(*args.Url)
 		if err != nil {
 			return nil, err
 		}
-		urlParsed = deletable.Skip(opt.New(*u))
+		urlParsed = deletable.Skip(opt.New(u))
 	}
 
 	var slug opt.Optional[mark.Slug]
@@ -463,11 +464,11 @@ func (lt *libraryTools) ExecuteLibraryPageUpdate(ctx context.Context, args mcp.T
 	}
 
 	if args.Url != nil {
-		u, err := url.Parse(*args.Url)
+		u, err := link_url.Parse(*args.Url)
 		if err != nil {
 			return nil, err
 		}
-		partial.URL = deletable.Skip(opt.New(*u))
+		partial.URL = deletable.Skip(opt.New(u))
 	}
 
 	if args.Slug != nil {

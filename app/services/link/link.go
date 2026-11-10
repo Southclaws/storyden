@@ -2,6 +2,7 @@ package link
 
 import (
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
+	"github.com/Southclaws/storyden/app/services/link/liveness"
 	"github.com/Southclaws/storyden/app/services/link/scrape"
 	"github.com/Southclaws/storyden/app/services/link/scrape_job"
 	"go.uber.org/fx"
@@ -14,5 +15,6 @@ func Build() fx.Option {
 			scrape.New,
 		),
 		scrape_job.Build(),
+		liveness.Build(),
 	)
 }

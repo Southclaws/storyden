@@ -3,7 +3,6 @@ package tools
 import (
 	"context"
 	"fmt"
-	"net/url"
 	"strings"
 
 	"github.com/Southclaws/opt"
@@ -14,6 +13,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -220,12 +220,12 @@ func (f libraryBatchFields) parse() (node_mutate.BatchFields, error) {
 	}
 
 	if f.URL != nil {
-		value, err := url.Parse(*f.URL)
+		value, err := link_url.Parse(*f.URL)
 		if err != nil {
 			return fields, err
 		}
 
-		fields.URL = opt.New(*value)
+		fields.URL = opt.New(value)
 	}
 
 	if f.Visibility != nil {

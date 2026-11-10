@@ -3,7 +3,6 @@ package node_mutate
 import (
 	"context"
 	"fmt"
-	"net/url"
 	"strings"
 
 	"github.com/Southclaws/opt"
@@ -13,6 +12,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -25,7 +25,7 @@ type BatchFields struct {
 	Slug       opt.Optional[mark.Slug]
 	Content    opt.Optional[datagraph.Content]
 	Parent     opt.Optional[library.QueryKey]
-	URL        opt.Optional[url.URL]
+	URL        opt.Optional[link_url.URL]
 	Tags       opt.Optional[tag_ref.Names]
 	Visibility opt.Optional[visibility.Visibility]
 }
@@ -76,8 +76,8 @@ func (f BatchFields) validate() error {
 		return fmt.Errorf("parent must identify a page")
 	}
 
-	if u, ok := f.URL.Get(); ok && ((u.Scheme != "http" && u.Scheme != "https") || u.Hostname() == "") {
-		return fmt.Errorf("URL must be an absolute HTTP or HTTPS URL")
+	if u, ok := f.URL.Get(); ok && u.IsZero() {
+		return link_url.ErrEmpty
 	}
 
 	if v, ok := f.Visibility.Get(); ok && v != visibility.VisibilityPublished && v != visibility.VisibilityDraft {

@@ -71,6 +71,90 @@ func (_c *LinkCreate) SetDescription(v string) *LinkCreate {
 	return _c
 }
 
+// SetLivenessStatus sets the "liveness_status" field.
+func (_c *LinkCreate) SetLivenessStatus(v link.LivenessStatus) *LinkCreate {
+	_c.mutation.SetLivenessStatus(v)
+	return _c
+}
+
+// SetNillableLivenessStatus sets the "liveness_status" field if the given value is not nil.
+func (_c *LinkCreate) SetNillableLivenessStatus(v *link.LivenessStatus) *LinkCreate {
+	if v != nil {
+		_c.SetLivenessStatus(*v)
+	}
+	return _c
+}
+
+// SetLivenessCheckedAt sets the "liveness_checked_at" field.
+func (_c *LinkCreate) SetLivenessCheckedAt(v time.Time) *LinkCreate {
+	_c.mutation.SetLivenessCheckedAt(v)
+	return _c
+}
+
+// SetNillableLivenessCheckedAt sets the "liveness_checked_at" field if the given value is not nil.
+func (_c *LinkCreate) SetNillableLivenessCheckedAt(v *time.Time) *LinkCreate {
+	if v != nil {
+		_c.SetLivenessCheckedAt(*v)
+	}
+	return _c
+}
+
+// SetLivenessFailures sets the "liveness_failures" field.
+func (_c *LinkCreate) SetLivenessFailures(v int) *LinkCreate {
+	_c.mutation.SetLivenessFailures(v)
+	return _c
+}
+
+// SetNillableLivenessFailures sets the "liveness_failures" field if the given value is not nil.
+func (_c *LinkCreate) SetNillableLivenessFailures(v *int) *LinkCreate {
+	if v != nil {
+		_c.SetLivenessFailures(*v)
+	}
+	return _c
+}
+
+// SetScrapeStatus sets the "scrape_status" field.
+func (_c *LinkCreate) SetScrapeStatus(v link.ScrapeStatus) *LinkCreate {
+	_c.mutation.SetScrapeStatus(v)
+	return _c
+}
+
+// SetNillableScrapeStatus sets the "scrape_status" field if the given value is not nil.
+func (_c *LinkCreate) SetNillableScrapeStatus(v *link.ScrapeStatus) *LinkCreate {
+	if v != nil {
+		_c.SetScrapeStatus(*v)
+	}
+	return _c
+}
+
+// SetScrapeAttemptedAt sets the "scrape_attempted_at" field.
+func (_c *LinkCreate) SetScrapeAttemptedAt(v time.Time) *LinkCreate {
+	_c.mutation.SetScrapeAttemptedAt(v)
+	return _c
+}
+
+// SetNillableScrapeAttemptedAt sets the "scrape_attempted_at" field if the given value is not nil.
+func (_c *LinkCreate) SetNillableScrapeAttemptedAt(v *time.Time) *LinkCreate {
+	if v != nil {
+		_c.SetScrapeAttemptedAt(*v)
+	}
+	return _c
+}
+
+// SetScrapedAt sets the "scraped_at" field.
+func (_c *LinkCreate) SetScrapedAt(v time.Time) *LinkCreate {
+	_c.mutation.SetScrapedAt(v)
+	return _c
+}
+
+// SetNillableScrapedAt sets the "scraped_at" field if the given value is not nil.
+func (_c *LinkCreate) SetNillableScrapedAt(v *time.Time) *LinkCreate {
+	if v != nil {
+		_c.SetScrapedAt(*v)
+	}
+	return _c
+}
+
 // SetPrimaryAssetID sets the "primary_asset_id" field.
 func (_c *LinkCreate) SetPrimaryAssetID(v xid.ID) *LinkCreate {
 	_c.mutation.SetPrimaryAssetID(v)
@@ -265,6 +349,18 @@ func (_c *LinkCreate) defaults() {
 		v := link.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
 	}
+	if _, ok := _c.mutation.LivenessStatus(); !ok {
+		v := link.DefaultLivenessStatus
+		_c.mutation.SetLivenessStatus(v)
+	}
+	if _, ok := _c.mutation.LivenessFailures(); !ok {
+		v := link.DefaultLivenessFailures
+		_c.mutation.SetLivenessFailures(v)
+	}
+	if _, ok := _c.mutation.ScrapeStatus(); !ok {
+		v := link.DefaultScrapeStatus
+		_c.mutation.SetScrapeStatus(v)
+	}
 	if _, ok := _c.mutation.ID(); !ok {
 		v := link.DefaultID()
 		_c.mutation.SetID(v)
@@ -290,6 +386,25 @@ func (_c *LinkCreate) check() error {
 	}
 	if _, ok := _c.mutation.Description(); !ok {
 		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Link.description"`)}
+	}
+	if _, ok := _c.mutation.LivenessStatus(); !ok {
+		return &ValidationError{Name: "liveness_status", err: errors.New(`ent: missing required field "Link.liveness_status"`)}
+	}
+	if v, ok := _c.mutation.LivenessStatus(); ok {
+		if err := link.LivenessStatusValidator(v); err != nil {
+			return &ValidationError{Name: "liveness_status", err: fmt.Errorf(`ent: validator failed for field "Link.liveness_status": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.LivenessFailures(); !ok {
+		return &ValidationError{Name: "liveness_failures", err: errors.New(`ent: missing required field "Link.liveness_failures"`)}
+	}
+	if _, ok := _c.mutation.ScrapeStatus(); !ok {
+		return &ValidationError{Name: "scrape_status", err: errors.New(`ent: missing required field "Link.scrape_status"`)}
+	}
+	if v, ok := _c.mutation.ScrapeStatus(); ok {
+		if err := link.ScrapeStatusValidator(v); err != nil {
+			return &ValidationError{Name: "scrape_status", err: fmt.Errorf(`ent: validator failed for field "Link.scrape_status": %w`, err)}
+		}
 	}
 	if v, ok := _c.mutation.ID(); ok {
 		if err := link.IDValidator(v.String()); err != nil {
@@ -355,6 +470,30 @@ func (_c *LinkCreate) createSpec() (*Link, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Description(); ok {
 		_spec.SetField(link.FieldDescription, field.TypeString, value)
 		_node.Description = value
+	}
+	if value, ok := _c.mutation.LivenessStatus(); ok {
+		_spec.SetField(link.FieldLivenessStatus, field.TypeEnum, value)
+		_node.LivenessStatus = value
+	}
+	if value, ok := _c.mutation.LivenessCheckedAt(); ok {
+		_spec.SetField(link.FieldLivenessCheckedAt, field.TypeTime, value)
+		_node.LivenessCheckedAt = &value
+	}
+	if value, ok := _c.mutation.LivenessFailures(); ok {
+		_spec.SetField(link.FieldLivenessFailures, field.TypeInt, value)
+		_node.LivenessFailures = value
+	}
+	if value, ok := _c.mutation.ScrapeStatus(); ok {
+		_spec.SetField(link.FieldScrapeStatus, field.TypeEnum, value)
+		_node.ScrapeStatus = value
+	}
+	if value, ok := _c.mutation.ScrapeAttemptedAt(); ok {
+		_spec.SetField(link.FieldScrapeAttemptedAt, field.TypeTime, value)
+		_node.ScrapeAttemptedAt = &value
+	}
+	if value, ok := _c.mutation.ScrapedAt(); ok {
+		_spec.SetField(link.FieldScrapedAt, field.TypeTime, value)
+		_node.ScrapedAt = &value
 	}
 	if nodes := _c.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -558,6 +697,102 @@ func (u *LinkUpsert) UpdateDescription() *LinkUpsert {
 	return u
 }
 
+// SetLivenessStatus sets the "liveness_status" field.
+func (u *LinkUpsert) SetLivenessStatus(v link.LivenessStatus) *LinkUpsert {
+	u.Set(link.FieldLivenessStatus, v)
+	return u
+}
+
+// UpdateLivenessStatus sets the "liveness_status" field to the value that was provided on create.
+func (u *LinkUpsert) UpdateLivenessStatus() *LinkUpsert {
+	u.SetExcluded(link.FieldLivenessStatus)
+	return u
+}
+
+// SetLivenessCheckedAt sets the "liveness_checked_at" field.
+func (u *LinkUpsert) SetLivenessCheckedAt(v time.Time) *LinkUpsert {
+	u.Set(link.FieldLivenessCheckedAt, v)
+	return u
+}
+
+// UpdateLivenessCheckedAt sets the "liveness_checked_at" field to the value that was provided on create.
+func (u *LinkUpsert) UpdateLivenessCheckedAt() *LinkUpsert {
+	u.SetExcluded(link.FieldLivenessCheckedAt)
+	return u
+}
+
+// ClearLivenessCheckedAt clears the value of the "liveness_checked_at" field.
+func (u *LinkUpsert) ClearLivenessCheckedAt() *LinkUpsert {
+	u.SetNull(link.FieldLivenessCheckedAt)
+	return u
+}
+
+// SetLivenessFailures sets the "liveness_failures" field.
+func (u *LinkUpsert) SetLivenessFailures(v int) *LinkUpsert {
+	u.Set(link.FieldLivenessFailures, v)
+	return u
+}
+
+// UpdateLivenessFailures sets the "liveness_failures" field to the value that was provided on create.
+func (u *LinkUpsert) UpdateLivenessFailures() *LinkUpsert {
+	u.SetExcluded(link.FieldLivenessFailures)
+	return u
+}
+
+// AddLivenessFailures adds v to the "liveness_failures" field.
+func (u *LinkUpsert) AddLivenessFailures(v int) *LinkUpsert {
+	u.Add(link.FieldLivenessFailures, v)
+	return u
+}
+
+// SetScrapeStatus sets the "scrape_status" field.
+func (u *LinkUpsert) SetScrapeStatus(v link.ScrapeStatus) *LinkUpsert {
+	u.Set(link.FieldScrapeStatus, v)
+	return u
+}
+
+// UpdateScrapeStatus sets the "scrape_status" field to the value that was provided on create.
+func (u *LinkUpsert) UpdateScrapeStatus() *LinkUpsert {
+	u.SetExcluded(link.FieldScrapeStatus)
+	return u
+}
+
+// SetScrapeAttemptedAt sets the "scrape_attempted_at" field.
+func (u *LinkUpsert) SetScrapeAttemptedAt(v time.Time) *LinkUpsert {
+	u.Set(link.FieldScrapeAttemptedAt, v)
+	return u
+}
+
+// UpdateScrapeAttemptedAt sets the "scrape_attempted_at" field to the value that was provided on create.
+func (u *LinkUpsert) UpdateScrapeAttemptedAt() *LinkUpsert {
+	u.SetExcluded(link.FieldScrapeAttemptedAt)
+	return u
+}
+
+// ClearScrapeAttemptedAt clears the value of the "scrape_attempted_at" field.
+func (u *LinkUpsert) ClearScrapeAttemptedAt() *LinkUpsert {
+	u.SetNull(link.FieldScrapeAttemptedAt)
+	return u
+}
+
+// SetScrapedAt sets the "scraped_at" field.
+func (u *LinkUpsert) SetScrapedAt(v time.Time) *LinkUpsert {
+	u.Set(link.FieldScrapedAt, v)
+	return u
+}
+
+// UpdateScrapedAt sets the "scraped_at" field to the value that was provided on create.
+func (u *LinkUpsert) UpdateScrapedAt() *LinkUpsert {
+	u.SetExcluded(link.FieldScrapedAt)
+	return u
+}
+
+// ClearScrapedAt clears the value of the "scraped_at" field.
+func (u *LinkUpsert) ClearScrapedAt() *LinkUpsert {
+	u.SetNull(link.FieldScrapedAt)
+	return u
+}
+
 // SetPrimaryAssetID sets the "primary_asset_id" field.
 func (u *LinkUpsert) SetPrimaryAssetID(v xid.ID) *LinkUpsert {
 	u.Set(link.FieldPrimaryAssetID, v)
@@ -690,6 +925,118 @@ func (u *LinkUpsertOne) SetDescription(v string) *LinkUpsertOne {
 func (u *LinkUpsertOne) UpdateDescription() *LinkUpsertOne {
 	return u.Update(func(s *LinkUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// SetLivenessStatus sets the "liveness_status" field.
+func (u *LinkUpsertOne) SetLivenessStatus(v link.LivenessStatus) *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.SetLivenessStatus(v)
+	})
+}
+
+// UpdateLivenessStatus sets the "liveness_status" field to the value that was provided on create.
+func (u *LinkUpsertOne) UpdateLivenessStatus() *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.UpdateLivenessStatus()
+	})
+}
+
+// SetLivenessCheckedAt sets the "liveness_checked_at" field.
+func (u *LinkUpsertOne) SetLivenessCheckedAt(v time.Time) *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.SetLivenessCheckedAt(v)
+	})
+}
+
+// UpdateLivenessCheckedAt sets the "liveness_checked_at" field to the value that was provided on create.
+func (u *LinkUpsertOne) UpdateLivenessCheckedAt() *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.UpdateLivenessCheckedAt()
+	})
+}
+
+// ClearLivenessCheckedAt clears the value of the "liveness_checked_at" field.
+func (u *LinkUpsertOne) ClearLivenessCheckedAt() *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.ClearLivenessCheckedAt()
+	})
+}
+
+// SetLivenessFailures sets the "liveness_failures" field.
+func (u *LinkUpsertOne) SetLivenessFailures(v int) *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.SetLivenessFailures(v)
+	})
+}
+
+// AddLivenessFailures adds v to the "liveness_failures" field.
+func (u *LinkUpsertOne) AddLivenessFailures(v int) *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.AddLivenessFailures(v)
+	})
+}
+
+// UpdateLivenessFailures sets the "liveness_failures" field to the value that was provided on create.
+func (u *LinkUpsertOne) UpdateLivenessFailures() *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.UpdateLivenessFailures()
+	})
+}
+
+// SetScrapeStatus sets the "scrape_status" field.
+func (u *LinkUpsertOne) SetScrapeStatus(v link.ScrapeStatus) *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.SetScrapeStatus(v)
+	})
+}
+
+// UpdateScrapeStatus sets the "scrape_status" field to the value that was provided on create.
+func (u *LinkUpsertOne) UpdateScrapeStatus() *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.UpdateScrapeStatus()
+	})
+}
+
+// SetScrapeAttemptedAt sets the "scrape_attempted_at" field.
+func (u *LinkUpsertOne) SetScrapeAttemptedAt(v time.Time) *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.SetScrapeAttemptedAt(v)
+	})
+}
+
+// UpdateScrapeAttemptedAt sets the "scrape_attempted_at" field to the value that was provided on create.
+func (u *LinkUpsertOne) UpdateScrapeAttemptedAt() *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.UpdateScrapeAttemptedAt()
+	})
+}
+
+// ClearScrapeAttemptedAt clears the value of the "scrape_attempted_at" field.
+func (u *LinkUpsertOne) ClearScrapeAttemptedAt() *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.ClearScrapeAttemptedAt()
+	})
+}
+
+// SetScrapedAt sets the "scraped_at" field.
+func (u *LinkUpsertOne) SetScrapedAt(v time.Time) *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.SetScrapedAt(v)
+	})
+}
+
+// UpdateScrapedAt sets the "scraped_at" field to the value that was provided on create.
+func (u *LinkUpsertOne) UpdateScrapedAt() *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.UpdateScrapedAt()
+	})
+}
+
+// ClearScrapedAt clears the value of the "scraped_at" field.
+func (u *LinkUpsertOne) ClearScrapedAt() *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.ClearScrapedAt()
 	})
 }
 
@@ -998,6 +1345,118 @@ func (u *LinkUpsertBulk) SetDescription(v string) *LinkUpsertBulk {
 func (u *LinkUpsertBulk) UpdateDescription() *LinkUpsertBulk {
 	return u.Update(func(s *LinkUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// SetLivenessStatus sets the "liveness_status" field.
+func (u *LinkUpsertBulk) SetLivenessStatus(v link.LivenessStatus) *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.SetLivenessStatus(v)
+	})
+}
+
+// UpdateLivenessStatus sets the "liveness_status" field to the value that was provided on create.
+func (u *LinkUpsertBulk) UpdateLivenessStatus() *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.UpdateLivenessStatus()
+	})
+}
+
+// SetLivenessCheckedAt sets the "liveness_checked_at" field.
+func (u *LinkUpsertBulk) SetLivenessCheckedAt(v time.Time) *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.SetLivenessCheckedAt(v)
+	})
+}
+
+// UpdateLivenessCheckedAt sets the "liveness_checked_at" field to the value that was provided on create.
+func (u *LinkUpsertBulk) UpdateLivenessCheckedAt() *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.UpdateLivenessCheckedAt()
+	})
+}
+
+// ClearLivenessCheckedAt clears the value of the "liveness_checked_at" field.
+func (u *LinkUpsertBulk) ClearLivenessCheckedAt() *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.ClearLivenessCheckedAt()
+	})
+}
+
+// SetLivenessFailures sets the "liveness_failures" field.
+func (u *LinkUpsertBulk) SetLivenessFailures(v int) *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.SetLivenessFailures(v)
+	})
+}
+
+// AddLivenessFailures adds v to the "liveness_failures" field.
+func (u *LinkUpsertBulk) AddLivenessFailures(v int) *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.AddLivenessFailures(v)
+	})
+}
+
+// UpdateLivenessFailures sets the "liveness_failures" field to the value that was provided on create.
+func (u *LinkUpsertBulk) UpdateLivenessFailures() *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.UpdateLivenessFailures()
+	})
+}
+
+// SetScrapeStatus sets the "scrape_status" field.
+func (u *LinkUpsertBulk) SetScrapeStatus(v link.ScrapeStatus) *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.SetScrapeStatus(v)
+	})
+}
+
+// UpdateScrapeStatus sets the "scrape_status" field to the value that was provided on create.
+func (u *LinkUpsertBulk) UpdateScrapeStatus() *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.UpdateScrapeStatus()
+	})
+}
+
+// SetScrapeAttemptedAt sets the "scrape_attempted_at" field.
+func (u *LinkUpsertBulk) SetScrapeAttemptedAt(v time.Time) *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.SetScrapeAttemptedAt(v)
+	})
+}
+
+// UpdateScrapeAttemptedAt sets the "scrape_attempted_at" field to the value that was provided on create.
+func (u *LinkUpsertBulk) UpdateScrapeAttemptedAt() *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.UpdateScrapeAttemptedAt()
+	})
+}
+
+// ClearScrapeAttemptedAt clears the value of the "scrape_attempted_at" field.
+func (u *LinkUpsertBulk) ClearScrapeAttemptedAt() *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.ClearScrapeAttemptedAt()
+	})
+}
+
+// SetScrapedAt sets the "scraped_at" field.
+func (u *LinkUpsertBulk) SetScrapedAt(v time.Time) *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.SetScrapedAt(v)
+	})
+}
+
+// UpdateScrapedAt sets the "scraped_at" field to the value that was provided on create.
+func (u *LinkUpsertBulk) UpdateScrapedAt() *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.UpdateScrapedAt()
+	})
+}
+
+// ClearScrapedAt clears the value of the "scraped_at" field.
+func (u *LinkUpsertBulk) ClearScrapedAt() *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.ClearScrapedAt()
 	})
 }
 

@@ -46,7 +46,7 @@ func TestLinkListPaging(t *testing.T) {
 			const matching = 4
 			for i := range matching {
 				_, err := lw.Store(ctx,
-					fmt.Sprintf("https://%s.example.com/%d", run, i),
+					parseLinkURL(t, fmt.Sprintf("https://%s.example.com/%d", run, i)),
 					fmt.Sprintf("%s title %d", run, i),
 					"a link that matches the keyword",
 				)
@@ -56,7 +56,7 @@ func TestLinkListPaging(t *testing.T) {
 			const unrelated = 3
 			for i := range unrelated {
 				_, err := lw.Store(ctx,
-					fmt.Sprintf("https://%s.example.com/%d", other, i),
+					parseLinkURL(t, fmt.Sprintf("https://%s.example.com/%d", other, i)),
 					fmt.Sprintf("%s title %d", other, i),
 					"no keyword here",
 				)
@@ -71,6 +71,14 @@ func TestLinkListPaging(t *testing.T) {
 				a.Len(result.Items, 2)
 			})
 
+			t.Run("blank_search_adds_no_filter", func(t *testing.T) {
+				result, err := lq.Search(root, pagination.NewPageParams(1, 10),
+					link_querier.WithKeyword(run), link_querier.WithKeyword(" \t\n"))
+				r.NoError(err)
+				a.Len(result.Items, matching)
+				a.Equal(matching, result.Results)
+			})
+
 			t.Run("walks_every_page_exactly_once", func(t *testing.T) {
 				seen := map[string]struct{}{}
 
@@ -80,9 +88,9 @@ func TestLinkListPaging(t *testing.T) {
 					r.Equal(int(page), result.CurrentPage)
 
 					for _, l := range result.Items {
-						_, duplicate := seen[l.URL]
+						_, duplicate := seen[l.URL.String()]
 						a.False(duplicate, "link %s was returned on more than one page", l.URL)
-						seen[l.URL] = struct{}{}
+						seen[l.URL.String()] = struct{}{}
 					}
 
 					next, ok := result.NextPage.Get()
@@ -98,7 +106,7 @@ func TestLinkListPaging(t *testing.T) {
 
 			t.Run("exact_url_lookup_ignores_longer_urls", func(t *testing.T) {
 				result, err := lq.Search(root, pagination.NewPageParams(1, 10),
-					link_querier.WithURL(fmt.Sprintf("https://%s.example.com/", run)),
+					link_querier.WithURL(parseLinkURL(t, fmt.Sprintf("https://%s.example.com/", run))),
 				)
 				r.NoError(err)
 				a.Empty(result.Items, "a prefix of a stored URL is not that URL")
@@ -117,7 +125,7 @@ func TestLinkListPaging(t *testing.T) {
 				const overflow = 55
 				for i := range overflow {
 					_, err := lw.Store(ctx,
-						fmt.Sprintf("https://%s.example.com/%d", bulk, i),
+						parseLinkURL(t, fmt.Sprintf("https://%s.example.com/%d", bulk, i)),
 						fmt.Sprintf("%s title %d", bulk, i),
 						"enough links to need a second page",
 					)

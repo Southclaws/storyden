@@ -2,27 +2,29 @@ package scrape_job
 
 import (
 	"context"
-	"log/slog"
-	"net/url"
 
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	jobs "github.com/Southclaws/storyden/app/resources/background_job"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
-	"github.com/Southclaws/storyden/app/resources/message"
+	"github.com/Southclaws/storyden/app/resources/link/link_scrape"
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_writer"
 	"github.com/Southclaws/storyden/app/resources/post/reply_querier"
 	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
+	"github.com/Southclaws/storyden/app/services/background_job"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
@@ -39,13 +41,12 @@ type scrapeConsumer struct {
 	nodeWriter  *node_writer.Writer
 	threadQuery *thread_querier.Querier
 	nodeQuery   *node_querier.Querier
-	bus         *pubsub.Bus
 }
 
 func runScrapeConsumer(
 	ctx context.Context,
 	lc fx.Lifecycle,
-	logger *slog.Logger,
+	runner *background_job.Runner,
 	bus *pubsub.Bus,
 	fetcher *fetcher.Fetcher,
 	postWriter *post_writer.PostWriter,
@@ -53,7 +54,7 @@ func runScrapeConsumer(
 	nodeWriter *node_writer.Writer,
 	threadQuery *thread_querier.Querier,
 	nodeQuery *node_querier.Querier,
-) {
+) error {
 	ic := scrapeConsumer{
 		fetcher:     fetcher,
 		postWriter:  postWriter,
@@ -61,20 +62,18 @@ func runScrapeConsumer(
 		nodeWriter:  nodeWriter,
 		threadQuery: threadQuery,
 		nodeQuery:   nodeQuery,
-		bus:         bus,
 	}
 
-	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		// Subscribe to scrape commands
-		_, err := pubsub.SubscribeCommand(ctx, bus, "scrape_job.scrape", func(ctx context.Context, cmd *message.CommandScrapeLink) error {
-			return ic.scrapeLink(ctx, cmd.URL, opt.NewPtr(cmd.Item))
-		})
-		if err != nil {
-			return err
-		}
+	err := runner.Register(link_scrape.Kind, 2, background_job.Handler[link_scrape.Payload]{
+		Run: ic.run,
+	})
+	if err != nil {
+		return err
+	}
 
+	lc.Append(fx.StartHook(func() error {
 		// Subscribe to thread events for URL hydration
-		_, err = pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_thread_created", func(ctx context.Context, evt *rpc.EventThreadPublished) error {
+		_, err := pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_thread_created", func(ctx context.Context, evt *rpc.EventThreadPublished) error {
 			return ic.hydrateThreadURLs(ctx, evt.ID)
 		})
 		if err != nil {
@@ -120,10 +119,22 @@ func runScrapeConsumer(
 
 		return nil
 	}))
+	return nil
 }
 
-func (s *scrapeConsumer) scrapeLink(ctx context.Context, u url.URL, item opt.Optional[datagraph.Ref]) error {
-	ln, _, err := s.fetcher.ScrapeAndStore(ctx, u)
+func (s *scrapeConsumer) run(ctx context.Context, job *jobs.Job[link_scrape.Payload]) (background_job.Result, error) {
+	var err error
+	if job.Payload.Item == nil {
+		_, _, err = s.fetcher.ScrapeAndStore(ctx, job.Payload.URL)
+	} else {
+		err = s.scrapeLink(ctx, job.Payload.URL, opt.NewPtr(job.Payload.Item))
+	}
+
+	return background_job.Result{Terminal: ftag.Get(err) == ftag.InvalidArgument}, err
+}
+
+func (s *scrapeConsumer) scrapeLink(ctx context.Context, u link_url.URL, item opt.Optional[datagraph.Ref]) error {
+	ln, err := s.fetcher.Fetch(ctx, u)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

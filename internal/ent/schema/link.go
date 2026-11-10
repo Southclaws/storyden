@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"github.com/rs/xid"
 )
 
@@ -26,6 +27,12 @@ func (Link) Fields() []ent.Field {
 		field.String("domain"),
 		field.String("title"),
 		field.String("description"),
+		field.Enum("liveness_status").Values("unknown", "alive", "offline").Default("unknown"),
+		field.Time("liveness_checked_at").Optional().Nillable(),
+		field.Int("liveness_failures").Default(0),
+		field.Enum("scrape_status").Values("pending", "success", "failed").Default("pending"),
+		field.Time("scrape_attempted_at").Optional().Nillable(),
+		field.Time("scraped_at").Optional().Nillable(),
 
 		field.String("primary_asset_id").
 			GoType(xid.ID{}).
@@ -36,6 +43,13 @@ func (Link) Fields() []ent.Field {
 			GoType(xid.ID{}).
 			Optional().
 			Nillable(),
+	}
+}
+
+func (Link) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("created_at", "id"),
+		index.Fields("liveness_checked_at", "id"),
 	}
 }
 

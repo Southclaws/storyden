@@ -109,9 +109,7 @@ func Map(in *ent.Post) (*Post, error) {
 	}
 
 	// This edge is optional anyway, so if not loaded, nothing bad happens.
-	link := opt.Map(opt.NewPtr(in.Edges.Link), func(in ent.Link) link_ref.LinkRef {
-		return *link_ref.Map(&in)
-	})
+	link := link_ref.MapOptional(in.Edges.Link)
 
 	// These edges are arrays so if not loaded, nothing bad happens.
 	reacts, err := reaction.MapList(in.Edges.Reacts)

@@ -599,6 +599,12 @@ var (
 		{Name: "domain", Type: field.TypeString},
 		{Name: "title", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString},
+		{Name: "liveness_status", Type: field.TypeEnum, Enums: []string{"unknown", "alive", "offline"}, Default: "unknown"},
+		{Name: "liveness_checked_at", Type: field.TypeTime, Nullable: true},
+		{Name: "liveness_failures", Type: field.TypeInt, Default: 0},
+		{Name: "scrape_status", Type: field.TypeEnum, Enums: []string{"pending", "success", "failed"}, Default: "pending"},
+		{Name: "scrape_attempted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "scraped_at", Type: field.TypeTime, Nullable: true},
 		{Name: "primary_asset_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "favicon_asset_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
@@ -610,15 +616,27 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "links_assets_primary_image",
-				Columns:    []*schema.Column{LinksColumns[7]},
+				Columns:    []*schema.Column{LinksColumns[13]},
 				RefColumns: []*schema.Column{AssetsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "links_assets_favicon_image",
-				Columns:    []*schema.Column{LinksColumns[8]},
+				Columns:    []*schema.Column{LinksColumns[14]},
 				RefColumns: []*schema.Column{AssetsColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "link_created_at_id",
+				Unique:  false,
+				Columns: []*schema.Column{LinksColumns[1], LinksColumns[0]},
+			},
+			{
+				Name:    "link_liveness_checked_at_id",
+				Unique:  false,
+				Columns: []*schema.Column{LinksColumns[8], LinksColumns[0]},
 			},
 		},
 	}

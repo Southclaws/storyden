@@ -2,8 +2,8 @@ package scrape
 
 import (
 	"context"
+	"errors"
 	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/Southclaws/fault"
@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/Southclaws/storyden/internal/infrastructure/httpsafe"
 )
 
@@ -19,10 +20,11 @@ const scrapeFetchTimeout = 30 * time.Second
 var errFailedToScrape = fault.New("failed to scrape")
 
 type Scraper interface {
-	Scrape(ctx context.Context, url url.URL) (*WebContent, error)
+	Scrape(ctx context.Context, url link_url.URL) (*WebContent, error)
 }
 
 type WebContent struct {
+	URL         link_url.URL
 	Title       string
 	Description string
 	Text        string
@@ -36,17 +38,22 @@ type webScraper struct {
 }
 
 func New() Scraper {
-	return &webScraper{
-		client: httpsafe.NewClient(httpsafe.Config{Timeout: scrapeFetchTimeout}),
+	client := httpsafe.NewClient(httpsafe.Config{Timeout: scrapeFetchTimeout})
+	redirectPolicy := client.CheckRedirect
+	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		if _, err := link_url.Parse(req.URL.String()); err != nil {
+			return err
+		}
+
+		return redirectPolicy(req, via)
 	}
+
+	return &webScraper{client: client}
 }
 
-func (s *webScraper) Scrape(ctx context.Context, addr url.URL) (*WebContent, error) {
-	if addr.Scheme != "http" && addr.Scheme != "https" {
-		return nil, fault.New("invalid URL scheme",
-			fctx.With(ctx),
-			ftag.With(ftag.InvalidArgument),
-			fmsg.WithDesc("unsupported URL scheme", "Only HTTP and HTTPS URLs are supported."))
+func (s *webScraper) Scrape(ctx context.Context, addr link_url.URL) (*WebContent, error) {
+	if addr.IsZero() {
+		return nil, link_url.ErrEmpty
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, addr.String(), nil)
@@ -71,18 +78,29 @@ func (s *webScraper) Scrape(ctx context.Context, addr url.URL) (*WebContent, err
 
 	resp, err := s.client.Do(req)
 	if err != nil {
+		if errors.Is(err, httpsafe.ErrDisallowedHost) || errors.Is(err, httpsafe.ErrDisallowedAddress) {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument),
+				fmsg.WithDesc("unsupported URL host", "Only public HTTP and HTTPS URLs are supported."))
+		}
+
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fault.Wrap(errFailedToScrape, fctx.With(ctx))
-	}
-
-	wc, err := s.postprocess(ctx, addr, resp.Body)
+	finalURL, err := link_url.Parse(resp.Request.URL.String())
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, err
 	}
 
+	if resp.StatusCode != http.StatusOK {
+		return &WebContent{URL: finalURL}, fault.Wrap(errFailedToScrape, fctx.With(ctx))
+	}
+
+	wc, err := s.postprocess(ctx, finalURL, resp.Body)
+	if err != nil {
+		return &WebContent{URL: finalURL}, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	wc.URL = finalURL
 	return wc, nil
 }

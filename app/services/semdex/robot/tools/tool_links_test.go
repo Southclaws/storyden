@@ -6,7 +6,6 @@ import (
 	"google.golang.org/adk/v2/agent"
 	"google.golang.org/adk/v2/model"
 	"google.golang.org/adk/v2/tool"
-	"net/url"
 	"strings"
 	"testing"
 
@@ -14,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/Southclaws/storyden/app/services/link/scrape"
 	"github.com/Southclaws/storyden/lib/mcp"
 )
@@ -43,7 +43,7 @@ type staticScraper struct {
 	content *scrape.WebContent
 }
 
-func (s staticScraper) Scrape(context.Context, url.URL) (*scrape.WebContent, error) {
+func (s staticScraper) Scrape(context.Context, link_url.URL) (*scrape.WebContent, error) {
 	return s.content, nil
 }
 

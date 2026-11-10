@@ -3,11 +3,11 @@ package scrape
 import (
 	"context"
 	"errors"
-	"net/url"
 	"strconv"
 	"strings"
 	"testing"
 
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -15,7 +15,8 @@ import (
 func TestPostprocessBodyLimit(t *testing.T) {
 	const limit = 8 * 1024 * 1024
 	const page = `<html><head><meta property="og:title" content="Example"></head><body><p>Article text.</p></body></html>`
-	addr := url.URL{Scheme: "https", Host: "example.com"}
+	addr, err := link_url.Parse("https://example.com/")
+	require.NoError(t, err)
 	scraper := webScraper{}
 
 	for _, size := range []int{len(page), limit} {

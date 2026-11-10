@@ -20052,6 +20052,13 @@ type LinkMutation struct {
 	domain                         *string
 	title                          *string
 	description                    *string
+	liveness_status                *link.LivenessStatus
+	liveness_checked_at            *time.Time
+	liveness_failures              *int
+	addliveness_failures           *int
+	scrape_status                  *link.ScrapeStatus
+	scrape_attempted_at            *time.Time
+	scraped_at                     *time.Time
 	clearedFields                  map[string]struct{}
 	posts                          map[xid.ID]struct{}
 	removedposts                   map[xid.ID]struct{}
@@ -20395,6 +20402,281 @@ func (m *LinkMutation) OldDescription(ctx context.Context) (v string, err error)
 // ResetDescription resets all changes to the "description" field.
 func (m *LinkMutation) ResetDescription() {
 	m.description = nil
+}
+
+// SetLivenessStatus sets the "liveness_status" field.
+func (m *LinkMutation) SetLivenessStatus(ls link.LivenessStatus) {
+	m.liveness_status = &ls
+}
+
+// LivenessStatus returns the value of the "liveness_status" field in the mutation.
+func (m *LinkMutation) LivenessStatus() (r link.LivenessStatus, exists bool) {
+	v := m.liveness_status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLivenessStatus returns the old "liveness_status" field's value of the Link entity.
+// If the Link object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LinkMutation) OldLivenessStatus(ctx context.Context) (v link.LivenessStatus, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLivenessStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLivenessStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLivenessStatus: %w", err)
+	}
+	return oldValue.LivenessStatus, nil
+}
+
+// ResetLivenessStatus resets all changes to the "liveness_status" field.
+func (m *LinkMutation) ResetLivenessStatus() {
+	m.liveness_status = nil
+}
+
+// SetLivenessCheckedAt sets the "liveness_checked_at" field.
+func (m *LinkMutation) SetLivenessCheckedAt(t time.Time) {
+	m.liveness_checked_at = &t
+}
+
+// LivenessCheckedAt returns the value of the "liveness_checked_at" field in the mutation.
+func (m *LinkMutation) LivenessCheckedAt() (r time.Time, exists bool) {
+	v := m.liveness_checked_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLivenessCheckedAt returns the old "liveness_checked_at" field's value of the Link entity.
+// If the Link object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LinkMutation) OldLivenessCheckedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLivenessCheckedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLivenessCheckedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLivenessCheckedAt: %w", err)
+	}
+	return oldValue.LivenessCheckedAt, nil
+}
+
+// ClearLivenessCheckedAt clears the value of the "liveness_checked_at" field.
+func (m *LinkMutation) ClearLivenessCheckedAt() {
+	m.liveness_checked_at = nil
+	m.clearedFields[link.FieldLivenessCheckedAt] = struct{}{}
+}
+
+// LivenessCheckedAtCleared returns if the "liveness_checked_at" field was cleared in this mutation.
+func (m *LinkMutation) LivenessCheckedAtCleared() bool {
+	_, ok := m.clearedFields[link.FieldLivenessCheckedAt]
+	return ok
+}
+
+// ResetLivenessCheckedAt resets all changes to the "liveness_checked_at" field.
+func (m *LinkMutation) ResetLivenessCheckedAt() {
+	m.liveness_checked_at = nil
+	delete(m.clearedFields, link.FieldLivenessCheckedAt)
+}
+
+// SetLivenessFailures sets the "liveness_failures" field.
+func (m *LinkMutation) SetLivenessFailures(i int) {
+	m.liveness_failures = &i
+	m.addliveness_failures = nil
+}
+
+// LivenessFailures returns the value of the "liveness_failures" field in the mutation.
+func (m *LinkMutation) LivenessFailures() (r int, exists bool) {
+	v := m.liveness_failures
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLivenessFailures returns the old "liveness_failures" field's value of the Link entity.
+// If the Link object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LinkMutation) OldLivenessFailures(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLivenessFailures is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLivenessFailures requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLivenessFailures: %w", err)
+	}
+	return oldValue.LivenessFailures, nil
+}
+
+// AddLivenessFailures adds i to the "liveness_failures" field.
+func (m *LinkMutation) AddLivenessFailures(i int) {
+	if m.addliveness_failures != nil {
+		*m.addliveness_failures += i
+	} else {
+		m.addliveness_failures = &i
+	}
+}
+
+// AddedLivenessFailures returns the value that was added to the "liveness_failures" field in this mutation.
+func (m *LinkMutation) AddedLivenessFailures() (r int, exists bool) {
+	v := m.addliveness_failures
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetLivenessFailures resets all changes to the "liveness_failures" field.
+func (m *LinkMutation) ResetLivenessFailures() {
+	m.liveness_failures = nil
+	m.addliveness_failures = nil
+}
+
+// SetScrapeStatus sets the "scrape_status" field.
+func (m *LinkMutation) SetScrapeStatus(ls link.ScrapeStatus) {
+	m.scrape_status = &ls
+}
+
+// ScrapeStatus returns the value of the "scrape_status" field in the mutation.
+func (m *LinkMutation) ScrapeStatus() (r link.ScrapeStatus, exists bool) {
+	v := m.scrape_status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldScrapeStatus returns the old "scrape_status" field's value of the Link entity.
+// If the Link object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LinkMutation) OldScrapeStatus(ctx context.Context) (v link.ScrapeStatus, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldScrapeStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldScrapeStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldScrapeStatus: %w", err)
+	}
+	return oldValue.ScrapeStatus, nil
+}
+
+// ResetScrapeStatus resets all changes to the "scrape_status" field.
+func (m *LinkMutation) ResetScrapeStatus() {
+	m.scrape_status = nil
+}
+
+// SetScrapeAttemptedAt sets the "scrape_attempted_at" field.
+func (m *LinkMutation) SetScrapeAttemptedAt(t time.Time) {
+	m.scrape_attempted_at = &t
+}
+
+// ScrapeAttemptedAt returns the value of the "scrape_attempted_at" field in the mutation.
+func (m *LinkMutation) ScrapeAttemptedAt() (r time.Time, exists bool) {
+	v := m.scrape_attempted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldScrapeAttemptedAt returns the old "scrape_attempted_at" field's value of the Link entity.
+// If the Link object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LinkMutation) OldScrapeAttemptedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldScrapeAttemptedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldScrapeAttemptedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldScrapeAttemptedAt: %w", err)
+	}
+	return oldValue.ScrapeAttemptedAt, nil
+}
+
+// ClearScrapeAttemptedAt clears the value of the "scrape_attempted_at" field.
+func (m *LinkMutation) ClearScrapeAttemptedAt() {
+	m.scrape_attempted_at = nil
+	m.clearedFields[link.FieldScrapeAttemptedAt] = struct{}{}
+}
+
+// ScrapeAttemptedAtCleared returns if the "scrape_attempted_at" field was cleared in this mutation.
+func (m *LinkMutation) ScrapeAttemptedAtCleared() bool {
+	_, ok := m.clearedFields[link.FieldScrapeAttemptedAt]
+	return ok
+}
+
+// ResetScrapeAttemptedAt resets all changes to the "scrape_attempted_at" field.
+func (m *LinkMutation) ResetScrapeAttemptedAt() {
+	m.scrape_attempted_at = nil
+	delete(m.clearedFields, link.FieldScrapeAttemptedAt)
+}
+
+// SetScrapedAt sets the "scraped_at" field.
+func (m *LinkMutation) SetScrapedAt(t time.Time) {
+	m.scraped_at = &t
+}
+
+// ScrapedAt returns the value of the "scraped_at" field in the mutation.
+func (m *LinkMutation) ScrapedAt() (r time.Time, exists bool) {
+	v := m.scraped_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldScrapedAt returns the old "scraped_at" field's value of the Link entity.
+// If the Link object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LinkMutation) OldScrapedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldScrapedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldScrapedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldScrapedAt: %w", err)
+	}
+	return oldValue.ScrapedAt, nil
+}
+
+// ClearScrapedAt clears the value of the "scraped_at" field.
+func (m *LinkMutation) ClearScrapedAt() {
+	m.scraped_at = nil
+	m.clearedFields[link.FieldScrapedAt] = struct{}{}
+}
+
+// ScrapedAtCleared returns if the "scraped_at" field was cleared in this mutation.
+func (m *LinkMutation) ScrapedAtCleared() bool {
+	_, ok := m.clearedFields[link.FieldScrapedAt]
+	return ok
+}
+
+// ResetScrapedAt resets all changes to the "scraped_at" field.
+func (m *LinkMutation) ResetScrapedAt() {
+	m.scraped_at = nil
+	delete(m.clearedFields, link.FieldScrapedAt)
 }
 
 // SetPrimaryAssetID sets the "primary_asset_id" field.
@@ -20879,7 +21161,7 @@ func (m *LinkMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *LinkMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 14)
 	if m.created_at != nil {
 		fields = append(fields, link.FieldCreatedAt)
 	}
@@ -20897,6 +21179,24 @@ func (m *LinkMutation) Fields() []string {
 	}
 	if m.description != nil {
 		fields = append(fields, link.FieldDescription)
+	}
+	if m.liveness_status != nil {
+		fields = append(fields, link.FieldLivenessStatus)
+	}
+	if m.liveness_checked_at != nil {
+		fields = append(fields, link.FieldLivenessCheckedAt)
+	}
+	if m.liveness_failures != nil {
+		fields = append(fields, link.FieldLivenessFailures)
+	}
+	if m.scrape_status != nil {
+		fields = append(fields, link.FieldScrapeStatus)
+	}
+	if m.scrape_attempted_at != nil {
+		fields = append(fields, link.FieldScrapeAttemptedAt)
+	}
+	if m.scraped_at != nil {
+		fields = append(fields, link.FieldScrapedAt)
 	}
 	if m.primary_image != nil {
 		fields = append(fields, link.FieldPrimaryAssetID)
@@ -20924,6 +21224,18 @@ func (m *LinkMutation) Field(name string) (ent.Value, bool) {
 		return m.Title()
 	case link.FieldDescription:
 		return m.Description()
+	case link.FieldLivenessStatus:
+		return m.LivenessStatus()
+	case link.FieldLivenessCheckedAt:
+		return m.LivenessCheckedAt()
+	case link.FieldLivenessFailures:
+		return m.LivenessFailures()
+	case link.FieldScrapeStatus:
+		return m.ScrapeStatus()
+	case link.FieldScrapeAttemptedAt:
+		return m.ScrapeAttemptedAt()
+	case link.FieldScrapedAt:
+		return m.ScrapedAt()
 	case link.FieldPrimaryAssetID:
 		return m.PrimaryAssetID()
 	case link.FieldFaviconAssetID:
@@ -20949,6 +21261,18 @@ func (m *LinkMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldTitle(ctx)
 	case link.FieldDescription:
 		return m.OldDescription(ctx)
+	case link.FieldLivenessStatus:
+		return m.OldLivenessStatus(ctx)
+	case link.FieldLivenessCheckedAt:
+		return m.OldLivenessCheckedAt(ctx)
+	case link.FieldLivenessFailures:
+		return m.OldLivenessFailures(ctx)
+	case link.FieldScrapeStatus:
+		return m.OldScrapeStatus(ctx)
+	case link.FieldScrapeAttemptedAt:
+		return m.OldScrapeAttemptedAt(ctx)
+	case link.FieldScrapedAt:
+		return m.OldScrapedAt(ctx)
 	case link.FieldPrimaryAssetID:
 		return m.OldPrimaryAssetID(ctx)
 	case link.FieldFaviconAssetID:
@@ -21004,6 +21328,48 @@ func (m *LinkMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDescription(v)
 		return nil
+	case link.FieldLivenessStatus:
+		v, ok := value.(link.LivenessStatus)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLivenessStatus(v)
+		return nil
+	case link.FieldLivenessCheckedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLivenessCheckedAt(v)
+		return nil
+	case link.FieldLivenessFailures:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLivenessFailures(v)
+		return nil
+	case link.FieldScrapeStatus:
+		v, ok := value.(link.ScrapeStatus)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetScrapeStatus(v)
+		return nil
+	case link.FieldScrapeAttemptedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetScrapeAttemptedAt(v)
+		return nil
+	case link.FieldScrapedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetScrapedAt(v)
+		return nil
 	case link.FieldPrimaryAssetID:
 		v, ok := value.(xid.ID)
 		if !ok {
@@ -21025,13 +21391,21 @@ func (m *LinkMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *LinkMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addliveness_failures != nil {
+		fields = append(fields, link.FieldLivenessFailures)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *LinkMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case link.FieldLivenessFailures:
+		return m.AddedLivenessFailures()
+	}
 	return nil, false
 }
 
@@ -21040,6 +21414,13 @@ func (m *LinkMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *LinkMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case link.FieldLivenessFailures:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLivenessFailures(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Link numeric field %s", name)
 }
@@ -21048,6 +21429,15 @@ func (m *LinkMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *LinkMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(link.FieldLivenessCheckedAt) {
+		fields = append(fields, link.FieldLivenessCheckedAt)
+	}
+	if m.FieldCleared(link.FieldScrapeAttemptedAt) {
+		fields = append(fields, link.FieldScrapeAttemptedAt)
+	}
+	if m.FieldCleared(link.FieldScrapedAt) {
+		fields = append(fields, link.FieldScrapedAt)
+	}
 	if m.FieldCleared(link.FieldPrimaryAssetID) {
 		fields = append(fields, link.FieldPrimaryAssetID)
 	}
@@ -21068,6 +21458,15 @@ func (m *LinkMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *LinkMutation) ClearField(name string) error {
 	switch name {
+	case link.FieldLivenessCheckedAt:
+		m.ClearLivenessCheckedAt()
+		return nil
+	case link.FieldScrapeAttemptedAt:
+		m.ClearScrapeAttemptedAt()
+		return nil
+	case link.FieldScrapedAt:
+		m.ClearScrapedAt()
+		return nil
 	case link.FieldPrimaryAssetID:
 		m.ClearPrimaryAssetID()
 		return nil
@@ -21099,6 +21498,24 @@ func (m *LinkMutation) ResetField(name string) error {
 		return nil
 	case link.FieldDescription:
 		m.ResetDescription()
+		return nil
+	case link.FieldLivenessStatus:
+		m.ResetLivenessStatus()
+		return nil
+	case link.FieldLivenessCheckedAt:
+		m.ResetLivenessCheckedAt()
+		return nil
+	case link.FieldLivenessFailures:
+		m.ResetLivenessFailures()
+		return nil
+	case link.FieldScrapeStatus:
+		m.ResetScrapeStatus()
+		return nil
+	case link.FieldScrapeAttemptedAt:
+		m.ResetScrapeAttemptedAt()
+		return nil
+	case link.FieldScrapedAt:
+		m.ResetScrapedAt()
 		return nil
 	case link.FieldPrimaryAssetID:
 		m.ResetPrimaryAssetID()

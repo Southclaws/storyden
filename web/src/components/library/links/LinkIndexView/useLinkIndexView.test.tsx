@@ -169,6 +169,23 @@ describe("Links search and add flow", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("shows the saved redirect destination in the search and normal result list", async () => {
+    const submitted = "https://www.a.invalid/old";
+    list.mockImplementation(async (query: string) =>
+      query === link.url ? single : empty,
+    );
+    renderView(submitted, 1, empty);
+    fireEvent.click(screen.getByRole("button", { name: "Add link" }));
+
+    await waitFor(() => expect(input()).toHaveValue(link.url));
+    await waitFor(() =>
+      expect(results().getByRole("article", { name: "A link" })).toBeVisible(),
+    );
+    expect(create).toHaveBeenCalledExactlyOnceWith({ url: submitted });
+    expect(screen.getByRole("button", { name: "Saved" })).toBeDisabled();
+    expect(results().getAllByRole("article")).toHaveLength(1);
+  });
+
   it("adds immediately, then shows the saved link in the normal filtered list", async () => {
     let saved = false;
     list.mockImplementation(async (query: string) => {
@@ -279,6 +296,24 @@ describe("Links search and add flow", () => {
       expect(screen.getByRole("button", { name: "Saved" })).toBeDisabled(),
     );
     expect(results().getByRole("article", { name: "A link" })).toBeVisible();
+  });
+
+  it("keeps a newer search when a pending save returns a redirect destination", async () => {
+    const pending = deferred<LinkReference>();
+    create.mockReturnValueOnce(pending.promise);
+    list.mockImplementation(async (query: string) =>
+      query === "browser" ? { ...single, links: [otherLink] } : empty,
+    );
+    renderView("https://www.a.invalid/old", 1, empty);
+    fireEvent.click(screen.getByRole("button", { name: "Add link" }));
+    fireEvent.change(input(), { target: { value: "browser" } });
+
+    await act(async () => pending.resolve(link));
+    await waitFor(() =>
+      expect(results().getByRole("article", { name: "B link" })).toBeVisible(),
+    );
+    expect(input()).toHaveValue("browser");
+    expect(onUrlUpdate.mock.lastCall![0].searchParams.get("q")).toBe("browser");
   });
 
   it("keeps a newer add pending when an earlier request for the same URL completes", async () => {

@@ -54,9 +54,11 @@ func (s *service) Create(ctx context.Context,
 
 	if u, ok := partial.URL.Get(); ok {
 		ln, err := s.fetcher.Fetch(ctx, u)
-		if err == nil {
-			opts = append(opts, thread_writer.WithLink(xid.ID(ln.ID)))
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
+
+		opts = append(opts, thread_writer.WithLink(xid.ID(ln.ID)))
 	}
 
 	if tags, ok := partial.Tags.Get(); ok {

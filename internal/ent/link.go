@@ -31,6 +31,18 @@ type Link struct {
 	Title string `json:"title,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
+	// LivenessStatus holds the value of the "liveness_status" field.
+	LivenessStatus link.LivenessStatus `json:"liveness_status,omitempty"`
+	// LivenessCheckedAt holds the value of the "liveness_checked_at" field.
+	LivenessCheckedAt *time.Time `json:"liveness_checked_at,omitempty"`
+	// LivenessFailures holds the value of the "liveness_failures" field.
+	LivenessFailures int `json:"liveness_failures,omitempty"`
+	// ScrapeStatus holds the value of the "scrape_status" field.
+	ScrapeStatus link.ScrapeStatus `json:"scrape_status,omitempty"`
+	// ScrapeAttemptedAt holds the value of the "scrape_attempted_at" field.
+	ScrapeAttemptedAt *time.Time `json:"scrape_attempted_at,omitempty"`
+	// ScrapedAt holds the value of the "scraped_at" field.
+	ScrapedAt *time.Time `json:"scraped_at,omitempty"`
 	// PrimaryAssetID holds the value of the "primary_asset_id" field.
 	PrimaryAssetID *xid.ID `json:"primary_asset_id,omitempty"`
 	// FaviconAssetID holds the value of the "favicon_asset_id" field.
@@ -136,9 +148,11 @@ func (*Link) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case link.FieldPrimaryAssetID, link.FieldFaviconAssetID:
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
-		case link.FieldURL, link.FieldSlug, link.FieldDomain, link.FieldTitle, link.FieldDescription:
+		case link.FieldLivenessFailures:
+			values[i] = new(sql.NullInt64)
+		case link.FieldURL, link.FieldSlug, link.FieldDomain, link.FieldTitle, link.FieldDescription, link.FieldLivenessStatus, link.FieldScrapeStatus:
 			values[i] = new(sql.NullString)
-		case link.FieldCreatedAt:
+		case link.FieldCreatedAt, link.FieldLivenessCheckedAt, link.FieldScrapeAttemptedAt, link.FieldScrapedAt:
 			values[i] = new(sql.NullTime)
 		case link.FieldID:
 			values[i] = new(xid.ID)
@@ -198,6 +212,45 @@ func (_m *Link) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
 				_m.Description = value.String
+			}
+		case link.FieldLivenessStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field liveness_status", values[i])
+			} else if value.Valid {
+				_m.LivenessStatus = link.LivenessStatus(value.String)
+			}
+		case link.FieldLivenessCheckedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field liveness_checked_at", values[i])
+			} else if value.Valid {
+				_m.LivenessCheckedAt = new(time.Time)
+				*_m.LivenessCheckedAt = value.Time
+			}
+		case link.FieldLivenessFailures:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field liveness_failures", values[i])
+			} else if value.Valid {
+				_m.LivenessFailures = int(value.Int64)
+			}
+		case link.FieldScrapeStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field scrape_status", values[i])
+			} else if value.Valid {
+				_m.ScrapeStatus = link.ScrapeStatus(value.String)
+			}
+		case link.FieldScrapeAttemptedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field scrape_attempted_at", values[i])
+			} else if value.Valid {
+				_m.ScrapeAttemptedAt = new(time.Time)
+				*_m.ScrapeAttemptedAt = value.Time
+			}
+		case link.FieldScrapedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field scraped_at", values[i])
+			} else if value.Valid {
+				_m.ScrapedAt = new(time.Time)
+				*_m.ScrapedAt = value.Time
 			}
 		case link.FieldPrimaryAssetID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -301,6 +354,30 @@ func (_m *Link) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(_m.Description)
+	builder.WriteString(", ")
+	builder.WriteString("liveness_status=")
+	builder.WriteString(fmt.Sprintf("%v", _m.LivenessStatus))
+	builder.WriteString(", ")
+	if v := _m.LivenessCheckedAt; v != nil {
+		builder.WriteString("liveness_checked_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	builder.WriteString("liveness_failures=")
+	builder.WriteString(fmt.Sprintf("%v", _m.LivenessFailures))
+	builder.WriteString(", ")
+	builder.WriteString("scrape_status=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ScrapeStatus))
+	builder.WriteString(", ")
+	if v := _m.ScrapeAttemptedAt; v != nil {
+		builder.WriteString("scrape_attempted_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	if v := _m.ScrapedAt; v != nil {
+		builder.WriteString("scraped_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	if v := _m.PrimaryAssetID; v != nil {
 		builder.WriteString("primary_asset_id=")

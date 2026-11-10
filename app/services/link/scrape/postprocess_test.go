@@ -5,11 +5,11 @@ import (
 	"context"
 	"embed"
 	"io/fs"
-	"net/url"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/stretchr/testify/require"
 )
 
@@ -35,9 +35,10 @@ func Test_webScraper_postprocess(t *testing.T) {
 		b, err := os.ReadFile(filename)
 		r.NoError(err)
 
-		u, _ := url.Parse("https://storyden.org")
+		u, err := link_url.Parse("https://storyden.org")
+		r.NoError(err)
 
-		wc, err := w.postprocess(ctx, *u, bytes.NewReader(b))
+		wc, err := w.postprocess(ctx, u, bytes.NewReader(b))
 		r.NoError(err)
 		r.NotNil(wc)
 

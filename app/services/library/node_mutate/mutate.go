@@ -2,7 +2,6 @@ package node_mutate
 
 import (
 	"log/slog"
-	"net/url"
 
 	"github.com/Southclaws/opt"
 
@@ -16,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_version/node_version_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_writer"
@@ -30,7 +30,7 @@ import (
 type Partial struct {
 	Name         opt.Optional[string]
 	Slug         opt.Optional[mark.Slug]
-	URL          deletable.Value[url.URL]
+	URL          deletable.Value[link_url.URL]
 	Description  opt.Optional[string]
 	PrimaryImage deletable.Value[asset.AssetID]
 	Content      opt.Optional[datagraph.Content]

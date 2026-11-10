@@ -13,13 +13,14 @@ import (
 	"golang.org/x/net/html"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 )
 
 const scrapeMaxBytes = 8 * 1024 * 1024
 
 var errBodyTooLarge = fault.New("scraped page exceeds maximum size")
 
-func (s *webScraper) postprocess(ctx context.Context, addr url.URL, r io.Reader) (*WebContent, error) {
+func (s *webScraper) postprocess(ctx context.Context, addr link_url.URL, r io.Reader) (*WebContent, error) {
 	buf, err := io.ReadAll(io.LimitReader(r, scrapeMaxBytes+1))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -55,7 +56,8 @@ func (s *webScraper) postprocess(ctx context.Context, addr url.URL, r io.Reader)
 			return u.String()
 		}
 
-		return addr.ResolveReference(u).String()
+		base := addr.NetURL()
+		return base.ResolveReference(u).String()
 	}
 
 	wc := &WebContent{

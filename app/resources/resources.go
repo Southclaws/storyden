@@ -51,6 +51,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/like/like_querier"
 	"github.com/Southclaws/storyden/app/resources/like/like_writer"
+	"github.com/Southclaws/storyden/app/resources/link/link_check"
 	"github.com/Southclaws/storyden/app/resources/link/link_querier"
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
 	"github.com/Southclaws/storyden/app/resources/oauth/oauth_querier"
@@ -162,6 +163,7 @@ func Build() fx.Option {
 			node_search.New,
 			node_properties.New,
 			link_querier.New,
+			link_check.New,
 			link_writer.New,
 			oauth_remote.New,
 			oauth_querier.New,

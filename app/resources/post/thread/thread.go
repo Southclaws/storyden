@@ -79,9 +79,7 @@ func Map(m *ent.Post) (*Thread, error) {
 		return *category.FromModel(&in)
 	})
 
-	link := opt.Map(opt.NewPtr(m.Edges.Link), func(in ent.Link) link_ref.LinkRef {
-		return *link_ref.Map(&in)
-	})
+	link := link_ref.MapOptional(m.Edges.Link)
 
 	content, err := datagraph.NewRichTextWithBlocks(m.Body)
 	if err != nil {
@@ -138,9 +136,7 @@ func Mapper(
 			return *category.FromModel(&in)
 		})
 
-		link := opt.Map(opt.NewPtr(m.Edges.Link), func(in ent.Link) link_ref.LinkRef {
-			return *link_ref.Map(&in)
-		})
+		link := link_ref.MapOptional(m.Edges.Link)
 
 		content, err := datagraph.NewRichTextWithBlocks(m.Body)
 		if err != nil {

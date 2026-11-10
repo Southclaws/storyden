@@ -8,6 +8,7 @@
  * OpenAPI spec version: v1.26.16-post
  */
 import type {
+  BadRequestResponse,
   InternalServerErrorResponse,
   LinkCreateBody,
   LinkCreateOKResponse,
@@ -66,6 +67,11 @@ export type linkCreateResponse200 = {
   status: 200;
 };
 
+export type linkCreateResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
 export type linkCreateResponse401 = {
   data: UnauthorisedResponse;
   status: 401;
@@ -73,13 +79,14 @@ export type linkCreateResponse401 = {
 
 export type linkCreateResponseDefault = {
   data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 401>;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401>;
 };
 
 export type linkCreateResponseSuccess = linkCreateResponse200 & {
   headers: Headers;
 };
 export type linkCreateResponseError = (
+  | linkCreateResponse400
   | linkCreateResponse401
   | linkCreateResponseDefault
 ) & {
@@ -91,17 +98,18 @@ export const getLinkCreateUrl = () => {
 };
 
 /**
- * Add a link to the community bookmarks. This will also scrape the content
- * at the site the link points to, if possible. If scraping fails, the link
- * is stored with basic information instead of scraped metadata.
+ * Save a URL as a community bookmark and retrieve available page metadata.
+ * Only public HTTP(S) URLs with fully qualified DNS hostnames, no
+ * credentials, and no explicit ports are accepted, including redirect
+ * destinations.
  *
- * If the submitted URL already exists, the existing link is returned and a
- * background scrape is queued to refresh its metadata. The handler
- * consumes only the `url` field; submitted `title` and `description` are
- * not applied.
+ * New bookmarks use the final URL reached after redirects. If that URL is
+ * already bookmarked, the existing link is returned. Paths, queries, and
+ * fragments distinguish bookmarks.
  *
- * The submitted URL is used for lookup and storage without removing its
- * fragment. Use the returned link resource to inspect the stored metadata.
+ * Unavailable pages can still be bookmarked. Metadata may be refreshed
+ * asynchronously; failed refreshes preserve previously saved metadata.
+ * Submitted titles and descriptions are ignored.
  */
 export const linkCreate = async (
   linkCreateBody?: LinkCreateBody,
@@ -181,7 +189,10 @@ export const getLinkListUrl = (params?: LinkListParams) => {
 };
 
 /**
- * List all links using the filtering options.
+ * List links with paginated search. Text searches match titles,
+ * descriptions, and URLs. URL and domain searches match HTTP and HTTPS
+ * forms with or without www, while distinguishing different hostnames.
+ * Search does not create or refresh links.
  */
 export const linkList = async (
   params?: LinkListParams,

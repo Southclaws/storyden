@@ -3,7 +3,6 @@ package role_test
 import (
 	"context"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/Southclaws/opt"
@@ -15,6 +14,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/role"
+	"github.com/Southclaws/storyden/app/resources/link/link_writer"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -32,6 +32,7 @@ func TestResourceProfileReferencesIncludeRoles(t *testing.T) {
 		cl *openapi.ClientWithResponses,
 		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
+		links *link_writer.LinkWriter,
 	) {
 		lc.Append(fx.StartHook(func() {
 			authorCtx, author := e2e.WithAccount(root, aw, seed.Account_001_Odin)
@@ -105,13 +106,9 @@ func TestResourceProfileReferencesIncludeRoles(t *testing.T) {
 			tests.AssertRequest(cl.CollectionAddPostWithResponse(authorCtx, collectionCreate.JSON200.Id, threadCreate.JSON200.Id, authorSession))(t, http.StatusOK)
 			tests.AssertRequest(cl.CollectionAddNodeWithResponse(authorCtx, collectionCreate.JSON200.Id, nodeCreate.JSON200.Id, authorSession))(t, http.StatusOK)
 
-			linkServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				w.Header().Set("Content-Type", "text/html; charset=utf-8")
-				_, _ = w.Write([]byte(`<!doctype html><html><head><title>Role Link Test</title></head><body>ok</body></html>`))
-			}))
-			t.Cleanup(linkServer.Close)
-			// Link slugs omit the port, so each run needs a unique path.
-			linkURL := linkServer.URL + "/sprites-dev-" + xid.New().String()
+			linkURL := "https://role-link-" + xid.New().String() + ".invalid/"
+			_, err := links.Store(authorCtx, linkURL, "Role Link Test", "")
+			require.NoError(t, err)
 
 			threadWithLink := tests.AssertRequest(cl.ThreadCreateWithResponse(authorCtx, openapi.ThreadInitialProps{
 				Title:      "thread-with-link-and-roles-" + xid.New().String(),

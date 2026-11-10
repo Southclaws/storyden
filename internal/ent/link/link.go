@@ -3,6 +3,7 @@
 package link
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -27,6 +28,18 @@ const (
 	FieldTitle = "title"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldLivenessStatus holds the string denoting the liveness_status field in the database.
+	FieldLivenessStatus = "liveness_status"
+	// FieldLivenessCheckedAt holds the string denoting the liveness_checked_at field in the database.
+	FieldLivenessCheckedAt = "liveness_checked_at"
+	// FieldLivenessFailures holds the string denoting the liveness_failures field in the database.
+	FieldLivenessFailures = "liveness_failures"
+	// FieldScrapeStatus holds the string denoting the scrape_status field in the database.
+	FieldScrapeStatus = "scrape_status"
+	// FieldScrapeAttemptedAt holds the string denoting the scrape_attempted_at field in the database.
+	FieldScrapeAttemptedAt = "scrape_attempted_at"
+	// FieldScrapedAt holds the string denoting the scraped_at field in the database.
+	FieldScrapedAt = "scraped_at"
 	// FieldPrimaryAssetID holds the string denoting the primary_asset_id field in the database.
 	FieldPrimaryAssetID = "primary_asset_id"
 	// FieldFaviconAssetID holds the string denoting the favicon_asset_id field in the database.
@@ -101,6 +114,12 @@ var Columns = []string{
 	FieldDomain,
 	FieldTitle,
 	FieldDescription,
+	FieldLivenessStatus,
+	FieldLivenessCheckedAt,
+	FieldLivenessFailures,
+	FieldScrapeStatus,
+	FieldScrapeAttemptedAt,
+	FieldScrapedAt,
 	FieldPrimaryAssetID,
 	FieldFaviconAssetID,
 }
@@ -130,11 +149,67 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
+	// DefaultLivenessFailures holds the default value on creation for the "liveness_failures" field.
+	DefaultLivenessFailures int
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )
+
+// LivenessStatus defines the type for the "liveness_status" enum field.
+type LivenessStatus string
+
+// LivenessStatusUnknown is the default value of the LivenessStatus enum.
+const DefaultLivenessStatus = LivenessStatusUnknown
+
+// LivenessStatus values.
+const (
+	LivenessStatusUnknown LivenessStatus = "unknown"
+	LivenessStatusAlive   LivenessStatus = "alive"
+	LivenessStatusOffline LivenessStatus = "offline"
+)
+
+func (ls LivenessStatus) String() string {
+	return string(ls)
+}
+
+// LivenessStatusValidator is a validator for the "liveness_status" field enum values. It is called by the builders before save.
+func LivenessStatusValidator(ls LivenessStatus) error {
+	switch ls {
+	case LivenessStatusUnknown, LivenessStatusAlive, LivenessStatusOffline:
+		return nil
+	default:
+		return fmt.Errorf("link: invalid enum value for liveness_status field: %q", ls)
+	}
+}
+
+// ScrapeStatus defines the type for the "scrape_status" enum field.
+type ScrapeStatus string
+
+// ScrapeStatusPending is the default value of the ScrapeStatus enum.
+const DefaultScrapeStatus = ScrapeStatusPending
+
+// ScrapeStatus values.
+const (
+	ScrapeStatusPending ScrapeStatus = "pending"
+	ScrapeStatusSuccess ScrapeStatus = "success"
+	ScrapeStatusFailed  ScrapeStatus = "failed"
+)
+
+func (ss ScrapeStatus) String() string {
+	return string(ss)
+}
+
+// ScrapeStatusValidator is a validator for the "scrape_status" field enum values. It is called by the builders before save.
+func ScrapeStatusValidator(ss ScrapeStatus) error {
+	switch ss {
+	case ScrapeStatusPending, ScrapeStatusSuccess, ScrapeStatusFailed:
+		return nil
+	default:
+		return fmt.Errorf("link: invalid enum value for scrape_status field: %q", ss)
+	}
+}
 
 // OrderOption defines the ordering options for the Link queries.
 type OrderOption func(*sql.Selector)
@@ -172,6 +247,36 @@ func ByTitle(opts ...sql.OrderTermOption) OrderOption {
 // ByDescription orders the results by the description field.
 func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+}
+
+// ByLivenessStatus orders the results by the liveness_status field.
+func ByLivenessStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLivenessStatus, opts...).ToFunc()
+}
+
+// ByLivenessCheckedAt orders the results by the liveness_checked_at field.
+func ByLivenessCheckedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLivenessCheckedAt, opts...).ToFunc()
+}
+
+// ByLivenessFailures orders the results by the liveness_failures field.
+func ByLivenessFailures(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLivenessFailures, opts...).ToFunc()
+}
+
+// ByScrapeStatus orders the results by the scrape_status field.
+func ByScrapeStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldScrapeStatus, opts...).ToFunc()
+}
+
+// ByScrapeAttemptedAt orders the results by the scrape_attempted_at field.
+func ByScrapeAttemptedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldScrapeAttemptedAt, opts...).ToFunc()
+}
+
+// ByScrapedAt orders the results by the scraped_at field.
+func ByScrapedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldScrapedAt, opts...).ToFunc()
 }
 
 // ByPrimaryAssetID orders the results by the primary_asset_id field.

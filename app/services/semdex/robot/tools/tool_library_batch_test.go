@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,6 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -144,7 +144,7 @@ func TestLibraryURLFallbackAndStorageFailure(t *testing.T) {
 			require.NoError(t, err)
 			link, ok := page.WebLink.Get()
 			require.True(t, ok)
-			assert.Equal(t, "https://example.com/unavailable", link.URL)
+			assert.Equal(t, "https://example.com/unavailable", link.URL.String())
 			db.Link.Use(func(ent.Mutator) ent.Mutator {
 				return ent.MutateFunc(func(context.Context, ent.Mutation) (ent.Value, error) {
 					return nil, errors.New("injected link storage failure")
@@ -229,6 +229,6 @@ func TestLibraryBatchHierarchyAndDraftGuards(t *testing.T) {
 
 type unavailablePageScraper struct{}
 
-func (unavailablePageScraper) Scrape(context.Context, url.URL) (*scrape.WebContent, error) {
+func (unavailablePageScraper) Scrape(context.Context, link_url.URL) (*scrape.WebContent, error) {
 	return nil, errors.New("page is unavailable")
 }

@@ -7,7 +7,7 @@ import {
   linkCreate,
   useLinkList,
 } from "@/api/openapi-client/links";
-import { LinkListResult } from "@/api/openapi-schema";
+import { LinkListResult, LinkReference } from "@/api/openapi-schema";
 import { normalizeLink } from "@/lib/link/validation";
 import { deriveError } from "@/utils/error";
 
@@ -108,8 +108,9 @@ export function useLinkIndexView(props: Props) {
     requestRef.current = request;
     setAdding({ state: "adding" });
 
+    let saved: LinkReference;
     try {
-      await linkCreate({ url });
+      saved = await linkCreate({ url });
     } catch (error) {
       if (requestRef.current !== request) {
         return;
@@ -124,6 +125,12 @@ export function useLinkIndexView(props: Props) {
     await mutate((key) => Array.isArray(key) && key[0] === getLinkListKey()[0]);
 
     if (requestRef.current === request) {
+      if (saved.url !== url) {
+        setSearch({ query: saved.url, page: 1 });
+        void setFilters({ q: saved.url, page: null });
+        return;
+      }
+
       setAdding({ state: "added" });
     }
   }

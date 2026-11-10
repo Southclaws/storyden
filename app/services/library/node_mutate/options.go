@@ -77,9 +77,11 @@ func (s *Manager) preMutation(ctx context.Context, p Partial, current opt.Option
 	linkUrl, removeLinkURL := p.URL.Get()
 	if u, ok := linkUrl.Get(); ok && !removeLinkURL {
 		ln, _, err := s.fetcher.ScrapeAndStore(ctx, u)
-		if err == nil {
-			opts = append(opts, node_writer.WithLink(xid.ID(ln.ID)))
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
+
+		opts = append(opts, node_writer.WithLink(xid.ID(ln.ID)))
 	} else if removeLinkURL {
 		opts = append(opts, node_writer.WithLinkRemove())
 	}

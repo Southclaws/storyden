@@ -22,6 +22,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_properties"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
@@ -108,13 +109,7 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	url, err := opt.MapErr(opt.NewPtr(request.Body.Url), func(s string) (url.URL, error) {
-		u, err := url.Parse(s)
-		if err != nil {
-			return url.URL{}, err
-		}
-		return *u, nil
-	})
+	url, err := opt.MapErr(opt.NewPtr(request.Body.Url), link_url.Parse)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
@@ -376,13 +371,7 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	url, err := deletable.NewMapErr(request.Body.Url, func(s string) (url.URL, error) {
-		u, err := url.Parse(s)
-		if err != nil {
-			return url.URL{}, err
-		}
-		return *u, nil
-	})
+	url, err := deletable.NewMapErr(request.Body.Url, link_url.Parse)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}

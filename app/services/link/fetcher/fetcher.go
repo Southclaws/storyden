@@ -7,30 +7,31 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/background_job"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/link"
 	"github.com/Southclaws/storyden/app/resources/link/link_querier"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
+	"github.com/Southclaws/storyden/app/resources/link/link_scrape"
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
-	"github.com/Southclaws/storyden/app/resources/message"
-	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/app/services/background_job/job_dispatcher"
 	"github.com/Southclaws/storyden/app/services/link/scrape"
 	"github.com/Southclaws/storyden/internal/infrastructure/httpsafe"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 var (
-	errEmptyLink     = fault.New("empty link")
 	errAssetTooLarge = fault.New("linked asset exceeds maximum size")
 )
 
@@ -40,13 +41,14 @@ const (
 )
 
 type Fetcher struct {
-	logger   *slog.Logger
-	uploader *asset_upload.Uploader
-	lq       *link_querier.LinkQuerier
-	lr       *link_writer.LinkWriter
-	sc       scrape.Scraper
-	bus      *pubsub.Bus
-	client   *http.Client
+	logger     *slog.Logger
+	uploader   *asset_upload.Uploader
+	lq         *link_querier.LinkQuerier
+	lr         *link_writer.LinkWriter
+	sc         scrape.Scraper
+	jobs       *background_job.Repository
+	dispatcher job_dispatcher.Dispatcher
+	client     *http.Client
 }
 
 func New(
@@ -55,41 +57,70 @@ func New(
 	lq *link_querier.LinkQuerier,
 	lr *link_writer.LinkWriter,
 	sc scrape.Scraper,
-	bus *pubsub.Bus,
+	jobs *background_job.Repository,
+	dispatcher job_dispatcher.Dispatcher,
 ) *Fetcher {
 	return &Fetcher{
-		logger:   logger,
-		uploader: uploader,
-		lq:       lq,
-		lr:       lr,
-		sc:       sc,
-		bus:      bus,
-		client:   httpsafe.NewClient(httpsafe.Config{Timeout: assetFetchTimeout}),
+		logger:     logger,
+		uploader:   uploader,
+		lq:         lq,
+		lr:         lr,
+		sc:         sc,
+		jobs:       jobs,
+		dispatcher: dispatcher,
+		client:     httpsafe.NewClient(httpsafe.Config{Timeout: assetFetchTimeout}),
 	}
 }
 
-func (s *Fetcher) Fetch(ctx context.Context, u url.URL) (*link_ref.LinkRef, error) {
-	if u.String() == "" {
-		return nil, fault.Wrap(errEmptyLink, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+const (
+	metadataFreshness  = 24 * time.Hour
+	metadataRetryDelay = 15 * time.Minute
+)
+
+func (s *Fetcher) Fetch(ctx context.Context, u link_url.URL) (*link_ref.LinkRef, error) {
+	if u.IsZero() {
+		return nil, link_url.ErrEmpty
 	}
 
-	r, err := s.lq.Search(ctx, pagination.NewPageParams(1, 1), link_querier.WithURL(u.String()))
+	existing, err := s.lq.FindByURL(ctx, u)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, err
 	}
-	if len(r.Items) > 0 {
-		if err := s.bus.SendCommand(ctx, &message.CommandScrapeLink{URL: u}); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
+
+	if existing == nil {
+		ln, _, err := s.ScrapeAndStore(ctx, u)
+		return ln, err
+	}
+
+	if needsRefresh(existing, time.Now()) {
+		if err := s.enqueue(ctx, link_scrape.Payload{URL: existing.URL}); err != nil {
+			return nil, err
 		}
-		return r.Items[0], nil
 	}
 
-	lr, _, err := s.ScrapeAndStore(ctx, u)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+	return existing, nil
+}
+
+func needsRefresh(existing *link_ref.LinkRef, now time.Time) bool {
+	if existing.ScrapeAttemptedAt == nil {
+		return true
 	}
 
-	return lr, nil
+	if existing.ScrapeStatus == "failed" {
+		return existing.ScrapeAttemptedAt.Before(now.Add(-metadataRetryDelay))
+	}
+
+	return existing.ScrapedAt == nil || existing.ScrapedAt.Before(now.Add(-metadataFreshness))
+}
+
+func (s *Fetcher) enqueue(ctx context.Context, payload link_scrape.Payload) error {
+	id := xid.New()
+	if err := s.jobs.Ensure(ctx, id, link_scrape.Kind, id.String(), payload); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	s.dispatcher.Dispatch(ctx, id)
+	return nil
 }
 
 // HydrateContentURLs takes all the URLs mentioned in the content of an item and
@@ -99,12 +130,12 @@ func (s *Fetcher) HydrateContentURLs(ctx context.Context, item datagraph.Item) {
 	urls := item.GetContent().Links()
 
 	for _, l := range urls {
-		parsed, err := url.Parse(l)
+		parsed, err := link_url.Parse(l)
 		if err != nil {
 			continue
 		}
 
-		err = s.queueForItem(ctx, *parsed, item)
+		err = s.queueForItem(ctx, parsed, item)
 		if err != nil {
 			continue
 		}
@@ -113,58 +144,82 @@ func (s *Fetcher) HydrateContentURLs(ctx context.Context, item datagraph.Item) {
 
 // queueForItem queues a scrape request for a URL that is linked to an item.
 // When the scrape job is done, the scraped link will be related to the item.
-func (s *Fetcher) queueForItem(ctx context.Context, u url.URL, item datagraph.Item) error {
-	if err := s.bus.SendCommand(ctx, &message.CommandScrapeLink{
-		URL:  u,
-		Item: datagraph.NewRef(item),
-	}); err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return nil
+func (s *Fetcher) queueForItem(ctx context.Context, u link_url.URL, item datagraph.Item) error {
+	return s.enqueue(ctx, link_scrape.Payload{URL: u, Item: datagraph.NewRef(item)})
 }
 
-func (s *Fetcher) ScrapeAndStore(ctx context.Context, u url.URL) (*link_ref.LinkRef, *scrape.WebContent, error) {
-	wc, err := s.sc.Scrape(ctx, u)
+func (s *Fetcher) ScrapeAndStore(ctx context.Context, u link_url.URL) (*link_ref.LinkRef, *scrape.WebContent, error) {
+	if u.IsZero() {
+		return nil, nil, link_url.ErrEmpty
+	}
+
+	existing, err := s.lq.FindByURL(ctx, u)
 	if err != nil {
-		s.logger.Warn("failed to scrape URL, storing link with basic information only",
-			slog.String("error", err.Error()),
-			slog.String("url", u.String()))
-
-		ln, err := s.lr.Store(ctx, u.String(), "", "", []link_writer.Option{}...)
-		if err != nil {
-			return nil, nil, fault.Wrap(err, fctx.With(ctx))
-		}
-
-		return ln, &scrape.WebContent{}, nil
+		return nil, nil, err
 	}
 
-	opts := []link_writer.Option{}
-
-	if wc.Favicon != "" {
-		a, err := s.CopyAsset(ctx, wc.Favicon)
-		if err != nil {
-			s.logger.Warn("failed to scrape web content favicon image", slog.String("error", err.Error()), slog.String("url", u.String()))
-		} else {
-			opts = append(opts, link_writer.WithFaviconImage(a.ID))
+	wc, scrapeErr := s.sc.Scrape(ctx, u)
+	if scrapeErr != nil {
+		if ftag.Get(scrapeErr) == ftag.InvalidArgument || ctx.Err() != nil {
+			return nil, nil, scrapeErr
 		}
+
+		s.logger.Warn("failed to scrape URL, retaining existing metadata", slog.String("error", scrapeErr.Error()), slog.String("url", u.String()))
 	}
 
-	if wc.Image != "" {
-		a, err := s.CopyAsset(ctx, wc.Image)
+	if wc == nil {
+		wc = &scrape.WebContent{}
+	}
+
+	target := u
+	if !wc.URL.IsZero() {
+		target = wc.URL
+	}
+
+	if existing == nil {
+		existing, err = s.lr.Store(ctx, target, "", "")
 		if err != nil {
-			s.logger.Warn("failed to scrape web content primary image", slog.String("error", err.Error()), slog.String("url", u.String()))
-		} else {
-			opts = append(opts, link_writer.WithPrimaryImage(a.ID))
+			return nil, nil, err
 		}
 	}
 
-	ln, err := s.lr.Store(ctx, u.String(), wc.Title, wc.Description, opts...)
-	if err != nil {
-		return nil, nil, fault.Wrap(err, fctx.With(ctx))
+	result := link_writer.ScrapeResult{Success: scrapeErr == nil, Title: wc.Title, Description: wc.Description}
+	if result.Success {
+		result.Domain = existing.URL.Hostname()
+		result.Options = s.copyMetadataAssets(ctx, wc)
 	}
 
-	return ln, wc, nil
+	if err := s.lr.FinishScrape(ctx, existing.ID, time.Now(), result); err != nil {
+		return nil, nil, err
+	}
+
+	ln, err := s.lq.GetByID(ctx, link.LinkID(existing.ID))
+	return ln, wc, err
+}
+
+func (s *Fetcher) copyMetadataAssets(ctx context.Context, wc *scrape.WebContent) []link_writer.Option {
+	var opts []link_writer.Option
+	for _, image := range []struct {
+		url    string
+		option func(asset.AssetID) link_writer.Option
+	}{
+		{wc.Favicon, link_writer.WithFaviconImage},
+		{wc.Image, link_writer.WithPrimaryImage},
+	} {
+		if image.url == "" {
+			continue
+		}
+
+		a, err := s.CopyAsset(ctx, image.url)
+		if err != nil {
+			s.logger.Warn("failed to scrape metadata image", slog.String("url", image.url), slog.String("error", err.Error()))
+			continue
+		}
+
+		opts = append(opts, image.option(a.ID))
+	}
+
+	return opts
 }
 
 func (s *Fetcher) CopyAsset(ctx context.Context, url string) (*asset.Asset, error) {

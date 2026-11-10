@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -29,7 +30,7 @@ func (l *Link) AssetIDs() []asset.AssetID {
 	return dt.Map(l.Assets, func(a *asset.Asset) asset.AssetID { return a.ID })
 }
 
-func NewLink(url, title, description string) link_ref.LinkRef {
+func NewLink(url link_url.URL, title, description string) link_ref.LinkRef {
 	return link_ref.LinkRef{
 		URL:         url,
 		Title:       opt.New(title),
@@ -37,13 +38,13 @@ func NewLink(url, title, description string) link_ref.LinkRef {
 	}
 }
 
-func NewLinkOpt(purl, ptitle, pdescription *string) opt.Optional[link_ref.LinkRef] {
+func NewLinkOpt(purl *link_url.URL, ptitle, pdescription *string) opt.Optional[link_ref.LinkRef] {
 	if purl == nil {
 		return opt.NewEmpty[link_ref.LinkRef]()
 	}
 
 	return opt.New(link_ref.LinkRef{
-		URL:         opt.NewPtr(purl).String(),
+		URL:         *purl,
 		Title:       opt.NewPtr(ptitle),
 		Description: opt.NewPtr(pdescription),
 	})
@@ -72,8 +73,13 @@ func Map(in *ent.Link) (*Link, error) {
 		return nil, fault.Wrap(err)
 	}
 
+	ref, err := link_ref.Map(in)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
 	return &Link{
-		LinkRef: *link_ref.Map(in),
+		LinkRef: *ref,
 		Assets:  dt.Map(in.Edges.Assets, asset.Map),
 		Posts:   posts,
 		Nodes:   nodes,

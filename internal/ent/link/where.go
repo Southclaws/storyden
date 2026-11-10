@@ -86,6 +86,26 @@ func Description(v string) predicate.Link {
 	return predicate.Link(sql.FieldEQ(FieldDescription, v))
 }
 
+// LivenessCheckedAt applies equality check predicate on the "liveness_checked_at" field. It's identical to LivenessCheckedAtEQ.
+func LivenessCheckedAt(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldEQ(FieldLivenessCheckedAt, v))
+}
+
+// LivenessFailures applies equality check predicate on the "liveness_failures" field. It's identical to LivenessFailuresEQ.
+func LivenessFailures(v int) predicate.Link {
+	return predicate.Link(sql.FieldEQ(FieldLivenessFailures, v))
+}
+
+// ScrapeAttemptedAt applies equality check predicate on the "scrape_attempted_at" field. It's identical to ScrapeAttemptedAtEQ.
+func ScrapeAttemptedAt(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldEQ(FieldScrapeAttemptedAt, v))
+}
+
+// ScrapedAt applies equality check predicate on the "scraped_at" field. It's identical to ScrapedAtEQ.
+func ScrapedAt(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldEQ(FieldScrapedAt, v))
+}
+
 // PrimaryAssetID applies equality check predicate on the "primary_asset_id" field. It's identical to PrimaryAssetIDEQ.
 func PrimaryAssetID(v xid.ID) predicate.Link {
 	return predicate.Link(sql.FieldEQ(FieldPrimaryAssetID, v))
@@ -459,6 +479,236 @@ func DescriptionEqualFold(v string) predicate.Link {
 // DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
 func DescriptionContainsFold(v string) predicate.Link {
 	return predicate.Link(sql.FieldContainsFold(FieldDescription, v))
+}
+
+// LivenessStatusEQ applies the EQ predicate on the "liveness_status" field.
+func LivenessStatusEQ(v LivenessStatus) predicate.Link {
+	return predicate.Link(sql.FieldEQ(FieldLivenessStatus, v))
+}
+
+// LivenessStatusNEQ applies the NEQ predicate on the "liveness_status" field.
+func LivenessStatusNEQ(v LivenessStatus) predicate.Link {
+	return predicate.Link(sql.FieldNEQ(FieldLivenessStatus, v))
+}
+
+// LivenessStatusIn applies the In predicate on the "liveness_status" field.
+func LivenessStatusIn(vs ...LivenessStatus) predicate.Link {
+	return predicate.Link(sql.FieldIn(FieldLivenessStatus, vs...))
+}
+
+// LivenessStatusNotIn applies the NotIn predicate on the "liveness_status" field.
+func LivenessStatusNotIn(vs ...LivenessStatus) predicate.Link {
+	return predicate.Link(sql.FieldNotIn(FieldLivenessStatus, vs...))
+}
+
+// LivenessCheckedAtEQ applies the EQ predicate on the "liveness_checked_at" field.
+func LivenessCheckedAtEQ(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldEQ(FieldLivenessCheckedAt, v))
+}
+
+// LivenessCheckedAtNEQ applies the NEQ predicate on the "liveness_checked_at" field.
+func LivenessCheckedAtNEQ(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldNEQ(FieldLivenessCheckedAt, v))
+}
+
+// LivenessCheckedAtIn applies the In predicate on the "liveness_checked_at" field.
+func LivenessCheckedAtIn(vs ...time.Time) predicate.Link {
+	return predicate.Link(sql.FieldIn(FieldLivenessCheckedAt, vs...))
+}
+
+// LivenessCheckedAtNotIn applies the NotIn predicate on the "liveness_checked_at" field.
+func LivenessCheckedAtNotIn(vs ...time.Time) predicate.Link {
+	return predicate.Link(sql.FieldNotIn(FieldLivenessCheckedAt, vs...))
+}
+
+// LivenessCheckedAtGT applies the GT predicate on the "liveness_checked_at" field.
+func LivenessCheckedAtGT(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldGT(FieldLivenessCheckedAt, v))
+}
+
+// LivenessCheckedAtGTE applies the GTE predicate on the "liveness_checked_at" field.
+func LivenessCheckedAtGTE(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldGTE(FieldLivenessCheckedAt, v))
+}
+
+// LivenessCheckedAtLT applies the LT predicate on the "liveness_checked_at" field.
+func LivenessCheckedAtLT(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldLT(FieldLivenessCheckedAt, v))
+}
+
+// LivenessCheckedAtLTE applies the LTE predicate on the "liveness_checked_at" field.
+func LivenessCheckedAtLTE(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldLTE(FieldLivenessCheckedAt, v))
+}
+
+// LivenessCheckedAtIsNil applies the IsNil predicate on the "liveness_checked_at" field.
+func LivenessCheckedAtIsNil() predicate.Link {
+	return predicate.Link(sql.FieldIsNull(FieldLivenessCheckedAt))
+}
+
+// LivenessCheckedAtNotNil applies the NotNil predicate on the "liveness_checked_at" field.
+func LivenessCheckedAtNotNil() predicate.Link {
+	return predicate.Link(sql.FieldNotNull(FieldLivenessCheckedAt))
+}
+
+// LivenessFailuresEQ applies the EQ predicate on the "liveness_failures" field.
+func LivenessFailuresEQ(v int) predicate.Link {
+	return predicate.Link(sql.FieldEQ(FieldLivenessFailures, v))
+}
+
+// LivenessFailuresNEQ applies the NEQ predicate on the "liveness_failures" field.
+func LivenessFailuresNEQ(v int) predicate.Link {
+	return predicate.Link(sql.FieldNEQ(FieldLivenessFailures, v))
+}
+
+// LivenessFailuresIn applies the In predicate on the "liveness_failures" field.
+func LivenessFailuresIn(vs ...int) predicate.Link {
+	return predicate.Link(sql.FieldIn(FieldLivenessFailures, vs...))
+}
+
+// LivenessFailuresNotIn applies the NotIn predicate on the "liveness_failures" field.
+func LivenessFailuresNotIn(vs ...int) predicate.Link {
+	return predicate.Link(sql.FieldNotIn(FieldLivenessFailures, vs...))
+}
+
+// LivenessFailuresGT applies the GT predicate on the "liveness_failures" field.
+func LivenessFailuresGT(v int) predicate.Link {
+	return predicate.Link(sql.FieldGT(FieldLivenessFailures, v))
+}
+
+// LivenessFailuresGTE applies the GTE predicate on the "liveness_failures" field.
+func LivenessFailuresGTE(v int) predicate.Link {
+	return predicate.Link(sql.FieldGTE(FieldLivenessFailures, v))
+}
+
+// LivenessFailuresLT applies the LT predicate on the "liveness_failures" field.
+func LivenessFailuresLT(v int) predicate.Link {
+	return predicate.Link(sql.FieldLT(FieldLivenessFailures, v))
+}
+
+// LivenessFailuresLTE applies the LTE predicate on the "liveness_failures" field.
+func LivenessFailuresLTE(v int) predicate.Link {
+	return predicate.Link(sql.FieldLTE(FieldLivenessFailures, v))
+}
+
+// ScrapeStatusEQ applies the EQ predicate on the "scrape_status" field.
+func ScrapeStatusEQ(v ScrapeStatus) predicate.Link {
+	return predicate.Link(sql.FieldEQ(FieldScrapeStatus, v))
+}
+
+// ScrapeStatusNEQ applies the NEQ predicate on the "scrape_status" field.
+func ScrapeStatusNEQ(v ScrapeStatus) predicate.Link {
+	return predicate.Link(sql.FieldNEQ(FieldScrapeStatus, v))
+}
+
+// ScrapeStatusIn applies the In predicate on the "scrape_status" field.
+func ScrapeStatusIn(vs ...ScrapeStatus) predicate.Link {
+	return predicate.Link(sql.FieldIn(FieldScrapeStatus, vs...))
+}
+
+// ScrapeStatusNotIn applies the NotIn predicate on the "scrape_status" field.
+func ScrapeStatusNotIn(vs ...ScrapeStatus) predicate.Link {
+	return predicate.Link(sql.FieldNotIn(FieldScrapeStatus, vs...))
+}
+
+// ScrapeAttemptedAtEQ applies the EQ predicate on the "scrape_attempted_at" field.
+func ScrapeAttemptedAtEQ(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldEQ(FieldScrapeAttemptedAt, v))
+}
+
+// ScrapeAttemptedAtNEQ applies the NEQ predicate on the "scrape_attempted_at" field.
+func ScrapeAttemptedAtNEQ(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldNEQ(FieldScrapeAttemptedAt, v))
+}
+
+// ScrapeAttemptedAtIn applies the In predicate on the "scrape_attempted_at" field.
+func ScrapeAttemptedAtIn(vs ...time.Time) predicate.Link {
+	return predicate.Link(sql.FieldIn(FieldScrapeAttemptedAt, vs...))
+}
+
+// ScrapeAttemptedAtNotIn applies the NotIn predicate on the "scrape_attempted_at" field.
+func ScrapeAttemptedAtNotIn(vs ...time.Time) predicate.Link {
+	return predicate.Link(sql.FieldNotIn(FieldScrapeAttemptedAt, vs...))
+}
+
+// ScrapeAttemptedAtGT applies the GT predicate on the "scrape_attempted_at" field.
+func ScrapeAttemptedAtGT(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldGT(FieldScrapeAttemptedAt, v))
+}
+
+// ScrapeAttemptedAtGTE applies the GTE predicate on the "scrape_attempted_at" field.
+func ScrapeAttemptedAtGTE(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldGTE(FieldScrapeAttemptedAt, v))
+}
+
+// ScrapeAttemptedAtLT applies the LT predicate on the "scrape_attempted_at" field.
+func ScrapeAttemptedAtLT(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldLT(FieldScrapeAttemptedAt, v))
+}
+
+// ScrapeAttemptedAtLTE applies the LTE predicate on the "scrape_attempted_at" field.
+func ScrapeAttemptedAtLTE(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldLTE(FieldScrapeAttemptedAt, v))
+}
+
+// ScrapeAttemptedAtIsNil applies the IsNil predicate on the "scrape_attempted_at" field.
+func ScrapeAttemptedAtIsNil() predicate.Link {
+	return predicate.Link(sql.FieldIsNull(FieldScrapeAttemptedAt))
+}
+
+// ScrapeAttemptedAtNotNil applies the NotNil predicate on the "scrape_attempted_at" field.
+func ScrapeAttemptedAtNotNil() predicate.Link {
+	return predicate.Link(sql.FieldNotNull(FieldScrapeAttemptedAt))
+}
+
+// ScrapedAtEQ applies the EQ predicate on the "scraped_at" field.
+func ScrapedAtEQ(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldEQ(FieldScrapedAt, v))
+}
+
+// ScrapedAtNEQ applies the NEQ predicate on the "scraped_at" field.
+func ScrapedAtNEQ(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldNEQ(FieldScrapedAt, v))
+}
+
+// ScrapedAtIn applies the In predicate on the "scraped_at" field.
+func ScrapedAtIn(vs ...time.Time) predicate.Link {
+	return predicate.Link(sql.FieldIn(FieldScrapedAt, vs...))
+}
+
+// ScrapedAtNotIn applies the NotIn predicate on the "scraped_at" field.
+func ScrapedAtNotIn(vs ...time.Time) predicate.Link {
+	return predicate.Link(sql.FieldNotIn(FieldScrapedAt, vs...))
+}
+
+// ScrapedAtGT applies the GT predicate on the "scraped_at" field.
+func ScrapedAtGT(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldGT(FieldScrapedAt, v))
+}
+
+// ScrapedAtGTE applies the GTE predicate on the "scraped_at" field.
+func ScrapedAtGTE(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldGTE(FieldScrapedAt, v))
+}
+
+// ScrapedAtLT applies the LT predicate on the "scraped_at" field.
+func ScrapedAtLT(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldLT(FieldScrapedAt, v))
+}
+
+// ScrapedAtLTE applies the LTE predicate on the "scraped_at" field.
+func ScrapedAtLTE(v time.Time) predicate.Link {
+	return predicate.Link(sql.FieldLTE(FieldScrapedAt, v))
+}
+
+// ScrapedAtIsNil applies the IsNil predicate on the "scraped_at" field.
+func ScrapedAtIsNil() predicate.Link {
+	return predicate.Link(sql.FieldIsNull(FieldScrapedAt))
+}
+
+// ScrapedAtNotNil applies the NotNil predicate on the "scraped_at" field.
+func ScrapedAtNotNil() predicate.Link {
+	return predicate.Link(sql.FieldNotNull(FieldScrapedAt))
 }
 
 // PrimaryAssetIDEQ applies the EQ predicate on the "primary_asset_id" field.

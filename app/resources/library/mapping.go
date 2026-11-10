@@ -70,9 +70,7 @@ func MapNode(isRoot bool, ps *PropertySchemaTable) func(c *ent.Node) (*Node, err
 		})
 
 		// This edge is optional anyway, so if not loaded, nothing bad happens.
-		link := opt.Map(opt.NewPtr(c.Edges.Link), func(in ent.Link) link_ref.LinkRef {
-			return *link_ref.Map(&in)
-		})
+		link := link_ref.MapOptional(c.Edges.Link)
 
 		metadata := c.Metadata
 		if metadata == nil {

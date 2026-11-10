@@ -23,6 +23,7 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
@@ -119,13 +120,13 @@ func (tt *threadTools) ExecuteThreadCreate(ctx context.Context, args mcp.ToolThr
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	var parsedURL opt.Optional[url.URL]
+	var parsedURL opt.Optional[link_url.URL]
 	if args.Url != nil && *args.Url != "" {
-		u, err := url.Parse(*args.Url)
+		u, err := link_url.Parse(*args.Url)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 		}
-		parsedURL = opt.New(*u)
+		parsedURL = opt.New(u)
 	}
 
 	var tagNames opt.Optional[tag_ref.Names]
@@ -164,7 +165,7 @@ func (tt *threadTools) ExecuteThreadCreate(ctx context.Context, args mcp.ToolThr
 
 	var urlStr *string
 	if webLink, ok := createdThread.WebLink.Get(); ok {
-		urlStr = &webLink.URL
+		urlStr = nonEmptyString(webLink.URL.String())
 	}
 
 	output := mcp.ToolThreadCreateOutput{
@@ -325,7 +326,7 @@ func (tt *threadTools) ExecuteThreadGet(ctx context.Context, args mcp.ToolThread
 
 	var urlStr *string
 	if webLink, ok := thread.WebLink.Get(); ok {
-		urlStr = &webLink.URL
+		urlStr = nonEmptyString(webLink.URL.String())
 	}
 
 	content, nextAction := contentForAudience(ctx,
@@ -536,7 +537,7 @@ func (tt *threadTools) ExecuteThreadUpdate(ctx context.Context, args mcp.ToolThr
 
 	var urlStr *string
 	if webLink, ok := thread.WebLink.Get(); ok {
-		urlStr = &webLink.URL
+		urlStr = nonEmptyString(webLink.URL.String())
 	}
 
 	output := mcp.ToolThreadUpdateOutput{

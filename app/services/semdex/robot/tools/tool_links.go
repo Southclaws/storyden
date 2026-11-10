@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"net/url"
 
 	adkagent "google.golang.org/adk/v2/agent"
 	"google.golang.org/adk/v2/session"
 	"google.golang.org/adk/v2/tool"
 	"google.golang.org/adk/v2/tool/functiontool"
 
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/app/services/link/scrape"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/documents"
@@ -60,11 +60,11 @@ func (lt *linkTools) newWebFetchTool() *Tool {
 }
 
 func (lt *linkTools) ExecuteWebFetch(ctx context.Context, args mcp.ToolWebFetchInput) (*mcp.ToolWebFetchOutput, error) {
-	u, err := url.Parse(args.Url)
+	u, err := link_url.Parse(args.Url)
 	if err != nil {
 		return nil, err
 	}
-	wc, err := lt.scraper.Scrape(ctx, *u)
+	wc, err := lt.scraper.Scrape(ctx, u)
 	if err != nil {
 		return nil, err
 	}
@@ -129,11 +129,11 @@ func (lt *linkTools) newWebOpenTool() *Tool {
 			return functiontool.New(
 				functiontool.Config{Name: toolDef.Name, Description: toolDef.Description, InputSchema: toolDef.InputSchema},
 				func(ctx adkagent.Context, args mcp.ToolWebOpenInput) (*mcp.RobotDocumentProjectionYaml, error) {
-					u, err := url.Parse(args.Url)
+					u, err := link_url.Parse(args.Url)
 					if err != nil {
 						return nil, err
 					}
-					wc, err := lt.scraper.Scrape(ctx, *u)
+					wc, err := lt.scraper.Scrape(ctx, u)
 					if err != nil {
 						return nil, err
 					}
@@ -177,19 +177,19 @@ func (lt *linkTools) newLinkCreateTool() *Tool {
 }
 
 func (lt *linkTools) ExecuteLinkCreate(ctx context.Context, args mcp.ToolLinkCreateInput) (*mcp.ToolLinkCreateOutput, error) {
-	u, err := url.Parse(args.Url)
+	u, err := link_url.Parse(args.Url)
 	if err != nil {
 		return nil, err
 	}
 
-	link, wc, err := lt.fetcher.ScrapeAndStore(ctx, *u)
+	link, wc, err := lt.fetcher.ScrapeAndStore(ctx, u)
 	if err != nil {
 		return nil, err
 	}
 
 	output := mcp.ToolLinkCreateOutput{
 		Slug:                 link.Slug,
-		Url:                  link.URL,
+		Url:                  link.URL.String(),
 		OpengraphTitle:       link.Title.Ptr(),
 		OpengraphDescription: link.Description.Ptr(),
 		PlainText:            func() *string { s := wc.Content.Plaintext(); return &s }(),

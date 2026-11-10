@@ -117,6 +117,34 @@ function linkResults(page: Page) {
   return page.getByRole("region", { name: "Link results" });
 }
 
+test("Links URL search finds www and slash variants without matching a longer host", async ({
+  page,
+}) => {
+  const seed = randomUUID().slice(0, 8);
+  const host = `variants-${seed}.invalid`;
+  const url = `https://${host}/`;
+  const input = await openLinksPage(page, seed);
+  await seedLinks(page, [url, `https://${host}-long/`]);
+  await page.reload({ waitUntil: "networkidle" });
+  const creates = recordLinkCreates(page);
+
+  for (const query of [
+    `https://www.${host}/`,
+    `https://www.${host}`,
+    `https://${host}`,
+    `www.${host}`,
+    host,
+  ]) {
+    await input.fill(query);
+    await expect(linkResults(page).getByRole("article")).toHaveCount(1);
+    await expect(
+      linkResults(page).getByRole("link", { name: url, exact: true }),
+    ).toBeVisible();
+  }
+
+  expect(creates).toEqual([]);
+});
+
 test("Links search filters text and pasted URLs, survives reload, and clears", async ({
   page,
 }) => {

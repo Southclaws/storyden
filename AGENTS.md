@@ -33,6 +33,22 @@ Use this as an index, then open only the docs needed for the work at hand.
   - `api/openapi.yaml` as API contract source of truth.
   - `api/rpc/README.md` and `sdk/**/README.md` for transport/SDK usage.
 
+## API Description Contracts
+
+OpenAPI descriptions define the observable API contract: outcomes, behaviour,
+validation, permissions, side effects, and material caveats that callers need.
+
+- Settle the intended behaviour and its description before implementation, then
+  implement against that contract.
+- Keep implementation choices out of descriptions. Internal queues, lease
+  tokens, storage mechanisms, cache freshness, and retry intervals belong in
+  implementation documentation unless explicitly promised as public behaviour.
+- If a description keeps changing after the behaviour is settled, it is probably
+  too detailed. Changing the implementation should not require rewriting the
+  contract when callers observe the same behaviour.
+- Add small clarifications when new observable behaviours or material caveats
+  are discovered. Keep those additions focused on what callers can rely on.
+
 ## Code Style and Readability
 
 Code is written for human maintainers, not for minimising tokens, characters, or lines of output.

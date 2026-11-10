@@ -853,6 +853,10 @@ func init() {
 	linkDescCreatedAt := linkMixinFields1[0].Descriptor()
 	// link.DefaultCreatedAt holds the default value on creation for the created_at field.
 	link.DefaultCreatedAt = linkDescCreatedAt.Default.(func() time.Time)
+	// linkDescLivenessFailures is the schema descriptor for liveness_failures field.
+	linkDescLivenessFailures := linkFields[7].Descriptor()
+	// link.DefaultLivenessFailures holds the default value on creation for the liveness_failures field.
+	link.DefaultLivenessFailures = linkDescLivenessFailures.Default.(int)
 	// linkDescID is the schema descriptor for id field.
 	linkDescID := linkMixinFields0[0].Descriptor()
 	// link.DefaultID holds the default value on creation for the id field.

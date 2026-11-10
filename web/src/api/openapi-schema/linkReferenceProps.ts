@@ -10,6 +10,8 @@
 import type { Asset } from "./asset";
 import type { LinkDescription } from "./linkDescription";
 import type { LinkDomain } from "./linkDomain";
+import type { LinkLivenessStatus } from "./linkLivenessStatus";
+import type { LinkScrapeStatus } from "./linkScrapeStatus";
 import type { LinkSlug } from "./linkSlug";
 import type { LinkTitle } from "./linkTitle";
 import type { Url } from "./url";
@@ -22,4 +24,12 @@ export interface LinkReferenceProps {
   description?: LinkDescription;
   favicon_image?: Asset;
   primary_image?: Asset;
+  liveness_status?: LinkLivenessStatus;
+  /** When the link was last checked for reachability. */
+  liveness_checked_at?: string;
+  scrape_status?: LinkScrapeStatus;
+  /** When the latest scrape attempt was recorded. */
+  scrape_attempted_at?: string;
+  /** When metadata was last successfully scraped. */
+  scraped_at?: string;
 }

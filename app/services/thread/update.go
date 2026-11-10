@@ -101,9 +101,11 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 
 	if u, ok := partial.URL.Get(); ok {
 		ln, err := s.fetcher.Fetch(ctx, u)
-		if err == nil {
-			opts = append(opts, thread_writer.WithLink(xid.ID(ln.ID)))
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
+
+		opts = append(opts, thread_writer.WithLink(xid.ID(ln.ID)))
 	}
 
 	if err := s.cache.Invalidate(ctx, xid.ID(threadID)); err != nil {

@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -71,6 +72,115 @@ func (_u *LinkUpdate) SetNillableDescription(v *string) *LinkUpdate {
 	if v != nil {
 		_u.SetDescription(*v)
 	}
+	return _u
+}
+
+// SetLivenessStatus sets the "liveness_status" field.
+func (_u *LinkUpdate) SetLivenessStatus(v link.LivenessStatus) *LinkUpdate {
+	_u.mutation.SetLivenessStatus(v)
+	return _u
+}
+
+// SetNillableLivenessStatus sets the "liveness_status" field if the given value is not nil.
+func (_u *LinkUpdate) SetNillableLivenessStatus(v *link.LivenessStatus) *LinkUpdate {
+	if v != nil {
+		_u.SetLivenessStatus(*v)
+	}
+	return _u
+}
+
+// SetLivenessCheckedAt sets the "liveness_checked_at" field.
+func (_u *LinkUpdate) SetLivenessCheckedAt(v time.Time) *LinkUpdate {
+	_u.mutation.SetLivenessCheckedAt(v)
+	return _u
+}
+
+// SetNillableLivenessCheckedAt sets the "liveness_checked_at" field if the given value is not nil.
+func (_u *LinkUpdate) SetNillableLivenessCheckedAt(v *time.Time) *LinkUpdate {
+	if v != nil {
+		_u.SetLivenessCheckedAt(*v)
+	}
+	return _u
+}
+
+// ClearLivenessCheckedAt clears the value of the "liveness_checked_at" field.
+func (_u *LinkUpdate) ClearLivenessCheckedAt() *LinkUpdate {
+	_u.mutation.ClearLivenessCheckedAt()
+	return _u
+}
+
+// SetLivenessFailures sets the "liveness_failures" field.
+func (_u *LinkUpdate) SetLivenessFailures(v int) *LinkUpdate {
+	_u.mutation.ResetLivenessFailures()
+	_u.mutation.SetLivenessFailures(v)
+	return _u
+}
+
+// SetNillableLivenessFailures sets the "liveness_failures" field if the given value is not nil.
+func (_u *LinkUpdate) SetNillableLivenessFailures(v *int) *LinkUpdate {
+	if v != nil {
+		_u.SetLivenessFailures(*v)
+	}
+	return _u
+}
+
+// AddLivenessFailures adds value to the "liveness_failures" field.
+func (_u *LinkUpdate) AddLivenessFailures(v int) *LinkUpdate {
+	_u.mutation.AddLivenessFailures(v)
+	return _u
+}
+
+// SetScrapeStatus sets the "scrape_status" field.
+func (_u *LinkUpdate) SetScrapeStatus(v link.ScrapeStatus) *LinkUpdate {
+	_u.mutation.SetScrapeStatus(v)
+	return _u
+}
+
+// SetNillableScrapeStatus sets the "scrape_status" field if the given value is not nil.
+func (_u *LinkUpdate) SetNillableScrapeStatus(v *link.ScrapeStatus) *LinkUpdate {
+	if v != nil {
+		_u.SetScrapeStatus(*v)
+	}
+	return _u
+}
+
+// SetScrapeAttemptedAt sets the "scrape_attempted_at" field.
+func (_u *LinkUpdate) SetScrapeAttemptedAt(v time.Time) *LinkUpdate {
+	_u.mutation.SetScrapeAttemptedAt(v)
+	return _u
+}
+
+// SetNillableScrapeAttemptedAt sets the "scrape_attempted_at" field if the given value is not nil.
+func (_u *LinkUpdate) SetNillableScrapeAttemptedAt(v *time.Time) *LinkUpdate {
+	if v != nil {
+		_u.SetScrapeAttemptedAt(*v)
+	}
+	return _u
+}
+
+// ClearScrapeAttemptedAt clears the value of the "scrape_attempted_at" field.
+func (_u *LinkUpdate) ClearScrapeAttemptedAt() *LinkUpdate {
+	_u.mutation.ClearScrapeAttemptedAt()
+	return _u
+}
+
+// SetScrapedAt sets the "scraped_at" field.
+func (_u *LinkUpdate) SetScrapedAt(v time.Time) *LinkUpdate {
+	_u.mutation.SetScrapedAt(v)
+	return _u
+}
+
+// SetNillableScrapedAt sets the "scraped_at" field if the given value is not nil.
+func (_u *LinkUpdate) SetNillableScrapedAt(v *time.Time) *LinkUpdate {
+	if v != nil {
+		_u.SetScrapedAt(*v)
+	}
+	return _u
+}
+
+// ClearScrapedAt clears the value of the "scraped_at" field.
+func (_u *LinkUpdate) ClearScrapedAt() *LinkUpdate {
+	_u.mutation.ClearScrapedAt()
 	return _u
 }
 
@@ -376,6 +486,21 @@ func (_u *LinkUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (_u *LinkUpdate) check() error {
+	if v, ok := _u.mutation.LivenessStatus(); ok {
+		if err := link.LivenessStatusValidator(v); err != nil {
+			return &ValidationError{Name: "liveness_status", err: fmt.Errorf(`ent: validator failed for field "Link.liveness_status": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.ScrapeStatus(); ok {
+		if err := link.ScrapeStatusValidator(v); err != nil {
+			return &ValidationError{Name: "scrape_status", err: fmt.Errorf(`ent: validator failed for field "Link.scrape_status": %w`, err)}
+		}
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (_u *LinkUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *LinkUpdate {
 	_u.modifiers = append(_u.modifiers, modifiers...)
@@ -383,6 +508,9 @@ func (_u *LinkUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *LinkUpdat
 }
 
 func (_u *LinkUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(link.Table, link.Columns, sqlgraph.NewFieldSpec(link.FieldID, field.TypeString))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -399,6 +527,36 @@ func (_u *LinkUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(link.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.LivenessStatus(); ok {
+		_spec.SetField(link.FieldLivenessStatus, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.LivenessCheckedAt(); ok {
+		_spec.SetField(link.FieldLivenessCheckedAt, field.TypeTime, value)
+	}
+	if _u.mutation.LivenessCheckedAtCleared() {
+		_spec.ClearField(link.FieldLivenessCheckedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.LivenessFailures(); ok {
+		_spec.SetField(link.FieldLivenessFailures, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedLivenessFailures(); ok {
+		_spec.AddField(link.FieldLivenessFailures, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.ScrapeStatus(); ok {
+		_spec.SetField(link.FieldScrapeStatus, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.ScrapeAttemptedAt(); ok {
+		_spec.SetField(link.FieldScrapeAttemptedAt, field.TypeTime, value)
+	}
+	if _u.mutation.ScrapeAttemptedAtCleared() {
+		_spec.ClearField(link.FieldScrapeAttemptedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.ScrapedAt(); ok {
+		_spec.SetField(link.FieldScrapedAt, field.TypeTime, value)
+	}
+	if _u.mutation.ScrapedAtCleared() {
+		_spec.ClearField(link.FieldScrapedAt, field.TypeTime)
 	}
 	if _u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -747,6 +905,115 @@ func (_u *LinkUpdateOne) SetNillableDescription(v *string) *LinkUpdateOne {
 	return _u
 }
 
+// SetLivenessStatus sets the "liveness_status" field.
+func (_u *LinkUpdateOne) SetLivenessStatus(v link.LivenessStatus) *LinkUpdateOne {
+	_u.mutation.SetLivenessStatus(v)
+	return _u
+}
+
+// SetNillableLivenessStatus sets the "liveness_status" field if the given value is not nil.
+func (_u *LinkUpdateOne) SetNillableLivenessStatus(v *link.LivenessStatus) *LinkUpdateOne {
+	if v != nil {
+		_u.SetLivenessStatus(*v)
+	}
+	return _u
+}
+
+// SetLivenessCheckedAt sets the "liveness_checked_at" field.
+func (_u *LinkUpdateOne) SetLivenessCheckedAt(v time.Time) *LinkUpdateOne {
+	_u.mutation.SetLivenessCheckedAt(v)
+	return _u
+}
+
+// SetNillableLivenessCheckedAt sets the "liveness_checked_at" field if the given value is not nil.
+func (_u *LinkUpdateOne) SetNillableLivenessCheckedAt(v *time.Time) *LinkUpdateOne {
+	if v != nil {
+		_u.SetLivenessCheckedAt(*v)
+	}
+	return _u
+}
+
+// ClearLivenessCheckedAt clears the value of the "liveness_checked_at" field.
+func (_u *LinkUpdateOne) ClearLivenessCheckedAt() *LinkUpdateOne {
+	_u.mutation.ClearLivenessCheckedAt()
+	return _u
+}
+
+// SetLivenessFailures sets the "liveness_failures" field.
+func (_u *LinkUpdateOne) SetLivenessFailures(v int) *LinkUpdateOne {
+	_u.mutation.ResetLivenessFailures()
+	_u.mutation.SetLivenessFailures(v)
+	return _u
+}
+
+// SetNillableLivenessFailures sets the "liveness_failures" field if the given value is not nil.
+func (_u *LinkUpdateOne) SetNillableLivenessFailures(v *int) *LinkUpdateOne {
+	if v != nil {
+		_u.SetLivenessFailures(*v)
+	}
+	return _u
+}
+
+// AddLivenessFailures adds value to the "liveness_failures" field.
+func (_u *LinkUpdateOne) AddLivenessFailures(v int) *LinkUpdateOne {
+	_u.mutation.AddLivenessFailures(v)
+	return _u
+}
+
+// SetScrapeStatus sets the "scrape_status" field.
+func (_u *LinkUpdateOne) SetScrapeStatus(v link.ScrapeStatus) *LinkUpdateOne {
+	_u.mutation.SetScrapeStatus(v)
+	return _u
+}
+
+// SetNillableScrapeStatus sets the "scrape_status" field if the given value is not nil.
+func (_u *LinkUpdateOne) SetNillableScrapeStatus(v *link.ScrapeStatus) *LinkUpdateOne {
+	if v != nil {
+		_u.SetScrapeStatus(*v)
+	}
+	return _u
+}
+
+// SetScrapeAttemptedAt sets the "scrape_attempted_at" field.
+func (_u *LinkUpdateOne) SetScrapeAttemptedAt(v time.Time) *LinkUpdateOne {
+	_u.mutation.SetScrapeAttemptedAt(v)
+	return _u
+}
+
+// SetNillableScrapeAttemptedAt sets the "scrape_attempted_at" field if the given value is not nil.
+func (_u *LinkUpdateOne) SetNillableScrapeAttemptedAt(v *time.Time) *LinkUpdateOne {
+	if v != nil {
+		_u.SetScrapeAttemptedAt(*v)
+	}
+	return _u
+}
+
+// ClearScrapeAttemptedAt clears the value of the "scrape_attempted_at" field.
+func (_u *LinkUpdateOne) ClearScrapeAttemptedAt() *LinkUpdateOne {
+	_u.mutation.ClearScrapeAttemptedAt()
+	return _u
+}
+
+// SetScrapedAt sets the "scraped_at" field.
+func (_u *LinkUpdateOne) SetScrapedAt(v time.Time) *LinkUpdateOne {
+	_u.mutation.SetScrapedAt(v)
+	return _u
+}
+
+// SetNillableScrapedAt sets the "scraped_at" field if the given value is not nil.
+func (_u *LinkUpdateOne) SetNillableScrapedAt(v *time.Time) *LinkUpdateOne {
+	if v != nil {
+		_u.SetScrapedAt(*v)
+	}
+	return _u
+}
+
+// ClearScrapedAt clears the value of the "scraped_at" field.
+func (_u *LinkUpdateOne) ClearScrapedAt() *LinkUpdateOne {
+	_u.mutation.ClearScrapedAt()
+	return _u
+}
+
 // SetPrimaryAssetID sets the "primary_asset_id" field.
 func (_u *LinkUpdateOne) SetPrimaryAssetID(v xid.ID) *LinkUpdateOne {
 	_u.mutation.SetPrimaryAssetID(v)
@@ -1062,6 +1329,21 @@ func (_u *LinkUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (_u *LinkUpdateOne) check() error {
+	if v, ok := _u.mutation.LivenessStatus(); ok {
+		if err := link.LivenessStatusValidator(v); err != nil {
+			return &ValidationError{Name: "liveness_status", err: fmt.Errorf(`ent: validator failed for field "Link.liveness_status": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.ScrapeStatus(); ok {
+		if err := link.ScrapeStatusValidator(v); err != nil {
+			return &ValidationError{Name: "scrape_status", err: fmt.Errorf(`ent: validator failed for field "Link.scrape_status": %w`, err)}
+		}
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (_u *LinkUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *LinkUpdateOne {
 	_u.modifiers = append(_u.modifiers, modifiers...)
@@ -1069,6 +1351,9 @@ func (_u *LinkUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *LinkUp
 }
 
 func (_u *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(link.Table, link.Columns, sqlgraph.NewFieldSpec(link.FieldID, field.TypeString))
 	id, ok := _u.mutation.ID()
 	if !ok {
@@ -1102,6 +1387,36 @@ func (_u *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) {
 	}
 	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(link.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.LivenessStatus(); ok {
+		_spec.SetField(link.FieldLivenessStatus, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.LivenessCheckedAt(); ok {
+		_spec.SetField(link.FieldLivenessCheckedAt, field.TypeTime, value)
+	}
+	if _u.mutation.LivenessCheckedAtCleared() {
+		_spec.ClearField(link.FieldLivenessCheckedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.LivenessFailures(); ok {
+		_spec.SetField(link.FieldLivenessFailures, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedLivenessFailures(); ok {
+		_spec.AddField(link.FieldLivenessFailures, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.ScrapeStatus(); ok {
+		_spec.SetField(link.FieldScrapeStatus, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.ScrapeAttemptedAt(); ok {
+		_spec.SetField(link.FieldScrapeAttemptedAt, field.TypeTime, value)
+	}
+	if _u.mutation.ScrapeAttemptedAtCleared() {
+		_spec.ClearField(link.FieldScrapeAttemptedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.ScrapedAt(); ok {
+		_spec.SetField(link.FieldScrapedAt, field.TypeTime, value)
+	}
+	if _u.mutation.ScrapedAtCleared() {
+		_spec.ClearField(link.FieldScrapedAt, field.TypeTime)
 	}
 	if _u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{

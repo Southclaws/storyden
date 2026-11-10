@@ -1,7 +1,6 @@
 package message
 
 import (
-	"net/url"
 	"time"
 
 	"github.com/Southclaws/opt"
@@ -105,13 +104,4 @@ type CommandSendBeacon struct {
 	Item       datagraph.Ref
 	Subject    opt.Optional[account_ref.ID]
 	ReceivedAt time.Time
-}
-
-// -
-// Scraping commands
-// -
-
-type CommandScrapeLink struct {
-	URL  url.URL
-	Item *datagraph.Ref
 }
