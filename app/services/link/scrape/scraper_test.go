@@ -11,7 +11,8 @@ import (
 
 func Test_scraper_Scrape(t *testing.T) {
 	ctx := context.Background()
-	sc := New()
+	sc, err := New()
+	require.NoError(t, err)
 
 	u, err := link_url.Parse("https://ogp.me/")
 	require.NoError(t, err)
@@ -27,6 +28,8 @@ func Test_scraper_Scrape(t *testing.T) {
 
 func TestScrapeRejectsZeroURL(t *testing.T) {
 	t.Parallel()
-	_, err := New().Scrape(context.Background(), link_url.URL{})
+	sc, err := New()
+	require.NoError(t, err)
+	_, err = sc.Scrape(context.Background(), link_url.URL{})
 	require.ErrorIs(t, err, link_url.ErrEmpty)
 }

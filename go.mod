@@ -51,6 +51,8 @@ require (
 	github.com/dgraph-io/ristretto/v2 v2.4.2
 	github.com/durable-streams/durable-streams/packages/client-go v0.2.0
 	github.com/dustin/go-humanize v1.1.0
+	github.com/enetx/http v1.0.36
+	github.com/enetx/surf v1.0.223
 	github.com/forPelevin/gomoji v1.4.1
 	github.com/gabriel-vasile/mimetype v1.4.16
 	github.com/gen2brain/webp v0.6.4
@@ -140,6 +142,7 @@ require (
 	github.com/RoaringBitmap/roaring/v2 v2.30.0 // indirect
 	github.com/Southclaws/schemancer v1.2.1-0.20260728191127-dce16f80a18f // indirect
 	github.com/alecthomas/chroma/v2 v2.27.0 // indirect
+	github.com/andybalholm/brotli v1.2.8 // indirect
 	github.com/andybalholm/cascadia v1.3.5 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
@@ -194,6 +197,8 @@ require (
 	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936 // indirect
 	github.com/dvsekhvalnov/jose2go v1.11.0 // indirect
 	github.com/ebitengine/purego v0.11.3 // indirect
+	github.com/enetx/g v1.1.1 // indirect
+	github.com/enetx/quic-go v1.0.13 // indirect
 	github.com/fatih/color v1.19.0 // indirect
 	github.com/felixge/httpsnoop v1.1.0 // indirect
 	github.com/fogleman/gg v1.3.0 // indirect
@@ -251,6 +256,7 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/molecule-man/go-brrr v1.3.1 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/mtibben/percent v0.2.1 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
@@ -279,7 +285,9 @@ require (
 	github.com/prometheus/client_model v0.6.3 // indirect
 	github.com/prometheus/common v0.73.1 // indirect
 	github.com/prometheus/procfs v0.23.0 // indirect
+	github.com/quic-go/qpack v0.6.0 // indirect
 	github.com/rabbitmq/amqp091-go v1.16.0 // indirect
+	github.com/refraction-networking/utls v1.8.3-0.20261108164504-a13c59ffe98b // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/sanity-io/litter v1.5.8 // indirect
@@ -308,6 +316,7 @@ require (
 	github.com/vanng822/css v1.0.1 // indirect
 	github.com/vanng822/go-premailer v1.38.0 // indirect
 	github.com/vmware-labs/yaml-jsonpath v0.3.2 // indirect
+	github.com/wzshiming/socks5 v0.8.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xo/terminfo v1.3.1 // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect

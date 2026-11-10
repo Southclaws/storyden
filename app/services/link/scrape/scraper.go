@@ -37,8 +37,12 @@ type webScraper struct {
 	client *http.Client
 }
 
-func New() Scraper {
-	client := httpsafe.NewClient(httpsafe.Config{Timeout: scrapeFetchTimeout})
+func New() (Scraper, error) {
+	client, err := httpsafe.NewSurfClient(httpsafe.Config{Timeout: scrapeFetchTimeout})
+	if err != nil {
+		return nil, err
+	}
+
 	redirectPolicy := client.CheckRedirect
 	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 		if _, err := link_url.Parse(req.URL.String()); err != nil {
@@ -48,7 +52,7 @@ func New() Scraper {
 		return redirectPolicy(req, via)
 	}
 
-	return &webScraper{client: client}
+	return &webScraper{client: client}, nil
 }
 
 func (s *webScraper) Scrape(ctx context.Context, addr link_url.URL) (*WebContent, error) {
@@ -60,21 +64,6 @@ func (s *webScraper) Scrape(ctx context.Context, addr link_url.URL) (*WebContent
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	req.Header.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
-	req.Header.Add("Accept-Language", "en-GB,en-US;q=0.9,en;q=0.8")
-	req.Header.Add("Cache-Control", "no-cache")
-	req.Header.Add("Dnt", "1")
-	req.Header.Add("Pragma", "no-cache")
-	req.Header.Add("Sec-Ch-Ua", `"Google Chrome";v="119", "Chromium";v="119", "Not?A_Brand";v="24"`)
-	req.Header.Add("Sec-Ch-Ua-Mobile", "?0")
-	req.Header.Add("Sec-Ch-Ua-Platform", `"macOS"`)
-	req.Header.Add("Sec-Fetch-Dest", "document")
-	req.Header.Add("Sec-Fetch-Mode", "navigate")
-	req.Header.Add("Sec-Fetch-Site", "none")
-	req.Header.Add("Sec-Fetch-User", "?1")
-	req.Header.Add("Upgrade-Insecure-Requests", "1")
-	req.Header.Add("User-Agent", `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`)
 
 	resp, err := s.client.Do(req)
 	if err != nil {

@@ -59,7 +59,12 @@ func New(
 	sc scrape.Scraper,
 	jobs *background_job.Repository,
 	dispatcher job_dispatcher.Dispatcher,
-) *Fetcher {
+) (*Fetcher, error) {
+	client, err := httpsafe.NewSurfClient(httpsafe.Config{Timeout: assetFetchTimeout})
+	if err != nil {
+		return nil, err
+	}
+
 	return &Fetcher{
 		logger:     logger,
 		uploader:   uploader,
@@ -68,8 +73,8 @@ func New(
 		sc:         sc,
 		jobs:       jobs,
 		dispatcher: dispatcher,
-		client:     httpsafe.NewClient(httpsafe.Config{Timeout: assetFetchTimeout}),
-	}
+		client:     client,
+	}, nil
 }
 
 const (
