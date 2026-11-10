@@ -14,6 +14,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/role"
+	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/seed"
@@ -107,7 +108,9 @@ func TestResourceProfileReferencesIncludeRoles(t *testing.T) {
 			tests.AssertRequest(cl.CollectionAddNodeWithResponse(authorCtx, collectionCreate.JSON200.Id, nodeCreate.JSON200.Id, authorSession))(t, http.StatusOK)
 
 			linkURL := "https://role-link-" + xid.New().String() + ".invalid/"
-			_, err := links.Store(authorCtx, linkURL, "Role Link Test", "")
+			parsedLinkURL, err := link_url.Parse(linkURL)
+			require.NoError(t, err)
+			_, err = links.Store(authorCtx, parsedLinkURL, "Role Link Test", "")
 			require.NoError(t, err)
 
 			threadWithLink := tests.AssertRequest(cl.ThreadCreateWithResponse(authorCtx, openapi.ThreadInitialProps{
