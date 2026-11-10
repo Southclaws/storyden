@@ -87,6 +87,10 @@ export function useAssetUploadEditor(props: Props) {
   }
 
   function onSave() {
+    if (!file) {
+      return;
+    }
+
     if (!ref || !ref.current) {
       return;
     }
