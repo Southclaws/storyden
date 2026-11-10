@@ -104,12 +104,19 @@ export function useLibraryPageLinkBlock() {
 
       const url = u.toString();
 
-      await handle(async () => {
-        setResolvedLink(null);
-        const link = await linkCreate({ url });
-        setResolvedLink(link);
-        setLink(link);
-      });
+      await handle(
+        async () => {
+          setResolvedLink(null);
+          const link = await linkCreate({ url });
+          setResolvedLink(link);
+          setLink(link);
+        },
+        {
+          onError: async () => {
+            setResolvedLink(undefined);
+          },
+        },
+      );
     }, 500),
   ).current;
 

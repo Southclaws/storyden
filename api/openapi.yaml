@@ -3986,6 +3986,7 @@ paths:
       operationId: LinkCreate
       description: |
         Save a URL as a community bookmark and retrieve available page metadata.
+        Requires Use Links permission.
         Only public HTTP(S) URLs with fully qualified DNS hostnames, no
         credentials, and no explicit ports are accepted, including redirect
         destinations.
@@ -4001,8 +4002,9 @@ paths:
       requestBody: { $ref: "#/components/requestBodies/LinkCreate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
         "401": { $ref: "#/components/responses/Unauthorised" }
+        "400": { $ref: "#/components/responses/BadRequest" }
         "200": { $ref: "#/components/responses/LinkCreateOK" }
     get:
       operationId: LinkList
@@ -4011,6 +4013,7 @@ paths:
         descriptions, and URLs. URL and domain searches match HTTP and HTTPS
         forms with or without www, while distinguishing different hostnames.
         Search does not create or refresh links.
+        Requires View Links permission.
       tags: [links]
       parameters:
         - $ref: "#/components/parameters/SearchQuery"
@@ -4018,6 +4021,7 @@ paths:
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
+        "403": { $ref: "#/components/responses/Forbidden" }
         "200": { $ref: "#/components/responses/LinkListOK" }
 
   /links/{link_slug}:
@@ -4032,6 +4036,19 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "200": { $ref: "#/components/responses/LinkGetOK" }
+    delete:
+      operationId: LinkDelete
+      description: |
+        Delete a community bookmark. Associated posts, replies, library pages,
+        and uploaded assets are preserved. Requires Manage Links permission.
+      tags: [links]
+      parameters: [{ $ref: "#/components/parameters/LinkSlugParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "204": { $ref: "#/components/responses/NoContent" }
 
   #
   #      888          888                                               888
@@ -9508,6 +9525,10 @@ components:
         - "MANAGE_LIBRARY"
         - "SUBMIT_LIBRARY_NODE"
         - "SUBMIT_LIBRARY_NODE_CHANGES"
+        # Links
+        - "VIEW_LINKS"
+        - "USE_LINKS"
+        - "MANAGE_LINKS"
         # Assets
         - "UPLOAD_ASSET"
         # Events

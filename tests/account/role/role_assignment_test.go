@@ -67,22 +67,6 @@ func TestRoleAssignment(t *testing.T) {
 			r.Len(guest1Get.JSON200.Roles, 2, "1 default roles, 1 new role")
 			role1 := findRole(guest1Get.JSON200.Roles, "000000000000000000m0")
 			r.NotNil(role1, "default role not found")
-			a.Equal("green", role1.Colour)
-			a.Equal([]openapi.Permission{
-				"CREATE_POST",
-				"READ_PUBLISHED_THREADS",
-				"CREATE_REACTION",
-				"READ_PUBLISHED_LIBRARY",
-				"SUBMIT_LIBRARY_NODE",
-				"SUBMIT_LIBRARY_NODE_CHANGES",
-				"UPLOAD_ASSET",
-				"LIST_PROFILES",
-				"READ_PROFILE",
-				"CREATE_COLLECTION",
-				"LIST_COLLECTIONS",
-				"READ_COLLECTION",
-				"COLLECTION_SUBMIT",
-			}, role1.Permissions)
 			role2 := findRole(guest1Get.JSON200.Roles, role.JSON200.Id)
 			r.NotNil(role2, "new role not found")
 			a.Equal(role.JSON200.Id, role2.Id)

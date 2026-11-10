@@ -16,6 +16,7 @@ var ErrPermissions = fault.New("invalid permissions", ftag.With(ftag.PermissionD
 var readPermissions = []Permission{
 	PermissionReadPublishedThreads,
 	PermissionReadPublishedLibrary,
+	PermissionViewLinks,
 	PermissionListProfiles,
 	PermissionReadProfile,
 	PermissionListCollections,
@@ -31,6 +32,8 @@ var writePermissions = []Permission{
 	PermissionManageLibrary,
 	PermissionSubmitLibraryNode,
 	PermissionSubmitLibraryNodeChanges,
+	PermissionUseLinks,
+	PermissionManageLinks,
 	PermissionUploadAsset,
 	PermissionManageEvents,
 	PermissionCreateCollection,

@@ -12,8 +12,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/link/link_url"
+	"github.com/Southclaws/storyden/app/resources/rbac"
+	authsession "github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/link/scrape"
 	"github.com/Southclaws/storyden/lib/mcp"
 )
@@ -119,4 +122,14 @@ func TestWebResearchGuidanceUsesConversationAvailability(t *testing.T) {
 	require.NoError(t, err)
 	assert.Contains(t, webResearchNextAction(ctx, "https://example.com"), "configured tools")
 	assert.NotContains(t, webResearchNextAction(ctx, "https://example.com"), "toolset_load")
+}
+
+func TestLinkCreateRequiresUsePermission(t *testing.T) {
+	links := &linkTools{}
+	ctx := authsession.WithGuestPermissions(context.Background(), rbac.NewList(rbac.PermissionViewLinks))
+
+	_, err := links.ExecuteLinkCreate(ctx, mcp.ToolLinkCreateInput{Url: "https://example.com/"})
+
+	require.Error(t, err)
+	assert.Equal(t, ftag.PermissionDenied, ftag.Get(err))
 }

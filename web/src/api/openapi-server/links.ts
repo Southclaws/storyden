@@ -9,12 +9,14 @@
  */
 import type {
   BadRequestResponse,
+  ForbiddenResponse,
   InternalServerErrorResponse,
   LinkCreateBody,
   LinkCreateOKResponse,
   LinkGetOKResponse,
   LinkListOKResponse,
   LinkListParams,
+  NoContentResponse,
   NotFoundResponse,
   UnauthorisedResponse,
 } from "../openapi-schema";
@@ -77,9 +79,14 @@ export type linkCreateResponse401 = {
   status: 401;
 };
 
+export type linkCreateResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
 export type linkCreateResponseDefault = {
   data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 400 | 401>;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 403>;
 };
 
 export type linkCreateResponseSuccess = linkCreateResponse200 & {
@@ -88,6 +95,7 @@ export type linkCreateResponseSuccess = linkCreateResponse200 & {
 export type linkCreateResponseError = (
   | linkCreateResponse400
   | linkCreateResponse401
+  | linkCreateResponse403
   | linkCreateResponseDefault
 ) & {
   headers: Headers;
@@ -99,6 +107,7 @@ export const getLinkCreateUrl = () => {
 
 /**
  * Save a URL as a community bookmark and retrieve available page metadata.
+ * Requires Use Links permission.
  * Only public HTTP(S) URLs with fully qualified DNS hostnames, no
  * credentials, and no explicit ports are accepted, including redirect
  * destinations.
@@ -152,6 +161,11 @@ export type linkListResponse200 = {
   status: 200;
 };
 
+export type linkListResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
 export type linkListResponse404 = {
   data: NotFoundResponse;
   status: 404;
@@ -159,13 +173,14 @@ export type linkListResponse404 = {
 
 export type linkListResponseDefault = {
   data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 404>;
+  status: Exclude<HTTPStatusCodes, 200 | 403 | 404>;
 };
 
 export type linkListResponseSuccess = linkListResponse200 & {
   headers: Headers;
 };
 export type linkListResponseError = (
+  | linkListResponse403
   | linkListResponse404
   | linkListResponseDefault
 ) & {
@@ -193,6 +208,7 @@ export const getLinkListUrl = (params?: LinkListParams) => {
  * descriptions, and URLs. URL and domain searches match HTTP and HTTPS
  * forms with or without www, while distinguishing different hostnames.
  * Search does not create or refresh links.
+ * Requires View Links permission.
  */
 export const linkList = async (
   params?: LinkListParams,
@@ -244,5 +260,60 @@ export const linkGet = async (
   return fetcher<linkGetResponseSuccess>(getLinkGetUrl(linkSlug), {
     ...options,
     method: "GET",
+  });
+};
+
+export type linkDeleteResponse204 = {
+  data: NoContentResponse;
+  status: 204;
+};
+
+export type linkDeleteResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type linkDeleteResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type linkDeleteResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type linkDeleteResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 204 | 401 | 403 | 404>;
+};
+
+export type linkDeleteResponseSuccess = linkDeleteResponse204 & {
+  headers: Headers;
+};
+export type linkDeleteResponseError = (
+  | linkDeleteResponse401
+  | linkDeleteResponse403
+  | linkDeleteResponse404
+  | linkDeleteResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getLinkDeleteUrl = (linkSlug: string) => {
+  return `/links/${linkSlug}`;
+};
+
+/**
+ * Delete a community bookmark. Associated posts, replies, library pages,
+ * and uploaded assets are preserved. Requires Manage Links permission.
+ */
+export const linkDelete = async (
+  linkSlug: string,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<linkDeleteResponseSuccess> => {
+  return fetcher<linkDeleteResponseSuccess>(getLinkDeleteUrl(linkSlug), {
+    ...options,
+    method: "DELETE",
   });
 };

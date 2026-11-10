@@ -871,15 +871,19 @@ func (m *Mapping) NodeUpdatePosition() (bool, *rbac.Permission) {
 }
 
 func (m *Mapping) LinkCreate() (bool, *rbac.Permission) {
-	return true, nil
+	return true, nil // See NOTE.
 }
 
 func (m *Mapping) LinkList() (bool, *rbac.Permission) {
-	return false, &rbac.PermissionReadPublishedLibrary
+	return false, nil // See NOTE.
 }
 
 func (m *Mapping) LinkGet() (bool, *rbac.Permission) {
-	return true, &rbac.PermissionReadPublishedLibrary
+	return false, nil // See NOTE.
+}
+
+func (m *Mapping) LinkDelete() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageLinks
 }
 
 func (m *Mapping) DatagraphSearch() (bool, *rbac.Permission) {

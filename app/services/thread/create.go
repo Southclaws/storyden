@@ -112,6 +112,12 @@ func (s *service) Create(ctx context.Context,
 }
 
 func authoriseMutation(ctx context.Context, partial Partial) error {
+	if partial.URL.Ok() {
+		if err := session.Authorise(ctx, nil, rbac.PermissionUseLinks, rbac.PermissionManageLinks); err != nil {
+			return fault.Wrap(err, fctx.With(ctx), fmsg.WithDesc("missing link permission", "You need the Use Links permission to add a link. Ask an administrator to grant it."))
+		}
+	}
+
 	if partial.Locked.Ok() {
 		if err := session.Authorise(ctx, nil, rbac.PermissionManagePosts); err != nil {
 			return fault.Wrap(err,

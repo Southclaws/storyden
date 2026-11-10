@@ -17,11 +17,11 @@ export function LinkIndexView(props: Props) {
 
   let submitLabel = "Search";
 
-  if (data.isURL) {
+  if (data.isURL && data.canUseLinks) {
     submitLabel = "Add link";
   }
 
-  if (data.isURL && data.isSaved) {
+  if (data.isURL && data.canUseLinks && data.isSaved) {
     submitLabel = "Saved";
   }
 
@@ -90,7 +90,7 @@ export function LinkIndexView(props: Props) {
           borderLeftRadius="none"
           type="submit"
           width="min"
-          disabled={data.isURL && data.isSaved}
+          disabled={data.canUseLinks && data.isURL && data.isSaved}
           loading={data.adding.state === "adding"}
           loadingText="Adding…"
         >

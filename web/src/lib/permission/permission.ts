@@ -61,6 +61,23 @@ export const PermissionDetails: Record<Permission, PermissionDetail> = {
     name: "Submit library page changes",
     description: "Submit proposed changes to existing library pages.",
   },
+  [Permission.VIEW_LINKS]: {
+    value: Permission.VIEW_LINKS,
+    name: "View links",
+    description: "Browse and search the community bookmark list.",
+  },
+  [Permission.USE_LINKS]: {
+    value: Permission.USE_LINKS,
+    name: "Use links",
+    description:
+      "Explicitly save community bookmarks or attach links to content. Includes View links. URLs mentioned in content can still be indexed automatically without this permission.",
+  },
+  [Permission.MANAGE_LINKS]: {
+    value: Permission.MANAGE_LINKS,
+    name: "Manage links",
+    description:
+      "Delete community bookmarks. Linked posts and library pages are preserved. Includes Use links and View links.",
+  },
   [Permission.UPLOAD_ASSET]: {
     value: Permission.UPLOAD_ASSET,
     name: "Upload assets",

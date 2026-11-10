@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/link"
@@ -14,6 +15,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
 
+	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
@@ -37,6 +40,10 @@ func NewLinks(
 }
 
 func (i *Links) LinkCreate(ctx context.Context, request openapi.LinkCreateRequestObject) (openapi.LinkCreateResponseObject, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionUseLinks, rbac.PermissionManageLinks); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.WithDesc("missing link permission", "You need the Use Links permission to add a link. Ask an administrator to grant it."))
+	}
+
 	u, err := link_url.Parse(request.Body.Url)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -53,6 +60,10 @@ func (i *Links) LinkCreate(ctx context.Context, request openapi.LinkCreateReques
 }
 
 func (i *Links) LinkList(ctx context.Context, request openapi.LinkListRequestObject) (openapi.LinkListResponseObject, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionViewLinks, rbac.PermissionUseLinks, rbac.PermissionManageLinks); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	params := deserialisePageParams(request.Params.Page, 50)
 
 	opts := []link_querier.Filter{}
@@ -87,6 +98,14 @@ func (i *Links) LinkGet(ctx context.Context, request openapi.LinkGetRequestObjec
 	return openapi.LinkGet200JSONResponse{
 		LinkGetOKJSONResponse: openapi.LinkGetOKJSONResponse(serialiseLink(l)),
 	}, nil
+}
+
+func (i *Links) LinkDelete(ctx context.Context, request openapi.LinkDeleteRequestObject) (openapi.LinkDeleteResponseObject, error) {
+	if err := i.linkWriter.Delete(ctx, request.LinkSlug); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.LinkDelete204Response{}, nil
 }
 
 func serialiseLink(in *link.Link) openapi.Link {

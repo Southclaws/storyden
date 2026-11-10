@@ -15,6 +15,9 @@ oneOf:
   - $ref: "#/$defs/MANAGE_LIBRARY"
   - $ref: "#/$defs/SUBMIT_LIBRARY_NODE"
   - $ref: "#/$defs/SUBMIT_LIBRARY_NODE_CHANGES"
+  - $ref: "#/$defs/VIEW_LINKS"
+  - $ref: "#/$defs/USE_LINKS"
+  - $ref: "#/$defs/MANAGE_LINKS"
   - $ref: "#/$defs/UPLOAD_ASSET"
   - $ref: "#/$defs/MANAGE_EVENTS"
   - $ref: "#/$defs/LIST_PROFILES"
@@ -100,6 +103,24 @@ $defs:
     const: SUBMIT_LIBRARY_NODE_CHANGES
     title: Submit library page changes
     description: Submit proposed edits to existing library pages.
+
+  VIEW_LINKS:
+    type: string
+    const: VIEW_LINKS
+    title: View links
+    description: Browse and search the community bookmark list.
+
+  USE_LINKS:
+    type: string
+    const: USE_LINKS
+    title: Use links
+    description: Explicitly save community bookmarks or attach links to content. Includes View links. URLs mentioned in content can still be indexed automatically without this permission.
+
+  MANAGE_LINKS:
+    type: string
+    const: MANAGE_LINKS
+    title: Manage links
+    description: Delete community bookmarks. Linked posts and library pages are preserved. Includes Use links and View links.
 
   UPLOAD_ASSET:
     type: string

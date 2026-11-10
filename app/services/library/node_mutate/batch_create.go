@@ -37,7 +37,11 @@ func (s *Manager) CreateMany(ctx context.Context, items []BatchCreate) ([]BatchR
 		return nil, err
 	}
 
-	options := s.batchOptions(ctx, fields, make([]node_querier.MutationState, len(items)), parents)
+	options, err := s.batchOptions(ctx, fields, make([]node_querier.MutationState, len(items)), parents)
+	if err != nil {
+		return nil, err
+	}
+
 	writes := make([]node_writer.CreateInput, len(items))
 	results := make([]BatchResult, len(items))
 	events := make([]any, 0, len(items)*2)

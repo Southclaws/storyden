@@ -8,19 +8,21 @@
  * OpenAPI spec version: v1.26.16-post
  */
 import useSwr from "swr";
-import type { Key, SWRConfiguration } from "swr";
+import type { Arguments, Key, SWRConfiguration } from "swr";
 import useSWRMutation from "swr/mutation";
 import type { SWRMutationConfiguration } from "swr/mutation";
 
 import { fetcher } from "../client";
 import type {
   BadRequestResponse,
+  ForbiddenResponse,
   InternalServerErrorResponse,
   LinkCreateBody,
   LinkCreateOKResponse,
   LinkGetOKResponse,
   LinkListOKResponse,
   LinkListParams,
+  NoContentResponse,
   NotFoundResponse,
   UnauthorisedResponse,
 } from "../openapi-schema";
@@ -33,6 +35,7 @@ export const getLinkCreateUrl = () => {
 
 /**
  * Save a URL as a community bookmark and retrieve available page metadata.
+ * Requires Use Links permission.
  * Only public HTTP(S) URLs with fully qualified DNS hostnames, no
  * credentials, and no explicit ports are accepted, including redirect
  * destinations.
@@ -98,6 +101,7 @@ export const useLinkCreate = <
   TError =
     | BadRequestResponse
     | UnauthorisedResponse
+    | ForbiddenResponse
     | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
@@ -142,6 +146,7 @@ export const getLinkListUrl = (params?: LinkListParams) => {
  * descriptions, and URLs. URL and domain searches match HTTP and HTTPS
  * forms with or without www, while distinguishing different hostnames.
  * Search does not create or refresh links.
+ * Requires View Links permission.
  */
 export const linkList = async (
   params?: LinkListParams,
@@ -161,7 +166,7 @@ export type LinkListQueryResult = NonNullable<
 >;
 
 export const useLinkList = <
-  TError = NotFoundResponse | InternalServerErrorResponse,
+  TError = ForbiddenResponse | NotFoundResponse | InternalServerErrorResponse,
 >(
   params?: LinkListParams,
   options?: {
@@ -242,6 +247,70 @@ export const useLinkGet = <
     swrFn,
     swrOptions,
   );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getLinkDeleteUrl = (linkSlug: string) => {
+  return `/links/${linkSlug}`;
+};
+
+/**
+ * Delete a community bookmark. Associated posts, replies, library pages,
+ * and uploaded assets are preserved. Requires Manage Links permission.
+ */
+export const linkDelete = async (
+  linkSlug: string,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<NoContentResponse> => {
+  return fetcher<NoContentResponse>(getLinkDeleteUrl(linkSlug), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getLinkDeleteMutationFetcher = (
+  linkSlug: string,
+  options?: SecondParameter<typeof fetcher>,
+) => {
+  return (_: Key, __: { arg: Arguments }) => {
+    return linkDelete(linkSlug, options);
+  };
+};
+export const getLinkDeleteMutationKey = (linkSlug: string) =>
+  [`/links/${linkSlug}`] as const;
+
+export type LinkDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof linkDelete>>
+>;
+
+export const useLinkDelete = <
+  TError =
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  linkSlug: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof linkDelete>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof linkDelete>>
+    > & { swrKey?: string };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getLinkDeleteMutationKey(linkSlug);
+  const swrFn = getLinkDeleteMutationFetcher(linkSlug, requestOptions);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
   return {
     swrKey,

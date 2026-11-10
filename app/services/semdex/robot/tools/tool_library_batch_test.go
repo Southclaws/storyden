@@ -135,7 +135,7 @@ func TestLibraryURLFallbackAndStorageFailure(t *testing.T) {
 	integration.Test(t, nil, fx.Decorate(func(scrape.Scraper) scrape.Scraper { return unavailablePageScraper{} }), fx.Invoke(func(lc fx.Lifecycle, ctx context.Context, registry *robottools.Registry, aw *account_writer.Writer, reader *node_querier.Querier, db *ent.Client) {
 		lc.Append(fx.StartHook(func() {
 			ctx, account := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
-			ctx = session.WithAccountPermissions(ctx, *account, rbac.NewList(rbac.PermissionManageLibrary))
+			ctx = session.WithAccountPermissions(ctx, *account, rbac.NewList(rbac.PermissionManageLibrary, rbac.PermissionUseLinks))
 			create, err := registry.GetTool(ctx, "library_pages_create")
 			require.NoError(t, err)
 			created := callLibraryTool(t, create, ctx, `{"items":[{"ref":"fallback","name":"Unavailable source","url":"https://example.com/unavailable"}]}`)

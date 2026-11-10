@@ -15,17 +15,22 @@ import type { LinkListResult, LinkReference } from "@/api/openapi-schema";
 
 import { LinkIndexView } from "./LinkIndexView";
 
-const { list, create, onUrlUpdate } = vi.hoisted(() => ({
+const { list, create, onUrlUpdate, auth } = vi.hoisted(() => ({
   list: vi.fn(),
   create: vi.fn(),
   onUrlUpdate: vi.fn(),
+  auth: { canUseLinks: true },
 }));
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),
 }));
 
-vi.mock("@/auth", () => ({ useSession: () => undefined }));
+vi.mock("@/auth", () => ({
+  useSession: () => ({
+    roles: [{ permissions: auth.canUseLinks ? ["USE_LINKS"] : [] }],
+  }),
+}));
 
 vi.mock("@/api/client", () => ({
   fetcher: (path: string, options: { method: string; body?: string }) => {
@@ -115,8 +120,26 @@ function deferred<T>() {
 
 describe("Links search and add flow", () => {
   beforeEach(() => {
+    auth.canUseLinks = true;
     list.mockResolvedValue(all);
     create.mockResolvedValue(link);
+  });
+
+  it("searches URLs without offering or submitting creation when Use Links is absent", async () => {
+    auth.canUseLinks = false;
+    list.mockResolvedValue(empty);
+    renderView(link.url, 1, empty);
+
+    expect(
+      screen.queryByRole("button", { name: "Add link" }),
+    ).not.toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole("button", { name: "Search" }),
+    );
+    fireEvent.submit(input().closest("form")!);
+
+    expect(create).not.toHaveBeenCalled();
+    expect(input()).toHaveValue(link.url);
   });
 
   it("filters while typing and removes pagination that belongs to the previous results", async () => {

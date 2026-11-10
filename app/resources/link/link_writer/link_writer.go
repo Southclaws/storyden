@@ -8,6 +8,7 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
@@ -107,6 +108,19 @@ func (d *LinkWriter) Store(ctx context.Context, u link_url.URL, title, descripti
 	}
 
 	return link_ref.Map(r)
+}
+
+func (d *LinkWriter) Delete(ctx context.Context, slug string) error {
+	row, err := d.db.Link.Query().Where(link_ent.SlugEQ(slug)).Only(ctx)
+	if ent.IsNotFound(err) {
+		return fault.Wrap(err, ftag.With(ftag.NotFound))
+	}
+
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return d.db.Link.DeleteOneID(row.ID).Exec(ctx)
 }
 
 func getLinkAttrs(u link_url.URL) (string, string) {

@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	roleListKey  = "role:list"
+	roleListKey  = "role:list:v2"
 	roleCacheTTL = time.Hour * 24 * 365
 )
 

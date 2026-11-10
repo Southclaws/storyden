@@ -7,9 +7,15 @@ import {
   linkCreate,
   useLinkList,
 } from "@/api/openapi-client/links";
-import { LinkListResult, LinkReference } from "@/api/openapi-schema";
+import {
+  LinkListResult,
+  LinkReference,
+  Permission,
+} from "@/api/openapi-schema";
+import { useSession } from "@/auth";
 import { normalizeLink } from "@/lib/link/validation";
 import { deriveError } from "@/utils/error";
+import { hasPermission } from "@/utils/permissions";
 
 export type Props = {
   initialResult?: LinkListResult;
@@ -25,6 +31,12 @@ type AddState =
 
 export function useLinkIndexView(props: Props) {
   const { mutate } = useSWRConfig();
+  const session = useSession();
+  const canUseLinks = hasPermission(
+    session,
+    Permission.USE_LINKS,
+    Permission.MANAGE_LINKS,
+  );
   const [filters, setFilters] = useQueryStates({
     q: parseAsString.withDefault(""),
     page: parseAsInteger.withDefault(1),
@@ -96,7 +108,7 @@ export function useLinkIndexView(props: Props) {
     setSearch({ query, page: 1 });
     void setFilters({ page: null });
 
-    if (!url) {
+    if (!url || !canUseLinks) {
       return;
     }
 
@@ -140,6 +152,7 @@ export function useLinkIndexView(props: Props) {
       query: filters.q,
       page,
       isURL: url !== undefined,
+      canUseLinks,
       isSaved,
       isLoading,
       links,

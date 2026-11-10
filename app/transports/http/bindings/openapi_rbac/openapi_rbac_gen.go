@@ -222,6 +222,7 @@ type OperationPermissions interface {
 	LinkCreate() (bool, *rbac.Permission)
 	LinkList() (bool, *rbac.Permission)
 	LinkGet() (bool, *rbac.Permission)
+	LinkDelete() (bool, *rbac.Permission)
 	DatagraphSearch() (bool, *rbac.Permission)
 	DatagraphMatches() (bool, *rbac.Permission)
 	EventList() (bool, *rbac.Permission)
@@ -721,6 +722,8 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.LinkList()
 	case "LinkGet":
 		return optable.LinkGet()
+	case "LinkDelete":
+		return optable.LinkDelete()
 	case "DatagraphSearch":
 		return optable.DatagraphSearch()
 	case "DatagraphMatches":

@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
@@ -16,8 +17,10 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
 type preMutationResult struct {
@@ -76,6 +79,10 @@ func (s *Manager) preMutation(ctx context.Context, p Partial, current opt.Option
 	// set that as the content to be used for fill rules.
 	linkUrl, removeLinkURL := p.URL.Get()
 	if u, ok := linkUrl.Get(); ok && !removeLinkURL {
+		if err := session.Authorise(ctx, nil, rbac.PermissionUseLinks, rbac.PermissionManageLinks); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), fmsg.WithDesc("missing link permission", "You need the Use Links permission to add a link. Ask an administrator to grant it."))
+		}
+
 		ln, _, err := s.fetcher.ScrapeAndStore(ctx, u)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))

@@ -26,6 +26,7 @@ var DefaultRoleMember = Role{
 		rbac.PermissionReadPublishedLibrary,
 		rbac.PermissionSubmitLibraryNode,
 		rbac.PermissionSubmitLibraryNodeChanges,
+		rbac.PermissionUseLinks,
 		rbac.PermissionUploadAsset,
 		rbac.PermissionListProfiles,
 		rbac.PermissionReadProfile,
@@ -44,6 +45,7 @@ var DefaultRoleGuest = Role{
 	Permissions: rbac.NewList(
 		rbac.PermissionReadPublishedThreads,
 		rbac.PermissionReadPublishedLibrary,
+		rbac.PermissionViewLinks,
 		rbac.PermissionListProfiles,
 		rbac.PermissionReadProfile,
 		rbac.PermissionListCollections,

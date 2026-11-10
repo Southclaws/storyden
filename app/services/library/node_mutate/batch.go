@@ -3,8 +3,11 @@ package node_mutate
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strings"
 
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
@@ -14,8 +17,10 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/link/link_url"
 	"github.com/Southclaws/storyden/app/resources/mark"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
 const MaxBatchItems = 100
@@ -134,7 +139,16 @@ func validateBatchHierarchy(parents map[library.NodeID]library.NodeID) error {
 	return nil
 }
 
-func (s *Manager) batchOptions(ctx context.Context, fields []BatchFields, current []node_querier.MutationState, parents []opt.Optional[library.NodeID]) [][]node_writer.Option {
+func (s *Manager) batchOptions(ctx context.Context, fields []BatchFields, current []node_querier.MutationState, parents []opt.Optional[library.NodeID]) ([][]node_writer.Option, error) {
+	hasLinks := slices.ContainsFunc(fields, func(field BatchFields) bool {
+		return field.URL.Ok()
+	})
+	if hasLinks {
+		if err := session.Authorise(ctx, nil, rbac.PermissionUseLinks, rbac.PermissionManageLinks); err != nil {
+			return nil, fault.Wrap(err, fmsg.WithDesc("missing link permission", "You need the Use Links permission to add a link. Ask an administrator to grant it."))
+		}
+	}
+
 	options := make([][]node_writer.Option, len(fields))
 	links := make(map[string]opt.Optional[xid.ID])
 	for i, field := range fields {
@@ -165,5 +179,5 @@ func (s *Manager) batchOptions(ctx context.Context, fields []BatchFields, curren
 		options[i] = opts
 	}
 
-	return options
+	return options, nil
 }

@@ -11,6 +11,8 @@ import (
 	"google.golang.org/adk/v2/tool/functiontool"
 
 	"github.com/Southclaws/storyden/app/resources/link/link_url"
+	"github.com/Southclaws/storyden/app/resources/rbac"
+	authsession "github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/app/services/link/scrape"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/documents"
@@ -177,6 +179,10 @@ func (lt *linkTools) newLinkCreateTool() *Tool {
 }
 
 func (lt *linkTools) ExecuteLinkCreate(ctx context.Context, args mcp.ToolLinkCreateInput) (*mcp.ToolLinkCreateOutput, error) {
+	if err := authsession.Authorise(ctx, nil, rbac.PermissionUseLinks, rbac.PermissionManageLinks); err != nil {
+		return nil, err
+	}
+
 	u, err := link_url.Parse(args.Url)
 	if err != nil {
 		return nil, err

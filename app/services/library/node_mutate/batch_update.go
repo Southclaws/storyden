@@ -57,7 +57,11 @@ func (s *Manager) UpdateMany(ctx context.Context, items []BatchUpdate) ([]BatchR
 		return nil, err
 	}
 
-	options := s.batchOptions(ctx, fields, current, parents)
+	options, err := s.batchOptions(ctx, fields, current, parents)
+	if err != nil {
+		return nil, err
+	}
+
 	writes := make([]node_writer.UpdateInput, len(items))
 	results := make([]BatchResult, len(items))
 	events := make([]any, 0, len(items)*2)

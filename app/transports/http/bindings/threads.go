@@ -148,6 +148,11 @@ func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdate
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
+	url, err := opt.MapErr(opt.NewPtr(request.Body.Url), link_url.Parse)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	pinned := opt.NewPtrMap(request.Body.Pinned, func(p openapi.PinnedRank) int {
 		return int(p)
 	})
@@ -155,6 +160,7 @@ func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdate
 	thread, err := i.thread_svc.Update(ctx, postID, thread_service.Partial{
 		Title:             opt.NewPtr(request.Body.Title),
 		Content:           richContent,
+		URL:               url,
 		Tags:              tags,
 		Category:          opt.NewPtrMap(request.Body.Category, deserialiseID),
 		Visibility:        Visibility,
