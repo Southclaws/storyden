@@ -91,6 +91,10 @@ export async function buildResult<T>(response: Response): Promise<T> {
     return response.json();
   }
 
+  if (response.headers.get("content-type")?.includes("text/plain")) {
+    return response.text() as T;
+  }
+
   return response.blob() as T;
 }
 
