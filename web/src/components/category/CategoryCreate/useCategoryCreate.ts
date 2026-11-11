@@ -1,13 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { mutate } from "swr";
 
 import { handle } from "@/api/client";
+import { assetUpload } from "@/api/openapi-client/assets";
 import {
   categoryCreate,
   getCategoryListKey,
 } from "@/api/openapi-client/categories";
-import { Asset } from "@/api/openapi-schema";
+import {
+  ImageCropperRef,
+  ImageCropperSnapshot,
+} from "@/components/ui/image-cropper";
 import * as z from "@/lib/validation";
 import { slugify, slugifyDraft } from "@/utils/slugify";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
@@ -36,13 +41,19 @@ export interface CategoryCreateProps extends UseDisclosureProps {
 }
 
 export function useCategoryCreate(props: CategoryCreateProps) {
-  const { register, handleSubmit, control, setValue } = useForm<Form>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      colour: "#8577ce",
-      parent: props.defaultParent,
-    },
-  });
+  const cropperRef = useRef<ImageCropperRef>(null);
+  const [pendingCrop, setPendingCrop] = useState<ImageCropperSnapshot | null>(
+    null,
+  );
+  const [imageLoading, setImageLoading] = useState(false);
+  const { register, handleSubmit, control, setValue, formState } =
+    useForm<Form>({
+      resolver: zodResolver(FormSchema),
+      defaultValues: {
+        colour: "#8577ce",
+        parent: props.defaultParent,
+      },
+    });
 
   const slugInput = register("slug", {
     onChange(event) {
@@ -63,15 +74,39 @@ export function useCategoryCreate(props: CategoryCreateProps) {
   });
 
   const onSubmit = handleSubmit(async (data) => {
+    if (imageLoading) {
+      return;
+    }
+
     await handle(async () => {
+      const crop = pendingCrop;
+      if (crop) {
+        const asset = await assetUpload(await crop.getBlob(), {
+          filename: "category-cover",
+        });
+        data.cover_image_asset_id = asset.id;
+      }
+
       await categoryCreate(data);
       props.onClose?.();
       mutate(getCategoryListKey());
     });
   });
 
-  function handleImageUpload(asset: Asset) {
-    setValue("cover_image_asset_id", asset.id);
+  async function handleImageFileChange() {
+    setImageLoading(true);
+    setPendingCrop(null);
+  }
+
+  function handleImageChange() {
+    setImageLoading(false);
+    setPendingCrop(cropperRef.current?.getCrop() ?? null);
+  }
+
+  async function handleImageRemove() {
+    setImageLoading(false);
+    setPendingCrop(null);
+    setValue("cover_image_asset_id", undefined, { shouldDirty: true });
   }
 
   return {
@@ -79,6 +114,11 @@ export function useCategoryCreate(props: CategoryCreateProps) {
     register,
     slugInput,
     control,
-    handleImageUpload,
+    cropperRef,
+    imageLoading,
+    isSubmitting: formState.isSubmitting,
+    handleImageFileChange,
+    handleImageChange,
+    handleImageRemove,
   };
 }

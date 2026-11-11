@@ -1,24 +1,25 @@
-import { AssetUploadEditor } from "@/components/asset/AssetUploadEditor/AssetUploadEditor";
 import { Button } from "@/components/ui/button";
 import { ColorPickerField } from "@/components/ui/color-picker";
 import { FormControl } from "@/components/ui/form-control";
 import { FormFeedback } from "@/components/ui/form-feedback";
 import { FormLabel } from "@/components/ui/form-label";
+import { ImageCropper } from "@/components/ui/image-cropper";
 import { Input, InputPrefix } from "@/components/ui/input";
 import { WEB_ADDRESS } from "@/config";
 import {
   CATEGORY_COVER_HEIGHT,
+  CATEGORY_COVER_SAFE_AREA,
   CATEGORY_COVER_WIDTH,
 } from "@/lib/category/cover";
 import { HStack, VStack, styled } from "@/styled-system/jsx";
+import { getAssetURL } from "@/utils/asset";
 
-import type { useCategoryEdit } from "./useCategoryEdit";
+import { type Props, useCategoryEdit } from "./useCategoryEdit";
 
-export function CategoryEditForm({
-  form,
-  slugInput,
-  handlers,
-}: ReturnType<typeof useCategoryEdit>) {
+export function CategoryEditForm(props: Props) {
+  const { form, slugInput, handlers, cropperRef, imageLoading } =
+    useCategoryEdit(props);
+  const coverImage = useWatch({ control: form.control, name: "cover_image" });
   const hostname = new URL(WEB_ADDRESS).host;
   return (
     <styled.form
@@ -27,20 +28,30 @@ export function CategoryEditForm({
       justifyContent="space-between"
       alignItems="start"
       height="full"
+      w="full"
+      minW="0"
       onSubmit={handlers.handleSubmit}
       gap="2"
     >
       <VStack w="full">
         <FormControl>
           <FormLabel>Cover Image</FormLabel>
-          <AssetUploadEditor
+          <ImageCropper
+            ref={cropperRef}
+            aria-label="Category cover image"
+            cropMode="fixed"
+            safeArea={CATEGORY_COVER_SAFE_AREA}
+            saving={form.formState.isSubmitting}
+            disabled={form.formState.isSubmitting}
             width={CATEGORY_COVER_WIDTH}
             height={CATEGORY_COVER_HEIGHT}
-            value={form.watch("cover_image") || undefined}
-            onUpload={handlers.handleImageUpload}
+            src={getAssetURL(coverImage?.path)}
+            onFileChange={handlers.handleImageFileChange}
+            onChange={handlers.handleImageChange}
+            onRemove={handlers.handleImageRemove}
           />
           <FormFeedback error={form.formState.errors["cover_image"]?.message}>
-            Upload a cover image for the category (4:1 aspect ratio).
+            Safe area is used for social preview cards.
           </FormFeedback>
         </FormControl>
 
@@ -114,10 +125,16 @@ export function CategoryEditForm({
         >
           Cancel
         </Button>
-        <Button type="submit" size="sm">
+        <Button
+          type="submit"
+          size="sm"
+          loading={form.formState.isSubmitting}
+          disabled={imageLoading}
+        >
           Save
         </Button>
       </HStack>
     </styled.form>
   );
 }
+import { useWatch } from "react-hook-form";

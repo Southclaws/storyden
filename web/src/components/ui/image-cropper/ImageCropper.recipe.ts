@@ -14,8 +14,9 @@ export const imageCropper = defineSlotRecipe({
     "status",
     "checkmark",
     "fileUpload",
-    "hint",
     "description",
+    "safeArea",
+    "gestureHint",
   ],
   base: {
     root: {
@@ -27,9 +28,13 @@ export const imageCropper = defineSlotRecipe({
       backgroundColor: "background.surface",
     },
     viewport: {
+      position: "relative",
       width: "full",
       height: "full",
       opacity: "100",
+      '&[aria-disabled="false"]': {
+        cursor: "move",
+      },
       transitionProperty: "opacity",
       transitionDuration: "normal",
       '&[data-saving="true"]': {
@@ -57,8 +62,8 @@ export const imageCropper = defineSlotRecipe({
       gap: "2",
       '&[data-has-image="true"]': {
         inset: "auto",
-        top: "3",
-        right: "3",
+        top: { base: "1.5", md: "3" },
+        right: { base: "1.5", md: "3" },
       },
     },
     toolbar: {
@@ -114,15 +119,37 @@ export const imageCropper = defineSlotRecipe({
       alignItems: "center",
       justifyContent: "center",
     },
-    hint: {
+    safeArea: {
       position: "absolute",
-      bottom: "3",
-      left: "3",
-      backgroundColor: "background.overlay",
-      borderRadius: "sm",
-      px: "2",
-      py: "1",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
       pointerEvents: "none",
+      borderWidth: "thin",
+      borderStyle: "dashed",
+      borderColor: "white.a8",
+      boxShadow: "0 0 0 100vmax token(colors.black.a4)",
+    },
+    gestureHint: {
+      position: "absolute",
+      inset: "0",
+      display: { base: "flex", md: "none" },
+      alignItems: "center",
+      justifyContent: "center",
+      color: "white.a12",
+      pointerEvents: "none",
+      _before: {
+        content: '""',
+        position: "absolute",
+        inset: "0",
+        backgroundColor: "black.a7",
+        animation: "imageCropperGestureBackdrop 2s linear forwards",
+        _motionReduce: { animation: "none" },
+      },
+      "& > span": {
+        position: "relative",
+        filter: "drop-shadow(0 1px 2px token(colors.black.a12))",
+      },
     },
     description: { srOnly: true },
   },

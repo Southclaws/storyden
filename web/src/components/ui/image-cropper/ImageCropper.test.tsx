@@ -8,7 +8,7 @@ import { ImageCropper } from ".";
 
 vi.mock("@/config", () => ({ API_ADDRESS: "https://api.storyden.test" }));
 
-it("keeps the default toolbar collapsible and reveals actions with the keyboard", async () => {
+it("opens and closes tools explicitly with pointer and keyboard input", async () => {
   render(
     <ImageCropper
       src="/photo.png"
@@ -17,16 +17,31 @@ it("keeps the default toolbar collapsible and reveals actions with the keyboard"
       onRemove={async () => {}}
     />,
   );
+  const user = userEvent.setup();
   const tools = screen.getByRole("button", { name: "Image tools" });
+  await user.hover(tools);
   expect(tools).toHaveAttribute("aria-expanded", "false");
   expect(
     screen.queryByRole("button", { name: "Remove image" }),
   ).not.toBeInTheDocument();
   tools.focus();
-  await userEvent.setup().keyboard("{Enter}");
+  await user.keyboard("{Enter}");
   expect(tools).toHaveAttribute("aria-expanded", "true");
   expect(screen.getByRole("button", { name: "Replace image" })).toBeVisible();
   expect(screen.getByRole("button", { name: "Remove image" })).toBeVisible();
+  await user.keyboard("{Enter}");
+  expect(tools).toHaveAttribute("aria-expanded", "false");
+  expect(
+    screen.queryByRole("button", { name: "Replace image" }),
+  ).not.toBeInTheDocument();
+
+  await user.click(tools);
+  expect(tools).toHaveAttribute("aria-expanded", "true");
+  await user.click(tools);
+  expect(tools).toHaveAttribute("aria-expanded", "false");
+  expect(
+    screen.queryByRole("button", { name: "Remove image" }),
+  ).not.toBeInTheDocument();
 });
 
 it.each(["fixed", "resizable"] as const)(
@@ -38,14 +53,20 @@ it.each(["fixed", "resizable"] as const)(
         width={1600}
         height={900}
         cropMode={cropMode}
-        toolbar="expanded"
       >
         <Menu.Item value="caption">Edit caption</Menu.Item>
       </ImageCropper>,
     );
-    await userEvent
-      .setup()
-      .click(screen.getByRole("button", { name: "Image options" }));
+    const user = userEvent.setup();
+    expect(screen.getByRole("button", { name: "Image tools" })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+    expect(
+      screen.queryByRole("button", { name: "Image options" }),
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Image tools" }));
+    await user.click(screen.getByRole("button", { name: "Image options" }));
     expect(
       screen.getByRole("menuitem", { name: "Edit caption" }),
     ).toBeVisible();
@@ -65,13 +86,12 @@ it.each(["fixed", "resizable"] as const)(
   },
 );
 
-it("announces saving and locks all expanded editing actions", () => {
+it("announces saving and locks editing actions when the tools are opened", async () => {
   render(
     <ImageCropper
       width={1600}
       height={900}
       saving
-      toolbar="expanded"
       src="/photo.png"
       onRemove={async () => {}}
     >
@@ -82,6 +102,9 @@ it("announces saving and locks all expanded editing actions", () => {
     "aria-busy",
     "true",
   );
+  await userEvent
+    .setup()
+    .click(screen.getByRole("button", { name: "Image tools" }));
   expect(screen.getByRole("group", { name: "Crop area" })).toHaveAttribute(
     "aria-disabled",
     "true",

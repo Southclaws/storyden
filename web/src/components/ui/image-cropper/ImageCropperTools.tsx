@@ -1,7 +1,7 @@
 import { Portal } from "@ark-ui/react";
 import type { FileUploadFileAcceptDetails } from "@ark-ui/react";
 import { motion, useReducedMotion } from "framer-motion";
-import { type ReactNode, useEffect, useId, useRef, useState } from "react";
+import { type ReactNode, useId, useState } from "react";
 import { toast } from "sonner";
 
 import { imageCropper } from "@/styled-system/recipes";
@@ -13,6 +13,7 @@ import { CheckIcon } from "../icons/Check";
 import { DeleteIcon } from "../icons/Delete";
 import { EditIcon } from "../icons/Edit";
 import { MediaAddIcon } from "../icons/Media";
+import { MoreIcon } from "../icons/More";
 import * as Menu from "../menu";
 import { Menu as OptionsMenu } from "../menu/Menu";
 import { Spinner } from "../spinner";
@@ -35,7 +36,6 @@ type Props = {
   saved: boolean;
   onSavedEnd: () => void;
   disabled: boolean;
-  toolbar: "collapsible" | "expanded";
   accept: string[];
   menuLabel: string;
   children?: ReactNode;
@@ -44,7 +44,7 @@ type Props = {
   onCropShapeChange?: (shape: string) => void;
 };
 
-// Owns the floating toolbar, including its collapsed index-page interaction.
+// Owns the floating toolbar, opened and closed by the Image tools toggle.
 // Menu items extend these controls without placing UI around the crop viewport.
 export function ImageCropperTools({
   hasImage,
@@ -52,7 +52,6 @@ export function ImageCropperTools({
   saved,
   onSavedEnd,
   disabled,
-  toolbar,
   accept,
   menuLabel,
   children,
@@ -61,84 +60,27 @@ export function ImageCropperTools({
   onCropShapeChange,
 }: Props) {
   const styles = imageCropper();
-  const [expanded, setExpanded] = useState(false);
-  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const [open, setOpen] = useState(false);
   const reducedMotion = useReducedMotion();
   const actionsID = useId();
-  const open = toolbar === "expanded" || expanded;
   const hasMenu = Boolean(children || onCropShapeChange);
-  useEffect(() => () => clearTimeout(closeTimeoutRef.current), []);
 
   return (
     <div className={styles.controls} data-has-image={hasImage}>
-      <div
-        className={styles.toolbar}
-        data-expanded={open || busy || saved}
-        onPointerEnter={(event) => {
-          if (event.pointerType === "touch") {
-            return;
-          }
-          clearTimeout(closeTimeoutRef.current);
-          setExpanded(true);
-        }}
-        onPointerLeave={(event) => {
-          if (event.pointerType === "touch") {
-            return;
-          }
-          closeTimeoutRef.current = setTimeout(() => setExpanded(false), 650);
-        }}
-        onBlur={(event) => {
-          if (!event.currentTarget.contains(event.relatedTarget)) {
-            setExpanded(false);
-          }
-        }}
-      >
-        {hasImage &&
-          (hasMenu ? (
-            <OptionsMenu
-              trigger={
-                <IconButton
-                  type="button"
-                  variant="ghost"
-                  className={styles.editTrigger}
-                  aria-label={menuLabel}
-                  disabled={disabled}
-                >
-                  <EditIcon />
-                </IconButton>
-              }
-            >
-              {children}
-              {onCropShapeChange && (
-                <Menu.Root onSelect={({ value }) => onCropShapeChange(value)}>
-                  <Menu.TriggerItem>Crop ratio</Menu.TriggerItem>
-                  <Portal>
-                    <Menu.Positioner>
-                      <Menu.Content>
-                        {cropShapes.map(([value, label]) => (
-                          <Menu.Item key={value} value={value!}>
-                            {label}
-                          </Menu.Item>
-                        ))}
-                      </Menu.Content>
-                    </Menu.Positioner>
-                  </Portal>
-                </Menu.Root>
-              )}
-            </OptionsMenu>
-          ) : (
-            <IconButton
-              type="button"
-              variant="ghost"
-              className={styles.editTrigger}
-              aria-label="Image tools"
-              aria-expanded={open}
-              aria-controls={actionsID}
-              onClick={() => setExpanded((value) => !value)}
-            >
-              <EditIcon />
-            </IconButton>
-          ))}
+      <div className={styles.toolbar} data-expanded={open || busy || saved}>
+        {hasImage && (
+          <IconButton
+            type="button"
+            variant="ghost"
+            className={styles.editTrigger}
+            aria-label="Image tools"
+            aria-expanded={open}
+            aria-controls={actionsID}
+            onClick={() => setOpen((value) => !value)}
+          >
+            <EditIcon />
+          </IconButton>
+        )}
         <motion.div
           className={styles.reveal}
           animate={{
@@ -212,11 +154,43 @@ export function ImageCropperTools({
                 disabled={disabled}
                 onClick={async () => {
                   await onRemove();
-                  setExpanded(false);
+                  setOpen(false);
                 }}
               >
                 <DeleteIcon />
               </IconButton>
+            )}
+            {hasImage && hasMenu && (
+              <OptionsMenu
+                trigger={
+                  <IconButton
+                    type="button"
+                    variant="ghost"
+                    aria-label={menuLabel}
+                    disabled={disabled}
+                  >
+                    <MoreIcon />
+                  </IconButton>
+                }
+              >
+                {children}
+                {onCropShapeChange && (
+                  <Menu.Root onSelect={({ value }) => onCropShapeChange(value)}>
+                    <Menu.TriggerItem>Crop ratio</Menu.TriggerItem>
+                    <Portal>
+                      <Menu.Positioner>
+                        <Menu.Content>
+                          {cropShapes.map(([value, label]) => (
+                            <Menu.Item key={value} value={value!}>
+                              {label}
+                            </Menu.Item>
+                          ))}
+                        </Menu.Content>
+                      </Menu.Positioner>
+                    </Portal>
+                  </Menu.Root>
+                )}
+              </OptionsMenu>
             )}
           </div>
         </motion.div>

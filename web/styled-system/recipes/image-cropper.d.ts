@@ -9,7 +9,7 @@ export type ImageCropperVariantProps = {
 
 export type ImageCropperVariantMap = RecipeVariantMap<ImageCropperVariant>
 
-export type ImageCropperSlot = "root" | "viewport" | "cropper" | "controls" | "toolbar" | "editTrigger" | "reveal" | "actions" | "status" | "checkmark" | "fileUpload" | "hint" | "description"
+export type ImageCropperSlot = "root" | "viewport" | "cropper" | "controls" | "toolbar" | "editTrigger" | "reveal" | "actions" | "status" | "checkmark" | "fileUpload" | "description" | "safeArea" | "gestureHint"
 
 export type ImageCropperRecipe = ConfigSlotRecipeRuntimeFn<ImageCropperSlot, ImageCropperVariantProps, ImageCropperVariantMap>
 

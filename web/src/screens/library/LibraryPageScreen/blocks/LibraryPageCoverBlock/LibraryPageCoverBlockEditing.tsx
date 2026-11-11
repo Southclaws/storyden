@@ -105,8 +105,6 @@ function MainImageCropEditor({
       cropMode={layout === "image" ? "resizable" : "fixed"}
       maxOutputSize={{ width: 1920, height: 1920 }}
       cropOnUpload={false}
-      toolbar="expanded"
-      showHint={false}
       accept={["image/png", "image/jpeg", "image/gif", "image/webp"]}
       menuLabel="Main image options"
       className={frameStyles[layout]}

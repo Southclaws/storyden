@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
 import { UnreadyBanner } from "@/components/site/Unready";
 
-import { type Props, useCategoryEdit } from "./useCategoryEdit";
+import { type Props } from "./useCategoryEdit";
 
 const CategoryEditForm = dynamic(
   () => import("./CategoryEditForm").then((module) => module.CategoryEditForm),
@@ -11,7 +11,6 @@ const CategoryEditForm = dynamic(
 );
 
 export function CategoryEditModal(props: Props) {
-  const form = useCategoryEdit(props);
   return (
     <ModalDrawer
       isOpen={props.isOpen}
@@ -19,7 +18,7 @@ export function CategoryEditModal(props: Props) {
       onOpenChange={props.onOpenChange}
       title="Edit category"
     >
-      <CategoryEditForm {...form} />
+      <CategoryEditForm {...props} />
     </ModalDrawer>
   );
 }

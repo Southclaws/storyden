@@ -59,10 +59,16 @@ export function useCategoryMutations() {
       const newData = {
         categories: data.categories.map((category) => {
           if (category.slug === slug) {
-            return {
+            const updatedCategory = {
               ...category,
               ...updated,
             };
+
+            if (updated.cover_image_asset_id === null) {
+              updatedCategory.cover_image = undefined;
+            }
+
+            return updatedCategory;
           }
 
           return category;

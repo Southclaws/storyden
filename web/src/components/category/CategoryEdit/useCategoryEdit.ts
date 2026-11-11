@@ -1,10 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { handle } from "@/api/client";
+import { assetUpload } from "@/api/openapi-client/assets";
 import { Asset, Category } from "@/api/openapi-schema";
+import {
+  ImageCropperRef,
+  ImageCropperSnapshot,
+} from "@/components/ui/image-cropper";
 import { useCategoryMutations } from "@/lib/category/mutation";
 import * as z from "@/lib/validation";
 import { slugify, slugifyDraft } from "@/utils/slugify";
@@ -27,6 +32,11 @@ export const FormSchema = z.object({
 export type Form = z.infer<typeof FormSchema>;
 
 export function useCategoryEdit(props: Props) {
+  const cropperRef = useRef<ImageCropperRef>(null);
+  const [pendingCrop, setPendingCrop] = useState<ImageCropperSnapshot | null>(
+    null,
+  );
+  const [imageLoading, setImageLoading] = useState(false);
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -61,12 +71,23 @@ export function useCategoryEdit(props: Props) {
   const { revalidateList, updateCategory } = useCategoryMutations();
 
   const handleSubmit = form.handleSubmit(async (data) => {
+    if (imageLoading) {
+      return;
+    }
+
     const originalSlug = props.category.slug;
     const slugChanged = data.slug !== originalSlug;
 
     await handle(
       async () => {
-        const { cover_image, ...rest } = data;
+        let { cover_image, ...rest } = data;
+        const crop = pendingCrop;
+        if (crop) {
+          cover_image = await assetUpload(await crop.getBlob(), {
+            filename: "category-cover",
+          });
+        }
+
         const updateData = {
           ...rest,
           cover_image_asset_id: cover_image?.id || null,
@@ -92,21 +113,39 @@ export function useCategoryEdit(props: Props) {
   });
 
   function handleCancel() {
+    setImageLoading(false);
+    setPendingCrop(null);
     form.reset();
     props.onClose?.();
   }
 
-  function handleImageUpload(asset: Asset) {
-    form.setValue("cover_image", asset);
+  async function handleImageFileChange() {
+    setImageLoading(true);
+    setPendingCrop(null);
+  }
+
+  function handleImageChange() {
+    setImageLoading(false);
+    setPendingCrop(cropperRef.current?.getCrop() ?? null);
+  }
+
+  async function handleImageRemove() {
+    setImageLoading(false);
+    setPendingCrop(null);
+    form.setValue("cover_image", null, { shouldDirty: true });
   }
 
   return {
     form,
+    cropperRef,
+    imageLoading,
     slugInput,
     handlers: {
       handleSubmit,
       handleCancel,
-      handleImageUpload,
+      handleImageFileChange,
+      handleImageChange,
+      handleImageRemove,
     },
   };
 }

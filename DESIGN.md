@@ -2,79 +2,135 @@
 name: Storyden
 description: Compact, calm community software shaped around the Quiet Campfire.
 colors:
-  background-canvas: "#fcfcfc"
-  background-surface: "#f9f9f9"
-  background-inset: "#f0f0f0"
-  background-overlay: "#ffffff"
-  background-control: "#fcfcfc"
-  text-default: "#202020"
-  text-muted: "#646464"
-  border-default: "#e0e0e0"
-  accent-default: "var(--accent-colour-flat-fill-400)"
+  background-canvas: "var(--colors-background-canvas, #fcfcfc)"
+  background-surface: "var(--colors-background-surface, #f9f9f9)"
+  background-inset: "var(--colors-background-inset, #f0f0f0)"
+  background-overlay: var(--colors-background-overlay, rgba(255, 255, 255, 0.95))
+  background-control: "var(--colors-background-control, #fcfcfc)"
+  background-control-disabled: "var(--colors-background-control-disabled, #f9f9f9)"
+  text-default: "var(--colors-text-default, #202020)"
+  text-muted: "var(--colors-text-muted, #646464)"
+  text-disabled: "var(--colors-text-disabled, #bbbbbb)"
+  border-default: "var(--colors-border-default, #e0e0e0)"
+  border-strong: "var(--colors-border-strong, #cecece)"
+  selection-background: "var(--colors-selection-background, #e8e8e8)"
+  accent-solid: var(--colors-accent-solid, hsl(156.99deg 51% 54.1%))
+  accent-foreground: "var(--colors-accent-solid-foreground, #303030)"
 typography:
   page-heading:
-    fontFamily: "var(--font-inter), Inter, sans-serif"
-    fontSize: "1.25rem"
+    fontFamily: var(--fonts-heading, var(--font-inter, Inter)), sans-serif
+    fontSize: 1.25rem
     fontWeight: 600
     lineHeight: 1.5
   section-heading:
-    fontFamily: "var(--font-inter), Inter, sans-serif"
-    fontSize: "1rem"
+    fontFamily: var(--fonts-heading, var(--font-inter, Inter)), sans-serif
+    fontSize: 1rem
     fontWeight: 700
     lineHeight: 1.5
   body:
-    fontFamily: "var(--font-inter), Inter, sans-serif"
-    fontSize: "1rem"
+    fontFamily: var(--fonts-body, var(--font-inter, Inter)), sans-serif
+    fontSize: 1rem
     fontWeight: 400
     lineHeight: 1.5
   supporting:
-    fontFamily: "var(--font-inter), Inter, sans-serif"
-    fontSize: "0.875rem"
+    fontFamily: var(--fonts-body, var(--font-inter, Inter)), sans-serif
+    fontSize: 0.875rem
     fontWeight: 400
     lineHeight: 1.25
   metadata:
-    fontFamily: "var(--font-inter), Inter, sans-serif"
-    fontSize: "0.75rem"
+    fontFamily: var(--fonts-body, var(--font-inter, Inter)), sans-serif
+    fontSize: 0.75rem
     fontWeight: 500
     lineHeight: 1.25
+  action:
+    fontFamily: var(--fonts-body, var(--font-inter, Inter)), sans-serif
+    fontSize: 0.75rem
+    fontWeight: 600
+    lineHeight: 1.125rem
+  control:
+    fontFamily: var(--fonts-body, var(--font-inter, Inter)), sans-serif
+    fontSize: 0.75rem
+    fontWeight: 400
+    lineHeight: 1.125rem
 rounded:
-  control: "0.25rem"
-  panel: "0.5rem"
-  overlay: "0.75rem"
-  pill: "9999px"
+  control: 0.25rem
+  panel: 0.5rem
+  overlay: 0.75rem
+  pill: 9999px
 spacing:
-  "1": "0.25rem"
-  "2": "0.5rem"
-  "3": "0.75rem"
-  "4": "1rem"
-  "6": "1.5rem"
-  "8": "2rem"
+  "1": 0.25rem
+  "2": 0.5rem
+  "3": 0.75rem
+  "4": 1rem
+  "6": 1.5rem
+  "8": 2rem
 components:
   button-subtle:
-    backgroundColor: "{colors.background-inset}"
-    textColor: "{colors.text-default}"
+    backgroundColor: "color-mix(in oklab, var(--colors-gray-3, #f0f0f0) 80%, transparent)"
+    textColor: "var(--colors-gray-text, #202020)"
+    typography: "{typography.action}"
     rounded: "{rounded.control}"
-    height: "1.5rem"
+    padding: 0 0.5rem
+    height: 1.5rem
   button-solid:
-    backgroundColor: "{colors.accent-default}"
+    backgroundColor: var(--colors-accent-solid, hsl(156.99deg 51% 54.1%))
+    textColor: "var(--colors-accent-solid-foreground, #303030)"
+    typography: "{typography.action}"
     rounded: "{rounded.control}"
-    height: "1.5rem"
+    padding: 0 0.5rem
+    height: 1.5rem
+  button-outline:
+    backgroundColor: "var(--colors-background-control, #fcfcfc)"
+    textColor: "var(--colors-gray-text, #202020)"
+    typography: "{typography.action}"
+    rounded: "{rounded.control}"
+    padding: 0 0.5rem
+    height: 1.5rem
+  button-ghost:
+    backgroundColor: transparent
+    textColor: "var(--colors-text-muted, #646464)"
+    typography: "{typography.action}"
+    rounded: "{rounded.control}"
+    padding: 0 0.5rem
+    height: 1.5rem
+  button-plain:
+    backgroundColor: transparent
+    textColor: "var(--colors-text-muted, #646464)"
+    typography: "{typography.action}"
+    rounded: "{rounded.control}"
+    padding: "0"
+    height: 1.125rem
+  input:
+    backgroundColor: "{colors.background-control}"
+    textColor: "{colors.text-default}"
+    typography: "{typography.control}"
+    rounded: "{rounded.control}"
+    padding: 0 0.5rem
+    height: 1.5rem
+    width: 100%
   surface:
     backgroundColor: "{colors.background-surface}"
     textColor: "{colors.text-default}"
     rounded: "{rounded.panel}"
-  input:
-    backgroundColor: "{colors.background-control}"
-    textColor: "{colors.text-default}"
+    padding: 0.5rem
+  sidebar-navigation:
+    textColor: "{colors.text-muted}"
     rounded: "{rounded.control}"
-    height: "1.5rem"
+    padding: 0.25rem
+    width: 100%
+  badge:
+    backgroundColor: "var(--colors-gray-3, #f0f0f0)"
+    textColor: "var(--colors-gray-text, #202020)"
+    rounded: "{rounded.pill}"
+    padding: 0 0.625rem
+    height: 1.5rem
 ---
 
 # Design System: Storyden
 
 ## Overview
 
-**Creative north star: The Quiet Campfire.**
+**Creative North Star: "The Quiet Campfire"**
 
 Storyden is calm community software. The interface should guide participation,
 curation, moderation, and administration without competing with the community's
@@ -101,7 +157,21 @@ The default answer is usually the quietest existing component that communicates
 the role clearly. New visual components are design-system decisions, not local
 conveniences.
 
+**Key Characteristics:**
+
+- Compact and precise without crowding.
+- Neutral, themeable structure that serves community identity and content.
+- Semantic components and Storybook guide interface decisions.
+- Keyboard access, reduced motion and responsive layouts are part of the system.
+
 ## Colors
+
+The frontmatter references the live Panda semantic CSS variables, with current
+light-theme fallbacks for standalone previews. The neutral palette has
+light and dark variants, and the accent follows the community configuration;
+the fallback green is an example, not a fixed Storyden brand colour. Preserve
+the paired `accent.solid` and `accent.solidForeground` tokens. Do not use the
+retired `accent.default` or `--accent-colour-flat-fill-400` names.
 
 ### Structural layers
 
@@ -128,7 +198,7 @@ identical Surface-in-Surface nesting; subordinate content belongs on Inset.
 Avoid Inset-in-Inset. An Inset may sit directly on Canvas when its meaning is
 clearly supporting rather than independent.
 
-This is a hard rule: all Cards are Surfaces and all Surfaces have borders.
+**The Surface Boundary Rule.** All Cards are Surfaces and all Surfaces have borders.
 Component recipes enforce the boundary so call sites do not decide whether a
 Card needs one. A media-backed Card may omit the redundant border between its
 cover and content, but the content region still retains the Surface boundary.
@@ -187,7 +257,8 @@ Panda's definitions in `web/src/theme/base/typography.ts` and
 `web/src/theme/semantic/index.ts` are the source of truth for font tokens.
 The typography documented here reflects those definitions.
 
-Both systems use variable Inter for body text and headings. Only the upright
+Both systems default to variable Inter for body text and headings; the
+configured body and heading font tokens may override it. Only the upright
 face is preloaded; the true italic face loads on demand. The existing role
 weights remain constrained as specified above.
 
@@ -223,6 +294,9 @@ use rich-text styles to lay out settings or tools.
 
 The canonical compact scale is intentional: controls default to `sm`, ordinary
 UI copy is 16px, supporting copy is 14px, metadata and compact actions are 12px.
+The default small Button and Input are 24px high with 12px text. Button
+labels use weight 600; inputs use weight 400. Badge defaults to its medium
+24px size, with weight 500 and an 18px line height.
 Increase size only when hierarchy or touch ergonomics genuinely requires it.
 Information density comes from consistent alignment and close semantic groups,
 not by collapsing line height or removing necessary separation.
@@ -230,6 +304,10 @@ not by collapsing line height or removing necessary separation.
 ## Layout
 
 ### Page widths
+
+The shared responsive breakpoints are 640px, 768px, 1024px, 1280px and 1536px.
+They belong to the layout system; prefer the existing responsive component
+patterns when deciding where a specific surface changes.
 
 Use `PageLayout` to declare the screen's workspace:
 
@@ -292,15 +370,19 @@ objects, not for dividing every part of a page.
 Tone and border establish ordinary hierarchy. Shadows are reserved for spatial
 elevation:
 
-- **`shadow.surface`** is optional and quiet. Most Surfaces rely on fill and
+- **`shadows.surface`** is optional and quiet. Most Surfaces rely on fill and
   border instead.
-- **`shadow.floating`** separates tooltips and compact transient surfaces.
-- **`shadow.overlay`** separates menus, popovers, and dialogs where overlapping
+- **`shadows.floating`** separates tooltips and compact transient surfaces.
+- **`shadows.overlay`** separates menus, popovers, and dialogs where overlapping
   content requires a stronger boundary.
 
 An Overlay must use the canonical closed component defaults for portalling,
 placement, collision handling, viewport fitting, and click-away behavior.
 Do not add Floating UI parameters independently at every call site.
+
+The exact shadow definitions, transition timings and breakpoints are mirrored
+in `.impeccable/design.json`. Compact transitions use the shared fast duration;
+ordinary control transitions use the normal duration and default easing.
 
 Motion should explain a state change, not decorate it. Keep transitions short
 and restrained. Preserve reduced-motion behavior. Drag overlays disappear on
@@ -463,6 +545,20 @@ This follows [GitHub Primer's accessible notifications
 guidance](https://primer.style/accessibility/toasts/): toast interfaces carry
 inherent accessibility and usability risks, while in-flow messages are easier
 to discover and revisit.
+
+### Image editing
+
+Use the shared `ImageCropper` for positioning, zooming, replacement and removal.
+Keep those controls on the image rather than introducing a second image editor.
+The enclosing feature owns the output dimensions, saving and persistence.
+
+A fixed crop fills its frame and exports the requested dimensions. A resizable
+crop exposes selection handles and ratio choices. Category covers use a fixed
+4:1 frame; Library main images may expose additional layout choices.
+
+Optional safe-area guides show a secondary composition region inside the
+frame. They are labelled, described to assistive technology and transparent
+to pointer input. Guides and shading never appear in exported image pixels.
 
 ### Block editors and draggable UI
 

@@ -28,6 +28,7 @@ import { handle } from "@/api/client";
 import { cx } from "@/styled-system/css";
 import { imageCropper } from "@/styled-system/recipes";
 
+import { PinchGestureHint } from "../pinch-gesture-hint";
 import { Text } from "../text";
 
 import "react-advanced-cropper/dist/style.css";
@@ -76,9 +77,11 @@ export type ImageCropperProps = Omit<
   maxOutputSize?: ImageCropperSize;
   /** False displays the caller's uploaded src without immediately cropping it. */
   cropOnUpload?: boolean;
-  toolbar?: "collapsible" | "expanded";
   accept?: string[];
-  showHint?: boolean;
+  /** A visual-only guide; label describes it to assistive technology. */
+  safeArea?: ImageCropperSize & { label: string };
+  /** Show the one-shot zoom cue on ready fixed crops below the md breakpoint. */
+  showGestureHint?: boolean;
   menuLabel?: string;
   children?: ReactNode;
   className?: string;
@@ -102,9 +105,9 @@ export function ImageCropper({
   cropMode = "fixed",
   maxOutputSize,
   cropOnUpload = true,
-  toolbar = "collapsible",
   accept = ["image/png", "image/jpeg", "image/webp"],
-  showHint = true,
+  safeArea,
+  showGestureHint = true,
   menuLabel = "Image options",
   children,
   className,
@@ -128,10 +131,21 @@ export function ImageCropper({
   const [loadError, setLoadError] = useState(false);
   const [originalRatio, setOriginalRatio] = useState(width / height);
   const [selection, setSelection] = useState({ shape: "free", revision: 0 });
+  const [gestureHintDismissed, setGestureHintDismissed] = useState(false);
   const imageURL = selectedURL ?? src;
+  const frameRatio = width / height;
+  const safeAreaRatio = safeArea
+    ? safeArea.width / safeArea.height
+    : frameRatio;
   const busy = loading || saving;
   const controlsDisabled = disabled || saving;
   const cropDisabled = controlsDisabled || !ready;
+  const gestureHintVisible =
+    showGestureHint &&
+    !gestureHintDismissed &&
+    cropMode === "fixed" &&
+    !cropDisabled &&
+    !busy;
   const descriptionID = useId();
   const styles = imageCropper();
   const notifyChange = useEffectEvent(() => onChange?.());
@@ -236,6 +250,12 @@ export function ImageCropper({
     });
   }
 
+  function dismissGestureHint() {
+    if (!cropDisabled) {
+      setGestureHintDismissed(true);
+    }
+  }
+
   const cropperProps = {
     ref: attachCropper,
     className: styles.cropper,
@@ -279,6 +299,18 @@ export function ImageCropper({
   return (
     <div
       {...rootProps}
+      onPointerDownCapture={(event) => {
+        dismissGestureHint();
+        rootProps.onPointerDownCapture?.(event);
+      }}
+      onWheelCapture={(event) => {
+        dismissGestureHint();
+        rootProps.onWheelCapture?.(event);
+      }}
+      onKeyDownCapture={(event) => {
+        dismissGestureHint();
+        rootProps.onKeyDownCapture?.(event);
+      }}
       className={cx(styles.root, className)}
       role="group"
       aria-label={ariaLabel}
@@ -306,31 +338,50 @@ export function ImageCropper({
           }
         }}
       >
-        {cropMode === "fixed" ? (
-          <FixedCropper
-            key={`fixed:${selection.revision}`}
-            {...cropperProps}
-            stencilProps={{
-              className: "image-cropper__selection",
-              handlers: false,
-              lines: false,
-              movable: false,
-              resizable: false,
+        {imageURL &&
+          (cropMode === "fixed" ? (
+            <FixedCropper
+              key={`fixed:${selection.revision}`}
+              {...cropperProps}
+              stencilProps={{
+                className: "image-cropper__selection",
+                handlers: false,
+                lines: false,
+                movable: false,
+                resizable: false,
+              }}
+              stencilSize={{ width, height }}
+            />
+          ) : (
+            <Cropper
+              key={`resizable:${selection.revision}`}
+              {...cropperProps}
+              stencilProps={{
+                className: "image-cropper__selection",
+                aspectRatio:
+                  selection.shape === "original"
+                    ? originalRatio
+                    : Number(selection.shape) || undefined,
+              }}
+            />
+          ))}
+        {safeArea && ready && (
+          <div
+            className={styles.safeArea}
+            aria-hidden="true"
+            style={{
+              width: `${Math.min(1, safeAreaRatio / frameRatio) * 100}%`,
+              height: `${Math.min(1, frameRatio / safeAreaRatio) * 100}%`,
             }}
-            stencilSize={{ width, height }}
           />
-        ) : (
-          <Cropper
-            key={`resizable:${selection.revision}`}
-            {...cropperProps}
-            stencilProps={{
-              className: "image-cropper__selection",
-              aspectRatio:
-                selection.shape === "original"
-                  ? originalRatio
-                  : Number(selection.shape) || undefined,
-            }}
-          />
+        )}
+        {gestureHintVisible && (
+          <div className={styles.gestureHint}>
+            <PinchGestureHint
+              size={56}
+              onComplete={() => setGestureHintDismissed(true)}
+            />
+          </div>
         )}
       </div>
 
@@ -341,7 +392,9 @@ export function ImageCropper({
         {cropMode === "fixed" &&
           "Pinch or scroll to zoom, or use the plus and minus keys."}{" "}
         {cropMode === "resizable" &&
-          `Drag the crop handles to resize the selection. Choose a crop ratio from ${menuLabel}.`}
+          `Drag the crop handles to resize the selection. Choose a crop ratio from ${menuLabel}.`}{" "}
+        {safeArea &&
+          `${safeArea.label}: the centred ${safeArea.width} by ${safeArea.height} guide marks where to keep important details.`}
       </Text>
       <Text
         as="span"
@@ -360,7 +413,6 @@ export function ImageCropper({
         saved={showSaved}
         onSavedEnd={() => setShowSaved(false)}
         disabled={controlsDisabled}
-        toolbar={toolbar}
         accept={accept}
         menuLabel={menuLabel}
         onFile={handleFile}
@@ -379,14 +431,6 @@ export function ImageCropper({
       >
         {children}
       </ImageCropperTools>
-
-      {showHint && ready && !controlsDisabled && (
-        <Text className={styles.hint} variant="metadata">
-          {cropMode === "fixed"
-            ? "Drag to move · Pinch or scroll to zoom"
-            : "Drag to reposition"}
-        </Text>
-      )}
     </div>
   );
 }
