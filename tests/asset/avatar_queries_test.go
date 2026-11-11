@@ -23,9 +23,14 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/cache"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
+	"github.com/Southclaws/storyden/tests"
 )
 
 func TestAvatarReadsUseCachedAccount(t *testing.T) {
+	if tests.IsSharedPostgresDatabase() {
+		t.Skip("isolated file storage is incompatible with shared job workers")
+	}
+
 	t.Parallel()
 
 	type queryCountKey struct{}

@@ -308,11 +308,15 @@ func TestLinkFetchLifecycle(t *testing.T) {
 		require.Equal(t, entlink.ScrapeStatusFailed, stored.ScrapeStatus)
 		jobs, err := db.BackgroundJob.Query().Where(entjob.KindEQ(link_scrape.Kind)).All(ctx)
 		require.NoError(t, err)
-		var payloads []string
+		var queuedURLs []string
 		for _, job := range jobs {
-			payloads = append(payloads, string(job.Payload))
+			var payload struct {
+				URL string `json:"url"`
+			}
+			require.NoError(t, json.Unmarshal(job.Payload, &payload))
+			queuedURLs = append(queuedURLs, payload.URL)
 		}
-		require.Contains(t, payloads, `{"url":"`+canonical+`"}`, "refreshes are persisted as background jobs")
+		require.Contains(t, queuedURLs, canonical, "refreshes are persisted as background jobs")
 		require.Equal(t, "Original title", stored.Title)
 		require.Equal(t, "Original description", stored.Description)
 		require.WithinDuration(t, lastSuccess, *stored.ScrapedAt, time.Microsecond)
