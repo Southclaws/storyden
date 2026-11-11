@@ -159,3 +159,25 @@ it("waits for a newly selected image before saving", async () => {
     expect.objectContaining({ cover_image_asset_id: null }),
   );
 });
+
+it("allows unrelated changes after a replacement image fails to decode", async () => {
+  const { result } = renderHook(() => useCategoryEdit({ category }));
+
+  await act(() => result.current.handlers.handleImageFileChange());
+  expect(result.current.imageLoading).toBe(true);
+
+  act(() => result.current.handlers.handleImageError());
+  expect(result.current.imageLoading).toBe(false);
+
+  act(() => result.current.form.setValue("name", "Community"));
+  await act(() => result.current.handlers.handleSubmit());
+
+  expect(updateCategory).toHaveBeenCalledWith(
+    "general",
+    expect.objectContaining({
+      name: "Community",
+      cover_image_asset_id: cover.id,
+    }),
+  );
+  expect(assetUpload).not.toHaveBeenCalled();
+});

@@ -103,6 +103,11 @@ export function useCategoryCreate(props: CategoryCreateProps) {
     setPendingCrop(cropperRef.current?.getCrop() ?? null);
   }
 
+  function handleImageError() {
+    setImageLoading(false);
+    setPendingCrop(null);
+  }
+
   async function handleImageRemove() {
     setImageLoading(false);
     setPendingCrop(null);
@@ -119,6 +124,7 @@ export function useCategoryCreate(props: CategoryCreateProps) {
     isSubmitting: formState.isSubmitting,
     handleImageFileChange,
     handleImageChange,
+    handleImageError,
     handleImageRemove,
   };
 }

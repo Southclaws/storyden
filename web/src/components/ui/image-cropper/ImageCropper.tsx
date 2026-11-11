@@ -87,6 +87,8 @@ export type ImageCropperProps = Omit<
   className?: string;
   style?: CSSProperties;
   onFileChange?: (file: File) => Promise<void>;
+  /** Notify the caller when an image cannot be loaded or decoded. */
+  onLoadError?: () => void;
   onRemove?: () => Promise<void>;
   onChange?: () => void;
 };
@@ -113,6 +115,7 @@ export function ImageCropper({
   className,
   style,
   onFileChange,
+  onLoadError,
   onRemove,
   onChange,
   ...rootProps
@@ -286,6 +289,7 @@ export function ImageCropper({
       setReady(false);
       setLoading(false);
       setLoadError(true);
+      onLoadError?.();
       toast.error("The image could not be opened. Please choose another.");
     },
     onInteractionEnd: cropDisabled ? undefined : onChange,

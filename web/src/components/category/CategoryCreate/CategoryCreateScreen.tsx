@@ -33,6 +33,7 @@ export function CategoryCreateScreen(props: CategoryCreateProps) {
     imageLoading,
     handleImageFileChange,
     handleImageChange,
+    handleImageError,
     handleImageRemove,
   } = useCategoryCreate(props);
 
@@ -78,6 +79,7 @@ export function CategoryCreateScreen(props: CategoryCreateProps) {
             width={CATEGORY_COVER_WIDTH}
             height={CATEGORY_COVER_HEIGHT}
             onFileChange={handleImageFileChange}
+            onLoadError={handleImageError}
             onChange={handleImageChange}
             onRemove={handleImageRemove}
           />

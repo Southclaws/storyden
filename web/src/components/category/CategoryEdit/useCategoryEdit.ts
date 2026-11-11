@@ -129,6 +129,11 @@ export function useCategoryEdit(props: Props) {
     setPendingCrop(cropperRef.current?.getCrop() ?? null);
   }
 
+  function handleImageError() {
+    setImageLoading(false);
+    setPendingCrop(null);
+  }
+
   async function handleImageRemove() {
     setImageLoading(false);
     setPendingCrop(null);
@@ -145,6 +150,7 @@ export function useCategoryEdit(props: Props) {
       handleCancel,
       handleImageFileChange,
       handleImageChange,
+      handleImageError,
       handleImageRemove,
     },
   };

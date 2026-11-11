@@ -1,3 +1,5 @@
+import { useWatch } from "react-hook-form";
+
 import { Button } from "@/components/ui/button";
 import { ColorPickerField } from "@/components/ui/color-picker";
 import { FormControl } from "@/components/ui/form-control";
@@ -47,6 +49,7 @@ export function CategoryEditForm(props: Props) {
             height={CATEGORY_COVER_HEIGHT}
             src={getAssetURL(coverImage?.path)}
             onFileChange={handlers.handleImageFileChange}
+            onLoadError={handlers.handleImageError}
             onChange={handlers.handleImageChange}
             onRemove={handlers.handleImageRemove}
           />
@@ -137,4 +140,3 @@ export function CategoryEditForm(props: Props) {
     </styled.form>
   );
 }
-import { useWatch } from "react-hook-form";

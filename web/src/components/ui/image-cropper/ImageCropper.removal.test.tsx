@@ -13,14 +13,24 @@ vi.mock("react-advanced-cropper", async (importOriginal) => {
   const { forwardRef, useImperativeHandle } = await import("react");
 
   // The engine can retain a loaded image after its source is cleared.
-  const LoadedCropper = forwardRef(function LoadedCropper(_props, ref) {
+  const LoadedCropper = forwardRef(function LoadedCropper(
+    { onError }: { onError?: () => void },
+    ref,
+  ) {
     useImperativeHandle(ref, () => ({
       getCoordinates: () => ({ left: 0, top: 0, width: 200, height: 50 }),
       getImage: () => ({ width: 200, height: 100 }),
       getCanvas: () => document.createElement("canvas"),
     }));
 
-    return <div role="img" aria-label="Crop preview" />;
+    return (
+      <div>
+        <div role="img" aria-label="Crop preview" />
+        <button type="button" onClick={onError}>
+          Simulate decode failure
+        </button>
+      </div>
+    );
   });
 
   return { ...original, Cropper: LoadedCropper, FixedCropper: LoadedCropper };
@@ -65,3 +75,31 @@ it.each(["fixed", "resizable"] as const)(
     await expect(ref.current?.getCroppedImage()).resolves.toBeNull();
   },
 );
+
+it("notifies the caller and announces when image decoding fails", async () => {
+  const onLoadError = vi.fn();
+  const onChange = vi.fn();
+  render(
+    <ImageCropper
+      src="/corrupt.png"
+      width={200}
+      height={50}
+      onLoadError={onLoadError}
+      onChange={onChange}
+    />,
+  );
+
+  await userEvent
+    .setup()
+    .click(screen.getByRole("button", { name: "Simulate decode failure" }));
+
+  expect(onLoadError).toHaveBeenCalledOnce();
+  expect(onChange).not.toHaveBeenCalled();
+  expect(screen.getByRole("group", { name: "Crop area" })).toHaveAttribute(
+    "aria-busy",
+    "false",
+  );
+  expect(screen.getByRole("status")).toHaveTextContent(
+    "The image could not be opened. Please choose another.",
+  );
+});

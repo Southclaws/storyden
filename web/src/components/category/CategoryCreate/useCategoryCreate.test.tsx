@@ -74,3 +74,36 @@ it.each([false, true])(
     }
   },
 );
+
+it("allows creation without a cover after an image fails to decode", async () => {
+  const { result } = renderHook(() => useCategoryCreate({}));
+
+  await act(async () => {
+    for (const [name, value] of [
+      ["name", "General"],
+      ["slug", "general"],
+      ["description", "Community conversation"],
+    ] as const) {
+      const field = result.current.register(name);
+      await field.onChange({ target: { name, value }, type: "change" });
+    }
+  });
+
+  await act(() => result.current.handleImageFileChange());
+  expect(result.current.imageLoading).toBe(true);
+
+  act(() => result.current.handleImageError());
+  expect(result.current.imageLoading).toBe(false);
+  await act(() => result.current.onSubmit());
+
+  expect(categoryCreate).toHaveBeenCalledWith(
+    expect.objectContaining({
+      name: "General",
+      slug: "general",
+    }),
+  );
+  expect(
+    vi.mocked(categoryCreate).mock.calls[0]?.[0]?.cover_image_asset_id,
+  ).toBeUndefined();
+  expect(assetUpload).not.toHaveBeenCalled();
+});

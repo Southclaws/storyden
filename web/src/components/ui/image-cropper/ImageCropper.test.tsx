@@ -8,6 +8,43 @@ import { ImageCropper } from ".";
 
 vi.mock("@/config", () => ({ API_ADDRESS: "https://api.storyden.test" }));
 
+it.each([false, true])(
+  "Enter submits through Create when an image is present: %s",
+  async (hasImage) => {
+    const submit = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          submit((event.nativeEvent as SubmitEvent).submitter);
+        }}
+      >
+        <ImageCropper
+          src={hasImage ? "/photo.png" : undefined}
+          width={200}
+          height={50}
+        />
+        <input aria-label="Name" />
+        <button type="submit">Create</button>
+      </form>,
+    );
+
+    if (hasImage) {
+      await user.click(screen.getByRole("button", { name: "Image tools" }));
+      expect(submit).not.toHaveBeenCalled();
+    }
+
+    await user.type(
+      screen.getByRole("textbox", { name: "Name" }),
+      "News{Enter}",
+    );
+    expect(submit).toHaveBeenCalledExactlyOnceWith(
+      screen.getByRole("button", { name: "Create" }),
+    );
+  },
+);
+
 it("opens and closes tools explicitly with pointer and keyboard input", async () => {
   render(
     <ImageCropper
