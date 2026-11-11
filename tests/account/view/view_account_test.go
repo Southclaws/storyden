@@ -204,6 +204,37 @@ func TestAccountView(t *testing.T) {
 				require.NotNil(t, updated.JSON200)
 				assert.False(t, updated.JSON200.Admin)
 			})
+
+			t.Run("manage_accounts_cannot_update_administrator_profile", func(t *testing.T) {
+				handle := openapi.AccountHandle("hijacked-" + xid.New().String())
+				name := "Hijacked " + xid.New().String()
+
+				for _, body := range []openapi.AccountManageUpdateJSONRequestBody{
+					{Handle: &handle},
+					{Name: &name},
+				} {
+					tests.AssertRequest(
+						cl.AccountManageUpdateWithResponse(root, admin2.ID.String(), body, managerSession),
+					)(t, http.StatusForbidden)
+				}
+
+				stored := tests.AssertRequest(
+					cl.AccountViewWithResponse(root, admin2.ID.String(), adminSession),
+				)(t, http.StatusOK)
+				assert.Equal(t, admin2.Handle, stored.JSON200.Handle)
+				assert.Equal(t, admin2.Name, stored.JSON200.Name)
+			})
+
+			t.Run("administrator_can_update_administrator_profile", func(t *testing.T) {
+				name := "Updated " + xid.New().String()
+
+				updated := tests.AssertRequest(
+					cl.AccountManageUpdateWithResponse(root, admin2.ID.String(), openapi.AccountManageUpdateJSONRequestBody{
+						Name: &name,
+					}, adminSession),
+				)(t, http.StatusOK)
+				assert.Equal(t, name, updated.JSON200.Name)
+			})
 		}))
 	}))
 }

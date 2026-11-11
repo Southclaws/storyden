@@ -98,6 +98,15 @@ func (h *Roles) RoleGet(ctx context.Context, request openapi.RoleGetRequestObjec
 func (h *Roles) RoleUpdate(ctx context.Context, request openapi.RoleUpdateRequestObject) (openapi.RoleUpdateResponseObject, error) {
 	id := role.RoleID(openapi.ParseID(request.RoleId))
 
+	existing, err := h.roleQuerier.Get(ctx, id)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := authoriseAdministratorRole(ctx, existing); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	opts := []role_writer.Mutation{}
 
 	if request.Body.Name != nil {
@@ -166,12 +175,31 @@ func (h *Roles) RoleUpdateOrder(ctx context.Context, request openapi.RoleUpdateO
 }
 
 func (h *Roles) RoleDelete(ctx context.Context, request openapi.RoleDeleteRequestObject) (openapi.RoleDeleteResponseObject, error) {
-	err := h.roleWriter.Delete(ctx, role.RoleID(openapi.ParseID(request.RoleId)))
+	id := role.RoleID(openapi.ParseID(request.RoleId))
+
+	existing, err := h.roleQuerier.Get(ctx, id)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := authoriseAdministratorRole(ctx, existing); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	err = h.roleWriter.Delete(ctx, id)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return nil, nil
+}
+
+func authoriseAdministratorRole(ctx context.Context, r *role.Role) error {
+	if !r.Permissions.HasAny(rbac.PermissionAdministrator) {
+		return nil
+	}
+
+	return session.Authorise(ctx, nil, rbac.PermissionAdministrator)
 }
 
 func serialiseRole(in role.Role) openapi.Role {

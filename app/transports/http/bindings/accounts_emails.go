@@ -71,7 +71,7 @@ func (h *Accounts) AccountManageUpdateEmailVerifiedStatus(ctx context.Context, r
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	ae, err := h.accountEmail.SetVerifiedStatus(ctx, account.AccountID(accountID), emailAddressID, request.Body.Verified)
+	ae, err := h.accountManage.SetEmailVerifiedStatus(ctx, account.AccountID(accountID), emailAddressID, request.Body.Verified)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

@@ -29,7 +29,7 @@ func (m *Manager) GetPasswordResetToken(ctx context.Context, targetID account.Ac
 		return "", fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := m.authoriseResetTarget(ctx, target); err != nil {
+	if err := m.authoriseAdministratorTarget(ctx, target); err != nil {
 		return "", err
 	}
 
@@ -74,7 +74,7 @@ func (m *Manager) SendPasswordResetEmail(
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := m.authoriseResetTarget(ctx, target); err != nil {
+	if err := m.authoriseAdministratorTarget(ctx, target); err != nil {
 		return err
 	}
 
@@ -115,18 +115,6 @@ func (m *Manager) SendPasswordResetEmail(
 	)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return nil
-}
-
-func (m *Manager) authoriseResetTarget(ctx context.Context, target *account.AccountWithEdges) error {
-	if !target.Roles.Permissions().HasAny(rbac.PermissionAdministrator) {
-		return nil
-	}
-
-	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
-		return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.PermissionDenied))
 	}
 
 	return nil
