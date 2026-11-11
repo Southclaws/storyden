@@ -1,4 +1,4 @@
-import { act, renderHook } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { expect, it, vi } from "vitest";
 
 import { assetUpload } from "@/api/openapi-client/assets";
@@ -181,3 +181,57 @@ it("allows unrelated changes after a replacement image fails to decode", async (
   );
   expect(assetUpload).not.toHaveBeenCalled();
 });
+
+it.each(["cancel", "close", "unmount"])(
+  "does not update a category when the form is dismissed with %s during upload",
+  async (dismiss) => {
+    const upload = Promise.withResolvers<Asset>();
+    vi.mocked(assetUpload).mockReturnValue(upload.promise);
+    const onClose = vi.fn();
+    const { result, rerender, unmount } = renderHook(
+      ({ isOpen }) => useCategoryEdit({ category, onClose, isOpen }),
+      { initialProps: { isOpen: true } },
+    );
+
+    const image = new Blob(["cropped image"], { type: "image/png" });
+    result.current.cropperRef.current = {
+      getCrop: () => ({
+        coordinates: { left: 0, top: 0, width: 800, height: 200 },
+        imageSize: { width: 800, height: 600 },
+        width: 1536,
+        height: 384,
+        getBlob: async () => image,
+      }),
+      getCoordinates: () => null,
+      getCroppedImage: async () => image,
+    };
+    act(() => {
+      result.current.form.setValue("name", "Community");
+      result.current.handlers.handleImageChange();
+    });
+
+    let submission: Promise<void>;
+    await act(async () => {
+      submission = result.current.handlers.handleSubmit();
+    });
+    await waitFor(() => expect(assetUpload).toHaveBeenCalledOnce());
+
+    if (dismiss === "cancel") {
+      act(() => result.current.handlers.handleCancel());
+      expect(onClose).toHaveBeenCalledOnce();
+    } else if (dismiss === "close") {
+      rerender({ isOpen: false });
+    } else {
+      unmount();
+    }
+    onClose.mockClear();
+
+    await act(async () => {
+      upload.resolve({ ...cover, id: "new-cover" });
+      await submission;
+    });
+
+    expect(updateCategory).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
+  },
+);

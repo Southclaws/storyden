@@ -27,6 +27,7 @@ export function CategoryCreateScreen(props: CategoryCreateProps) {
     register,
     slugInput,
     onSubmit,
+    handleCancel,
     control,
     cropperRef,
     isSubmitting,
@@ -158,7 +159,7 @@ export function CategoryCreateScreen(props: CategoryCreateProps) {
         </FormControl>
 
         <WStack>
-          <Button flexGrow="1" type="button" onClick={props.onClose}>
+          <Button flexGrow="1" type="button" onClick={handleCancel}>
             Cancel
           </Button>
           <Button

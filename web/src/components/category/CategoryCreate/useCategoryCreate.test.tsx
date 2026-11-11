@@ -1,4 +1,4 @@
-import { act, renderHook } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { expect, it, vi } from "vitest";
 
 import { assetUpload } from "@/api/openapi-client/assets";
@@ -107,3 +107,72 @@ it("allows creation without a cover after an image fails to decode", async () =>
   ).toBeUndefined();
   expect(assetUpload).not.toHaveBeenCalled();
 });
+
+it.each(["cancel", "close", "unmount"])(
+  "does not create a category when the form is dismissed with %s during upload",
+  async (dismiss) => {
+    const upload = Promise.withResolvers<Asset>();
+    vi.mocked(assetUpload).mockReturnValue(upload.promise);
+    const onClose = vi.fn();
+    const { result, rerender, unmount } = renderHook(
+      ({ isOpen }) => useCategoryCreate({ onClose, isOpen }),
+      { initialProps: { isOpen: true } },
+    );
+
+    await act(async () => {
+      for (const [name, value] of [
+        ["name", "General"],
+        ["slug", "general"],
+        ["description", "Community conversation"],
+      ] as const) {
+        const field = result.current.register(name);
+        await field.onChange({ target: { name, value }, type: "change" });
+      }
+    });
+
+    const image = new Blob(["cropped image"], { type: "image/png" });
+    result.current.cropperRef.current = {
+      getCrop: () => ({
+        coordinates: { left: 0, top: 0, width: 800, height: 200 },
+        imageSize: { width: 800, height: 600 },
+        width: 1536,
+        height: 384,
+        getBlob: async () => image,
+      }),
+      getCoordinates: () => null,
+      getCroppedImage: async () => image,
+    };
+    act(() => result.current.handleImageChange());
+
+    let submission: Promise<void>;
+    await act(async () => {
+      submission = result.current.onSubmit();
+    });
+    await waitFor(() => expect(assetUpload).toHaveBeenCalledOnce());
+
+    if (dismiss === "cancel") {
+      act(() => result.current.handleCancel());
+      expect(onClose).toHaveBeenCalledOnce();
+    } else if (dismiss === "close") {
+      rerender({ isOpen: false });
+    } else {
+      unmount();
+    }
+    onClose.mockClear();
+
+    await act(async () => {
+      upload.resolve({
+        id: "new-cover",
+        path: "/api/assets/new-cover",
+        filename: "cover.png",
+        mime_type: "image/png",
+        width: 1536,
+        height: 384,
+      });
+      await submission;
+    });
+
+    expect(categoryCreate).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
+  },
+);

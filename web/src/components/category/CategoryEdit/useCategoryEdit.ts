@@ -1,7 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePathname, useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { BaseSyntheticEvent, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { handle } from "@/api/client";
 import { assetUpload } from "@/api/openapi-client/assets";
@@ -32,6 +33,14 @@ export const FormSchema = z.object({
 export type Form = z.infer<typeof FormSchema>;
 
 export function useCategoryEdit(props: Props) {
+  const submissionRevision = useRef(0);
+
+  useEffect(() => {
+    return () => {
+      submissionRevision.current += 1;
+    };
+  }, [props.isOpen]);
+
   const cropperRef = useRef<ImageCropperRef>(null);
   const [pendingCrop, setPendingCrop] = useState<ImageCropperSnapshot | null>(
     null,
@@ -70,49 +79,60 @@ export function useCategoryEdit(props: Props) {
 
   const { revalidateList, updateCategory } = useCategoryMutations();
 
-  const handleSubmit = form.handleSubmit(async (data) => {
-    if (imageLoading) {
-      return;
-    }
+  function handleSubmit(event?: BaseSyntheticEvent) {
+    const revision = ++submissionRevision.current;
 
-    const originalSlug = props.category.slug;
-    const slugChanged = data.slug !== originalSlug;
+    return form.handleSubmit(async (data) => {
+      if (imageLoading || revision !== submissionRevision.current) {
+        return;
+      }
 
-    await handle(
-      async () => {
-        let { cover_image, ...rest } = data;
-        const crop = pendingCrop;
-        if (crop) {
-          cover_image = await assetUpload(await crop.getBlob(), {
-            filename: "category-cover",
-          });
-        }
+      const originalSlug = props.category.slug;
+      const slugChanged = data.slug !== originalSlug;
 
-        const updateData = {
-          ...rest,
-          cover_image_asset_id: cover_image?.id || null,
-        };
-        await updateCategory(originalSlug, updateData);
+      await handle(
+        async () => {
+          let { cover_image, ...rest } = data;
+          const crop = pendingCrop;
+          if (crop) {
+            const blob = await crop.getBlob();
+            if (revision !== submissionRevision.current) {
+              return;
+            }
 
-        props.onClose?.();
-
-        if (slugChanged) {
-          if (pathname.includes(`/d/${originalSlug}`)) {
-            router.replace(`/d/${data.slug}`);
+            cover_image = await assetUpload(blob, {
+              filename: "category-cover",
+            });
           }
-        }
-      },
-      {
-        promiseToast: {
-          loading: "Updating category...",
-          success: "Category updated.",
+
+          if (revision !== submissionRevision.current) {
+            return;
+          }
+
+          const updateData = {
+            ...rest,
+            cover_image_asset_id: cover_image?.id || null,
+          };
+          await updateCategory(originalSlug, updateData);
+          toast.success("Category updated.");
+
+          props.onClose?.();
+
+          if (slugChanged) {
+            if (pathname.includes(`/d/${originalSlug}`)) {
+              router.replace(`/d/${data.slug}`);
+            }
+          }
         },
-        cleanup: () => revalidateList(),
-      },
-    );
-  });
+        {
+          cleanup: () => revalidateList(),
+        },
+      );
+    })(event);
+  }
 
   function handleCancel() {
+    submissionRevision.current += 1;
     setImageLoading(false);
     setPendingCrop(null);
     form.reset();

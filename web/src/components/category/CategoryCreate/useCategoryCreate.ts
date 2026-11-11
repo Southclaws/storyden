@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRef, useState } from "react";
+import { BaseSyntheticEvent, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { mutate } from "swr";
 
@@ -41,6 +41,14 @@ export interface CategoryCreateProps extends UseDisclosureProps {
 }
 
 export function useCategoryCreate(props: CategoryCreateProps) {
+  const submissionRevision = useRef(0);
+
+  useEffect(() => {
+    return () => {
+      submissionRevision.current += 1;
+    };
+  }, [props.isOpen]);
+
   const cropperRef = useRef<ImageCropperRef>(null);
   const [pendingCrop, setPendingCrop] = useState<ImageCropperSnapshot | null>(
     null,
@@ -73,25 +81,45 @@ export function useCategoryCreate(props: CategoryCreateProps) {
     },
   });
 
-  const onSubmit = handleSubmit(async (data) => {
-    if (imageLoading) {
-      return;
-    }
+  function onSubmit(event?: BaseSyntheticEvent) {
+    const revision = ++submissionRevision.current;
 
-    await handle(async () => {
-      const crop = pendingCrop;
-      if (crop) {
-        const asset = await assetUpload(await crop.getBlob(), {
-          filename: "category-cover",
-        });
-        data.cover_image_asset_id = asset.id;
+    return handleSubmit(async (data) => {
+      if (imageLoading || revision !== submissionRevision.current) {
+        return;
       }
 
-      await categoryCreate(data);
-      props.onClose?.();
-      mutate(getCategoryListKey());
-    });
-  });
+      await handle(async () => {
+        const crop = pendingCrop;
+        if (crop) {
+          const blob = await crop.getBlob();
+          if (revision !== submissionRevision.current) {
+            return;
+          }
+
+          const asset = await assetUpload(blob, {
+            filename: "category-cover",
+          });
+          data.cover_image_asset_id = asset.id;
+        }
+
+        if (revision !== submissionRevision.current) {
+          return;
+        }
+
+        await categoryCreate(data);
+        props.onClose?.();
+        mutate(getCategoryListKey());
+      });
+    })(event);
+  }
+
+  function handleCancel() {
+    submissionRevision.current += 1;
+    setImageLoading(false);
+    setPendingCrop(null);
+    props.onClose?.();
+  }
 
   async function handleImageFileChange() {
     setImageLoading(true);
@@ -116,6 +144,7 @@ export function useCategoryCreate(props: CategoryCreateProps) {
 
   return {
     onSubmit,
+    handleCancel,
     register,
     slugInput,
     control,

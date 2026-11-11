@@ -552,9 +552,10 @@ Use the shared `ImageCropper` for positioning, zooming, replacement and removal.
 Keep those controls on the image rather than introducing a second image editor.
 The enclosing feature owns the output dimensions, saving and persistence.
 
-A fixed crop fills its frame and exports the requested dimensions. A resizable
-crop exposes selection handles and ratio choices. Category covers use a fixed
-4:1 frame; Library main images may expose additional layout choices.
+A fixed crop fills its frame and exports the requested dimensions by default.
+When `maxOutputSize` is set, the export is proportionally bounded by that limit.
+A resizable crop exposes selection handles and ratio choices. Category covers
+use a fixed 4:1 frame; Library main images may expose additional layout choices.
 
 Optional safe-area guides show a secondary composition region inside the
 frame. They are labelled, described to assistive technology and transparent
