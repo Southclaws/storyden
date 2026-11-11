@@ -51,11 +51,13 @@ func TestScrapeFollowsRedirectsAndResolvesMetadataAtDestination(t *testing.T) {
 
 func TestScrapeClassifiesBlockedDNSAsInvalidInput(t *testing.T) {
 	t.Parallel()
-	s := webScraper{client: httpsafe.NewClient(httpsafe.Config{
+	client, err := httpsafe.NewSurfClient(httpsafe.Config{
 		Resolver: func(context.Context, string, string) ([]netip.Addr, error) {
 			return []netip.Addr{netip.MustParseAddr("10.0.0.1")}, nil
 		},
-	})}
+	})
+	require.NoError(t, err)
+	s := webScraper{client: client}
 	u, err := link_url.Parse("https://public-looking.example.com/")
 	require.NoError(t, err)
 	_, err = s.Scrape(context.Background(), u)
@@ -65,11 +67,12 @@ func TestScrapeClassifiesBlockedDNSAsInvalidInput(t *testing.T) {
 
 func TestScrapeRejectsRedirectToBlockedDNS(t *testing.T) {
 	t.Parallel()
-	client := httpsafe.NewClient(httpsafe.Config{
+	client, err := httpsafe.NewSurfClient(httpsafe.Config{
 		Resolver: func(context.Context, string, string) ([]netip.Addr, error) {
 			return []netip.Addr{netip.MustParseAddr("169.254.169.254")}, nil
 		},
 	})
+	require.NoError(t, err)
 	guarded := client.Transport
 	client.Transport = transportFunc(func(req *http.Request) (*http.Response, error) {
 		if req.URL.Host == "public.example.com" {
@@ -102,7 +105,9 @@ func TestScrapeRejectsRedirectsOutsideLinkURLPolicyBeforeRequest(t *testing.T) {
 		"https://bad_host.example.com/",
 	} {
 		t.Run(target, func(t *testing.T) {
-			s := New().(*webScraper)
+			sc, err := New()
+			require.NoError(t, err)
+			s := sc.(*webScraper)
 			requests := 0
 			s.client.Transport = transportFunc(func(req *http.Request) (*http.Response, error) {
 				requests++
