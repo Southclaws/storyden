@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { type ReactNode } from "react";
 
 import { useAccountGet } from "@/api/openapi-client/accounts";
+import { useGetVersion } from "@/api/openapi-client/misc";
 import { Permission } from "@/api/openapi-schema";
 import {
   SidebarNavigationLink,
@@ -23,6 +24,7 @@ import { RobotIcon } from "@/components/ui/icons/Robot";
 import { SearchIcon } from "@/components/ui/icons/Search";
 import { SystemIcon } from "@/components/ui/icons/System";
 import { ToolIcon } from "@/components/ui/icons/Tool";
+import { Text } from "@/components/ui/text";
 import { useSettings } from "@/lib/settings/settings-client";
 import { hasPermission } from "@/utils/permissions";
 
@@ -54,6 +56,16 @@ export function AdminNavigationPane() {
     Permission.ADMINISTRATOR,
     Permission.MANAGE_SETTINGS,
   );
+  const version = useGetVersion({
+    swr: { enabled: settings.ready && !account.isLoading && authorised },
+  });
+  let versionLabel = "Loading Storyden version…";
+
+  if (version.data) {
+    versionLabel = `Storyden ${version.data}`;
+  } else if (version.error) {
+    versionLabel = "Storyden version unavailable";
+  }
 
   if (!settings.ready || account.isLoading || !authorised) {
     return null;
@@ -77,6 +89,17 @@ export function AdminNavigationPane() {
           ))}
         </SidebarNavigationSection>
       ))}
+      <Text
+        as="footer"
+        variant="metadata"
+        mt="auto"
+        px="2"
+        py="2"
+        flexShrink="0"
+        overflowWrap="anywhere"
+      >
+        {versionLabel}
+      </Text>
     </SidebarNavigationPane>
   );
 }

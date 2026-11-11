@@ -35,6 +35,13 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      - name: Set edge version
+        if: github.ref_type == 'branch'
+        id: version
+        run: |
+          commit=$(git describe --always --long)
+          echo "version=edge-$commit" >> "$GITHUB_OUTPUT"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
@@ -51,6 +58,8 @@ jobs:
           context: .
           platforms: ${{ matrix.platform }}
           file: ${{ env.DOCKERFILE }}
+          build-args: |
+            STORYDEN_VERSION=${{ steps.version.outputs.version }}
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:tmp-${{ env.IMAGE_KIND }}-${{ github.sha }}-${{ matrix.arch }}

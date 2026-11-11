@@ -19,9 +19,13 @@ COPY ./sdk ./sdk
 COPY ./cmd ./cmd
 COPY ./internal ./internal
 
+ARG STORYDEN_VERSION
+
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=cache,target="/root/.cache/go-build" \
-    CGO_ENABLED=0 GOOS=linux go build -o /build/storyden ./cmd/backend
+    CGO_ENABLED=0 GOOS=linux go build \
+    -ldflags "${STORYDEN_VERSION:+-X=github.com/Southclaws/storyden/internal/config.Version=$STORYDEN_VERSION}" \
+    -o /build/storyden ./cmd/backend
 
 #
 # RUNTIME IMAGE
