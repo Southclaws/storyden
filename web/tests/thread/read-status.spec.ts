@@ -36,8 +36,20 @@ for (const viewport of [
       exact: true,
     });
 
-    await trigger.focus();
-    await trigger.press("Enter");
+    // The card can remount while scrolling into view; retry the full interaction.
+    await expect(async () => {
+      await trigger.scrollIntoViewIfNeeded();
+
+      if ((await trigger.getAttribute("aria-expanded")) !== "true") {
+        await trigger.focus();
+        await expect(trigger).toBeFocused();
+        await trigger.press("Enter");
+      }
+
+      await expect(
+        page.getByRole("menuitem", { name: "Mark as read", exact: true }),
+      ).toBeVisible({ timeout: 1_000 });
+    }).toPass({ timeout: 10_000 });
     await expect(
       page.getByRole("menuitem", { name: "Mark as unread", exact: true }),
     ).toHaveCount(0);
