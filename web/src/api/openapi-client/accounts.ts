@@ -429,6 +429,8 @@ export const getAccountManageUpdateUrl = (accountId: string) => {
  * MANAGE_ACCOUNTS. Updating any field on an account that holds
  * ADMINISTRATOR, or changing an account's admin flag, additionally
  * requires ADMINISTRATOR.
+ * Changes that would leave no active account with ADMINISTRATOR are
+ * rejected with 400.
  */
 export const accountManageUpdate = async (
   accountId: string,
@@ -1944,6 +1946,8 @@ export const getAccountRemoveRoleUrl = (
  * that grants ADMINISTRATOR additionally requires ADMINISTRATOR. The
  * built-in admin role cannot be removed from yourself, and the default
  * member role cannot be removed.
+ * Removals that would leave no active account with ADMINISTRATOR are
+ * rejected with 400.
  */
 export const accountRemoveRole = async (
   accountHandle: string,
@@ -1979,6 +1983,7 @@ export type AccountRemoveRoleMutationResult = NonNullable<
 
 export const useAccountRemoveRole = <
   TError =
+    | BadRequestResponse
     | UnauthorisedResponse
     | NotFoundResponse
     | InternalServerErrorResponse,

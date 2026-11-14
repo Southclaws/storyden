@@ -11,6 +11,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_ref"
+	"github.com/Southclaws/storyden/app/resources/account/admin_guard"
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_accountroles "github.com/Southclaws/storyden/internal/ent/accountroles"
@@ -78,7 +79,7 @@ func (w *Assignment) UpdateRoles(ctx context.Context, accountID account_ref.ID, 
 	)
 	defer span.End()
 
-	tx, err := w.db.Tx(ctx)
+	tx, err := admin_guard.Begin(ctx, w.db)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -116,11 +117,9 @@ func (w *Assignment) UpdateRoles(ctx context.Context, accountID account_ref.ID, 
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := w.storeRoleAssignmentsCache(ctx, xid.ID(accountID), roleIDs); err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if err := tx.Commit(); err != nil {
+	if err := tx.Commit(ctx, func() error {
+		return w.storeRoleAssignmentsCache(ctx, xid.ID(accountID), roleIDs)
+	}); err != nil {
 		_ = w.deleteRoleIDsCache(ctx, xid.ID(accountID))
 		return fault.Wrap(err, fctx.With(ctx))
 	}

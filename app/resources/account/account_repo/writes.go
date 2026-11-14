@@ -2,6 +2,7 @@ package account_repo
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/Southclaws/dt"
@@ -13,6 +14,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/admin_guard"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -215,7 +217,23 @@ func (r *Repository) Update(ctx context.Context, id account.AccountID, opts ...M
 		option(update)
 	}
 
-	if err := update.Exec(ctx); err != nil {
+	mutation := update.Mutation()
+	admin, adminChanged := mutation.Admin()
+	_, suspending := mutation.DeletedAt()
+	removingAdmin := adminChanged && !admin
+
+	var err error
+	if removingAdmin || suspending {
+		err = r.updateAdministrator(ctx, mutation)
+	} else {
+		err = update.Exec(ctx)
+	}
+
+	if err != nil {
+		if errors.Is(err, admin_guard.ErrLastAdministrator) {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
 		if ent.IsNotFound(err) {
 			err = fault.Wrap(err, ftag.With(ftag.NotFound))
 		} else if ent.IsConstraintError(err) {
@@ -228,4 +246,18 @@ func (r *Repository) Update(ctx context.Context, id account.AccountID, opts ...M
 	}
 
 	return r.GetByID(ctx, id)
+}
+
+func (r *Repository) updateAdministrator(ctx context.Context, mutation *ent.AccountMutation) error {
+	tx, err := admin_guard.Begin(ctx, r.db)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	if _, err := tx.Client().Mutate(ctx, mutation); err != nil {
+		return err
+	}
+
+	return tx.Commit(ctx)
 }

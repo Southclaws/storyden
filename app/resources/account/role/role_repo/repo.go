@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/admin_guard"
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -106,6 +107,30 @@ func (r *Repository) Update(ctx context.Context, id role.RoleID, opts ...Mutatio
 	ctx, span := r.ins.Instrument(ctx, kv.String("role_id", xid.ID(id).String()))
 	defer span.End()
 
+	tx, err := admin_guard.Begin(ctx, r.db)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	repository := *r
+	repository.db = tx.Client()
+
+	updated, err := repository.update(ctx, id, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	r.setRoleCache(ctx, updated)
+
+	return updated, nil
+}
+
+func (r *Repository) update(ctx context.Context, id role.RoleID, opts ...Mutation) (*role.Role, error) {
 	if id == role.DefaultRoleMemberID {
 		return r.updateDefaultRole(ctx, opts...)
 	}
@@ -138,8 +163,6 @@ func (r *Repository) Update(ctx context.Context, id role.RoleID, opts ...Mutatio
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	r.setRoleCache(ctx, rl)
 
 	return rl, nil
 }
@@ -311,7 +334,7 @@ func (r *Repository) Delete(ctx context.Context, id role.RoleID) error {
 	ctx, span := r.ins.Instrument(ctx, kv.String("role_id", xid.ID(id).String()))
 	defer span.End()
 
-	tx, err := r.db.Tx(ctx)
+	tx, err := admin_guard.Begin(ctx, r.db)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -326,11 +349,10 @@ func (r *Repository) Delete(ctx context.Context, id role.RoleID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := r.removeRoleCacheStrict(ctx, id); err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if err := tx.Commit(); err != nil {
+	if err := tx.Commit(ctx, func() error {
+		return r.removeRoleCacheStrict(ctx, id)
+	}); err != nil {
+		_ = tx.Rollback()
 		r.refreshRoleListCache(ctx)
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -440,8 +462,6 @@ func (r *Repository) updateDefaultRole(ctx context.Context, opts ...Mutation) (*
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		r.setRoleCache(ctx, mapped)
-
 		return mapped, nil
 	}
 
@@ -461,8 +481,6 @@ func (r *Repository) updateDefaultRole(ctx context.Context, opts ...Mutation) (*
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	r.setRoleCache(ctx, mapped)
 
 	return mapped, nil
 }
@@ -506,8 +524,6 @@ func (r *Repository) updateAdminRole(ctx context.Context, opts ...Mutation) (*ro
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		r.setRoleCache(ctx, mapped)
-
 		return mapped, nil
 	}
 
@@ -531,8 +547,6 @@ func (r *Repository) updateAdminRole(ctx context.Context, opts ...Mutation) (*ro
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	r.setRoleCache(ctx, mapped)
 
 	return mapped, nil
 }
@@ -572,8 +586,6 @@ func (r *Repository) updateGuestRole(ctx context.Context, opts ...Mutation) (*ro
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		r.setRoleCache(ctx, mapped)
-
 		return mapped, nil
 	}
 
@@ -597,8 +609,6 @@ func (r *Repository) updateGuestRole(ctx context.Context, opts ...Mutation) (*ro
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	r.setRoleCache(ctx, mapped)
 
 	return mapped, nil
 }
