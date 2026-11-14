@@ -9,6 +9,7 @@ import {
   login,
   withAdminAccessKey,
 } from "../access_key_admin_assignment";
+import { openImageTools } from "../image_cropper";
 
 test("Library keeps its cover visible while the cropper loads, and saves cropping", async ({
   page,
@@ -236,6 +237,7 @@ test("a cover uploaded in quick edit keeps its original when cropped", async ({
 });
 
 async function dragCover(page: Page, distance: number): Promise<Asset> {
+  await openImageTools(page);
   await page
     .getByRole("button", { name: "Main image options", exact: true })
     .click();
@@ -245,6 +247,7 @@ async function dragCover(page: Page, distance: number): Promise<Asset> {
   await page
     .getByRole("menuitem", { name: "Banner · wide page header", exact: true })
     .click();
+  await expect(page.locator('[role="menu"]:visible')).toHaveCount(0);
   const cropper = page.locator(
     '[aria-label="Image cropper"] .advanced-cropper',
   );

@@ -1,53 +1,218 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-11T21:15:35Z",
+  "generatedAt": "2026-11-11T19:22:49.311716Z",
   "title": "Design System: Storyden",
   "extensions": {
     "colorMeta": {
       "background-canvas": {
-        "role": "structural",
-        "displayName": "background.canvas",
-        "canonical": "#fcfcfc"
+        "role": "neutral",
+        "displayName": "Canvas",
+        "canonical": "var(--colors-background-canvas, #fcfcfc)",
+        "tonalRamp": [
+          "#202020",
+          "#646464",
+          "#838383",
+          "#8d8d8d",
+          "#cecece",
+          "#e0e0e0",
+          "#f0f0f0",
+          "#fcfcfc"
+        ]
       },
       "background-surface": {
-        "role": "structural",
-        "displayName": "background.surface",
-        "canonical": "#f9f9f9"
+        "role": "neutral",
+        "displayName": "Surface",
+        "canonical": "var(--colors-background-surface, #f9f9f9)",
+        "tonalRamp": [
+          "#202020",
+          "#646464",
+          "#838383",
+          "#8d8d8d",
+          "#cecece",
+          "#e0e0e0",
+          "#f0f0f0",
+          "#fcfcfc"
+        ]
       },
       "background-inset": {
-        "role": "structural",
-        "displayName": "background.inset",
-        "canonical": "#f0f0f0"
+        "role": "neutral",
+        "displayName": "Inset",
+        "canonical": "var(--colors-background-inset, #f0f0f0)",
+        "tonalRamp": [
+          "#202020",
+          "#646464",
+          "#838383",
+          "#8d8d8d",
+          "#cecece",
+          "#e0e0e0",
+          "#f0f0f0",
+          "#fcfcfc"
+        ]
       },
       "background-overlay": {
-        "role": "structural",
-        "displayName": "background.overlay",
-        "canonical": "rgba(255, 255, 255, 0.95)"
+        "role": "neutral",
+        "displayName": "Overlay",
+        "canonical": "var(--colors-background-overlay, rgba(255, 255, 255, 0.95))",
+        "tonalRamp": [
+          "#202020",
+          "#646464",
+          "#838383",
+          "#8d8d8d",
+          "#cecece",
+          "#e0e0e0",
+          "#f0f0f0",
+          "#fcfcfc"
+        ]
       },
       "background-control": {
-        "role": "control",
-        "displayName": "background.control",
-        "canonical": "#fcfcfc"
+        "role": "neutral",
+        "displayName": "Control",
+        "canonical": "var(--colors-background-control, #fcfcfc)",
+        "tonalRamp": [
+          "#202020",
+          "#646464",
+          "#838383",
+          "#8d8d8d",
+          "#cecece",
+          "#e0e0e0",
+          "#f0f0f0",
+          "#fcfcfc"
+        ]
+      },
+      "background-control-disabled": {
+        "role": "neutral",
+        "displayName": "Disabled control",
+        "canonical": "var(--colors-background-control-disabled, #f9f9f9)",
+        "tonalRamp": [
+          "#202020",
+          "#646464",
+          "#838383",
+          "#8d8d8d",
+          "#cecece",
+          "#e0e0e0",
+          "#f0f0f0",
+          "#fcfcfc"
+        ]
       },
       "text-default": {
-        "role": "foreground",
-        "displayName": "text.default",
-        "canonical": "#202020"
+        "role": "neutral",
+        "displayName": "Primary text",
+        "canonical": "var(--colors-text-default, #202020)",
+        "tonalRamp": [
+          "#202020",
+          "#646464",
+          "#838383",
+          "#8d8d8d",
+          "#cecece",
+          "#e0e0e0",
+          "#f0f0f0",
+          "#fcfcfc"
+        ]
       },
       "text-muted": {
-        "role": "foreground",
-        "displayName": "text.muted",
-        "canonical": "#646464"
+        "role": "neutral",
+        "displayName": "Supporting text",
+        "canonical": "var(--colors-text-muted, #646464)",
+        "tonalRamp": [
+          "#202020",
+          "#646464",
+          "#838383",
+          "#8d8d8d",
+          "#cecece",
+          "#e0e0e0",
+          "#f0f0f0",
+          "#fcfcfc"
+        ]
+      },
+      "text-disabled": {
+        "role": "neutral",
+        "displayName": "Disabled text",
+        "canonical": "var(--colors-text-disabled, #bbbbbb)",
+        "tonalRamp": [
+          "#202020",
+          "#646464",
+          "#838383",
+          "#8d8d8d",
+          "#cecece",
+          "#e0e0e0",
+          "#f0f0f0",
+          "#fcfcfc"
+        ]
       },
       "border-default": {
-        "role": "boundary",
-        "displayName": "border.default",
-        "canonical": "#e0e0e0"
+        "role": "neutral",
+        "displayName": "Surface boundary",
+        "canonical": "var(--colors-border-default, #e0e0e0)",
+        "tonalRamp": [
+          "#202020",
+          "#646464",
+          "#838383",
+          "#8d8d8d",
+          "#cecece",
+          "#e0e0e0",
+          "#f0f0f0",
+          "#fcfcfc"
+        ]
       },
-      "accent-default": {
+      "border-strong": {
+        "role": "neutral",
+        "displayName": "Strong boundary",
+        "canonical": "var(--colors-border-strong, #cecece)",
+        "tonalRamp": [
+          "#202020",
+          "#646464",
+          "#838383",
+          "#8d8d8d",
+          "#cecece",
+          "#e0e0e0",
+          "#f0f0f0",
+          "#fcfcfc"
+        ]
+      },
+      "selection-background": {
+        "role": "neutral",
+        "displayName": "Selected navigation",
+        "canonical": "var(--colors-selection-background, #e8e8e8)",
+        "tonalRamp": [
+          "#202020",
+          "#646464",
+          "#838383",
+          "#8d8d8d",
+          "#cecece",
+          "#e0e0e0",
+          "#f0f0f0",
+          "#fcfcfc"
+        ]
+      },
+      "accent-solid": {
         "role": "primary",
-        "displayName": "accent.default",
-        "canonical": "var(--accent-colour-flat-fill-400)"
+        "displayName": "Community accent",
+        "canonical": "var(--colors-accent-solid, hsl(156.99deg 51% 54.1%))",
+        "tonalRamp": [
+          "hsl(156.99deg 50% 25.1%)",
+          "hsl(156.99deg 45% 35%)",
+          "hsl(156.99deg 45% 50.2%)",
+          "hsl(156.99deg 51% 54.1%)",
+          "hsl(156.99deg 62% 80.6%)",
+          "hsl(156.99deg 75% 90.6%)",
+          "hsl(156.99deg 90% 96.3%)",
+          "hsl(156.99deg 50% 99.2%)"
+        ]
+      },
+      "accent-foreground": {
+        "role": "neutral",
+        "displayName": "Content on the accent fill",
+        "canonical": "var(--colors-accent-solid-foreground, #303030)",
+        "tonalRamp": [
+          "#202020",
+          "#646464",
+          "#838383",
+          "#8d8d8d",
+          "#cecece",
+          "#e0e0e0",
+          "#f0f0f0",
+          "#fcfcfc"
+        ]
       }
     },
     "typographyMeta": {
@@ -70,34 +235,42 @@
       "metadata": {
         "displayName": "Metadata",
         "purpose": "Timestamps, counts, identifiers, and compact annotations."
+      },
+      "action": {
+        "displayName": "Compact action",
+        "purpose": "Default small Button labels: 12px, weight 600, 18px line height."
+      },
+      "control": {
+        "displayName": "Compact control",
+        "purpose": "Default small Input content: 12px, weight 400, 18px line height."
       }
     },
     "shadows": [
       {
         "name": "surface",
-        "value": "0 1px 2px rgb(0 0 0 / 2.4%), 0 0 1px rgb(0 0 0 / 6%)",
+        "value": "0px 1px 2px 0px #00000006, 0px 0px 1px 0px #0000000f",
         "purpose": "Optional quiet depth; every Surface still retains a border."
       },
       {
         "name": "floating",
-        "value": "0 2px 4px rgb(0 0 0 / 6%), 0 0 1px rgb(0 0 0 / 19%)",
+        "value": "0px 2px 4px 0px #0000000f, 0px 0px 1px 0px #00000031",
         "purpose": "Tooltips and compact transient content."
       },
       {
         "name": "overlay",
-        "value": "0 8px 16px rgb(0 0 0 / 6%), 0 0 1px rgb(0 0 0 / 19%)",
+        "value": "0px 8px 16px 0px #0000000f, 0px 0px 1px 0px #00000031",
         "purpose": "Menus, popovers, dialogs, and other overlapping content."
       }
     ],
     "motion": [
       {
         "name": "fast",
-        "value": "150ms cubic-bezier(0.2, 0, 0, 1)",
+        "value": "150ms cubic-bezier(0.2, 0.0, 0, 1.0)",
         "purpose": "Compact hover and highlight transitions."
       },
       {
         "name": "normal",
-        "value": "200ms cubic-bezier(0.2, 0, 0, 1)",
+        "value": "200ms cubic-bezier(0.2, 0.0, 0, 1.0)",
         "purpose": "Default control state transitions."
       }
     ],
@@ -129,82 +302,110 @@
       "name": "Subtle Button",
       "kind": "button",
       "refersTo": "button-subtle",
-      "description": "The compact default for routine Storyden commands.",
+      "description": "The compact default for routine commands.",
       "html": "<button class=\"ds-button-subtle\">Save</button>",
-      "css": ".ds-button-subtle { height:1.5rem; padding:0 .5rem; border:0; border-radius:.25rem; background:var(--colors-background-control-subtle, #e8e8e8); color:var(--colors-text-default, #202020); font:500 .75rem/1.125rem Inter, sans-serif; }"
+      "css": ".ds-button-subtle {\n  appearance: none;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n  height: 1.5rem;\n  min-width: 1.5rem;\n  padding: 0 0.5rem;\n  border: 0;\n  border-radius: var(--radii-sm, 0.25rem);\n  background: color-mix(in oklab, var(--colors-gray-3, #f0f0f0) 80%, transparent);\n  color: var(--colors-gray-text, #202020);\n  font-family: var(--fonts-body, var(--font-inter, Inter)), sans-serif;\n  font-size: 0.75rem;\n  font-weight: 600;\n  line-height: 1.125rem;\n  white-space: nowrap;\n  cursor: pointer;\n  transition: background 200ms cubic-bezier(0.2, 0.0, 0, 1.0), border-color 200ms cubic-bezier(0.2, 0.0, 0, 1.0), color 200ms cubic-bezier(0.2, 0.0, 0, 1.0);\n}\n\n.ds-button-subtle:hover:not(:disabled) {\n  background: var(--colors-gray-4, #e8e8e8);\n  color: var(--colors-gray-text, #202020);\n}\n\n.ds-button-subtle:focus-visible {\n  outline: 2px solid var(--colors-gray-text, #202020);\n  outline-offset: 2px;\n}\n\n.ds-button-subtle:disabled {\n  background: var(--colors-background-control-disabled, #f9f9f9);\n  color: var(--colors-text-disabled, #bbbbbb);\n  cursor: not-allowed;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .ds-button-subtle {\n    transition: none;\n  }\n}"
     },
     {
       "name": "Solid Button",
       "kind": "button",
       "refersTo": "button-solid",
-      "description": "The single decisive completion action in a workflow.",
+      "description": "The single decisive completion action; its foreground follows the configured accent contrast.",
       "html": "<button class=\"ds-button-solid\">Continue</button>",
-      "css": ".ds-button-solid { height:1.5rem; padding:0 .5rem; border:0; border-radius:.25rem; background:var(--colors-accent-default); color:var(--colors-text-inverse); font:500 .75rem/1.125rem Inter, sans-serif; }"
+      "css": ".ds-button-solid {\n  appearance: none;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n  height: 1.5rem;\n  min-width: 1.5rem;\n  padding: 0 0.5rem;\n  border: 0;\n  border-radius: var(--radii-sm, 0.25rem);\n  background: var(--colors-accent-solid, hsl(156.99deg 51% 54.1%));\n  color: var(--colors-accent-solid-foreground, #303030);\n  font-family: var(--fonts-body, var(--font-inter, Inter)), sans-serif;\n  font-size: 0.75rem;\n  font-weight: 600;\n  line-height: 1.125rem;\n  white-space: nowrap;\n  cursor: pointer;\n  transition: background 200ms cubic-bezier(0.2, 0.0, 0, 1.0), border-color 200ms cubic-bezier(0.2, 0.0, 0, 1.0), color 200ms cubic-bezier(0.2, 0.0, 0, 1.0);\n}\n\n.ds-button-solid:hover:not(:disabled) {\n  background: var(--colors-accent-solid, hsl(156.99deg 51% 54.1%));\n  color: var(--colors-accent-solid-foreground, #303030);\n  outline: 1px solid color-mix(in oklab, var(--colors-accent-solid-foreground, #303030) 20%, transparent);\n  outline-offset: -1px;\n}\n\n.ds-button-solid:focus-visible {\n  outline: 2px solid var(--colors-accent-text, hsl(156.99deg 45% 35%));\n  outline-offset: 2px;\n}\n\n.ds-button-solid:disabled {\n  background: var(--colors-background-control-disabled, #f9f9f9);\n  color: var(--colors-text-disabled, #bbbbbb);\n  cursor: not-allowed;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .ds-button-solid {\n    transition: none;\n  }\n}"
     },
     {
-      "name": "Surface",
-      "kind": "card",
-      "refersTo": "surface",
-      "description": "An independent content object. Every Surface and Card has a border.",
-      "html": "<article class=\"ds-surface\"><strong>Discussion</strong><p>Independent community content.</p></article>",
-      "css": ".ds-surface { padding:.5rem; border:1px solid var(--colors-border-default, #e0e0e0); border-radius:.5rem; background:var(--colors-background-surface, #f9f9f9); color:var(--colors-text-default, #202020); }"
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "A visible secondary command or browse action.",
+      "html": "<button class=\"ds-button-outline\">Browse</button>",
+      "css": ".ds-button-outline {\n  appearance: none;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n  height: 1.5rem;\n  min-width: 1.5rem;\n  padding: 0 0.5rem;\n  border: 1px solid var(--colors-gray-7, #cecece);\n  border-radius: var(--radii-sm, 0.25rem);\n  background: var(--colors-background-control, #fcfcfc);\n  color: var(--colors-gray-text, #202020);\n  font-family: var(--fonts-body, var(--font-inter, Inter)), sans-serif;\n  font-size: 0.75rem;\n  font-weight: 600;\n  line-height: 1.125rem;\n  white-space: nowrap;\n  cursor: pointer;\n  transition: background 200ms cubic-bezier(0.2, 0.0, 0, 1.0), border-color 200ms cubic-bezier(0.2, 0.0, 0, 1.0), color 200ms cubic-bezier(0.2, 0.0, 0, 1.0);\n}\n\n.ds-button-outline:hover:not(:disabled) {\n  background: var(--colors-gray-3, #f0f0f0);\n  color: var(--colors-gray-text, #202020);\n  border-color: var(--colors-gray-8, #bbbbbb);\n}\n\n.ds-button-outline:focus-visible {\n  outline: 2px solid var(--colors-gray-text, #202020);\n  outline-offset: 2px;\n}\n\n.ds-button-outline:disabled {\n  background: var(--colors-background-control-disabled, #f9f9f9);\n  color: var(--colors-text-disabled, #bbbbbb);\n  cursor: not-allowed;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .ds-button-outline {\n    transition: none;\n  }\n}"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Quiet Cancel, Close and contextual commands.",
+      "html": "<button class=\"ds-button-ghost\">Cancel</button>",
+      "css": ".ds-button-ghost {\n  appearance: none;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n  height: 1.5rem;\n  min-width: 1.5rem;\n  padding: 0 0.5rem;\n  border: 0;\n  border-radius: var(--radii-sm, 0.25rem);\n  background: transparent;\n  color: var(--colors-text-muted, #646464);\n  font-family: var(--fonts-body, var(--font-inter, Inter)), sans-serif;\n  font-size: 0.75rem;\n  font-weight: 600;\n  line-height: 1.125rem;\n  white-space: nowrap;\n  cursor: pointer;\n  transition: background 200ms cubic-bezier(0.2, 0.0, 0, 1.0), border-color 200ms cubic-bezier(0.2, 0.0, 0, 1.0), color 200ms cubic-bezier(0.2, 0.0, 0, 1.0);\n}\n\n.ds-button-ghost:hover:not(:disabled) {\n  background: var(--colors-accent-3, hsl(156.99deg 90% 96.3%));\n  color: var(--colors-accent-text, hsl(156.99deg 45% 35%));\n}\n\n.ds-button-ghost:focus-visible {\n  outline: 2px solid var(--colors-accent-text, hsl(156.99deg 45% 35%));\n  outline-offset: 2px;\n}\n\n.ds-button-ghost:disabled {\n  background: transparent;\n  color: var(--colors-text-disabled, #bbbbbb);\n  cursor: not-allowed;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .ds-button-ghost {\n    transition: none;\n  }\n}"
+    },
+    {
+      "name": "Plain Button",
+      "kind": "button",
+      "refersTo": "button-plain",
+      "description": "Dense navigation text with a 24px hit area; not a general-purpose form button.",
+      "html": "<button class=\"ds-button-plain\">More</button>",
+      "css": ".ds-button-plain {\n  appearance: none;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n  height: auto;\n  min-width: 0;\n  padding: 0;\n  border: 0;\n  border-radius: var(--radii-sm, 0.25rem);\n  background: transparent;\n  color: var(--colors-text-muted, #646464);\n  font-family: var(--fonts-body, var(--font-inter, Inter)), sans-serif;\n  font-size: 0.75rem;\n  font-weight: 600;\n  line-height: 1.125rem;\n  white-space: nowrap;\n  cursor: pointer;\n  transition: background 200ms cubic-bezier(0.2, 0.0, 0, 1.0), border-color 200ms cubic-bezier(0.2, 0.0, 0, 1.0), color 200ms cubic-bezier(0.2, 0.0, 0, 1.0);\n}\n\n.ds-button-plain:hover:not(:disabled) {\n  background: transparent;\n  color: var(--colors-text-default, #202020);\n}\n\n.ds-button-plain:focus-visible {\n  outline: 2px solid var(--colors-border-default, #e0e0e0);\n  outline-offset: 2px;\n}\n\n.ds-button-plain:disabled {\n  background: transparent;\n  color: var(--colors-text-disabled, #bbbbbb);\n  cursor: not-allowed;\n}\n\n.ds-button-plain::after {\n  content: \"\";\n  position: absolute;\n  top: 50%;\n  left: 50%;\n  width: 1.5rem;\n  height: 1.5rem;\n  transform: translate(-50%, -50%);\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .ds-button-plain {\n    transition: none;\n  }\n}"
     },
     {
       "name": "Outlined Input",
       "kind": "input",
       "refersTo": "input",
-      "description": "The default compact form control on the control background.",
-      "html": "<input class=\"ds-input\" placeholder=\"Community name\" />",
-      "css": ".ds-input { width:100%; height:1.5rem; padding:0 .5rem; border:1px solid var(--colors-border-default, #e0e0e0); border-radius:.25rem; background:var(--colors-background-control, #fcfcfc); color:var(--colors-text-default, #202020); font:400 .875rem/1.25rem Inter, sans-serif; }"
+      "description": "The default small form control, with 12px text and a 24px height.",
+      "html": "<input class=\"ds-input\" aria-label=\"Community name\" placeholder=\"Community name\" />",
+      "css": ".ds-input {\n  box-sizing: border-box;\n  appearance: none;\n  width: 100%;\n  height: 1.5rem;\n  padding: 0 0.5rem;\n  border: 1px solid var(--colors-border-default, #e0e0e0);\n  border-radius: var(--radii-sm, 0.25rem);\n  background: var(--colors-background-control, #fcfcfc);\n  color: var(--colors-text-default, #202020);\n  font-family: var(--fonts-body, var(--font-inter, Inter)), sans-serif;\n  font-size: 0.75rem;\n  font-weight: 400;\n  line-height: 1.125rem;\n  outline: 0;\n  transition: box-shadow 200ms cubic-bezier(0.2, 0.0, 0, 1.0), border-color 200ms cubic-bezier(0.2, 0.0, 0, 1.0);\n}\n\n.ds-input::placeholder {\n  color: var(--colors-text-muted, #646464);\n  opacity: 1;\n}\n\n.ds-input:focus {\n  outline: 0;\n  box-shadow: none;\n}\n\n.ds-input:focus-visible {\n  outline-color: var(--sd-color-focus-ring, var(--colors-border-strong, #cecece));\n}\n\n.ds-input:disabled {\n  opacity: 0.4;\n  cursor: not-allowed;\n}"
+    },
+    {
+      "name": "Surface",
+      "kind": "card",
+      "refersTo": "surface",
+      "description": "The bordered Surface shell, shown as a compact CardBox. Rich Cards add domain-owned media, titles and actions.",
+      "html": "<article class=\"ds-surface\"><strong>Discussion</strong><p>Independent community content.</p></article>",
+      "css": ".ds-surface {\n  display: flex;\n  flex-direction: column;\n  gap: 0.25rem;\n  padding: 0.5rem;\n  border: 1px solid var(--colors-border-default, #e0e0e0);\n  border-radius: var(--radii-lg, 0.5rem);\n  background: var(--colors-background-surface, #f9f9f9);\n  color: var(--colors-text-default, #202020);\n  font-family: var(--fonts-body, var(--font-inter, Inter)), sans-serif;\n}\n\n.ds-surface strong {\n  font-size: 0.875rem;\n  font-weight: 600;\n  line-height: 1.25rem;\n}\n\n.ds-surface p {\n  margin: 0;\n  color: var(--colors-text-muted, #646464);\n  font-size: 0.875rem;\n  line-height: 1.25;\n}"
+    },
+    {
+      "name": "Sidebar Navigation",
+      "kind": "nav",
+      "refersTo": "sidebar-navigation",
+      "description": "Neutral sidebar selection; retain hierarchy and a single responsive navigation tree.",
+      "html": "<nav class=\"ds-navigation\" aria-label=\"Community\"><a class=\"ds-navigation-link\" href=\"#discussion\" aria-current=\"page\">Discussion</a><a class=\"ds-navigation-link\" href=\"#library\">Library</a></nav>",
+      "css": ".ds-navigation {\n  display: flex;\n  flex-direction: column;\n  font-family: var(--fonts-body, var(--font-inter, Inter)), sans-serif;\n}\n\n.ds-navigation-link {\n  display: flex;\n  min-width: 0;\n  gap: 0.25rem;\n  padding: 0.25rem;\n  border-radius: var(--radii-sm, 0.25rem);\n  color: var(--colors-text-muted, #646464);\n  text-decoration: none;\n}\n\n.ds-navigation-link:hover {\n  background: var(--colors-control-hover-background);\n  color: var(--colors-text-default, #202020);\n}\n\n.ds-navigation-link[aria-current=\"page\"] {\n  background: var(--colors-background-inset, #f0f0f0);\n  color: var(--colors-text-default, #202020);\n}\n\n.ds-navigation-link:focus-visible {\n  outline: 2px solid var(--colors-border-strong, #cecece);\n  outline-offset: 1px;\n}"
+    },
+    {
+      "name": "Subtle Badge",
+      "kind": "chip",
+      "refersTo": "badge",
+      "description": "Compact classification or metadata, with neutral colour by default. Lifecycle meaning belongs to StatusBadge.",
+      "html": "<span class=\"ds-badge\">General</span>",
+      "css": ".ds-badge {\n  box-sizing: border-box;\n  display: inline-flex;\n  align-items: center;\n  gap: 0.375rem;\n  height: 1.5rem;\n  padding: 0 0.625rem;\n  border: 1px solid var(--colors-gray-6, #d9d9d9);\n  border-radius: 9999px;\n  background: var(--colors-gray-3, #f0f0f0);\n  color: var(--colors-gray-text, #202020);\n  font-family: var(--fonts-body, var(--font-inter, Inter)), sans-serif;\n  font-size: 0.75rem;\n  font-weight: 500;\n  line-height: 1.125rem;\n  white-space: nowrap;\n}"
     }
   ],
   "narrative": {
     "northStar": "The Quiet Campfire",
-    "overview": "Storyden is compact, calm community software. Neutral structural layers guide participation and curation while the community's content, identity, imagery, and configured accent remain primary.",
+    "overview": "Storyden is calm community software. The interface should guide participation, curation, moderation, and administration without competing with the community's identity or content. It should feel compact and precise, but never cramped; neutral and themeable, but never anonymous; modern, but still recognisably a place where people talk and build shared knowledge.\n\nStorybook is the directional authority for implemented UI. It is not only a catalogue of component capabilities. Before composing a screen, read `Foundations/Principles/Storyden`, then the relevant component and composition stories. This document defines durable philosophy; Storybook shows that philosophy rendered in the current system.\n\nThe default answer is usually the quietest existing component that communicates the role clearly. New visual components are design-system decisions, not local conveniences.",
     "keyCharacteristics": [
-      "Community-native rather than generic corporate SaaS.",
-      "Compact and information dense without becoming crowded.",
-      "White-label foundations with selective semantic colour.",
-      "Storybook as directional product guidance, not only a prop catalogue.",
-      "WCAG 2.2 AA, keyboard access, reduced motion, and stable responsive layouts."
+      "Compact and precise without crowding.",
+      "Neutral, themeable structure that serves community identity and content.",
+      "Semantic components and Storybook guide interface decisions.",
+      "Keyboard access, reduced motion and responsive layouts are part of the system."
     ],
     "rules": [
       {
-        "name": "Meaning before appearance",
-        "body": "Choose the semantic role first: navigation, action, content object, supporting region, status, or overlay.",
-        "section": "overview"
-      },
-      {
-        "name": "Every Surface has a border",
-        "body": "All Cards are Surfaces and all Surfaces retain a border.default boundary; fill alone is not sufficient separation from Canvas.",
+        "name": "The Surface Boundary Rule",
+        "body": "All Cards are Surfaces and all Surfaces have borders. Component recipes enforce the boundary so call sites do not decide whether a Card needs one. A media-backed Card may omit the redundant border between its cover and content, but the content region still retains the Surface boundary.",
         "section": "colors"
-      },
-      {
-        "name": "Composition before invention",
-        "body": "Consult Storybook and existing components before introducing a new visual language or local wrapper.",
-        "section": "components"
-      },
-      {
-        "name": "Semantic icons before shapes",
-        "body": "Choose icons by their exported product meaning, create a dedicated semantic export for deliberate object identity, and let the containing component own contextual size.",
-        "section": "components"
       }
     ],
     "dos": [
-      "Use semantic background, text, border, control, status, and accent tokens.",
-      "Use compact defaults and stable dimensions for repeated workflows.",
-      "Keep community content stronger than application chrome.",
-      "Use semantic icon exports only when the icon adds information; let the owning component determine its contextual size.",
-      "Use PageLayout and PageHeader as screen-level decisions.",
-      "Test interaction-heavy components from the outside."
+      "Use semantic layer, text, border, status, and control tokens.",
+      "Consult Storybook principles and realistic compositions before building.",
+      "Keep community content and host branding stronger than application chrome.",
+      "Prefer compact defaults, stable dimensions, and aligned controls.",
+      "Use semantic icon exports only when the icon adds information; let the owning",
+      "Preserve keyboard focus, accessible names, contrast, reduced motion, and",
+      "Render one expensive navigation tree and reposition it responsively.",
+      "Test interaction-heavy components from the outside, including slow requests,"
     ],
     "donts": [
-      "Do not invent ad-hoc structural backgrounds or text roles.",
-      "Do not nest visually identical Surfaces or use CardBox as a page wrapper.",
-      "Do not use accent colour when neutral selection communicates the state.",
-      "Do not choose icons by shape, borrow another product concept's icon, add redundant glyphs, or rely on third-party default icon dimensions.",
-      "Do not duplicate the expensive navigation tree for responsive layouts.",
-      "Do not treat Storybook as a capability-only prop playground."
+      "Do not invent one-off backgrounds, wrappers, card treatments, or text roles.",
+      "Do not turn every page section into a floating card or nest identical",
+      "Do not use accent colour merely to make an active state more obvious when a",
+      "Do not inflate controls or headings to create hierarchy that composition",
+      "Do not choose icons by shape, borrow another product concept's icon, add",
+      "Do not put settings navigation in horizontally overflowing Tabs.",
+      "Do not duplicate server-rendered navigation content for desktop and mobile.",
+      "Do not treat Storybook as a prop playground; stories must explain the approved"
     ]
   }
 }

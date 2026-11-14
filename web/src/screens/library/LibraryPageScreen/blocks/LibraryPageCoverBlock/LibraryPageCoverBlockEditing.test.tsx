@@ -53,6 +53,7 @@ it.each([undefined, "banner", "artwork", "image"] as const)(
       />,
     );
     const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Image tools" }));
     await user.click(
       screen.getByRole("button", { name: "Main image options" }),
     );

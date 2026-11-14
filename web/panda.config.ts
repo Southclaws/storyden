@@ -276,6 +276,10 @@ export default defineConfig({
           from: { opacity: "100" },
           to: { opacity: "0" },
         },
+        imageCropperGestureBackdrop: {
+          "0%, 100%": { opacity: "0" },
+          "8%, 92%": { opacity: "100" },
+        },
         shimmer: {
           "100%": { transform: "translateX(100%)" },
         },

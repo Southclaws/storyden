@@ -1,18 +1,19 @@
 import { createListCollection } from "@ark-ui/react";
 
 import { useCategoryList } from "@/api/openapi-client/categories";
-import { AssetUploadEditor } from "@/components/asset/AssetUploadEditor/AssetUploadEditor";
 import { Button } from "@/components/ui/button";
 import { ColorPickerField } from "@/components/ui/color-picker";
 import { FormControl } from "@/components/ui/form-control";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
+import { ImageCropper } from "@/components/ui/image-cropper";
 import { Input, InputPrefix } from "@/components/ui/input";
 import { SelectField } from "@/components/ui/select";
 import { Text } from "@/components/ui/text";
 import { WEB_ADDRESS } from "@/config";
 import {
   CATEGORY_COVER_HEIGHT,
+  CATEGORY_COVER_SAFE_AREA,
   CATEGORY_COVER_WIDTH,
 } from "@/lib/category/cover";
 import { HStack, VStack, WStack, styled } from "@/styled-system/jsx";
@@ -22,8 +23,20 @@ import { CategoryCreateProps, useCategoryCreate } from "./useCategoryCreate";
 export type { CategoryCreateProps };
 
 export function CategoryCreateScreen(props: CategoryCreateProps) {
-  const { register, slugInput, onSubmit, control, handleImageUpload } =
-    useCategoryCreate(props);
+  const {
+    register,
+    slugInput,
+    onSubmit,
+    handleCancel,
+    control,
+    cropperRef,
+    isSubmitting,
+    imageLoading,
+    handleImageFileChange,
+    handleImageChange,
+    handleImageError,
+    handleImageRemove,
+  } = useCategoryCreate(props);
 
   const { data: categoryListResult } = useCategoryList();
   const categories = categoryListResult?.categories || [];
@@ -57,13 +70,22 @@ export function CategoryCreateScreen(props: CategoryCreateProps) {
       >
         <FormControl>
           <FormLabel>Cover Image</FormLabel>
-          <AssetUploadEditor
+          <ImageCropper
+            ref={cropperRef}
+            aria-label="Category cover image"
+            cropMode="fixed"
+            safeArea={CATEGORY_COVER_SAFE_AREA}
+            saving={isSubmitting}
+            disabled={isSubmitting}
             width={CATEGORY_COVER_WIDTH}
             height={CATEGORY_COVER_HEIGHT}
-            onUpload={handleImageUpload}
+            onFileChange={handleImageFileChange}
+            onLoadError={handleImageError}
+            onChange={handleImageChange}
+            onRemove={handleImageRemove}
           />
           <FormHelperText>
-            Upload a cover image for the category (4:1 aspect ratio)
+            Safe area is used for social preview cards.
           </FormHelperText>
         </FormControl>
 
@@ -137,10 +159,15 @@ export function CategoryCreateScreen(props: CategoryCreateProps) {
         </FormControl>
 
         <WStack>
-          <Button flexGrow="1" type="button" onClick={props.onClose}>
+          <Button flexGrow="1" type="button" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button flexGrow="1" type="submit">
+          <Button
+            flexGrow="1"
+            type="submit"
+            loading={isSubmitting}
+            disabled={imageLoading}
+          >
             Create
           </Button>
         </WStack>

@@ -122,7 +122,6 @@ export function BannerEditor() {
         width={CROP_STENCIL_WIDTH}
         height={CROP_STENCIL_HEIGHT}
         className={css({ maxWidth: "[calc(16rem * 1200 / 630)]" })}
-        toolbar="expanded"
         saving={saving}
         saved={saved}
         onChange={() => setSaved(false)}

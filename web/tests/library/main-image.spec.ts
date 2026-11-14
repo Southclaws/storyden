@@ -9,6 +9,7 @@ import {
   login,
   withAdminAccessKey,
 } from "../access_key_admin_assignment";
+import { openImageTools } from "../image_cropper";
 import { pinchOut } from "../touch";
 
 async function upload(page: Page, width: number, height: number) {
@@ -49,6 +50,7 @@ async function edit(page: Page) {
 }
 
 async function presentation(page: Page, name: string) {
+  await openImageTools(page);
   await page
     .getByRole("button", { name: "Main image options", exact: true })
     .click();
@@ -181,6 +183,7 @@ test("Main image presets preserve assets, match edit/view, and bound stress dime
 });
 
 async function cropRatio(page: Page, name: string) {
+  await openImageTools(page);
   await page
     .getByRole("button", { name: "Main image options", exact: true })
     .click();
@@ -430,6 +433,7 @@ for (const mode of ["Banner", "Artwork"] as const) {
         mode === "Banner" ? 4 : 1,
         1,
       );
+      await openImageTools(page);
       await page
         .getByRole("button", { name: "Main image options", exact: true })
         .click();
@@ -440,6 +444,7 @@ for (const mode of ["Banner", "Artwork"] as const) {
         page.getByRole("menuitem", { name: "Crop ratio", exact: true }),
       ).toHaveCount(0);
       await page.keyboard.press("Escape");
+      await expect(page.locator('[role="menu"]:visible')).toHaveCount(0);
     }
     const before = (await frame.boundingBox())!;
     const cropped = cropResponse(page);
@@ -590,6 +595,7 @@ test("uploading after removing a legacy banner does not reuse its crop", async (
   );
   await page.goto(`/l/${node.slug}`);
   await edit(page);
+  await openImageTools(page);
   await page.getByRole("button", { name: "Remove image", exact: true }).click();
   const chooser = page.waitForEvent("filechooser");
   await page
@@ -696,6 +702,7 @@ test("Main image replacement keeps the whole original and removal preserves page
   await expect(
     page.getByRole("button", { name: "View", exact: true }),
   ).toBeEnabled();
+  await openImageTools(page);
   await page.getByRole("button", { name: "Remove image", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Upload main image" }),
