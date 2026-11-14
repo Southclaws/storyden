@@ -444,6 +444,7 @@ for (const mode of ["Banner", "Artwork"] as const) {
         page.getByRole("menuitem", { name: "Crop ratio", exact: true }),
       ).toHaveCount(0);
       await page.keyboard.press("Escape");
+      await expect(page.locator('[role="menu"]:visible')).toHaveCount(0);
     }
     const before = (await frame.boundingBox())!;
     const cropped = cropResponse(page);

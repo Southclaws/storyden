@@ -247,6 +247,7 @@ async function dragCover(page: Page, distance: number): Promise<Asset> {
   await page
     .getByRole("menuitem", { name: "Banner · wide page header", exact: true })
     .click();
+  await expect(page.locator('[role="menu"]:visible')).toHaveCount(0);
   const cropper = page.locator(
     '[aria-label="Image cropper"] .advanced-cropper',
   );
