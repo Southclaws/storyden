@@ -228,6 +228,44 @@ func TestAccountEmails(t *testing.T) {
 				tests.Ok(t, err, acc)
 				a.Equal(openapi.AccountVerifiedStatusNone, acc.JSON200.VerifiedStatus)
 			})
+
+			t.Run("manage_accounts_cannot_update_administrator_email_verified_status", func(t *testing.T) {
+				r := require.New(t)
+
+				adminCtx, _ := e2e.WithAccount(root, accountWrite, seed.Account_001_Odin)
+				adminSession := sh.WithSession(adminCtx)
+				victimCtx, victim := e2e.WithAccount(root, accountWrite, seed.Account_002_Frigg)
+				victimSession := sh.WithSession(victimCtx)
+				managerCtx, manager := e2e.WithAccount(root, accountWrite, seed.Account_004_Loki)
+				managerSession := sh.WithSession(managerCtx)
+
+				managerRole := tests.AssertRequest(cl.RoleCreateWithResponse(root, openapi.RoleCreateJSONRequestBody{
+					Name:        "email-manager-" + xid.New().String(),
+					Colour:      "blue",
+					Permissions: openapi.PermissionList{openapi.MANAGEACCOUNTS},
+				}, adminSession))(t, http.StatusOK)
+				tests.AssertRequest(cl.AccountAddRoleWithResponse(root, manager.Handle, managerRole.JSON200.Id, adminSession))(t, http.StatusOK)
+
+				add := tests.AssertRequest(cl.AccountEmailAddWithResponse(root, openapi.AccountEmailInitialProps{
+					EmailAddress: xid.New().String() + "@example.com",
+				}, victimSession))(t, http.StatusOK)
+
+				tests.AssertRequest(
+					cl.AccountManageUpdateEmailVerifiedStatusWithResponse(root, victim.ID.String(), add.JSON200.Id, openapi.AccountEmailVerifiedStatusMutableProps{
+						Verified: true,
+					}, managerSession),
+				)(t, http.StatusForbidden)
+
+				acc := tests.AssertRequest(cl.AccountGetWithResponse(root, victimSession))(t, http.StatusOK)
+				r.Len(acc.JSON200.EmailAddresses, 1)
+				r.False(acc.JSON200.EmailAddresses[0].Verified)
+
+				tests.AssertRequest(
+					cl.AccountManageUpdateEmailVerifiedStatusWithResponse(root, victim.ID.String(), add.JSON200.Id, openapi.AccountEmailVerifiedStatusMutableProps{
+						Verified: true,
+					}, adminSession),
+				)(t, http.StatusOK)
+			})
 		}))
 	}))
 }

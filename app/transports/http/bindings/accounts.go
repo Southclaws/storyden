@@ -672,6 +672,15 @@ func (h *Accounts) AccountRemoveRole(ctx context.Context, request openapi.Accoun
 		return nil, fault.Wrap(ErrEveryoneRole, fctx.With(ctx))
 	}
 
+	removedRole, err := h.roleQuerier.Get(ctx, roleID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := authoriseAdministratorRole(ctx, removedRole); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	err = h.roleAssign.UpdateRoles(ctx, acc.ID, role_assign.Remove(roleID))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -719,10 +728,8 @@ func (h *Accounts) AccountAddRole(ctx context.Context, request openapi.AccountAd
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if assignedRole.Permissions.HasAny(rbac.PermissionAdministrator) {
-		if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
+	if err := authoriseAdministratorRole(ctx, assignedRole); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	err = h.roleAssign.UpdateRoles(ctx, acc.ID, role_assign.Add(roleID))

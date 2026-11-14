@@ -129,7 +129,45 @@ func (m *Manager) Update(ctx context.Context, targetID account.AccountID, params
 		}
 	}
 
+	target, err := m.accountQuery.GetByID(ctx, targetID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := m.authoriseAdministratorTarget(ctx, target); err != nil {
+		return nil, err
+	}
+
 	return m.updater.Update(ctx, targetID, params)
+}
+
+func (m *Manager) SetEmailVerifiedStatus(ctx context.Context, targetID account.AccountID, emailAddressID xid.ID, verified bool) (*account.EmailAddress, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionManageAccounts); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.PermissionDenied))
+	}
+
+	target, err := m.accountQuery.GetByID(ctx, targetID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := m.authoriseAdministratorTarget(ctx, target); err != nil {
+		return nil, err
+	}
+
+	return m.accountEmail.SetVerifiedStatus(ctx, target.ID, emailAddressID, verified)
+}
+
+func (m *Manager) authoriseAdministratorTarget(ctx context.Context, target *account.AccountWithEdges) error {
+	if !target.Roles.Permissions().HasAny(rbac.PermissionAdministrator) {
+		return nil
+	}
+
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+		return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.PermissionDenied))
+	}
+
+	return nil
 }
 
 // GetByID retrieves an account by ID with proper authorization checks.
