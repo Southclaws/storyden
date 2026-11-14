@@ -902,6 +902,8 @@ export const getAdminAccountBanCreateUrl = (accountHandle: string) => {
  * account owner to log in and use the platform. It keeps the account on
  * record for linkage to content so UI doesn't break. It does not change
  * anything else about the account such as the avatar, name, etc.
+ * Suspending the last active account with ADMINISTRATOR is rejected
+ * with 400. Suspended accounts do not count as remaining administrators.
  */
 export const adminAccountBanCreate = async (
   accountHandle: string,
@@ -933,6 +935,7 @@ export type AdminAccountBanCreateMutationResult = NonNullable<
 
 export const useAdminAccountBanCreate = <
   TError =
+    | BadRequestResponse
     | UnauthorisedResponse
     | NotFoundResponse
     | InternalServerErrorResponse,

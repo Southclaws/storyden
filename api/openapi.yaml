@@ -495,10 +495,13 @@ paths:
         account owner to log in and use the platform. It keeps the account on
         record for linkage to content so UI doesn't break. It does not change
         anything else about the account such as the avatar, name, etc.
+        Suspending the last active account with ADMINISTRATOR is rejected
+        with 400. Suspended accounts do not count as remaining administrators.
       tags: [admin]
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AccountGetOK" }
@@ -1200,11 +1203,14 @@ paths:
         Update a role's attributes. Requires MANAGE_ROLES. Updating a role that
         already grants ADMINISTRATOR, or granting ADMINISTRATOR to a role,
         additionally requires ADMINISTRATOR.
+        Updates that would leave no active account with ADMINISTRATOR are
+        rejected with 400.
       tags: [roles]
       parameters: [{ $ref: "#/components/parameters/RoleIDParam" }]
       requestBody: { $ref: "#/components/requestBodies/RoleUpdate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/RoleGetOK" }
@@ -1213,10 +1219,13 @@ paths:
       description: |
         Delete a role. Requires MANAGE_ROLES. Deleting a role that grants
         ADMINISTRATOR additionally requires ADMINISTRATOR.
+        Deletions that would leave no active account with ADMINISTRATOR are
+        rejected with 400.
       tags: [roles]
       parameters: [{ $ref: "#/components/parameters/RoleIDParam" }]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { description: OK }
@@ -2134,6 +2143,8 @@ paths:
         MANAGE_ACCOUNTS. Updating any field on an account that holds
         ADMINISTRATOR, or changing an account's admin flag, additionally
         requires ADMINISTRATOR.
+        Changes that would leave no active account with ADMINISTRATOR are
+        rejected with 400.
       tags: [accounts]
       parameters: [{ $ref: "#/components/parameters/AccountIDParam" }]
       requestBody: { $ref: "#/components/requestBodies/AccountManageUpdate" }
@@ -2420,12 +2431,15 @@ paths:
         that grants ADMINISTRATOR additionally requires ADMINISTRATOR. The
         built-in admin role cannot be removed from yourself, and the default
         member role cannot be removed.
+        Removals that would leave no active account with ADMINISTRATOR are
+        rejected with 400.
       tags: [accounts]
       parameters:
         - $ref: "#/components/parameters/RoleIDParam"
         - $ref: "#/components/parameters/AccountHandleParam"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AccountUpdateOK" }

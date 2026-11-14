@@ -299,6 +299,11 @@ export type roleUpdateResponse200 = {
   status: 200;
 };
 
+export type roleUpdateResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
 export type roleUpdateResponse401 = {
   data: UnauthorisedResponse;
   status: 401;
@@ -311,13 +316,14 @@ export type roleUpdateResponse404 = {
 
 export type roleUpdateResponseDefault = {
   data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 401 | 404>;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 404>;
 };
 
 export type roleUpdateResponseSuccess = roleUpdateResponse200 & {
   headers: Headers;
 };
 export type roleUpdateResponseError = (
+  | roleUpdateResponse400
   | roleUpdateResponse401
   | roleUpdateResponse404
   | roleUpdateResponseDefault
@@ -333,6 +339,8 @@ export const getRoleUpdateUrl = (roleId: string) => {
  * Update a role's attributes. Requires MANAGE_ROLES. Updating a role that
  * already grants ADMINISTRATOR, or granting ADMINISTRATOR to a role,
  * additionally requires ADMINISTRATOR.
+ * Updates that would leave no active account with ADMINISTRATOR are
+ * rejected with 400.
  */
 export const roleUpdate = async (
   roleId: string,
@@ -376,6 +384,11 @@ export type roleDeleteResponse200 = {
   status: 200;
 };
 
+export type roleDeleteResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
 export type roleDeleteResponse401 = {
   data: UnauthorisedResponse;
   status: 401;
@@ -388,13 +401,14 @@ export type roleDeleteResponse404 = {
 
 export type roleDeleteResponseDefault = {
   data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 401 | 404>;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 404>;
 };
 
 export type roleDeleteResponseSuccess = roleDeleteResponse200 & {
   headers: Headers;
 };
 export type roleDeleteResponseError = (
+  | roleDeleteResponse400
   | roleDeleteResponse401
   | roleDeleteResponse404
   | roleDeleteResponseDefault
@@ -409,6 +423,8 @@ export const getRoleDeleteUrl = (roleId: string) => {
 /**
  * Delete a role. Requires MANAGE_ROLES. Deleting a role that grants
  * ADMINISTRATOR additionally requires ADMINISTRATOR.
+ * Deletions that would leave no active account with ADMINISTRATOR are
+ * rejected with 400.
  */
 export const roleDelete = async (
   roleId: string,
