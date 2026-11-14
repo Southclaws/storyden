@@ -487,12 +487,12 @@ export const Indicator: Story = {
 
 export const SuccessBorder: Story = {
   args: {
-    id: "selected-answer",
-    title: "Answer",
+    id: "highlighted-reply",
+    title: "Highlighted reply",
     titleIcon: <ThreadConclusionIcon color="status.success.content" />,
-    url: "/t/locate/selected-answer",
+    url: "/t/locate/highlighted-reply",
     content:
-      "<p>The community found a solution. The border marks this selected outcome while the content keeps the normal Surface treatment.</p>",
+      "<p>A useful contribution worth highlighting. The border marks this selected reply while the content keeps the normal Surface treatment.</p>",
     tone: "success",
     shape: "row",
     disableAnchors: true,
@@ -501,7 +501,7 @@ export const SuccessBorder: Story = {
     docs: {
       description: {
         story:
-          "Use the success tone for an object representing a selected positive outcome, such as a thread's answer. The tone changes the border only. Pair it with a meaningful label and semantic icon; colour must not be the only cue. It does not indicate read state or prevent further replies.",
+          "Use the success tone for an object representing a selected positive outcome, such as a thread's highlighted reply. The tone changes the border only. Pair it with a meaningful label and semantic icon; colour must not be the only cue. It does not indicate read state or prevent further replies.",
       },
     },
   },

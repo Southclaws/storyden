@@ -137,7 +137,7 @@ export function Reply(props: Props) {
           {isConclusion && (
             <StatusBadge tone="success">
               <ThreadConclusionIcon w="4" h="4" aria-hidden="true" />
-              Answer
+              Highlighted reply
             </StatusBadge>
           )}
           <ThreadReactList

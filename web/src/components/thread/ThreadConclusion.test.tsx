@@ -77,11 +77,14 @@ describe("thread conclusion preview", () => {
       queryResult(options?.swr?.fallbackData as Reply | undefined),
     );
     render(<Preview thread={thread} initialConclusionReply={answer} />);
-    expect(screen.getByRole("article", { name: "Answer" })).toBeInTheDocument();
-    expect(screen.getByText("The selected answer")).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "View in thread" }),
-    ).toHaveAttribute("href", "/t/locate/answer");
+      screen.getByRole("article", { name: "Highlighted reply" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("The selected answer")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "View reply" })).toHaveAttribute(
+      "href",
+      "/t/locate/answer",
+    );
     expect(fetch).not.toHaveBeenCalled();
   });
 
@@ -97,9 +100,14 @@ describe("thread conclusion preview", () => {
       />,
     );
     expect(screen.queryByText("The selected answer")).not.toBeInTheDocument();
+    expect(screen.queryByRole("article")).not.toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Jump to answer" }),
-    ).toHaveAttribute("href", "#answer");
+      screen.getByRole("navigation", { name: "Highlighted reply" }),
+    ).toHaveTextContent("Highlighted reply below");
+    expect(screen.getByRole("link", { name: "Jump to reply" })).toHaveAttribute(
+      "href",
+      "#answer",
+    );
     expect(vi.mocked(useReplyGet).mock.lastCall?.[2]?.swr?.enabled).toBe(false);
   });
 
@@ -115,7 +123,9 @@ describe("thread conclusion preview", () => {
       />,
     );
     expect(screen.queryByText("The selected answer")).not.toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent("Loading answer");
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Loading highlighted reply",
+    );
     expect(
       vi.mocked(useReplyGet).mock.lastCall?.[2]?.swr?.fallbackData,
     ).toBeUndefined();
@@ -130,6 +140,7 @@ describe("thread conclusion preview", () => {
       />,
     );
     expect(screen.queryByRole("article")).not.toBeInTheDocument();
+    expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
     expect(vi.mocked(useReplyGet).mock.lastCall?.[2]?.swr?.enabled).toBe(false);
   });
 
@@ -139,7 +150,7 @@ describe("thread conclusion preview", () => {
     );
     render(<Preview thread={thread} />);
     expect(screen.getByRole("status")).toHaveTextContent(
-      "The answer could not be loaded",
+      "The highlighted reply could not be loaded",
     );
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(refresh).toHaveBeenCalledOnce();

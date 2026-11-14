@@ -82,7 +82,7 @@ export function ReplyMenu(props: Props) {
                 >
                   <HStack gap="1">
                     <ThreadConclusionIcon color="status.success.content" />
-                    {isConclusion ? "Remove answer" : "Mark as answer"}
+                    {isConclusion ? "Remove highlight" : "Highlight reply"}
                   </HStack>
                 </Menu.Item>
               )}

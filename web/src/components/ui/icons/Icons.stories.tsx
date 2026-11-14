@@ -308,7 +308,7 @@ export const ReadAndResolutionStates: Story = {
     docs: {
       description: {
         story:
-          "ReadStateReadIcon and ReadStateUnreadIcon communicate whether a member has read a discussion. Use them for read-state commands and navigation. ResolvedIcon communicates that a discussion has reached a conclusion, independently of who has read it or whether an answer has been nominated. ThreadConclusionIcon identifies the particular reply selected as the answer. Use status.success.content for these positive outcome icons and accompanying status text. Keep generic check icons for confirmation or selection; do not use them as substitutes for these product states. The containing component owns icon size, colour, and accessible labels.",
+          "ReadStateReadIcon and ReadStateUnreadIcon communicate whether a member has read a discussion. Use them for read-state commands and navigation. ResolvedIcon communicates that a discussion has reached a conclusion, independently of who has read it or whether a reply has been highlighted. ThreadConclusionIcon identifies the highlighted reply. Use status.success.content for these positive outcome icons and accompanying status text. Keep generic check icons for confirmation or selection; do not use them as substitutes for these product states. The containing component owns icon size, colour, and accessible labels.",
       },
     },
   },
@@ -340,7 +340,7 @@ export const ReadAndResolutionStates: Story = {
           color="status.success.content"
           aria-hidden="true"
         />
-        <span>Selected answer</span>
+        <span>Highlighted reply</span>
       </styled.div>
     </styled.div>
   ),

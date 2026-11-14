@@ -33,7 +33,7 @@ export const Variants: Story = {
       </CardBox>
 
       <CardBox tone="success">
-        <styled.strong fontSize="sm">Selected answer</styled.strong>
+        <styled.strong fontSize="sm">Highlighted reply</styled.strong>
         <styled.span color="text.muted" fontSize="xs">
           A success border distinguishes a selected positive outcome. Keep a
           visible status label so colour is not the only cue.
