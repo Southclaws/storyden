@@ -308,6 +308,8 @@ export const getRoleUpdateUrl = (roleId: string) => {
  * Update a role's attributes. Requires MANAGE_ROLES. Updating a role that
  * already grants ADMINISTRATOR, or granting ADMINISTRATOR to a role,
  * additionally requires ADMINISTRATOR.
+ * Updates that would leave no active account with ADMINISTRATOR are
+ * rejected with 400.
  */
 export const roleUpdate = async (
   roleId: string,
@@ -363,6 +365,7 @@ export type RoleUpdateMutationResult = NonNullable<
 
 export const useRoleUpdate = <
   TError =
+    | BadRequestResponse
     | UnauthorisedResponse
     | NotFoundResponse
     | InternalServerErrorResponse,
@@ -398,6 +401,8 @@ export const getRoleDeleteUrl = (roleId: string) => {
 /**
  * Delete a role. Requires MANAGE_ROLES. Deleting a role that grants
  * ADMINISTRATOR additionally requires ADMINISTRATOR.
+ * Deletions that would leave no active account with ADMINISTRATOR are
+ * rejected with 400.
  */
 export const roleDelete = async (
   roleId: string,
@@ -426,6 +431,7 @@ export type RoleDeleteMutationResult = NonNullable<
 
 export const useRoleDelete = <
   TError =
+    | BadRequestResponse
     | UnauthorisedResponse
     | NotFoundResponse
     | InternalServerErrorResponse,
