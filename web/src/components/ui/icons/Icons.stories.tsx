@@ -267,7 +267,7 @@ export const StatusColours: Story = {
     docs: {
       description: {
         story:
-          "Ordinary navigation and action icons inherit the surrounding text colour. Apply semantic content colours only when an icon communicates an actual outcome or risk: success for completion, warning for a caution, and danger for a failed operation or error details. Compact indicators keep the icon unfilled and their text neutral. Alert owns the coordinated surface, border, and content colours for a full status message; do not fill an individual outline icon with a status surface token.",
+          "Ordinary navigation and action icons inherit the surrounding text colour. Apply semantic content colours only when an icon communicates status: status.success.content for completion, status.warning.content for a caution, status.danger.content for a failed operation or error details, and status.info.content for informational context. Content tokens colour status text and icon strokes. Compact indicators keep the icon unfilled and their text neutral. Alert owns the coordinated surface, border, and content colours for a full status message; do not fill an individual outline icon with a status surface token.",
       },
     },
   },
@@ -295,6 +295,10 @@ export const StatusColours: Story = {
         <WarningIcons.WarningIcon color="status.danger.content" />
         <span>Failed operation or error details: danger stroke</span>
       </styled.div>
+      <styled.div display="flex" alignItems="center" gap="2">
+        <InfoIcons.InfoIcon color="status.info.content" />
+        <span>Information: info stroke</span>
+      </styled.div>
     </styled.div>
   ),
 };
@@ -304,7 +308,7 @@ export const ReadAndResolutionStates: Story = {
     docs: {
       description: {
         story:
-          "ReadStateReadIcon and ReadStateUnreadIcon communicate whether a member has read a discussion. Use them for read-state commands and navigation. ResolvedIcon communicates that a discussion has reached a conclusion, independently of who has read it or whether an answer has been nominated. ThreadConclusionIcon identifies the particular reply selected as the answer. Use semantic success colour for these positive outcomes. Keep generic check icons for confirmation or selection; do not use them as substitutes for these product states. The containing component owns icon size, colour, and accessible labels.",
+          "ReadStateReadIcon and ReadStateUnreadIcon communicate whether a member has read a discussion. Use them for read-state commands and navigation. ResolvedIcon communicates that a discussion has reached a conclusion, independently of who has read it or whether an answer has been nominated. ThreadConclusionIcon identifies the particular reply selected as the answer. Use status.success.content for these positive outcome icons and accompanying status text. Keep generic check icons for confirmation or selection; do not use them as substitutes for these product states. The containing component owns icon size, colour, and accessible labels.",
       },
     },
   },

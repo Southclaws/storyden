@@ -8,7 +8,7 @@ export const status = {
     },
     content: {
       value: {
-        _osLight: "{colors.tomato.light.12}",
+        _osLight: "{colors.tomato.light.11}",
         _osDark: "{colors.tomato.dark.11}",
       },
     },
@@ -28,7 +28,7 @@ export const status = {
     },
     content: {
       value: {
-        _osLight: "{colors.green.light.12}",
+        _osLight: "{colors.green.light.11}",
         _osDark: "{colors.green.dark.11}",
       },
     },
