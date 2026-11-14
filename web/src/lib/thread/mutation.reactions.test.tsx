@@ -65,17 +65,33 @@ function reaction(id: string): Reaction {
   } as Reaction;
 }
 
-function threadResponse(reactions: Reaction[] = []): ThreadGetResponse {
-  return {
+function threadResponse(
+  reactions: Reaction[] = [],
+  postID = "reply",
+): ThreadGetResponse {
+  const thread = {
     id: "thread",
     slug: "thread",
+    reacts: [] as Reaction[],
     replies: {
-      replies: [{ id: "reply", reacts: reactions } as Reply],
+      replies: [{ id: "reply", reacts: [] as Reaction[] } as Reply],
     },
   } as ThreadGetResponse;
+
+  if (postID === "thread") {
+    thread.reacts = reactions;
+  } else {
+    thread.replies.replies[0]!.reacts = reactions;
+  }
+
+  return thread;
 }
 
-function cachedReactions() {
+function cachedReactions(postID: string) {
+  if (postID === "thread") {
+    return cachedThread!.reacts;
+  }
+
   return cachedThread!.replies.replies[0]!.reacts;
 }
 
@@ -90,23 +106,26 @@ function deferred<T>() {
   return { promise, reject, resolve };
 }
 
-describe("reaction mutations", () => {
+describe.each(["thread", "reply"])("%s reaction mutations", (postID) => {
   beforeEach(() => {
     sessionQuery.account = { id: "current" } as Account;
     api.postReactAdd.mockReset();
     api.postReactRemove.mockReset();
     mutate.mockClear();
-    cachedThread = threadResponse();
+    cachedThread = threadResponse([], postID);
     serverThread = cachedThread;
   });
 
   test("uses the rendered thread before the client cache has data", async () => {
-    const initialThread = threadResponse([
-      {
-        ...reaction("other-reaction"),
-        author: { id: "other" },
-      } as Reaction,
-    ]);
+    const initialThread = threadResponse(
+      [
+        {
+          ...reaction("other-reaction"),
+          author: { id: "other" },
+        } as Reaction,
+      ],
+      postID,
+    );
     const created = reaction("server-reaction");
     const request = deferred<Reaction>();
     api.postReactAdd.mockReturnValue(request.promise);
@@ -117,21 +136,21 @@ describe("reaction mutations", () => {
 
     let operation!: Promise<Reaction | undefined>;
     act(() => {
-      operation = result.current.reactionAdd("reply", "🔥");
+      operation = result.current.reactionAdd(postID, "🔥");
     });
 
     await waitFor(() => {
-      expect(cachedThread?.replies.replies[0]?.reacts).toHaveLength(2);
+      expect(cachedReactions(postID)).toHaveLength(2);
     });
-    expect(cachedReactions()[1]?.author.id).toBe("current");
+    expect(cachedReactions(postID)[1]?.author.id).toBe("current");
 
     await act(async () => {
       request.resolve(created);
       await operation;
     });
 
-    expect(cachedReactions()).toEqual([
-      initialThread.replies.replies[0]!.reacts[0],
+    expect(cachedReactions(postID)).toEqual([
+      { ...reaction("other-reaction"), author: { id: "other" } },
       created,
     ]);
   });
@@ -146,11 +165,11 @@ describe("reaction mutations", () => {
     );
 
     await act(async () => {
-      await result.current.reactionAdd("reply", "🔥");
+      await result.current.reactionAdd(postID, "🔥");
     });
 
-    expect(api.postReactAdd).toHaveBeenCalledWith("reply", { emoji: "🔥" });
-    expect(cachedReactions()).toEqual([created]);
+    expect(api.postReactAdd).toHaveBeenCalledWith(postID, { emoji: "🔥" });
+    expect(cachedReactions(postID)).toEqual([created]);
   });
 
   test("keeps an optimistic add during latency then replaces it with the server reaction", async () => {
@@ -163,11 +182,13 @@ describe("reaction mutations", () => {
 
     let operation!: Promise<Reaction | undefined>;
     act(() => {
-      operation = result.current.reactionAdd("reply", "🔥");
+      operation = result.current.reactionAdd(postID, "🔥");
     });
 
     await waitFor(() => {
-      expect(cachedReactions()[0]!.id).toMatch(/^optimistic_reply_update_/);
+      expect(cachedReactions(postID)[0]!.id).toMatch(
+        /^optimistic_reply_update_/,
+      );
     });
     expect(api.postReactAdd).toHaveBeenCalledOnce();
 
@@ -176,7 +197,7 @@ describe("reaction mutations", () => {
       await operation;
     });
 
-    expect(cachedReactions()).toEqual([created]);
+    expect(cachedReactions(postID)).toEqual([created]);
   });
 
   test("rolls back an optimistic add when the delayed request fails", async () => {
@@ -188,10 +209,10 @@ describe("reaction mutations", () => {
 
     let operation!: Promise<Reaction | undefined>;
     act(() => {
-      operation = result.current.reactionAdd("reply", "🔥");
+      operation = result.current.reactionAdd(postID, "🔥");
     });
     await waitFor(() => {
-      expect(cachedReactions()).toHaveLength(1);
+      expect(cachedReactions(postID)).toHaveLength(1);
     });
 
     await expect(
@@ -200,7 +221,7 @@ describe("reaction mutations", () => {
         await operation;
       }),
     ).rejects.toThrow("network timeout");
-    expect(cachedReactions()).toEqual([]);
+    expect(cachedReactions(postID)).toEqual([]);
   });
 
   test("restores server state when a delayed removal fails", async () => {
@@ -209,7 +230,7 @@ describe("reaction mutations", () => {
       ...reaction("optimistic_reply_update_2"),
       emoji: "👍",
     };
-    cachedThread = threadResponse([existing]);
+    cachedThread = threadResponse([existing], postID);
     serverThread = cachedThread;
     const request = deferred<void>();
     api.postReactRemove.mockReturnValue(request.promise);
@@ -219,13 +240,13 @@ describe("reaction mutations", () => {
 
     let operation!: Promise<void>;
     act(() => {
-      operation = result.current.reactionRemove("reply", existing.id);
+      operation = result.current.reactionRemove(postID, existing.id);
     });
     await waitFor(() => {
-      expect(cachedReactions()).toEqual([]);
+      expect(cachedReactions(postID)).toEqual([]);
     });
 
-    cachedThread = threadResponse([concurrent]);
+    cachedThread = threadResponse([concurrent], postID);
 
     await expect(
       act(async () => {
@@ -233,21 +254,21 @@ describe("reaction mutations", () => {
         await operation;
       }),
     ).rejects.toThrow("network timeout");
-    expect(cachedReactions()).toEqual([existing, concurrent]);
+    expect(cachedReactions(postID)).toEqual([existing, concurrent]);
   });
 
   test("does not send optimistic IDs to the remove endpoint", async () => {
     const optimistic = reaction("optimistic_reply_update_1");
-    cachedThread = threadResponse([optimistic]);
+    cachedThread = threadResponse([optimistic], postID);
     const { result } = renderHook(() =>
       useThreadMutations(cachedThread as Thread),
     );
 
     await act(async () => {
-      await result.current.reactionRemove("reply", optimistic.id);
+      await result.current.reactionRemove(postID, optimistic.id);
     });
 
     expect(api.postReactRemove).not.toHaveBeenCalled();
-    expect(cachedReactions()).toEqual([optimistic]);
+    expect(cachedReactions(postID)).toEqual([optimistic]);
   });
 });

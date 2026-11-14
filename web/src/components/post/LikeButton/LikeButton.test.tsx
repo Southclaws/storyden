@@ -1,11 +1,14 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR, { SWRConfig } from "swr";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getThreadListKey } from "@/api/openapi-client/threads";
+import {
+  getThreadGetKey,
+  getThreadListKey,
+} from "@/api/openapi-client/threads";
 import type {
   Account,
   ThreadListOKResponse,
@@ -27,29 +30,49 @@ const account = { id: "reader" } as Account;
 const thread = {
   id: "harbour",
   title: "Harbour notes",
+  slug: "harbour-notes",
   likes: { likes: 3, liked: false },
 } as ThreadReference;
 let serverPage: ThreadListOKResponse;
 
-function Feed({ signedIn = true }: { signedIn?: boolean }) {
+function Feed({
+  signedIn = true,
+  detail = false,
+}: {
+  signedIn?: boolean;
+  detail?: boolean;
+}) {
   const [initialPage] = useState(serverPage);
   const { data } = useSWR(
     getThreadListKey({ page: "1" }),
     async () => serverPage,
     { fallbackData: initialPage },
   );
+  const { data: detailThread } = useSWR(
+    detail ? getThreadGetKey(thread.slug, { page: "2" }) : null,
+    async () => serverPage.threads[0]!,
+    { fallbackData: initialPage.threads[0]! },
+  );
+
   return (
-    <LikeButton
-      thread={data!.threads[0]!}
-      initialSession={signedIn ? account : undefined}
-      label="Like Harbour notes"
-      showCount
-    />
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        throw new Error("Liking must not submit the thread editor");
+      }}
+    >
+      <LikeButton
+        thread={detail ? detailThread! : data!.threads[0]!}
+        initialSession={signedIn ? account : undefined}
+        label="Like Harbour notes"
+        size={detail ? "large" : "small"}
+      />
+    </form>
   );
 }
 
-function renderFeed(signedIn = true) {
-  return render(<Feed signedIn={signedIn} />, {
+function renderFeed(signedIn = true, detail = false) {
+  return render(<Feed signedIn={signedIn} detail={detail} />, {
     wrapper: ({ children }) => (
       <SWRConfig
         value={{
@@ -65,14 +88,20 @@ function renderFeed(signedIn = true) {
   });
 }
 
-describe("feed likes", () => {
+describe.each([false, true])("likes on thread detail: %s", (detail) => {
   beforeEach(() => {
     serverPage = { threads: [thread] } as ThreadListOKResponse;
   });
 
-  it("reports likes and the sign-in requirement without an unusable guest button", () => {
-    renderFeed(false);
-    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+  it("reports likes and the sign-in requirement for guests", () => {
+    renderFeed(false, detail);
+
+    const button = screen.getByRole("button", { name: "Like Harbour notes" });
+    expect(button).toBeDisabled();
+    expect(button).toHaveAccessibleDescription(
+      "3 likes. Sign in to like discussions.",
+    );
+
     expect(
       screen.getByText(/3 likes\. Sign in to like discussions\./),
     ).toBeInTheDocument();
@@ -88,12 +117,21 @@ describe("feed likes", () => {
     api.remove.mockImplementation(async () => {
       serverPage = { threads: [thread] } as ThreadListOKResponse;
     });
-    renderFeed();
+    renderFeed(true, detail);
     const button = screen.getByRole("button", {
       name: "Like Harbour notes",
       pressed: false,
     });
     expect(button).toHaveAccessibleDescription("3 likes.");
+
+    if (detail) {
+      expect(within(button).getByText("Like")).toBeVisible();
+    } else {
+      expect(within(button).queryByText("Like")).not.toBeInTheDocument();
+    }
+
+    expect(within(button).getByText("3")).toBeVisible();
+
     await user.tab();
     await user.keyboard("{Enter}");
     await waitFor(() => expect(button).toHaveAttribute("aria-pressed", "true"));
@@ -120,7 +158,7 @@ describe("feed likes", () => {
         }),
     );
     const user = userEvent.setup();
-    renderFeed();
+    renderFeed(true, detail);
     const button = screen.getByRole("button", { name: "Like Harbour notes" });
     await user.tab();
     await user.keyboard("{Enter}");

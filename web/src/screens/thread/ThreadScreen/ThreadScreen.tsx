@@ -7,6 +7,7 @@ import { CategoryBadge } from "@/components/category/CategoryBadge";
 import { Byline } from "@/components/content/Byline";
 import { ContentComposerField } from "@/components/content/ContentComposer";
 import { LinkCard } from "@/components/library/links/LinkCard";
+import { LikeButton } from "@/components/post/LikeButton/LikeButton";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { SaveAction } from "@/components/site/Action/Save";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
@@ -14,6 +15,7 @@ import { Unready } from "@/components/site/Unready";
 import { TagBadgeList } from "@/components/tag/TagBadgeList";
 import { Breadcrumbs } from "@/components/thread/Breadcrumbs";
 import { PostReviewBadge } from "@/components/thread/PostReviewBadge";
+import { ThreadReactList } from "@/components/thread/ReactList/ThreadReactList";
 import { ReplyBox } from "@/components/thread/ReplyBox/ReplyBox";
 import { ReplyProvider } from "@/components/thread/ReplyContext";
 import { ReplyList } from "@/components/thread/ReplyList/ReplyList";
@@ -140,22 +142,31 @@ export function ThreadScreen(props: Props) {
                 )}
               </HStack>
 
-              {match(thread.visibility)
-                .with(Visibility.published, () => null)
-                .with(Visibility.review, () => (
-                  <PostReviewBadge
-                    isModerator={isModerator}
-                    postId={thread.id}
-                    onAccept={handlers.handleAcceptThread}
-                    onEditAndAccept={handlers.handleEditAndAccept}
-                    onDelete={handlers.handleConfirmDelete}
-                    isConfirmingDelete={isConfirmingDelete}
-                    onCancelDelete={handlers.handleCancelDelete}
-                  />
-                ))
-                .otherwise(() => (
-                  <VisibilityBadge visibility={thread.visibility} />
-                ))}
+              <HStack>
+                <LikeButton
+                  initialSession={props.initialSession}
+                  thread={thread}
+                  size="large"
+                  label={`Like ${thread.title}`}
+                />
+
+                {match(thread.visibility)
+                  .with(Visibility.published, () => null)
+                  .with(Visibility.review, () => (
+                    <PostReviewBadge
+                      isModerator={isModerator}
+                      postId={thread.id}
+                      onAccept={handlers.handleAcceptThread}
+                      onEditAndAccept={handlers.handleEditAndAccept}
+                      onDelete={handlers.handleConfirmDelete}
+                      isConfirmingDelete={isConfirmingDelete}
+                      onCancelDelete={handlers.handleCancelDelete}
+                    />
+                  ))
+                  .otherwise(() => (
+                    <VisibilityBadge visibility={thread.visibility} />
+                  ))}
+              </HStack>
             </WStack>
             <FormErrorText>{form.formState.errors.root?.message}</FormErrorText>
 
@@ -222,6 +233,13 @@ export function ThreadScreen(props: Props) {
               />
             )}
           </styled.form>
+
+          <ThreadReactList
+            initialSession={props.initialSession}
+            thread={thread}
+            reply={thread}
+            currentPage={thread.replies.current_page}
+          />
 
           <ThreadStats thread={thread} />
 

@@ -151,7 +151,6 @@ export const ThreadReferenceCard = memo(
                 <LikeButton
                   initialSession={session}
                   thread={thread}
-                  showCount
                   label={`Like ${title}`}
                 />
                 {session && (

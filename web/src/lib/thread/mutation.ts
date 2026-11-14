@@ -174,7 +174,7 @@ export function useThreadMutations(
     await postDelete(id);
   };
 
-  const reactionAdd = async (replyID: Identifier, emoji: string) => {
+  const reactionAdd = async (postID: Identifier, emoji: string) => {
     const session = sessionRef.current;
 
     if (!session) {
@@ -187,64 +187,31 @@ export function useThreadMutations(
       author: session,
     } satisfies React;
 
-    const mutator: MutatorCallback<ThreadGetResponse> = (
-      data = initialThread,
-    ) => {
-      if (!data) {
-        return;
-      }
-
-      const newData = {
-        ...data,
-        replies: {
-          ...data.replies,
-          replies: data.replies.replies.map((reply) => {
-            if (reply.id !== replyID) {
-              return reply;
-            }
-
-            return {
-              ...reply,
-              reacts: [...reply.reacts, optimisticReaction],
-            };
-          }),
-        },
-      };
-
-      return newData;
-    };
-
-    await mutate(key, mutator, {
-      revalidate: false,
-    });
+    await mutate(
+      key,
+      (data: ThreadGetResponse | undefined = initialThread) =>
+        updatePostReactions(data, postID, (reacts) => [
+          ...reacts,
+          optimisticReaction,
+        ]),
+      { revalidate: false },
+    );
 
     try {
-      const reaction = await postReactAdd(replyID, { emoji });
+      const reaction = await postReactAdd(postID, { emoji });
 
       await mutate(
         key,
-        (data: ThreadGetResponse | undefined = initialThread) => {
-          if (!data) {
-            return;
-          }
+        (data: ThreadGetResponse | undefined = initialThread) =>
+          updatePostReactions(data, postID, (reacts) =>
+            reacts.map((item) => {
+              if (item.id === optimisticReaction.id) {
+                return reaction;
+              }
 
-          return {
-            ...data,
-            replies: {
-              ...data.replies,
-              replies: data.replies.replies.map((reply) =>
-                reply.id === replyID
-                  ? {
-                      ...reply,
-                      reacts: reply.reacts.map((item) =>
-                        item.id === optimisticReaction.id ? reaction : item,
-                      ),
-                    }
-                  : reply,
-              ),
-            },
-          };
-        },
+              return item;
+            }),
+          ),
         { revalidate: false },
       );
 
@@ -252,28 +219,10 @@ export function useThreadMutations(
     } catch (error) {
       await mutate(
         key,
-        (data: ThreadGetResponse | undefined = initialThread) => {
-          if (!data) {
-            return;
-          }
-
-          return {
-            ...data,
-            replies: {
-              ...data.replies,
-              replies: data.replies.replies.map((reply) =>
-                reply.id === replyID
-                  ? {
-                      ...reply,
-                      reacts: reply.reacts.filter(
-                        (item) => item.id !== optimisticReaction.id,
-                      ),
-                    }
-                  : reply,
-              ),
-            },
-          };
-        },
+        (data: ThreadGetResponse | undefined = initialThread) =>
+          updatePostReactions(data, postID, (reacts) =>
+            reacts.filter((item) => item.id !== optimisticReaction.id),
+          ),
         { revalidate: false },
       );
 
@@ -281,7 +230,7 @@ export function useThreadMutations(
     }
   };
 
-  const reactionRemove = async (replyID: Identifier, reactID: Identifier) => {
+  const reactionRemove = async (postID: Identifier, reactID: Identifier) => {
     if (reactID.startsWith("optimistic")) {
       return;
     }
@@ -295,86 +244,47 @@ export function useThreadMutations(
     let removedReaction: React | undefined;
     let removedIndex = -1;
 
-    const mutator: MutatorCallback<ThreadGetResponse> = (
-      data = initialThread,
-    ) => {
-      if (!data) {
-        return;
-      }
+    await mutate(
+      key,
+      (data: ThreadGetResponse | undefined = initialThread) =>
+        updatePostReactions(data, postID, (reacts) => {
+          const index = reacts.findIndex((reaction) => reaction.id === reactID);
 
-      const newData = {
-        ...data,
-        replies: {
-          ...data.replies,
-          replies: data.replies.replies.map((reply) => {
-            if (reply.id !== replyID) {
-              return reply;
-            }
+          if (index === -1) {
+            return reacts;
+          }
 
-            const index = reply.reacts.findIndex(
-              (reaction) => reaction.id === reactID,
-            );
+          removedReaction = reacts[index];
+          removedIndex = index;
 
-            if (index === -1) {
-              return reply;
-            }
-
-            removedReaction = reply.reacts[index]!;
-            removedIndex = index;
-
-            return {
-              ...reply,
-              reacts: reply.reacts.filter(
-                (reaction) => reaction.id !== reactID,
-              ),
-            };
-          }),
-        },
-      };
-
-      return newData;
-    };
-
-    await mutate(key, mutator, {
-      revalidate: false,
-    });
+          return reacts.filter((reaction) => reaction.id !== reactID);
+        }),
+      { revalidate: false },
+    );
 
     try {
-      await postReactRemove(replyID, reactID);
+      await postReactRemove(postID, reactID);
     } catch (error) {
       const reaction = removedReaction;
+
       if (reaction) {
         await mutate(
           key,
-          (data: ThreadGetResponse | undefined = initialThread) => {
-            if (!data) {
-              return;
-            }
+          (data: ThreadGetResponse | undefined = initialThread) =>
+            updatePostReactions(data, postID, (reacts) => {
+              if (reacts.some((item) => item.id === reaction.id)) {
+                return reacts;
+              }
 
-            return {
-              ...data,
-              replies: {
-                ...data.replies,
-                replies: data.replies.replies.map((reply) => {
-                  if (
-                    reply.id !== replyID ||
-                    reply.reacts.some((item) => item.id === reaction.id)
-                  ) {
-                    return reply;
-                  }
+              const restored = [...reacts];
+              const index = Math.max(
+                0,
+                Math.min(removedIndex, restored.length),
+              );
+              restored.splice(index, 0, reaction);
 
-                  const reacts = [...reply.reacts];
-                  const index = Math.max(
-                    0,
-                    Math.min(removedIndex, reacts.length),
-                  );
-                  reacts.splice(index, 0, reaction);
-
-                  return { ...reply, reacts };
-                }),
-              },
-            };
-          },
+              return restored;
+            }),
           { revalidate: false },
         );
       }
@@ -418,5 +328,33 @@ export function useThreadMutations(
     reactionRemove,
     updateCategory,
     revalidate,
+  };
+}
+
+function updatePostReactions(
+  data: ThreadGetResponse | undefined,
+  postID: Identifier,
+  update: (reacts: React[]) => React[],
+): ThreadGetResponse | undefined {
+  if (!data) {
+    return;
+  }
+
+  if (data.id === postID) {
+    return { ...data, reacts: update(data.reacts) };
+  }
+
+  return {
+    ...data,
+    replies: {
+      ...data.replies,
+      replies: data.replies.replies.map((reply) => {
+        if (reply.id !== postID) {
+          return reply;
+        }
+
+        return { ...reply, reacts: update(reply.reacts) };
+      }),
+    },
   };
 }

@@ -10,7 +10,7 @@ import { groupReactions } from "./ReactList.model";
 export type Props = {
   initialSession?: Account;
   thread: Thread;
-  reply: Reply;
+  reply: Pick<Reply, "id" | "reacts">;
   currentPage?: number;
 };
 

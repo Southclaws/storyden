@@ -1048,7 +1048,7 @@ export const LongContent: Story = {
     docs: {
       description: {
         story:
-          "Every shape at narrow and wide container sizes with unbroken titles, long footer content, long footer controls, and all three together. Titles truncate within their column, leaving the title icon visible. Footer slots move onto another line when needed and wrap unbroken text; consumers can opt into truncation when a single line is required. Fill displays identity in its header because that shape hides the title slot.",
+          "Every shape at narrow and wide container sizes with unbroken titles, long footer content, long footer controls, and all three together. Titles truncate within their column, leaving the title icon visible. Footer slots stay alongside one another; consumers own wrapping or truncation within their content. Fill displays identity in its header because that shape hides the title slot.",
       },
     },
   },

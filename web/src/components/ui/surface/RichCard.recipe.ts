@@ -134,18 +134,12 @@ export const richCard = defineSlotRecipe({
 
     footerContainer: {
       display: "flex",
-      flexWrap: "wrap",
       alignItems: "center",
       justifyContent: "start",
       width: "full",
       minWidth: "0",
       gap: "2",
       marginTop: "2",
-      overflowWrap: "anywhere",
-      "& > *": {
-        minWidth: "0",
-        maxWidth: "full",
-      },
     },
 
     mediaBackdropContainer: {
@@ -310,7 +304,7 @@ export const richCard = defineSlotRecipe({
       },
       row: {
         root: {
-          gridTemplateColumns: `[edge-start] 0.5rem [content-start] minmax(0, 1fr) [content-end] 0.5rem [media-start] minmax(0, 25cqw) [media-end] 0.5rem [edge-end]`,
+          gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [media-start] minmax(0, 25cqw) [media-end] 0.5rem [edge-end]`,
           gridTemplateRows: `[edge-start] 0.5rem [header-start] min-content [header-end] 0 [title-start] min-content [title-end] 0 [content-start] 1fr [content-end] 0 [footer-start] min-content [footer-end] 0.5rem [edge-end]`,
         },
 
@@ -383,10 +377,10 @@ export const richCard = defineSlotRecipe({
       },
       responsive: {
         root: {
-          gridTemplateColumns: `[edge-start] 0.5rem [content-start] minmax(0, 1fr) [content-end] 0.5rem [media-start] minmax(0, 25cqw) [media-end] 0.5rem [edge-end]`,
+          gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [media-start] minmax(0, 25cqw) [media-end] 0.5rem [edge-end]`,
           gridTemplateRows: `[edge-start] 0.5rem [header-start] min-content [header-end] 0 [title-start] min-content [title-end] 0 [content-start] 1fr [content-end] 0 [footer-start] min-content [footer-end] 0.5rem [edge-end]`,
           _containerSmall: {
-            gridTemplateColumns: `[edge-start] 0.5rem [content-start] minmax(0, 1fr) [content-end] 0.5rem [edge-end]`,
+            gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [edge-end]`,
             gridTemplateRows: `[edge-start] 0.5rem [header-start] min-content [header-end] 0 [title-start] min-content [title-end] 0 [content-start] 1fr [content-end] 0 [media-start] auto [media-end] 0 [footer-start] min-content [footer-end] 0.5rem [edge-end]`,
           },
         },
@@ -479,7 +473,7 @@ export const richCard = defineSlotRecipe({
       },
       box: {
         root: {
-          gridTemplateColumns: `[edge-start] 0.5rem [content-start] minmax(0, 1fr) [content-end] 0.5rem [edge-end]`,
+          gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [edge-end]`,
           gridTemplateRows: `[edge-start] 0.5rem min-content min-content auto auto min-content 0.5rem [edge-end]`,
           gridTemplateAreas: `
             ". .       . "
@@ -559,7 +553,7 @@ export const richCard = defineSlotRecipe({
           boxShadow: "none",
           // Keep the frosted lower panel above the image and below its content.
           "--card-backdrop-index": "3",
-          gridTemplateColumns: `[edge-start] 0.5rem [content-start] minmax(0, 1fr) [content-end] 0.5rem [edge-end]`,
+          gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [edge-end]`,
           gridTemplateRows: `[edge-start] 0.5rem [header-start] min-content [header-end] minmax(300px, 1fr) [content-start] min-content [footer-start] min-content [edge-end]`,
         },
 
