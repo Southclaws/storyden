@@ -4,11 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"testing"
+	"time"
 
+	"github.com/Southclaws/opt"
 	sdkmcp "github.com/modelcontextprotocol/go-sdk/mcp"
+	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	robot_tools "github.com/Southclaws/storyden/app/services/semdex/robot/tools"
 	storydenmcp "github.com/Southclaws/storyden/lib/mcp"
 )
@@ -121,4 +127,77 @@ func TestShouldExportToolSkipsExternalMCPTools(t *testing.T) {
 	assert.True(t, shouldExportTool(webFetchTool))
 	assert.False(t, shouldExportTool(externalTool))
 	assert.False(t, shouldExportTool(internalTool))
+}
+
+func TestBindToolEnforcesRequiredPermission(t *testing.T) {
+	member := account.Account{ID: account.AccountID(xid.New()), Handle: "member"}
+	suspended := account.Account{ID: account.AccountID(xid.New()), Handle: "suspended", DeletedAt: opt.New(time.Now())}
+
+	cases := map[string]struct {
+		ctx     context.Context
+		allowed bool
+	}{
+		"member_without_permission":        {session.WithAccountPermissions(t.Context(), member, rbac.NewList(rbac.PermissionCreatePost)), false},
+		"member_with_permission":           {session.WithAccountPermissions(t.Context(), member, rbac.NewList(rbac.PermissionManageSuspensions)), true},
+		"administrator":                    {session.WithAccountPermissions(t.Context(), member, rbac.NewList(rbac.PermissionAdministrator)), true},
+		"suspended_member_with_permission": {session.WithAccountPermissions(t.Context(), suspended, rbac.NewList(rbac.PermissionManageSuspensions)), false},
+		"no_session":                       {t.Context(), false},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			called := false
+			tool := &robot_tools.Tool{
+				Definition: &storydenmcp.ToolDefinition{
+					Name:               "privileged_tool",
+					RequiredPermission: opt.New(rbac.PermissionManageSuspensions),
+				},
+				Handler: func(context.Context, json.RawMessage) (json.RawMessage, error) {
+					called = true
+					return json.RawMessage(`{"ok":true}`), nil
+				},
+			}
+
+			res := callBoundTool(t, tc.ctx, tool)
+			assert.Equal(t, tc.allowed, called)
+			assert.Equal(t, !tc.allowed, res.IsError)
+		})
+	}
+}
+
+func TestBindToolRejectsSuspendedAccountWithoutRequiredPermission(t *testing.T) {
+	suspended := account.Account{ID: account.AccountID(xid.New()), Handle: "suspended", DeletedAt: opt.New(time.Now())}
+	called := false
+	tool := &robot_tools.Tool{
+		Definition: &storydenmcp.ToolDefinition{Name: "open_tool"},
+		Handler: func(context.Context, json.RawMessage) (json.RawMessage, error) {
+			called = true
+			return json.RawMessage(`{"ok":true}`), nil
+		},
+	}
+
+	res := callBoundTool(t, session.WithAccountPermissions(t.Context(), suspended, rbac.NewList(rbac.PermissionCreatePost)), tool)
+	assert.False(t, called)
+	assert.True(t, res.IsError)
+}
+
+func callBoundTool(t *testing.T, ctx context.Context, tool *robot_tools.Tool) *sdkmcp.CallToolResult {
+	t.Helper()
+
+	server := sdkmcp.NewServer(&sdkmcp.Implementation{Name: "test", Version: "v1"}, nil)
+	bindTool(server, tool)
+
+	clientTransport, serverTransport := sdkmcp.NewInMemoryTransports()
+	serverSession, err := server.Connect(ctx, serverTransport, nil)
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = serverSession.Close() })
+
+	client := sdkmcp.NewClient(&sdkmcp.Implementation{Name: "test-client", Version: "v1"}, nil)
+	clientSession, err := client.Connect(t.Context(), clientTransport, nil)
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = clientSession.Close() })
+
+	res, err := clientSession.CallTool(t.Context(), &sdkmcp.CallToolParams{Name: tool.Definition.Name, Arguments: map[string]any{}})
+	require.NoError(t, err)
+	return res
 }
