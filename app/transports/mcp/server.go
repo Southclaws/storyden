@@ -7,9 +7,12 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/ftag"
 	sdkmcp "github.com/modelcontextprotocol/go-sdk/mcp"
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	robot_tools "github.com/Southclaws/storyden/app/services/semdex/robot/tools"
@@ -20,6 +23,7 @@ import (
 	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/httpserver"
+	storydenmcp "github.com/Southclaws/storyden/lib/mcp"
 )
 
 func MountMCP(
@@ -122,6 +126,12 @@ func bindTool(s *sdkmcp.Server, t *robot_tools.Tool) {
 	}, func(ctx context.Context, req *sdkmcp.CallToolRequest) (*sdkmcp.CallToolResult, error) {
 		ctx = robot_tools.ContextWithToolAudience(ctx, robot_tools.ToolAudienceMCP)
 
+		if err := authoriseTool(ctx, def); err != nil {
+			res := &sdkmcp.CallToolResult{}
+			res.SetError(err)
+			return res, nil
+		}
+
 		args := req.Params.Arguments
 		if args == nil {
 			args = json.RawMessage(`{}`)
@@ -147,6 +157,25 @@ func bindTool(s *sdkmcp.Server, t *robot_tools.Tool) {
 			StructuredContent: structured,
 		}, nil
 	})
+}
+
+func authoriseTool(ctx context.Context, def *storydenmcp.ToolDefinition) error {
+	if acc, ok := session.GetOptAccount(ctx).Get(); ok {
+		if err := acc.RejectSuspended(); err != nil {
+			return err
+		}
+	}
+
+	perm, ok := def.RequiredPermission.Get()
+	if !ok {
+		return nil
+	}
+
+	if !session.HasContext(ctx) {
+		return fault.New("tool requires an authenticated session", ftag.With(ftag.Unauthenticated))
+	}
+
+	return session.Authorise(ctx, nil, perm, rbac.PermissionAdministrator)
 }
 
 func shouldExportTool(t *robot_tools.Tool) bool {
@@ -195,7 +224,7 @@ func defaultObjectSchema() json.RawMessage {
 func withStrictAuthMCP(resourceMetadataURL string) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			_, err := session.GetAccountID(r.Context())
+			acc, err := session.GetAccount(r.Context())
 			if err != nil {
 				challenge := "Bearer"
 				if resourceMetadataURL != "" {
@@ -203,6 +232,11 @@ func withStrictAuthMCP(resourceMetadataURL string) func(next http.Handler) http.
 				}
 				w.Header().Set("WWW-Authenticate", challenge)
 				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
+			if acc.IsSuspended() {
+				w.WriteHeader(http.StatusForbidden)
 				return
 			}
 
