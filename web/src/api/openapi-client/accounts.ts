@@ -425,7 +425,10 @@ export const getAccountManageUpdateUrl = (accountId: string) => {
 };
 
 /**
- * Update staff-managed account lifecycle fields.
+ * Update staff-managed account profile and lifecycle fields. Requires
+ * MANAGE_ACCOUNTS. Updating any field on an account that holds
+ * ADMINISTRATOR, or changing an account's admin flag, additionally
+ * requires ADMINISTRATOR.
  */
 export const accountManageUpdate = async (
   accountId: string,
@@ -696,9 +699,11 @@ export const getAccountManageUpdateEmailVerifiedStatusUrl = (
 /**
  * Override the verified status of an email address. This is intended for
  * admin and integration driven account management and is not intended to
- * be used for normal verification flows. Changing the verified status of
- * an email address here will not trigger any verification emails or other
- * side effects, it will simply set the field to the provided value.
+ * be used for normal verification flows. Requires MANAGE_ACCOUNTS. If the
+ * account holds ADMINISTRATOR, the caller must also hold ADMINISTRATOR.
+ * The email address must belong to the specified account. No verification
+ * email is sent. The account's verified status reflects whether it has a
+ * verified email address, unless it has been manually verified.
  */
 export const accountManageUpdateEmailVerifiedStatus = async (
   accountId: string,
@@ -1854,8 +1859,10 @@ export const getAccountAddRoleUrl = (accountHandle: string, roleId: string) => {
 };
 
 /**
- * Adds a role to an account. Members without the MANAGE_ROLES permission
- * cannot use this operation.
+ * Add a role to an account. Requires MANAGE_ROLES. Assigning a role that
+ * grants ADMINISTRATOR additionally requires ADMINISTRATOR. The built-in
+ * admin role cannot be assigned to yourself, and the default member role
+ * cannot be assigned through this operation.
  */
 export const accountAddRole = async (
   accountHandle: string,
@@ -1933,8 +1940,10 @@ export const getAccountRemoveRoleUrl = (
 };
 
 /**
- * Removes a role from an account. Members without the MANAGE_ROLES cannot
- * use this operation. Admins cannot remove the admin role from themselves.
+ * Remove a role from an account. Requires MANAGE_ROLES. Removing a role
+ * that grants ADMINISTRATOR additionally requires ADMINISTRATOR. The
+ * built-in admin role cannot be removed from yourself, and the default
+ * member role cannot be removed.
  */
 export const accountRemoveRole = async (
   accountHandle: string,

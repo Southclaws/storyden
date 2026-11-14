@@ -1196,7 +1196,10 @@ paths:
         "200": { $ref: "#/components/responses/RoleGetOK" }
     patch:
       operationId: RoleUpdate
-      description: Updates a role's attributes.
+      description: |
+        Update a role's attributes. Requires MANAGE_ROLES. Updating a role that
+        already grants ADMINISTRATOR, or granting ADMINISTRATOR to a role,
+        additionally requires ADMINISTRATOR.
       tags: [roles]
       parameters: [{ $ref: "#/components/parameters/RoleIDParam" }]
       requestBody: { $ref: "#/components/requestBodies/RoleUpdate" }
@@ -1207,7 +1210,9 @@ paths:
         "200": { $ref: "#/components/responses/RoleGetOK" }
     delete:
       operationId: RoleDelete
-      description: Deletes a role.
+      description: |
+        Delete a role. Requires MANAGE_ROLES. Deleting a role that grants
+        ADMINISTRATOR additionally requires ADMINISTRATOR.
       tags: [roles]
       parameters: [{ $ref: "#/components/parameters/RoleIDParam" }]
       responses:
@@ -2124,7 +2129,11 @@ paths:
 
     patch:
       operationId: AccountManageUpdate
-      description: Update staff-managed account lifecycle fields.
+      description: |
+        Update staff-managed account profile and lifecycle fields. Requires
+        MANAGE_ACCOUNTS. Updating any field on an account that holds
+        ADMINISTRATOR, or changing an account's admin flag, additionally
+        requires ADMINISTRATOR.
       tags: [accounts]
       parameters: [{ $ref: "#/components/parameters/AccountIDParam" }]
       requestBody: { $ref: "#/components/requestBodies/AccountManageUpdate" }
@@ -2176,9 +2185,11 @@ paths:
       description: |
         Override the verified status of an email address. This is intended for
         admin and integration driven account management and is not intended to
-        be used for normal verification flows. Changing the verified status of
-        an email address here will not trigger any verification emails or other
-        side effects, it will simply set the field to the provided value.
+        be used for normal verification flows. Requires MANAGE_ACCOUNTS. If the
+        account holds ADMINISTRATOR, the caller must also hold ADMINISTRATOR.
+        The email address must belong to the specified account. No verification
+        email is sent. The account's verified status reflects whether it has a
+        verified email address, unless it has been manually verified.
       tags: [accounts]
       parameters:
         - { $ref: "#/components/parameters/AccountIDParam" }
@@ -2389,8 +2400,10 @@ paths:
     put:
       operationId: AccountAddRole
       description: |
-        Adds a role to an account. Members without the MANAGE_ROLES permission
-        cannot use this operation.
+        Add a role to an account. Requires MANAGE_ROLES. Assigning a role that
+        grants ADMINISTRATOR additionally requires ADMINISTRATOR. The built-in
+        admin role cannot be assigned to yourself, and the default member role
+        cannot be assigned through this operation.
       tags: [accounts]
       parameters:
         - $ref: "#/components/parameters/RoleIDParam"
@@ -2403,8 +2416,10 @@ paths:
     delete:
       operationId: AccountRemoveRole
       description: |
-        Removes a role from an account. Members without the MANAGE_ROLES cannot
-        use this operation. Admins cannot remove the admin role from themselves.
+        Remove a role from an account. Requires MANAGE_ROLES. Removing a role
+        that grants ADMINISTRATOR additionally requires ADMINISTRATOR. The
+        built-in admin role cannot be removed from yourself, and the default
+        member role cannot be removed.
       tags: [accounts]
       parameters:
         - $ref: "#/components/parameters/RoleIDParam"

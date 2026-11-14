@@ -330,7 +330,9 @@ export const getRoleUpdateUrl = (roleId: string) => {
 };
 
 /**
- * Updates a role's attributes.
+ * Update a role's attributes. Requires MANAGE_ROLES. Updating a role that
+ * already grants ADMINISTRATOR, or granting ADMINISTRATOR to a role,
+ * additionally requires ADMINISTRATOR.
  */
 export const roleUpdate = async (
   roleId: string,
@@ -405,7 +407,8 @@ export const getRoleDeleteUrl = (roleId: string) => {
 };
 
 /**
- * Deletes a role.
+ * Delete a role. Requires MANAGE_ROLES. Deleting a role that grants
+ * ADMINISTRATOR additionally requires ADMINISTRATOR.
  */
 export const roleDelete = async (
   roleId: string,
