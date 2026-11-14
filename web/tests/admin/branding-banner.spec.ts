@@ -9,6 +9,7 @@ import { randomUUID } from "node:crypto";
 
 import { API_ADDRESS } from "../../src/config";
 import { createAdmin, login } from "../access_key_admin_assignment";
+import { openImageTools } from "../image_cropper";
 import { pinchOut } from "../touch";
 
 function isBannerSave(response: Response) {
@@ -48,6 +49,7 @@ async function openBranding(page: Page) {
   await expect(
     editor.getByRole("group", { name: "Crop area", exact: true }),
   ).toHaveAttribute("aria-disabled", "false");
+  await openImageTools(editor);
   return editor;
 }
 

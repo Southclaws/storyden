@@ -10,6 +10,7 @@ import {
   login,
   withAdminAccessKey,
 } from "../access_key_admin_assignment";
+import { openImageTools } from "../image_cropper";
 import { pinchOut } from "../touch";
 
 test("feed cover restores its source and crop without changing the social preview", async ({
@@ -156,6 +157,10 @@ test("feed cover restores its source and crop without changing the social previe
     await block.getByRole("button", { name: "Image tools" }).hover();
     await expect(
       block.getByRole("button", { name: "Replace image" }),
+    ).toBeHidden();
+    await openImageTools(block);
+    await expect(
+      block.getByRole("button", { name: "Replace image" }),
     ).toBeInViewport({ ratio: 1 });
     await expect(
       block.getByRole("button", { name: "Remove image" }),
@@ -241,6 +246,8 @@ test("feed cover restores its source and crop without changing the social previe
 
     await page.mouse.move(0, 0);
     const imageTools = block.getByRole("button", { name: "Image tools" });
+    await expect(imageTools).toHaveAttribute("aria-expanded", "true");
+    await imageTools.click();
     await expect(imageTools).toHaveAttribute("aria-expanded", "false");
     await expect
       .poll(async () => {
@@ -469,6 +476,7 @@ test("feed cover restores its source and crop without changing the social previe
       name: "Banner image",
       exact: true,
     });
+    await openImageTools(bannerEditor);
     const banner = page.waitForResponse((response) => {
       return (
         new URL(response.url()).pathname === "/api/admin" &&
