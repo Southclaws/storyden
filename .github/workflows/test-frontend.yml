@@ -20,6 +20,10 @@ on:
   pull_request:
     paths-ignore: *ignored_paths
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   frontend-test:
     runs-on: ubuntu-latest

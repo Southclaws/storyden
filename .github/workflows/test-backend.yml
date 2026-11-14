@@ -22,6 +22,10 @@ on:
   pull_request:
     paths-ignore: *ignored_paths
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   backend-test-postgres:
     runs-on: ubuntu-latest
