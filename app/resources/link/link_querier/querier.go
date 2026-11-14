@@ -17,6 +17,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/internal/ent"
 	link_ent "github.com/Southclaws/storyden/internal/ent/link"
+	ent_node "github.com/Southclaws/storyden/internal/ent/node"
+	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 )
 
@@ -125,11 +127,26 @@ func (d *LinkQuerier) Get(ctx context.Context, slug string) (*link.Link, error) 
 		WithPrimaryImage().
 		WithFaviconImage().
 		WithPosts(func(pq *ent.PostQuery) {
+			pq.Where(
+				ent_post.VisibilityEQ(ent_post.VisibilityPublished),
+				ent_post.DeletedAtIsNil(),
+				ent_post.Or(
+					ent_post.RootPostIDIsNil(),
+					ent_post.HasRootWith(
+						ent_post.VisibilityEQ(ent_post.VisibilityPublished),
+						ent_post.DeletedAtIsNil(),
+					),
+				),
+			)
 			pq.WithAuthor()
 			pq.WithCategory()
 			pq.WithRoot()
 		}).
 		WithNodes(func(nq *ent.NodeQuery) {
+			nq.Where(
+				ent_node.VisibilityEQ(ent_node.VisibilityPublished),
+				ent_node.DeletedAtIsNil(),
+			)
 			nq.WithOwner()
 		})
 
