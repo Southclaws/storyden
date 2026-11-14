@@ -92,7 +92,7 @@ export const BuiltInNavigationItemName: Record<
   search: "Search",
   compose: "New thread",
   categories: "Discussion",
-  unread: "Unread",
+  unread: "Catch Up",
   library: "Library",
   robots: "Robots",
   collections: "Collections",

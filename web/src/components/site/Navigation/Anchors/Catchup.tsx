@@ -3,16 +3,16 @@ import type { LinkButtonStyleProps } from "@/components/ui/link-button";
 
 import { Anchor, type AnchorProps } from "./Anchor";
 
-export const UnreadID = "unread";
-export const UnreadRoute = "/unread";
-export const UnreadLabel = "Unread";
+export const CatchupID = "catchup";
+export const CatchupRoute = "/catchup";
+export const CatchupLabel = "Catch Up";
 
-export function UnreadAnchor(props: AnchorProps & LinkButtonStyleProps) {
+export function CatchupAnchor(props: AnchorProps & LinkButtonStyleProps) {
   return (
     <Anchor
-      id={UnreadID}
-      route={UnreadRoute}
-      label={UnreadLabel}
+      id={CatchupID}
+      route={CatchupRoute}
+      label={CatchupLabel}
       icon={<ReadStateUnreadIcon />}
       {...props}
     />

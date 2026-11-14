@@ -1,9 +1,4 @@
-import { useSWRConfig } from "swr";
-
-import {
-  getThreadListKey,
-  threadReadStatusUpdate,
-} from "@/api/openapi-client/threads";
+import { threadReadStatusUpdate } from "@/api/openapi-client/threads";
 import type {
   ThreadGetResponse,
   ThreadReadStatusMutableProps,
@@ -15,7 +10,6 @@ import { useThreadCache } from "./cache";
 export function useThreadReadStatus(
   thread: ThreadReference | ThreadGetResponse,
 ) {
-  const { mutate } = useSWRConfig();
   const { updateCachedThread } = useThreadCache(thread);
 
   async function updateReadStatus(
@@ -23,12 +17,6 @@ export function useThreadReadStatus(
   ) {
     const readStatus = await threadReadStatusUpdate(thread.slug, { status });
     await updateCachedThread({ read_status: readStatus });
-    await mutate(
-      (key) =>
-        Array.isArray(key) &&
-        key[0] === getThreadListKey()[0] &&
-        key[1]?.read_status !== undefined,
-    );
 
     return readStatus;
   }

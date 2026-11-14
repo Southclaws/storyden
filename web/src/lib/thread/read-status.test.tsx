@@ -216,7 +216,7 @@ describe("thread read status", () => {
     expect(result.current.read_status).toEqual(thread.read_status);
   });
 
-  it("refetches filtered membership and totals after an explicit read change", async () => {
+  it("keeps displayed threads and totals after an explicit read change", async () => {
     const key = getThreadListKey({ read_status: "unread", page: "1" });
     const initial: ThreadListOKResponse = {
       threads: [thread],
@@ -231,6 +231,8 @@ describe("thread read status", () => {
       results: 0,
       total_pages: 0,
     });
+    const cache = new Map();
+    cache.set(unstable_serialize(key), { data: initial, _k: key });
     const { result } = renderHook(
       () => {
         const { data } = useSWR<ThreadListOKResponse>(key, fetchList, {
@@ -239,7 +241,7 @@ describe("thread read status", () => {
         });
         return { data, ...useThreadReadStatus(thread) };
       },
-      { wrapper: withCache(new Map()) },
+      { wrapper: withCache(cache) },
     );
     vi.mocked(threadReadStatusUpdate).mockResolvedValueOnce({
       last_read_at: markedAt,
@@ -250,8 +252,12 @@ describe("thread read status", () => {
       await result.current.updateReadStatus("read");
     });
 
-    expect(fetchList).toHaveBeenCalledOnce();
-    expect(result.current.data?.threads).toEqual([]);
-    expect(result.current.data?.total_pages).toBe(0);
+    expect(result.current.data?.threads).toHaveLength(1);
+    expect(result.current.data?.threads[0]?.read_status).toEqual({
+      last_read_at: markedAt,
+      replies_since: 0,
+    });
+    expect(result.current.data?.total_pages).toBe(1);
+    expect(fetchList).not.toHaveBeenCalled();
   });
 });

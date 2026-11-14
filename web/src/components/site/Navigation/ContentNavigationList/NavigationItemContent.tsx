@@ -13,6 +13,7 @@ import {
 import { hasPermission } from "@/utils/permissions";
 
 import { Anchor } from "../Anchors/Anchor";
+import { CatchupAnchor } from "../Anchors/Catchup";
 import { CollectionsAnchor } from "../Anchors/Collections";
 import { ComposeAnchor } from "../Anchors/Compose";
 import { LinksAnchor } from "../Anchors/Link";
@@ -20,7 +21,6 @@ import { MembersAnchor } from "../Anchors/Members";
 import { RobotsAnchor } from "../Anchors/Robots";
 import { RolesAnchor } from "../Anchors/Roles";
 import { SearchAnchor } from "../Anchors/Search";
-import { UnreadAnchor } from "../Anchors/Unread";
 import { LibraryNavigationTree } from "../LibraryNavigationTree/LibraryNavigationTree";
 import { libraryNavigationVisibility } from "../LibraryNavigationTree/LibraryNavigationTree.constants";
 
@@ -51,7 +51,7 @@ export function NavigationItemContent({
         />
       );
     case "unread":
-      return session ? <UnreadAnchor /> : null;
+      return session ? <CatchupAnchor /> : null;
     case "library":
       return (
         <LibraryNavigationTree

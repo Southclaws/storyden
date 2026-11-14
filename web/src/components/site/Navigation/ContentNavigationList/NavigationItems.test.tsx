@@ -77,22 +77,22 @@ it("keeps server-rendered navigation available until the editing controls are re
   ).not.toBeInTheDocument();
 });
 
-it("renders Unread only for signed-in members", () => {
+it("renders Catch Up only for signed-in members", () => {
   const props: Props = {
     navigation: { items: [{ type: "unread" }] },
-    currentPath: "/unread",
+    currentPath: "/catchup",
     isEditing: false,
     robotsEnabled: false,
   };
 
   const view = render(<NavigationItems {...props} />);
-  expect(screen.queryByRole("link", { name: "Unread" })).toBeNull();
+  expect(screen.queryByRole("link", { name: "Catch Up" })).toBeNull();
 
   view.rerender(
     <NavigationItems {...props} session={{ id: "member-id" } as Account} />,
   );
-  expect(screen.getByRole("link", { name: "Unread" })).toHaveAttribute(
+  expect(screen.getByRole("link", { name: "Catch Up" })).toHaveAttribute(
     "href",
-    "/unread",
+    "/catchup",
   );
 });
