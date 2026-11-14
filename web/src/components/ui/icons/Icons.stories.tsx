@@ -18,6 +18,7 @@ import * as BulletIcons from "./Bullet";
 import * as CalendarIcons from "./Calendar";
 import * as CancelIcons from "./Cancel";
 import * as CardIcons from "./Card";
+import * as CatchupIcons from "./Catchup";
 import * as CategoryIcons from "./Category";
 import * as CheckIcons from "./Check";
 import * as CheckCircleIcons from "./CheckCircle";
@@ -106,6 +107,7 @@ const modules = {
   CancelIcons,
   CardIcons,
   CategoryIcons,
+  CatchupIcons,
   CheckIcons,
   CheckCircleIcons,
   ChevronIcons,

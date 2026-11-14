@@ -90,6 +90,7 @@ export const selectBaseStyles = {
     },
     "& :where(svg)": {
       color: "text.muted",
+      flexShrink: "0",
     },
   },
 } as const;
@@ -151,6 +152,12 @@ export const select = defineSlotRecipe({
       fontWeight: "medium",
     },
     trigger: selectBaseStyles.trigger,
+    valueText: {
+      minWidth: "0",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+    },
   },
   defaultVariants: {
     size: "sm",

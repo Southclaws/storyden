@@ -16,6 +16,7 @@ import { hasPermission } from "@/utils/permissions";
 import { useDisclosure } from "@/utils/useDisclosure";
 
 import { AdminMenuItem } from "../Anchors/Admin";
+import { CatchupMenuItem } from "../Anchors/Catchup";
 import { DraftsMenuItem } from "../Anchors/Drafts";
 import { LogoutMenuItem } from "../Anchors/Logout";
 import { ProfileMenuItem } from "../Anchors/Profile";
@@ -89,6 +90,7 @@ export function AccountMenu({ account, size = "md", name = "hidden" }: Props) {
               </Menu.ItemGroup>
 
               <Menu.ItemGroup id="content">
+                <CatchupMenuItem />
                 <DraftsMenuItem />
                 <QueueMenuItem />
                 <ReportsMenuItem />

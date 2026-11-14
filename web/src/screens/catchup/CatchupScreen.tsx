@@ -12,7 +12,7 @@ import { SelectIcon } from "@/components/ui/icons/Select";
 import { PageHeader } from "@/components/ui/page-header";
 import * as Select from "@/components/ui/select";
 import * as Tabs from "@/components/ui/tabs";
-import { HStack, LStack } from "@/styled-system/jsx";
+import { LStack } from "@/styled-system/jsx";
 
 import { type Props, useCatchupScreen } from "./useCatchupScreen";
 
@@ -45,6 +45,8 @@ export function CatchupScreen(props: Props) {
   let emptyMessage = "You're all caught up.";
   if (view === "unresolved") {
     emptyMessage = "There are no unresolved threads.";
+  } else if (view === "unanswered") {
+    emptyMessage = "There are no unanswered threads.";
   }
 
   if (category) {
@@ -75,52 +77,44 @@ export function CatchupScreen(props: Props) {
         value={view}
         onValueChange={({ value }) => handleViewChange(value)}
       >
-        <HStack
-          gap="3"
-          justifyContent="space-between"
-          alignItems={{ base: "stretch", sm: "center" }}
-          flexDirection={{ base: "column", sm: "row" }}
-        >
+        <Tabs.Bar>
           <Tabs.List aria-label="Catch Up views">
             <Tabs.Trigger value="unread">Unread</Tabs.Trigger>
             <Tabs.Trigger value="unresolved">Unresolved</Tabs.Trigger>
+            <Tabs.Trigger value="unanswered">Unanswered</Tabs.Trigger>
             <Tabs.Indicator />
           </Tabs.List>
 
-          <Select.Root
-            collection={collection}
-            value={[category]}
-            size="sm"
-            width={{ base: "full", sm: "56" }}
-            minW="0"
-            onValueChange={({ value }) => handleCategoryChange(value[0] ?? "")}
-          >
-            <Select.Control>
-              <Select.Trigger aria-label="Filter by category">
-                <Select.ValueText
-                  placeholder="All categories"
-                  flex="1"
-                  minW="0"
-                  truncate
-                />
-                <SelectIcon />
-              </Select.Trigger>
-            </Select.Control>
-            <Select.Positioner>
-              <Select.Content>
-                {collection.items.map((item) => (
-                  <Select.Item key={item.value} item={item}>
-                    <Select.ItemText>{item.label}</Select.ItemText>
-                    <Select.ItemIndicator>
-                      <CheckIcon />
-                    </Select.ItemIndicator>
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Positioner>
-            <Select.HiddenSelect />
-          </Select.Root>
-        </HStack>
+          <Tabs.Controls>
+            <Select.Root
+              collection={collection}
+              value={[category]}
+              onValueChange={({ value }) =>
+                handleCategoryChange(value[0] ?? "")
+              }
+            >
+              <Select.Control>
+                <Select.Trigger aria-label="Filter by category">
+                  <Select.ValueText placeholder="All categories" />
+                  <SelectIcon />
+                </Select.Trigger>
+              </Select.Control>
+              <Select.Positioner>
+                <Select.Content>
+                  {collection.items.map((item) => (
+                    <Select.Item key={item.value} item={item}>
+                      <Select.ItemText>{item.label}</Select.ItemText>
+                      <Select.ItemIndicator>
+                        <CheckIcon />
+                      </Select.ItemIndicator>
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Positioner>
+              <Select.HiddenSelect />
+            </Select.Root>
+          </Tabs.Controls>
+        </Tabs.Bar>
 
         <Tabs.Content value={view}>
           <LStack gap="4">

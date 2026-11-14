@@ -12,6 +12,7 @@ import type { CategorySlugListQueryParameter } from "./categorySlugListQueryPara
 import type { PaginationQueryParameter } from "./paginationQueryParameter";
 import type { SearchQueryParameter } from "./searchQueryParameter";
 import type { TagListIDs } from "./tagListIDs";
+import type { ThreadsHasRepliesQueryParameter } from "./threadsHasRepliesQueryParameter";
 import type { ThreadsIgnorePinnedQueryParameter } from "./threadsIgnorePinnedQueryParameter";
 import type { ThreadsLifecycleStateQueryParameter } from "./threadsLifecycleStateQueryParameter";
 import type { ThreadsReadStatusQueryParameter } from "./threadsReadStatusQueryParameter";
@@ -45,6 +46,14 @@ export type ThreadListParams = {
    * of publication visibility and reply permissions. New threads start open.
    */
   lifecycle_state?: ThreadsLifecycleStateQueryParameter;
+  /**
+   * Filter by whether a thread has undeleted replies. Set to false to return
+   * threads with no replies, or true for threads with at least one reply.
+   * Replies anywhere in the thread count, including the author's own replies
+   * and replies not visible to the requesting account. Read status and
+   * resolution do not affect this filter. Omit to include both cases.
+   */
+  has_replies?: ThreadsHasRepliesQueryParameter;
   /** Show only results creeated by this user. */
   author?: AccountHandle;
   /**

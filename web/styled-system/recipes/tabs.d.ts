@@ -11,7 +11,7 @@ export type TabsVariantProps = {
 
 export type TabsVariantMap = RecipeVariantMap<TabsVariant>
 
-export type TabsSlot = "root" | "list" | "trigger" | "content" | "indicator"
+export type TabsSlot = "root" | "list" | "trigger" | "content" | "indicator" | "bar" | "controls"
 
 export type TabsRecipe = ConfigSlotRecipeRuntimeFn<TabsSlot, TabsVariantProps, TabsVariantMap>
 

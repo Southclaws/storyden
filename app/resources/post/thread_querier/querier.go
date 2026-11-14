@@ -191,3 +191,14 @@ func HasLifecycleState(state post.ThreadLifecycleState) Query {
 		q.q.Where(ent_post.LifecycleStateEQ(ent_post.LifecycleState(state.String())))
 	}
 }
+
+func HasReplies(hasReplies bool) Query {
+	return func(q *threadListOptions) {
+		predicate := ent_post.HasPostsWith(ent_post.DeletedAtIsNil())
+		if !hasReplies {
+			predicate = ent_post.Not(predicate)
+		}
+
+		q.q.Where(predicate)
+	}
+}

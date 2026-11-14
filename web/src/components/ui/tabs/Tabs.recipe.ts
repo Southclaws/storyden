@@ -3,12 +3,13 @@ import { defineSlotRecipe } from "@pandacss/dev";
 
 export const tabs = defineSlotRecipe({
   className: "tabs",
-  slots: tabsAnatomy.keys(),
+  slots: [...tabsAnatomy.keys(), "bar", "controls"],
   base: {
     root: {
       colorPalette: "accent",
       display: "flex",
       width: "full",
+      minWidth: "0",
       _horizontal: {
         flexDirection: "column",
       },
@@ -16,11 +17,45 @@ export const tabs = defineSlotRecipe({
         flexDirection: "row",
       },
     },
+    bar: {
+      display: "flex",
+      flexDirection: { base: "column", sm: "row" },
+      alignItems: { base: "stretch", sm: "center" },
+      gap: "3",
+      minWidth: "0",
+      "& > [data-part='list']": {
+        flex: "1",
+        minWidth: "0",
+      },
+    },
+    controls: {
+      display: "flex",
+      alignItems: "center",
+      gap: "2",
+      minWidth: "0",
+      maxWidth: { base: "full", sm: "50%" },
+      flexShrink: "0",
+    },
     list: {
       display: "flex",
       flexShrink: "0",
       _horizontal: {
         flexDirection: "row",
+        minWidth: "0",
+        scrollPaddingInline: "6",
+        "--tabs-fade-start": "0px",
+        "--tabs-fade-end": "0px",
+        maskImage:
+          "linear-gradient(var(--tabs-fade-direction, to right), transparent, black var(--tabs-fade-start), black calc(100% - var(--tabs-fade-end)), transparent)",
+        '&[data-overflow-inline-start="true"]': {
+          "--tabs-fade-start": "var(--spacing-6)",
+        },
+        '&[data-overflow-inline-end="true"]': {
+          "--tabs-fade-end": "var(--spacing-6)",
+        },
+        "&[dir='rtl']": {
+          "--tabs-fade-direction": "to left",
+        },
       },
       _vertical: {
         flexDirection: "column",
@@ -104,6 +139,14 @@ export const tabs = defineSlotRecipe({
         },
       },
       line: {
+        bar: {
+          sm: {
+            boxShadow: "0 -1px 0 0 inset var(--colors-border-default)",
+            "& > [data-part='list']": {
+              boxShadow: "none",
+            },
+          },
+        },
         list: {
           _horizontal: {
             boxShadow: "0 -1px 0 0 inset var(--colors-border-default)",

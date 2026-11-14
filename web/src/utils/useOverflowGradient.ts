@@ -24,14 +24,23 @@ export function useOverflowGradient<T extends HTMLElement>(enabled = true) {
       }
 
       frame = requestAnimationFrame(() => {
-        const remaining =
+        const remainingBlock =
           viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop;
+        const inlineOffset = Math.abs(viewport.scrollLeft);
+        const remainingInline =
+          viewport.scrollWidth - viewport.clientWidth - inlineOffset;
 
         viewport.dataset["overflowBlockStart"] = String(
           viewport.scrollTop > OVERFLOW_THRESHOLD,
         );
         viewport.dataset["overflowBlockEnd"] = String(
-          remaining > OVERFLOW_THRESHOLD,
+          remainingBlock > OVERFLOW_THRESHOLD,
+        );
+        viewport.dataset["overflowInlineStart"] = String(
+          inlineOffset > OVERFLOW_THRESHOLD,
+        );
+        viewport.dataset["overflowInlineEnd"] = String(
+          remainingInline > OVERFLOW_THRESHOLD,
         );
       });
     };
@@ -74,6 +83,8 @@ export function useOverflowGradient<T extends HTMLElement>(enabled = true) {
 
       delete viewport.dataset["overflowBlockEnd"];
       delete viewport.dataset["overflowBlockStart"];
+      delete viewport.dataset["overflowInlineEnd"];
+      delete viewport.dataset["overflowInlineStart"];
     };
   }, [enabled]);
 

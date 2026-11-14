@@ -236,7 +236,7 @@ test("requires sign-in and hides the Catch Up navigation entry for guests", asyn
   );
 });
 
-for (const width of [1280, 390]) {
+for (const width of [1280, 390, 320]) {
   test(`bookmarks and switches category presets with the keyboard at ${width}px`, async ({
     page,
     context,
@@ -316,22 +316,45 @@ for (const width of [1280, 390]) {
       }
       await route.continue();
     });
-    await ssrPage.goto(bookmark);
-    const ssrContent = ssrPage
-      .locator('[data-sd-page="catchup"]:visible')
-      .first();
-    await expect(
-      ssrContent.getByRole("tab", { name: "Unresolved", selected: true }),
-    ).toBeVisible();
-    await expect(
-      ssrContent.getByRole("link", { name: openRead.title, exact: true }),
-    ).toBeVisible();
-    await expect(
-      ssrContent.getByRole("link", { name: resolved.title, exact: true }),
-    ).toHaveCount(0);
-    await expect(
-      ssrContent.getByRole("link", { name: outside.title, exact: true }),
-    ).toHaveCount(0);
+    for (const preset of [
+      {
+        view: "unresolved",
+        label: "Unresolved",
+        included: openRead,
+        excluded: resolved,
+      },
+      {
+        view: "unanswered",
+        label: "Unanswered",
+        included: resolved,
+        excluded: openRead,
+      },
+    ]) {
+      await ssrPage.goto(
+        `/catchup?view=${preset.view}&category=${category.slug}`,
+      );
+      const ssrContent = ssrPage
+        .locator('[data-sd-page="catchup"]:visible')
+        .first();
+      await expect(
+        ssrContent.getByRole("tab", { name: preset.label, selected: true }),
+      ).toBeVisible();
+      await expect(
+        ssrContent.getByRole("link", {
+          name: preset.included.title,
+          exact: true,
+        }),
+      ).toBeVisible();
+      await expect(
+        ssrContent.getByRole("link", {
+          name: preset.excluded.title,
+          exact: true,
+        }),
+      ).toHaveCount(0);
+      await expect(
+        ssrContent.getByRole("link", { name: outside.title, exact: true }),
+      ).toHaveCount(0);
+    }
     await ssrPage.close();
 
     await page.goto(bookmark);
@@ -360,6 +383,28 @@ for (const width of [1280, 390]) {
       content.getByRole("tab", { name: "Unread", selected: true }),
     ).toBeVisible();
     await expect(page).toHaveURL(`/catchup?category=${category.slug}`);
+    const tabs = content.getByRole("tablist", { name: "Catch Up views" });
+    await expect(tabs.getByRole("combobox")).toHaveCount(0);
+    await page.keyboard.press("End");
+    const unanswered = content.getByRole("tab", { name: "Unanswered" });
+    await expect(unanswered).toBeFocused();
+    await expect(
+      content.getByRole("tab", { name: "Unread", selected: true }),
+    ).toBeVisible();
+    await expect
+      .poll(async () => {
+        const listBounds = await tabs.boundingBox();
+        const tabBounds = await unanswered.boundingBox();
+        if (!listBounds || !tabBounds) {
+          return false;
+        }
+
+        return (
+          tabBounds.x >= listBounds.x - 1 &&
+          tabBounds.x + tabBounds.width <= listBounds.x + listBounds.width + 1
+        );
+      })
+      .toBe(true);
     await expect(
       content.getByRole("link", { name: openRead.title, exact: true }),
     ).toHaveCount(0);
@@ -367,15 +412,46 @@ for (const width of [1280, 390]) {
       content.getByRole("link", { name: resolved.title, exact: true }),
     ).toBeVisible();
 
+    const markedRead = await page.request.patch(
+      `${API_ADDRESS}/api/threads/${resolved.slug}/read-status`,
+      { data: { status: "read" } },
+    );
+    expect(markedRead.ok()).toBe(true);
+    await content.getByRole("tab", { name: "Unanswered" }).click();
+    await expect(page).toHaveURL(
+      `/catchup?category=${category.slug}&view=unanswered`,
+    );
+    await expect(
+      content.getByRole("link", { name: resolved.title, exact: true }),
+    ).toBeVisible();
+    await expect(
+      content.getByRole("link", { name: openUnread.title, exact: true }),
+    ).toBeVisible();
+    await expect(
+      content.getByRole("link", { name: openRead.title, exact: true }),
+    ).toHaveCount(0);
+    await page.screenshot({
+      path: testInfo.outputPath("catchup-unanswered.png"),
+      fullPage: true,
+      animations: "disabled",
+    });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+
     await categorySelect.focus();
     await page.keyboard.press("Enter");
     await page
       .getByRole("option", { name: emptyCategory.name, exact: true })
       .click();
-    await expect(page).toHaveURL(`/catchup?category=${emptyCategory.slug}`);
+    await expect(page).toHaveURL(
+      `/catchup?category=${emptyCategory.slug}&view=unanswered`,
+    );
     await expect(
       content.getByText(
-        `There are no unread threads in ${emptyCategory.name}.`,
+        `There are no unanswered threads in ${emptyCategory.name}.`,
         { exact: true },
       ),
     ).toBeVisible();

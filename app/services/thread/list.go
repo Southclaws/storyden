@@ -32,6 +32,7 @@ type Params struct {
 	IgnorePinned   opt.Optional[bool]
 	Unread         opt.Optional[bool]
 	LifecycleState opt.Optional[post.ThreadLifecycleState]
+	HasReplies     opt.Optional[bool]
 }
 
 func (s *service) List(ctx context.Context,
@@ -62,6 +63,7 @@ func (s *service) List(ctx context.Context,
 	}
 
 	opts.LifecycleState.Call(func(value post.ThreadLifecycleState) { q = append(q, thread_querier.HasLifecycleState(value)) })
+	opts.HasReplies.Call(func(value bool) { q = append(q, thread_querier.HasReplies(value)) })
 	opts.Query.Call(func(value string) { q = append(q, thread_querier.HasKeyword(value)) })
 	opts.CreatedBefore.Call(func(value time.Time) { q = append(q, thread_querier.HasCreatedDateBefore(value)) })
 	opts.CreatedSince.Call(func(value time.Time) { q = append(q, thread_querier.HasCreatedDateSince(value)) })

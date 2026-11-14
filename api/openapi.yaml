@@ -2986,6 +2986,7 @@ paths:
         - $ref: "#/components/parameters/ThreadsIgnorePinnedQuery"
         - $ref: "#/components/parameters/ThreadsReadStatusQuery"
         - $ref: "#/components/parameters/ThreadsLifecycleStateQuery"
+        - $ref: "#/components/parameters/ThreadsHasRepliesQuery"
         - name: author
           description: Show only results creeated by this user.
           required: false
@@ -5707,6 +5708,19 @@ components:
       in: query
       required: false
       schema: { $ref: "#/components/schemas/ThreadReadStatusFilter" }
+
+    ThreadsHasRepliesQuery:
+      description: |
+        Filter by whether a thread has undeleted replies. Set to false to return
+        threads with no replies, or true for threads with at least one reply.
+        Replies anywhere in the thread count, including the author's own replies
+        and replies not visible to the requesting account. Read status and
+        resolution do not affect this filter. Omit to include both cases.
+      name: has_replies
+      in: query
+      required: false
+      schema:
+        type: boolean
 
     CategorySlugParam:
       description: Unique category URL slug.

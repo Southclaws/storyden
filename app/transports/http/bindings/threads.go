@@ -263,6 +263,7 @@ func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequ
 	page = max(0, page-1)
 	result, err := i.thread_svc.List(ctx, page, pageSize, thread_service.Params{
 		LifecycleState: lifecycleState,
+		HasReplies:     opt.NewPtr(request.Params.HasReplies),
 		Query:          query,
 		AccountID:      author,
 		Visibility:     visibilities,

@@ -1,6 +1,11 @@
+import { LocaleProvider, createListCollection } from "@ark-ui/react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { LStack } from "@/styled-system/jsx";
+
+import { CheckIcon } from "../icons/Check";
+import { SelectIcon } from "../icons/Select";
+import * as Select from "../select";
 
 import * as Tabs from ".";
 
@@ -11,7 +16,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Use Tabs for a small, stable set of peer views within one product feature, such as Robots and Sessions. Do not use them for large settings hierarchies, cross-page admin navigation, or content whose semantic structure should remain visible without tab state.",
+          "Use Tabs for a small, stable set of peer views within one product feature, such as Robots and Sessions. Use SectionNavigation for routes and hierarchies instead. Do not hide content whose structure should remain visible without tab state. For horizontal tabs with adjacent filters or actions, wrap List and Controls in Bar. Controls stay outside the tablist, stack below it on small screens, and share the line variant's full-width divider. Lists scroll independently and fade only at edges with more tabs; keyboard focus reveals offscreen tabs.",
       },
     },
   },
@@ -85,5 +90,89 @@ export const Variants: Story = {
         defaultValue="overview"
       />
     </LStack>
+  ),
+};
+
+const categories = createListCollection({
+  items: [
+    { label: "All categories", value: "all" },
+    {
+      label: "Community questions and project discussions",
+      value: "community",
+    },
+  ],
+});
+
+function WithControlsExample({
+  manyTabs = false,
+  ...props
+}: Tabs.RootProps & { manyTabs?: boolean }) {
+  const views = manyTabs
+    ? ["Overview", "Activity", "Discussions", "Members", "Events", "Settings"]
+    : ["Unread", "Unresolved", "Unanswered"];
+
+  return (
+    <Tabs.Root {...props} defaultValue={views[0]} orientation="horizontal">
+      <Tabs.Bar>
+        <Tabs.List aria-label="Community views">
+          {views.map((view) => (
+            <Tabs.Trigger key={view} value={view}>
+              {view}
+            </Tabs.Trigger>
+          ))}
+          <Tabs.Indicator />
+        </Tabs.List>
+        <Tabs.Controls>
+          <Select.Root collection={categories} defaultValue={["all"]}>
+            <Select.Control>
+              <Select.Trigger aria-label="Filter by category">
+                <Select.ValueText />
+                <SelectIcon />
+              </Select.Trigger>
+            </Select.Control>
+            <Select.Positioner>
+              <Select.Content>
+                {categories.items.map((item) => (
+                  <Select.Item key={item.value} item={item}>
+                    <Select.ItemText>{item.label}</Select.ItemText>
+                    <Select.ItemIndicator>
+                      <CheckIcon />
+                    </Select.ItemIndicator>
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Positioner>
+            <Select.HiddenSelect />
+          </Select.Root>
+        </Tabs.Controls>
+      </Tabs.Bar>
+      {views.map((view) => (
+        <Tabs.Content key={view} value={view}>
+          {view} discussions for the selected category.
+        </Tabs.Content>
+      ))}
+    </Tabs.Root>
+  );
+}
+
+export const WithControls: Story = {
+  render: (args) => <WithControlsExample {...args} />,
+};
+
+export const Overflow: Story = {
+  render: (args) => (
+    <LStack maxW="lg">
+      <WithControlsExample {...args} manyTabs />
+    </LStack>
+  ),
+};
+
+export const RightToLeftOverflow: Story = {
+  render: (args) => (
+    <LocaleProvider locale="ar">
+      <LStack maxW="lg" dir="rtl">
+        <WithControlsExample {...args} manyTabs />
+      </LStack>
+    </LocaleProvider>
   ),
 };

@@ -51,10 +51,25 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-function Example(props: SelectStoryArgs) {
+function Example({
+  longLabel = false,
+  ...props
+}: SelectStoryArgs & { longLabel?: boolean }) {
+  const options = longLabel
+    ? createListCollection({
+        items: [
+          {
+            label: "Community questions and project discussions",
+            value: "community",
+          },
+        ],
+      })
+    : collection;
+
   return (
     <Select.Root
-      collection={collection}
+      collection={options}
+      defaultValue={longLabel ? ["community"] : undefined}
       maxW="sm"
       size={props.size}
       variant={props.variant}
@@ -68,7 +83,7 @@ function Example(props: SelectStoryArgs) {
       </Select.Control>
       <Select.Positioner>
         <Select.Content>
-          {items.map((item) => (
+          {options.items.map((item) => (
             <Select.Item key={item.value} item={item}>
               <Select.ItemText>{item.label}</Select.ItemText>
               <Select.ItemIndicator>
@@ -94,6 +109,22 @@ export const Variants: Story = {
         <Example key={size} size={size} />
       ))}
       <Example variant="ghost" />
+    </LStack>
+  ),
+};
+
+export const LongLabel: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Long selected labels truncate within the available width while the icon stays visible. The option list retains the full label.",
+      },
+    },
+  },
+  render: (args) => (
+    <LStack maxW="48">
+      <Example {...args} longLabel />
     </LStack>
   ),
 };

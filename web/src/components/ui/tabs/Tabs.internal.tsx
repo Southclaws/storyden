@@ -2,10 +2,12 @@
 
 import type { Assign } from "@ark-ui/react";
 import { Tabs } from "@ark-ui/react/tabs";
+import { forwardRef, useImperativeHandle } from "react";
 
 import { type TabsVariantProps, tabs } from "@/styled-system/recipes";
 import type { ComponentProps, HTMLStyledProps } from "@/styled-system/types";
 import { createStyleContext } from "@/utils/create-style-context";
+import { useOverflowGradient } from "@/utils/useOverflowGradient";
 
 const { withProvider, withContext } = createStyleContext(tabs);
 
@@ -34,10 +36,31 @@ export const Indicator = withContext<
   Assign<HTMLStyledProps<"div">, Tabs.IndicatorBaseProps>
 >(Tabs.Indicator, "indicator");
 
-export const List = withContext<
+export const Bar = withContext<HTMLDivElement, HTMLStyledProps<"div">>(
+  "div",
+  "bar",
+);
+
+export const Controls = withContext<HTMLDivElement, HTMLStyledProps<"div">>(
+  "div",
+  "controls",
+);
+
+const StyledList = withContext<
   HTMLDivElement,
   Assign<HTMLStyledProps<"div">, Tabs.ListBaseProps>
 >(Tabs.List, "list");
+
+export const List = forwardRef<
+  HTMLDivElement,
+  ComponentProps<typeof StyledList>
+>(function List(props, ref) {
+  const viewportRef = useOverflowGradient<HTMLDivElement>();
+
+  useImperativeHandle(ref, () => viewportRef.current!);
+
+  return <StyledList {...props} ref={viewportRef} />;
+});
 
 export const Trigger = withContext<
   HTMLButtonElement,

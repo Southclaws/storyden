@@ -20,6 +20,27 @@ test.beforeEach(async ({ page }) => {
   await page.goto(`/m/${member}`, { waitUntil: "networkidle" });
 });
 
+test("opens Catch Up from the account menu between Invite and Drafts", async ({
+  page,
+}, testInfo) => {
+  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  const menu = page.getByRole("menu");
+  await expect(
+    menu
+      .getByRole("menuitem")
+      .filter({ hasText: /^(Invite|Catch Up|Drafts)$/ }),
+  ).toHaveText(["Invite", "Catch Up", "Drafts"]);
+  await page.screenshot({
+    path: testInfo.outputPath("account-menu-catchup.png"),
+    animations: "disabled",
+  });
+  await menu.getByRole("menuitem", { name: "Catch Up", exact: true }).click();
+  await expect(page).toHaveURL("/catchup");
+  await expect(
+    page.getByRole("heading", { name: "Catch Up", exact: true }),
+  ).toBeVisible();
+});
+
 test("opens a report while its form loads, retains a draft and submits it", async ({
   page,
 }) => {

@@ -86,7 +86,7 @@ export function useCatchupScreen(props: Props) {
   }
 
   function handleViewChange(view: string) {
-    if (view === "unread" || view === "unresolved") {
+    if (view === "unread" || view === "unresolved" || view === "unanswered") {
       void setView(view);
       void setPage(1);
     }

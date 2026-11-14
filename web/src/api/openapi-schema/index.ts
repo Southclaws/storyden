@@ -1037,6 +1037,7 @@ export * from "./threadReadStatusUpdateBody";
 export * from "./threadReadStatusUpdateOKResponse";
 export * from "./threadReference";
 export * from "./threadReferenceProps";
+export * from "./threadsHasRepliesQueryParameter";
 export * from "./threadsIgnorePinnedQueryParameter";
 export * from "./threadsLifecycleStateQueryParameter";
 export * from "./threadsReadStatusQueryParameter";
