@@ -66,6 +66,7 @@ async function chooseBlockMenuItem(page: Page, item: string, value: string) {
   await valueItem.hover();
   await expect(valueItem).toHaveAttribute("data-highlighted", "");
   await page.keyboard.press("Enter");
+  await expect(menuItem).toBeHidden();
 }
 
 async function clickOutsideOpenMenu(page: Page) {
