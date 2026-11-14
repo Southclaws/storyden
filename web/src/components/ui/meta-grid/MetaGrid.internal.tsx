@@ -16,8 +16,8 @@ export function MetaGrid({ children, columns }: MetaGridProps) {
       display="grid"
       gridTemplateColumns={
         columns ?? {
-          base: "1fr",
-          md: "minmax(12rem, 1fr) minmax(12rem, 1fr) minmax(8rem, .7fr)",
+          base: "minmax(0, 1fr)",
+          md: "repeat(auto-fit, minmax(min(100%, 12rem), 1fr))",
         }
       }
       gap={{ base: "2", md: "3" }}

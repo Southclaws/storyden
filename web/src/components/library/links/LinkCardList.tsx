@@ -11,7 +11,7 @@ export function LinkCardRows({ links }: Props) {
   return (
     <CardRows>
       {links.map((l) => (
-        <LinkCard key={l.slug} shape="row" link={l} />
+        <LinkCard key={l.slug} shape="responsive" link={l} />
       ))}
     </CardRows>
   );
@@ -21,7 +21,7 @@ export function LinkCardGrid({ links }: Props) {
   return (
     <CardGrid>
       {links.map((l) => (
-        <LinkCard key={l.slug} shape="row" link={l} />
+        <LinkCard key={l.slug} shape="box" link={l} />
       ))}
     </CardGrid>
   );

@@ -962,6 +962,98 @@ export const ContentStates: Story = {
   },
 };
 
+export const LongContent: Story = {
+  render: () => (
+    <LStack gap="8" w="full">
+      {shapes.map((shape) => (
+        <LStack key={shape} as="section" gap="3" w="full">
+          <SectionHeading>{shape}</SectionHeading>
+          {[320, 640].map((width) => (
+            <LStack key={width} gap="3" w="full" maxW="full">
+              <Text variant="metadata">{width}px container</Text>
+              {[
+                {
+                  name: "Long title",
+                  title: true,
+                  footer: false,
+                  controls: false,
+                },
+                {
+                  name: "Long footer",
+                  title: false,
+                  footer: true,
+                  controls: false,
+                },
+                {
+                  name: "Long footer control",
+                  title: false,
+                  footer: false,
+                  controls: true,
+                },
+                {
+                  name: "Long title and both footer slots",
+                  title: true,
+                  footer: true,
+                  controls: true,
+                },
+              ].map((state) => {
+                const longURL = `https://${"reference".repeat(7)}.${"saved".repeat(12)}.example/${"unbroken-path".repeat(12)}`;
+                let title = "Saved reference";
+                let footer = "Saved yesterday";
+                let controls = "Reference";
+
+                if (state.title) {
+                  title = longURL;
+                }
+
+                if (state.footer) {
+                  footer = longURL;
+                }
+
+                if (state.controls) {
+                  controls = longURL;
+                }
+
+                return (
+                  <LStack
+                    key={state.name}
+                    gap="1"
+                    style={{ width }}
+                    maxW="full"
+                  >
+                    <Text variant="metadata">{state.name}</Text>
+                    <Card
+                      id={`long-content-${shape}-${width}-${state.name}`}
+                      title={title}
+                      url="/l/saved-reference"
+                      shape={shape}
+                      image={previewImage}
+                      titleIcon={<EmptyIcon />}
+                      header={<Text truncate>{title}</Text>}
+                      controls={<Text variant="metadata">{controls}</Text>}
+                      disableAnchors
+                    >
+                      <Text variant="metadata">{footer}</Text>
+                    </Card>
+                  </LStack>
+                );
+              })}
+            </LStack>
+          ))}
+        </LStack>
+      ))}
+    </LStack>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Every shape at narrow and wide container sizes with unbroken titles, long footer content, long footer controls, and all three together. Titles truncate within their column, leaving the title icon visible. Footer slots move onto another line when needed and wrap unbroken text; consumers can opt into truncation when a single line is required. Fill displays identity in its header because that shape hides the title slot.",
+      },
+    },
+  },
+};
+
 export const AccessiblePreview: Story = {
   args: {
     id: "accessible-preview",

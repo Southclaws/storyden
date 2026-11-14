@@ -75,8 +75,12 @@ const single: LinkListResult = {
   total_pages: 1,
 };
 
-function renderView(query = "", page = 1, initialResult = all) {
+function renderView(query = "", page = 1, initialResult = all, view?: string) {
   const searchParams = new URLSearchParams({ q: query, page: page.toString() });
+
+  if (view) {
+    searchParams.set("view", view);
+  }
 
   return render(
     <NuqsTestingAdapter
@@ -125,6 +129,63 @@ describe("Links search and add flow", () => {
     create.mockResolvedValue(link);
   });
 
+  it("defaults to rows and stores grid selection in the URL", async () => {
+    renderView("design", 2);
+    expect(screen.getByRole("radio", { name: "List view" })).toBeChecked();
+
+    await userEvent.click(screen.getByRole("radio", { name: "Grid view" }));
+    await waitFor(() => {
+      const params = onUrlUpdate.mock.lastCall![0].searchParams;
+      expect(params.get("view")).toBe("grid");
+      expect(params.get("q")).toBe("design");
+      expect(params.get("page")).toBe("2");
+    });
+
+    await userEvent.click(screen.getByRole("radio", { name: "List view" }));
+    await waitFor(() => {
+      const params = onUrlUpdate.mock.lastCall![0].searchParams;
+      expect(params.get("view")).toBeNull();
+      expect(params.get("q")).toBe("design");
+      expect(params.get("page")).toBe("2");
+    });
+  });
+
+  it("restores grid from the URL and preserves it through pagination and searching", async () => {
+    renderView("design", 1, all, "grid");
+    expect(screen.getByRole("radio", { name: "Grid view" })).toBeChecked();
+
+    const nextPage = results().getByRole("link", { name: "2" });
+    const nextParams = new URL(
+      nextPage.getAttribute("href")!,
+      "https://storyden.invalid",
+    ).searchParams;
+    expect(nextParams.get("view")).toBe("grid");
+    expect(nextParams.get("q")).toBe("design");
+    fireEvent.click(nextPage);
+    await waitFor(() => expect(list).toHaveBeenCalledWith("design", 2));
+    expect(onUrlUpdate.mock.lastCall![0].searchParams.get("view")).toBe("grid");
+
+    fireEvent.change(input(), { target: { value: "browser" } });
+    await waitFor(() => expect(list).toHaveBeenCalledWith("browser", 1));
+    expect(onUrlUpdate.mock.lastCall![0].searchParams.get("view")).toBe("grid");
+
+    await userEvent.click(screen.getByRole("button", { name: "Clear search" }));
+    await waitFor(() => expect(list).toHaveBeenCalledWith("", 1));
+    expect(onUrlUpdate.mock.lastCall![0].searchParams.toString()).toBe(
+      "view=grid",
+    );
+  });
+
+  it("falls back to rows for an unsupported view", () => {
+    renderView("", 1, all, "unsupported");
+    expect(screen.getByRole("radio", { name: "List view" })).toBeChecked();
+    const pageParams = new URL(
+      results().getByRole("link", { name: "2" }).getAttribute("href")!,
+      "https://storyden.invalid",
+    ).searchParams;
+    expect(pageParams.has("view")).toBe(false);
+  });
+
   it("searches URLs without offering or submitting creation when Use Links is absent", async () => {
     auth.canUseLinks = false;
     list.mockResolvedValue(empty);
@@ -133,9 +194,7 @@ describe("Links search and add flow", () => {
     expect(
       screen.queryByRole("button", { name: "Add link" }),
     ).not.toBeInTheDocument();
-    await userEvent.click(
-      screen.getByRole("button", { name: "Search" }),
-    );
+    await userEvent.click(screen.getByRole("button", { name: "Search" }));
     fireEvent.submit(input().closest("form")!);
 
     expect(create).not.toHaveBeenCalled();
