@@ -59,7 +59,23 @@ export const List = forwardRef<
 
   useImperativeHandle(ref, () => viewportRef.current!);
 
-  return <StyledList {...props} ref={viewportRef} />;
+  return (
+    <StyledList
+      {...props}
+      ref={viewportRef}
+      onFocus={(event) => {
+        props.onFocus?.(event);
+
+        if (event.defaultPrevented) {
+          return;
+        }
+
+        if (event.target.getAttribute("role") === "tab") {
+          event.target.scrollIntoView({ block: "nearest", inline: "nearest" });
+        }
+      }}
+    />
+  );
 });
 
 export const Trigger = withContext<

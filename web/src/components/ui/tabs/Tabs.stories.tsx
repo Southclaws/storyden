@@ -167,6 +167,22 @@ export const Overflow: Story = {
   ),
 };
 
+export const PartialOverflow: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A partly visible tab must scroll fully into view when focused. Use End and Home to check both edges without activating another view.",
+      },
+    },
+  },
+  render: (args) => (
+    <LStack maxW="72">
+      <WithControlsExample {...args} size="sm" activationMode="manual" />
+    </LStack>
+  ),
+};
+
 export const RightToLeftOverflow: Story = {
   render: (args) => (
     <LocaleProvider locale="ar">

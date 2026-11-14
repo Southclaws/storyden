@@ -14,6 +14,10 @@ afterEach(() => {
   cleanup();
 });
 
+if (typeof HTMLElement.prototype.scrollIntoView !== "function") {
+  HTMLElement.prototype.scrollIntoView = () => {};
+}
+
 if (typeof globalThis.ResizeObserver === "undefined") {
   class ResizeObserver {
     observe() {}

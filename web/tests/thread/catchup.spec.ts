@@ -236,7 +236,7 @@ test("requires sign-in and hides the Catch Up navigation entry for guests", asyn
   );
 });
 
-for (const width of [1280, 390, 320]) {
+for (const width of [1280, 390, 320, 300]) {
   test(`bookmarks and switches category presets with the keyboard at ${width}px`, async ({
     page,
     context,
@@ -375,7 +375,11 @@ for (const width of [1280, 390, 320]) {
       content.getByRole("link", { name: openUnread.title, exact: true }),
     ).toBeVisible();
 
-    await content.getByRole("tab", { name: "Unresolved" }).focus();
+    await page.evaluate(() => document.fonts.ready);
+
+    const unresolved = content.getByRole("tab", { name: "Unresolved" });
+    await unresolved.click();
+    await expect(unresolved).toBeFocused();
     await page.keyboard.press("ArrowLeft");
     await expect(content.getByRole("tab", { name: "Unread" })).toBeFocused();
     await page.keyboard.press("Enter");
