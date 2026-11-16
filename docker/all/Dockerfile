@@ -2,7 +2,7 @@
 # BACKEND API LAYER
 #
 
-FROM docker.io/golang:1.27.3-alpine AS api-builder
+FROM docker.io/golang:1.27.4-alpine AS api-builder
 
 WORKDIR /server
 
