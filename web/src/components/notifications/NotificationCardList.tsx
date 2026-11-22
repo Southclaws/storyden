@@ -54,7 +54,12 @@ export function NotificationCardList({ notifications, onMove }: Props) {
 function NotificationSource(props: NotificationItem) {
   if (props.source) {
     return (
-      <MemberBadge profile={props.source} size="sm" name="full-horizontal" />
+      <MemberBadge
+        profile={props.source}
+        size="sm"
+        name="full-horizontal"
+        as="link"
+      />
     );
   }
 

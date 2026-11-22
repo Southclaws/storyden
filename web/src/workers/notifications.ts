@@ -1,9 +1,9 @@
+import { DatagraphItemKind } from "@/api/openapi-schema/datagraphItemKind";
+import { NotificationEvent } from "@/api/openapi-schema/notificationEvent";
+import { NotificationStatus } from "@/api/openapi-schema/notificationStatus";
 import { accountGet } from "@/api/openapi-worker/accounts";
-import { notificationList } from "@/api/openapi-worker/notifications";
-import {
-  formatNotification,
-  formatNotificationFallback,
-} from "@/lib/notification";
+import { formatNotification } from "@/lib/notification";
+import * as z from "@/lib/validation";
 import { decodePublicKey, saveSubscription } from "@/lib/webpush/api";
 import { withPushLock } from "@/lib/webpush/lock";
 import {
@@ -11,6 +11,39 @@ import {
   readPushContext,
   writePushContext,
 } from "@/lib/webpush/storage";
+
+const IdentifierSchema = z.string().check(z.regex(/^[0-9a-v]{20}$/));
+
+// NOTE: Hand built from the notification schema - gotta match the OpenAPI def
+// otherwise it'll break. If that def changes, it has to change here too!
+const PushNotificationPayloadSchema = z.object({
+  account_id: IdentifierSchema,
+  subscription_id: IdentifierSchema,
+  notification: z.object({
+    id: IdentifierSchema,
+    created_at: z.string(),
+    event: z.enum(NotificationEvent),
+    status: z.enum(NotificationStatus),
+    target: z.optional(z.string()),
+    item: z.optional(
+      z.object({
+        id: IdentifierSchema,
+        kind: z.enum(DatagraphItemKind),
+        title: z.string(),
+        slug: z.optional(z.string()),
+      }),
+    ),
+    source: z.optional(
+      z.object({
+        id: IdentifierSchema,
+        handle: z.string(),
+        name: z.string(),
+      }),
+    ),
+  }),
+});
+
+type PushNotificationPayload = z.infer<typeof PushNotificationPayloadSchema>;
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -47,58 +80,30 @@ async function isCurrentAccount(context: PushContext) {
 }
 
 async function receivePush(event: PushEvent) {
-  const id = event.data?.text();
+  let payload: PushNotificationPayload;
+  try {
+    const data: unknown = event.data?.json();
+    const result = PushNotificationPayloadSchema.safeParse(data);
+    if (!result.success) {
+      return;
+    }
 
-  if (!id || !/^[0-9a-v]{20}$/.test(id)) {
+    payload = result.data;
+  } catch (e) {
+    console.warn("push notification payload did not validate", e);
     return;
   }
 
   const context = await readPushContext();
-
-  if (!context?.subscriptionId) {
+  if (
+    context?.accountId !== payload.account_id ||
+    context.subscriptionId !== payload.subscription_id
+  ) {
     return;
   }
 
-  let content = formatNotificationFallback();
-
-  try {
-    if (!(await isCurrentAccount(context))) {
-      return;
-    }
-
-    const response = await notificationList(undefined, {
-      apiAddress: context.apiAddress,
-    });
-
-    if (response.status === 401 || response.status === 403) {
-      return;
-    }
-
-    if (response.status === 200) {
-      const result = response.data;
-      const notification = result.notifications.find(
-        (notification) => notification.id === id,
-      );
-
-      if (!notification) {
-        return;
-      }
-
-      content = formatNotification(notification);
-    } else {
-      console.warn(
-        "[Web Push worker] Notification lookup failed; using generic notification",
-        {
-          status: response.status,
-        },
-      );
-    }
-  } catch (error) {
-    console.warn(
-      "[Web Push worker] Notification lookup failed; using generic notification",
-      error,
-    );
-  }
+  const notification = payload.notification;
+  const content = formatNotification(notification);
 
   const current = await readPushContext();
 
@@ -113,7 +118,7 @@ async function receivePush(event: PushEvent) {
     await self.registration.showNotification(content.title, {
       body: content.body,
       icon: `${context.apiAddress.replace(/\/$/, "")}/api/info/icon/192x192`,
-      tag: `storyden:${context.accountId}:${id}`,
+      tag: `storyden:${context.accountId}:${notification.id}`,
       data: { url: content.url, accountId: context.accountId },
     });
   } catch (error) {

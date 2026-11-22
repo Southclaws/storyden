@@ -14,13 +14,13 @@ import (
 const (
 	recordSize     = 4096
 	headerSize     = 16 + 4 + 1 + 65
-	maxPayloadSize = recordSize - headerSize - 1 - 16
+	MaxPayloadSize = recordSize - headerSize - 1 - 16
 )
 
 var ErrPayloadTooLarge = errors.New("push payload must not exceed 3993 bytes")
 
 func encrypt(subscription Subscription, payload []byte) ([]byte, error) {
-	if len(payload) > maxPayloadSize {
+	if len(payload) > MaxPayloadSize {
 		return nil, ErrPayloadTooLarge
 	}
 

@@ -352,6 +352,8 @@ func Build() fx.Option {
 
 		fx.Provide(newAuthorisation),
 
+		fx.Invoke(subscribeNotificationPush),
+
 		// Provide the Echo router.
 		fx.Provide(newRouter),
 

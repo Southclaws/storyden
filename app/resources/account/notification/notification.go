@@ -6,19 +6,32 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
 type Notification struct {
 	ID     xid.ID
 	Event  Event
-	Item   datagraph.Item
-	Source opt.Optional[profile.Ref]
+	Item   opt.Optional[Item]
+	Source opt.Optional[Source]
 	Time   time.Time
 	Read   bool
 	Target opt.Optional[string]
+}
+
+type Item struct {
+	ID    xid.ID
+	Kind  datagraph.Kind
+	Title string
+	Slug  opt.Optional[string]
+}
+
+type Source struct {
+	ID     account.AccountID
+	Handle string
+	Name   string
 }
 
 type Notifications []*Notification
@@ -31,7 +44,7 @@ type NotificationRef struct {
 	ID      xid.ID
 	Event   Event
 	ItemRef opt.Optional[datagraph.Ref]
-	Source  opt.Optional[profile.Ref]
+	Source  opt.Optional[Source]
 	Time    time.Time
 	Read    bool
 	Target  opt.Optional[string]
@@ -42,16 +55,9 @@ type NotificationRefs []*NotificationRef
 func Map(r *ent.Notification) (*NotificationRef, error) {
 	sourceEdge := opt.NewPtr(r.Edges.Source)
 
-	source, err := opt.MapErr(sourceEdge, func(a ent.Account) (profile.Ref, error) {
-		p, err := profile.MapRef(&a)
-		if err != nil {
-			return profile.Ref{}, err
-		}
-		return *p, err
+	source := opt.Map(sourceEdge, func(a ent.Account) Source {
+		return Source{ID: account.AccountID(a.ID), Handle: a.Handle, Name: a.Name}
 	})
-	if err != nil {
-		return nil, err
-	}
 
 	et, err := NewEvent(r.EventType)
 	if err != nil {

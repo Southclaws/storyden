@@ -11357,10 +11357,33 @@ components:
           format: date-time
           description: The time the resource was created.
         event: { $ref: "#/components/schemas/NotificationEvent" }
-        item: { $ref: "#/components/schemas/DatagraphItem" }
-        source: { $ref: "#/components/schemas/ProfileReference" }
+        item: { $ref: "#/components/schemas/NotificationItemReference" }
+        source: { $ref: "#/components/schemas/NotificationSource" }
         target: { type: string }
         status: { $ref: "#/components/schemas/NotificationStatus" }
+
+    NotificationItemReference:
+      description: A compact reference to the item a notification concerns.
+      type: object
+      required: [id, kind, title]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        kind: { $ref: "#/components/schemas/DatagraphItemKind" }
+        title:
+          type: string
+          description: The item's title or display name.
+        slug:
+          type: string
+          description: The page slug or member handle, when needed for navigation.
+
+    NotificationSource:
+      description: The member who triggered a notification.
+      type: object
+      required: [id, handle, name]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        handle: { $ref: "#/components/schemas/AccountHandle" }
+        name: { $ref: "#/components/schemas/AccountName" }
 
     NotificationMutableProps:
       type: object

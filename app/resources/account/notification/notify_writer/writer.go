@@ -10,7 +10,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 	entaccount "github.com/Southclaws/storyden/internal/ent/account"
@@ -18,12 +17,11 @@ import (
 )
 
 type Writer struct {
-	db          *ent.Client
-	roleQuerier *role_hydrate.Hydrator
+	db *ent.Client
 }
 
-func New(db *ent.Client, roleQuerier *role_hydrate.Hydrator) *Writer {
-	return &Writer{db: db, roleQuerier: roleQuerier}
+func New(db *ent.Client) *Writer {
+	return &Writer{db: db}
 }
 
 func (n *Writer) Notification(ctx context.Context,
@@ -57,16 +55,12 @@ func (n *Writer) Notification(ctx context.Context,
 
 	r, err = n.db.Notification.Query().
 		Where(entnotification.ID(r.ID)).
-		WithSource().
+		WithSource(func(q *ent.AccountQuery) {
+			q.Select(entaccount.FieldID, entaccount.FieldHandle, entaccount.FieldName)
+		}).
 		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if source := r.Edges.Source; source != nil {
-		if err := n.roleQuerier.HydrateRoleEdges(ctx, source); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
 	}
 
 	nr, err := notification.Map(r)
@@ -88,16 +82,12 @@ func (n *Writer) SetRead(ctx context.Context, accountID account.AccountID, id xi
 
 	r, err = n.db.Notification.Query().
 		Where(entnotification.ID(r.ID)).
-		WithSource().
+		WithSource(func(q *ent.AccountQuery) {
+			q.Select(entaccount.FieldID, entaccount.FieldHandle, entaccount.FieldName)
+		}).
 		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if source := r.Edges.Source; source != nil {
-		if err := n.roleQuerier.HydrateRoleEdges(ctx, source); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
 	}
 
 	nr, err := notification.Map(r)
@@ -139,19 +129,11 @@ func (n *Writer) UpdateStatusMany(ctx context.Context, accountID account.Account
 
 	rows, err := tx.Notification.Query().
 		Where(entnotification.IDIn(updatedIDs...)).
-		WithSource().
+		WithSource(func(q *ent.AccountQuery) {
+			q.Select(entaccount.FieldID, entaccount.FieldHandle, entaccount.FieldName)
+		}).
 		All(ctx)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	sources := make([]*ent.Account, 0, len(rows))
-	for _, row := range rows {
-		if source := row.Edges.Source; source != nil {
-			sources = append(sources, source)
-		}
-	}
-	if err := n.roleQuerier.HydrateRoleEdges(ctx, sources...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

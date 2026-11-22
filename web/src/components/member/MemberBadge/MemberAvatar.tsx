@@ -10,19 +10,22 @@ import { css } from "@/styled-system/css";
 import { Box } from "@/styled-system/jsx";
 
 import { MemberAvatarEditable } from "./MemberAvatarEditable";
+import type { MemberIdentity } from "./types";
 
 const avatarStyles = css({
   borderRadius: "full",
 });
 
 export type Props = {
-  profile: ProfileReference;
   size?: "xs" | "sm" | "md" | "lg";
-  editable?: boolean;
   alt?: string;
-};
+} & (
+  | { profile: MemberIdentity; editable?: false }
+  | { profile: ProfileReference; editable: boolean }
+);
 
-export function MemberAvatar({ profile, size, editable, alt }: Props) {
+export function MemberAvatar(props: Props) {
+  const { profile, size, alt } = props;
   const avatarURL = getAvatarURL(
     profile.handle,
     size === "xs" || size === "sm"
@@ -36,7 +39,7 @@ export function MemberAvatar({ profile, size, editable, alt }: Props) {
 
   return (
     <Box position="relative" flexShrink="0">
-      {editable && <MemberAvatarEditable profile={profile} />}
+      {props.editable && <MemberAvatarEditable profile={props.profile} />}
       <Image
         className={avatarStyles}
         src={avatarURL}
