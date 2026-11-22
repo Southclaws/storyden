@@ -7,19 +7,19 @@
  *
  * OpenAPI spec version: v1.26.17-post
  */
-import type { DatagraphItem } from "./datagraphItem";
 import type { Identifier } from "./identifier";
 import type { NotificationEvent } from "./notificationEvent";
+import type { NotificationItemReference } from "./notificationItemReference";
+import type { NotificationSource } from "./notificationSource";
 import type { NotificationStatus } from "./notificationStatus";
-import type { ProfileReference } from "./profileReference";
 
 export interface Notification {
   id: Identifier;
   /** The time the resource was created. */
   created_at: string;
   event: NotificationEvent;
-  item?: DatagraphItem;
-  source?: ProfileReference;
+  item?: NotificationItemReference;
+  source?: NotificationSource;
   target?: string;
   status: NotificationStatus;
 }

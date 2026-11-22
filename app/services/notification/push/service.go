@@ -14,10 +14,11 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_querier"
 	"github.com/Southclaws/storyden/app/resources/account/notification/push_subscription"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/internal/infrastructure/webpush"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
+
+type SendFunc func(ctx context.Context, owner account.AccountID, subscription push_subscription.Subscription, item *notification.Notification) error
 
 type Service struct {
 	repository    *push_subscription.Repository
@@ -28,24 +29,7 @@ type Service struct {
 }
 
 func Build() fx.Option {
-	return fx.Options(
-		fx.Provide(New),
-		fx.Invoke(func(
-			ctx context.Context,
-			lc fx.Lifecycle,
-			bus *pubsub.Bus,
-			service *Service,
-		) {
-			if !service.client.Enabled() {
-				return
-			}
-
-			lc.Append(fx.StartHook(func() error {
-				_, err := pubsub.Subscribe(ctx, bus, "notification.push", service.deliver)
-				return err
-			}))
-		}),
-	)
+	return fx.Provide(New)
 }
 
 func New(
@@ -76,7 +60,7 @@ func (s *Service) Register(
 	return s.repository.Upsert(ctx, owner, input)
 }
 
-func (s *Service) deliver(ctx context.Context, event *rpc.EventNotificationCreated) error {
+func (s *Service) Deliver(ctx context.Context, event *rpc.EventNotificationCreated, send SendFunc) error {
 	settings, err := s.accounts.GetNotificationSettings(ctx, event.AccountID)
 	if err != nil {
 		s.logger.Error("failed to load push preferences",
@@ -90,7 +74,7 @@ func (s *Service) deliver(ctx context.Context, event *rpc.EventNotificationCreat
 		return nil
 	}
 
-	item, err := s.notifications.GetRef(ctx, event.AccountID, event.ID)
+	item, err := s.notifications.Get(ctx, event.AccountID, event.ID)
 	if err != nil {
 		s.logger.Error("failed to load push notification",
 			slog.String("notification_id", event.ID.String()),
@@ -112,10 +96,8 @@ func (s *Service) deliver(ctx context.Context, event *rpc.EventNotificationCreat
 		return nil
 	}
 
-	payload := []byte(event.ID.String())
-
 	for _, subscription := range subscriptions {
-		err := s.client.Send(ctx, subscription.Subscription, payload)
+		err := send(ctx, event.AccountID, subscription, item)
 		if errors.Is(err, webpush.ErrExpired) {
 			err = s.repository.Delete(ctx, event.AccountID, subscription.ID)
 		}

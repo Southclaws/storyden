@@ -1,4 +1,7 @@
-import { DatagraphItem, ProfileReference } from "@/api/openapi-schema";
+import type {
+  NotificationItemReference,
+  NotificationSource,
+} from "@/api/openapi-schema";
 
 export type NotificationItem = {
   id: string;
@@ -8,6 +11,6 @@ export type NotificationItem = {
   body: string;
   url: string;
   isRead: boolean;
-  source?: ProfileReference;
-  item?: DatagraphItem;
+  source?: NotificationSource;
+  item?: NotificationItemReference;
 };

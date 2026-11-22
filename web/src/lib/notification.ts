@@ -1,11 +1,8 @@
 import type { Notification } from "@/api/openapi-schema/notification";
 
-import { getCommonProperties } from "./datagraph/item";
-
 function getNotificationContent(n: Notification) {
-  const p = n.item && getCommonProperties(n.item);
-  const postURL = p?.id
-    ? `/t/locate/${encodeURIComponent(p.id)}`
+  const postURL = n.item?.id
+    ? `/t/locate/${encodeURIComponent(n.item.id)}`
     : "/notifications";
 
   switch (n.event) {
@@ -106,25 +103,33 @@ function getNotificationContent(n: Notification) {
     case "warning_issued":
       return {
         description: "issued you a warning",
-        url: p?.slug ? `/m/${p.slug}` : "/notifications",
+        url: n.item?.slug
+          ? `/m/${encodeURIComponent(n.item.slug)}`
+          : "/notifications",
       };
 
     case "node_version_created":
       return {
         description: "created a draft for your page",
-        url: p?.slug ? `/l/${p.slug}` : "/notifications",
+        url: n.item?.slug
+          ? `/l/${encodeURIComponent(n.item.slug)}`
+          : "/notifications",
       };
 
     case "node_version_applied":
       return {
         description: "applied your draft",
-        url: p?.slug ? `/l/${p.slug}` : "/notifications",
+        url: n.item?.slug
+          ? `/l/${encodeURIComponent(n.item.slug)}`
+          : "/notifications",
       };
 
     case "node_version_deleted":
       return {
         description: "discarded your draft",
-        url: p?.slug ? `/l/${p.slug}` : "/notifications",
+        url: n.item?.slug
+          ? `/l/${encodeURIComponent(n.item.slug)}`
+          : "/notifications",
       };
 
     default:
@@ -137,8 +142,7 @@ function getNotificationContent(n: Notification) {
 
 export function formatNotification(n: Notification) {
   const content = getNotificationContent(n);
-  const properties = n.item && getCommonProperties(n.item);
-  const itemName = n.item?.kind === "profile" ? undefined : properties?.name;
+  const itemName = n.item?.kind === "profile" ? undefined : n.item?.title;
   const body = itemName
     ? `${content.description} "${itemName}"`
     : content.description;

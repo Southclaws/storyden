@@ -59,23 +59,8 @@ describe("shared notification formatting", () => {
         source,
         item: {
           kind: "post",
-          ref: {
-            id: "post-one",
-            createdAt: "2026-11-07T12:00:00Z",
-            updatedAt: "2026-11-07T12:00:00Z",
-            title: "The little harbour is finally playable",
-            description:
-              "I got the boats moving! The lighting still needs work.",
-            slug: "post-one-the-little-harbour-is-finally-playable",
-            author: source,
-            visibility: "published",
-            assets: [],
-            reacts: [],
-            collections: { in_collections: 0, has_collected: false },
-            likes: { likes: 0, liked: false },
-            body: "I got the boats moving! The lighting still needs work.",
-            body_links: [],
-          },
+          id: "post-one",
+          title: "The little harbour is finally playable",
         },
       });
 

@@ -49,7 +49,14 @@ func (h *Notifications) NotificationList(ctx context.Context, request openapi.No
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	list, err := h.notifyReader.ListNotifications(ctx, session)
+	var statuses []bool
+	if request.Params.Status != nil {
+		for _, status := range *request.Params.Status {
+			statuses = append(statuses, deserialiseNotificationStatus(status))
+		}
+	}
+
+	list, err := h.notifyReader.ListNotifications(ctx, session, statuses...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -205,16 +212,31 @@ func (h *Notifications) PushSubscriptionDelete(
 }
 
 func serialiseNotification(in *notification.Notification) openapi.Notification {
-	item := opt.Map(opt.NewSafe(in.Item, in.Item != nil), serialiseDatagraphItem)
-
 	return openapi.Notification{
 		Id:        in.ID.String(),
 		CreatedAt: in.Time,
 		Event:     openapi.NotificationEvent(in.Event.String()),
-		Item:      item.Ptr(),
-		Source:    opt.Map(in.Source, serialiseProfileReference).Ptr(),
+		Item:      opt.Map(in.Item, serialiseNotificationItem).Ptr(),
+		Source:    opt.Map(in.Source, serialiseNotificationSource).Ptr(),
 		Status:    serialiseNotificationStatus(in.Read),
 		Target:    in.Target.Ptr(),
+	}
+}
+
+func serialiseNotificationItem(in notification.Item) openapi.NotificationItemReference {
+	return openapi.NotificationItemReference{
+		Id:    in.ID.String(),
+		Kind:  openapi.DatagraphItemKind(in.Kind.String()),
+		Title: in.Title,
+		Slug:  in.Slug.Ptr(),
+	}
+}
+
+func serialiseNotificationSource(in notification.Source) openapi.NotificationSource {
+	return openapi.NotificationSource{
+		Id:     in.ID.String(),
+		Handle: in.Handle,
+		Name:   in.Name,
 	}
 }
 
@@ -223,7 +245,7 @@ func serialiseNotificationRef(in *notification.NotificationRef) openapi.Notifica
 		Id:        in.ID.String(),
 		CreatedAt: in.Time,
 		Event:     openapi.NotificationEvent(in.Event.String()),
-		Source:    opt.Map(in.Source, serialiseProfileReference).Ptr(),
+		Source:    opt.Map(in.Source, serialiseNotificationSource).Ptr(),
 		Status:    serialiseNotificationStatus(in.Read),
 		Target:    in.Target.Ptr(),
 	}

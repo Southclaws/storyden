@@ -98,9 +98,7 @@ func TestGlobalNotifications(t *testing.T) {
 			found = true
 			r.NotNil(item.Item)
 			r.NotNil(item.Source)
-			post, err := item.Item.AsDatagraphItemPost()
-			r.NoError(err)
-			a.Equal(postID, post.Ref.Id)
+			a.Equal(postID, item.Item.Id)
 			a.Equal(actor.ID.String(), item.Source.Id)
 			a.Equal(openapi.NotificationStatusUnread, item.Status)
 

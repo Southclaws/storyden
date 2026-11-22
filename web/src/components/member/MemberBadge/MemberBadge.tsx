@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { AccountRoleList, ProfileReference } from "@/api/openapi-schema";
+import { ProfileReference } from "@/api/openapi-schema";
 import { WEB_ADDRESS } from "@/config";
 import { css, cx } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
@@ -10,17 +10,19 @@ import { HStack } from "@/styled-system/jsx";
 import { MemberOptionsMenu } from "../MemberOptions/MemberOptionsMenu";
 
 import { MemberIdent } from "./MemberIdent";
+import type { MemberIdentity } from "./types";
 
 export type Props = {
-  profile: ProfileReference;
   size?: "xs" | "sm" | "md" | "lg";
   name?: "hidden" | "handle" | "full-horizontal" | "full-vertical";
   showRoles?: "hidden" | "badge" | "all";
   avatar?: "hidden" | "visible";
 
   // NOTE: If you don't need either of these, just render a <MemberIdent />.
-  as?: "menu" | "link";
-};
+} & (
+  | { profile: ProfileReference; as?: "menu" }
+  | { profile: MemberIdentity; as: "link" }
+);
 
 const identContainerStyles = css({
   maxW: "full",
@@ -29,22 +31,22 @@ const identContainerStyles = css({
   flex: "1",
 });
 
-export function MemberBadge({
-  profile,
-  size = "md",
-  name = "hidden",
-  avatar = "visible",
-  showRoles = "hidden",
-  as = "menu",
-}: Props) {
+export function MemberBadge(props: Props) {
+  const {
+    profile,
+    size = "md",
+    name = "hidden",
+    avatar = "visible",
+    showRoles = "hidden",
+  } = props;
   const permalink = `${WEB_ADDRESS}/m/${profile.handle}`;
 
-  if (as === "menu") {
+  if (props.as !== "link") {
     return (
       <HStack
         className={cx("member-badge__menu-container", identContainerStyles)}
       >
-        <MemberOptionsMenu profile={profile}>
+        <MemberOptionsMenu profile={props.profile}>
           <MemberIdent
             profile={profile}
             size={size}

@@ -11,10 +11,10 @@ vi.mock("@/lib/webpush/storage", () => ({
 }));
 
 const context = {
-  accountId: "account-one",
+  accountId: "d4v1p9b2t53b3lo5e3ca",
   apiAddress: "https://api.example.com",
   publicKey: "AQID",
-  subscriptionId: "subscription-one",
+  subscriptionId: "d4v1p9b2t53b3lo5e3cb",
 };
 
 const id = "d4v1p9b2t53b3lo5e3cg";
@@ -103,8 +103,20 @@ async function dispatch(name: string, data: object) {
   await work;
 }
 
-function receive(payload = id) {
-  return dispatch("push", { data: { text: () => payload } });
+const payload = {
+  account_id: context.accountId,
+  subscription_id: context.subscriptionId,
+  notification: {
+    id,
+    created_at: "2026-11-07T12:00:00Z",
+    event: "trail_run_attention",
+    target: "run one",
+    status: "unread",
+  },
+};
+
+function receive(data: unknown = payload) {
+  return dispatch("push", { data: { json: () => data } });
 }
 
 function respondWithAccount(accountId = context.accountId) {
@@ -112,34 +124,18 @@ function respondWithAccount(accountId = context.accountId) {
 }
 
 describe("push notifications", () => {
-  it("retrieves structured data using cookies and displays shared formatting", async () => {
-    respondWithAccount();
-    fetchRequest.mockResolvedValueOnce(
-      Response.json({
-        notifications: [
-          {
-            id,
-            created_at: "2026-11-07T12:00:00Z",
-            event: "trail_run_attention",
-            target: "run one",
-            status: "unread",
-          },
-        ],
-      }),
+  it("displays structured content without API queries and includes the instance icon", async () => {
+    fetchRequest.mockRejectedValue(
+      new TypeError("Client certificate unavailable"),
     );
 
     await receive();
 
-    const request = fetchRequest.mock.lastCall?.[0] as Request;
-
-    expect(request.url).toBe("https://api.example.com/api/notifications");
-    expect(request.credentials).toBe("include");
-    expect(request.cache).toBe("no-store");
-    expect(request.redirect).toBe("error");
+    expect(fetchRequest).not.toHaveBeenCalled();
     expect(showNotification).toHaveBeenCalledWith("System", {
       body: "A Trail run needs your attention",
       icon: "https://api.example.com/api/info/icon/192x192",
-      tag: `storyden:account-one:${id}`,
+      tag: `storyden:${context.accountId}:${id}`,
       data: {
         url: "/robots/trails?run=run%20one",
         accountId: context.accountId,
@@ -147,15 +143,54 @@ describe("push notifications", () => {
     });
   });
 
-  it.each(["", "../secrets", "<script>", "z".repeat(20), "a".repeat(21)])(
-    "ignores invalid payload %s",
-    async (payload) => {
-      await receive(payload);
+  it("formats the sender and item title from the payload", async () => {
+    await receive({
+      ...payload,
+      notification: {
+        ...payload.notification,
+        event: "thread_reply",
+        source: { id: context.accountId, handle: "odin", name: "Odin" },
+        item: { id, kind: "post", title: "A little harbour" },
+      },
+    });
 
-      expect(fetchRequest).not.toHaveBeenCalled();
-      expect(showNotification).not.toHaveBeenCalled();
+    expect(fetchRequest).not.toHaveBeenCalled();
+    expect(showNotification).toHaveBeenCalledWith(
+      "odin",
+      expect.objectContaining({
+        body: 'replied to your post "A little harbour"',
+        data: { url: `/t/locate/${id}`, accountId: context.accountId },
+      }),
+    );
+  });
+
+  it.each([
+    null,
+    {},
+    id,
+    { ...payload, notification: {} },
+    {
+      ...payload,
+      notification: { ...payload.notification, item: { id, kind: "post" } },
     },
-  );
+  ])("ignores malformed notification data %j", async (data) => {
+    await receive(data);
+
+    expect(fetchRequest).not.toHaveBeenCalled();
+    expect(showNotification).not.toHaveBeenCalled();
+  });
+
+  it("ignores malformed JSON", async () => {
+    await dispatch("push", {
+      data: {
+        json: () => {
+          throw new SyntaxError("Invalid JSON");
+        },
+      },
+    });
+
+    expect(showNotification).not.toHaveBeenCalled();
+  });
 
   it("ignores pushes without local subscription state", async () => {
     readContext.mockResolvedValue(undefined);
@@ -165,54 +200,32 @@ describe("push notifications", () => {
     expect(showNotification).not.toHaveBeenCalled();
   });
 
-  it.each([401, 403])(
-    "suppresses personal content when the session returns %i",
-    async (status) => {
-      fetchRequest.mockResolvedValueOnce(new Response(null, { status }));
-
-      await receive();
-
-      expect(showNotification).not.toHaveBeenCalled();
-    },
-  );
-
   it("ignores notifications for a previous account", async () => {
-    respondWithAccount("another-account");
+    await receive({ ...payload, account_id: "00000000000000000001" });
 
-    await receive();
-
-    expect(fetchRequest).toHaveBeenCalledTimes(1);
+    expect(fetchRequest).not.toHaveBeenCalled();
     expect(showNotification).not.toHaveBeenCalled();
   });
 
-  it("ignores identifiers missing from the authenticated inbox", async () => {
-    respondWithAccount();
-    fetchRequest.mockResolvedValueOnce(Response.json({ notifications: [] }));
-
-    await receive();
+  it("ignores notifications for a replaced subscription", async () => {
+    await receive({ ...payload, subscription_id: "00000000000000000001" });
 
     expect(showNotification).not.toHaveBeenCalled();
   });
 
-  it("uses generic frontend copy when offline", async () => {
-    fetchRequest.mockRejectedValueOnce(new TypeError("Offline"));
-    vi.spyOn(console, "warn").mockImplementation(() => {});
-
-    await receive();
-
-    expect(showNotification).toHaveBeenCalledWith(
-      "System",
-      expect.objectContaining({
-        body: "You have a new notification",
-        data: { url: "/notifications", accountId: context.accountId },
-      }),
-    );
-  });
-
-  it("does not display data after logout during a fetch", async () => {
-    respondWithAccount();
-    fetchRequest.mockResolvedValueOnce(new Response(null, { status: 503 }));
+  it("does not display content after logout while reading local state", async () => {
     readContext.mockResolvedValueOnce(context).mockResolvedValueOnce(undefined);
+
+    await receive();
+
+    expect(showNotification).not.toHaveBeenCalled();
+  });
+
+  it("does not display content after a subscription changes", async () => {
+    readContext.mockResolvedValueOnce(context).mockResolvedValueOnce({
+      ...context,
+      subscriptionId: "00000000000000000001",
+    });
 
     await receive();
 

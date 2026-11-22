@@ -1,12 +1,13 @@
-import { AccountRoleRefList, ProfileReference } from "@/api/openapi-schema";
+import { AccountRoleRefList } from "@/api/openapi-schema";
 import { RoleBadgeList } from "@/components/role/RoleBadge/RoleBadgeList";
 import { parseRoleMetadata } from "@/lib/role/metadata";
 import { Flex, HStack, styled } from "@/styled-system/jsx";
 
 import { MemberAvatar } from "./MemberAvatar";
+import type { MemberIdentity } from "./types";
 
 export type Props = {
-  profile: ProfileReference;
+  profile: MemberIdentity;
   size?: "xs" | "sm" | "md" | "lg";
   name?: "hidden" | "handle" | "full-horizontal" | "full-vertical";
   showRoles?: "hidden" | "badge" | "all";
@@ -46,14 +47,14 @@ export function MemberIdent({
   );
 }
 
-function topRoleForDecoration(roles: AccountRoleRefList) {
-  return roles.find((r) => {
+function topRoleForDecoration(roles: AccountRoleRefList | undefined) {
+  return roles?.find((r) => {
     const metadata = parseRoleMetadata(r.meta);
     return metadata.bold || metadata.italic || metadata.coloured;
   });
 }
 
-function getRoleDecorationStyle(roles: AccountRoleRefList) {
+function getRoleDecorationStyle(roles: AccountRoleRefList | undefined) {
   const role = topRoleForDecoration(roles);
   const metadata = role ? parseRoleMetadata(role.meta) : null;
   const resolvedWeight = metadata?.bold
@@ -258,6 +259,10 @@ function Roles({ profile, showRoles }: Pick<Props, "profile" | "showRoles">) {
   }
 
   if (showRoles === "hidden") {
+    return null;
+  }
+
+  if (!profile.roles) {
     return null;
   }
 

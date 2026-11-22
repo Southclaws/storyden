@@ -137,12 +137,7 @@ func TestNodeVersionProposalLifecycle(t *testing.T) {
 							continue
 						}
 
-						item, itemErr := n.Item.AsDatagraphItemNode()
-						if itemErr != nil {
-							continue
-						}
-
-						if item.Ref.Id == node.JSON200.Id {
+						if n.Item.Id == node.JSON200.Id {
 							applyNotification = n
 							return true
 						}
@@ -152,11 +147,12 @@ func TestNodeVersionProposalLifecycle(t *testing.T) {
 				}, 5*time.Second, 100*time.Millisecond, "expected node version applied notification with node item")
 
 				r.NotNil(applyNotification.Item)
-				notificationItem, err := applyNotification.Item.AsDatagraphItemNode()
-				r.NoError(err)
+				notificationItem := applyNotification.Item
 				a.Equal(openapi.DatagraphItemKindNode, notificationItem.Kind)
-				a.Equal(node.JSON200.Id, notificationItem.Ref.Id)
-				a.Equal(updatedSlug, notificationItem.Ref.Slug)
+				a.Equal(node.JSON200.Id, notificationItem.Id)
+				a.Equal(updatedName, notificationItem.Title)
+				r.NotNil(notificationItem.Slug)
+				a.Equal(updatedSlug, *notificationItem.Slug)
 
 				nodeAfterApply, err := cl.NodeGetWithResponse(root, updatedSlug, &openapi.NodeGetParams{})
 				tests.Ok(t, err, nodeAfterApply)
