@@ -7,7 +7,6 @@ export default function ReactionPicker({
     <EmojiPicker
       onEmojiClick={onEmojiClick}
       emojiStyle={EmojiStyle.NATIVE}
-      searchDisabled
       previewConfig={{ showPreview: false }}
       lazyLoadEmojis
     />
