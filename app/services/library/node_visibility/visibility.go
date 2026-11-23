@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/app/services/library/nodetree"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
@@ -65,6 +66,14 @@ func (m *Controller) ChangeVisibility(ctx context.Context, qk library.QueryKey, 
 		return nil
 	}, rbac.PermissionManageLibrary); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	parent, hasParent := n.Parent.Get()
+	changesVisibility := n.Visibility != vis
+	if hasParent && changesVisibility {
+		if err := nodetree.AuthoriseParent(ctx, &parent, vis); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 	}
 
 	oldVisibility := n.Visibility
