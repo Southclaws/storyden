@@ -54,16 +54,13 @@ func (s *Manager) preMutation(ctx context.Context, p Partial, current opt.Option
 	p.Visibility.Call(func(value visibility.Visibility) { opts = append(opts, node_writer.WithVisibility(value)) })
 	p.HideChildren.Call(func(value bool) { opts = append(opts, node_writer.WithHideChildren(value)) })
 
-	// If the mutation includes a parent node, we need to query it because the
-	// WithParent API only accepts a node ID, not a node mark (slug or ID).
-	if parentSlug, ok := p.Parent.Get(); ok {
-		parent, err := s.nodeQuerier.Get(ctx, parentSlug)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-
-		opts = append(opts, node_writer.WithParent(library.NodeID(parent.Mark.ID())))
+	parent, err := s.prepareParent(ctx, p, current)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+	parent.Call(func(id library.NodeID) {
+		opts = append(opts, node_writer.WithParent(id))
+	})
 
 	// If the mutation includes asset sources (so, URLs to assets to be added)
 	// download them and append them to the node's asset list.

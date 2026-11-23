@@ -3,8 +3,11 @@ title: Node Update
 description: |
   Update a node directly.
 
-  Direct updates are intended for fast edits by members who can manage
-  the target node. If a node has a working draft version, direct updates
+  Requires ownership of the node or Manage Library permission. A new
+  parent must also be owned by the caller, except that unpublished pages
+  may be placed beneath another member's published page.
+
+  If a node has a working draft version, direct updates
   to versioned page fields are rejected until the draft is applied or
   deleted. When a direct update changes versioned page fields and no
   draft exists, the node's `current_version_id` pointer is cleared
@@ -23,8 +26,11 @@ _openapi:
       - content: |
           Update a node directly.
 
-          Direct updates are intended for fast edits by members who can manage
-          the target node. If a node has a working draft version, direct updates
+          Requires ownership of the node or Manage Library permission. A new
+          parent must also be owned by the caller, except that unpublished pages
+          may be placed beneath another member's published page.
+
+          If a node has a working draft version, direct updates
           to versioned page fields are rejected until the draft is applied or
           deleted. When a direct update changes versioned page fields and no
           draft exists, the node's `current_version_id` pointer is cleared

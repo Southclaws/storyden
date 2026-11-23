@@ -67,6 +67,10 @@ export const getNodeCreateUrl = () => {
 
 /**
  * Create a node for curating structured knowledge together.
+ *
+ * The parent must be owned by the caller unless they have Manage Library
+ * permission. Unpublished pages may be created beneath another member's
+ * published page.
  */
 export const nodeCreate = async (
   nodeCreateBody?: NodeCreateBody,
@@ -384,8 +388,11 @@ export const getNodeUpdateUrl = (nodeSlug: string) => {
 /**
  * Update a node directly.
  *
- * Direct updates are intended for fast edits by members who can manage
- * the target node. If a node has a working draft version, direct updates
+ * Requires ownership of the node or Manage Library permission. A new
+ * parent must also be owned by the caller, except that unpublished pages
+ * may be placed beneath another member's published page.
+ *
+ * If a node has a working draft version, direct updates
  * to versioned page fields are rejected until the draft is applied or
  * deleted. When a direct update changes versioned page fields and no
  * draft exists, the node's `current_version_id` pointer is cleared
@@ -496,6 +503,10 @@ export const getNodeDeleteUrl = (
 /**
  * Delete a node and move its direct children to the root, or to the parent
  * specified by `target_node`.
+ *
+ * Requires ownership of the node and its direct children, or Manage
+ * Library permission. When `target_node` is supplied, the caller must also
+ * own the destination or have Manage Library permission.
  */
 export const nodeDelete = async (
   nodeSlug: string,
@@ -1253,6 +1264,10 @@ export const getNodeUpdateVisibilityUrl = (nodeSlug: string) => {
  * Update the visibility of a node. When changed, this may trigger other
  * operations such as notifications/newsletters. Changing the visibility of
  * anything to "published" is often accompanied by some other side effects.
+ *
+ * Requires ownership of the node or Manage Library permission. Publishing
+ * a submission beneath another member's page requires Manage Library
+ * permission.
  */
 export const nodeUpdateVisibility = async (
   nodeSlug: string,
@@ -2268,7 +2283,12 @@ export const getNodeAddNodeUrl = (nodeSlug: string, nodeSlugChild: string) => {
 };
 
 /**
- * Set a node's parent to the specified node
+ * Set a node's parent to the specified node. Requires ownership of the
+ * child or Manage Library permission. The caller must also own the new
+ * parent, except that draft and review submissions may be placed beneath
+ * another member's published page.
+ * Reversing an existing parent-child relationship requires ownership of
+ * both pages or Manage Library permission.
  */
 export const nodeAddNode = async (
   nodeSlug: string,
@@ -2347,6 +2367,7 @@ export const getNodeRemoveNodeUrl = (
 
 /**
  * Remove a node from its parent node and back to the top level.
+ * Requires ownership of the child or Manage Library permission.
  */
 export const nodeRemoveNode = async (
   nodeSlug: string,
@@ -2427,6 +2448,12 @@ export const getNodeUpdatePositionUrl = (nodeSlug: string) => {
  * allows for moving the node's sort position within either its current
  * parent, or when moving it to a new parent. Use this operation for a
  * draggable tree interface or a table interface.
+ *
+ * Requires ownership of the node or Manage Library permission. A new
+ * parent must also be owned by the caller, except that draft and review
+ * submissions may be placed beneath another member's published page.
+ * Reversing an existing parent-child relationship requires ownership of
+ * both pages or Manage Library permission.
  */
 export const nodeUpdatePosition = async (
   nodeSlug: string,

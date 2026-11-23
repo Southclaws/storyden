@@ -5,7 +5,6 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
@@ -14,9 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
-	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
-	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
@@ -66,11 +63,6 @@ func (s *service) Move(ctx context.Context, child library.QueryKey, parent libra
 		return nil, fault.Wrap(ErrIdenticalParentChild, fctx.With(ctx))
 	}
 
-	accountID, err := session.GetAccountID(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	cnode, err := s.nodeQuerier.Get(ctx, child)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -81,19 +73,11 @@ func (s *service) Move(ctx context.Context, child library.QueryKey, parent libra
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := session.Authorise(ctx, func() error {
-		ownsChild := cnode.Owner.ID == accountID
-		ownsParent := pnode.Owner.ID == accountID
-		ownsNeither := !ownsChild && !ownsParent
+	if err := AuthoriseOwner(ctx, cnode); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
-		if ownsNeither {
-			return fault.Wrap(rbac.ErrPermissions,
-				fctx.With(ctx),
-				fmsg.WithDesc("not owner", "You are not the owner of both of the pages being affected and do not have the Manage Library permission."))
-		}
-
-		return nil
-	}, rbac.PermissionManageLibrary); err != nil {
+	if err := AuthoriseParent(ctx, pnode, cnode.Visibility); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -103,19 +87,25 @@ func (s *service) Move(ctx context.Context, child library.QueryKey, parent libra
 		return nil, fault.Wrap(ErrVisibilityRules, fctx.With(ctx))
 	}
 
+	parentParent, hasParent := pnode.Parent.Get()
+	reversesRelationship := hasParent && parentParent.GetID() == cnode.GetID()
+	if reversesRelationship {
+		if err := AuthoriseOwner(ctx, pnode); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+	}
+
 	if err := s.cache.InvalidateBeforeWrite(ctx); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	// If the target parent is actually a child of the target child, sever this
 	// connection before adding the target child to the target parent.
-	if parentParent, ok := pnode.Parent.Get(); ok {
-		if parentParent.Mark.ID() == cnode.Mark.ID() {
-			cnode, err = s.nodeWriter.Update(ctx, library.NewQueryKey(cnode.Mark), node_writer.WithChildNodeRemove(xid.ID(pnode.Mark.ID())))
-			s.cache.InvalidateAfterWrite(ctx)
-			if err != nil {
-				return nil, fault.Wrap(err, fctx.With(ctx))
-			}
+	if reversesRelationship {
+		cnode, err = s.nodeWriter.Update(ctx, library.NewQueryKey(cnode.Mark), node_writer.WithChildNodeRemove(xid.ID(pnode.Mark.ID())))
+		s.cache.InvalidateAfterWrite(ctx)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 	}
 
@@ -138,11 +128,6 @@ func (s *service) Sever(ctx context.Context, child library.QueryKey, parent libr
 		return nil, fault.Wrap(ErrIdenticalParentChild, fctx.With(ctx))
 	}
 
-	accountID, err := session.GetAccountID(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	cnode, err := s.nodeQuerier.Get(ctx, child)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -153,19 +138,7 @@ func (s *service) Sever(ctx context.Context, child library.QueryKey, parent libr
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := session.Authorise(ctx, func() error {
-		ownsChild := cnode.Owner.ID == accountID
-		ownsParent := pnode.Owner.ID == accountID
-		ownsNeither := !ownsChild && !ownsParent
-
-		if ownsNeither {
-			return fault.Wrap(rbac.ErrPermissions,
-				fctx.With(ctx),
-				fmsg.WithDesc("not owner", "You are not the owner of both of the pages being affected and do not have the Manage Library permission."))
-		}
-
-		return nil
-	}, rbac.PermissionManageLibrary); err != nil {
+	if err := AuthoriseOwner(ctx, cnode); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
