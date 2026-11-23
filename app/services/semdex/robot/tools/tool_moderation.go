@@ -14,8 +14,10 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/report"
 	"github.com/Southclaws/storyden/app/services/account/account_suspension"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -28,6 +30,7 @@ type moderationTools struct {
 	memberReportMgr *member_report.Manager
 	reportMgr       *report_manager.Manager
 	suspensions     account_suspension.Service
+	accountQuery    *account_querier.Querier
 }
 
 func newModerationTools(
@@ -35,11 +38,13 @@ func newModerationTools(
 	memberReportMgr *member_report.Manager,
 	reportMgr *report_manager.Manager,
 	suspensions account_suspension.Service,
+	accountQuery *account_querier.Querier,
 ) *moderationTools {
 	t := &moderationTools{
 		memberReportMgr: memberReportMgr,
 		reportMgr:       reportMgr,
 		suspensions:     suspensions,
+		accountQuery:    accountQuery,
 	}
 
 	registry.Register(t.newReportCreateTool())
@@ -217,6 +222,9 @@ func (mt *moderationTools) ExecuteMemberSuspend(ctx context.Context, args mcp.To
 	if account.AccountID(id) == actingAccountID {
 		return nil, fault.Wrap(fault.New("a Robot cannot suspend its own account"), fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
+	if err := mt.authoriseSuspensionTarget(ctx, account.AccountID(id)); err != nil {
+		return nil, err
+	}
 	acc, err := mt.suspensions.Suspend(ctx, account.AccountID(id))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -242,11 +250,31 @@ func (mt *moderationTools) ExecuteMemberReinstate(ctx context.Context, args mcp.
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
+	if err := mt.authoriseSuspensionTarget(ctx, account.AccountID(id)); err != nil {
+		return nil, err
+	}
 	acc, err := mt.suspensions.Reinstate(ctx, account.AccountID(id))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 	return &mcp.ToolMemberReinstateOutput{AccountId: acc.ID.String(), Handle: acc.Handle, Suspended: false}, nil
+}
+
+func (mt *moderationTools) authoriseSuspensionTarget(ctx context.Context, id account.AccountID) error {
+	target, err := mt.accountQuery.GetRefByID(ctx, id)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if !target.Roles.Permissions().HasAny(rbac.PermissionAdministrator) {
+		return nil
+	}
+
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+		return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.PermissionDenied))
+	}
+
+	return nil
 }
 
 func mapModerationReport(rep *report.Report) mcp.ModerationToolReportYaml {

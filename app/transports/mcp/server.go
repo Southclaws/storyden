@@ -7,12 +7,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Southclaws/fault"
-	"github.com/Southclaws/fault/ftag"
 	sdkmcp "github.com/modelcontextprotocol/go-sdk/mcp"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	robot_tools "github.com/Southclaws/storyden/app/services/semdex/robot/tools"
@@ -23,7 +20,6 @@ import (
 	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/httpserver"
-	storydenmcp "github.com/Southclaws/storyden/lib/mcp"
 )
 
 func MountMCP(
@@ -78,9 +74,10 @@ func MountMCP(
 			bindTool(mcpServer, t)
 		}
 
+		// Each call must use the current HTTP request's session permissions.
 		handler := sdkmcp.NewStreamableHTTPHandler(func(r *http.Request) *sdkmcp.Server {
 			return mcpServer
-		}, nil)
+		}, &sdkmcp.StreamableHTTPOptions{Stateless: true})
 
 		resourceMetadataURL := ""
 		if cfg.OAuthEnabled {
@@ -126,7 +123,7 @@ func bindTool(s *sdkmcp.Server, t *robot_tools.Tool) {
 	}, func(ctx context.Context, req *sdkmcp.CallToolRequest) (*sdkmcp.CallToolResult, error) {
 		ctx = robot_tools.ContextWithToolAudience(ctx, robot_tools.ToolAudienceMCP)
 
-		if err := authoriseTool(ctx, def); err != nil {
+		if err := robot_tools.Authorise(ctx, def); err != nil {
 			res := &sdkmcp.CallToolResult{}
 			res.SetError(err)
 			return res, nil
@@ -157,25 +154,6 @@ func bindTool(s *sdkmcp.Server, t *robot_tools.Tool) {
 			StructuredContent: structured,
 		}, nil
 	})
-}
-
-func authoriseTool(ctx context.Context, def *storydenmcp.ToolDefinition) error {
-	if acc, ok := session.GetOptAccount(ctx).Get(); ok {
-		if err := acc.RejectSuspended(); err != nil {
-			return err
-		}
-	}
-
-	perm, ok := def.RequiredPermission.Get()
-	if !ok {
-		return nil
-	}
-
-	if !session.HasContext(ctx) {
-		return fault.New("tool requires an authenticated session", ftag.With(ftag.Unauthenticated))
-	}
-
-	return session.Authorise(ctx, nil, perm, rbac.PermissionAdministrator)
 }
 
 func shouldExportTool(t *robot_tools.Tool) bool {

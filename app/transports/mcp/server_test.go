@@ -13,6 +13,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role"
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	robot_tools "github.com/Southclaws/storyden/app/services/semdex/robot/tools"
@@ -131,6 +133,11 @@ func TestShouldExportToolSkipsExternalMCPTools(t *testing.T) {
 
 func TestBindToolEnforcesRequiredPermission(t *testing.T) {
 	member := account.Account{ID: account.AccountID(xid.New()), Handle: "member"}
+	administrator := account.Account{
+		ID:    account.AccountID(xid.New()),
+		Admin: true,
+		Roles: held.Roles{&held.Role{Role: role.Role{Permissions: rbac.NewList(rbac.PermissionAdministrator)}}},
+	}
 	suspended := account.Account{ID: account.AccountID(xid.New()), Handle: "suspended", DeletedAt: opt.New(time.Now())}
 
 	cases := map[string]struct {
@@ -142,6 +149,10 @@ func TestBindToolEnforcesRequiredPermission(t *testing.T) {
 		"administrator":                    {session.WithAccountPermissions(t.Context(), member, rbac.NewList(rbac.PermissionAdministrator)), true},
 		"suspended_member_with_permission": {session.WithAccountPermissions(t.Context(), suspended, rbac.NewList(rbac.PermissionManageSuspensions)), false},
 		"no_session":                       {t.Context(), false},
+		"restricted_administrator_oauth":   {session.WithOAuthToken(t.Context(), administrator, rbac.NewList(rbac.PermissionReadPublishedThreads), []string{"read"}), false},
+		"restricted_administrator_key":     {session.WithAccessKeyPermissions(t.Context(), administrator, rbac.NewList(rbac.PermissionReadPublishedThreads)), false},
+		"oauth_with_permission":            {session.WithOAuthToken(t.Context(), member, rbac.NewList(rbac.PermissionManageSuspensions), []string{"write"}), true},
+		"access_key_with_permission":       {session.WithAccessKeyPermissions(t.Context(), member, rbac.NewList(rbac.PermissionManageSuspensions)), true},
 	}
 
 	for name, tc := range cases {

@@ -28,7 +28,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/robot/robot_memory"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_ref"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
-	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_history"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry/denbot"
@@ -306,6 +305,19 @@ func (s *Agent) resolveAgentSpec(ctx context.Context, robotRef string) (*resolve
 	return spec, nil
 }
 
+func (s *Agent) checkToolRBAC(ctx agent.Context, tool adktool.Tool, _ map[string]any) (map[string]any, error) {
+	registered, ok := s.toolProvider.FindByADKName(tool.Name())
+	if !ok {
+		return nil, nil
+	}
+
+	if err := tools.Authorise(ctx, registered.Definition); err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
 func (s *Agent) runResolvedAgent(
 	ctx context.Context,
 	spec *resolvedAgentSpec,
@@ -328,21 +340,6 @@ func (s *Agent) runResolvedAgent(
 		if err != nil {
 			return errorSeq(err)
 		}
-	}
-
-	checkToolRBAC := func(ctx agent.Context, tool adktool.Tool, args map[string]any) (map[string]any, error) {
-		t, ok := s.toolProvider.FindByADKName(tool.Name())
-		if !ok {
-			return nil, nil
-		}
-
-		if p, ok := t.Definition.RequiredPermission.Get(); ok {
-			if err := session.Authorise(ctx, nil, p); err != nil {
-				return nil, err
-			}
-		}
-
-		return nil, nil
 	}
 
 	ctx = tools.ContextWithToolAudience(ctx, tools.ToolAudienceRobot)
@@ -395,7 +392,7 @@ func (s *Agent) runResolvedAgent(
 		resolvedToolsets = append(resolvedToolsets, &tools.Toolset{ToolList: []adktool.Tool{finishTool}})
 	}
 
-	beforeToolCallbacks := append([]llmagent.BeforeToolCallback{checkToolRBAC, interceptClientSideTools(s.logger, s.toolProvider, invocationContext, runOptions)}, s.beforeToolCallbacks...)
+	beforeToolCallbacks := append([]llmagent.BeforeToolCallback{s.checkToolRBAC, interceptClientSideTools(s.logger, s.toolProvider, invocationContext, runOptions)}, s.beforeToolCallbacks...)
 	afterModelCallbacks := append([]llmagent.AfterModelCallback{annotateClientToolCalls(runOptions.ClientTools, invocationContext)}, s.afterModelCallbacks...)
 	currentIdentity := robotIdentity{
 		ID:               spec.DatabaseRobotID,
