@@ -24,7 +24,7 @@ import (
 )
 
 var (
-	service   = authentication.ServiceOAuthKeycloak
+	service   = authentication.AuthServiceOAuthKeycloak
 	tokenType = authentication.TokenTypeOAuth
 )
 

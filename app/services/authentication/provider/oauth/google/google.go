@@ -26,7 +26,7 @@ import (
 )
 
 var (
-	service   = authentication.ServiceOAuthGoogle
+	service   = authentication.AuthServiceOAuthGoogle
 	tokenType = authentication.TokenTypeOAuth
 )
 
