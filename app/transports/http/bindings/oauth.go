@@ -812,6 +812,15 @@ func (o OAuth) OAuthUserInfo(ctx context.Context, _ openapi.OAuthUserInfoRequest
 	if err != nil {
 		return openapi.OAuthUserInfo401Response{}, nil
 	}
+
+	// This operation requires no session in the RBAC mapping, so the generic
+	// suspension check in the authorisation validator does not apply here.
+	if a, ok := session.GetOptAccount(ctx).Get(); ok {
+		if err := a.RejectSuspended(); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+	}
+
 	scopes, err := session.GetOAuthScopes(ctx)
 	if err != nil {
 		return nil, err

@@ -187,6 +187,10 @@ func (p *Provider) ResetPassword(ctx context.Context, token string, newpassword 
 			fmsg.WithDesc("no password", "The specified account does not use password authentication. Please try a different method."))
 	}
 
+	if err := auth.Account.RejectSuspended(); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	hashed, err := argon2id.CreateHash(newpassword, argon2id.DefaultParams)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create secure password hash"))
