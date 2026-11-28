@@ -345,6 +345,10 @@ func (s *Service) exchangeDeviceCode(ctx context.Context, input TokenRequest) (*
 		return nil, oauthError("authorization_pending", "User has not yet approved the device authorisation"), nil
 	}
 
+	if _, oauthErr, err := s.grantAccount(ctx, accountID); oauthErr != nil || err != nil {
+		return nil, oauthErr, err
+	}
+
 	consumed, err := s.tokens.ConsumeDeviceAuthorisation(ctx, rec.ID, now)
 	if err != nil {
 		return nil, nil, err

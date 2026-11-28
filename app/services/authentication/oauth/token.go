@@ -89,9 +89,9 @@ func (s *Service) exchangeClientCredentials(ctx context.Context, input TokenRequ
 		return nil, oauthError("unauthorized_client", "Client has no associated account"), nil
 	}
 
-	accountPermissions, err := s.accountPermissions(ctx, accountID)
-	if err != nil {
-		return nil, nil, err
+	accountPermissions, oauthErr, err := s.accountPermissions(ctx, accountID)
+	if oauthErr != nil || err != nil {
+		return nil, oauthErr, err
 	}
 
 	grantedScope, err := grantClientCredentialsScope(input.Scope.OrZero(), cl, accountPermissions)
@@ -148,6 +148,10 @@ func (s *Service) exchangeAuthorizationCode(ctx context.Context, input TokenRequ
 	sumb64 := b64url(sum[:])
 	if sumb64 != rec.CodeChallenge {
 		return nil, oauthError("invalid_grant", "Code verifier does not match the code challenge"), nil
+	}
+
+	if _, oauthErr, err := s.grantAccount(ctx, rec.AccountID); oauthErr != nil || err != nil {
+		return nil, oauthErr, err
 	}
 
 	consumed, err := s.tokens.ConsumeAuthorisationCode(ctx, rec.ID, time.Now())
@@ -208,9 +212,9 @@ func (s *Service) exchangeRefreshToken(ctx context.Context, input TokenRequest) 
 		return nil, oauthError("invalid_grant", "Refresh token is invalid, expired, or revoked"), nil
 	}
 
-	accountPermissions, err := s.accountPermissions(ctx, rec.AccountID)
-	if err != nil {
-		return nil, nil, err
+	accountPermissions, oauthErr, err := s.accountPermissions(ctx, rec.AccountID)
+	if oauthErr != nil || err != nil {
+		return nil, oauthErr, err
 	}
 
 	grantedScope, err := refreshScope(rec.Scope, cl, accountPermissions)
@@ -270,13 +274,29 @@ func (s *Service) revokeRefreshTokenFamily(ctx context.Context, reused *oauthres
 	return nil
 }
 
-func (s *Service) accountPermissions(ctx context.Context, accountID account.AccountID) (rbac.Permissions, error) {
-	acc, err := s.account.GetRefByID(ctx, accountID)
-	if err != nil {
-		return rbac.Permissions{}, err
+func (s *Service) accountPermissions(ctx context.Context, accountID account.AccountID) (rbac.Permissions, *Error, error) {
+	acc, oauthErr, err := s.grantAccount(ctx, accountID)
+	if oauthErr != nil || err != nil {
+		return rbac.Permissions{}, oauthErr, err
 	}
 
-	return acc.Roles.Permissions(), nil
+	return acc.Roles.Permissions(), nil, nil
+}
+
+// grantAccount loads the account that tokens are about to be issued for. Every
+// token exchange must go through this so a suspended account cannot obtain new
+// access tokens, ID tokens or refresh tokens from an existing grant.
+func (s *Service) grantAccount(ctx context.Context, accountID account.AccountID) (*account.Account, *Error, error) {
+	acc, err := s.account.GetRefByID(ctx, accountID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if err := acc.RejectSuspended(); err != nil {
+		return nil, oauthError("invalid_grant", "The account for this grant is suspended"), nil
+	}
+
+	return acc, nil, nil
 }
 
 func (s *Service) authenticateConfidentialClient(ctx context.Context, client *oauthresource.Client, input TokenRequest) (*Error, error) {
